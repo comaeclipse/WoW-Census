@@ -679,14 +679,14 @@ async function popPage(url, env) {
   const races = perDay ? uniq.races : p.races;
   const sightings = perDay ? uniq.sightings : p.observed;
   // Link back to this realm's market screener. Retail market lives under the
-  // faction-agnostic key, so fall back to the stripped realm if the exact key
-  // has no items. If neither has items, go home.
-  let marketGame = game;
-  let hasItems = await env.DB.prepare("SELECT 1 FROM items WHERE game=? LIMIT 1").bind(game).first();
-  if (!hasItems) {
-    const alt = "realm:" + stripFaction(realm);
-    if (alt !== game && await env.DB.prepare("SELECT 1 FROM items WHERE game=? LIMIT 1").bind(alt).first()) {
-      marketGame = alt; hasItems = true;
+  // faction-agnostic key, so always target the faction-stripped realm; fall back
+  // to the exact per-faction key only for datasets that store per-faction items.
+  // If neither has items, go home.
+  let marketGame = "realm:" + stripFaction(realm);
+  let hasItems = await env.DB.prepare("SELECT 1 FROM items WHERE game=? LIMIT 1").bind(marketGame).first();
+  if (!hasItems && marketGame !== game) {
+    if (await env.DB.prepare("SELECT 1 FROM items WHERE game=? LIMIT 1").bind(game).first()) {
+      marketGame = game; hasItems = true;
     }
   }
   const backHref = hasItems ? gameHref("/?game=", marketGame) : "/";
