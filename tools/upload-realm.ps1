@@ -80,8 +80,9 @@ if ($obj.type -ne "ml-realm-v1") {
 # compact export string is still from the previous UI session. Rebuild directly
 # from the authoritative realm tables so a stale/empty cache can never wipe the
 # cloud dataset. The helper is dependency-free and emits the same ml-realm-v1
-# shape as the addon.
-if ($Flavor -eq "retail") {
+# shape as the addon. A -Realm target also uses this path so it can pull any
+# faction bucket, not just whichever character is the active export.
+if ($Flavor -eq "retail" -or $Realm) {
     $helper = Join-Path $scriptDir "export-realm-from-savedvariables.js"
     $node = Get-Command node -ErrorAction SilentlyContinue
     if ($node -and (Test-Path $helper)) {
