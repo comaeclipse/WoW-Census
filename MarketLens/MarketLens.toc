@@ -1,6 +1,6 @@
 ## Interface: 120100, 120007, 50504, 38000, 20506, 11508, 11509
 ## Title: MarketLens
-## Notes: Auction House market and profession analytics for TBC Classic
+## Notes: Auction House market + population analytics for Classic Era, Anniversary/TBC, and Retail
 ## Author: skarz
 ## Version: 0.1.0
 ## SavedVariables: MarketLensDB
