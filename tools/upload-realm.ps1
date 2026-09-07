@@ -15,7 +15,11 @@ param(
     [string]$Flavor = "classic",
     [string]$Region,
     [string]$Url    = "https://marketlens.skarz.workers.dev",
-    [string]$Wow
+    [string]$Wow,
+    # Retail only: upload a specific "Realm-Faction" bucket instead of the active
+    # export. Both factions' data live in the account-wide save, so this uploads
+    # either side without swapping characters and reloading. e.g. Nesingwary-Alliance
+    [string]$Realm
 )
 
 $ErrorActionPreference = "Stop"
@@ -81,7 +85,9 @@ if ($Flavor -eq "retail") {
     $helper = Join-Path $scriptDir "export-realm-from-savedvariables.js"
     $node = Get-Command node -ErrorAction SilentlyContinue
     if ($node -and (Test-Path $helper)) {
-        $rebuilt = & $node.Source $helper $file.FullName
+        $mktArgs = @($helper, $file.FullName)
+        if ($Realm) { $mktArgs += "--realm=$Realm" }
+        $rebuilt = & $node.Source @mktArgs
         if ($LASTEXITCODE -ne 0 -or -not $rebuilt) {
             Write-Host "Couldn't rebuild the Retail realm export from SavedVariables." -ForegroundColor Red
             exit 1
@@ -122,7 +128,9 @@ if ($content -match '\["popExport"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
     $helper = Join-Path $scriptDir "export-realm-from-savedvariables.js"
     $node = Get-Command node -ErrorAction SilentlyContinue
     if ($node -and (Test-Path $helper)) {
-        $rebuiltPop = & $node.Source $helper $file.FullName --population "--flavor=$Region"
+        $popArgs = @($helper, $file.FullName, "--population", "--flavor=$Region")
+        if ($Realm) { $popArgs += "--realm=$Realm" }
+        $rebuiltPop = & $node.Source @popArgs
         if ($LASTEXITCODE -eq 0 -and $rebuiltPop) {
             try {
                 $pop = $rebuiltPop | ConvertFrom-Json

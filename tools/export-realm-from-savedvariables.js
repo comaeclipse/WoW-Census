@@ -96,9 +96,14 @@ function table() {
 
 const db = value();
 const realms = db.realms || {};
-const realmName = db.exportRealm && realms[db.exportRealm]
-  ? db.exportRealm
-  : Object.keys(realms).sort((a, b) => (realms[b].lastScan || 0) - (realms[a].lastScan || 0))[0];
+const realmArg = process.argv.find((a) => a.startsWith("--realm="));
+const wanted = realmArg ? realmArg.slice(8) : null;
+if (wanted && !realms[wanted])
+  throw new Error(`realm "${wanted}" not found in SavedVariables (have: ${Object.keys(realms).join(", ")})`);
+const realmName = wanted
+  || (db.exportRealm && realms[db.exportRealm]
+    ? db.exportRealm
+    : Object.keys(realms).sort((a, b) => (realms[b].lastScan || 0) - (realms[a].lastScan || 0))[0]);
 const realm = realms[realmName];
 if (!realm) throw new Error("no realm data found");
 
