@@ -1,0 +1,21 @@
+# Remembered admin token (DPAPI-encrypted) — never commit
+tools/.mltoken
+.mltoken
+
+# Wrangler local state / build cache
+.wrangler/
+site/.wrangler/
+
+# Secrets / local env
+.env
+*.env
+.dev.vars
+site/.dev.vars
+
+# Node
+node_modules/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp

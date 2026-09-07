@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MarketLens Arcade</title>
+<meta name="description" content="8-bit auction-house market screener powered by TradeSkillMaster region data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="crt" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="cab">
+    <a class="logo" href="/">MARKET<b>LENS</b></a>
+    <div class="tag">Region Screener</div>
+    <div class="meta" id="meta">loading&hellip; <span class="blink">&#9608;</span></div>
+  </header>
+
+  <nav class="games" id="games" aria-label="dataset"></nav>
+
+  <section class="tiles" id="tiles"></section>
+
+  <section class="controls">
+    <label class="search">
+      <span>FIND&#9608;</span>
+      <input id="search" type="text" placeholder="search item name..." autocomplete="off" spellcheck="false">
+    </label>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr id="head"></tr></thead>
+      <tbody id="rows"><tr><td class="l" colspan="7" style="padding:22px;color:var(--muted)">Loading region data&hellip;</td></tr></tbody>
+    </table>
+    <div class="foot" id="foot"></div>
+  </div>
+
+  <p class="src">
+    Demand is inferred from region sale rate &amp; volume &mdash; never observed sales.<br>
+    Data: TradeSkillMaster public data &middot; companion to the MarketLens addon. Click any item for price history.
+  </p>
+</div>
+<!-- Wowhead item icons + authentic hover tooltips. iconizeLinks turns the empty
+     per-row <a class="ic"> links into icons; renameLinks off so our own name
+     links keep their text. The /tbc/, /classic/ path on each link tells the
+     script which game data to use, so one script serves every dataset. -->
+<script>const whTooltips = { colorLinks: false, iconizeLinks: true, renameLinks: false };</script>
+<script src="https://wow.zamimg.com/js/tooltips.js" defer></script>
+<script src="/app.js"></script>
+</body>
+</html>

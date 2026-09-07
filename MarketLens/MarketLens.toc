@@ -1,0 +1,42 @@
+## Interface: 120100, 120007, 50504, 38000, 20506, 11508, 11509
+## Title: MarketLens
+## Notes: Auction House market and profession analytics for TBC Classic
+## Author: skarz
+## Version: 0.1.0
+## SavedVariables: MarketLensDB
+## X-Category: Auction House & Vendors
+
+# Embedded libraries. LibAHTab-1-0 gives us a native tab on the modern
+# (Retail / Cata+) AuctionHouseFrame tab strip; harmless to load on Classic.
+Libs/LibStub/LibStub.lua
+Libs/LibAHTab/LibAHTab.lua
+
+Core.lua
+
+Utils/Tables.lua
+Utils/Money.lua
+
+Data/Categories.lua
+Data/Professions.lua
+Data/Items.lua
+Data/TSMRegion.lua
+Data/TSMRegionRetail.lua
+
+AH/Parser.lua
+AH/Scanner.lua
+
+Analytics/Snapshots.lua
+Analytics/Trends.lua
+Analytics/Region.lua
+Analytics/Demand.lua
+Analytics/Saturation.lua
+Analytics/Scores.lua
+
+Population/WhoScan.lua
+
+UI/MainFrame.lua
+UI/MarketTable.lua
+UI/ItemTable.lua
+UI/Population.lua
+UI/Minimap.lua
+UI/Tooltips.lua

@@ -1,0 +1,30 @@
+name = "marketlens"
+main = "src/worker.js"
+compatibility_date = "2024-11-06"
+
+# Static assets (index page, styles, client script) live in ./public
+[assets]
+directory = "public"
+binding = "ASSETS"
+
+# D1 database. Create it with:  wrangler d1 create marketlens
+# then paste the printed database_id below.
+[[d1_databases]]
+binding = "DB"
+database_name = "marketlens"
+database_id = "72f2d530-b4a7-4b99-b8bb-6d3ccec39ae2"
+
+# Daily collector (10:00 UTC). Region files refresh ~daily, so once is enough.
+# If a single run is too slow/large (esp. with retail), split into per-game
+# crons that each hit /admin/refresh?game=... for one dataset.
+[triggers]
+crons = ["0 10 * * *"]
+
+[vars]
+# Which datasets the cron collects. Comma-separated.
+GAMES = "classic-progression,classic,retail"
+
+# Set the admin token as a SECRET, not here:
+#   wrangler secret put REFRESH_TOKEN
+# Then seed immediately after deploy:
+#   curl "https://<your-worker>.workers.dev/admin/refresh?token=...&game=classic-progression"
