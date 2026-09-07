@@ -72,11 +72,23 @@ a{color:var(--blue)}
 /* tiles */
 .tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;}
 @media (max-width:760px){.tiles{grid-template-columns:repeat(2,1fr);}}
+/* five-across variant (population survey): tighter so all 5 fit one row */
+.tiles5{grid-template-columns:repeat(5,1fr); gap:10px;}
+.tiles5 .tile{padding:10px 10px 11px; overflow-wrap:anywhere;}
+.tiles5 .tile .v{font-size:13px; margin-top:9px;}
+.tiles5 .tile .s{font-size:15px;}
+@media (max-width:900px){.tiles5{grid-template-columns:repeat(3,1fr);}}
+@media (max-width:600px){.tiles5{grid-template-columns:repeat(2,1fr);}}
 .tile{background:var(--panel); border:2px solid var(--line); box-shadow:5px 5px 0 var(--shadow); padding:12px 13px 13px;}
 .tile .k{font-family:var(--pixel); font-size:8px; color:var(--muted); letter-spacing:1px; text-transform:uppercase;}
 .tile .v{font-family:var(--pixel); font-size:16px; color:var(--gold); margin-top:12px; line-height:1.35;}
 .tile .v.gr{color:var(--green);} .tile .v.mu{color:var(--ink);} .tile .v.g{color:var(--gold);}
 .tile .s{font-size:18px; color:var(--muted); margin-top:6px;}
+
+/* two-column panel layout (kills vertical scrolling on data-heavy pages) */
+.panelgrid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; align-items:start; margin-bottom:22px;}
+.panelgrid > .panel{margin-bottom:0 !important;}
+@media (max-width:760px){.panelgrid{grid-template-columns:1fr;}}
 
 /* controls */
 .controls{display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:16px;}

@@ -747,9 +747,9 @@ async function popPage(url, env) {
     <h1 class="iname">${esc(realm)} &mdash; Observed Population</h1>
     <div class="itag">${esc(p.faction || "")} &middot; ${sightings.toLocaleString()} sightings &middot; ${p.samples} scan${p.samples === 1 ? "" : "s"} &middot; sampled via /who</div>
   </header>
-  <section class="tiles">${tiles}</section>
+  <section class="tiles tiles5">${tiles}</section>
   ${empty ? '<div class="panel"><p class="hint">No population samples uploaded yet. In game, open the Population tab and press Scan Population (or /ml who), then upload.</p></div>'
-    : identityPanel + classPanel + racePanel + demandPanel}
+    : '<div class="panelgrid">' + identityPanel + classPanel + racePanel + demandPanel + '</div>'}
   <p class="src">
     A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
     ${perDay ? "Each character is counted once per day, however many scans ran that day" : "Tables count raw sightings across all scans"}. Unique metrics use normalized character name + realm + game flavor.<br>
