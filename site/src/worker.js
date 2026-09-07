@@ -272,15 +272,16 @@ async function importRealm(url, env, req) {
     const last = snaps[snaps.length - 1];
     const q = last[1] || 0, sc = sellersAvailable ? (last[3] || 0) : null;
     const w = last[6] || 0; // [t,q,a,s,l,m,w,tc]
+    const cat = (rec.m && String(rec.m).trim()) ? String(rec.m) : null;
     itemRows.push([game, id, name, slugify(name), q * w, w, rr.sr || 0, rr.spd || 0, rr.asp || 0,
-      new Date().toISOString(), q, sc]);
+      new Date().toISOString(), q, sc, cat]);
     for (const sn of snaps) {
       histRows.push([game, id, dayBucketFromUnix(sn[0]), (sn[1] || 0) * (sn[6] || 0), sn[6] || 0,
         rr.sr || 0, rr.spd || 0, sn[1] || 0]);
     }
   }
   await bulkInsert(env.DB, "items",
-    ["game", "id", "name", "slug", "mv", "asp", "sr", "spd", "hist", "updated_at", "q", "sc"], itemRows, 120);
+    ["game", "id", "name", "slug", "mv", "asp", "sr", "spd", "hist", "updated_at", "q", "sc", "cat"], itemRows, 120);
   await bulkInsert(env.DB, "history",
     ["game", "id", "ts", "mv", "asp", "sr", "spd", "q"], histRows, 150);
   await env.DB.prepare(
@@ -293,14 +294,14 @@ async function apiItems(url, env, ctx) {
   const game = pickGame(url);
   const cache = caches.default;
   // Bump the version suffix whenever the response shape changes, to bust the edge cache.
-  const key = new Request(url.origin + "/api/items?game=" + game + "&v=8");
+  const key = new Request(url.origin + "/api/items?game=" + game + "&v=9");
   const hit = await cache.match(key);
   if (hit) return hit;
 
   const { results } = await env.DB.prepare(
-    "SELECT id,name,slug,mv,asp,sr,spd,q,sc,hist FROM items WHERE game=? ORDER BY spd DESC"
+    "SELECT id,name,slug,mv,asp,sr,spd,q,sc,hist,cat FROM items WHERE game=? ORDER BY spd DESC"
   ).bind(game).all();
-  const rows = results.map((r) => [r.id, r.name, r.slug, r.mv, r.asp, r.sr, r.spd, r.q, r.sc, r.hist]);
+  const rows = results.map((r) => [r.id, r.name, r.slug, r.mv, r.asp, r.sr, r.spd, r.q, r.sc, r.hist, r.cat]);
 
   // Freshness metadata for the confidence indicator.
   const meta = await env.DB.prepare("SELECT MAX(updated_at) u FROM items WHERE game=?").bind(game).first();

@@ -70,6 +70,30 @@
     if (/\b(Sword|Axe|Waraxe|Mace|Hammer|Maul|Dagger|Blade|Spear|Lance|Glaive|Cleaver|Halberd|Scepter|Fist|Greatsword|Longsword|Staff|Polearm|Bow|Gun|Rifle|Crossbow|Wand|Shield|Buckler|Helm|Helmet|Coif|Circlet|Cap|Crown|Hood|Cowl|Shoulders|Spaulders|Mantle|Pauldrons|Epaulets|Cloak|Cape|Drape|Shroud|Breastplate|Chestplate|Robe|Tunic|Vest|Hauberk|Chestguard|Chestpiece|Jerkin|Armor|Bracers|Bracer|Wristwraps|Wristband|Vambraces|Wristguards|Armguards|Gauntlets|Gloves|Grips|Handguards|Handwraps|Mitts|Belt|Waistband|Girdle|Waistguard|Cinch|Sash|Legguards|Leggings|Legplates|Legwraps|Greaves|Pants|Kilt|Trousers|Britches|Boots|Sabatons|Treads|Sandals|Walkers|Footwraps|Slippers|Ring|Band|Signet|Loop|Seal|Amulet|Necklace|Pendant|Choker|Collar|Trinket|Idol|Totem|Libram|Sigil)\b/.test(n)) return "Gear";
     return "Other";
   }
+  // Uploaded realm datasets carry the addon's real market string (from actual
+  // item class/subclass/equip-slot). Map it onto a site chip; fall back to the
+  // name heuristic when there's no server market or it's a placeholder/misc
+  // bucket the site doesn't chip out (pets, mounts, keys, quest items, ...).
+  var MARKET_MAP = {
+    "Ore & Bars": "Ore & Bars", "Outland Ore": "Ore & Bars", "Outland Bars": "Ore & Bars",
+    "Herbs": "Herbs", "Outland Herbs": "Herbs",
+    "Cloth": "Cloth", "Netherweave": "Cloth",
+    "Leather & Hides": "Leather", "Knothide": "Leather",
+    "Primals": "Primals", "Primals & Motes": "Primals",
+    "Enchanting Mats": "Enchanting", "Dust & Essence": "Enchanting", "Shards & Crystals": "Enchanting",
+    "Gems": "Gems", "JC Supplies": "Gems",
+    "Potions": "Potions", "Flasks": "Flasks", "Elixirs": "Elixirs",
+    "Food & Drink": "Cooking", "Cooking Ingredients": "Cooking",
+    "Oils & Stones": "Enhancements", "Scrolls": "Enhancements",
+    "Weapons": "Gear", "Armor": "Gear", "Shields": "Gear", "Relics": "Gear", "Off-Hand": "Gear",
+    "Cosmetic": "Cosmetic",
+    "Bags": "Bags", "Quivers": "Bags",
+    "Recipes": "Recipes"
+  };
+  function catFor(market, name) {
+    if (market) { var m = MARKET_MAP[market]; if (m) return m; }
+    return classify(name);
+  }
   function meter(d) {
     var on = Math.round(d / 10), h = "";
     for (var i = 0; i < 10; i++) h += i < on ? '<i class="' + (d >= 80 ? "hi" : "on") + '"></i>' : "<i></i>";
@@ -137,7 +161,7 @@
 
   var ITEMS = [], curCat = "All", search = "", CAP = 300;
   var sortKey = isRealm ? "deal" : "demand", sortDir = -1;
-  var CATS = ["All","Ore & Bars","Herbs","Cloth","Leather","Primals","Enchanting","Gems","Enhancements","Gear","Potions","Flasks","Elixirs","Cooking","Recipes","Bags","Other"];
+  var CATS = ["All","Ore & Bars","Herbs","Cloth","Leather","Primals","Enchanting","Gems","Enhancements","Gear","Potions","Flasks","Elixirs","Cooking","Cosmetic","Recipes","Bags","Other"];
   var COLS = isRealm ? [
     { k: "name", t: "Item", l: true },
     { k: "cat", t: "Market", l: true },
@@ -160,7 +184,7 @@
     if (isRealm && WH_BRANCH[data.sourceGame] != null) whBranch = WH_BRANCH[data.sourceGame];
     ITEMS = (data.items || []).map(function (r) {
       var o = { id: r[0], name: r[1], slug: r[2], mv: r[3], asp: r[4], sr: r[5], spd: r[6], q: r[7], sc: r[8], hist: r[9] };
-      o.cat = classify(o.name);
+      o.cat = catFor(r[10], o.name);
       o.demand = demand(o.sr, o.spd);
       o.deal = (isRealm && o.hist > 0 && o.asp > 0) ? Math.round((o.hist - o.asp) / o.hist * 100) : null;
       return o;

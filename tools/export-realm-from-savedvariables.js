@@ -113,7 +113,11 @@ for (const [id, rec] of Object.entries(realm.items || {})) {
     const s = rec.snaps[k];
     return [s.t || 0, s.q || 0, s.a || 0, s.s || 0, s.l || 0, s.m || 0, s.w || 0, s.tc || 0];
   });
-  if (snaps.length) items[id] = { n: rec.name || "", s: snaps };
+  // rec.class is the addon's { profession, sector, market } classification,
+  // computed from the real item class/subclass/equip-slot at scan time. Carry
+  // the market so the site can categorize properly instead of guessing by name.
+  const market = rec.class && rec.class.market;
+  if (snaps.length) items[id] = { n: rec.name || "", s: snaps, m: market || "" };
 }
 
 const payload = {

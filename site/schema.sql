@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS items (
   updated_at TEXT,                  -- upstream scan time (ISO)
   q          INTEGER,               -- realm scan quantity (NULL for region datasets)
   sc         INTEGER,               -- realm seller count (NULL when unavailable)
+  cat        TEXT,                  -- addon-computed market (NULL for region datasets; site maps it to a chip)
   PRIMARY KEY (game, id)
 );
 CREATE INDEX IF NOT EXISTS idx_items_slug ON items(game, slug);

@@ -71,7 +71,7 @@ async function main() {
     if (!id || !(sr > 0 || spd > 0)) continue;
     const row = { id, name, mv, hist, asp, sr, spd };
     region.set(id, row);
-    regionItems.push(["retail", id, name, slugify(name), mv, asp, sr, spd, hist, f[7] || "", null, null]);
+    regionItems.push(["retail", id, name, slugify(name), mv, asp, sr, spd, hist, f[7] || "", null, null, null]);
     regionHistory.push(["retail", id, day, mv, asp, sr, spd, null]);
   }
   if (regionItems.length < 10000) throw new Error(`refusing suspicious Retail CSV with ${regionItems.length} usable rows`);
@@ -85,8 +85,9 @@ async function main() {
     const name = rec.n && rec.n.trim() ? rec.n : (rr.name || `item:${id}`);
     const last = rec.s[rec.s.length - 1];
     const q = last[1] || 0, w = last[6] || 0;
+    const cat = rec.m && String(rec.m).trim() ? String(rec.m) : null;
     realmItems.push([realmGame, id, name, slugify(name), q * w, w, rr.sr || 0, rr.spd || 0,
-      rr.asp || 0, now, q, null]);
+      rr.asp || 0, now, q, null, cat]);
     for (const s of rec.s) {
       const sd = new Date((s[0] || 0) * 1000);
       const bucket = sd.getUTCFullYear() * 10000 + (sd.getUTCMonth() + 1) * 100 + sd.getUTCDate();
@@ -100,10 +101,10 @@ async function main() {
     "PRAGMA foreign_keys=ON;",
     "CREATE TABLE IF NOT EXISTS datasets (game TEXT PRIMARY KEY, source_game TEXT NOT NULL, updated_at TEXT);",
     "DELETE FROM items WHERE game='retail';",
-    ...inserts("items", ["game","id","name","slug","mv","asp","sr","spd","hist","updated_at","q","sc"], regionItems, 120),
+    ...inserts("items", ["game","id","name","slug","mv","asp","sr","spd","hist","updated_at","q","sc","cat"], regionItems, 120),
     ...inserts("history", ["game","id","ts","mv","asp","sr","spd","q"], regionHistory, 150),
     `DELETE FROM items WHERE game=${sql(realmGame)};`,
-    ...inserts("items", ["game","id","name","slug","mv","asp","sr","spd","hist","updated_at","q","sc"], realmItems, 100),
+    ...inserts("items", ["game","id","name","slug","mv","asp","sr","spd","hist","updated_at","q","sc","cat"], realmItems, 100),
     ...inserts("history", ["game","id","ts","mv","asp","sr","spd","q"], realmHistory, 120),
     `INSERT OR REPLACE INTO datasets (game,source_game,updated_at) VALUES (${sql(realmGame)},'retail',${sql(now)});`,
   ];

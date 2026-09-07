@@ -59,13 +59,13 @@ D.Overrides = {
 -- Resolve GetItemInfoInstant across possible namespaces.
 local function classOf(itemID)
     if C_Item and C_Item.GetItemInfoInstant then
-        local _, _, _, _, _, classID, subClassID = C_Item.GetItemInfoInstant(itemID)
-        return classID, subClassID
+        local _, _, _, equipLoc, _, classID, subClassID = C_Item.GetItemInfoInstant(itemID)
+        return classID, subClassID, equipLoc
     elseif GetItemInfoInstant then
-        local _, _, _, _, _, classID, subClassID = GetItemInfoInstant(itemID)
-        return classID, subClassID
+        local _, _, _, equipLoc, _, classID, subClassID = GetItemInfoInstant(itemID)
+        return classID, subClassID, equipLoc
     end
-    return nil, nil
+    return nil, nil, nil
 end
 
 -- Per-session classification cache to avoid repeated API calls during a scan.
@@ -81,11 +81,11 @@ function D:Classify(itemID)
     if cached then return cached end
 
     local result = self.Overrides[itemID]
-    local classID, subClassID
+    local classID, subClassID, equipLoc
     if not result then
-        classID, subClassID = classOf(itemID)
+        classID, subClassID, equipLoc = classOf(itemID)
         if classID then
-            result = self:ClassifyByClass(classID, subClassID)
+            result = self:ClassifyByClass(classID, subClassID, equipLoc)
         end
     end
 

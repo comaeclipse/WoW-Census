@@ -51,8 +51,20 @@ local CN = {
     BANDAGE  = 7,
 }
 
--- Returns { profession=, sector=, market= } or nil.
-function D:ClassifyByClass(classID, subClassID)
+-- Armor subclass 0 (Miscellaneous) is a grab-bag: rings, necklaces, trinkets,
+-- shirts, tabards, and held off-hand items all share it. Subclass alone can't
+-- tell them apart, so split by equip slot. (A novelty holdable like Simple
+-- Wildflowers and a stat caster off-hand are both HOLDABLE, so both land in
+-- "Off-Hand" -- the client class API doesn't expose the cosmetic/novelty flag.)
+local function miscArmorMarket(equipLoc)
+    if equipLoc == "INVTYPE_HOLDABLE" then return "Off-Hand"
+    elseif equipLoc == "INVTYPE_BODY" or equipLoc == "INVTYPE_TABARD" then return "Cosmetic" end
+    return "Armor" -- rings, necks, trinkets, or an unrecognized slot
+end
+
+-- Returns { profession=, sector=, market= } or nil. equipLoc (an INVTYPE_*
+-- string) is optional and only consulted to disambiguate miscellaneous armor.
+function D:ClassifyByClass(classID, subClassID, equipLoc)
     if classID == CLASS_TRADEGOODS then
         if subClassID == TG.METAL then
             return { profession = "Mining", sector = "Raw Materials", market = "Ore & Bars" }
@@ -122,6 +134,8 @@ function D:ClassifyByClass(classID, subClassID)
                 return { profession = "Gear", sector = "Gear", market = "Cosmetic" }
             elseif subClassID and subClassID >= 7 then
                 return { profession = "Gear", sector = "Gear", market = "Relics" }
+            elseif subClassID == 0 then
+                return { profession = "Gear", sector = "Gear", market = miscArmorMarket(equipLoc) }
             else
                 return { profession = "Gear", sector = "Gear", market = "Armor" }
             end
@@ -129,6 +143,8 @@ function D:ClassifyByClass(classID, subClassID)
             return { profession = "Gear", sector = "Gear", market = "Shields" }
         elseif subClassID and subClassID >= 6 then
             return { profession = "Gear", sector = "Gear", market = "Relics" }
+        elseif subClassID == 0 then
+            return { profession = "Gear", sector = "Gear", market = miscArmorMarket(equipLoc) }
         else
             return { profession = "Gear", sector = "Gear", market = "Armor" }
         end
