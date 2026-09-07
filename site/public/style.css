@@ -33,13 +33,41 @@ a{color:var(--blue)}
 @media (prefers-reduced-motion:no-preference){.blink{animation:bl 1.1s steps(1) infinite;}}
 @keyframes bl{50%{opacity:0;}}
 
-/* game selector */
-.games{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+/* game selector (chooser pages + nav fallback) */
+.games{display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; margin-bottom:16px;}
 .game{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-transform:uppercase;
   color:var(--ink); background:var(--panel); border:2px solid var(--line);
-  box-shadow:3px 3px 0 var(--shadow); padding:8px 10px; cursor:pointer; text-decoration:none;}
+  box-shadow:3px 3px 0 var(--shadow); padding:8px 10px; cursor:pointer; text-decoration:none;
+  display:inline-flex; align-items:center; gap:8px;}
 .game:hover{border-color:var(--gold);}
 .game[aria-current="true"]{background:var(--gold); color:#161018; border-color:var(--gold);}
+.game .fac{color:var(--muted); font-size:7px;}
+.game[aria-current="true"] .fac{color:#3a2b10;}
+
+/* dropdown menubar */
+.mgroup{position:relative;}
+.mtop{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-transform:uppercase;
+  color:var(--ink); background:var(--panel); border:2px solid var(--line);
+  box-shadow:3px 3px 0 var(--shadow); padding:8px 10px; cursor:pointer; text-decoration:none;
+  display:inline-flex; align-items:center; gap:7px; line-height:1;}
+.mtop:hover,.mtop:focus-visible{border-color:var(--gold); outline:none;}
+.mtop .car{color:var(--muted); font-size:7px;}
+.mgroup.on .mtop,.mtop.active{background:var(--gold); color:#161018; border-color:var(--gold);}
+.mgroup.on .mtop .car,.mtop.active .car{color:#3a2b10;}
+.mdrop{display:none; position:absolute; top:calc(100% + 4px); left:0; z-index:20;
+  min-width:210px; background:var(--panel2); border:2px solid var(--gold);
+  box-shadow:5px 5px 0 var(--shadow); padding:5px;}
+.mgroup.on .mdrop{display:block;}
+.mitem{display:flex; justify-content:space-between; align-items:center; gap:14px;
+  font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-transform:uppercase;
+  color:var(--ink); text-decoration:none; padding:9px; border:2px solid transparent; white-space:nowrap;}
+.mitem:hover,.mitem:focus-visible{border-color:var(--gold); background:var(--panel); outline:none;}
+.mitem[aria-current="true"]{color:var(--gold);}
+.mitem.reg{color:var(--gold);}
+.mitem .fac{color:var(--muted); font-size:7px;}
+.mitem[aria-current="true"] .fac{color:var(--gold);}
+.msep{height:2px; background:var(--line); margin:5px 3px;}
+.mtop.mimport{border-style:dashed;}
 
 /* tiles */
 .tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;}
@@ -111,6 +139,7 @@ tbody a.name:hover{color:var(--gold); text-decoration:underline;}
 /* Wowhead item icon in table rows (populated by tooltips.js). Fixed box so the
    layout stays stable before the icon image loads. */
 a.ic{display:inline-block; width:18px; height:18px; vertical-align:middle;
-     margin-right:7px; border-radius:2px; background:#0c0e16;}
+     margin-right:7px; border-radius:2px; background-color:#0c0e16;
+     background-repeat:no-repeat; background-position:center; background-size:18px 18px;}
 a.ic img, a.ic ins, a.ic del{width:18px !important; height:18px !important;
      display:inline-block; border-radius:2px;}

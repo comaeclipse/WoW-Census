@@ -36,7 +36,14 @@
     return "" + g;
   }
   function esc(x) { return String(x).replace(/[&<>]/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[m]; }); }
-  function href(g) { return "/?game=" + encodeURIComponent(g); }
+  // Keep the readable "realm:" prefix (its colon) in navigable URLs; only encode
+  // the realm name itself (spaces etc). Region games have no special chars.
+  function gameParam(g) { return g.indexOf("realm:") === 0 ? "realm:" + encodeURIComponent(g.slice(6)) : encodeURIComponent(g); }
+  function href(g) { return "/?game=" + gameParam(g); }
+  var GAME_LABEL = { "classic": "Classic Era", "classic-progression": "TBC Anniversary", "retail": "Retail" };
+  var GAME_SHORT = { "classic": "Classic", "classic-progression": "TBC", "retail": "Retail" };
+  var GAME_ORDER = ["classic", "classic-progression", "retail"];
+  function splitRealm(label) { var i = label.lastIndexOf("-"); return i > 0 ? [label.slice(0, i), label.slice(i + 1)] : [label, ""]; }
 
   var HERBS = new Set(["Peacebloom","Silverleaf","Earthroot","Mageroyal","Briarthorn","Bruiseweed","Stranglekelp","Wild Steelbloom","Kingsblood","Liferoot","Fadeleaf","Goldthorn","Khadgar's Whisker","Wintersbite","Firebloom","Purple Lotus","Arthas' Tears","Sungrass","Blindweed","Ghost Mushroom","Gromsblood","Golden Sansam","Dreamfoil","Mountain Silversage","Plaguebloom","Icecap","Black Lotus","Felweed","Dreaming Glory","Ragveil","Flame Cap","Terocone","Ancient Lichen","Netherbloom","Nightmare Vine","Mana Thistle","Fel Lotus","Bloodthistle"]);
   function classify(n) {
@@ -79,27 +86,51 @@
     return '<span class="meter" style="margin:0 6px 0 0">' + h + "</span>";
   }
 
-  fetch("/api/games").then(function (r) { return r.json(); }).then(function (g) {
-    var list = (g.games || []);
-    var region = list.filter(function (x) { return !x.realm; });
-    var realms = list.filter(function (x) { return x.realm; });
-    var order = { "classic-progression": 0, "classic": 1, "retail": 2 };
-    region.sort(function (a, b) { return (order[a.game] || 9) - (order[b.game] || 9); });
-    var html = region.concat(realms).map(function (x) {
-      // Realms with population but no AH items link straight to their /pop page
-      // (the item screener would be empty), and get a small POP marker.
-      var popOnly = x.hasItems === false && x.hasPop;
-      var url = popOnly ? ("/pop?game=" + encodeURIComponent(x.game)) : href(x.game);
-      var tag = popOnly ? ' ·POP' : "";
-      return '<a class="game" href="' + url + '" aria-current="' + (x.game === game) + '">' + esc(x.label) + tag + "</a>";
+  function realmItems(rs) {
+    return rs.slice().sort(function (a, b) { return a.label.localeCompare(b.label); }).map(function (x) {
+      var p = splitRealm(x.label);
+      return '<a class="mitem" href="' + href(x.game) + '" aria-current="' + (x.game === game) + '">' +
+        '<span>' + esc(p[0]) + '</span>' + (p[1] ? '<span class="fac">' + esc(p[1]) + '</span>' : '') + '</a>';
     }).join("");
-    html += '<a class="game" href="/import.html" style="border-style:dashed">+ IMPORT REALM</a>';
+  }
+  function group(top, active, items) {
+    return '<div class="mgroup">' +
+      '<button class="mtop' + (active ? ' active' : '') + '" aria-expanded="false" aria-haspopup="true">' +
+      top + ' <span class="car">&#9660;</span></button>' +
+      '<div class="mdrop">' + items + '</div></div>';
+  }
+  function buildMenu(list) {
+    var region = {}, realms = { "classic": [], "classic-progression": [], "retail": [] }, other = [];
+    var cur = null;
+    list.forEach(function (x) {
+      if (x.game === game) cur = x;
+      if (x.realm) { if (x.hasItems) (realms[x.sourceGame] ? realms[x.sourceGame] : other).push(x); }
+      else region[x.game] = x;
+    });
+    // A realm belongs to its source game; a realm with no recorded flavor lands
+    // in the catch-all until its next upload stamps one.
+    var curSrc = cur && cur.sourceGame;
+    var activeGroup = isRealm ? (realms[curSrc] ? curSrc : "other") : game;
+
+    var html = GAME_ORDER.map(function (gm) {
+      var items = "";
+      if (region[gm]) items += '<a class="mitem reg" href="' + href(gm) + '" aria-current="' + (game === gm) + '">Region screener</a>';
+      if (realms[gm].length) items += '<div class="msep"></div>' + realmItems(realms[gm]);
+      return group(GAME_SHORT[gm] || gm, activeGroup === gm, items);
+    }).join("");
+    if (other.length) html += group("Realms", activeGroup === "other", realmItems(other));
+    html += '<a class="mtop" href="/pop">Population</a>';
+    html += '<a class="mtop mimport" href="/import.html">+ Import</a>';
     document.getElementById("games").innerHTML = html;
+  }
+
+  fetch("/api/games").then(function (r) { return r.json(); }).then(function (g) {
+    buildMenu(g.games || []);
   }).catch(function () {
     document.getElementById("games").innerHTML =
-      ["classic-progression", "classic", "retail"].map(function (gm) {
-        return '<a class="game" href="' + href(gm) + '" aria-current="' + (gm === game) + '">' + gm + "</a>";
-      }).join("");
+      GAME_ORDER.map(function (gm) {
+        return '<a class="game" href="' + href(gm) + '" aria-current="' + (gm === game) + '">' + (GAME_SHORT[gm] || gm) + "</a>";
+      }).join("") + '<a class="game" href="/pop">Population</a>';
   });
 
   var ITEMS = [], curCat = "All", search = "", CAP = 300;
@@ -155,7 +186,7 @@
 
     if (isRealm) {
       document.getElementById("meta").innerHTML +=
-        '<br><a href="/pop?game=' + encodeURIComponent(game) + '" style="font-size:15px">&#9654; POPULATION SURVEY</a>';
+        '<br><a href="/pop?game=' + gameParam(game) + '" style="font-size:15px">&#9654; POPULATION SURVEY</a>';
     }
     if (isRealm) {
       var bestDeal = ITEMS.filter(function (x) { return x.deal != null; }).sort(function (a, b) { return b.deal - a.deal; })[0];
@@ -210,7 +241,7 @@
     for (var i = 0; i < shown.length; i++) {
       var it = shown[i];
       var ic = '<a class="ic" href="' + whItem(it.id) + '" tabindex="-1" aria-hidden="true"></a>';
-      var link = '<a class="name" href="/item/' + encodeURIComponent(it.slug || it.id) + '?game=' + encodeURIComponent(game) + '">' + esc(it.name) + "</a>";
+      var link = '<a class="name" href="/item/' + encodeURIComponent(it.slug || it.id) + '?game=' + gameParam(game) + '">' + esc(it.name) + "</a>";
       var dm = '<td><span class="meter">' + meter(it.demand) + '</span><span class="dv ' + (it.demand >= 80 ? "g" : it.demand >= 45 ? "gr" : "mu") + '">' + it.demand + "</span></td>";
       if (isRealm) {
         h += "<tr><td class=\"l\">" + ic + link + '</td><td class="l cat">' + esc(it.cat) + "</td>" +
@@ -243,4 +274,22 @@
     render();
   });
   document.getElementById("search").addEventListener("input", function (e) { search = e.target.value; render(); });
+
+  function closeMenus(except) {
+    Array.prototype.forEach.call(document.querySelectorAll("#games .mgroup.on"), function (n) {
+      if (n === except) return;
+      n.classList.remove("on");
+      var b = n.querySelector(".mtop"); if (b) b.setAttribute("aria-expanded", "false");
+    });
+  }
+  document.getElementById("games").addEventListener("click", function (e) {
+    var btn = e.target.closest("button.mtop"); if (!btn) return;
+    e.preventDefault();
+    var grp = btn.parentNode, open = grp.classList.contains("on");
+    closeMenus(open ? null : grp);
+    grp.classList.toggle("on", !open);
+    btn.setAttribute("aria-expanded", String(!open));
+  });
+  document.addEventListener("click", function (e) { if (!e.target.closest("#games .mgroup")) closeMenus(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenus(); });
 })();

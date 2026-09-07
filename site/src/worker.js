@@ -206,6 +206,10 @@ async function apiGames(env) {
     "SELECT game, COUNT(*) c FROM pop_samples GROUP BY game"
   ).all()).results;
 
+  const dsRows = (await env.DB.prepare("SELECT game, source_game FROM datasets").all()).results;
+  const source = new Map();
+  for (const r of dsRows) source.set(r.game, r.source_game);
+
   const map = new Map();
   for (const r of itemRows)
     map.set(r.game, { game: r.game, count: r.c, updatedAt: r.u, hasItems: true, hasPop: false });
@@ -220,6 +224,7 @@ async function apiGames(env) {
     return {
       game: e.game, count: e.count, updatedAt: e.updatedAt, realm,
       hasItems: e.hasItems, hasPop: e.hasPop,
+      sourceGame: realm ? (source.get(e.game) || null) : e.game,
       label: realm ? e.game.slice(6) : (GAMES[e.game] ? GAMES[e.game].label : e.game),
     };
   });
@@ -564,10 +569,74 @@ function distPanel(title, dist, colorFor, nameFor) {
     (body || '<tr><td class="l mu" colspan="4" style="padding:16px">No data.</td></tr>') + "</tbody></table></div>";
 }
 
+function splitRealm(label) {
+  const cut = label.lastIndexOf("-");
+  return cut > 0 ? { name: label.slice(0, cut), fac: label.slice(cut + 1) } : { name: label, fac: "" };
+}
+
+// Landing screen for /pop with no realm: pick a realm (grouped by client) to
+// view its population survey.
+async function popChooserPage(env) {
+  const rows = (await env.DB.prepare(
+    `SELECT p.game g, COUNT(*) samples, SUM(p.observed) obs, MAX(p.t) lastT, d.source_game src
+     FROM pop_samples p LEFT JOIN datasets d ON d.game = p.game
+     GROUP BY p.game ORDER BY obs DESC`
+  ).all()).results;
+
+  const order = ["classic-progression", "classic", "retail"];
+  const groups = new Map();
+  for (const r of rows) {
+    const src = GAMES[r.src] ? r.src : "other";
+    if (!groups.has(src)) groups.set(src, []);
+    groups.get(src).push(r);
+  }
+  const groupKeys = [...groups.keys()].sort((a, b) => ((order.indexOf(a) + 1) || 99) - ((order.indexOf(b) + 1) || 99));
+
+  let body = groupKeys.map((src) => {
+    const label = GAMES[src] ? GAMES[src].label : "Other realms";
+    const btns = groups.get(src).map((r) => {
+      const realm = r.g.slice(6);
+      const { name, fac } = splitRealm(realm);
+      const href = "/pop?game=realm:" + encodeURIComponent(realm);
+      const updated = r.lastT ? new Date(r.lastT * 1000).toISOString().slice(0, 10) : "";
+      return `<a class="game" href="${href}" title="${esc(r.obs || 0)} sightings${updated ? " · updated " + updated : ""}">` +
+        `${esc(name)}${fac ? ' <span class="fac">' + esc(fac) + "</span>" : ""}</a>`;
+    }).join("");
+    return `<div class="ptitle" style="margin:24px 0 12px">${esc(label)}</div><nav class="games">${btns}</nav>`;
+  }).join("");
+  if (!rows.length)
+    body = '<div class="panel"><p class="hint">No population data uploaded yet. In game, open the Population tab and press Scan Population (or /ml who), then run the uploader.</p></div>';
+
+  const html = `<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Population survey — MarketLens</title>
+<meta name="description" content="Choose a realm to view its observed population survey (class and race distribution sampled via /who).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head><body>
+<div class="crt" aria-hidden="true"></div>
+<div class="wrap">
+  <a class="back" href="/">&#9664; MARKETLENS</a>
+  <header class="ihead">
+    <h1 class="iname">Population Survey</h1>
+    <div class="itag">Choose a realm &middot; observed via /who</div>
+  </header>
+  ${body}
+  <p class="src">
+    A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
+    Companion to the MarketLens addon. Realms appear here once population samples are uploaded.
+  </p>
+</div>
+</body></html>`;
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } });
+}
+
 async function popPage(url, env) {
   const game = pickGame(url);
   if (game.indexOf("realm:") !== 0)
-    return new Response(notFound(game, "population"), { status: 404, headers: { "content-type": "text/html; charset=utf-8" } });
+    return await popChooserPage(env);
   const realm = game.slice(6);
   const p = await loadPop(env, game);
   const characters = await loadCharacterStats(env, game);
