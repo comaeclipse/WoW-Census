@@ -58,14 +58,16 @@
     if (/^(Recipe|Pattern|Plans|Schematic|Formula|Design|Manual|Book|Technique):/.test(n)) return "Recipes";
     if (/\bBag\b|Backpack|\bPouch\b|\bQuiver\b|\bSack\b/.test(n)) return "Bags";
     if (HERBS.has(n)) return "Herbs";
-    if (/\bMeat\b|\bFillet\b|\bFish\b|\bRibs\b|Stew|\bPie\b|\bBread\b|Cheese|Sausage|\bClam\b|\bEgg\b|\bRoast\b|Sandwich|Omelet|Juice|\bBrew\b/.test(n)) return "Cooking";
+    // Food, dishes, and drinks. Fish/berry/booze names rarely collide with gear
+    // (and Gear is matched later anyway), so a wide net here is safe.
+    if (/\bMeat\b|\bFillet\b|\bFish\b|\bRibs\b|Stew|\bPie\b|\bBread\b|Cheese|Sausage|\bClam\b|\bEgg\b|\bRoast\b|Sandwich|Omelet|Juice|\bBrew\b|Jerky|[Bb]erries|\b[Bb]erry\b|\bSpirits\b|Pretzel|\bCake\b|Cookie|Muffin|Biscuit|Pudding|\bJam\b|Chowder|Broth|Soup|\bSteak\b|Casserole|Delight|Feast|Ration|Snapper|\bCod\b|Salmon|Trout|\bBass\b|Tuna|Mackerel|Herring|Sardine|Catfish|\bEel\b|Yellowtail|Sagefish|Mudfish|Firefin|Rockscale|Elderhorn|\bMead\b|\bAle\b|\bWine\b|\bRum\b|Grog|Cider|Absinthe|Firewater|\bTea\b|Coffee|Slush|\bPort\b/.test(n)) return "Cooking";
     // Jewelcrafting stones — cut and raw share the base gem noun (e.g. "Runed
     // Living Ruby" and "Living Ruby" both match "Ruby"), so match the base.
-    if (/\b(Ruby|Topaz|Nightseye|Dawnstone|Talasite|Moonstone|Draenite|Spessarite|Peridot|Garnet|Spinel|Pyrestone|Amethyst|Sapphire|Emerald|Lionseye|Citrine|Chrysoprase|Jade|Opal|Aquamarine|Diamond|Pearl|Tanzanite)\b|Sun Crystal|Star of Elune/.test(n)) return "Gems";
+    if (/\b(Ruby|Topaz|Nightseye|Dawnstone|Talasite|Moonstone|Draenite|Spessarite|Peridot|Garnet|Spinel|Pyrestone|Amethyst|Sapphire|Emerald|Lionseye|Citrine|Chrysoprase|Jade|Opal|Aquamarine|Diamond|Pearl|Tanzanite|Bloodstone|Dreadstone|Zircon|Ametrine|Chalcedony|Carnelian|Hessonite|Bixbite)\b|Sun Crystal|Star of Elune/.test(n)) return "Gems";
     // Applied enhancements (enchant/tailor/LW/alchemy output onto gear/weapons).
     if (/\b(Spellthread|Leg Armor|Leg Reinforcement|Sharpening Stone|Weightstone|Wizard Oil|Mana Oil|Shadow Oil)\b|^Scroll of |\bWeapon Oil\b|\bArmor Kit\b/.test(n)) return "Enhancements";
     // Equipment — match by slot/weapon noun (arbitrary item names otherwise).
-    if (/\b(Sword|Axe|Mace|Hammer|Dagger|Blade|Staff|Polearm|Bow|Gun|Rifle|Crossbow|Wand|Shield|Buckler|Helm|Helmet|Cap|Crown|Hood|Cowl|Shoulders|Spaulders|Mantle|Pauldrons|Epaulets|Cloak|Cape|Drape|Shroud|Breastplate|Robe|Tunic|Vest|Hauberk|Chestguard|Chestpiece|Jerkin|Bracers|Bracer|Vambraces|Wristguards|Armguards|Gauntlets|Gloves|Grips|Handguards|Mitts|Belt|Girdle|Waistguard|Cinch|Sash|Legguards|Leggings|Legplates|Legwraps|Greaves|Pants|Kilt|Trousers|Britches|Boots|Sabatons|Treads|Sandals|Walkers|Footwraps|Slippers|Ring|Band|Signet|Loop|Seal|Amulet|Necklace|Pendant|Choker|Collar|Trinket|Idol|Totem|Libram|Sigil)\b/.test(n)) return "Gear";
+    if (/\b(Sword|Axe|Waraxe|Mace|Hammer|Maul|Dagger|Blade|Spear|Lance|Glaive|Cleaver|Halberd|Scepter|Fist|Greatsword|Longsword|Staff|Polearm|Bow|Gun|Rifle|Crossbow|Wand|Shield|Buckler|Helm|Helmet|Coif|Circlet|Cap|Crown|Hood|Cowl|Shoulders|Spaulders|Mantle|Pauldrons|Epaulets|Cloak|Cape|Drape|Shroud|Breastplate|Chestplate|Robe|Tunic|Vest|Hauberk|Chestguard|Chestpiece|Jerkin|Armor|Bracers|Bracer|Wristwraps|Wristband|Vambraces|Wristguards|Armguards|Gauntlets|Gloves|Grips|Handguards|Handwraps|Mitts|Belt|Waistband|Girdle|Waistguard|Cinch|Sash|Legguards|Leggings|Legplates|Legwraps|Greaves|Pants|Kilt|Trousers|Britches|Boots|Sabatons|Treads|Sandals|Walkers|Footwraps|Slippers|Ring|Band|Signet|Loop|Seal|Amulet|Necklace|Pendant|Choker|Collar|Trinket|Idol|Totem|Libram|Sigil)\b/.test(n)) return "Gear";
     return "Other";
   }
   function meter(d) {
@@ -185,8 +187,11 @@
       '<span style="font-size:15px;color:var(--muted)">updated ' + ageStr + ' ago &middot; ' + c.days + ' day' + (c.days === 1 ? "" : "s") + ' history</span>';
 
     if (isRealm) {
+      // Retail market is faction-agnostic; its population lives under per-faction
+      // keys, so point at the chooser rather than a single faction.
+      var popHref = data.sourceGame === "retail" ? "/pop" : "/pop?game=" + gameParam(game);
       document.getElementById("meta").innerHTML +=
-        '<br><a href="/pop?game=' + gameParam(game) + '" style="font-size:15px">&#9654; POPULATION SURVEY</a>';
+        '<br><a href="' + popHref + '" style="font-size:15px">&#9654; POPULATION SURVEY</a>';
     }
     if (isRealm) {
       var bestDeal = ITEMS.filter(function (x) { return x.deal != null; }).sort(function (a, b) { return b.deal - a.deal; })[0];

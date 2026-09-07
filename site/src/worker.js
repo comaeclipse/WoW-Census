@@ -23,6 +23,13 @@ const csvUrl = (game) =>
 function slugify(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
+// Retail's auction house is shared across both factions, so retail realm market
+// data is keyed by realm only (population stays per-faction — /who rosters differ).
+function stripFaction(name) { return name.replace(/-(Alliance|Horde|Neutral)$/, ""); }
+// Keep the readable "realm:" colon in a link; encode only the realm name.
+function gameHref(prefix, g) {
+  return prefix + (g.indexOf("realm:") === 0 ? "realm:" + encodeURIComponent(g.slice(6)) : encodeURIComponent(g));
+}
 function esc(s) {
   return String(s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 }
@@ -242,7 +249,8 @@ async function importRealm(url, env, req) {
   try { body = await req.json(); } catch (e) { return json({ error: "invalid json" }); }
   if (!body || body.type !== "ml-realm-v1" || !body.realm || !body.items)
     return json({ error: "expected an ml-realm-v1 export from /ml export" });
-  const game = "realm:" + body.realm;
+  const realmName = regionGame === "retail" ? stripFaction(body.realm) : body.realm;
+  const game = "realm:" + realmName;
   const capabilities = body.capabilities || {};
   const sellersAvailable = capabilities.sellers !== false;
 
@@ -278,14 +286,14 @@ async function importRealm(url, env, req) {
   await env.DB.prepare(
     "INSERT OR REPLACE INTO datasets (game,source_game,updated_at) VALUES (?,?,?)"
   ).bind(game, regionGame, new Date().toISOString()).run();
-  return json({ ok: true, realm: body.realm, items: itemRows.length });
+  return json({ ok: true, realm: realmName, items: itemRows.length });
 }
 
 async function apiItems(url, env, ctx) {
   const game = pickGame(url);
   const cache = caches.default;
   // Bump the version suffix whenever the response shape changes, to bust the edge cache.
-  const key = new Request(url.origin + "/api/items?game=" + game + "&v=7");
+  const key = new Request(url.origin + "/api/items?game=" + game + "&v=8");
   const hit = await cache.match(key);
   if (hit) return hit;
 
@@ -640,10 +648,19 @@ async function popPage(url, env) {
   const realm = game.slice(6);
   const p = await loadPop(env, game);
   const characters = await loadCharacterStats(env, game);
-  // If this realm has no AH items, the screener would be empty — send "back" home.
-  const hasItems = await env.DB.prepare("SELECT 1 FROM items WHERE game=? LIMIT 1").bind(game).first();
-  const backHref = hasItems ? "/?game=" + encodeURIComponent(game) : "/";
-  const backLabel = hasItems ? esc(realm) + " MARKET" : "MARKETLENS";
+  // Link back to this realm's market screener. Retail market lives under the
+  // faction-agnostic key, so fall back to the stripped realm if the exact key
+  // has no items. If neither has items, go home.
+  let marketGame = game;
+  let hasItems = await env.DB.prepare("SELECT 1 FROM items WHERE game=? LIMIT 1").bind(game).first();
+  if (!hasItems) {
+    const alt = "realm:" + stripFaction(realm);
+    if (alt !== game && await env.DB.prepare("SELECT 1 FROM items WHERE game=? LIMIT 1").bind(alt).first()) {
+      marketGame = alt; hasItems = true;
+    }
+  }
+  const backHref = hasItems ? gameHref("/?game=", marketGame) : "/";
+  const backLabel = hasItems ? esc(marketGame.slice(6)) + " MARKET" : "MARKETLENS";
 
   const tiles =
     tile("Realm", realm, p.faction || "") +
