@@ -499,6 +499,23 @@ async function loadPop(env, game) {
   return { classes, races, observed, samples, lastT, faction };
 }
 
+// Per-day-unique population from identity data: each character counts once per
+// day, no matter how many /who scans ran that day. Empty for older aggregate-
+// only realms, where callers fall back to loadPop's per-sample totals.
+async function loadPopUnique(env, game) {
+  const rows = (await env.DB.prepare(
+    `SELECT c.class_file cf, c.race race FROM character_observations o
+     JOIN characters c ON c.game = o.game AND c.source_game = o.source_game AND c.character_key = o.character_key
+     WHERE o.game = ?`
+  ).bind(game).all()).results;
+  const classes = {}, races = {};
+  for (const r of rows) {
+    if (r.cf) classes[r.cf] = (classes[r.cf] || 0) + 1;
+    if (r.race) races[r.race] = (races[r.race] || 0) + 1;
+  }
+  return { sightings: rows.length, classes, races };
+}
+
 async function loadCharacterStats(env, game) {
   const today = Math.floor(Date.now() / 86400000);
   const weekStart = today - 6, monthStart = today - 29;
@@ -546,10 +563,15 @@ async function apiPopulation(url, env) {
   const game = pickGame(url);
   const p = await loadPop(env, game);
   const characters = await loadCharacterStats(env, game);
+  const uniq = await loadPopUnique(env, game);
+  const perDayUnique = uniq.sightings > 0;
+  const classes = perDayUnique ? uniq.classes : p.classes;
+  const races = perDayUnique ? uniq.races : p.races;
+  const sightings = perDayUnique ? uniq.sightings : p.observed;
   return json({
     game, realm: game.indexOf("realm:") === 0 ? game.slice(6) : game,
-    faction: p.faction, samples: p.samples, observed: p.observed, updatedAt: p.lastT,
-    classes: p.classes, races: p.races, demand: popDemand(p.classes), characters,
+    faction: p.faction, samples: p.samples, sightings, observed: sightings, perDayUnique, updatedAt: p.lastT,
+    classes, races, demand: popDemand(classes), characters,
   }, 300);
 }
 
@@ -648,6 +670,13 @@ async function popPage(url, env) {
   const realm = game.slice(6);
   const p = await loadPop(env, game);
   const characters = await loadCharacterStats(env, game);
+  const uniq = await loadPopUnique(env, game);
+  // Count each character once per day when identity data exists; older aggregate
+  // realms fall back to the raw per-sample sightings.
+  const perDay = uniq.sightings > 0;
+  const classes = perDay ? uniq.classes : p.classes;
+  const races = perDay ? uniq.races : p.races;
+  const sightings = perDay ? uniq.sightings : p.observed;
   // Link back to this realm's market screener. Retail market lives under the
   // faction-agnostic key, so fall back to the stripped realm if the exact key
   // has no items. If neither has items, go home.
@@ -662,19 +691,20 @@ async function popPage(url, env) {
   const backHref = hasItems ? gameHref("/?game=", marketGame) : "/";
   const backLabel = hasItems ? esc(marketGame.slice(6)) + " MARKET" : "MARKETLENS";
 
+  const scanLabel = p.samples + " /who scan" + (p.samples === 1 ? "" : "s");
   const tiles =
     tile("Realm", realm, p.faction || "") +
-    tile("Sightings", p.observed.toLocaleString(), "across " + p.samples + " /who scan" + (p.samples === 1 ? "" : "s")) +
+    tile("Sightings", sightings.toLocaleString(), perDay ? "unique per day · " + scanLabel : "across " + scanLabel) +
     tile("Unique · 7 days", characters.week.toLocaleString(), characters.returningWeek + " returning · " + characters.newWeek + " new") +
     tile("Unique · 30 days", characters.month.toLocaleString(), characters.active3 + " seen on 3+ days") +
     tile("Updated", p.lastT ? new Date(p.lastT * 1000).toISOString().slice(0, 10) : "—", "last sample");
 
-  const classPanel = distPanel("Class distribution", p.classes,
+  const classPanel = distPanel("Class distribution", classes,
     (k) => (CLASS_META[k] ? CLASS_META[k][1] : null),
     (k) => (CLASS_META[k] ? CLASS_META[k][0] : k));
-  const racePanel = distPanel("Race distribution", p.races, null, null);
+  const racePanel = distPanel("Race distribution", races, null, null);
 
-  const demand = popDemand(p.classes);
+  const demand = popDemand(classes);
   const demandBody = demand.map((d) =>
     '<tr><td class="l">' + esc(d.prof) + '</td><td>' + d.score + '</td><td class="l">' + popMeter(d.score) + "</td></tr>"
   ).join("");
@@ -714,14 +744,14 @@ async function popPage(url, env) {
   <a class="back" href="${backHref}">&#9664; ${backLabel}</a>
   <header class="ihead">
     <h1 class="iname">${esc(realm)} &mdash; Observed Population</h1>
-    <div class="itag">${esc(p.faction || "")} &middot; ${p.observed.toLocaleString()} sightings &middot; ${p.samples} scan${p.samples === 1 ? "" : "s"} &middot; sampled via /who</div>
+    <div class="itag">${esc(p.faction || "")} &middot; ${sightings.toLocaleString()} sightings &middot; ${p.samples} scan${p.samples === 1 ? "" : "s"} &middot; sampled via /who</div>
   </header>
   <section class="tiles">${tiles}</section>
   ${empty ? '<div class="panel"><p class="hint">No population samples uploaded yet. In game, open the Population tab and press Scan Population (or /ml who), then upload.</p></div>'
     : identityPanel + classPanel + racePanel + demandPanel}
   <p class="src">
     A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
-    Aggregate tables count sightings. Unique metrics use normalized character name + realm + game flavor.<br>
+    ${perDay ? "Each character is counted once per day, however many scans ran that day" : "Tables count raw sightings across all scans"}. Unique metrics use normalized character name + realm + game flavor.<br>
     Characters are not human players/accounts; a rename appears as a new character. Companion to the MarketLens addon.
   </p>
 </div>
