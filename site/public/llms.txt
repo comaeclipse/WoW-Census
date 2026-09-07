@@ -1,0 +1,52 @@
+# MarketLens
+
+> World of Warcraft auction-house market screener and observed-population survey.
+> Market data comes from TradeSkillMaster public region data; realm-specific market
+> and population data are uploaded by the MarketLens in-game addon. Base URL:
+> https://marketlens.skarz.workers.dev
+
+The human-facing pages (/ and /item/...) fill their tables client-side from the
+JSON API below, so fetching that HTML without running JavaScript returns only a
+placeholder. Fetch the JSON endpoints directly instead — they are the source of
+truth and are edge-cached.
+
+## Conventions
+
+- `<game>` is a dataset key. Region datasets: `classic-progression` (TBC
+  Anniversary), `classic` (Classic Era), `retail`. Uploaded realms:
+  `realm:<RealmName>` or `realm:<RealmName>-<Faction>`, e.g.
+  `realm:Ashkandi-Alliance`. Call /api/games for the live list.
+- Money values (mv, asp, hist) are in copper. 100 copper = 1 silver; 10000
+  copper = 1 gold.
+- `sr` is a sale rate from 0 to 1. `spd` is estimated items sold per day.
+- Realm-only fields (`q`, `sc`, `cat`) are null on region datasets.
+
+## API
+
+- [/api/games](https://marketlens.skarz.workers.dev/api/games): Every dataset
+  present, each with `game`, `label`, `count`, `updatedAt`, `realm`, `hasItems`,
+  `hasPop`, `sourceGame`.
+- [/api/items?game=<game>](https://marketlens.skarz.workers.dev/api/items?game=classic-progression):
+  Latest market snapshot for a dataset. Returns `game`, `sourceGame`, `region`,
+  `count`, `updatedAt`, `days`, `columns`, and `items`. `items` is an array of
+  arrays; `columns` names each position. Current order:
+  `["id","name","slug","mv","asp","sr","spd","q","sc","hist","cat"]` where
+  mv=market value, asp=average sale price, sr=sale rate, spd=sold/day,
+  q=quantity on the realm AH, sc=distinct sellers, hist=region historical avg
+  (for the realm-vs-region deal signal), cat=category.
+- [/api/history?game=<game>&id=<itemId>](https://marketlens.skarz.workers.dev/api/history?game=classic-progression&id=2589):
+  Daily time series for one item. Returns `points`, an array of objects with
+  `ts` (YYYYMMDD integer), `mv`, `asp`, `sr`, `spd`.
+- [/api/population?game=realm:<realm>](https://marketlens.skarz.workers.dev/api/population?game=realm:Ashkandi-Alliance):
+  Observed population survey sampled via in-game /who. Returns `realm`,
+  `faction`, `samples`, `sightings`, `perDayUnique`, `updatedAt`, `classes`
+  (token -> count), `races` (token -> count), `demand` (inferred profession
+  demand: array of `{prof, weight, score}`), and `characters` (unique/returning
+  counts and a recent-activity roster).
+
+## Notes
+
+- Demand scores are inferred from region sale rate and volume, or (on the
+  population survey) from the observed class mix — never from observed sales.
+- A /who sample is currently-visible online players (server-capped, ~50 per
+  scan), not a census. Character names identify characters, not people.

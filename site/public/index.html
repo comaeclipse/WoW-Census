@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MarketLens Arcade</title>
 <meta name="description" content="8-bit auction-house market screener powered by TradeSkillMaster region data.">
+<!-- Machine-readable data. The screener table on this page is filled client-side
+     from the JSON API, so a non-JS fetch of this HTML sees only a placeholder.
+     Read the data directly instead:
+       /api/games                      list every dataset (region + uploaded realms)
+       /api/items?game=<game>          latest market snapshot (see its `columns`)
+       /api/history?game=<game>&id=<n> daily price/demand series for one item
+       /api/population?game=realm:<realm>  observed class/race/demand survey
+     <game> is a key like "classic-progression" or "realm:Ashkandi-Alliance".
+     See /llms.txt for the full field reference. -->
+<link rel="alternate" type="application/json" href="/api/items?game=classic-progression" title="Market data (JSON)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">

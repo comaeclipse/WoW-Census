@@ -17,6 +17,13 @@ const GAMES = {
   "retail":              { label: "Retail" },
 };
 const DEFAULT_GAME = "classic-progression";
+
+// Column order for the packed /api/items rows. Emitted in the response as
+// `columns` so scripts and LLMs can read the array-of-arrays without guessing.
+// mv/asp/hist are copper; sr is a 0-1 sale rate; spd is sold/day; q (quantity),
+// sc (seller count) and cat (category) are realm-upload only, else null.
+const ITEM_COLUMNS = ["id", "name", "slug", "mv", "asp", "sr", "spd", "q", "sc", "hist", "cat"];
+
 const csvUrl = (game) =>
   `https://public-data.tradeskillmaster.com/${game}/${REGION}/region/items.csv`;
 
@@ -294,7 +301,7 @@ async function apiItems(url, env, ctx) {
   const game = pickGame(url);
   const cache = caches.default;
   // Bump the version suffix whenever the response shape changes, to bust the edge cache.
-  const key = new Request(url.origin + "/api/items?game=" + game + "&v=9");
+  const key = new Request(url.origin + "/api/items?game=" + game + "&v=10");
   const hit = await cache.match(key);
   if (hit) return hit;
 
@@ -310,7 +317,7 @@ async function apiItems(url, env, ctx) {
 
   const res = json({
     game, sourceGame: (dataset && dataset.source_game) || game, region: REGION, count: rows.length,
-    updatedAt: meta && meta.u, days: (hd && hd.d) || 0, items: rows,
+    updatedAt: meta && meta.u, days: (hd && hd.d) || 0, columns: ITEM_COLUMNS, items: rows,
   }, 3600);
   ctx.waitUntil(cache.put(key, res.clone()));
   return res;
@@ -370,6 +377,7 @@ async function itemPage(url, env) {
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(row.name)} — MarketLens</title>
+<link rel="alternate" type="application/json" href="/api/history?game=${gameHref("", game)}&id=${row.id}" title="Price history (JSON)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
@@ -642,6 +650,7 @@ async function popChooserPage(env) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Population survey — MarketLens</title>
 <meta name="description" content="Choose a realm to view its observed population survey (class and race distribution sampled via /who).">
+<link rel="alternate" type="application/json" href="/api/games" title="Datasets (JSON)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
@@ -729,6 +738,7 @@ async function popPage(url, env) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(realm)} population — MarketLens</title>
 <meta name="description" content="Observed population survey for ${esc(realm)}: class and race distribution sampled via /who.">
+<link rel="alternate" type="application/json" href="/api/population?game=${gameHref("", game)}" title="Population survey (JSON)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
