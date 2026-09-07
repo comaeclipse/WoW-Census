@@ -540,11 +540,11 @@ async function loadCharacterStats(env, game) {
     GROUP BY character_key HAVING COUNT(DISTINCT day)>=3)`
   ).bind(game, monthStart).first();
   const activity = (await env.DB.prepare(`SELECT c.full_name,c.class,c.class_file,c.level,c.zone,
-    c.first_seen,c.last_seen,c.seen_count,COUNT(DISTINCT o.day) seen_days,SUM(o.sightings) window_sightings
+    c.first_seen,c.last_seen,c.seen_count,COUNT(DISTINCT o.day) seen_days
     FROM character_observations o JOIN characters c
       ON c.game=o.game AND c.source_game=o.source_game AND c.character_key=o.character_key
     WHERE o.game=? AND o.day>=? GROUP BY o.source_game,o.character_key
-    ORDER BY seen_days DESC,window_sightings DESC,c.last_seen DESC LIMIT 50`
+    ORDER BY seen_days DESC,c.last_seen DESC LIMIT 50`
   ).bind(game, monthStart).all()).results;
   const week = (windows && windows.week) || 0;
   const returning = (cohorts && cohorts.returning_week) || 0;
@@ -714,12 +714,12 @@ async function popPage(url, env) {
     '<p class="hint">Inferred from the observed class mix &mdash; a demand hint, not observed sales.</p></div>';
 
   const activityBody = characters.activity.map((c) =>
-    '<tr><td class="l">' + esc(c.full_name) + '</td><td>' + c.seen_days + '</td><td>' + c.window_sightings +
+    '<tr><td class="l">' + esc(c.full_name) + '</td><td>' + c.seen_days +
     '</td><td class="l">' + esc((c.class || "") + (c.level ? " · level " + c.level : "") + (c.zone ? " · " + c.zone : "")) + '</td></tr>'
   ).join("");
   const identityPanel = '<div class="panel" style="margin-bottom:22px"><div class="ptitle">Unique &amp; returning characters</div>' +
-    '<table class="poptable"><thead><tr><th class="l">Character</th><th>Days</th><th>Sightings</th><th class="l">Last profile</th></tr></thead><tbody>' +
-    (activityBody || '<tr><td class="l mu" colspan="4" style="padding:16px">Identity tracking begins with the next scan made by an identity-enabled addon.</td></tr>') +
+    '<table class="poptable"><thead><tr><th class="l">Character</th><th>Days seen</th><th class="l">Last profile</th></tr></thead><tbody>' +
+    (activityBody || '<tr><td class="l mu" colspan="3" style="padding:16px">Identity tracking begins with the next scan made by an identity-enabled addon.</td></tr>') +
     '</tbody></table><p class="hint">' + characters.lifetime.toLocaleString() + ' lifetime unique characters · ' +
     characters.returningRate + '% 7-day returning-character rate. Names identify characters, not people or Battle.net accounts.</p></div>';
 
