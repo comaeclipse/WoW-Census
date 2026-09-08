@@ -15,6 +15,10 @@ local U = ML.Util
 local PAGE_SIZE  = 50
 local READ_BATCH = 150   -- rows per frame when reading a getAll dump
 local BROWSE_REPLY_TIMEOUT = 30
+-- Times a paged scan re-queries the same page waiting on seller names to
+-- resolve before it gives up and commits the page with whatever owners arrived.
+-- Some owners stay legitimately nil, so this must be bounded or the scan hangs.
+local MAX_PAGE_RETRIES = 3
 
 S.scanning = false
 S.atAH = false
@@ -34,6 +38,7 @@ local function resetAccumulator()
     S.readIndex = 1
     S.readTotal = 0
     S.ownersSeen = false -- flips true if any auction returned a seller name
+    S.pageRetries = 0    -- re-query attempts for the current page's owner names
 end
 
 local function accumulate(items, a)
@@ -449,14 +454,48 @@ function S:ProcessPage()
     local shown, total = GetNumAuctionItems("list")
     shown = shown or 0
     total = total or 0
+    local throttle = ML.db.settings.scanThrottle or 0.5
 
+    -- Parse the page once into a scratch list. On legacy paged scans (Classic
+    -- Era / TBC) an auction's owner can be nil on the first
+    -- AUCTION_ITEM_LIST_UPDATE while the client resolves its GUID -> character
+    -- name; committing then would silently drop the row from seller stats and
+    -- bias concentration low. Count rows still resolving (Blizzard's hasAllInfo
+    -- flag, or a kept row with no owner yet) and re-query the same page a bounded
+    -- number of times before committing -- getAll/replicate never reach here.
+    local rows = {}
+    local pending = 0
     for i = 1, shown do
         local a = P:GetAuction(i)
-        if a then accumulate(self.acc.items, a) end
+        if a then
+            rows[#rows + 1] = a
+            if a.resolved == false or a.owner == nil then
+                pending = pending + 1
+            end
+        end
     end
-    self.acc.totalRows = self.acc.totalRows + shown
 
     local totalPages = math.max(math.ceil(total / PAGE_SIZE), 1)
+
+    if pending > 0 and (self.pageRetries or 0) < MAX_PAGE_RETRIES then
+        -- Hold the page: don't accumulate (avoids double-counting on the re-read)
+        -- and don't advance. The driver re-fires QueryCurrentPage for this same
+        -- page after the throttle, by which point more names should have arrived.
+        self.pageRetries = (self.pageRetries or 0) + 1
+        self.awaitingPage = false
+        self.throttle = throttle
+        ML:Fire("SCAN_PROGRESS", { mode = "paged", page = self.page + 1,
+            pages = totalPages, rows = self.acc.totalRows, resolving = pending })
+        return false
+    end
+
+    -- Page accepted: commit its parsed rows exactly once, then move on.
+    -- totalRows tracks rows seen from the AH (matching the getAll path), so add
+    -- shown rather than the kept-row count.
+    for _, a in ipairs(rows) do accumulate(self.acc.items, a) end
+    self.acc.totalRows = self.acc.totalRows + shown
+    self.pageRetries = 0
+
     ML:Fire("SCAN_PROGRESS", { mode = "paged", page = self.page + 1,
         pages = totalPages, rows = self.acc.totalRows })
 
@@ -464,7 +503,7 @@ function S:ProcessPage()
     if nextStart < total and shown > 0 then
         self.page = self.page + 1
         self.awaitingPage = false
-        self.throttle = ML.db.settings.scanThrottle or 0.5
+        self.throttle = throttle
         return false -- more pages; driver OnUpdate fires the next query
     end
     return true

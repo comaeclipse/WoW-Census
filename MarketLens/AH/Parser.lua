@@ -28,6 +28,12 @@ function P:GetAuction(index)
         owner     = ownerFullName or owner,
         quality   = quality,
         level     = level,
+        -- Blizzard's per-row "fully loaded" flag. On legacy paged scans
+        -- (Classic Era / TBC) a row can arrive before its GUID->character-name
+        -- lookup resolves, leaving owner nil; the scanner uses this to re-query
+        -- the page instead of committing an unattributed row. Legacy-only: it is
+        -- absent on clients without QueryAuctionItems, so treat nil as resolved.
+        resolved  = hasAllInfo,
     }
 end
 
