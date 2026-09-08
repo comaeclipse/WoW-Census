@@ -88,7 +88,10 @@
     "Weapons": "Gear", "Armor": "Gear", "Shields": "Gear", "Relics": "Gear", "Off-Hand": "Gear",
     "Cosmetic": "Cosmetic",
     "Bags": "Bags", "Quivers": "Bags",
-    "Recipes": "Recipes"
+    "Recipes": "Recipes",
+    // Class spell reagents. "Reagents" is the legacy addon string still present in
+    // datasets uploaded before class reagents got their own sector.
+    "Class Reagents": "Class Reagents", "Reagents": "Class Reagents"
   };
   function catFor(market, name) {
     if (market) { var m = MARKET_MAP[market]; if (m) return m; }
@@ -161,7 +164,7 @@
 
   var ITEMS = [], curCat = "All", search = "", CAP = 300;
   var sortKey = isRealm ? "deal" : "demand", sortDir = -1;
-  var CATS = ["All","Ore & Bars","Herbs","Cloth","Leather","Primals","Enchanting","Gems","Enhancements","Gear","Potions","Flasks","Elixirs","Cooking","Cosmetic","Recipes","Bags","Other"];
+  var CATS = ["All","Ore & Bars","Herbs","Cloth","Leather","Primals","Enchanting","Gems","Enhancements","Gear","Potions","Flasks","Elixirs","Cooking","Class Reagents","Cosmetic","Recipes","Bags","Other"];
   var COLS = isRealm ? [
     { k: "name", t: "Item", l: true },
     { k: "cat", t: "Market", l: true },

@@ -120,7 +120,9 @@ function D:ClassifyByClass(classID, subClassID, equipLoc)
     elseif classID == CLASS_PROJECTILE then
         return { profession = "Gear", sector = "Gear", market = "Ammo" }
     elseif classID == CLASS_REAGENT then
-        return { profession = "Unknown", sector = "Raw Materials", market = "Reagents" }
+        -- Class 5 in TBC is overwhelmingly class spell reagents (seeds, candles,
+        -- runes, powders, symbols, Ankh) -- class utility, not profession mats.
+        return { profession = "Class Reagents", sector = "Class Supplies", market = "Class Reagents" }
     elseif classID == CLASS_WEAPON then
         return { profession = "Gear", sector = "Gear", market = "Weapons" }
     elseif classID == CLASS_ARMOR then
@@ -160,7 +162,7 @@ function D:ClassifyByClass(classID, subClassID, equipLoc)
         elseif subClassID == 5 then
             return { profession = "Unknown", sector = "Other", market = "Mounts" }
         elseif subClassID == 1 then
-            return { profession = "Unknown", sector = "Raw Materials", market = "Reagents" }
+            return { profession = "Class Reagents", sector = "Class Supplies", market = "Class Reagents" }
         else
             return { profession = "Unknown", sector = "Other", market = "Miscellaneous" }
         end

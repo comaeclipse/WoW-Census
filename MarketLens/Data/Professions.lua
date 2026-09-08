@@ -9,6 +9,7 @@ D.Sectors = {
     "Consumables",
     "Gear",
     "Recipes",
+    "Class Supplies", -- class spell reagents (seeds, candles, runes, Ankh, ...)
     "Other",
 }
 
@@ -28,6 +29,7 @@ D.Professions = {
     { key = "Cloth",          sector = "Raw Materials" },
     { key = "Cooking",        sector = "Consumables"   },
     { key = "Gear",           sector = "Gear"          },
+    { key = "Class Reagents", sector = "Class Supplies"},
     { key = "Unknown",        sector = "Other"         },
 }
 
@@ -60,6 +62,7 @@ D.ProfessionIcons = {
     Cloth          = ICON .. "INV_Fabric_Netherweave",
     Cooking        = ICON .. "INV_Misc_Food_15",
     Gear           = ICON .. "INV_Chest_Chain",
+    ["Class Reagents"] = ICON .. "Spell_Nature_Reincarnation", -- Ankh/Rebirth reagent motif
     Unknown        = ICON .. "INV_Misc_QuestionMark",
 }
 
