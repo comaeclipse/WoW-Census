@@ -35,7 +35,9 @@ if (-not $GameType) {
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 if (-not $Out) {
     $name = if ($isRetail) { "TSMRegionRetail.lua" } else { "TSMRegion.lua" }
-    $Out  = Join-Path $scriptDir "..\Data\$name"
+    # The addon's data folder is repo\MarketLens\Data (the addon lives in a
+    # MarketLens\ subfolder), not repo\Data. tools\ sits at the repo root.
+    $Out  = Join-Path $scriptDir "..\MarketLens\Data\$name"
 }
 
 # The load-time guard: only the file matching the running client assigns the
