@@ -26,6 +26,7 @@ AH/Parser.lua
 AH/Scanner.lua
 
 Analytics/Snapshots.lua
+Analytics/Sellers.lua
 Analytics/Trends.lua
 Analytics/Region.lua
 Analytics/Demand.lua

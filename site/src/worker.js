@@ -4,6 +4,8 @@
 //   GET  /api/items?game=          latest snapshot for a dataset (JSON, cached)
 //   GET  /api/history?game=&id=    daily time series for one item (JSON)
 //   GET  /item/<slug|id>?game=     server-rendered item page + history graph
+//   GET  /seller/<slug|name>?game= server-rendered seller profile (realm only)
+//   POST /admin/import-sellers?token=&region=  upload seller profiles (paged scans)
 //   GET  /admin/refresh?token=&game=   manual collect (seed after deploy)
 //   cron                           daily collect of every dataset in env.GAMES
 //
@@ -360,6 +362,32 @@ async function itemPage(url, env) {
   const gameLabel = isRealm ? game.slice(6) : (GAMES[game] ? GAMES[game].label : game);
   const points = JSON.stringify(hist.results || []);
 
+  // Who is currently listing this item on the realm (cheapest first), linking to
+  // each seller's profile. Only realm datasets from paged scans have this.
+  let sellersHtml = "";
+  if (isRealm) {
+    const sres = await env.DB.prepare(
+      `SELECT sl.owner owner, sl.q q, sl.l l, s.slug slug
+       FROM seller_listings sl LEFT JOIN sellers s ON s.game = sl.game AND s.owner = sl.owner
+       WHERE sl.game = ? AND sl.id = ? ORDER BY sl.l ASC LIMIT 30`
+    ).bind(game, row.id).all();
+    const srows = (sres.results || []).map((r) =>
+      `<tr>
+        <td class="l"><a class="name" href="/seller/${encodeURIComponent(r.slug || slugify(r.owner))}?game=${gameHref("", game)}">${esc(r.owner)}</a></td>
+        <td>${(r.q || 0).toLocaleString()}</td>
+        <td class="g">${gsc(r.l)}</td>
+      </tr>`).join("");
+    if (srows) {
+      sellersHtml = `<div class="panel">
+        <div class="ptitle">WHO'S SELLING THIS <span class="mu">${(sres.results || []).length} sellers</span></div>
+        <div class="tablewrap"><table>
+          <thead><tr><th class="l">Seller</th><th>Qty</th><th>Buyout</th></tr></thead>
+          <tbody>${srows}</tbody>
+        </table></div>
+      </div>`;
+    }
+  }
+
   let statsHtml;
   if (isRealm) {
     const deal = row.hist > 0 ? Math.round((row.hist - row.asp) / row.hist * 100) : null;
@@ -411,6 +439,8 @@ async function itemPage(url, env) {
     </div>
     <p class="hint" id="hhint"></p>
   </div>
+
+  ${sellersHtml}
 
   <p class="src">Data: TradeSkillMaster public data (${esc(game)} / ${REGION}). History accrues daily from this site's collector.</p>
 </div>
@@ -496,6 +526,155 @@ async function importPop(url, env, req) {
   if (!rows.length && !characterRows.length) return json({ error: "no population data in export" });
   return json({ ok: true, realm: body.realm, sourceGame, samples: rows.length,
     characters: characterRows.length, observations: observationRows.length });
+}
+
+// Import a realm's seller profiles (ml-sellers-v1). Owner names come only from
+// legacy paged scans, so this is realm-only. Each upload fully replaces the
+// realm's prior snapshot so delisted auctions don't linger.
+async function importSellers(url, env, req) {
+  if (!env.REFRESH_TOKEN || url.searchParams.get("token") !== env.REFRESH_TOKEN)
+    return new Response("forbidden", { status: 403 });
+  const regionGame = GAMES[url.searchParams.get("region")] ? url.searchParams.get("region") : DEFAULT_GAME;
+
+  let body;
+  try { body = await req.json(); } catch (e) { return json({ error: "invalid json" }); }
+  if (!body || body.type !== "ml-sellers-v1" || !body.realm || !Array.isArray(body.sellers))
+    return json({ error: "expected an ml-sellers-v1 seller export" });
+  const realmName = regionGame === "retail" ? stripFaction(body.realm) : body.realm;
+  const game = "realm:" + realmName;
+
+  const sellerRows = [], listingRows = [];
+  for (const s of body.sellers) {
+    if (!s || !s.o || !Array.isArray(s.L) || !s.L.length) continue;
+    let items = 0, qty = 0, value = 0;
+    for (const l of s.L) {
+      const id = Number(l[0]) || 0, q = l[1] || 0, price = l[2] || 0;
+      if (!id) continue;
+      items++; qty += q; value += q * price;
+      listingRows.push([game, s.o, id, q, price]);
+    }
+    if (!items) continue;
+    sellerRows.push([game, s.o, slugify(s.o), s.fs || 0, s.ls || 0, s.sc || 0,
+      items, qty, value, JSON.stringify(s.h || [])]);
+  }
+  if (!sellerRows.length) return json({ error: "no sellers in export" });
+
+  await env.DB.prepare("DELETE FROM sellers WHERE game=?").bind(game).run();
+  await env.DB.prepare("DELETE FROM seller_listings WHERE game=?").bind(game).run();
+  await bulkInsert(env.DB, "sellers",
+    ["game", "owner", "slug", "first_seen", "last_seen", "seen_count", "items", "qty", "value", "hist"],
+    sellerRows, 60);
+  await bulkInsert(env.DB, "seller_listings",
+    ["game", "owner", "id", "q", "l"], listingRows, 120);
+  return json({ ok: true, realm: realmName, sellers: sellerRows.length, listings: listingRows.length });
+}
+
+// Tiny inline SVG sparkline of a seller's listed value over time (copper).
+function sparkline(points) {
+  const vals = points.map((p) => p[3] || 0);
+  if (vals.length < 2) return "";
+  const mn = Math.min(...vals), mx = Math.max(...vals), span = mx - mn || 1;
+  const w = 220, h = 40, step = w / (vals.length - 1);
+  const d = vals.map((v, i) => (i ? "L" : "M") + Math.round(i * step) + " " +
+    Math.round(h - ((v - mn) / span) * (h - 4) - 2)).join(" ");
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">
+    <path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2"/></svg>`;
+}
+
+function sellerNotFound(game, key, extra) {
+  return `<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/style.css">
+  <div class="wrap"><p class="src">No seller "${esc(key)}" in ${esc(game)}. ${extra ? esc(extra) + " " : ""}<a href="/?game=${esc(game)}">Back to screener</a></p></div>`;
+}
+
+// Server-rendered profile of everything one seller is currently listing on a
+// realm, plus a small history of how much they list over time.
+async function sellerPage(url, env) {
+  const game = pickGame(url);
+  if (game.indexOf("realm:") !== 0)
+    return new Response(sellerNotFound(game, "", "Seller profiles exist only for realm datasets."),
+      { status: 404, headers: { "content-type": "text/html; charset=utf-8" } });
+  const key = decodeURIComponent(url.pathname.replace(/^\/seller\//, "")).replace(/\/$/, "");
+
+  let seller = await env.DB.prepare(
+    "SELECT * FROM sellers WHERE game=? AND slug=? ORDER BY value DESC LIMIT 1"
+  ).bind(game, slugify(key)).first();
+  if (!seller) seller = await env.DB.prepare(
+    "SELECT * FROM sellers WHERE game=? AND owner=? LIMIT 1"
+  ).bind(game, key).first();
+  if (!seller) return new Response(sellerNotFound(game, key),
+    { status: 404, headers: { "content-type": "text/html; charset=utf-8" } });
+
+  // For realm datasets items.hist holds the region average sale price (items.asp
+  // is the realm buyout), so hist is the right "vs region" reference here.
+  const listRes = await env.DB.prepare(
+    `SELECT sl.id id, sl.q q, sl.l l, i.name name, i.slug slug, i.hist region
+     FROM seller_listings sl LEFT JOIN items i ON i.game = sl.game AND i.id = sl.id
+     WHERE sl.game = ? AND sl.owner = ? ORDER BY (sl.q * sl.l) DESC`
+  ).bind(game, seller.owner).all();
+  const listings = listRes.results || [];
+
+  const realmLabel = game.slice(6);
+  const lastSeen = seller.last_seen ? new Date(seller.last_seen * 1000).toISOString().slice(0, 10) : "—";
+  const stat = (k, v, cls) => `<div class="tile"><div class="k">${esc(k)}</div><div class="v ${cls || ""}">${esc(v)}</div></div>`;
+
+  const rows = listings.map((r) => {
+    const name = r.name || ("item:" + r.id);
+    const slug = r.slug || r.id;
+    // Positive = this seller is priced under the region average sale (a deal).
+    const vs = (r.region && r.l) ? Math.round((r.region - r.l) / r.region * 100) : null;
+    const vsCell = vs === null ? '<td class="mu">—</td>'
+      : `<td class="${vs >= 0 ? "gr" : "rd"}">${vs >= 0 ? "+" : ""}${vs}%</td>`;
+    return `<tr>
+      <td class="l"><a class="name" href="/item/${encodeURIComponent(slug)}?game=${gameHref("", game)}">${esc(name)}</a></td>
+      <td>${(r.q || 0).toLocaleString()}</td>
+      <td class="g">${gsc(r.l)}</td>
+      <td class="mu">${gsc(r.region)}</td>
+      ${vsCell}
+    </tr>`;
+  }).join("");
+
+  let hist = [];
+  try { hist = JSON.parse(seller.hist || "[]"); } catch (e) { hist = []; }
+  const spark = sparkline(hist);
+  const avgItems = hist.length ? Math.round(hist.reduce((s, p) => s + (p[1] || 0), 0) / hist.length) : seller.items;
+
+  const html = `<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(seller.owner)} — seller — MarketLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head><body>
+<div class="crt" aria-hidden="true"></div>
+<div class="wrap">
+  <a class="back" href="/?game=${gameHref("", game)}">&#9664; MARKETLENS</a>
+  <header class="ihead">
+    <h1 class="iname">${esc(seller.owner)}</h1>
+    <div class="itag">SELLER &middot; realm ${esc(realmLabel)} &middot; last seen ${esc(lastSeen)} &middot; ${seller.seen_count || 0} scans</div>
+  </header>
+
+  <section class="istats">
+    ${stat("Items listed", (seller.items || 0).toLocaleString())}
+    ${stat("Total quantity", (seller.qty || 0).toLocaleString())}
+    ${stat("Listed value", gsc(seller.value), "g")}
+    ${stat("Usually lists", (avgItems || 0) + " items", "mu")}
+  </section>
+
+  ${spark ? `<div class="panel"><div class="ptitle">LISTED VALUE OVER TIME</div>${spark}</div>` : ""}
+
+  <div class="panel">
+    <div class="ptitle">CURRENT LISTINGS <span class="mu">${listings.length} items</span></div>
+    <div class="tablewrap"><table>
+      <thead><tr><th class="l">Item</th><th>Qty</th><th>Their Buyout</th><th>Region Avg</th><th>vs Region</th></tr></thead>
+      <tbody>${rows || '<tr><td class="l" colspan="5" style="padding:18px;color:var(--muted)">No current listings.</td></tr>'}</tbody>
+    </table></div>
+  </div>
+
+  <p class="src">Seller data comes from legacy paged AH scans on ${esc(realmLabel)}. A seller's listings reflect the most recent paged scan; "usually lists" averages the last ${hist.length || 0} scans.</p>
+</div>
+</body></html>`;
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=1800" } });
 }
 
 // Aggregate every stored sample for a realm into class/race totals + demand.
@@ -793,7 +972,9 @@ export default {
       if (p === "/api/population") return await apiPopulation(url, env);
       if (p === "/admin/import-realm" && req.method === "POST") return await importRealm(url, env, req);
       if (p === "/admin/import-pop" && req.method === "POST") return await importPop(url, env, req);
+      if (p === "/admin/import-sellers" && req.method === "POST") return await importSellers(url, env, req);
       if (p === "/pop") return await popPage(url, env);
+      if (p.startsWith("/seller/")) return await sellerPage(url, env);
       if (p.startsWith("/item/")) return await itemPage(url, env);
       if (p === "/admin/refresh") {
         if (!env.REFRESH_TOKEN || url.searchParams.get("token") !== env.REFRESH_TOKEN)

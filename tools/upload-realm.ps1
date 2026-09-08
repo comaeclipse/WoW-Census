@@ -155,3 +155,33 @@ if ($content -match '\["popExport"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
         }
     }
 }
+
+# Seller profiles: which seller lists which items, rebuilt from SavedVariables.
+# Only legacy paged scans capture owner names, so getAll / retail uploads have no
+# seller data and the node helper exits non-zero here -- skipped silently.
+$node = Get-Command node -ErrorAction SilentlyContinue
+if ($node -and (Test-Path $helper)) {
+    $sellerArgs = @($helper, $file.FullName, "--sellers")
+    if ($Realm) { $sellerArgs += "--realm=$Realm" }
+    $rebuiltSellers = & $node.Source @sellerArgs
+    if ($LASTEXITCODE -eq 0 -and $rebuiltSellers) {
+        try { $sellers = $rebuiltSellers | ConvertFrom-Json } catch { $sellers = $null }
+        if ($sellers -and $sellers.type -eq "ml-sellers-v1" -and $sellers.sellers) {
+            $nSellers = ($sellers.sellers | Measure-Object).Count
+            if ($nSellers -gt 0) {
+                $sellerUri = "$Url/admin/import-sellers?token=$([uri]::EscapeDataString($Token))&region=$Region"
+                try {
+                    $sr = Invoke-RestMethod -Uri $sellerUri -Method Post -Body $rebuiltSellers -ContentType "application/json"
+                    if ($sr.ok) {
+                        Write-Host ("Imported {0} seller(s) with {1} listing(s) for {2}." -f $sr.sellers, $sr.listings, $sr.realm) -ForegroundColor Green
+                        Write-Host ("Sellers show on each item page ({0}/?game=realm:{1}, open an item)." -f $Url, [uri]::EscapeDataString($sr.realm))
+                    } else {
+                        Write-Host ("Seller upload error: {0}" -f $sr.error) -ForegroundColor Yellow
+                    }
+                } catch {
+                    Write-Host ("Seller upload failed: {0}" -f $_.Exception.Message) -ForegroundColor Yellow
+                }
+            }
+        }
+    }
+}

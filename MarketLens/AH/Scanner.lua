@@ -25,7 +25,9 @@ local driver = CreateFrame("Frame")
 driver:Hide()
 
 local function resetAccumulator()
-    S.acc = { items = {}, totalRows = 0 }
+    -- acc.sellers[owner] = { [itemID] = { q=, l=, n= } } is built only when the
+    -- scan returns owner names (paged legacy scans); it feeds seller profiles.
+    S.acc = { items = {}, sellers = {}, totalRows = 0 }
     S.page = 0
     S.awaitingPage = false
     S.throttle = 0
@@ -57,6 +59,21 @@ local function accumulate(items, a)
     if a.owner then
         it.sellers[a.owner] = (it.sellers[a.owner] or 0) + a.quantity
         S.ownersSeen = true
+        -- Per-owner listing detail (quantity + this owner's lowest unit price per
+        -- item) so the site can build a profile of everything a seller posts.
+        local sacc = S.acc and S.acc.sellers
+        if sacc then
+            local owned = sacc[a.owner]
+            if not owned then owned = {}; sacc[a.owner] = owned end
+            local li = owned[a.itemID]
+            if not li then
+                li = { q = 0, l = a.unitPrice, n = a.name }
+                owned[a.itemID] = li
+            end
+            li.q = li.q + a.quantity
+            if a.unitPrice and (not li.l or a.unitPrice < li.l) then li.l = a.unitPrice end
+            if not li.n and a.name then li.n = a.name end
+        end
     end
     it.prices[#it.prices + 1] = { price = a.unitPrice, quantity = a.quantity }
     if not it.minPrice or a.unitPrice < it.minPrice then
@@ -212,6 +229,13 @@ function S:Finish()
     ML:Print("Scan complete: %d %s, %d unique items.", self.acc.totalRows, unit, itemCount)
     ML.Snapshots:Record(self.acc.items)
     ML.Snapshots:Purge()
+    -- Seller profiles only exist when this scan captured owners (paged legacy).
+    -- getAll/browse/replicate leave acc.sellers empty, so stored profiles persist
+    -- untouched rather than being wiped by an owner-less scan.
+    if self.ownersSeen and ML.Sellers then
+        ML.Sellers:Record(self.acc.sellers)
+        ML.Sellers:Purge()
+    end
     ML:Fire("SCAN_COMPLETE", itemCount, self.acc.totalRows, self.mode)
 end
 

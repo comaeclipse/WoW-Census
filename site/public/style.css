@@ -105,6 +105,9 @@ a{color:var(--blue)}
 .chip[aria-pressed="true"]{background:var(--gold); color:#161018; border-color:var(--gold);}
 .chip:focus-visible,.game:focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
 
+/* seller-profile listed-value sparkline */
+.spark{display:block; margin-top:6px; max-width:100%;}
+
 /* table */
 .tablewrap{background:var(--panel); border:2px solid var(--line); box-shadow:6px 6px 0 var(--shadow); overflow-x:auto;}
 table{width:100%; border-collapse:collapse; min-width:720px;}
