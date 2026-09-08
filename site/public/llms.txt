@@ -19,7 +19,7 @@ truth and are edge-cached.
 - Money values (mv, asp, hist) are in copper. 100 copper = 1 silver; 10000
   copper = 1 gold.
 - `sr` is a sale rate from 0 to 1. `spd` is estimated items sold per day.
-- Realm-only fields (`q`, `sc`, `cat`) are null on region datasets.
+- Realm-only fields (`q`, `sc`, `tc`, `cat`) are null on region datasets.
 
 ## API
 
@@ -30,10 +30,11 @@ truth and are edge-cached.
   Latest market snapshot for a dataset. Returns `game`, `sourceGame`, `region`,
   `count`, `updatedAt`, `days`, `columns`, and `items`. `items` is an array of
   arrays; `columns` names each position. Current order:
-  `["id","name","slug","mv","asp","sr","spd","q","sc","hist","cat"]` where
+  `["id","name","slug","mv","asp","sr","spd","q","sc","tc","hist","cat"]` where
   mv=market value, asp=average sale price, sr=sale rate, spd=sold/day,
-  q=quantity on the realm AH, sc=distinct sellers, hist=region historical avg
-  (for the realm-vs-region deal signal), cat=category.
+  q=quantity on the realm AH, sc=distinct sellers, tc=top-seller concentration
+  (0-100, the largest single seller's share of listed quantity), hist=region
+  historical avg (for the realm-vs-region deal signal), cat=category.
 - [/api/history?game=<game>&id=<itemId>](https://marketlens.skarz.workers.dev/api/history?game=classic-progression&id=2589):
   Daily time series for one item. Returns `points`, an array of objects with
   `ts` (YYYYMMDD integer), `mv`, `asp`, `sr`, `spd`.

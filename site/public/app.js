@@ -171,6 +171,7 @@
     { k: "asp", t: "Your Buyout" },
     { k: "q", t: "Qty" },
     { k: "sc", t: "Sellers" },
+    { k: "tc", t: "Top Seller" },
     { k: "demand", t: "Demand" },
     { k: "deal", t: "vs Region" },
   ] : [
@@ -186,20 +187,20 @@
   fetch("/api/items?game=" + encodeURIComponent(game)).then(function (r) { return r.json(); }).then(function (data) {
     if (isRealm && WH_BRANCH[data.sourceGame] != null) whBranch = WH_BRANCH[data.sourceGame];
     ITEMS = (data.items || []).map(function (r) {
-      var o = { id: r[0], name: r[1], slug: r[2], mv: r[3], asp: r[4], sr: r[5], spd: r[6], q: r[7], sc: r[8], hist: r[9] };
-      o.cat = catFor(r[10], o.name);
+      var o = { id: r[0], name: r[1], slug: r[2], mv: r[3], asp: r[4], sr: r[5], spd: r[6], q: r[7], sc: r[8], tc: r[9], hist: r[10] };
+      o.cat = catFor(r[11], o.name);
       o.demand = demand(o.sr, o.spd);
       o.deal = (isRealm && o.hist > 0 && o.asp > 0) ? Math.round((o.hist - o.asp) / o.hist * 100) : null;
       return o;
     });
     if (!ITEMS.length) {
       document.getElementById("meta").innerHTML = "no data for this dataset";
-      document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="7" style="padding:22px;color:var(--muted)">No data yet.</td></tr>';
+      document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="' + COLS.length + '" style="padding:22px;color:var(--muted)">No data yet.</td></tr>';
       return;
     }
     boot(data);
   }).catch(function () {
-    document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="7" style="padding:22px;color:var(--red)">Failed to load data.</td></tr>';
+    document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="' + COLS.length + '" style="padding:22px;color:var(--red)">Failed to load data.</td></tr>';
   });
 
   function boot(data) {
@@ -276,9 +277,11 @@
       var link = '<a class="name" href="/item/' + encodeURIComponent(it.slug || it.id) + '?game=' + gameParam(game) + '">' + esc(it.name) + "</a>";
       var dm = '<td><span class="meter">' + meter(it.demand) + '</span><span class="dv ' + (it.demand >= 80 ? "g" : it.demand >= 45 ? "gr" : "mu") + '">' + it.demand + "</span></td>";
       if (isRealm) {
+        var tcCell = it.tc == null ? '<td class="mu">—</td>'
+          : '<td class="' + (it.tc >= 60 ? "gr" : it.tc >= 30 ? "g" : "mu") + '">' + it.tc + "%</td>";
         h += "<tr><td class=\"l\">" + ic + link + '</td><td class="l cat">' + esc(it.cat) + "</td>" +
           '<td class="g">' + gs(it.asp) + "</td><td>" + (it.q || 0).toLocaleString() + "</td><td>" + (it.sc == null ? "—" : it.sc) + "</td>" +
-          dm + dealCell(it.deal) + "</tr>";
+          tcCell + dm + dealCell(it.deal) + "</tr>";
       } else {
         h += "<tr><td class=\"l\">" + ic + link + '</td><td class="l cat">' + esc(it.cat) + "</td>" + dm +
           '<td class="' + (it.sr >= 0.35 ? "gr" : it.sr < 0.1 ? "rd" : "") + '">' + Math.round(it.sr * 100) + "%</td>" +
@@ -286,7 +289,7 @@
           '<td class="g">' + gs(it.asp) + '</td><td class="mu">' + big(it.mv) + "</td></tr>";
       }
     }
-    document.getElementById("rows").innerHTML = h || '<tr><td class="l" colspan="7" style="padding:20px;color:var(--muted)">No items match.</td></tr>';
+    document.getElementById("rows").innerHTML = h || '<tr><td class="l" colspan="' + COLS.length + '" style="padding:20px;color:var(--muted)">No items match.</td></tr>';
     whRefresh(); // re-scan the freshly rendered rows for Wowhead icons/tooltips
     document.getElementById("foot").textContent =
       "SHOWING " + shown.length.toLocaleString() + " OF " + rows.length.toLocaleString() + (rows.length > CAP ? "  (TOP " + CAP + " — REFINE TO SEE MORE)" : "");

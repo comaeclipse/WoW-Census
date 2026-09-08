@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS items (
   updated_at TEXT,                  -- upstream scan time (ISO)
   q          INTEGER,               -- realm scan quantity (NULL for region datasets)
   sc         INTEGER,               -- realm seller count (NULL when unavailable)
+  tc         INTEGER,               -- realm top-seller concentration 0-100 (NULL when sellers unknown)
   cat        TEXT,                  -- addon-computed market (NULL for region datasets; site maps it to a chip)
   PRIMARY KEY (game, id)
 );
