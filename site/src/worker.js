@@ -362,6 +362,18 @@ async function itemPage(url, env) {
   const gameLabel = isRealm ? game.slice(6) : (GAMES[game] ? GAMES[game].label : game);
   const points = JSON.stringify(hist.results || []);
 
+  // No captured name -> item:<id> placeholder. Pull the real name from Wowhead
+  // client-side (same source the screener's hover cards use). The branch mirrors
+  // app.js: realms and TBC Anniversary use the tbc site, Classic Era the classic
+  // site, retail the default.
+  const isPlaceholder = /^item:\d+$/.test(row.name);
+  const whBranch = isRealm ? "tbc"
+    : ({ "classic-progression": "tbc", "classic": "classic", "retail": "" }[game] ?? "tbc");
+  const whHref = "https://www.wowhead.com/" + (whBranch ? whBranch + "/" : "") + "item=" + row.id;
+  const nameHtml = isPlaceholder
+    ? `<a class="iname-wh" href="${whHref}" data-wh-rename-link="true">${esc(row.name)}</a>`
+    : esc(row.name);
+
   // Who is currently listing this item on the realm (cheapest first), linking to
   // each seller's profile. Only realm datasets from paged scans have this.
   let sellersHtml = "";
@@ -423,7 +435,7 @@ async function itemPage(url, env) {
 <div class="wrap">
   <a class="back" href="/?game=${game}">&#9664; MARKETLENS</a>
   <header class="ihead">
-    <h1 class="iname">${esc(row.name)}</h1>
+    <h1 class="iname">${nameHtml}</h1>
     <div class="itag">${esc(gameLabel)} &middot; region ${REGION.toUpperCase()} &middot; item ${row.id}</div>
   </header>
 
@@ -445,7 +457,9 @@ async function itemPage(url, env) {
   <p class="src">Data: TradeSkillMaster public data (${esc(game)} / ${REGION}). History accrues daily from this site's collector.</p>
 </div>
 <script>window.ITEM=${JSON.stringify({ id: row.id, name: row.name, game })};window.POINTS=${points};</script>
-<script src="/item.js"></script>
+<script src="/item.js"></script>${isPlaceholder ? `
+<script>const whTooltips={colorLinks:false,iconizeLinks:true,renameLinks:false};</script>
+<script src="https://wow.zamimg.com/js/tooltips.js" defer></script>` : ""}
 </body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=1800" } });
 
@@ -911,11 +925,11 @@ async function popPage(url, env) {
     '<p class="hint">Inferred from the observed class mix &mdash; a demand hint, not observed sales.</p></div>';
 
   const activityBody = characters.activity.map((c) =>
-    '<tr><td class="l">' + esc(c.full_name) + '</td><td>' + c.seen_days +
-    '</td><td class="l">' + esc((c.class || "") + (c.level ? " · level " + c.level : "") + (c.zone ? " · " + c.zone : "")) + '</td></tr>'
+    '<tr><td class="l">' + esc(c.full_name + (c.level ? " (" + c.level + ")" : "")) + '</td><td>' + c.seen_days +
+    '</td><td class="l">' + esc((c.class || "") + (c.zone ? " · " + c.zone : "")) + '</td></tr>'
   ).join("");
   const identityPanel = '<div class="panel" style="margin-bottom:22px"><div class="ptitle">Unique &amp; returning characters</div>' +
-    '<table class="poptable"><thead><tr><th class="l">Character</th><th>Days seen</th><th class="l">Last profile</th></tr></thead><tbody>' +
+    '<table class="poptable acttable"><thead><tr><th class="l">Character</th><th>Days seen</th><th class="l">Last profile</th></tr></thead><tbody>' +
     (activityBody || '<tr><td class="l mu" colspan="3" style="padding:16px">Identity tracking begins with the next scan made by an identity-enabled addon.</td></tr>') +
     '</tbody></table><p class="hint">' + characters.lifetime.toLocaleString() + ' lifetime unique characters · ' +
     characters.returningRate + '% 7-day returning-character rate. Names identify characters, not people or Battle.net accounts.</p></div>';
@@ -932,9 +946,12 @@ async function popPage(url, env) {
 <link rel="stylesheet" href="/style.css">
 <style>
   table.poptable{min-width:0}
-  table.poptable td,table.poptable th{white-space:nowrap}
+  table.poptable td,table.poptable th{white-space:nowrap; padding-left:8px; padding-right:8px}
   table.poptable td .meter{margin:0}
   table.poptable td.l .meter i{height:14px}
+  /* The character table is the wide one; let its text columns wrap instead of
+     overflowing into the class-distribution column beside it. */
+  table.acttable td.l{white-space:normal}
 </style>
 </head><body>
 <div class="crt" aria-hidden="true"></div>

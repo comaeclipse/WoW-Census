@@ -274,7 +274,18 @@
     for (var i = 0; i < shown.length; i++) {
       var it = shown[i];
       var ic = '<a class="ic" href="' + whItem(it.id) + '" tabindex="-1" aria-hidden="true"></a>';
-      var link = '<a class="name" href="/item/' + encodeURIComponent(it.slug || it.id) + '?game=' + gameParam(game) + '">' + esc(it.name) + "</a>";
+      var link;
+      if (/^item:\d+$/.test(it.name)) {
+        // No captured name (the addon scan never cached it and region data
+        // doesn't cover this item), so it's an item:<id> placeholder. Point the
+        // link at Wowhead with rename on — its tooltip data fills the real name
+        // client-side (same source as the hover card). A click still routes to
+        // our own item page via the delegated handler below.
+        link = '<a class="name whname" data-id="' + it.id + '" href="' + whItem(it.id) +
+          '" data-wh-rename-link="true">' + esc(it.name) + "</a>";
+      } else {
+        link = '<a class="name" href="/item/' + encodeURIComponent(it.slug || it.id) + '?game=' + gameParam(game) + '">' + esc(it.name) + "</a>";
+      }
       var dm = '<td><span class="meter">' + meter(it.demand) + '</span><span class="dv ' + (it.demand >= 80 ? "g" : it.demand >= 45 ? "gr" : "mu") + '">' + it.demand + "</span></td>";
       if (isRealm) {
         var tcCell = it.tc == null ? '<td class="mu">—</td>'
@@ -309,6 +320,13 @@
     render();
   });
   document.getElementById("search").addEventListener("input", function (e) { search = e.target.value; render(); });
+  // Placeholder-name rows point their link at Wowhead (so it can rename them);
+  // keep clicks on our own item page.
+  document.getElementById("rows").addEventListener("click", function (e) {
+    var a = e.target.closest("a.whname"); if (!a) return;
+    e.preventDefault();
+    location.href = "/item/" + encodeURIComponent(a.getAttribute("data-id")) + "?game=" + gameParam(game);
+  });
 
   function closeMenus(except) {
     Array.prototype.forEach.call(document.querySelectorAll("#games .mgroup.on"), function (n) {
