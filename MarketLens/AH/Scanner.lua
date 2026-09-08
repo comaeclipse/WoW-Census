@@ -125,7 +125,10 @@ function S:AtAuctionHouse()
     return self.atAH == true
 end
 
-function S:StartScan()
+-- forcePaged: skip Get All even when it's available. The bulk dump omits seller
+-- names, so a paged scan is the only legacy path that captures owners (and thus
+-- seller counts). Slower, but the trade-off callers opt into via /ml scan paged.
+function S:StartScan(forcePaged)
     if not self.eventDriverReady then
         ML:Print("Scanner initialization failed before its event handler loaded. Enable Lua errors and /reload.")
         return
@@ -164,7 +167,7 @@ function S:StartScan()
     ML.Data.classifyCache = {} -- refresh in case item info arrived since last scan
     ML:Fire("SCAN_START")
 
-    if canGetAll then
+    if canGetAll and not forcePaged then
         self.mode = "getAll"
         ML:Print("Starting full scan (Get All)...")
         self.awaitingPage = true
@@ -172,7 +175,9 @@ function S:StartScan()
         QueryAuctionItems("", nil, nil, 0, nil, nil, true, false)
     else
         self.mode = "paged"
-        ML:Print("Get All on cooldown \226\128\148 running a paged scan (slower)...")
+        ML:Print(forcePaged
+            and "Running a paged scan to capture seller names (slower)..."
+            or "Get All on cooldown \226\128\148 running a paged scan (slower)...")
         driver:Show()
         self:QueryCurrentPage()
     end

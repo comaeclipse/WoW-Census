@@ -230,6 +230,8 @@ SlashCmdList["MARKETLENS"] = function(msg)
     msg = raw:lower()
     if msg == "scan" then
         ML.Scanner:StartScan()
+    elseif msg == "scan paged" then
+        ML.Scanner:StartScan(true)
     elseif msg == "scan replicate" then
         if ML.Scanner.StartReplicate then ML.Scanner:StartReplicate() end
     elseif msg == "who" or msg:match("^who%s") then
