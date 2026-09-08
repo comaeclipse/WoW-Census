@@ -156,7 +156,13 @@ if (process.argv.includes("--sellers")) {
       sc: rec.seenCount || 0, L, h,
     });
   }
-  if (!sellers.length) throw new Error("seller export contains zero sellers");
+  if (!sellers.length) {
+    // Routine, not a crash: no realm.sellers yet (a Get-All scan, or a paged scan
+    // run before the seller-capture code loaded). Exit quietly so the uploader
+    // just skips the seller step instead of dumping a stack trace.
+    process.stderr.write("no seller data (run /ml scan paged after loading the current addon)\n");
+    process.exit(1);
+  }
   process.stdout.write(JSON.stringify({
     type: "ml-sellers-v1", realm: realmName,
     exportedAt: Math.floor(Date.now() / 1000), sellers,
