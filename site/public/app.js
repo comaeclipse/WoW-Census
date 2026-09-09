@@ -165,23 +165,24 @@
   var ITEMS = [], curCat = "All", search = "", CAP = 300;
   var sortKey = isRealm ? "deal" : "demand", sortDir = -1;
   var CATS = ["All","Ore & Bars","Herbs","Cloth","Leather","Primals","Enchanting","Gems","Enhancements","Gear","Potions","Flasks","Elixirs","Cooking","Class Reagents","Cosmetic","Recipes","Bags","Other"];
+  // `w` fixes each column's width so sorting (which reorders rows and moves the
+  // sort arrow) can't reflow the auto-layout and make the columns jump. The Item
+  // column has no width and absorbs the remaining space. See table-layout:fixed.
   var COLS = isRealm ? [
     { k: "name", t: "Item", l: true },
-    { k: "cat", t: "Market", l: true },
-    { k: "asp", t: "Your Buyout" },
-    { k: "q", t: "Qty" },
-    { k: "sc", t: "Sellers" },
-    { k: "tc", t: "Top Seller" },
-    { k: "demand", t: "Demand" },
-    { k: "deal", t: "vs Region" },
+    { k: "cat", t: "Market", l: true, w: 160 },
+    { k: "asp", t: "Realm Buyout", w: 140 },
+    { k: "q", t: "Qty", w: 80 },
+    { k: "demand", t: "Demand", w: 150 },
+    { k: "deal", t: "vs Region", w: 110 },
   ] : [
     { k: "name", t: "Item", l: true },
-    { k: "cat", t: "Market", l: true },
-    { k: "demand", t: "Demand" },
-    { k: "sr", t: "Rate" },
-    { k: "spd", t: "Sold/Day" },
-    { k: "asp", t: "Avg Sale (g/s)" },
-    { k: "mv", t: "Mkt Val (g)" },
+    { k: "cat", t: "Market", l: true, w: 160 },
+    { k: "demand", t: "Demand", w: 150 },
+    { k: "sr", t: "Rate", w: 80 },
+    { k: "spd", t: "Sold/Day", w: 100 },
+    { k: "asp", t: "Avg Sale (g/s)", w: 140 },
+    { k: "mv", t: "Mkt Val (g)", w: 120 },
   ];
 
   fetch("/api/items?game=" + encodeURIComponent(game)).then(function (r) { return r.json(); }).then(function (data) {
@@ -250,8 +251,14 @@
     return '<div class="tile"><div class="k">' + esc(k) + '</div><div class="v ' + (cls || "") + '">' + esc(v) + '</div><div class="s">' + esc(s) + "</div></div>";
   }
   function drawHead() {
+    document.getElementById("cols").innerHTML = COLS.map(function (c) {
+      return "<col" + (c.w ? ' style="width:' + c.w + 'px"' : "") + ">";
+    }).join("");
     document.getElementById("head").innerHTML = COLS.map(function (c) {
-      var ar = c.k === sortKey ? '<span class="ar">' + (sortDir < 0 ? "▼" : "▲") + "</span>" : "";
+      // Always render the arrow slot (hidden when this isn't the sort column) so
+      // switching the sorted column never nudges the header text left or right.
+      var glyph = c.k === sortKey ? (sortDir < 0 ? "▼" : "▲") : "▼";
+      var ar = '<span class="ar' + (c.k === sortKey ? "" : " off") + '">' + glyph + "</span>";
       return '<th class="' + (c.l ? "l" : "") + '" data-k="' + c.k + '">' + c.t + " " + ar + "</th>";
     }).join("");
   }
@@ -304,11 +311,9 @@
       }
       var dm = '<td><span class="meter">' + meter(it.demand) + '</span><span class="dv ' + (it.demand >= 80 ? "g" : it.demand >= 45 ? "gr" : "mu") + '">' + it.demand + "</span></td>";
       if (isRealm) {
-        var tcCell = it.tc == null ? '<td class="mu">—</td>'
-          : '<td class="' + (it.tc >= 60 ? "gr" : it.tc >= 30 ? "g" : "mu") + '">' + it.tc + "%</td>";
         h += "<tr><td class=\"l\">" + ic + link + "</td>" + catCell(it) +
-          '<td class="g">' + gs(it.asp) + "</td><td>" + (it.q || 0).toLocaleString() + "</td><td>" + (it.sc == null ? "—" : it.sc) + "</td>" +
-          tcCell + dm + dealCell(it.deal) + "</tr>";
+          '<td class="g">' + gs(it.asp) + "</td><td>" + (it.q || 0).toLocaleString() + "</td>" +
+          dm + dealCell(it.deal) + "</tr>";
       } else {
         h += "<tr><td class=\"l\">" + ic + link + "</td>" + catCell(it) + dm +
           '<td class="' + (it.sr >= 0.35 ? "gr" : it.sr < 0.1 ? "rd" : "") + '">' + Math.round(it.sr * 100) + "%</td>" +

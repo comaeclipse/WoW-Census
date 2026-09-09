@@ -110,13 +110,15 @@ a{color:var(--blue)}
 
 /* table */
 .tablewrap{background:var(--panel); border:2px solid var(--line); box-shadow:6px 6px 0 var(--shadow); overflow-x:auto;}
-table{width:100%; border-collapse:collapse; min-width:720px;}
+table{width:100%; border-collapse:collapse; min-width:720px; table-layout:fixed;}
+tbody td, thead th{overflow:hidden; text-overflow:ellipsis;}
 thead th{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-transform:uppercase; color:var(--gold);
   text-align:right; padding:12px; background:var(--panel2); border-bottom:2px solid var(--line);
   cursor:pointer; white-space:nowrap; position:sticky; top:0;}
 thead th.l{text-align:left;}
 thead th:hover{color:var(--ink);}
 thead th .ar{color:var(--muted);}
+thead th .ar.off{visibility:hidden;}
 tbody td{padding:6px 12px; text-align:right; border-bottom:1px solid #20263a; font-variant-numeric:tabular-nums; white-space:nowrap;}
 tbody td.l{text-align:left;}
 tbody tr:hover{background:var(--panel2);}

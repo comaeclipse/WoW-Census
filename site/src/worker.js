@@ -472,7 +472,7 @@ async function itemPage(url, env) {
     const deal = row.hist > 0 ? Math.round((row.hist - row.asp) / row.hist * 100) : null;
     statsHtml =
       stat("Demand", demand + "/100", demand >= 70 ? "gr" : demand >= 45 ? "g" : "mu") +
-      stat("Your buyout", gsc(row.asp), "g") +
+      stat("Realm buyout", gsc(row.asp), "g") +
       stat("Quantity", (row.q || 0).toLocaleString()) +
       stat("Sellers", row.sc == null ? "N/A" : row.sc) +
       // Top-seller share: a high % means one player controls most of the supply
