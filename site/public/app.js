@@ -189,6 +189,8 @@
     ITEMS = (data.items || []).map(function (r) {
       var o = { id: r[0], name: r[1], slug: r[2], mv: r[3], asp: r[4], sr: r[5], spd: r[6], q: r[7], sc: r[8], tc: r[9], hist: r[10] };
       o.cat = catFor(r[11], o.name);
+      o.src = r[12] || null;      // crafted | gathered | disenchant | ...
+      o.crafter = r[13] || null;  // producing/gathering profession
       o.demand = demand(o.sr, o.spd);
       o.deal = (isRealm && o.hist > 0 && o.asp > 0) ? Math.round((o.hist - o.asp) / o.hist * 100) : null;
       return o;
@@ -257,6 +259,20 @@
     if (d == null) return '<td class="mu">--</td>';
     return '<td class="' + (d >= 0 ? "gr" : "rd") + '">' + (d >= 0 ? "+" : "") + d + "%</td>";
   }
+  // Source axis badge: where an item's supply comes from, and (for crafted /
+  // gathered) the profession that produces it -- the "can a seller make more?"
+  // signal. Shown under the market chip.
+  var SRC_LABEL = { crafted: "Crafted", gathered: "Gathered", disenchant: "Disenchanted",
+    drop: "Drop", vendor: "Vendor", quest: "Quest", reputation: "Reputation", event: "Event" };
+  function srcBadge(it) {
+    if (!it.src) return "";
+    var label = SRC_LABEL[it.src] || it.src;
+    var text = it.crafter ? label + " · " + it.crafter : label;
+    return '<span class="srcb srcb-' + esc(it.src) + '" title="' + esc(text) + '">' + esc(text) + "</span>";
+  }
+  function catCell(it) {
+    return '<td class="l cat">' + esc(it.cat) + srcBadge(it) + "</td>";
+  }
   function render() {
     var q = search.trim().toLowerCase();
     var rows = ITEMS.filter(function (it) {
@@ -290,11 +306,11 @@
       if (isRealm) {
         var tcCell = it.tc == null ? '<td class="mu">—</td>'
           : '<td class="' + (it.tc >= 60 ? "gr" : it.tc >= 30 ? "g" : "mu") + '">' + it.tc + "%</td>";
-        h += "<tr><td class=\"l\">" + ic + link + '</td><td class="l cat">' + esc(it.cat) + "</td>" +
+        h += "<tr><td class=\"l\">" + ic + link + "</td>" + catCell(it) +
           '<td class="g">' + gs(it.asp) + "</td><td>" + (it.q || 0).toLocaleString() + "</td><td>" + (it.sc == null ? "—" : it.sc) + "</td>" +
           tcCell + dm + dealCell(it.deal) + "</tr>";
       } else {
-        h += "<tr><td class=\"l\">" + ic + link + '</td><td class="l cat">' + esc(it.cat) + "</td>" + dm +
+        h += "<tr><td class=\"l\">" + ic + link + "</td>" + catCell(it) + dm +
           '<td class="' + (it.sr >= 0.35 ? "gr" : it.sr < 0.1 ? "rd" : "") + '">' + Math.round(it.sr * 100) + "%</td>" +
           "<td>" + (it.spd >= 10 ? Math.round(it.spd) : it.spd.toFixed(1)) + "</td>" +
           '<td class="g">' + gs(it.asp) + '</td><td class="mu">' + big(it.mv) + "</td></tr>";

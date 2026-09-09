@@ -20,7 +20,16 @@ function Tip:Append(tooltip, itemID)
     if not row then return end
 
     tooltip:AddLine(" ")
-    tooltip:AddLine("|cff33aaffMarketLens|r  |cff888888(" .. (row.class.market or "?") .. ")|r")
+    -- Source tag: where this item's supply comes from, and (for crafted/gathered)
+    -- the profession that produces it -- so a hover answers "can a seller make more?"
+    local srcTag = ""
+    local src = row.class.source
+    if src then
+        local label = ML.Data:SourceLabel(src)
+        if row.class.crafter then label = label .. " \194\183 " .. row.class.crafter end
+        srcTag = "  |cff70c070" .. label .. "|r"
+    end
+    tooltip:AddLine("|cff33aaffMarketLens|r  |cff888888(" .. (row.class.market or "?") .. ")|r" .. srcTag)
 
     local srcTag = row.demandSource == "region" and " |cff808080(region)|r"
                 or row.demandSource == "local" and " |cff808080(local)|r" or ""

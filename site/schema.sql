@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS items (
   sc         INTEGER,               -- realm seller count (NULL when unavailable)
   tc         INTEGER,               -- realm top-seller concentration 0-100 (NULL when sellers unknown)
   cat        TEXT,                  -- addon-computed market (NULL for region datasets; site maps it to a chip)
+  src        TEXT,                  -- source axis: crafted | gathered | disenchant | ... (NULL when unknown)
+  crafter    TEXT,                  -- producing/gathering profession for src (NULL when unknown)
   PRIMARY KEY (game, id)
 );
 CREATE INDEX IF NOT EXISTS idx_items_slug ON items(game, slug);

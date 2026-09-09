@@ -127,6 +127,13 @@ tbody a.name:hover{color:var(--gold); text-decoration:underline;}
    already sits in front of the name. */
 tbody a.name.icontinyl{background-image:none !important; padding-left:0 !important;}
 .cat{font-family:var(--pixel); font-size:7px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;}
+/* Source badge under the market chip: crafted/gathered/... + producing profession. */
+.cat .srcb{display:inline-block; margin-top:5px; padding:2px 5px; border-radius:3px;
+  font-family:var(--pixel); font-size:7px; letter-spacing:1px; text-transform:uppercase;
+  color:var(--muted); background:rgba(255,255,255,.03); border:1px solid var(--line);}
+.cat .srcb.srcb-crafted{color:var(--green); border-color:rgba(102,209,107,.32);}
+.cat .srcb.srcb-gathered{color:var(--gold); border-color:rgba(255,206,67,.30);}
+.cat .srcb.srcb-disenchant{color:var(--blue); border-color:rgba(95,176,240,.30);}
 .g{color:var(--gold);} .gr{color:var(--green);} .rd{color:var(--red);} .mu{color:var(--muted);}
 .meter{display:inline-flex; gap:2px; vertical-align:middle; margin-right:8px;}
 .meter i{width:6px; height:13px; background:#31374d; display:inline-block;}

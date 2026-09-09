@@ -19,7 +19,7 @@ const GAMES = {
   "retail":              { label: "Retail" },
 };
 const DEFAULT_GAME = "classic-progression";
-const ITEMS_CACHE_VERSION = 12;
+const ITEMS_CACHE_VERSION = 13;
 
 function sourceGameKey(flavor) {
   const f = String(flavor || "").toLowerCase();
@@ -34,9 +34,10 @@ function sourceGameKey(flavor) {
 // Column order for the packed /api/items rows. Emitted in the response as
 // `columns` so scripts and LLMs can read the array-of-arrays without guessing.
 // mv/asp/hist are copper; sr is a 0-1 sale rate; spd is sold/day; q (quantity),
-// sc (seller count), tc (top-seller concentration 0-100) and cat (category) are
+// sc (seller count), tc (top-seller concentration 0-100), cat (category), src
+// (source: crafted/gathered/...) and crafter (producing profession) are
 // realm-upload only, else null.
-const ITEM_COLUMNS = ["id", "name", "slug", "mv", "asp", "sr", "spd", "q", "sc", "tc", "hist", "cat"];
+const ITEM_COLUMNS = ["id", "name", "slug", "mv", "asp", "sr", "spd", "q", "sc", "tc", "hist", "cat", "src", "crafter"];
 
 const csvUrl = (game) =>
   `https://public-data.tradeskillmaster.com/${game}/${REGION}/region/items.csv`;
@@ -326,15 +327,17 @@ async function importRealm(url, env, req) {
     const tc = sellersAvailable ? (last[7] || 0) : null;
     const w = last[6] || 0; // [t,q,a,s,l,m,w,tc]
     const cat = (rec.m && String(rec.m).trim()) ? String(rec.m) : null;
+    const src = (rec.src && String(rec.src).trim()) ? String(rec.src) : null;
+    const crafter = (rec.cr && String(rec.cr).trim()) ? String(rec.cr) : null;
     itemRows.push([game, id, name, slugify(name), q * w, w, rr.sr || 0, rr.spd || 0, rr.asp || 0,
-      new Date().toISOString(), q, sc, tc, cat]);
+      new Date().toISOString(), q, sc, tc, cat, src, crafter]);
     for (const sn of snaps) {
       histRows.push([game, id, dayBucketFromUnix(sn[0]), (sn[1] || 0) * (sn[6] || 0), sn[6] || 0,
         rr.sr || 0, rr.spd || 0, sn[1] || 0]);
     }
   }
   await bulkInsert(env.DB, "items",
-    ["game", "id", "name", "slug", "mv", "asp", "sr", "spd", "hist", "updated_at", "q", "sc", "tc", "cat"], itemRows, 120);
+    ["game", "id", "name", "slug", "mv", "asp", "sr", "spd", "hist", "updated_at", "q", "sc", "tc", "cat", "src", "crafter"], itemRows, 120);
   await bulkInsert(env.DB, "history",
     ["game", "id", "ts", "mv", "asp", "sr", "spd", "q"], histRows, 150);
   await env.DB.prepare(
@@ -360,9 +363,9 @@ async function apiItems(url, env, ctx) {
   if (hit) return hit;
 
   const { results } = await env.DB.prepare(
-    "SELECT id,name,slug,mv,asp,sr,spd,q,sc,tc,hist,cat FROM items WHERE game=? ORDER BY spd DESC"
+    "SELECT id,name,slug,mv,asp,sr,spd,q,sc,tc,hist,cat,src,crafter FROM items WHERE game=? ORDER BY spd DESC"
   ).bind(game).all();
-  const rows = results.map((r) => [r.id, r.name, r.slug, r.mv, r.asp, r.sr, r.spd, r.q, r.sc, r.tc, r.hist, r.cat]);
+  const rows = results.map((r) => [r.id, r.name, r.slug, r.mv, r.asp, r.sr, r.spd, r.q, r.sc, r.tc, r.hist, r.cat, r.src, r.crafter]);
 
   // Freshness metadata for the confidence indicator.
   const meta = await env.DB.prepare("SELECT MAX(updated_at) u FROM items WHERE game=?").bind(game).first();
@@ -455,6 +458,15 @@ async function itemPage(url, env) {
     }
   }
 
+  // Source axis: where supply comes from, and (for crafted/gathered) the
+  // producing profession -- the "can a seller make more of this?" signal.
+  const SRC_LABELS = { crafted: "Crafted", gathered: "Gathered", disenchant: "Disenchanted",
+    drop: "Drop", vendor: "Vendor", quest: "Quest", reputation: "Reputation", event: "Event" };
+  const srcStat = row.src
+    ? stat("Source", (SRC_LABELS[row.src] || row.src) + (row.crafter ? " · " + esc(row.crafter) : ""),
+        row.src === "crafted" ? "gr" : "")
+    : "";
+
   let statsHtml;
   if (isRealm) {
     const deal = row.hist > 0 ? Math.round((row.hist - row.asp) / row.hist * 100) : null;
@@ -467,14 +479,16 @@ async function itemPage(url, env) {
       // (a market you can undercut or wait out); low means it's spread thin.
       (row.tc == null || row.sc == null ? "" :
         stat("Top seller", row.tc + "%", row.tc >= 60 ? "gr" : row.tc >= 30 ? "g" : "mu")) +
-      (deal === null ? "" : stat("vs region", (deal >= 0 ? "+" : "") + deal + "%", deal >= 0 ? "gr" : "rd"));
+      (deal === null ? "" : stat("vs region", (deal >= 0 ? "+" : "") + deal + "%", deal >= 0 ? "gr" : "rd")) +
+      srcStat;
   } else {
     statsHtml =
       stat("Demand", demand + "/100", demand >= 70 ? "gr" : demand >= 45 ? "g" : "mu") +
       stat("Sale rate", Math.round(row.sr * 100) + "%") +
       stat("Sold / day", row.spd >= 10 ? Math.round(row.spd) : row.spd.toFixed(1)) +
       stat("Avg sale", gsc(row.asp), "g") +
-      stat("Market value", gsc(row.mv), "mu");
+      stat("Market value", gsc(row.mv), "mu") +
+      srcStat;
   }
 
   const html = `<!doctype html><html lang="en"><head>

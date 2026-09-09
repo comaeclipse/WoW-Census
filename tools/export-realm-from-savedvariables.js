@@ -116,17 +116,31 @@ function normalizeFlavor(flavor) {
   throw new Error(`unknown flavor: ${flavor}`);
 }
 
+// Crafted-item source map (itemID -> { source, profession, spellID }), generated
+// from DB2 by build-item-sources.js. Optional: if it isn't present we fall back
+// to whatever the addon stored on rec.class. Keying source off the itemID here
+// means even scans taken before the addon knew about source get enriched.
+let sourceMap = {};
+try { sourceMap = require("./item-sources.json"); } catch (e) { /* not generated yet */ }
+
 const items = {};
 for (const [id, rec] of Object.entries(realm.items || {})) {
   const snaps = Object.keys(rec.snaps || {}).sort((a, b) => Number(a) - Number(b)).map((k) => {
     const s = rec.snaps[k];
     return [s.t || 0, s.q || 0, s.a || 0, s.s || 0, s.l || 0, s.m || 0, s.w || 0, s.tc || 0];
   });
-  // rec.class is the addon's { profession, sector, market } classification,
-  // computed from the real item class/subclass/equip-slot at scan time. Carry
-  // the market so the site can categorize properly instead of guessing by name.
-  const market = rec.class && rec.class.market;
-  if (snaps.length) items[id] = { n: rec.name || "", s: snaps, m: market || "" };
+  // rec.class is the addon's { profession, sector, market, source, crafter }
+  // classification, computed from the real item class/subclass/equip-slot at
+  // scan time. Carry the market so the site categorizes properly instead of
+  // guessing by name, plus the source axis (crafted/gathered/...) and the
+  // producing profession -- itemID lookup takes priority so old scans enrich too.
+  const cls = rec.class || {};
+  const mapped = sourceMap[id];
+  const source = (mapped && mapped.source) || cls.source || "";
+  const crafter = (mapped && mapped.profession) || cls.crafter || "";
+  if (snaps.length) {
+    items[id] = { n: rec.name || "", s: snaps, m: cls.market || "", src: source, cr: crafter };
+  }
 }
 
 const payload = {

@@ -236,6 +236,17 @@ async function main() {
 
   fs.writeFileSync(args.out, lines.join("\n"), "utf8");
   process.stderr.write(`Wrote ${args.out}\n`);
+
+  // Also emit a compact JSON keyed by itemID, for the site pipeline: the export
+  // tool enriches any scan (old or new) with source purely from the itemID, so
+  // the backend never depends on which addon version produced the scan.
+  const jsonOut = args.json || path.join(__dirname, "item-sources.json");
+  const jsonMap = {};
+  for (const id of itemIDs) {
+    jsonMap[id] = { source: "crafted", profession: sources[id].profession, spellID: sources[id].spellID };
+  }
+  fs.writeFileSync(jsonOut, JSON.stringify(jsonMap), "utf8");
+  process.stderr.write(`Wrote ${jsonOut}\n`);
 }
 
 main().catch((err) => {
