@@ -144,6 +144,7 @@ if (process.argv.includes("--sellers")) {
     rows: stats.rows || realm.sellerSampleRows || 0,
     pages: stats.pages || 0,
     scannedPages: stats.scannedPages || 0,
+    samplePages: stats.samplePages || 0,
     ownerCoverage: stats.ownerCoverage || 0,
     elapsed: stats.elapsed || 0,
     projectedFullSeconds: stats.projectedFullSeconds || 0,

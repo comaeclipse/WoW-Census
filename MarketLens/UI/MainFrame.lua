@@ -659,13 +659,19 @@ function UI:OnScanProgress(p)
             p.rows or 0))
     elseif p.resolving and p.resolving > 0 then
         local st = p.stats or {}
-        self:SetStatus(string.format("Scanning...  page %d / %d\n|cffffffff%d rows; %d%% owners; %d names resolving|r",
-            p.page or 0, p.pages or 0, p.rows or 0, st.ownerCoverage or 0, p.resolving or 0))
+        local scanned = st.samplePages and st.samplePages > 0
+            and string.format("%d/%d sample pages", st.scannedPages or 0, st.samplePages or 0)
+            or string.format("page %d / %d", p.page or 0, p.pages or 0)
+        self:SetStatus(string.format("Scanning...  %s\n|cffffffff%d rows; %d%% owners; %d names resolving|r",
+            scanned, p.rows or 0, st.ownerCoverage or 0, p.resolving or 0))
     else
         local st = p.stats or {}
         if st.ownerCoverage then
-            self:SetStatus(string.format("Scanning...  page %d / %d\n|cffffffff%d rows; %d%% owners; ~%ds full|r",
-                p.page or 0, p.pages or 0, p.rows or 0,
+            local scanned = st.samplePages and st.samplePages > 0
+                and string.format("%d/%d sample pages", st.scannedPages or 0, st.samplePages or 0)
+                or string.format("page %d / %d", p.page or 0, p.pages or 0)
+            self:SetStatus(string.format("Scanning...  %s\n|cffffffff%d rows; %d%% owners; ~%ds full|r",
+                scanned, p.rows or 0,
                 st.ownerCoverage or 0, st.projectedFullSeconds or 0))
         else
             self:SetStatus(string.format("Scanning...  page %d / %d\n|cffffffff%d auctions read|r",

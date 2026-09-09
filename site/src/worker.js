@@ -50,6 +50,7 @@ function sellerMeta(body) {
     rows: Number(m.rows) || 0,
     pages: Number(m.pages) || 0,
     scannedPages: Number(m.scannedPages) || 0,
+    samplePages: Number(m.samplePages) || 0,
     ownerCoverage: Number(m.ownerCoverage) || 0,
     elapsed: Number(m.elapsed) || 0,
     projectedFullSeconds: Number(m.projectedFullSeconds) || 0,

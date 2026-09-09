@@ -52,7 +52,7 @@ addon by matching the folder name to the `.toc` filename.
 | --- | --- |
 | `/ml` | Open / close the dashboard |
 | `/ml scan` | Run a full AH scan (must be at the Auction House) |
-| `/ml scan paged` | Classic/Anniversary: run a time-boxed seller sample (Get All omits seller names) |
+| `/ml scan paged` | Classic/Anniversary: run a quick seller sample across the AH (Get All omits seller names) |
 | `/ml scan sellers full` | Classic/Anniversary: run an exhaustive paged seller scan for measurement |
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
@@ -71,10 +71,11 @@ Scan a few times over hours/days — demand needs repeated observations.
 On Classic/Anniversary, `/ml scan` uses Get All (one fast bulk dump), but that
 dump omits seller names, so seller counts show as N/A. If Get All is on cooldown,
 MarketLens waits instead of falling back to a huge page-by-page crawl. Use
-`/ml scan paged` when you want seller data: it runs a time-boxed seller sample
-(20 minutes by default), briefly re-reads loaded pages while names resolve, and
-records seller profiles without letting an incomplete sample overwrite full AH
-item totals. If the sample reaches the end of the AH before the time limit, it is
+`/ml scan paged` when you want seller data: it samples 60 pages spread across the
+AH by default, briefly re-reads loaded pages while names resolve, and records
+seller profiles without letting an incomplete sample overwrite full AH item
+totals. A 20-minute time limit remains as a hard guardrail, but the page cap
+should normally finish much sooner. If the sample covers the whole AH, it is
 treated as a complete seller-aware item snapshot. Use `/ml scan sellers full` to
 measure whether an exhaustive seller scan is practical on your realm; it uses the
 same local owner-resolution behavior but has no time cap and reports owner

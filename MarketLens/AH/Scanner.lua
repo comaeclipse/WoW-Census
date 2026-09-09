@@ -40,6 +40,8 @@ local function resetAccumulator()
     S.partialScan = false
     S.scanStartedAt = nil
     S.scanStats = nil
+    S.samplePages = nil
+    S.sampleIndex = nil
 end
 
 local function resetSellerStats(full)
@@ -49,6 +51,7 @@ local function resetSellerStats(full)
         partial = false,
         pages = 0,
         scannedPages = 0,
+        samplePages = 0,
         rows = 0,
         ownerRows = 0,
         missingOwnerRows = 0,
@@ -64,6 +67,7 @@ local function refreshSellerStats(totalPages)
     local st = S.scanStats
     if not st then return nil end
     st.pages = totalPages or st.pages or 0
+    st.samplePages = S.samplePages and #S.samplePages or 0
     st.uniqueSellers = U.CountKeys(S.acc and S.acc.sellers or {})
     st.elapsed = (GetTime and S.scanStartedAt)
         and math.floor(GetTime() - S.scanStartedAt + 0.5) or 0
@@ -74,6 +78,30 @@ local function refreshSellerStats(totalPages)
     end
     st.partial = S.partialScan == true
     return st
+end
+
+local function buildSamplePages(totalPages)
+    totalPages = math.max(totalPages or 1, 1)
+    local want = math.max(tonumber(ML.db.settings.sellerSamplePages) or 60, 1)
+    if want == 1 then return { 0 } end
+    if want >= totalPages then
+        local all = {}
+        for page = 0, totalPages - 1 do all[#all + 1] = page end
+        return all
+    end
+
+    local pages, seen = {}, {}
+    for i = 0, want - 1 do
+        local page = math.floor((i * (totalPages - 1) / (want - 1)) + 0.5)
+        if not seen[page] then
+            pages[#pages + 1] = page
+            seen[page] = true
+        end
+    end
+    if not seen[0] then table.insert(pages, 1, 0) end
+    if not seen[totalPages - 1] then pages[#pages + 1] = totalPages - 1 end
+    table.sort(pages)
+    return pages
 end
 
 local function accumulate(items, a)
@@ -240,10 +268,11 @@ function S:StartScan(forcePaged, fullSellerScan)
         self.mode = "paged"
         self.sellerSample = true
         self.sellerFull = fullSellerScan == true
+        self.sampleIndex = self.sellerFull and nil or 1
         resetSellerStats(self.sellerFull)
         ML:Print(self.sellerFull
             and "Running a full seller scan (paged AH scan; no time cap)..."
-            or "Running a time-boxed seller sample (paged AH scan)...")
+            or "Running a quick seller sample (spread across AH pages)...")
         driver:Show()
         self:QueryCurrentPage()
     end
@@ -598,15 +627,29 @@ function S:ProcessPage()
     ML:Fire("SCAN_PROGRESS", { mode = "paged", page = self.page + 1,
         pages = totalPages, rows = self.acc.totalRows, stats = st })
 
-    local nextStart = (self.page + 1) * PAGE_SIZE
-    if nextStart < total and shown > 0 then
+    if self.sellerSample and not self.sellerFull then
+        if not self.samplePages then self.samplePages = buildSamplePages(totalPages) end
+        if (self.scanStats and self.scanStats.scannedPages or 0) >= #self.samplePages then
+            self.partialScan = #self.samplePages < totalPages
+            refreshSellerStats(totalPages)
+            return true
+        end
         local budget = ML.db.settings.sellerSampleSeconds or 1200
-        if self.sellerSample and not self.sellerFull and budget > 0 and GetTime
+        if budget > 0 and GetTime
             and ((GetTime() - (self.scanStartedAt or GetTime())) >= budget) then
             self.partialScan = true
             refreshSellerStats(totalPages)
             return true
         end
+        self.sampleIndex = (self.sampleIndex or 1) + 1
+        self.page = self.samplePages[self.sampleIndex] or (self.page + 1)
+        self.awaitingPage = false
+        self.throttle = throttle
+        return false
+    end
+
+    local nextStart = (self.page + 1) * PAGE_SIZE
+    if nextStart < total and shown > 0 then
         self.page = self.page + 1
         self.awaitingPage = false
         self.throttle = throttle
