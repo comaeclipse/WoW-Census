@@ -3,19 +3,20 @@
 -- Storage layout (per realm):
 --   realm.sellers[owner] = {
 --       name=, firstSeen=, lastSeen=, seenCount=,
---       listings = { [itemID] = { q=, l=, n= } },      -- latest paged scan; replaced each time
+--       listings = { [itemID] = { q=, l=, n= } },      -- latest seller sample; replaced each time
 --       hist = { { t=, items=, qty=, value= }, ... }    -- rolling summary, oldest first, capped
 --   }
 --
 -- Only paged scans on the legacy AH return owner names, so this table is
--- realm-only and populated solely by /ml scan paged. getAll/browse/replicate
--- never call Record (the scanner gates on ownersSeen), so an owner-less scan
--- leaves stored profiles intact.
+-- realm-only and populated solely by /ml scan paged. Large realms use a
+-- time-boxed seller sample; getAll/browse/replicate never call Record (the
+-- scanner gates on ownersSeen), so an owner-less scan leaves stored profiles
+-- intact.
 --
--- We keep the full current listing set (so a profile shows exactly what a seller
--- is posting now) plus a small rolling SUMMARY history (item count / quantity /
--- gold value per scan) rather than a full listing set per scan -- that bounds the
--- SavedVariables footprint while still supporting "usually posts ~N items".
+-- We keep the latest sampled listing set plus a small rolling SUMMARY history
+-- (item count / quantity / gold value per sample) rather than a full listing set
+-- per sample -- that bounds the SavedVariables footprint while still supporting
+-- "usually posts ~N items".
 
 local ML = MarketLens
 local Sellers = {}

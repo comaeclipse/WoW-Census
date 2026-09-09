@@ -657,6 +657,9 @@ function UI:OnScanProgress(p)
     elseif p.mode == "browse" then
         self:SetStatus(string.format("Scanning Retail summaries...\n|cffffffff%d results read|r",
             p.rows or 0))
+    elseif p.resolving and p.resolving > 0 then
+        self:SetStatus(string.format("Scanning...  page %d / %d\n|cffffffff%d auctions read; %d names resolving|r",
+            p.page or 0, p.pages or 0, p.rows or 0, p.resolving or 0))
     else
         self:SetStatus(string.format("Scanning...  page %d / %d\n|cffffffff%d auctions read|r",
             p.page or 0, p.pages or 0, p.rows or 0))
@@ -732,9 +735,11 @@ function UI:Init()
     end
 
     -- Repaint + report when a scan completes.
-    ML:On("SCAN_COMPLETE", function(items, rows, mode)
+    ML:On("SCAN_COMPLETE", function(items, rows, mode, meta)
         local unit = mode == "browse" and "summaries" or "auctions"
-        UI:OnScanDone(string.format("Scan complete\n|cffffffff%d items \226\128\162 %d %s|r",
-            items or 0, rows or 0, unit))
+        local title = (meta and meta.sellerSample and meta.partial)
+            and "Seller sample complete" or "Scan complete"
+        UI:OnScanDone(string.format("%s\n|cffffffff%d items \226\128\162 %d %s|r",
+            title, items or 0, rows or 0, unit))
     end)
 end

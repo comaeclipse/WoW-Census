@@ -15,10 +15,6 @@ local U = ML.Util
 local PAGE_SIZE  = 50
 local READ_BATCH = 150   -- rows per frame when reading a getAll dump
 local BROWSE_REPLY_TIMEOUT = 30
--- Times a paged scan re-queries the same page waiting on seller names to
--- resolve before it gives up and commits the page with whatever owners arrived.
--- Some owners stay legitimately nil, so this must be bounded or the scan hangs.
-local MAX_PAGE_RETRIES = 3
 
 S.scanning = false
 S.atAH = false
@@ -38,7 +34,10 @@ local function resetAccumulator()
     S.readIndex = 1
     S.readTotal = 0
     S.ownersSeen = false -- flips true if any auction returned a seller name
-    S.pageRetries = 0    -- re-query attempts for the current page's owner names
+    S.resolvePasses = 0  -- local re-reads for the current page's owner names
+    S.sellerSample = false
+    S.partialScan = false
+    S.scanStartedAt = nil
 end
 
 local function accumulate(items, a)
@@ -148,8 +147,8 @@ function S:AtAuctionHouse()
 end
 
 -- forcePaged: skip Get All even when it's available. The bulk dump omits seller
--- names, so a paged scan is the only legacy path that captures owners (and thus
--- seller counts). Slower, but the trade-off callers opt into via /ml scan paged.
+-- names, so this runs a time-bounded legacy page walk that captures a seller
+-- sample. It is intentionally not a full-market crawl on very large realms.
 function S:StartScan(forcePaged)
     if not self.eventDriverReady then
         ML:Print("Scanner initialization failed before its event handler loaded. Enable Lua errors and /reload.")
@@ -182,8 +181,14 @@ function S:StartScan(forcePaged)
         return
     end
 
+    if not canGetAll and not forcePaged then
+        ML:Print("Get All is on cooldown. Wait a bit, or run |cffffff00/ml scan paged|r for a seller sample.")
+        return
+    end
+
     resetAccumulator()
     self.scanning = true
+    self.scanStartedAt = GetTime and GetTime() or 0
     self.auctionsAvailable = true
     self.priceDistributionAvailable = true
     ML.Data.classifyCache = {} -- refresh in case item info arrived since last scan
@@ -197,9 +202,10 @@ function S:StartScan(forcePaged)
         QueryAuctionItems("", nil, nil, 0, nil, nil, true, false)
     else
         self.mode = "paged"
+        self.sellerSample = true
         ML:Print(forcePaged
-            and "Running a paged scan to capture seller names (slower)..."
-            or "Get All on cooldown \226\128\148 running a paged scan (slower)...")
+            and "Running a time-boxed seller sample (paged AH scan)..."
+            or "Running a time-boxed seller sample (paged AH scan)...")
         driver:Show()
         self:QueryCurrentPage()
     end
@@ -223,17 +229,31 @@ function S:Finish()
     local itemCount = 0
     for _ in pairs(self.acc.items) do itemCount = itemCount + 1 end
 
-    -- Whether this client's scan API exposes seller names. When false, seller
-    -- count / concentration are meaningless and the UI hides them.
-    ML.realm.ownersAvailable = self.ownersSeen
-    ML.realm.auctionsAvailable = self.auctionsAvailable ~= false
-    ML.realm.priceDistributionAvailable = self.priceDistributionAvailable ~= false
+    -- Whether the latest full item snapshot has complete seller names. Partial
+    -- seller samples update seller profiles, but must not make per-item seller
+    -- counts look authoritative.
+    if not (self.sellerSample and self.partialScan) then
+        ML.realm.ownersAvailable = self.ownersSeen
+        ML.realm.auctionsAvailable = self.auctionsAvailable ~= false
+        ML.realm.priceDistributionAvailable = self.priceDistributionAvailable ~= false
+    end
+    if self.sellerSample then
+        ML.realm.lastSellerSample = time()
+        ML.realm.sellerSampleRows = self.acc.totalRows
+        ML.realm.sellerSamplePartial = self.partialScan == true
+    end
 
     local unit = self.mode == "browse"
         and "summary rows" or "auction rows"
-    ML:Print("Scan complete: %d %s, %d unique items.", self.acc.totalRows, unit, itemCount)
-    ML.Snapshots:Record(self.acc.items)
-    ML.Snapshots:Purge()
+    if self.sellerSample and self.partialScan then
+        ML:Print("Seller sample complete: %d %s, %d unique items%s.",
+            self.acc.totalRows, unit, itemCount,
+            self.partialScan and " (time limit reached)" or "")
+    else
+        ML:Print("Scan complete: %d %s, %d unique items.", self.acc.totalRows, unit, itemCount)
+        ML.Snapshots:Record(self.acc.items)
+        ML.Snapshots:Purge()
+    end
     -- Seller profiles only exist when this scan captured owners (paged legacy).
     -- getAll/browse/replicate leave acc.sellers empty, so stored profiles persist
     -- untouched rather than being wiped by an owner-less scan.
@@ -241,7 +261,10 @@ function S:Finish()
         ML.Sellers:Record(self.acc.sellers)
         ML.Sellers:Purge()
     end
-    ML:Fire("SCAN_COMPLETE", itemCount, self.acc.totalRows, self.mode)
+    ML:Fire("SCAN_COMPLETE", itemCount, self.acc.totalRows, self.mode, {
+        sellerSample = self.sellerSample == true,
+        partial = self.partialScan == true,
+    })
 end
 
 -- Begin reading a full-AH dump in batches that yield between frames.
@@ -455,14 +478,15 @@ function S:ProcessPage()
     shown = shown or 0
     total = total or 0
     local throttle = ML.db.settings.scanThrottle or 0.5
+    local resolveDelay = ML.db.settings.ownerResolveDelay or 0.15
+    local resolvePasses = ML.db.settings.ownerResolvePasses or 2
 
-    -- Parse the page once into a scratch list. On legacy paged scans (Classic
+    -- Parse the page into a scratch list. On legacy paged scans (Classic
     -- Era / TBC) an auction's owner can be nil on the first
     -- AUCTION_ITEM_LIST_UPDATE while the client resolves its GUID -> character
-    -- name; committing then would silently drop the row from seller stats and
-    -- bias concentration low. Count rows still resolving (Blizzard's hasAllInfo
-    -- flag, or a kept row with no owner yet) and re-query the same page a bounded
-    -- number of times before committing -- getAll/replicate never reach here.
+    -- name. Re-read the current client-side page briefly before committing, but
+    -- do not re-query the server page; re-querying multiplies scan time on large
+    -- realms.
     local rows = {}
     local pending = 0
     for i = 1, shown do
@@ -477,15 +501,18 @@ function S:ProcessPage()
 
     local totalPages = math.max(math.ceil(total / PAGE_SIZE), 1)
 
-    if pending > 0 and (self.pageRetries or 0) < MAX_PAGE_RETRIES then
+    if pending > 0 and (self.resolvePasses or 0) < resolvePasses and C_Timer and C_Timer.After then
         -- Hold the page: don't accumulate (avoids double-counting on the re-read)
-        -- and don't advance. The driver re-fires QueryCurrentPage for this same
-        -- page after the throttle, by which point more names should have arrived.
-        self.pageRetries = (self.pageRetries or 0) + 1
-        self.awaitingPage = false
-        self.throttle = throttle
+        -- and don't advance. Seller names usually resolve into the already-loaded
+        -- rows after a short client-side delay.
+        self.resolvePasses = (self.resolvePasses or 0) + 1
         ML:Fire("SCAN_PROGRESS", { mode = "paged", page = self.page + 1,
             pages = totalPages, rows = self.acc.totalRows, resolving = pending })
+        C_Timer.After(resolveDelay, function()
+            if not S.scanning or S.mode ~= "paged" or not S.awaitingPage then return end
+            local done = S:ProcessPage()
+            if done then S:Finish() end
+        end)
         return false
     end
 
@@ -494,13 +521,19 @@ function S:ProcessPage()
     -- shown rather than the kept-row count.
     for _, a in ipairs(rows) do accumulate(self.acc.items, a) end
     self.acc.totalRows = self.acc.totalRows + shown
-    self.pageRetries = 0
+    self.resolvePasses = 0
 
     ML:Fire("SCAN_PROGRESS", { mode = "paged", page = self.page + 1,
         pages = totalPages, rows = self.acc.totalRows })
 
     local nextStart = (self.page + 1) * PAGE_SIZE
     if nextStart < total and shown > 0 then
+        local budget = ML.db.settings.sellerSampleSeconds or 1200
+        if self.sellerSample and budget > 0 and GetTime
+            and ((GetTime() - (self.scanStartedAt or GetTime())) >= budget) then
+            self.partialScan = true
+            return true
+        end
         self.page = self.page + 1
         self.awaitingPage = false
         self.throttle = throttle

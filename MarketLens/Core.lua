@@ -57,6 +57,9 @@ local DEFAULT_SETTINGS = {
     populationRetentionDays = 35, -- daily identity observations retained for 30-day metrics
     minimumSamples        = 3,   -- snapshots needed before demand is scored
     scanThrottle          = 0.5, -- seconds between paged AH queries
+    sellerSampleSeconds   = 1200, -- hard budget for /ml scan paged seller sampling
+    ownerResolveDelay     = 0.15, -- local re-read delay for nil seller names
+    ownerResolvePasses    = 2,   -- local re-reads before accepting the page
     debug                 = false,
     minimap               = { angle = 214, hide = false },
 }

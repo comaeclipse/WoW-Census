@@ -374,8 +374,9 @@ async function itemPage(url, env) {
     ? `<a class="iname-wh" href="${whHref}" data-wh-rename-link="true">${esc(row.name)}</a>`
     : esc(row.name);
 
-  // Who is currently listing this item on the realm (cheapest first), linking to
-  // each seller's profile. Only realm datasets from paged scans have this.
+  // Who showed up in the latest seller sample for this item (cheapest first),
+  // linking to each seller's profile. Only realm datasets from paged scans have
+  // this.
   let sellersHtml = "";
   if (isRealm) {
     const sres = await env.DB.prepare(
@@ -685,7 +686,7 @@ async function sellerPage(url, env) {
     </table></div>
   </div>
 
-  <p class="src">Seller data comes from legacy paged AH scans on ${esc(realmLabel)}. A seller's listings reflect the most recent paged scan; "usually lists" averages the last ${hist.length || 0} scans.</p>
+  <p class="src">Seller data comes from legacy paged AH seller samples on ${esc(realmLabel)}. A seller's listings reflect the most recent sample; "usually lists" averages the last ${hist.length || 0} samples.</p>
 </div>
 </body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=1800" } });

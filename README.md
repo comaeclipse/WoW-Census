@@ -52,7 +52,7 @@ addon by matching the folder name to the `.toc` filename.
 | --- | --- |
 | `/ml` | Open / close the dashboard |
 | `/ml scan` | Run a full AH scan (must be at the Auction House) |
-| `/ml scan paged` | Classic/Anniversary: force the paged scan so seller names are captured (Get All omits them) |
+| `/ml scan paged` | Classic/Anniversary: run a time-boxed seller sample (Get All omits seller names) |
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
 | `/ml who <filter>` | Sample with a raw `/who` filter, e.g. `/ml who z-"Shattrath City"` |
@@ -67,11 +67,14 @@ addon by matching the folder name to the `.toc` filename.
 
 Scan a few times over hours/days — demand needs repeated observations.
 
-On Classic/Anniversary, `/ml scan` prefers Get All (one fast bulk dump), but that
-dump omits seller names, so seller counts show as N/A. Use `/ml scan paged` to
-walk the auction house page by page — slower, but it captures owners so seller
-counts populate. Uploads built from a paged scan carry seller data; ones built
-from Get All do not.
+On Classic/Anniversary, `/ml scan` uses Get All (one fast bulk dump), but that
+dump omits seller names, so seller counts show as N/A. If Get All is on cooldown,
+MarketLens waits instead of falling back to a huge page-by-page crawl. Use
+`/ml scan paged` when you want seller data: it runs a time-boxed seller sample
+(20 minutes by default), briefly re-reads loaded pages while names resolve, and
+records seller profiles without letting an incomplete sample overwrite full AH
+item totals. If the sample reaches the end of the AH before the time limit, it is
+treated as a complete seller-aware item snapshot.
 
 On Retail, `/ml scan` uses the browse-summary API: minimum price and total
 quantity are available, but individual auction and seller counts are not. The
