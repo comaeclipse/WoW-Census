@@ -19,6 +19,17 @@ const GAMES = {
   "retail":              { label: "Retail" },
 };
 const DEFAULT_GAME = "classic-progression";
+const ITEMS_CACHE_VERSION = 12;
+
+function sourceGameKey(flavor) {
+  const f = String(flavor || "").toLowerCase();
+  if (f === "tbc-anniversary" || f === "anniversary" || f === "tbc" || f === "classic-progression")
+    return "classic-progression";
+  if (f === "classic-era" || f === "era" || f === "classic")
+    return "classic";
+  if (f === "retail") return "retail";
+  return null;
+}
 
 // Column order for the packed /api/items rows. Emitted in the response as
 // `columns` so scripts and LLMs can read the array-of-arrays without guessing.
@@ -333,14 +344,18 @@ async function importRealm(url, env, req) {
        source_game = excluded.source_game,
        updated_at = excluded.updated_at`
   ).bind(game, regionGame, new Date().toISOString()).run();
+  if (typeof caches !== "undefined") {
+    await caches.default.delete(new Request(url.origin + "/api/items?game=" + game + "&v=" + ITEMS_CACHE_VERSION));
+  }
   return json({ ok: true, realm: realmName, items: itemRows.length });
 }
 
 async function apiItems(url, env, ctx) {
   const game = pickGame(url);
   const cache = caches.default;
-  // Bump the version suffix whenever the response shape changes, to bust the edge cache.
-  const key = new Request(url.origin + "/api/items?game=" + game + "&v=11");
+  // Bump the version suffix whenever the response shape changes or stale edge
+  // entries need to be retired.
+  const key = new Request(url.origin + "/api/items?game=" + game + "&v=" + ITEMS_CACHE_VERSION);
   const hit = await cache.match(key);
   if (hit) return hit;
 
@@ -525,7 +540,7 @@ async function importPop(url, env, req) {
   if (!body || !["ml-pop-v1", "ml-pop-v2"].includes(body.type) || !body.realm || !Array.isArray(body.samples))
     return json({ error: "expected an ml-pop-v1 or ml-pop-v2 population export" });
   const game = "realm:" + body.realm;
-  let sourceGame = GAMES[body.flavor] ? body.flavor : null;
+  let sourceGame = sourceGameKey(body.flavor);
   if (!sourceGame) {
     const dataset = await env.DB.prepare("SELECT source_game FROM datasets WHERE game=?").bind(game).first();
     sourceGame = dataset && GAMES[dataset.source_game] ? dataset.source_game : DEFAULT_GAME;

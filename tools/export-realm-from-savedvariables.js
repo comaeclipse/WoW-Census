@@ -107,6 +107,15 @@ const realmName = wanted
 const realm = realms[realmName];
 if (!realm) throw new Error("no realm data found");
 
+function normalizeFlavor(flavor) {
+  const f = String(flavor || "").toLowerCase();
+  if (["tbc-anniversary", "anniversary", "tbc", "classic-progression"].includes(f))
+    return "tbc-anniversary";
+  if (["classic-era", "era", "classic"].includes(f)) return "classic-era";
+  if (f === "retail") return "retail";
+  throw new Error(`unknown flavor: ${flavor}`);
+}
+
 const items = {};
 for (const [id, rec] of Object.entries(realm.items || {})) {
   const snaps = Object.keys(rec.snaps || {}).sort((a, b) => Number(a) - Number(b)).map((k) => {
@@ -183,9 +192,7 @@ if (process.argv.includes("--sellers")) {
   }));
 } else if (process.argv.includes("--population")) {
   const flavorArg = process.argv.find((a) => a.startsWith("--flavor="));
-  const flavor = flavorArg ? flavorArg.slice(9) : "classic-progression";
-  if (!["classic", "classic-progression", "retail"].includes(flavor))
-    throw new Error(`unknown flavor: ${flavor}`);
+  const flavor = normalizeFlavor(flavorArg ? flavorArg.slice(9) : "tbc-anniversary");
   const samples = Object.keys((realm.population && realm.population.samples) || {})
     .sort((a, b) => Number(a) - Number(b))
     .map((key) => {

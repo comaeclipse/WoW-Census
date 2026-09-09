@@ -79,16 +79,15 @@ function ML:RealmKey()
     return realm .. "-" .. (faction or "Neutral")
 end
 
--- Stable client flavor used as part of /who character identity. Progression
--- covers Anniversary/TBC (and future Classic progression clients).
+-- Stable user-facing client flavor used as part of /who character identity.
 function ML:GameFlavor()
     if WOW_PROJECT_ID and WOW_PROJECT_MAINLINE and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
         return "retail"
     end
     if WOW_PROJECT_ID and WOW_PROJECT_CLASSIC and WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-        return "classic"
+        return "classic-era"
     end
-    return "classic-progression"
+    return "tbc-anniversary"
 end
 
 function ML:Realm()

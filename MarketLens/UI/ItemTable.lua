@@ -33,7 +33,7 @@ local function oppCell(row)
 end
 
 -- Seller count is meaningless when the scan API returns no owner names
--- (bulk getAll/replicate on Classic/Anniversary) -- show a dash instead.
+-- (bulk getAll/replicate on Classic Era/TBC Anniversary) -- show a dash instead.
 local function sellersCell(row)
     if ML.realm and ML.realm.ownersAvailable then return tostring(row.latest.s) end
     return "|cff808080\226\128\148|r"

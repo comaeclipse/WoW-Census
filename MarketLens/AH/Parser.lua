@@ -23,7 +23,7 @@ function P:GetAuction(index)
         buyout    = buyoutPrice,
         unitPrice = math.floor(buyoutPrice / count),
         -- nil when the client didn't return a seller name. Bulk (getAll) scans
-        -- on Classic/Anniversary omit owners, so this is nil for every row --
+        -- on Classic Era/TBC Anniversary omit owners, so this is nil for every row --
         -- the scanner detects that and seller stats are hidden downstream.
         owner     = ownerFullName or owner,
         quality   = quality,

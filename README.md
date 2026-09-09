@@ -1,7 +1,7 @@
 # WoW-Census
 
 WoW-Census is a data project for the World of Warcraft economy and player
-population, spanning **Classic Era, Anniversary/TBC, and Retail**. It has two
+population, spanning **Classic Era, TBC Anniversary, and Retail**. It has two
 halves:
 
 - **MarketLens** — an in-game addon that scans the Auction House, aggregates
@@ -52,8 +52,8 @@ addon by matching the folder name to the `.toc` filename.
 | --- | --- |
 | `/ml` | Open / close the dashboard |
 | `/ml scan` | Run a full AH scan (must be at the Auction House) |
-| `/ml scan paged` | Classic/Anniversary: run a quick seller sample across the AH (Get All omits seller names) |
-| `/ml scan sellers full` | Classic/Anniversary: run an exhaustive paged seller scan for measurement |
+| `/ml scan paged` | Classic Era/TBC Anniversary: run a quick seller sample across the AH (Get All omits seller names) |
+| `/ml scan sellers full` | Classic Era/TBC Anniversary: run an exhaustive paged seller scan for measurement |
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
 | `/ml who <filter>` | Sample with a raw `/who` filter, e.g. `/ml who z-"Shattrath City"` |
@@ -68,7 +68,7 @@ addon by matching the folder name to the `.toc` filename.
 
 Scan a few times over hours/days — demand needs repeated observations.
 
-On Classic/Anniversary, `/ml scan` uses Get All (one fast bulk dump), but that
+On Classic Era/TBC Anniversary, `/ml scan` uses Get All (one fast bulk dump), but that
 dump omits seller names, so seller counts show as N/A. If Get All is on cooldown,
 MarketLens waits instead of falling back to a huge page-by-page crawl. Use
 `/ml scan paged` when you want seller data: it samples 60 pages spread across the
@@ -105,8 +105,9 @@ send that realm snapshot to the companion site:
 powershell -ExecutionPolicy Bypass -File .\tools\upload-realm.ps1 -Flavor retail
 ```
 
-Use `-Flavor classic` for Anniversary/TBC, `-Flavor classic-era` for Classic
-Era, or `-Flavor retail` for Retail.
+Use `-Flavor tbc-anniversary` for TBC Anniversary, `-Flavor classic-era` for
+Classic Era, or `-Flavor retail` for Retail. `-Flavor classic` is retained as a
+legacy alias for TBC Anniversary uploads.
 
 The first scan immediately supplies market, minimum buyout, quantity,
 saturation, regional demand, and local-vs-region analysis. Local supply and
@@ -143,7 +144,8 @@ tools/update-data.ps1
 Right-click → Run with PowerShell (or `powershell -File tools\update-data.ps1`).
 It writes `MarketLens/Data/TSMRegion.lua`; `/reload` in-game to pick it up.
 Re-run it when you want fresh data (the region file updates ~daily). Options:
-`-Region eu`, `-GameType classic`, `-Out <path>`.
+`-Region eu`, `-Flavor tbc-anniversary`, `-Flavor classic-era`, `-Flavor retail`,
+`-GameType <TSM slug>`, `-Out <path>`.
 
 When present, region data becomes the **authoritative demand signal** (tooltips
 tag it `(region)` vs `(local)`), and MarketLens computes a **local-vs-region deal
@@ -175,7 +177,7 @@ Sample repeatedly — and with filters (`/ml who z-"Hellfire Peninsula"`,
 `/ml who c-"Paladin" 60-70`, `/ml who r-"Blood Elf"`) — to build a picture over
 time. `first_seen`, `last_seen`, lifetime sighting count, and a rolling 35-day
 daily observation history accumulate independently for Classic Era,
-Anniversary/TBC, and Retail. This supports unique-today/7-day/30-day, new,
+TBC Anniversary, and Retail. This supports unique-today/7-day/30-day, new,
 returning, 3+-active-day, and returning-character-rate metrics.
 
 The **inferred profession demand** ranking is a *heuristic*: it weights each
@@ -203,7 +205,7 @@ a static frontend. It receives realm snapshots and `/who` population samples
 uploaded by `tools/upload-realm.ps1`, stores latest-value and day-bucketed
 history rows per item, and serves per-item price/sale-rate history and realm
 population/census views. Item links and icons follow the correct Wowhead branch
-(Retail vs Classic/TBC) based on each dataset's recorded flavor.
+(Retail vs Classic Era/TBC Anniversary) based on each dataset's recorded flavor.
 
 ## Status: v0.1 (MVP)
 

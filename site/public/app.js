@@ -41,7 +41,7 @@
   function gameParam(g) { return g.indexOf("realm:") === 0 ? "realm:" + encodeURIComponent(g.slice(6)) : encodeURIComponent(g); }
   function href(g) { return "/?game=" + gameParam(g); }
   var GAME_LABEL = { "classic": "Classic Era", "classic-progression": "TBC Anniversary", "retail": "Retail" };
-  var GAME_SHORT = { "classic": "Classic", "classic-progression": "TBC", "retail": "Retail" };
+  var GAME_SHORT = { "classic": "Era", "classic-progression": "TBC", "retail": "Retail" };
   var GAME_ORDER = ["classic", "classic-progression", "retail"];
   function splitRealm(label) { var i = label.lastIndexOf("-"); return i > 0 ? [label.slice(0, i), label.slice(i + 1)] : [label, ""]; }
 

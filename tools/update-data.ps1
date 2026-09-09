@@ -2,21 +2,21 @@
 # table that the in-game addon loads. WoW addons cannot fetch URLs themselves,
 # so this runs outside the game (double-click or scheduled).
 #
-# All WoW flavors here (retail / anniversary / classic-era) are junctions to the
+# All WoW flavors here (retail / tbc-anniversary / classic-era) may be junctions to the
 # same repo, so they load the SAME files. To let retail and classic data coexist
 # we emit TWO files, each self-gated on WOW_PROJECT_ID so exactly one assigns the
 # shared global MarketLensRegionData on any given client:
-#   -Flavor classic  -> Data/TSMRegion.lua        (skips on Retail)
-#   -Flavor retail   -> Data/TSMRegionRetail.lua  (runs only on Retail)
+#   -Flavor tbc-anniversary  -> Data/TSMRegion.lua        (skips on Retail)
+#   -Flavor classic-era      -> Data/TSMRegion.lua        (skips on Retail)
+#   -Flavor retail           -> Data/TSMRegionRetail.lua  (runs only on Retail)
 #
 # Data source: https://public-data.tradeskillmaster.com  (public, no key)
-# Usage:  right-click > Run with PowerShell  (defaults to classic-progression),
+# Usage:  right-click > Run with PowerShell  (defaults to TBC Anniversary),
 #   or:  powershell -File update-data.ps1 -Flavor retail
 #        optional: -Region eu   -GameType <override>   -Out C:\path\File.lua
 
 param(
-    [ValidateSet("classic", "retail")]
-    [string]$Flavor   = "classic",
+    [string]$Flavor   = "tbc-anniversary",
     [string]$Region   = "us",
     [string]$GameType,
     [string]$Out
@@ -25,11 +25,20 @@ param(
 $ErrorActionPreference = "Stop"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+$flavorKey = $Flavor.ToLowerInvariant()
+if ($flavorKey -in @("classic", "anniversary", "tbc")) { $flavorKey = "tbc-anniversary" }
+if ($flavorKey -notin @("tbc-anniversary", "classic-era", "retail")) {
+    Write-Host "Unknown flavor '$Flavor'. Use tbc-anniversary, classic-era, or retail." -ForegroundColor Red
+    exit 1
+}
+$Flavor = $flavorKey
 $isRetail = ($Flavor -eq "retail")
 
 # Default the TSM game-type slug per flavor unless the caller overrides it.
 if (-not $GameType) {
-    if ($isRetail) { $GameType = "retail" } else { $GameType = "classic-progression" }
+    if ($isRetail) { $GameType = "retail" }
+    elseif ($Flavor -eq "classic-era") { $GameType = "classic" }
+    else { $GameType = "classic-progression" }
 }
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -47,7 +56,7 @@ if (-not $Out) {
 if ($isRetail) {
     $guard = "if not (WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) then return end -- Retail only"
 } else {
-    $guard = "if WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then return end -- Classic/TBC only"
+    $guard = "if WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then return end -- Classic Era/TBC Anniversary only"
 }
 
 $url = "https://public-data.tradeskillmaster.com/$GameType/$Region/region/items.csv"

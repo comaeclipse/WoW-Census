@@ -1,8 +1,8 @@
 ﻿-- MarketLens/Data/TSMRegion.lua
 -- Auto-generated from TradeSkillMaster public data. Do not edit by hand.
 -- Source: https://public-data.tradeskillmaster.com/classic-progression/us/region/items.csv
--- Regenerate with tools/update-data.ps1 -Flavor classic
-if WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then return end -- Classic/TBC only
+-- Regenerate with tools/update-data.ps1 -Flavor tbc-anniversary
+if WOW_PROJECT_ID and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then return end -- Classic Era/TBC Anniversary only
 MarketLensRegionData = {
   region = "us",
   gameType = "classic-progression",

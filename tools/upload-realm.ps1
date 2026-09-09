@@ -2,6 +2,8 @@
 # No copy-paste. Run it after you /reload or log out in game.
 #
 # Usage:  powershell -File upload-realm.ps1 -Token YOUR_REFRESH_TOKEN
+# TBC:    powershell -File upload-realm.ps1 -Flavor tbc-anniversary
+# Era:    powershell -File upload-realm.ps1 -Flavor classic-era
 # Retail: powershell -File upload-realm.ps1 -Flavor retail
 #         (double-click "Run with PowerShell" and it will prompt for the token)
 #
@@ -11,8 +13,7 @@
 
 param(
     [string]$Token,
-    [ValidateSet("classic", "classic-era", "retail")]
-    [string]$Flavor = "classic",
+    [string]$Flavor = "tbc-anniversary",
     [string]$Region,
     [string]$Url    = "https://marketlens.skarz.workers.dev",
     [string]$Wow,
@@ -24,6 +25,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+$flavorKey = $Flavor.ToLowerInvariant()
+if ($flavorKey -in @("classic", "anniversary", "tbc")) { $flavorKey = "tbc-anniversary" }
+if ($flavorKey -notin @("tbc-anniversary", "classic-era", "retail")) {
+    Write-Host "Unknown flavor '$Flavor'. Use tbc-anniversary, classic-era, or retail." -ForegroundColor Red
+    exit 1
+}
+$Flavor = $flavorKey
 
 if (-not $Region) {
     $Region = if ($Flavor -eq "retail") { "retail" } elseif ($Flavor -eq "classic-era") { "classic" } else { "classic-progression" }
@@ -126,7 +135,7 @@ if ($content -match '\["popExport"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
     $helper = Join-Path $scriptDir "export-realm-from-savedvariables.js"
     $node = Get-Command node -ErrorAction SilentlyContinue
     if ($node -and (Test-Path $helper)) {
-        $popArgs = @($helper, $file.FullName, "--population", "--flavor=$Region")
+        $popArgs = @($helper, $file.FullName, "--population", "--flavor=$Flavor")
         if ($Realm) { $popArgs += "--realm=$Realm" }
         $rebuiltPop = & $node.Source @popArgs
         if ($LASTEXITCODE -eq 0 -and $rebuiltPop) {
