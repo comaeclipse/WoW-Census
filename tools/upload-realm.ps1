@@ -174,6 +174,9 @@ if ($node -and (Test-Path $helper)) {
                     $sr = Invoke-RestMethod -Uri $sellerUri -Method Post -Body $rebuiltSellers -ContentType "application/json"
                     if ($sr.ok) {
                         Write-Host ("Imported {0} seller(s) with {1} listing(s) for {2}." -f $sr.sellers, $sr.listings, $sr.realm) -ForegroundColor Green
+                        if ($sr.meta) {
+                            Write-Host ("Seller scan: {0}/{1} pages, {2}% owner coverage{3}." -f $sr.meta.scannedPages, $sr.meta.pages, $sr.meta.ownerCoverage, $(if ($sr.meta.partial) { " (sample)" } else { "" }))
+                        }
                         Write-Host ("Sellers show on each item page ({0}/?game=realm:{1}, open an item)." -f $Url, [uri]::EscapeDataString($sr.realm))
                     } else {
                         Write-Host ("Seller upload error: {0}" -f $sr.error) -ForegroundColor Yellow

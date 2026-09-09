@@ -99,7 +99,7 @@ async function main() {
 
   const statements = [
     "PRAGMA foreign_keys=ON;",
-    "CREATE TABLE IF NOT EXISTS datasets (game TEXT PRIMARY KEY, source_game TEXT NOT NULL, updated_at TEXT);",
+    "CREATE TABLE IF NOT EXISTS datasets (game TEXT PRIMARY KEY, source_game TEXT NOT NULL, updated_at TEXT, seller_updated_at TEXT, seller_meta TEXT);",
     "DELETE FROM items WHERE game='retail';",
     ...inserts("items", ["game","id","name","slug","mv","asp","sr","spd","hist","updated_at","q","sc","cat"], regionItems, 120),
     ...inserts("history", ["game","id","ts","mv","asp","sr","spd","q"], regionHistory, 150),

@@ -43,6 +43,34 @@ function gameHref(prefix, g) {
 function esc(s) {
   return String(s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 }
+function sellerMeta(body) {
+  const m = (body && body.meta) || {};
+  return {
+    partial: m.partial === true,
+    rows: Number(m.rows) || 0,
+    pages: Number(m.pages) || 0,
+    scannedPages: Number(m.scannedPages) || 0,
+    ownerCoverage: Number(m.ownerCoverage) || 0,
+    elapsed: Number(m.elapsed) || 0,
+    projectedFullSeconds: Number(m.projectedFullSeconds) || 0,
+  };
+}
+function parseSellerMeta(raw) {
+  if (!raw) return null;
+  try { return sellerMeta({ meta: JSON.parse(raw) }); } catch (e) { return null; }
+}
+function sellerMetaLabel(meta) {
+  if (!meta) return "seller scan";
+  return meta.partial ? "seller sample" : "full seller scan";
+}
+async function fetchSellerMeta(env, game) {
+  try {
+    const ds = await env.DB.prepare("SELECT seller_meta FROM datasets WHERE game=?").bind(game).first();
+    return parseSellerMeta(ds && ds.seller_meta);
+  } catch (e) {
+    return null;
+  }
+}
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 function scale100(v, mn, mx) { return mx === mn ? 0 : clamp(((v - mn) / (mx - mn)) * 100, 0, 100); }
 function demandScore(sr, spd) {
@@ -298,7 +326,11 @@ async function importRealm(url, env, req) {
   await bulkInsert(env.DB, "history",
     ["game", "id", "ts", "mv", "asp", "sr", "spd", "q"], histRows, 150);
   await env.DB.prepare(
-    "INSERT OR REPLACE INTO datasets (game,source_game,updated_at) VALUES (?,?,?)"
+    `INSERT INTO datasets (game, source_game, updated_at)
+     VALUES (?, ?, ?)
+     ON CONFLICT(game) DO UPDATE SET
+       source_game = excluded.source_game,
+       updated_at = excluded.updated_at`
   ).bind(game, regionGame, new Date().toISOString()).run();
   return json({ ok: true, realm: realmName, items: itemRows.length });
 }
@@ -374,9 +406,14 @@ async function itemPage(url, env) {
     ? `<a class="iname-wh" href="${whHref}" data-wh-rename-link="true">${esc(row.name)}</a>`
     : esc(row.name);
 
-  // Who showed up in the latest seller sample for this item (cheapest first),
-  // linking to each seller's profile. Only realm datasets from paged scans have
-  // this.
+  let smeta = null;
+  if (isRealm) {
+    smeta = await fetchSellerMeta(env, game);
+  }
+
+  // Who showed up in the latest seller scan/sample for this item (cheapest
+  // first), linking to each seller's profile. Only realm datasets from paged
+  // scans have this.
   let sellersHtml = "";
   if (isRealm) {
     const sres = await env.DB.prepare(
@@ -392,11 +429,12 @@ async function itemPage(url, env) {
       </tr>`).join("");
     if (srows) {
       sellersHtml = `<div class="panel">
-        <div class="ptitle">WHO'S SELLING THIS <span class="mu">${(sres.results || []).length} sellers</span></div>
+        <div class="ptitle">${smeta && smeta.partial ? "LATEST SELLER SAMPLE" : "WHO'S SELLING THIS"} <span class="mu">${(sres.results || []).length} sellers</span></div>
         <div class="tablewrap"><table>
           <thead><tr><th class="l">Seller</th><th>Qty</th><th>Buyout</th></tr></thead>
           <tbody>${srows}</tbody>
         </table></div>
+        ${smeta ? `<p class="src">${esc(sellerMetaLabel(smeta))}: ${smeta.scannedPages || 0}/${smeta.pages || 0} pages, ${smeta.ownerCoverage || 0}% owner coverage.</p>` : ""}
       </div>`;
     }
   }
@@ -536,7 +574,11 @@ async function importPop(url, env, req) {
       last_seen=MAX(character_observations.last_seen,excluded.last_seen)`).run();
   }
   await env.DB.prepare(
-    "INSERT OR REPLACE INTO datasets (game,source_game,updated_at) VALUES (?,?,?)"
+    `INSERT INTO datasets (game, source_game, updated_at)
+     VALUES (?, ?, ?)
+     ON CONFLICT(game) DO UPDATE SET
+       source_game = excluded.source_game,
+       updated_at = excluded.updated_at`
   ).bind(game, sourceGame, new Date().toISOString()).run();
   if (!rows.length && !characterRows.length) return json({ error: "no population data in export" });
   return json({ ok: true, realm: body.realm, sourceGame, samples: rows.length,
@@ -557,6 +599,8 @@ async function importSellers(url, env, req) {
     return json({ error: "expected an ml-sellers-v1 seller export" });
   const realmName = regionGame === "retail" ? stripFaction(body.realm) : body.realm;
   const game = "realm:" + realmName;
+  const meta = sellerMeta(body);
+  const now = new Date().toISOString();
 
   const sellerRows = [], listingRows = [];
   for (const s of body.sellers) {
@@ -581,7 +625,15 @@ async function importSellers(url, env, req) {
     sellerRows, 60);
   await bulkInsert(env.DB, "seller_listings",
     ["game", "owner", "id", "q", "l"], listingRows, 120);
-  return json({ ok: true, realm: realmName, sellers: sellerRows.length, listings: listingRows.length });
+  await env.DB.prepare(
+    `INSERT INTO datasets (game, source_game, seller_updated_at, seller_meta)
+     VALUES (?, ?, ?, ?)
+     ON CONFLICT(game) DO UPDATE SET
+       source_game = excluded.source_game,
+       seller_updated_at = excluded.seller_updated_at,
+       seller_meta = excluded.seller_meta`
+  ).bind(game, regionGame, now, JSON.stringify(meta)).run();
+  return json({ ok: true, realm: realmName, sellers: sellerRows.length, listings: listingRows.length, meta });
 }
 
 // Tiny inline SVG sparkline of a seller's listed value over time (copper).
@@ -629,6 +681,8 @@ async function sellerPage(url, env) {
   const listings = listRes.results || [];
 
   const realmLabel = game.slice(6);
+  const smeta = await fetchSellerMeta(env, game);
+  const sellerLabel = sellerMetaLabel(smeta);
   const lastSeen = seller.last_seen ? new Date(seller.last_seen * 1000).toISOString().slice(0, 10) : "—";
   const stat = (k, v, cls) => `<div class="tile"><div class="k">${esc(k)}</div><div class="v ${cls || ""}">${esc(v)}</div></div>`;
 
@@ -679,14 +733,14 @@ async function sellerPage(url, env) {
   ${spark ? `<div class="panel"><div class="ptitle">LISTED VALUE OVER TIME</div>${spark}</div>` : ""}
 
   <div class="panel">
-    <div class="ptitle">CURRENT LISTINGS <span class="mu">${listings.length} items</span></div>
+    <div class="ptitle">${smeta && smeta.partial ? "LATEST SAMPLE LISTINGS" : "CURRENT LISTINGS"} <span class="mu">${listings.length} items</span></div>
     <div class="tablewrap"><table>
       <thead><tr><th class="l">Item</th><th>Qty</th><th>Their Buyout</th><th>Region Avg</th><th>vs Region</th></tr></thead>
       <tbody>${rows || '<tr><td class="l" colspan="5" style="padding:18px;color:var(--muted)">No current listings.</td></tr>'}</tbody>
     </table></div>
   </div>
 
-  <p class="src">Seller data comes from legacy paged AH seller samples on ${esc(realmLabel)}. A seller's listings reflect the most recent sample; "usually lists" averages the last ${hist.length || 0} samples.</p>
+  <p class="src">Seller data comes from a legacy paged AH ${esc(sellerLabel)} on ${esc(realmLabel)}${smeta ? ` (${smeta.scannedPages || 0}/${smeta.pages || 0} pages, ${smeta.ownerCoverage || 0}% owner coverage)` : ""}. A seller's listings reflect the latest imported seller data; "usually lists" averages the last ${hist.length || 0} samples.</p>
 </div>
 </body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=1800" } });

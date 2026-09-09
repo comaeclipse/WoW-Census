@@ -27,11 +27,13 @@ local HIST_CAP = 20 -- rolling summary points retained per seller
 
 -- Fold this scan's per-owner listings into the persistent per-realm store.
 -- accSellers is Scanner.acc.sellers: { [owner] = { [itemID] = {q=,l=,n=} } }.
-function Sellers:Record(accSellers)
+function Sellers:Record(accSellers, scanStats)
     if not accSellers then return 0 end
     local realm = ML.realm
     realm.sellers = realm.sellers or {}
     local now = time()
+    local scanID = scanStats and scanStats.id or tostring(now)
+    realm.lastSellerScanID = scanID
     local n = 0
 
     for owner, listings in pairs(accSellers) do
@@ -52,6 +54,7 @@ function Sellers:Record(accSellers)
 
         rec.listings = listings -- replace the prior snapshot with the current one
         rec.lastSeen = now
+        rec.lastSellerScanID = scanID
         rec.seenCount = (rec.seenCount or 0) + 1
         rec.hist = rec.hist or {}
         U.PushCapped(rec.hist, { t = now, items = items, qty = qty, value = value }, HIST_CAP)

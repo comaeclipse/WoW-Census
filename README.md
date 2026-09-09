@@ -53,6 +53,7 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml` | Open / close the dashboard |
 | `/ml scan` | Run a full AH scan (must be at the Auction House) |
 | `/ml scan paged` | Classic/Anniversary: run a time-boxed seller sample (Get All omits seller names) |
+| `/ml scan sellers full` | Classic/Anniversary: run an exhaustive paged seller scan for measurement |
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
 | `/ml who <filter>` | Sample with a raw `/who` filter, e.g. `/ml who z-"Shattrath City"` |
@@ -74,7 +75,10 @@ MarketLens waits instead of falling back to a huge page-by-page crawl. Use
 (20 minutes by default), briefly re-reads loaded pages while names resolve, and
 records seller profiles without letting an incomplete sample overwrite full AH
 item totals. If the sample reaches the end of the AH before the time limit, it is
-treated as a complete seller-aware item snapshot.
+treated as a complete seller-aware item snapshot. Use `/ml scan sellers full` to
+measure whether an exhaustive seller scan is practical on your realm; it uses the
+same local owner-resolution behavior but has no time cap and reports owner
+coverage plus projected full-scan timing as it runs.
 
 On Retail, `/ml scan` uses the browse-summary API: minimum price and total
 quantity are available, but individual auction and seller counts are not. The

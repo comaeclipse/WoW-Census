@@ -133,11 +133,24 @@ const payload = {
 };
 
 if (process.argv.includes("--sellers")) {
-  // ml-sellers-v1: one entry per seller with their current listings and a small
-  // rolling summary history. Item names are resolved site-side from the realm
-  // items table, so listings carry only [itemID, quantity, lowestUnitPrice].
+  // ml-sellers-v1: one entry per seller observed in the latest seller scan/sample
+  // with their sampled listings and a small rolling summary history. Item names
+  // are resolved site-side from the realm items table, so listings carry only
+  // [itemID, quantity, lowestUnitPrice].
+  const latestSellerScanID = realm.lastSellerScanID || (realm.lastSellerScanStats && realm.lastSellerScanStats.id) || null;
+  const stats = realm.lastSellerScanStats || {};
+  const meta = {
+    partial: stats.partial === true || realm.sellerSamplePartial === true,
+    rows: stats.rows || realm.sellerSampleRows || 0,
+    pages: stats.pages || 0,
+    scannedPages: stats.scannedPages || 0,
+    ownerCoverage: stats.ownerCoverage || 0,
+    elapsed: stats.elapsed || 0,
+    projectedFullSeconds: stats.projectedFullSeconds || 0,
+  };
   const sellers = [];
   for (const [owner, rec] of Object.entries(realm.sellers || {})) {
+    if (latestSellerScanID && rec.lastSellerScanID !== latestSellerScanID) continue;
     const L = [];
     for (const [id, li] of Object.entries(rec.listings || {})) {
       const itemId = Number(id);
@@ -165,7 +178,7 @@ if (process.argv.includes("--sellers")) {
   }
   process.stdout.write(JSON.stringify({
     type: "ml-sellers-v1", realm: realmName,
-    exportedAt: Math.floor(Date.now() / 1000), sellers,
+    exportedAt: Math.floor(Date.now() / 1000), meta, sellers,
   }));
 } else if (process.argv.includes("--population")) {
   const flavorArg = process.argv.find((a) => a.startsWith("--flavor="));

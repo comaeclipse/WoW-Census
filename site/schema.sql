@@ -35,12 +35,14 @@ CREATE TABLE IF NOT EXISTS history (
 );
 CREATE INDEX IF NOT EXISTS idx_history_item ON history(game, id, ts);
 
--- Flavor provenance for uploaded realm datasets. This keeps external item links
--- and icons on the correct Wowhead branch (Retail vs Classic/TBC).
+-- Flavor provenance for uploaded datasets plus optional latest seller scan/sample
+-- metadata for realm seller pages.
 CREATE TABLE IF NOT EXISTS datasets (
   game        TEXT PRIMARY KEY,
   source_game TEXT NOT NULL,
-  updated_at  TEXT
+  updated_at  TEXT,
+  seller_updated_at TEXT,
+  seller_meta TEXT
 );
 
 -- Seller profiles for realm datasets (game = "realm:<Realm-Faction>"). Populated

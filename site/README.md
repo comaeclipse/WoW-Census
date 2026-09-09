@@ -39,6 +39,9 @@ wrangler d1 create marketlens
 # 2. apply the schema (remote)
 wrangler d1 execute marketlens --remote --file=schema.sql
 
+# existing databases: apply new migration files as they appear
+wrangler d1 execute marketlens --remote --file=migrate-seller-meta.sql
+
 # 3. set the admin token used by /admin/refresh
 wrangler secret put REFRESH_TOKEN     # type any long random string
 

@@ -36,8 +36,44 @@ local function resetAccumulator()
     S.ownersSeen = false -- flips true if any auction returned a seller name
     S.resolvePasses = 0  -- local re-reads for the current page's owner names
     S.sellerSample = false
+    S.sellerFull = false
     S.partialScan = false
     S.scanStartedAt = nil
+    S.scanStats = nil
+end
+
+local function resetSellerStats(full)
+    S.scanStats = {
+        id = nil,
+        full = full == true,
+        partial = false,
+        pages = 0,
+        scannedPages = 0,
+        rows = 0,
+        ownerRows = 0,
+        missingOwnerRows = 0,
+        ownerCoverage = 0,
+        uniqueSellers = 0,
+        elapsed = 0,
+        projectedFullSeconds = nil,
+        localOwnerRereads = 0,
+    }
+end
+
+local function refreshSellerStats(totalPages)
+    local st = S.scanStats
+    if not st then return nil end
+    st.pages = totalPages or st.pages or 0
+    st.uniqueSellers = U.CountKeys(S.acc and S.acc.sellers or {})
+    st.elapsed = (GetTime and S.scanStartedAt)
+        and math.floor(GetTime() - S.scanStartedAt + 0.5) or 0
+    local resolved = (st.ownerRows or 0) + (st.missingOwnerRows or 0)
+    st.ownerCoverage = resolved > 0 and U.Round((st.ownerRows or 0) / resolved * 100) or 0
+    if (st.scannedPages or 0) > 0 and (st.pages or 0) > 0 and st.elapsed > 0 then
+        st.projectedFullSeconds = math.floor(st.elapsed / st.scannedPages * st.pages + 0.5)
+    end
+    st.partial = S.partialScan == true
+    return st
 end
 
 local function accumulate(items, a)
@@ -149,7 +185,7 @@ end
 -- forcePaged: skip Get All even when it's available. The bulk dump omits seller
 -- names, so this runs a time-bounded legacy page walk that captures a seller
 -- sample. It is intentionally not a full-market crawl on very large realms.
-function S:StartScan(forcePaged)
+function S:StartScan(forcePaged, fullSellerScan)
     if not self.eventDriverReady then
         ML:Print("Scanner initialization failed before its event handler loaded. Enable Lua errors and /reload.")
         return
@@ -203,8 +239,10 @@ function S:StartScan(forcePaged)
     else
         self.mode = "paged"
         self.sellerSample = true
-        ML:Print(forcePaged
-            and "Running a time-boxed seller sample (paged AH scan)..."
+        self.sellerFull = fullSellerScan == true
+        resetSellerStats(self.sellerFull)
+        ML:Print(self.sellerFull
+            and "Running a full seller scan (paged AH scan; no time cap)..."
             or "Running a time-boxed seller sample (paged AH scan)...")
         driver:Show()
         self:QueryCurrentPage()
@@ -241,14 +279,29 @@ function S:Finish()
         ML.realm.lastSellerSample = time()
         ML.realm.sellerSampleRows = self.acc.totalRows
         ML.realm.sellerSamplePartial = self.partialScan == true
+        local st = refreshSellerStats(self.scanStats and self.scanStats.pages or 0)
+        if st then
+            st.id = tostring(time()) .. "-" .. tostring(st.rows or 0)
+            st.partial = self.partialScan == true
+            st.full = self.sellerFull == true
+            ML.realm.lastSellerScanID = st.id
+            ML.realm.lastSellerScanStats = st
+        end
     end
 
     local unit = self.mode == "browse"
         and "summary rows" or "auction rows"
     if self.sellerSample and self.partialScan then
-        ML:Print("Seller sample complete: %d %s, %d unique items%s.",
-            self.acc.totalRows, unit, itemCount,
+        local st = self.scanStats or {}
+        ML:Print("Seller sample complete: %d %s, %d unique items, %d%% owner coverage%s.",
+            self.acc.totalRows, unit, itemCount, st.ownerCoverage or 0,
             self.partialScan and " (time limit reached)" or "")
+    elseif self.sellerSample then
+        local st = self.scanStats or {}
+        ML:Print("Seller scan complete: %d %s, %d unique items, %d%% owner coverage.",
+            self.acc.totalRows, unit, itemCount, st.ownerCoverage or 0)
+        ML.Snapshots:Record(self.acc.items)
+        ML.Snapshots:Purge()
     else
         ML:Print("Scan complete: %d %s, %d unique items.", self.acc.totalRows, unit, itemCount)
         ML.Snapshots:Record(self.acc.items)
@@ -258,12 +311,14 @@ function S:Finish()
     -- getAll/browse/replicate leave acc.sellers empty, so stored profiles persist
     -- untouched rather than being wiped by an owner-less scan.
     if self.ownersSeen and ML.Sellers then
-        ML.Sellers:Record(self.acc.sellers)
+        ML.Sellers:Record(self.acc.sellers, ML.realm.lastSellerScanStats)
         ML.Sellers:Purge()
     end
     ML:Fire("SCAN_COMPLETE", itemCount, self.acc.totalRows, self.mode, {
         sellerSample = self.sellerSample == true,
+        sellerFull = self.sellerFull == true,
         partial = self.partialScan == true,
+        stats = self.scanStats,
     })
 end
 
@@ -506,8 +561,13 @@ function S:ProcessPage()
         -- and don't advance. Seller names usually resolve into the already-loaded
         -- rows after a short client-side delay.
         self.resolvePasses = (self.resolvePasses or 0) + 1
+        if self.scanStats then
+            self.scanStats.localOwnerRereads = (self.scanStats.localOwnerRereads or 0) + pending
+        end
+        local st = refreshSellerStats(totalPages)
         ML:Fire("SCAN_PROGRESS", { mode = "paged", page = self.page + 1,
-            pages = totalPages, rows = self.acc.totalRows, resolving = pending })
+            pages = totalPages, rows = self.acc.totalRows, resolving = pending,
+            stats = st })
         C_Timer.After(resolveDelay, function()
             if not S.scanning or S.mode ~= "paged" or not S.awaitingPage then return end
             local done = S:ProcessPage()
@@ -522,16 +582,29 @@ function S:ProcessPage()
     for _, a in ipairs(rows) do accumulate(self.acc.items, a) end
     self.acc.totalRows = self.acc.totalRows + shown
     self.resolvePasses = 0
+    if self.scanStats then
+        self.scanStats.scannedPages = (self.scanStats.scannedPages or 0) + 1
+        self.scanStats.rows = (self.scanStats.rows or 0) + shown
+        for _, a in ipairs(rows) do
+            if a.owner then
+                self.scanStats.ownerRows = (self.scanStats.ownerRows or 0) + 1
+            else
+                self.scanStats.missingOwnerRows = (self.scanStats.missingOwnerRows or 0) + 1
+            end
+        end
+    end
+    local st = refreshSellerStats(totalPages)
 
     ML:Fire("SCAN_PROGRESS", { mode = "paged", page = self.page + 1,
-        pages = totalPages, rows = self.acc.totalRows })
+        pages = totalPages, rows = self.acc.totalRows, stats = st })
 
     local nextStart = (self.page + 1) * PAGE_SIZE
     if nextStart < total and shown > 0 then
         local budget = ML.db.settings.sellerSampleSeconds or 1200
-        if self.sellerSample and budget > 0 and GetTime
+        if self.sellerSample and not self.sellerFull and budget > 0 and GetTime
             and ((GetTime() - (self.scanStartedAt or GetTime())) >= budget) then
             self.partialScan = true
+            refreshSellerStats(totalPages)
             return true
         end
         self.page = self.page + 1
