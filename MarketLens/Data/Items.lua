@@ -71,8 +71,35 @@ end
 -- Per-session classification cache to avoid repeated API calls during a scan.
 D.classifyCache = D.classifyCache or {}
 
--- Public: returns { profession=, sector=, market= }. Never nil (falls back to
--- an "Unknown / Other" bucket) so every scanned item lands somewhere.
+-- Overlay the item's source (crafted/gathered/drop/...) onto a class-based
+-- classification. Additive: attaches source + crafter + spellID, and -- for
+-- crafted/gathered items whose producing profession the class heuristic could
+-- not name (finished gear collapses to "Gear") -- reassigns profession so the
+-- item rolls up under the profession that actually supplies it. sector/market
+-- are left intact, so a crafted plate helm still shows in the Armor market but
+-- attributes to Blacksmithing.
+local GENERIC_PROFESSIONS = { Gear = true, Unknown = true }
+function D:ApplySource(itemID, base)
+    local src = self:ItemSource(itemID)
+    if not src then return base end
+    -- Copy so we never mutate a shared Overrides/heuristic table.
+    local out = {
+        profession = base.profession,
+        sector     = base.sector,
+        market     = base.market,
+        source     = src.source,
+        crafter    = src.profession, -- producing/gathering profession
+        spellID    = src.spellID,
+    }
+    if src.profession and GENERIC_PROFESSIONS[out.profession] then
+        out.profession = src.profession
+    end
+    return out
+end
+
+-- Public: returns { profession=, sector=, market=, source=, crafter=, spellID= }.
+-- Never nil (falls back to an "Unknown / Other" bucket) so every scanned item
+-- lands somewhere. source/crafter/spellID are present only when known.
 function D:Classify(itemID)
     if not itemID then
         return { profession = "Unknown", sector = "Other", market = "Uncategorized" }
@@ -90,12 +117,20 @@ function D:Classify(itemID)
     end
 
     if result then
-        -- Confident classification (override or real class): cache it.
+        -- Confident classification (override or real class): overlay source and cache.
+        result = self:ApplySource(itemID, result)
         self.classifyCache[itemID] = result
         return result
     end
 
     -- classID was nil (item data not cached yet) -> return a placeholder but do
-    -- NOT cache, so it reclassifies once the client loads the item's info.
+    -- NOT cache, so it reclassifies once the client loads the item's info. A
+    -- known source is still worth surfacing while the class data loads.
+    local src = self:ItemSource(itemID)
+    if src then
+        return { profession = src.profession or "Unknown", sector = "Other",
+                 market = "Uncategorized", source = src.source, crafter = src.profession,
+                 spellID = src.spellID }
+    end
     return { profession = "Unknown", sector = "Other", market = "Uncategorized" }
 end

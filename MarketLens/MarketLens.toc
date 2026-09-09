@@ -18,6 +18,8 @@ Utils/Money.lua
 
 Data/Categories.lua
 Data/Professions.lua
+Data/ItemSources.lua
+Data/ItemSourcesGen.lua
 Data/Items.lua
 Data/TSMRegion.lua
 Data/TSMRegionRetail.lua
