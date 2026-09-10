@@ -325,14 +325,20 @@ async function importRealm(url, env, req) {
     // Top-seller concentration: the largest single seller's share of supply
     // (0-100). Only meaningful when owners are known, same gate as sc.
     const tc = sellersAvailable ? (last[7] || 0) : null;
-    const w = last[6] || 0; // [t,q,a,s,l,m,w,tc]
+    // [t,q,a,s,l,m,w,tc]: value the realm at the weighted MEDIAN (m, idx 5), not
+    // the weighted average (w, idx 6). A single grossly-overpriced listing skews
+    // w wildly (e.g. Netherweave's wtd-avg spiked to ~58g/unit while its median
+    // held at ~18s), which poisoned mv (=q*price) and asp. Median is outlier-
+    // robust; fall back to w only when a median wasn't recorded.
+    const unit = last[5] || last[6] || 0;
     const cat = (rec.m && String(rec.m).trim()) ? String(rec.m) : null;
     const src = (rec.src && String(rec.src).trim()) ? String(rec.src) : null;
     const crafter = (rec.cr && String(rec.cr).trim()) ? String(rec.cr) : null;
-    itemRows.push([game, id, name, slugify(name), q * w, w, rr.sr || 0, rr.spd || 0, rr.asp || 0,
+    itemRows.push([game, id, name, slugify(name), q * unit, unit, rr.sr || 0, rr.spd || 0, rr.asp || 0,
       new Date().toISOString(), q, sc, tc, cat, src, crafter]);
     for (const sn of snaps) {
-      histRows.push([game, id, dayBucketFromUnix(sn[0]), (sn[1] || 0) * (sn[6] || 0), sn[6] || 0,
+      const u = sn[5] || sn[6] || 0;
+      histRows.push([game, id, dayBucketFromUnix(sn[0]), (sn[1] || 0) * u, u,
         rr.sr || 0, rr.spd || 0, sn[1] || 0]);
     }
   }
@@ -1037,6 +1043,11 @@ async function popPage(url, env) {
   /* The character table is the wide one; let its text columns wrap instead of
      overflowing into the class-distribution column beside it. */
   table.acttable td.l{white-space:normal}
+  /* Give the character name room and keep "Days seen" tight. */
+  table.acttable th:nth-child(1),table.acttable td:nth-child(1){width:52%}
+  table.acttable th:nth-child(2),table.acttable td:nth-child(2){width:13%}
+  table.acttable th:nth-child(3),table.acttable td:nth-child(3){width:35%}
+  table.acttable th:nth-child(2){white-space:normal}
 </style>
 </head><body>
 <div class="crt" aria-hidden="true"></div>
@@ -1055,6 +1066,49 @@ async function popPage(url, env) {
     Characters are not human players/accounts; a rename appears as a new character. Companion to the MarketLens addon.
   </p>
 </div>
+<script>
+(function(){
+  function cellVal(td){ return (td.textContent||"").replace(/\\u00a0/g," ").trim(); }
+  function toNum(v){ var n=parseFloat(String(v).replace(/[^0-9.\\-]/g,"")); return isNaN(n)?null:n; }
+  var state=new WeakMap();
+  function sortBy(table,idx){
+    var tb=table.tBodies[0]; if(!tb) return;
+    var rows=[].slice.call(tb.rows).filter(function(r){ return !r.querySelector("[colspan]"); });
+    if(rows.length<2) return;
+    var st=state.get(table)||{col:-1,dir:-1};
+    if(st.col===idx){ st.dir=-st.dir; } else { st.col=idx; st.dir=-1; }
+    state.set(table,st);
+    rows.sort(function(a,b){
+      var x=cellVal(a.cells[idx]), y=cellVal(b.cells[idx]);
+      var nx=toNum(x), ny=toNum(y);
+      if(nx!==null&&ny!==null) return st.dir*(nx-ny);
+      return st.dir*String(x).localeCompare(String(y),undefined,{numeric:true});
+    });
+    rows.forEach(function(r){ tb.appendChild(r); });
+    var ths=table.tHead.rows[0].cells;
+    for(var i=0;i<ths.length;i++){
+      var ar=ths[i].querySelector(".ar"); if(!ar) continue;
+      if(i===idx){ ar.classList.remove("off"); ar.textContent=st.dir<0?"\\u25BC":"\\u25B2"; }
+      else ar.classList.add("off");
+    }
+  }
+  function makeSortable(table){
+    if(!table.tHead||!table.tHead.rows.length) return;
+    var ths=table.tHead.rows[0].cells;
+    for(var i=0;i<ths.length;i++){ (function(th,idx){
+      if((th.textContent||"").replace(/\\u00a0/g,"").trim()==="") return; // skip meter/spacer column
+      if(!th.querySelector(".ar")){
+        th.appendChild(document.createTextNode(" "));
+        var ar=document.createElement("span"); ar.className="ar off"; ar.textContent="\\u25BC";
+        th.appendChild(ar);
+      }
+      th.addEventListener("click",function(){ sortBy(table,idx); });
+    })(ths[i],i); }
+  }
+  var ts=document.querySelectorAll("table.poptable");
+  for(var i=0;i<ts.length;i++) makeSortable(ts[i]);
+})();
+</script>
 </body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } });
 
