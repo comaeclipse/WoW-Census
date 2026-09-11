@@ -829,6 +829,16 @@ async function loadPopUnique(env, game) {
   return { sightings: rows.length, classes, races };
 }
 
+// Unique characters grouped by their last-known zone — a footprint of where the
+// /who scans caught the population, not a targeted zone census.
+async function loadZoneStats(env, game) {
+  return (await env.DB.prepare(
+    `SELECT COALESCE(NULLIF(zone, ''), 'Unknown') zone, COUNT(*) chars,
+       CAST(ROUND(AVG(level)) AS INT) avg_level
+     FROM characters WHERE game = ? GROUP BY zone ORDER BY chars DESC`
+  ).bind(game).all()).results;
+}
+
 async function loadCharacterStats(env, game) {
   const today = Math.floor(Date.now() / 86400000);
   const weekStart = today - 6, monthStart = today - 29;
@@ -985,6 +995,7 @@ async function popPage(url, env) {
   const p = await loadPop(env, game);
   const characters = await loadCharacterStats(env, game);
   const uniq = await loadPopUnique(env, game);
+  const zones = await loadZoneStats(env, game);
   // Count each character once per day when identity data exists; older aggregate
   // realms fall back to the raw per-sample sightings.
   const perDay = uniq.sightings > 0;
@@ -1037,6 +1048,17 @@ async function popPage(url, env) {
     '</tbody></table><p class="hint">' + characters.lifetime.toLocaleString() + ' lifetime unique characters · ' +
     characters.returningRate + '% 7-day returning-character rate. Names identify characters, not people or Battle.net accounts.</p></div>';
 
+  const zoneMax = zones.length ? zones[0].chars : 1;
+  const zoneBody = zones.map((z) =>
+    '<tr><td class="l">' + esc(z.zone) + '</td><td>' + z.chars + '</td><td>' + (z.avg_level || 0) +
+    '</td><td class="l">' + popMeter(Math.round(z.chars / zoneMax * 100)) + '</td></tr>'
+  ).join("");
+  const zonePanel = '<div class="panel zonepanel" style="margin-bottom:22px"><div class="ptitle">Zone activity &middot; ' +
+    zones.length + ' zones</div>' +
+    '<table class="poptable"><thead><tr><th class="l">Zone</th><th>Chars</th><th>Avg lvl</th><th class="l">&nbsp;</th></tr></thead><tbody>' +
+    (zoneBody || '<tr><td class="l mu" colspan="4" style="padding:16px">No zone data yet.</td></tr>') +
+    '</tbody></table><p class="hint">Where each observed character was last caught by /who &mdash; a footprint of the scans, not a targeted zone census.</p></div>';
+
   const empty = p.samples === 0;
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1059,6 +1081,11 @@ async function popPage(url, env) {
   table.acttable th:nth-child(1),table.acttable td:nth-child(1){width:46%}
   table.acttable th:nth-child(2),table.acttable td:nth-child(2){width:24%}
   table.acttable th:nth-child(3),table.acttable td:nth-child(3){width:30%}
+  /* Zone activity spans full width below the grid; give the meter room. */
+  .zonepanel table.poptable th:nth-child(1),.zonepanel table.poptable td:nth-child(1){width:40%}
+  .zonepanel table.poptable th:nth-child(2),.zonepanel table.poptable td:nth-child(2){width:12%}
+  .zonepanel table.poptable th:nth-child(3),.zonepanel table.poptable td:nth-child(3){width:14%}
+  .zonepanel table.poptable td.l .meter i{height:14px}
 </style>
 </head><body>
 <div class="crt" aria-hidden="true"></div>
@@ -1070,7 +1097,7 @@ async function popPage(url, env) {
   </header>
   <section class="tiles tiles5">${tiles}</section>
   ${empty ? '<div class="panel"><p class="hint">No population samples uploaded yet. In game, open the Population tab and press Scan Population (or /ml who), then upload.</p></div>'
-    : '<div class="panelgrid">' + identityPanel + classPanel + racePanel + demandPanel + '</div>'}
+    : '<div class="panelgrid">' + identityPanel + classPanel + racePanel + demandPanel + '</div>' + zonePanel}
   <p class="src">
     A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
     ${perDay ? "Each character is counted once per day, however many scans ran that day" : "Tables count raw sightings across all scans"}. Unique metrics use normalized character name + realm + game flavor.<br>
