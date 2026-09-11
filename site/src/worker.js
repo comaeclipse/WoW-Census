@@ -548,6 +548,18 @@ function notFound(game, key) {
   <div class="wrap"><p class="src">No item "${esc(key)}" in ${esc(game)}. <a href="/?game=${esc(game)}">Back to screener</a></p></div>`;
 }
 
+// The addon prefixes every character_key with its own flavor label, which has
+// drifted across addon versions (e.g. "classic-progression:" -> "tbc-anniversary:")
+// and fractures a character's identity across uploads. (game, source_game)
+// already scope the realm+flavor, so pin the key's leading segment to source_game
+// and let the realm:name tail identify the character. Keeps old and new uploads
+// linking to the same identity regardless of what label the client reports.
+function normalizeCharacterKey(k, sourceGame) {
+  const s = String(k || "");
+  const i = s.indexOf(":");
+  return i < 0 ? s : sourceGame + s.slice(i);
+}
+
 // Import aggregate samples (v1/v2) plus identity/history (v2). Re-uploading a
 // cumulative addon export is idempotent: lifetime bounds and daily counts only
 // move forward.
@@ -580,7 +592,7 @@ async function importPop(url, env, req) {
   const characterRows = [];
   for (const c of (body.characters || [])) {
     if (!c || !c.k || !c.fs || !c.ls) continue;
-    characterRows.push([game, sourceGame, c.k, c.fn || c.n || c.k, c.n || "", c.r || "",
+    characterRows.push([game, sourceGame, normalizeCharacterKey(c.k, sourceGame), c.fn || c.n || c.k, c.n || "", c.r || "",
       c.g || "", c.l || 0, c.race || "", c.class || "", c.cf || "", c.z || "",
       c.fs, c.ls, c.sc || 0]);
   }
@@ -598,7 +610,7 @@ async function importPop(url, env, req) {
   const observationRows = [];
   for (const o of (body.observations || [])) {
     if (!Array.isArray(o) || !o[0] || !o[1]) continue;
-    observationRows.push([game, sourceGame, o[0], o[1], o[2] || 0, o[3] || 0, o[4] || 0]);
+    observationRows.push([game, sourceGame, normalizeCharacterKey(o[0], sourceGame), o[1], o[2] || 0, o[3] || 0, o[4] || 0]);
   }
   for (let i = 0; i < observationRows.length; i += 100) {
     const values = observationRows.slice(i, i + 100).map((r) => "(" + r.map(sqlVal).join(",") + ")").join(",");
