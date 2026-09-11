@@ -840,7 +840,7 @@ async function loadCharacterStats(env, game) {
     SELECT character_key FROM character_observations WHERE game=? AND day>=?
     GROUP BY character_key HAVING COUNT(DISTINCT day)>=3)`
   ).bind(game, monthStart).first();
-  const activity = (await env.DB.prepare(`SELECT c.full_name,c.class,c.class_file,c.level,c.zone,
+  const activity = (await env.DB.prepare(`SELECT c.full_name,c.race,c.class,c.class_file,c.level,c.zone,
     c.first_seen,c.last_seen,c.seen_count,COUNT(DISTINCT o.day) seen_days
     FROM character_observations o JOIN characters c
       ON c.game=o.game AND c.source_game=o.source_game AND c.character_key=o.character_key
@@ -1017,10 +1017,10 @@ async function popPage(url, env) {
 
   const activityBody = characters.activity.map((c) =>
     '<tr><td class="l">' + esc(c.full_name + (c.level ? " (" + c.level + ")" : "")) + '</td><td>' + c.seen_days +
-    '</td><td class="l">' + esc((c.class || "") + (c.zone ? " · " + c.zone : "")) + '</td></tr>'
+    '</td><td class="l">' + esc([c.race, c.class].filter(Boolean).join(" ")) + '</td></tr>'
   ).join("");
   const identityPanel = '<div class="panel" style="margin-bottom:22px"><div class="ptitle">Unique &amp; returning characters</div>' +
-    '<table class="poptable acttable"><thead><tr><th class="l">Character</th><th>Days seen</th><th class="l">Last profile</th></tr></thead><tbody>' +
+    '<table class="poptable acttable"><thead><tr><th class="l">Character</th><th>Days seen</th><th class="l">Race / Class</th></tr></thead><tbody>' +
     (activityBody || '<tr><td class="l mu" colspan="3" style="padding:16px">Identity tracking begins with the next scan made by an identity-enabled addon.</td></tr>') +
     '</tbody></table><p class="hint">' + characters.lifetime.toLocaleString() + ' lifetime unique characters · ' +
     characters.returningRate + '% 7-day returning-character rate. Names identify characters, not people or Battle.net accounts.</p></div>';
@@ -1044,10 +1044,9 @@ async function popPage(url, env) {
      overflowing into the class-distribution column beside it. */
   table.acttable td.l{white-space:normal}
   /* Give the character name room and keep "Days seen" tight. */
-  table.acttable th:nth-child(1),table.acttable td:nth-child(1){width:52%}
-  table.acttable th:nth-child(2),table.acttable td:nth-child(2){width:13%}
-  table.acttable th:nth-child(3),table.acttable td:nth-child(3){width:35%}
-  table.acttable th:nth-child(2){white-space:normal}
+  table.acttable th:nth-child(1),table.acttable td:nth-child(1){width:46%}
+  table.acttable th:nth-child(2),table.acttable td:nth-child(2){width:24%}
+  table.acttable th:nth-child(3),table.acttable td:nth-child(3){width:30%}
 </style>
 </head><body>
 <div class="crt" aria-hidden="true"></div>
