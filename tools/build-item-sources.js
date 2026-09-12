@@ -17,8 +17,16 @@
 // Only the curated GATHERED / DISENCHANT pins and any manual crafted overrides
 // live in Data/ItemSources.lua; those take priority over this generated table.
 //
+// Also computes MarketLens/Data/GearCoverageGen.lua: what fraction of each
+// armor-crafting profession's addressable gear (its armor material, plus
+// weapons for Blacksmithing) is a player recipe (the rest is drops, quest
+// rewards, vendor items, or anything else no profession can supply). This
+// feeds Population/WhoScan.lua's demand heuristic, which otherwise has no way
+// to know whether a class's generic "Gear" weight should lean toward its
+// crafting profession or stay unattributed.
+//
 // Usage:
-//   node build-item-sources.js [--build=2.5.6.69546] [--out=<path>]
+//   node build-item-sources.js [--build=2.5.6.69546] [--out=<path>] [--coverage-out=<path>]
 //
 // Default build is the current TBC Anniversary (wow_anniversary) build.
 
@@ -28,6 +36,18 @@ const https = require("node:https");
 
 const DEFAULT_BUILD = "2.5.6.69546";
 const DEFAULT_OUT = path.join(__dirname, "..", "MarketLens", "Data", "ItemSourcesGen.lua");
+const DEFAULT_COVERAGE_OUT = path.join(__dirname, "..", "MarketLens", "Data", "GearCoverageGen.lua");
+
+// Item.db2 ClassID values (mirrors Data/Categories.lua's CLASS_ARMOR/CLASS_WEAPON).
+const ITEM_CLASS_WEAPON = 2;
+const ITEM_CLASS_ARMOR = 4;
+// Armor SubclassID values for the three player-craftable materials (TBC/Classic
+// numbering, same table Categories.lua reads -- 0=Misc,1=Cloth,2=Leather,
+// 3=Mail,4=Plate; 5+ is shields/relics, not modeled here).
+const ARMOR_SUBCLASS_CLOTH = 1;
+const ARMOR_SUBCLASS_LEATHER = 2;
+const ARMOR_SUBCLASS_MAIL = 3;
+const ARMOR_SUBCLASS_PLATE = 4;
 
 // wago.tools sits behind Cloudflare; a browser-like UA is required or it 403s.
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
@@ -61,7 +81,7 @@ const PROFESSION_MAP = {
 };
 
 function parseArgs(argv) {
-  const args = { build: DEFAULT_BUILD, out: DEFAULT_OUT };
+  const args = { build: DEFAULT_BUILD, out: DEFAULT_OUT, "coverage-out": DEFAULT_COVERAGE_OUT };
   for (const a of argv) {
     const m = /^--([^=]+)=(.*)$/.exec(a);
     if (m) args[m[1]] = m[2];
@@ -236,6 +256,90 @@ async function main() {
 
   fs.writeFileSync(args.out, lines.join("\n"), "utf8");
   process.stderr.write(`Wrote ${args.out}\n`);
+
+  // ---- Gear coverage: what share of each profession's addressable gear is
+  // actually a known player recipe, vs. drop/quest/vendor/other. Item.db2 has
+  // the class/subclass census the SpellEffect join above doesn't need but this
+  // does: total items per armor material + weapon, to use as a denominator.
+  process.stderr.write("Fetching Item for gear coverage ...\n");
+  const item = table(await fetchText(csvUrl(args.build, "Item")));
+  requireCols(item, "Item", ["ID", "ClassID", "SubclassID"]);
+  const iItId = item.indexOf.ID, iItClass = item.indexOf.ClassID, iItSub = item.indexOf.SubclassID;
+  const classOf = {};
+  const totalArmorBySub = {};
+  let totalWeapons = 0;
+  for (const row of item.rows) {
+    const id = Number(row[iItId]);
+    const classID = Number(row[iItClass]);
+    const subClassID = Number(row[iItSub]);
+    classOf[id] = { classID, subClassID };
+    if (classID === ITEM_CLASS_ARMOR) totalArmorBySub[subClassID] = (totalArmorBySub[subClassID] || 0) + 1;
+    else if (classID === ITEM_CLASS_WEAPON) totalWeapons++;
+  }
+
+  const craftedArmorBySub = {};
+  let craftedWeaponsByBlacksmithing = 0;
+  for (const id of itemIDs) {
+    const info = classOf[id];
+    if (!info) continue;
+    const prof = sources[id].profession;
+    if (info.classID === ITEM_CLASS_ARMOR) {
+      craftedArmorBySub[info.subClassID] = craftedArmorBySub[info.subClassID] || {};
+      craftedArmorBySub[info.subClassID][prof] = (craftedArmorBySub[info.subClassID][prof] || 0) + 1;
+    } else if (info.classID === ITEM_CLASS_WEAPON && prof === "Blacksmithing") {
+      craftedWeaponsByBlacksmithing++;
+    }
+  }
+  const armorCraftedBy = (sub, prof) => (craftedArmorBySub[sub] && craftedArmorBySub[sub][prof]) || 0;
+  const armorTotal = (sub) => totalArmorBySub[sub] || 0;
+
+  // Tailoring: Cloth armor only (Tailoring doesn't craft weapons).
+  const tailoringCrafted = armorCraftedBy(ARMOR_SUBCLASS_CLOTH, "Tailoring");
+  const tailoringTotal = armorTotal(ARMOR_SUBCLASS_CLOTH);
+  // Leatherworking: Leather + Mail armor (both are LW's domain in TBC; no weapons).
+  const lwCrafted = armorCraftedBy(ARMOR_SUBCLASS_LEATHER, "Leatherworking") + armorCraftedBy(ARMOR_SUBCLASS_MAIL, "Leatherworking");
+  const lwTotal = armorTotal(ARMOR_SUBCLASS_LEATHER) + armorTotal(ARMOR_SUBCLASS_MAIL);
+  // Blacksmithing: Plate armor + weapons (Blacksmithing's other big output).
+  const bsCrafted = armorCraftedBy(ARMOR_SUBCLASS_PLATE, "Blacksmithing") + craftedWeaponsByBlacksmithing;
+  const bsTotal = armorTotal(ARMOR_SUBCLASS_PLATE) + totalWeapons;
+
+  const coverage = {
+    Tailoring: tailoringTotal > 0 ? tailoringCrafted / tailoringTotal : 0,
+    Leatherworking: lwTotal > 0 ? lwCrafted / lwTotal : 0,
+    Blacksmithing: bsTotal > 0 ? bsCrafted / bsTotal : 0,
+  };
+  process.stderr.write(
+    `Gear coverage: Tailoring ${tailoringCrafted}/${tailoringTotal}, ` +
+    `Leatherworking ${lwCrafted}/${lwTotal}, Blacksmithing ${bsCrafted}/${bsTotal}\n`
+  );
+
+  const covLines = [];
+  covLines.push("");
+  covLines.push("-- GENERATED by tools/build-item-sources.js -- do not edit by hand.");
+  covLines.push(`-- Source: wago.tools DB2 export, build ${args.build} (Item.db2 class/subclass census).`);
+  covLines.push("--");
+  covLines.push("-- What fraction of each armor-crafting profession's addressable gear is an");
+  covLines.push("-- actual player recipe (Data/ItemSourcesGen.lua), vs. drops/quests/vendor/other");
+  covLines.push("-- that no profession supplies. Population/WhoScan.lua uses this to split each");
+  covLines.push("-- class's flat generic-Gear demand weight into a profession-attributed share");
+  covLines.push("-- and a true unattributed-Gear share, instead of a guessed constant.");
+  covLines.push("--");
+  covLines.push(`--   Tailoring:      ${tailoringCrafted} / ${tailoringTotal} cloth armor items = ${(coverage.Tailoring * 100).toFixed(1)}%`);
+  covLines.push(`--   Leatherworking: ${lwCrafted} / ${lwTotal} leather+mail armor items = ${(coverage.Leatherworking * 100).toFixed(1)}%`);
+  covLines.push(`--   Blacksmithing:  ${bsCrafted} / ${bsTotal} plate armor + weapon items = ${(coverage.Blacksmithing * 100).toFixed(1)}%`);
+  covLines.push("");
+  covLines.push("local ML = MarketLens");
+  covLines.push("local D = ML.Data");
+  covLines.push("");
+  covLines.push("D.GearCraftShare = {");
+  covLines.push(`    Tailoring = ${coverage.Tailoring.toFixed(4)},`);
+  covLines.push(`    Leatherworking = ${coverage.Leatherworking.toFixed(4)},`);
+  covLines.push(`    Blacksmithing = ${coverage.Blacksmithing.toFixed(4)},`);
+  covLines.push("}");
+  covLines.push("");
+
+  fs.writeFileSync(args["coverage-out"], covLines.join("\n"), "utf8");
+  process.stderr.write(`Wrote ${args["coverage-out"]}\n`);
 
   // Also emit a compact JSON keyed by itemID, for the site pipeline: the export
   // tool enriches any scan (old or new) with source purely from the itemID, so

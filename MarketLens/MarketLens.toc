@@ -20,6 +20,7 @@ Data/Categories.lua
 Data/Professions.lua
 Data/ItemSources.lua
 Data/ItemSourcesGen.lua
+Data/GearCoverageGen.lua
 Data/Items.lua
 Data/TSMRegion.lua
 Data/TSMRegionRetail.lua

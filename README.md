@@ -184,6 +184,12 @@ The **inferred profession demand** ranking is a *heuristic*: it weights each
 observed class toward the crafting markets that class buys from (plate → Blacksmithing,
 cloth → Tailoring, plus universal Enchanting/Alchemy/gem demand). Like the rest
 of MarketLens, it is inferred from what's observable — never claimed as real sales.
+The armor-type profession's share of that weight (vs. the generic "Gear" bucket,
+meaning drops/quests/vendor gear no profession supplies) isn't guessed: it's
+generated from Blizzard's own item data (`tools/build-item-sources.js` →
+`Data/GearCoverageGen.lua`) as the real fraction of that armor type which is a
+known player recipe — typically only 4-7%, so "Gear" dominates most realms'
+demand ranking, and that's expected, not a bug.
 
 ## Scores
 
