@@ -88,6 +88,8 @@ a{color:var(--blue)}
 /* two-column panel layout (kills vertical scrolling on data-heavy pages) */
 .panelgrid{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:18px; align-items:start; margin-bottom:22px;}
 .panelgrid > .panel{margin-bottom:0 !important;}
+.panelgrid > .panelcol{display:flex; flex-direction:column; gap:18px; min-width:0;}
+.panelgrid > .panelcol > .panel{margin-bottom:0 !important;}
 @media (max-width:760px){.panelgrid{grid-template-columns:1fr;}}
 
 /* controls */
