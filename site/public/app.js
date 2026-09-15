@@ -67,7 +67,7 @@
     // Applied enhancements (enchant/tailor/LW/alchemy output onto gear/weapons).
     if (/\b(Spellthread|Leg Armor|Leg Reinforcement|Sharpening Stone|Weightstone|Wizard Oil|Mana Oil|Shadow Oil)\b|^Scroll of |\bWeapon Oil\b|\bArmor Kit\b/.test(n)) return "Enhancements";
     // Equipment — match by slot/weapon noun (arbitrary item names otherwise).
-    if (/\b(Sword|Axe|Waraxe|Mace|Hammer|Maul|Dagger|Blade|Spear|Lance|Glaive|Cleaver|Halberd|Scepter|Fist|Greatsword|Longsword|Staff|Polearm|Bow|Gun|Rifle|Crossbow|Wand|Shield|Buckler|Helm|Helmet|Coif|Circlet|Cap|Crown|Hood|Cowl|Shoulders|Spaulders|Mantle|Pauldrons|Epaulets|Cloak|Cape|Drape|Shroud|Breastplate|Chestplate|Robe|Tunic|Vest|Hauberk|Chestguard|Chestpiece|Jerkin|Armor|Bracers|Bracer|Wristwraps|Wristband|Vambraces|Wristguards|Armguards|Gauntlets|Gloves|Grips|Handguards|Handwraps|Mitts|Belt|Waistband|Girdle|Waistguard|Cinch|Sash|Legguards|Leggings|Legplates|Legwraps|Greaves|Pants|Kilt|Trousers|Britches|Boots|Sabatons|Treads|Sandals|Walkers|Footwraps|Slippers|Ring|Band|Signet|Loop|Seal|Amulet|Necklace|Pendant|Choker|Collar|Trinket|Idol|Totem|Libram|Sigil)\b/.test(n)) return "Gear";
+    if (/\b(Sword|Axe|Waraxe|Mace|Hammer|Maul|Dagger|Blade|Spear|Lance|Glaive|Cleaver|Halberd|Scepter|Fist|Greatsword|Longsword|Staff|Polearm|Bow|Gun|Rifle|Crossbow|Wand|Shield|Buckler|Helm|Helmet|Coif|Circlet|Cap|Crown|Hood|Cowl|Shoulders|Spaulders|Mantle|Pauldrons|Epaulets|Cloak|Cape|Drape|Shroud|Breastplate|Chestplate|Robe|Tunic|Vest|Hauberk|Chestguard|Chestpiece|Jerkin|Armor|Bracers|Bracer|Wristwraps|Wristband|Vambraces|Wristguards|Armguards|Gauntlets|Gloves|Grips|Handguards|Handwraps|Mitts|Belt|Waistband|Girdle|Waistguard|Cinch|Sash|Legguards|Leggings|Legplates|Legwraps|Greaves|Pants|Kilt|Trousers|Britches|Boots|Sabatons|Treads|Sandals|Walkers|Footwraps|Slippers|Ring|Band|Loop|Seal|Amulet|Necklace|Pendant|Choker|Collar|Trinket|Idol|Totem|Libram|Sigil)\b/.test(n)) return "Gear";
     return "Other";
   }
   // Uploaded realm datasets carry the addon's real market string (from actual
@@ -89,11 +89,15 @@
     "Cosmetic": "Cosmetic",
     "Bags": "Bags", "Quivers": "Bags",
     "Recipes": "Recipes",
+    "Quest Items": "Quest Items",
+    "Keys": "Other",
+    "Miscellaneous": "Other",
     // Class spell reagents. "Reagents" is the legacy addon string still present in
     // datasets uploaded before class reagents got their own sector.
     "Class Reagents": "Class Reagents", "Reagents": "Class Reagents"
   };
-  function catFor(market, name) {
+  function catFor(market, name, source) {
+    if (source === "reputation") return "Reputation";
     if (market) { var m = MARKET_MAP[market]; if (m) return m; }
     return classify(name);
   }
@@ -166,7 +170,7 @@
   var ITEMS = [], curCat = params.get("cat") || "All", search = params.get("q") || "", CAP = 300;
   var sortKey = params.get("sort") || defaultSortKey;
   var sortDir = params.get("dir") === "asc" ? 1 : -1;
-  var CATS = ["All","Ore & Bars","Herbs","Cloth","Leather","Primals","Enchanting","Gems","Enhancements","Gear","Potions","Flasks","Elixirs","Cooking","Class Reagents","Cosmetic","Recipes","Bags","Other"];
+  var CATS = ["All","Ore & Bars","Herbs","Cloth","Leather","Primals","Enchanting","Gems","Enhancements","Gear","Potions","Flasks","Elixirs","Cooking","Class Reagents","Reputation","Quest Items","Cosmetic","Recipes","Bags","Other"];
   // `w` fixes each column's width so sorting (which reorders rows and moves the
   // sort arrow) can't reflow the auto-layout and make the columns jump. The Item
   // column has no width and absorbs the remaining space. See table-layout:fixed.
@@ -225,9 +229,9 @@
     if (isRealm && WH_BRANCH[data.sourceGame] != null) whBranch = WH_BRANCH[data.sourceGame];
     ITEMS = (data.items || []).map(function (r) {
       var o = { id: r[0], name: r[1], slug: r[2], mv: r[3], asp: r[4], sr: r[5], spd: r[6], q: r[7], sc: r[8], tc: r[9], hist: r[10] };
-      o.cat = catFor(r[11], o.name);
       o.src = r[12] || null;      // crafted | gathered | disenchant | ...
       o.crafter = r[13] || null;  // producing/gathering profession
+      o.cat = catFor(r[11], o.name, o.src);
       o.demand = demand(o.sr, o.spd);
       o.deal = (isRealm && o.hist > 0 && o.asp > 0) ? Math.round((o.hist - o.asp) / o.hist * 100) : null;
       return o;
@@ -310,6 +314,9 @@
   var SRC_LABEL = { crafted: "Crafted", gathered: "Gathered", disenchant: "Disenchanted",
     drop: "Drop", vendor: "Vendor", quest: "Quest", reputation: "Reputation", event: "Event" };
   function srcBadge(it) {
+    if (!it.src && it.cat === "Gear") {
+      return '<span class="srcb srcb-noncrafted" title="No crafted source matched this gear item">Non-crafted</span>';
+    }
     if (!it.src) return "";
     var label = SRC_LABEL[it.src] || it.src;
     var text = it.crafter ? label + " · " + it.crafter : label;

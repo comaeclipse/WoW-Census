@@ -78,6 +78,10 @@ D.ItemSources = {
     -- Crafted: Tailoring ------------------------------------------------------
     [21841] = { source = D.Source.CRAFTED, profession = "Tailoring" }, -- Netherweave Bag
 
+    -- Reputation turn-ins ------------------------------------------------------
+    [29426] = { source = D.Source.REPUTATION, profession = "Scryers" }, -- Firewing Signet
+    [30810] = { source = D.Source.REPUTATION, profession = "Scryers" }, -- Sunfury Signet
+
     -- Disenchant products (Enchanting supply pulled from gear) -----------------
     [22445] = { source = D.Source.DISENCHANT, profession = "Enchanting" }, -- Arcane Dust
     [22446] = { source = D.Source.DISENCHANT, profession = "Enchanting" }, -- Greater Planar Essence
