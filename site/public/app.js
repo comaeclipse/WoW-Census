@@ -162,8 +162,10 @@
       }).join("") + '<a class="game" href="/pop">Population</a>';
   });
 
-  var ITEMS = [], curCat = "All", search = "", CAP = 300;
-  var sortKey = isRealm ? "deal" : "demand", sortDir = -1;
+  var defaultSortKey = isRealm ? "deal" : "demand";
+  var ITEMS = [], curCat = params.get("cat") || "All", search = params.get("q") || "", CAP = 300;
+  var sortKey = params.get("sort") || defaultSortKey;
+  var sortDir = params.get("dir") === "asc" ? 1 : -1;
   var CATS = ["All","Ore & Bars","Herbs","Cloth","Leather","Primals","Enchanting","Gems","Enhancements","Gear","Potions","Flasks","Elixirs","Cooking","Class Reagents","Cosmetic","Recipes","Bags","Other"];
   // `w` fixes each column's width so sorting (which reorders rows and moves the
   // sort arrow) can't reflow the auto-layout and make the columns jump. The Item
@@ -184,6 +186,40 @@
     { k: "asp", t: "Avg Sale (g/s)", w: 140 },
     { k: "mv", t: "Mkt Val (g)", w: 120 },
   ];
+  if (CATS.indexOf(curCat) < 0) curCat = "All";
+  if (!COLS.some(function (c) { return c.k === sortKey; })) sortKey = defaultSortKey;
+
+  function stateUrl() {
+    var u = new URL(location.href);
+    u.search = "";
+    u.searchParams.set("game", game);
+    if (curCat !== "All") u.searchParams.set("cat", curCat);
+    if (search.trim()) u.searchParams.set("q", search.trim());
+    if (sortKey !== defaultSortKey || sortDir !== -1) {
+      u.searchParams.set("sort", sortKey);
+      u.searchParams.set("dir", sortDir < 0 ? "desc" : "asc");
+    }
+    return u.pathname + u.search + u.hash;
+  }
+  function syncUrl(replace) {
+    var next = stateUrl();
+    if (next === location.pathname + location.search + location.hash) return;
+    history[replace ? "replaceState" : "pushState"]({ cat: curCat, q: search, sort: sortKey, dir: sortDir }, "", next);
+  }
+  function setStateFromLocation() {
+    params = new URLSearchParams(location.search);
+    curCat = params.get("cat") || "All";
+    search = params.get("q") || "";
+    sortKey = params.get("sort") || defaultSortKey;
+    sortDir = params.get("dir") === "asc" ? 1 : -1;
+    if (CATS.indexOf(curCat) < 0) curCat = "All";
+    if (!COLS.some(function (c) { return c.k === sortKey; })) sortKey = defaultSortKey;
+    var input = document.getElementById("search");
+    if (input) input.value = search;
+    Array.prototype.forEach.call(document.querySelectorAll("#chips .chip"), function (c) {
+      c.setAttribute("aria-pressed", c.getAttribute("data-cat") === curCat ? "true" : "false");
+    });
+  }
 
   fetch("/api/items?game=" + encodeURIComponent(game)).then(function (r) { return r.json(); }).then(function (data) {
     if (isRealm && WH_BRANCH[data.sourceGame] != null) whBranch = WH_BRANCH[data.sourceGame];
@@ -243,8 +279,10 @@
         tile("Region turnover", big(turn) + "g", "changing hands / day");
     }
     document.getElementById("chips").innerHTML = CATS.map(function (ct) {
-      return '<button class="chip" data-cat="' + esc(ct) + '" aria-pressed="' + (ct === "All") + '">' + esc(ct) + "</button>";
+      return '<button class="chip" data-cat="' + esc(ct) + '" aria-pressed="' + (ct === curCat) + '">' + esc(ct) + "</button>";
     }).join("");
+    document.getElementById("search").value = search;
+    syncUrl(true);
     drawHead(); render();
   }
   function tile(k, v, s, cls) {
@@ -332,15 +370,21 @@
     var k = th.getAttribute("data-k");
     if (k === sortKey) sortDir = -sortDir;
     else { sortKey = k; sortDir = (k === "name" || k === "cat") ? 1 : -1; }
+    syncUrl(false);
     drawHead(); render();
   });
   document.getElementById("chips").addEventListener("click", function (e) {
     var b = e.target.closest(".chip"); if (!b) return;
     curCat = b.getAttribute("data-cat");
     Array.prototype.forEach.call(this.children, function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+    syncUrl(false);
     render();
   });
-  document.getElementById("search").addEventListener("input", function (e) { search = e.target.value; render(); });
+  document.getElementById("search").addEventListener("input", function (e) { search = e.target.value; syncUrl(true); render(); });
+  window.addEventListener("popstate", function () {
+    setStateFromLocation();
+    drawHead(); render();
+  });
   // Placeholder-name rows point their link at Wowhead (so it can rename them);
   // keep clicks on our own item page.
   document.getElementById("rows").addEventListener("click", function (e) {
