@@ -44,6 +44,8 @@ local function resetAccumulator()
     S.samplePages = nil
     S.sampleIndex = nil
     S.stopPage = nil
+    S.nameFilter = nil
+    S.itemQuery = false
 end
 
 local function resetSellerStats(full)
@@ -219,7 +221,12 @@ end
 -- startPage/stopPage (1-based, inclusive) restrict a fullSellerScan walk to a
 -- page range -- lets successive fast scans sweep different sections of a big
 -- AH instead of always covering the same pages before the budget runs out.
-function S:StartScan(forcePaged, fullSellerScan, fastPaged, startPage, stopPage)
+-- nameFilter scopes the query to one item's listings (QueryAuctionItems'
+-- built-in name search) instead of walking the whole AH; results are reported
+-- directly to chat and deliberately never touch realm.sellers/lastSellerScanID
+-- (see FinishItemQuery) so a quick lookup can never overwrite the realm-wide
+-- seller snapshot the next upload depends on.
+function S:StartScan(forcePaged, fullSellerScan, fastPaged, startPage, stopPage, nameFilter)
     if not self.eventDriverReady then
         ML:Print("Scanner initialization failed before its event handler loaded. Enable Lua errors and /reload.")
         return
@@ -266,6 +273,8 @@ function S:StartScan(forcePaged, fullSellerScan, fastPaged, startPage, stopPage)
     self.scanStartedAt = GetTime and GetTime() or 0
     self.auctionsAvailable = true
     self.priceDistributionAvailable = true
+    self.nameFilter = (nameFilter and nameFilter ~= "") and nameFilter or nil
+    self.itemQuery = self.nameFilter ~= nil
     ML.Data.classifyCache = {} -- refresh in case item info arrived since last scan
     ML:Fire("SCAN_START")
 
@@ -289,7 +298,9 @@ function S:StartScan(forcePaged, fullSellerScan, fastPaged, startPage, stopPage)
             rangeNote = string.format(" (pages %d-%s)", self.page + 1,
                 self.stopPage and tostring(self.stopPage + 1) or "end")
         end
-        ML:Print(self.fastPaged
+        ML:Print(self.itemQuery
+            and string.format('Scanning the AH for "%s"...', self.nameFilter)
+            or self.fastPaged
             and ("Running a fast full paged scan (accepting missing seller names; time-bounded)%s..."):format(rangeNote)
             or self.sellerFull
             and ("Running a full seller scan (paged AH scan; no time cap)%s..."):format(rangeNote)
@@ -308,6 +319,42 @@ function S:Abort(reason)
     ML:Fire("SCAN_ABORT", reason)
 end
 
+-- Report a nameFilter scan's results directly to chat instead of folding them
+-- into the persistent realm/seller stores. A targeted lookup must never touch
+-- realm.sellers or lastSellerScanID: Sellers:Record REPLACES each matched
+-- seller's whole listing snapshot with just this query's item and repoints
+-- the realm's "latest scan" id at it, which would make the next --sellers
+-- export drop every seller not selling this one item. See Finish().
+function S:FinishItemQuery(itemCount)
+    if itemCount == 0 then
+        ML:Print('No auctions found for "%s".', self.nameFilter)
+    else
+        for itemID, it in pairs(self.acc.items) do
+            local rows = {}
+            for owner, listings in pairs(self.acc.sellers or {}) do
+                local li = listings[itemID]
+                if li then rows[#rows + 1] = { owner = owner, q = li.q, l = li.l } end
+            end
+            table.sort(rows, function(a, b) return (a.l or 0) < (b.l or 0) end)
+            ML:Print("%s: %d auction(s), %d seller(s).", it.name or ("item " .. itemID),
+                it.auctions or 0, #rows)
+            for i, r in ipairs(rows) do
+                if i > 25 then
+                    ML:Print("  ...and %d more.", #rows - 25)
+                    break
+                end
+                ML:Print("  %s x%d @ %s", r.owner, r.q or 0, U.MoneyShort(r.l))
+            end
+        end
+        ML.Snapshots:Record(self.acc.items)
+        ML.Snapshots:Purge()
+    end
+    ML:Fire("SCAN_COMPLETE", itemCount, self.acc.totalRows, self.mode, {
+        sellerSample = true, sellerFull = true, partial = self.partialScan == true,
+        stats = self.scanStats,
+    })
+end
+
 function S:Finish()
     self.scanning = false
     self.awaitingPage = false
@@ -316,6 +363,11 @@ function S:Finish()
 
     local itemCount = 0
     for _ in pairs(self.acc.items) do itemCount = itemCount + 1 end
+
+    if self.itemQuery then
+        self:FinishItemQuery(itemCount)
+        return
+    end
 
     -- Whether the latest full item snapshot has complete seller names. Partial
     -- seller samples update seller profiles, but must not make per-item seller
@@ -577,7 +629,7 @@ end
 
 function S:QueryCurrentPage()
     self.awaitingPage = true
-    QueryAuctionItems("", nil, nil, self.page, false, 0, false, false)
+    QueryAuctionItems(self.nameFilter or "", nil, nil, self.page, false, 0, false, false)
 end
 
 -- Process the current results page. Returns true when the scan is complete.

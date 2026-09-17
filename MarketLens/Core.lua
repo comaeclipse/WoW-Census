@@ -242,6 +242,12 @@ SlashCmdList["MARKETLENS"] = function(msg)
             stopPage ~= "" and tonumber(stopPage) or nil)
     elseif msg == "scan sellers full" then
         ML.Scanner:StartScan(true, true)
+    elseif msg == "scan item" then
+        ML:Print("Usage: /ml scan item <name>")
+    elseif msg:match("^scan item%s+%S") then
+        local _, prefixEnd = msg:find("^scan item%s+")
+        local itemName = raw:sub(prefixEnd + 1)
+        ML.Scanner:StartScan(true, true, false, nil, nil, itemName)
     elseif msg == "scan replicate" then
         if ML.Scanner.StartReplicate then ML.Scanner:StartReplicate() end
     elseif msg == "who" or msg:match("^who%s") then
