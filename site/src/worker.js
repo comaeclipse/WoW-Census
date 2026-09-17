@@ -9,6 +9,8 @@ import { Hono } from "hono";
 //   GET  /seller/<slug|name>?game= server-rendered seller profile (realm only)
 //   POST /admin/import-sellers?token=&region=  upload seller profiles (paged scans)
 //   GET  /admin/refresh?token=&game=   manual collect (seed after deploy)
+//   GET  /admin/resolve-names?token=&region=&limit=  backfill item:<id> names
+//                                   from Blizzard's Item API (bounded batch)
 //   cron                           daily collect of every dataset in env.GAMES
 //
 // Data source: TradeSkillMaster public data (CSVs have no CORS header, so the
@@ -410,6 +412,87 @@ async function collectAll(env) {
     catch (e) { results.push({ game: g, error: String(e) }); }
   }
   return results;
+}
+
+// bnetStaticNamespaceForGame maps our "classic-progression" key to
+// static-classic-us, which is Blizzard's actual Classic Progression/SoD
+// product, not TBC Anniversary -- confirmed against a live item lookup, so
+// this is deliberately its own explicit map rather than reusing that helper.
+function itemStaticNamespace(sourceGame) {
+  if (sourceGame === "classic-progression") return "static-classicann-us"; // TBC Anniversary
+  if (sourceGame === "classic") return "static-classic1x-us"; // Classic Era
+  return "static-us"; // retail
+}
+
+async function bnetItemName(token, id, namespace) {
+  const u = new URL("/data/wow/item/" + id, BNET_API_BASE);
+  u.searchParams.set("namespace", namespace);
+  u.searchParams.set("locale", "en_US");
+  try {
+    const res = await fetch(u.toString(), { headers: { authorization: "Bearer " + token } });
+    if (!res.ok) return null;
+    const body = await res.json().catch(() => ({}));
+    return (body && body.name) || null;
+  } catch (e) { return null; }
+}
+
+// Backfill item:<id> placeholders with Blizzard's own item names instead of
+// relying on the client-side Wowhead rename trick (data-wh-rename-link),
+// which only fires after an extra async round-trip in the browser -- causing
+// the visible name to pop in late and the page to reflow around it. This
+// resolves names once, server-side, and writes them into BOTH the region
+// reference table (so future realm uploads' rr.name fallback finds them
+// without hitting Blizzard again) and any already-uploaded realm rows still
+// showing the placeholder (so the fix is visible immediately, not just on
+// the next scan). Bounded per call (default 40 items) to stay well under
+// Workers' subrequest cap; safe to call repeatedly to keep working through
+// a realm's backlog.
+async function resolveItemNames(url, env) {
+  if (!env.REFRESH_TOKEN || url.searchParams.get("token") !== env.REFRESH_TOKEN)
+    return new Response("forbidden", { status: 403 });
+  const region = url.searchParams.get("region") || DEFAULT_GAME;
+  if (!GAMES[region]) return json({ error: "unknown region " + region }, 0, 400);
+  const limit = Math.min(Math.max(Number(url.searchParams.get("limit")) || 40, 1), 80);
+  const namespace = itemStaticNamespace(region);
+
+  const ds = await env.DB.prepare("SELECT DISTINCT game FROM datasets WHERE source_game=?").bind(region).all();
+  const realmGames = (ds.results || []).map((r) => r.game);
+
+  const idSet = new Set();
+  for (const g of realmGames) {
+    if (idSet.size >= limit) break;
+    const { results } = await env.DB.prepare(
+      "SELECT DISTINCT id FROM items WHERE game=? AND name LIKE 'item:%'"
+    ).bind(g).all();
+    for (const r of results) {
+      idSet.add(r.id);
+      if (idSet.size >= limit) break;
+    }
+  }
+
+  let token;
+  try { token = await bnetToken(env); }
+  catch (e) { return json({ error: String(e && e.message || e) }, 0, 502); }
+
+  let resolved = 0, failed = 0;
+  const now = new Date().toISOString();
+  for (const id of idSet) {
+    const name = await bnetItemName(token, id, namespace);
+    if (!name) { failed++; continue; }
+    const slug = slugify(name);
+    await env.DB.prepare(
+      `INSERT INTO items (game,id,name,slug,mv,asp,sr,spd,hist,updated_at)
+       VALUES (?,?,?,?,0,0,0,0,0,?)
+       ON CONFLICT(game,id) DO UPDATE SET name=excluded.name, slug=excluded.slug, updated_at=excluded.updated_at`
+    ).bind(region, id, name, slug, now).run();
+    for (const g of realmGames) {
+      await env.DB.prepare(
+        "UPDATE items SET name=?, slug=? WHERE game=? AND id=? AND name LIKE 'item:%'"
+      ).bind(name, slug, g, id).run();
+    }
+    resolved++;
+  }
+  return json({ ok: true, region, namespace, realms: realmGames, checked: idSet.size, resolved, failed });
 }
 
 function pickGame(url) {
@@ -1383,6 +1466,7 @@ app.post("/admin/import-pop", (c) => importPop(new URL(c.req.url), c.env, c.req.
 app.post("/admin/import-sellers", (c) => importSellers(new URL(c.req.url), c.env, c.req.raw));
 app.all("/admin/bnet-test", (c) => bnetTest(new URL(c.req.url), c.env));
 app.all("/admin/bnet-realm-auctions", (c) => bnetRealmAuctions(new URL(c.req.url), c.env));
+app.all("/admin/resolve-names", (c) => resolveItemNames(new URL(c.req.url), c.env));
 app.all("/admin/refresh", async (c) => {
   const url = new URL(c.req.url);
   if (!c.env.REFRESH_TOKEN || url.searchParams.get("token") !== c.env.REFRESH_TOKEN)
