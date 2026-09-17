@@ -30,17 +30,18 @@ $OutputEncoding = New-Object System.Text.UTF8Encoding($false)
 
 $flavorKey = $Flavor.ToLowerInvariant()
 if ($flavorKey -in @("classic", "anniversary", "tbc")) { $flavorKey = "tbc-anniversary" }
-if ($flavorKey -notin @("tbc-anniversary", "classic-era", "retail")) {
-    Write-Host "Unknown flavor '$Flavor'. Use tbc-anniversary, classic-era, or retail." -ForegroundColor Red
+if ($flavorKey -in @("forever", "classicbeta")) { $flavorKey = "classic-beta" }
+if ($flavorKey -notin @("tbc-anniversary", "classic-era", "retail", "classic-beta")) {
+    Write-Host "Unknown flavor '$Flavor'. Use tbc-anniversary, classic-era, retail, or classic-beta." -ForegroundColor Red
     exit 1
 }
 $Flavor = $flavorKey
 
 if (-not $Region) {
-    $Region = if ($Flavor -eq "retail") { "retail" } elseif ($Flavor -eq "classic-era") { "classic" } else { "classic-progression" }
+    $Region = if ($Flavor -eq "retail") { "retail" } elseif ($Flavor -eq "classic-era") { "classic" } elseif ($Flavor -eq "classic-beta") { "classic-beta" } else { "classic-progression" }
 }
 if (-not $Wow) {
-    $wowFolder = if ($Flavor -eq "retail") { "_retail_" } elseif ($Flavor -eq "classic-era") { "_classic_era_" } else { "_anniversary_" }
+    $wowFolder = if ($Flavor -eq "retail") { "_retail_" } elseif ($Flavor -eq "classic-era") { "_classic_era_" } elseif ($Flavor -eq "classic-beta") { "_classic_beta_" } else { "_anniversary_" }
     $Wow = Join-Path "C:\Program Files (x86)\World of Warcraft" $wowFolder
 }
 
@@ -99,34 +100,37 @@ if ($node -and (Test-Path $helper)) {
     if ($Realm) { $mktArgs += "--realm=$Realm" }
     $rebuilt = & $node.Source @mktArgs
     if ($LASTEXITCODE -ne 0 -or -not $rebuilt) {
-        Write-Host "Couldn't rebuild the realm export from SavedVariables." -ForegroundColor Red
-        exit 1
+        # A legitimate zero-item export (no AH scan yet) makes the helper throw;
+        # fall back to the already-parsed export string instead of aborting, same
+        # as when node itself isn't available.
+        Write-Host "No item data to rebuild from SavedVariables (probably no AH scan yet) -- using the compact export as-is." -ForegroundColor Yellow
+    } else {
+        try { $obj = $rebuilt | ConvertFrom-Json } catch {
+            Write-Host "Rebuilt export isn't valid JSON." -ForegroundColor Red
+            exit 1
+        }
+        $json = $rebuilt
     }
-    try { $obj = $rebuilt | ConvertFrom-Json } catch {
-        Write-Host "Rebuilt export isn't valid JSON." -ForegroundColor Red
-        exit 1
-    }
-    $json = $rebuilt
 }
 $itemCount = ($obj.items.PSObject.Properties | Measure-Object).Count
-if ($itemCount -lt 1) {
-    Write-Host "Refusing to upload a realm export with zero items." -ForegroundColor Red
-    exit 1
-}
 Write-Host ("Realm: {0}  -  {1} items to upload" -f $obj.realm, $itemCount)
 
 if (-not $Token) { $Token = Load-Token }
 if (-not $Token) { $Token = Read-Host "REFRESH_TOKEN" }
 if ($Token) { Save-Token $Token }
 
-$uri = "$Url/admin/import-realm?token=$([uri]::EscapeDataString($Token))&region=$Region"
-$resp = Invoke-RestMethod -Uri $uri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($json)) -ContentType "application/json; charset=utf-8"
-
-if ($resp.ok) {
-    Write-Host ("Imported {0} items for {1}." -f $resp.items, $resp.realm) -ForegroundColor Green
-    Write-Host ("View: {0}/?game=realm:{1}" -f $Url, [uri]::EscapeDataString($resp.realm))
+if ($itemCount -lt 1) {
+    Write-Host "No AH items in this export yet (no auction house scan) -- skipping the market upload, still trying population/sellers below." -ForegroundColor Yellow
 } else {
-    Write-Host ("Server error: {0}" -f $resp.error) -ForegroundColor Red
+    $uri = "$Url/admin/import-realm?token=$([uri]::EscapeDataString($Token))&region=$Region"
+    $resp = Invoke-RestMethod -Uri $uri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($json)) -ContentType "application/json; charset=utf-8"
+
+    if ($resp.ok) {
+        Write-Host ("Imported {0} items for {1}." -f $resp.items, $resp.realm) -ForegroundColor Green
+        Write-Host ("View: {0}/?game=realm:{1}" -f $Url, [uri]::EscapeDataString($resp.realm))
+    } else {
+        Write-Host ("Server error: {0}" -f $resp.error) -ForegroundColor Red
+    }
 }
 
 # The addon also writes a population export. Rebuild it from the authoritative

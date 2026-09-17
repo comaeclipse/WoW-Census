@@ -117,6 +117,7 @@ function normalizeFlavor(flavor) {
     return "tbc-anniversary";
   if (["classic-era", "era", "classic"].includes(f)) return "classic-era";
   if (f === "retail") return "retail";
+  if (["classic-beta", "forever", "classicbeta"].includes(f)) return "classic-beta";
   throw new Error(`unknown flavor: ${flavor}`);
 }
 

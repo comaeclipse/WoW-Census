@@ -21,6 +21,7 @@ const GAMES = {
   "classic-progression": { label: "TBC Anniversary" },
   "classic":             { label: "Classic Era" },
   "retail":              { label: "Retail" },
+  "classic-beta":        { label: "Forever (Beta)" },
 };
 const DEFAULT_GAME = "classic-progression";
 const ITEMS_CACHE_VERSION = 13;
@@ -33,6 +34,8 @@ function sourceGameKey(flavor) {
   if (f === "classic-era" || f === "era" || f === "classic")
     return "classic";
   if (f === "retail") return "retail";
+  if (f === "classic-beta" || f === "forever" || f === "classicbeta")
+    return "classic-beta";
   return null;
 }
 
@@ -1235,7 +1238,7 @@ async function popChooserPage(env) {
      GROUP BY p.game ORDER BY obs DESC`
   ).all()).results;
 
-  const order = ["classic-progression", "classic", "retail"];
+  const order = ["classic-progression", "classic", "retail", "classic-beta"];
   const groups = new Map();
   for (const r of rows) {
     const src = GAMES[r.src] ? r.src : "other";
