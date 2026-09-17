@@ -141,7 +141,12 @@
       '<p class="src" style="text-align:left;margin:12px 0">In game: <b>/ml export</b> &rarr; copy the text &rarr; paste below. Stored only in this browser.</p>' +
       '<textarea id="imp" style="width:100%;height:90px;background:var(--bg);color:var(--ink);border:2px solid var(--line);font-family:var(--term);font-size:16px;padding:8px" placeholder="paste /ml export json..."></textarea>' +
       '<div style="margin-top:10px;display:flex;gap:8px"><button class="chip" id="impSave">SAVE</button><button class="chip" id="impClear">CLEAR</button></div>';
-    chart.closest(".wrap").insertBefore(wrap, document.querySelector(".src"));
+    // Target #datasrc specifically, not .src -- the sellers panel above it
+    // (when present) has its own .src note, and querySelector(".src") picks
+    // whichever one comes first in the DOM. When that's the nested one, it
+    // isn't a direct child of .wrap, and insertBefore throws NotFoundError,
+    // silently dropping this whole section.
+    chart.closest(".wrap").insertBefore(wrap, document.getElementById("datasrc"));
     document.getElementById("impSave").onclick = function () {
       try { JSON.parse(document.getElementById("imp").value); localStorage.setItem("ml_realm", document.getElementById("imp").value); location.reload(); }
       catch (e) { alert("That doesn't look like valid /ml export JSON."); }

@@ -814,7 +814,7 @@ async function itemPage(url, env) {
 
   ${sellersHtml}
 
-  <p class="src">Data: TradeSkillMaster public data (${esc(game)} / ${REGION}). History accrues daily from this site's collector.</p>
+  <p class="src" id="datasrc">Data: TradeSkillMaster public data (${esc(game)} / ${REGION}). History accrues daily from this site's collector.</p>
 </div>
 <script>window.ITEM=${JSON.stringify({ id: row.id, name: row.name, game })};window.POINTS=${points};</script>
 <script src="/item.js"></script>${isPlaceholder ? `
