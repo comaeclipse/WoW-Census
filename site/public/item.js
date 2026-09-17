@@ -7,6 +7,34 @@
     return { d: ymdToMs(p.ts), asp: p.asp || 0, mv: p.mv || 0, sr: p.sr || 0 };
   });
 
+  // No captured name -> the H1 link (.iname-wh) has data-wh-rename-link so
+  // Wowhead's tooltip widget fills in the real name client-side, but that
+  // widget only ever touches the DOM elements it's pointed at -- it can't
+  // reach <title>, so the browser tab kept showing the raw "item:<id>"
+  // forever. Watch for Wowhead's rename and mirror it into the title.
+  // Re-query the H1 fresh each time rather than holding a node reference:
+  // Wowhead's widget replaces the link's contents wholesale (icon + text),
+  // not a simple text-node edit, so observing a stale node can miss it --
+  // observing at the body level and re-checking the live selector catches
+  // the rename regardless of how it mutates the DOM.
+  if (/^item:\d+$/.test(ITEM.name || "")) {
+    var checkRenamed = function () {
+      var el = document.querySelector(".iname-wh");
+      var resolved = el && el.textContent.trim();
+      if (resolved && !/^item:\d+$/.test(resolved)) {
+        document.title = resolved + " — MarketLens";
+        return true;
+      }
+      return false;
+    };
+    if (!checkRenamed() && window.MutationObserver) {
+      var whObserver = new MutationObserver(function () {
+        if (checkRenamed()) whObserver.disconnect();
+      });
+      whObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+    }
+  }
+
   function ymdToMs(ts) {
     ts = ts | 0;
     var y = Math.floor(ts / 10000), m = Math.floor((ts % 10000) / 100), d = ts % 100;
