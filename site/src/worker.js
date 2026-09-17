@@ -888,6 +888,8 @@ async function sellerPage(url, env) {
   const realmLabel = game.slice(6);
   const smeta = await fetchSellerMeta(env, game);
   const sellerLabel = sellerMetaLabel(smeta);
+  const dataset = await env.DB.prepare("SELECT source_game FROM datasets WHERE game=?").bind(game).first();
+  const whBranch = ({ classic: "classic", "classic-progression": "tbc", retail: "" })[dataset && dataset.source_game] ?? "tbc";
   const lastSeen = seller.last_seen ? new Date(seller.last_seen * 1000).toISOString().slice(0, 10) : "—";
   const stat = (k, v, cls) => `<div class="tile"><div class="k">${esc(k)}</div><div class="v ${cls || ""}">${esc(v)}</div></div>`;
 
@@ -896,13 +898,14 @@ async function sellerPage(url, env) {
     const slug = r.slug || r.id;
     // Positive = this seller is priced under the region average sale (a deal).
     const vs = (r.region && r.l) ? Math.round((r.region - r.l) / r.region * 100) : null;
-    const vsCell = vs === null ? '<td class="mu">—</td>'
-      : `<td class="${vs >= 0 ? "gr" : "rd"}">${vs >= 0 ? "+" : ""}${vs}%</td>`;
+    const whHref = "https://www.wowhead.com/" + (whBranch ? whBranch + "/" : "") + "item=" + r.id;
+    const vsCell = vs === null ? '<td class="mu" data-sort="">—</td>'
+      : `<td data-sort="${vs}" class="${vs >= 0 ? "gr" : "rd"}">${vs >= 0 ? "+" : ""}${vs}%</td>`;
     return `<tr>
-      <td class="l"><a class="name" href="/item/${encodeURIComponent(slug)}?game=${gameHref("", game)}">${esc(name)}</a></td>
-      <td>${(r.q || 0).toLocaleString()}</td>
-      <td class="g">${gsc(r.l)}</td>
-      <td class="mu">${gsc(r.region)}</td>
+      <td class="l"><a class="ic" href="${whHref}" tabindex="-1" aria-hidden="true"></a><a class="name" href="/item/${encodeURIComponent(slug)}?game=${gameHref("", game)}">${esc(name)}</a></td>
+      <td data-sort="${r.q || 0}">${(r.q || 0).toLocaleString()}</td>
+      <td class="g" data-sort="${r.l || 0}">${gsc(r.l)}</td>
+      <td class="mu" data-sort="${r.region || ""}">${gsc(r.region)}</td>
       ${vsCell}
     </tr>`;
   }).join("");
@@ -939,14 +942,17 @@ async function sellerPage(url, env) {
 
   <div class="panel">
     <div class="ptitle">LATEST OBSERVED LISTINGS <span class="mu">${listings.length} items</span></div>
-    <div class="tablewrap"><table>
-      <thead><tr><th class="l">Item</th><th>Qty</th><th>Their Buyout</th><th>Region Avg</th><th>vs Region</th></tr></thead>
+    <div class="tablewrap"><table class="seller-listings">
+      <thead><tr><th class="l" data-type="text">Item</th><th>Qty</th><th>Their Buyout</th><th>Region Avg</th><th>vs Region</th></tr></thead>
       <tbody>${rows || '<tr><td class="l" colspan="5" style="padding:18px;color:var(--muted)">No current listings.</td></tr>'}</tbody>
     </table></div>
   </div>
 
   <p class="src">Seller data comes from a legacy paged AH ${esc(sellerLabel)} on ${esc(realmLabel)}${smeta ? ` (${smeta.scannedPages || 0}/${smeta.pages || 0} pages, ${smeta.ownerCoverage || 0}% seller-name coverage across the scan)` : ""}. Listings with unresolved seller names cannot be assigned to a profile, so this seller's items, quantity, and listed value may be understated. Scan coverage is not a completeness estimate for this individual seller. Listings reflect the latest imported observations, not confirmed sales or guaranteed current availability; average observed items uses the last ${hist.length || 0} samples.</p>
 </div>
+<script src="/seller.js"></script>
+<script>const whTooltips={colorLinks:false,iconizeLinks:true,renameLinks:false};</script>
+<script src="https://wow.zamimg.com/widgets/power.js" async></script>
 </body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=1800" } });
 }

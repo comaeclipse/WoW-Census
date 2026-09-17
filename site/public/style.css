@@ -174,3 +174,6 @@ a.ic{display:inline-block; width:18px; height:18px; vertical-align:middle;
      background-repeat:no-repeat; background-position:center; background-size:18px 18px;}
 a.ic img, a.ic ins, a.ic del{width:18px !important; height:18px !important;
      display:inline-block; border-radius:2px;}
+.seller-sort{appearance:none; background:none; border:0; padding:0; color:inherit;
+  font:inherit; text-transform:inherit; cursor:pointer; white-space:nowrap;}
+.seller-sort:focus-visible{outline:2px solid var(--gold); outline-offset:4px;}
