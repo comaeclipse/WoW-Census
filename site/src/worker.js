@@ -471,14 +471,26 @@ async function importRealm(url, env, req) {
   const rmap = new Map();
   for (const r of reg.results) rmap.set(r.id, r);
 
-  let latestScanUnix = 0;
+  // "Current" is relative to this upload's own scan time, not wall-clock now,
+  // so an upload of data collected a while ago (e.g. after time offline) still
+  // shows as current rather than getting wholesale filtered out. Use the
+  // MEDIAN of items' latest-snapshot times rather than the max: a targeted
+  // single-item top-up (/ml scan item) can leave one item stamped much more
+  // recently than the rest of a realm-wide scan, and anchoring on the max
+  // would treat that one fresh timestamp as "the scan just happened" and
+  // filter out every other item as stale. The median stays representative of
+  // the bulk of the batch either way.
+  const scanTimes = [];
   for (const idStr in body.items) {
     const rec = body.items[idStr];
     const snaps = rec && rec.s;
     if (!snaps || !snaps.length) continue;
     const last = snaps[snaps.length - 1];
-    latestScanUnix = Math.max(latestScanUnix, Number(last[0]) || 0);
+    const t = Number(last[0]) || 0;
+    if (t) scanTimes.push(t);
   }
+  scanTimes.sort((a, b) => a - b);
+  const latestScanUnix = scanTimes.length ? scanTimes[Math.floor(scanTimes.length / 2)] : 0;
   const currentCutoffUnix = latestScanUnix ? latestScanUnix - REALM_CURRENT_AUCTION_MAX_AGE_SECONDS : 0;
 
   const itemRows = [], histRows = [];
