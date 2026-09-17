@@ -378,11 +378,20 @@ async function collectGame(env, game) {
     const id = parseInt(f[0], 10);
     if (!id) continue;
     const name = f[1];
-    const mv = Math.round(+f[2] || 0), hist = Math.round(+f[3] || 0);
-    const asp = Math.round(+f[4] || 0), sr = +f[5] || 0, spd = +f[6] || 0;
-    if (!(sr > 0 || spd > 0)) continue;
+    const sr = +f[5] || 0, spd = +f[6] || 0;
+    const hasDemand = sr > 0 || spd > 0;
+    // Every item still gets a row -- realm uploads join on this table purely
+    // to resolve names (importRealm's rr.name fallback, seller/item page item
+    // names) for items TSM reports zero region sale-rate on, and dropping
+    // those rows entirely left ~1 in 3 live AH listings on TBC Anniversary
+    // realms unnamed. Zero out mv/asp/hist instead of trusting whatever the
+    // CSV carries for a no-signal item, so a stale/leftover value can never
+    // be read downstream as real region demand.
+    const mv = hasDemand ? Math.round(+f[2] || 0) : 0;
+    const hist = hasDemand ? Math.round(+f[3] || 0) : 0;
+    const asp = hasDemand ? Math.round(+f[4] || 0) : 0;
     itemRows.push([game, id, name, slugify(name), mv, asp, sr, spd, hist, f[7] || ""]);
-    histRows.push([game, id, ts, mv, asp, sr, spd]);
+    if (hasDemand) histRows.push([game, id, ts, mv, asp, sr, spd]);
   }
 
   await bulkInsert(env.DB, "items",
