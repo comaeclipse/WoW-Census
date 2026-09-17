@@ -49,8 +49,9 @@ CREATE TABLE IF NOT EXISTS datasets (
 
 -- Seller profiles for realm datasets (game = "realm:<Realm-Faction>"). Populated
 -- only by legacy paged scans, which return owner names. `sellers` is one row per
--- owner (current summary + rolling history JSON); `seller_listings` is that
--- owner's current per-item listings. Both are fully replaced on each upload.
+-- owner (latest observed summary + rolling history JSON); `seller_listings`
+-- keeps each owner's latest observed per-item listing so stale listings can be
+-- shown instead of erased after a later scan misses them.
 CREATE TABLE IF NOT EXISTS sellers (
   game       TEXT    NOT NULL,
   owner      TEXT    NOT NULL,
@@ -73,6 +74,7 @@ CREATE TABLE IF NOT EXISTS seller_listings (
   id    INTEGER NOT NULL,           -- WoW item id
   q     INTEGER,                    -- quantity this seller lists
   l     INTEGER,                    -- this seller's lowest unit price (copper)
+  last_seen INTEGER,                -- latest scan timestamp that saw this listing
   PRIMARY KEY (game, owner, id)
 );
 CREATE INDEX IF NOT EXISTS idx_seller_listings_owner ON seller_listings(game, owner);

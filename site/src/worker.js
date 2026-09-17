@@ -228,6 +228,15 @@ async function fetchSellerMeta(env, game) {
     return null;
   }
 }
+
+const STALE_LISTING_SECONDS = 48 * 60 * 60;
+
+function shortDate(ts) {
+  if (!ts) return "Unknown";
+  const d = new Date(ts * 1000);
+  if (Number.isNaN(d.getTime())) return "Unknown";
+  return d.toISOString().slice(0, 16).replace("T", " ");
+}
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 function scale100(v, mn, mx) { return mx === mn ? 0 : clamp(((v - mn) / (mx - mn)) * 100, 0, 100); }
 function demandScore(sr, spd) {
@@ -602,30 +611,36 @@ async function itemPage(url, env) {
     smeta = await fetchSellerMeta(env, game);
   }
 
-  // Who showed up in the latest seller scan/sample for this item (cheapest
-  // first), linking to each seller's profile. Only realm datasets from paged
-  // scans have this.
+  // Who showed up in seller scans/samples for this item, newest observations
+  // first so stale listings remain visible without looking current.
   let sellersHtml = "";
   if (isRealm) {
+    const freshCutoff = Math.floor(Date.now() / 1000) - STALE_LISTING_SECONDS;
     const sres = await env.DB.prepare(
-      `SELECT sl.owner owner, sl.q q, sl.l l, s.slug slug
+      `SELECT sl.owner owner, sl.q q, sl.l l, sl.last_seen last_seen, s.slug slug
        FROM seller_listings sl LEFT JOIN sellers s ON s.game = sl.game AND s.owner = sl.owner
-       WHERE sl.game = ? AND sl.id = ? ORDER BY sl.l ASC LIMIT 30`
-    ).bind(game, row.id).all();
-    const srows = (sres.results || []).map((r) =>
-      `<tr>
+       WHERE sl.game = ? AND sl.id = ?
+       ORDER BY CASE WHEN COALESCE(sl.last_seen, 0) >= ? THEN 0 ELSE 1 END,
+         COALESCE(sl.last_seen, 0) DESC, sl.l ASC
+       LIMIT 60`
+    ).bind(game, row.id, freshCutoff).all();
+    const srows = (sres.results || []).map((r) => {
+      const fresh = (r.last_seen || 0) >= freshCutoff;
+      return `<tr>
         <td class="l"><a class="name" href="/seller/${encodeURIComponent(r.slug || slugify(r.owner))}?game=${gameHref("", game)}">${esc(r.owner)}</a></td>
         <td>${(r.q || 0).toLocaleString()}</td>
         <td class="g">${gsc(r.l)}</td>
-      </tr>`).join("");
+        <td class="${fresh ? "gr" : "rd"}">${esc(shortDate(r.last_seen))}</td>
+      </tr>`;
+    }).join("");
     if (srows) {
       sellersHtml = `<div class="panel">
         <div class="ptitle">${smeta && smeta.partial ? "LATEST SELLER SAMPLE" : "WHO'S SELLING THIS"} <span class="mu">${(sres.results || []).length} sellers</span></div>
         <div class="tablewrap"><table>
-          <thead><tr><th class="l">Seller</th><th>Qty</th><th>Buyout</th></tr></thead>
+          <thead><tr><th class="l">Seller</th><th>Qty</th><th>Buyout</th><th>Observed</th></tr></thead>
           <tbody>${srows}</tbody>
         </table></div>
-        ${smeta ? `<p class="src">${esc(sellerMetaLabel(smeta))}: ${smeta.scannedPages || 0}/${smeta.pages || 0} pages, ${smeta.ownerCoverage || 0}% owner coverage.</p>` : ""}
+        ${smeta ? `<p class="src">${esc(sellerMetaLabel(smeta))}: ${smeta.scannedPages || 0}/${smeta.pages || 0} pages, ${smeta.ownerCoverage || 0}% owner coverage. Red dates are listings not observed in the last 48 hours.</p>` : ""}
       </div>`;
     }
   }
@@ -801,8 +816,9 @@ async function importPop(url, env, req) {
 }
 
 // Import a realm's seller profiles (ml-sellers-v1). Owner names come only from
-// legacy paged scans, so this is realm-only. Each upload fully replaces the
-// realm's prior snapshot so delisted auctions don't linger.
+// legacy paged scans, so this is realm-only. Current observations are upserted
+// and older per-item seller listings are retained with their last_seen date so
+// item pages can show stale listings instead of losing that trail.
 async function importSellers(url, env, req) {
   if (!env.REFRESH_TOKEN || url.searchParams.get("token") !== env.REFRESH_TOKEN)
     return new Response("forbidden", { status: 403 });
@@ -826,7 +842,7 @@ async function importSellers(url, env, req) {
       const id = Number(l[0]) || 0, q = l[1] || 0, price = l[2] || 0;
       if (!id) continue;
       items++; qty += q; value += q * price;
-      listingRows.push([game, s.o, id, q, price]);
+      listingRows.push([game, s.o, id, q, price, s.ls || body.exportedAt || Math.floor(Date.now() / 1000)]);
     }
     if (!items) continue;
     sellerRows.push([game, s.o, slugify(s.o), s.fs || 0, s.ls || 0, s.sc || 0,
@@ -834,13 +850,11 @@ async function importSellers(url, env, req) {
   }
   if (!sellerRows.length) return json({ error: "no sellers in export" });
 
-  await env.DB.prepare("DELETE FROM sellers WHERE game=?").bind(game).run();
-  await env.DB.prepare("DELETE FROM seller_listings WHERE game=?").bind(game).run();
   await bulkInsert(env.DB, "sellers",
     ["game", "owner", "slug", "first_seen", "last_seen", "seen_count", "items", "qty", "value", "hist"],
     sellerRows, 60);
   await bulkInsert(env.DB, "seller_listings",
-    ["game", "owner", "id", "q", "l"], listingRows, 120);
+    ["game", "owner", "id", "q", "l", "last_seen"], listingRows, 120);
   await env.DB.prepare(
     `INSERT INTO datasets (game, source_game, seller_updated_at, seller_meta)
      VALUES (?, ?, ?, ?)
