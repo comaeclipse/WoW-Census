@@ -1,3 +1,5 @@
+import { Hono } from "hono";
+
 // MarketLens — Cloudflare Worker
 // Routes:
 //   GET  /                         arcade screener (static shell + /api/items)
@@ -20,6 +22,7 @@ const GAMES = {
 };
 const DEFAULT_GAME = "classic-progression";
 const ITEMS_CACHE_VERSION = 13;
+const REALM_CURRENT_AUCTION_MAX_AGE_SECONDS = 48 * 60 * 60;
 
 function sourceGameKey(flavor) {
   const f = String(flavor || "").toLowerCase();
@@ -41,6 +44,139 @@ const ITEM_COLUMNS = ["id", "name", "slug", "mv", "asp", "sr", "spd", "q", "sc",
 
 const csvUrl = (game) =>
   `https://public-data.tradeskillmaster.com/${game}/${REGION}/region/items.csv`;
+
+const BNET_API_BASE = `https://${REGION}.api.blizzard.com`;
+const BNET_OAUTH_URL = `https://oauth.battle.net/token`;
+
+async function bnetToken(env) {
+  if (!env.BLIZZARD_CLIENT_ID || !env.BLIZZARD_CLIENT_SECRET) {
+    throw new Error("missing BLIZZARD_CLIENT_ID or BLIZZARD_CLIENT_SECRET secret");
+  }
+  const basic = btoa(env.BLIZZARD_CLIENT_ID + ":" + env.BLIZZARD_CLIENT_SECRET);
+  const res = await fetch(BNET_OAUTH_URL, {
+    method: "POST",
+    headers: {
+      authorization: "Basic " + basic,
+      "content-type": "application/x-www-form-urlencoded",
+    },
+    body: "grant_type=client_credentials",
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error("Battle.net OAuth " + res.status + ": " + (body.error_description || body.error || "request failed"));
+  if (!body.access_token) throw new Error("Battle.net OAuth returned no access token");
+  return body.access_token;
+}
+
+async function bnetGet(env, path, namespace, options = {}) {
+  const token = await bnetToken(env);
+  const url = new URL(path, BNET_API_BASE);
+  if (namespace) url.searchParams.set("namespace", namespace);
+  if (options.locale !== false && !url.searchParams.has("locale")) url.searchParams.set("locale", "en_US");
+  const res = await fetch(url.toString(), { headers: { authorization: "Bearer " + token } });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error("Battle.net API " + res.status + ": " + JSON.stringify(body).slice(0, 500));
+  return { url: url.toString(), body };
+}
+
+function bnetNamespaceForGame(game) {
+  const raw = String(game || "").toLowerCase();
+  if (raw === "tbc-anniversary" || raw === "anniversary" || raw === "tbc" || raw === "classicann")
+    return "dynamic-classicann-us";
+  const g = sourceGameKey(game) || game;
+  if (g === "classic") return "dynamic-classic1x-us";
+  if (g === "classic-progression") return "dynamic-classic-us";
+  return "dynamic-us";
+}
+
+function bnetStaticNamespaceForGame(game) {
+  const raw = String(game || "").toLowerCase();
+  if (raw === "tbc-anniversary" || raw === "anniversary" || raw === "tbc" || raw === "classicann")
+    return "static-classicann-us";
+  const g = sourceGameKey(game) || game;
+  if (g === "classic") return "static-classic1x-us";
+  if (g === "classic-progression") return "static-classic-us";
+  return "static-us";
+}
+
+function normalizeRealmKey(s) {
+  return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+async function bnetFindConnectedRealm(env, realmName, namespace) {
+  const idx = await bnetGet(env, "/data/wow/connected-realm/index", namespace);
+  const refs = ((idx.body && idx.body.connected_realms) || [])
+    .map((r) => r.href && new URL(r.href).pathname)
+    .filter(Boolean);
+  const wanted = normalizeRealmKey(realmName);
+  for (const path of refs) {
+    const detail = await bnetGet(env, path, namespace);
+    const realms = (detail.body && detail.body.realms) || [];
+    for (const realm of realms) {
+      if (normalizeRealmKey(realm.name) === wanted || normalizeRealmKey(realm.slug) === wanted) {
+        return { detail, realm };
+      }
+    }
+  }
+  return null;
+}
+
+async function bnetTest(url, env) {
+  if (!env.REFRESH_TOKEN || url.searchParams.get("token") !== env.REFRESH_TOKEN)
+    return new Response("forbidden", { status: 403 });
+
+  const namespace = url.searchParams.get("namespace") || "dynamic-classic-us";
+  const path = url.searchParams.get("path") || "/data/wow/connected-realm/index";
+  const out = await bnetGet(env, path, namespace, { locale: url.searchParams.get("locale") !== "false" });
+  const body = out.body || {};
+  const connectedRealms = Array.isArray(body.connected_realms) ? body.connected_realms.length : null;
+  const sample = {};
+  for (const key of Object.keys(body)) {
+    if (key === "_links") continue;
+    const value = body[key];
+    sample[key] = Array.isArray(value) ? { count: value.length, first: value.slice(0, 3) } : value;
+  }
+  return json({
+    ok: true,
+    requestedUrl: out.url.replace(/access_token=[^&]+/g, "access_token=REDACTED"),
+    namespace,
+    path,
+    keys: Object.keys(body),
+    connectedRealms,
+    sample,
+  }, 0);
+}
+
+async function bnetRealmAuctions(url, env) {
+  if (!env.REFRESH_TOKEN || url.searchParams.get("token") !== env.REFRESH_TOKEN)
+    return new Response("forbidden", { status: 403 });
+
+  const realmName = url.searchParams.get("realm") || "Dreamscythe";
+  const game = url.searchParams.get("game") || url.searchParams.get("flavor") || "classic-progression";
+  const namespace = url.searchParams.get("namespace") || bnetNamespaceForGame(game);
+  const found = await bnetFindConnectedRealm(env, realmName, namespace);
+  if (!found) return json({ ok: false, error: "realm not found", realm: realmName, namespace }, 0);
+
+  const detail = found.detail.body;
+  const auctionHref = detail && detail.auctions && detail.auctions.href;
+  if (!auctionHref) return json({ ok: false, error: "realm has no auctions href", realm: found.realm, namespace, connectedRealm: detail }, 0);
+
+  const auctionPath = new URL(auctionHref).pathname;
+  const auctions = await bnetGet(env, auctionPath, namespace);
+  const body = auctions.body || {};
+  const rows = Array.isArray(body.auctions) ? body.auctions : [];
+  return json({
+    ok: true,
+    realm: found.realm,
+    connectedRealmId: detail.id,
+    namespace,
+    staticNamespace: bnetStaticNamespaceForGame(game),
+    auctionPath,
+    auctionKeys: Object.keys(body),
+    auctionCount: rows.length,
+    auctionHouseIndex: rows.length && rows[0] && rows[0].key && rows[0].name ? rows.map((r) => ({ id: r.id, name: r.name, href: r.key && r.key.href })).slice(0, 10) : null,
+    sampleAuctions: rows.length && !(rows[0] && rows[0].key && rows[0].name) ? rows.slice(0, 10) : [],
+  }, 0);
+}
 
 function slugify(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -107,32 +243,27 @@ const CLASS_META = {
 // Class -> crafting-market affinity (mirrors the addon's Population/WhoScan.lua).
 // A demand HINT from population mix, never observed sales.
 //
-// The Blacksmithing/Leatherworking/Tailoring vs. generic "Gear" split isn't a
-// guess: it's GEAR_BUDGET(5) scaled by D.GearCraftShare, generated by
+// The Blacksmithing/Leatherworking/Tailoring gear demand isn't a guess: it's
+// GEAR_BUDGET(5) scaled by D.GearCraftShare, generated by
 // tools/build-item-sources.js from Blizzard's own item data (build 2.5.6.69546)
 // -- see MarketLens/Data/GearCoverageGen.lua for the source numbers. Only
 // ~4-7% of a given armor type's items are an actual player recipe; the rest is
-// drops/quests/vendor/other that no profession supplies. This file can't run
-// that generator (it's a Cloudflare Worker, no filesystem), so the split is
-// hardcoded here to match -- re-derive by hand from GearCoverageGen.lua's
-// header if that file is regenerated with a newer build:
-//   Blacksmithing  share 0.0390 -> 0.195 / 4.805
-//   Leatherworking share 0.0545 -> 0.2725 / 4.7275
-//   Tailoring      share 0.0671 -> 0.3355 / 4.6645
+// drops/quests/vendor/other that no profession supplies, so it is deliberately
+// excluded from this profession table.
 const POP_AFFINITY = {
-  WARRIOR: { Blacksmithing: 0.195, Gear: 4.805, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
-  PALADIN: { Blacksmithing: 0.195, Gear: 4.805, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
-  HUNTER:  { Leatherworking: 0.2725, Gear: 4.7275, Engineering: 1, Enchanting: 1, Alchemy: 1 },
-  ROGUE:   { Leatherworking: 0.2725, Gear: 4.7275, Alchemy: 2, Enchanting: 1 },
-  SHAMAN:  { Leatherworking: 0.2725, Gear: 4.7275, Enchanting: 1, Jewelcrafting: 1, Alchemy: 1 },
-  DRUID:   { Leatherworking: 0.2725, Gear: 4.7275, Alchemy: 1, Enchanting: 1 },
-  PRIEST:  { Tailoring: 0.3355, Gear: 4.6645, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
-  MAGE:    { Tailoring: 0.3355, Gear: 4.6645, Enchanting: 2, Jewelcrafting: 1, Alchemy: 1 },
-  WARLOCK: { Tailoring: 0.3355, Gear: 4.6645, Enchanting: 2, Alchemy: 1 },
-  DEATHKNIGHT: { Blacksmithing: 0.195, Gear: 4.805, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
-  MONK: { Leatherworking: 0.2725, Gear: 4.7275, Alchemy: 1, Enchanting: 1, Jewelcrafting: 1 },
-  DEMONHUNTER: { Leatherworking: 0.2725, Gear: 4.7275, Alchemy: 2, Enchanting: 1 },
-  EVOKER: { Leatherworking: 0.2725, Gear: 4.7275, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
+  WARRIOR: { Blacksmithing: 0.195, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
+  PALADIN: { Blacksmithing: 0.195, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
+  HUNTER:  { Leatherworking: 0.2725, Engineering: 1, Enchanting: 1, Alchemy: 1 },
+  ROGUE:   { Leatherworking: 0.2725, Alchemy: 2, Enchanting: 1 },
+  SHAMAN:  { Leatherworking: 0.2725, Enchanting: 1, Jewelcrafting: 1, Alchemy: 1 },
+  DRUID:   { Leatherworking: 0.2725, Alchemy: 1, Enchanting: 1 },
+  PRIEST:  { Tailoring: 0.3355, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
+  MAGE:    { Tailoring: 0.3355, Enchanting: 2, Jewelcrafting: 1, Alchemy: 1 },
+  WARLOCK: { Tailoring: 0.3355, Enchanting: 2, Alchemy: 1 },
+  DEATHKNIGHT: { Blacksmithing: 0.195, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
+  MONK: { Leatherworking: 0.2725, Alchemy: 1, Enchanting: 1, Jewelcrafting: 1 },
+  DEMONHUNTER: { Leatherworking: 0.2725, Alchemy: 2, Enchanting: 1 },
+  EVOKER: { Leatherworking: 0.2725, Enchanting: 2, Alchemy: 1, Jewelcrafting: 1 },
 };
 
 function popDemand(classes) {
@@ -322,6 +453,16 @@ async function importRealm(url, env, req) {
   const rmap = new Map();
   for (const r of reg.results) rmap.set(r.id, r);
 
+  let latestScanUnix = 0;
+  for (const idStr in body.items) {
+    const rec = body.items[idStr];
+    const snaps = rec && rec.s;
+    if (!snaps || !snaps.length) continue;
+    const last = snaps[snaps.length - 1];
+    latestScanUnix = Math.max(latestScanUnix, Number(last[0]) || 0);
+  }
+  const currentCutoffUnix = latestScanUnix ? latestScanUnix - REALM_CURRENT_AUCTION_MAX_AGE_SECONDS : 0;
+
   const itemRows = [], histRows = [];
   for (const idStr in body.items) {
     const id = parseInt(idStr, 10);
@@ -334,27 +475,30 @@ async function importRealm(url, env, req) {
     // item's name), since getAll scans often leave names uncached.
     const name = (rec.n && rec.n.trim()) ? rec.n : (rr.name || ("item:" + id));
     const last = snaps[snaps.length - 1];
-    const q = last[1] || 0, sc = sellersAvailable ? (last[3] || 0) : null;
-    // Top-seller concentration: the largest single seller's share of supply
-    // (0-100). Only meaningful when owners are known, same gate as sc.
-    const tc = sellersAvailable ? (last[7] || 0) : null;
-    // [t,q,a,s,l,m,w,tc]: value the realm at the weighted MEDIAN (m, idx 5), not
-    // the weighted average (w, idx 6). A single grossly-overpriced listing skews
-    // w wildly (e.g. Netherweave's wtd-avg spiked to ~58g/unit while its median
-    // held at ~18s), which poisoned mv (=q*price) and asp. Median is outlier-
-    // robust; fall back to w only when a median wasn't recorded.
-    const unit = last[5] || last[6] || 0;
-    const cat = (rec.m && String(rec.m).trim()) ? String(rec.m) : null;
-    const src = (rec.src && String(rec.src).trim()) ? String(rec.src) : null;
-    const crafter = (rec.cr && String(rec.cr).trim()) ? String(rec.cr) : null;
-    itemRows.push([game, id, name, slugify(name), q * unit, unit, rr.sr || 0, rr.spd || 0, rr.asp || 0,
-      new Date().toISOString(), q, sc, tc, cat, src, crafter]);
+    if ((Number(last[0]) || 0) >= currentCutoffUnix) {
+      const q = last[1] || 0, sc = sellersAvailable ? (last[3] || 0) : null;
+      // Top-seller concentration: the largest single seller's share of supply
+      // (0-100). Only meaningful when owners are known, same gate as sc.
+      const tc = sellersAvailable ? (last[7] || 0) : null;
+      // [t,q,a,s,l,m,w,tc]: value the realm at the weighted MEDIAN (m, idx 5), not
+      // the weighted average (w, idx 6). A single grossly-overpriced listing skews
+      // w wildly (e.g. Netherweave's wtd-avg spiked to ~58g/unit while its median
+      // held at ~18s), which poisoned mv (=q*price) and asp. Median is outlier-
+      // robust; fall back to w only when a median wasn't recorded.
+      const unit = last[5] || last[6] || 0;
+      const cat = (rec.m && String(rec.m).trim()) ? String(rec.m) : null;
+      const src = (rec.src && String(rec.src).trim()) ? String(rec.src) : null;
+      const crafter = (rec.cr && String(rec.cr).trim()) ? String(rec.cr) : null;
+      itemRows.push([game, id, name, slugify(name), q * unit, unit, rr.sr || 0, rr.spd || 0, rr.asp || 0,
+        new Date().toISOString(), q, sc, tc, cat, src, crafter]);
+    }
     for (const sn of snaps) {
       const u = sn[5] || sn[6] || 0;
       histRows.push([game, id, dayBucketFromUnix(sn[0]), (sn[1] || 0) * u, u,
         rr.sr || 0, rr.spd || 0, sn[1] || 0]);
     }
   }
+  await env.DB.prepare("DELETE FROM items WHERE game=?").bind(game).run();
   await bulkInsert(env.DB, "items",
     ["game", "id", "name", "slug", "mv", "asp", "sr", "spd", "hist", "updated_at", "q", "sc", "tc", "cat", "src", "crafter"], itemRows, 120);
   await bulkInsert(env.DB, "history",
@@ -1049,7 +1193,7 @@ async function popPage(url, env) {
   const demandPanel = '<div class="panel" style="margin-bottom:22px"><div class="ptitle">Inferred profession demand</div>' +
     '<table class="poptable"><thead><tr><th class="l">Profession</th><th>Score</th><th class="l">&nbsp;</th></tr></thead><tbody>' +
     (demandBody || '<tr><td class="l mu" colspan="3" style="padding:16px">No data.</td></tr>') + "</tbody></table>" +
-    '<p class="hint">Inferred from the observed class mix &mdash; a demand hint, not observed sales.</p></div>';
+    '<p class="hint">Inferred from the observed class mix &mdash; crafted gear is counted under Blacksmithing, Leatherworking, and Tailoring only when the item-source data identifies actual profession recipes; drop, quest, vendor, and unknown gear is excluded from profession scores.</p></div>';
 
   const activityBody = characters.activity.map((c) =>
     '<tr><td class="l">' + esc(c.full_name + (c.level ? " (" + c.level + ")" : "")) + '</td><td>' + c.seen_days +
@@ -1168,33 +1312,36 @@ async function popPage(url, env) {
   }
 }
 
+const app = new Hono();
+
+app.all("/api/items", (c) => apiItems(new URL(c.req.url), c.env, c.executionCtx));
+app.all("/api/history", (c) => apiHistory(new URL(c.req.url), c.env));
+app.all("/api/games", (c) => apiGames(c.env));
+app.all("/api/population", (c) => apiPopulation(new URL(c.req.url), c.env));
+
+app.post("/admin/import-realm", (c) => importRealm(new URL(c.req.url), c.env, c.req.raw));
+app.post("/admin/import-pop", (c) => importPop(new URL(c.req.url), c.env, c.req.raw));
+app.post("/admin/import-sellers", (c) => importSellers(new URL(c.req.url), c.env, c.req.raw));
+app.all("/admin/bnet-test", (c) => bnetTest(new URL(c.req.url), c.env));
+app.all("/admin/bnet-realm-auctions", (c) => bnetRealmAuctions(new URL(c.req.url), c.env));
+app.all("/admin/refresh", async (c) => {
+  const url = new URL(c.req.url);
+  if (!c.env.REFRESH_TOKEN || url.searchParams.get("token") !== c.env.REFRESH_TOKEN)
+    return new Response("forbidden", { status: 403 });
+  const g = url.searchParams.get("game");
+  const out = g ? [await collectGame(c.env, g)] : await collectAll(c.env);
+  return json({ ok: true, out });
+});
+
+app.all("/pop", (c) => popPage(new URL(c.req.url), c.env));
+app.all("/seller/*", (c) => sellerPage(new URL(c.req.url), c.env));
+app.all("/item/*", (c) => itemPage(new URL(c.req.url), c.env));
+
+app.notFound((c) => c.env.ASSETS.fetch(c.req.raw));
+app.onError((e) => new Response("error: " + (e && e.stack || e), { status: 500 }));
+
 export default {
-  async fetch(req, env, ctx) {
-    const url = new URL(req.url);
-    const p = url.pathname;
-    try {
-      if (p === "/api/items") return await apiItems(url, env, ctx);
-      if (p === "/api/history") return await apiHistory(url, env);
-      if (p === "/api/games") return await apiGames(env);
-      if (p === "/api/population") return await apiPopulation(url, env);
-      if (p === "/admin/import-realm" && req.method === "POST") return await importRealm(url, env, req);
-      if (p === "/admin/import-pop" && req.method === "POST") return await importPop(url, env, req);
-      if (p === "/admin/import-sellers" && req.method === "POST") return await importSellers(url, env, req);
-      if (p === "/pop") return await popPage(url, env);
-      if (p.startsWith("/seller/")) return await sellerPage(url, env);
-      if (p.startsWith("/item/")) return await itemPage(url, env);
-      if (p === "/admin/refresh") {
-        if (!env.REFRESH_TOKEN || url.searchParams.get("token") !== env.REFRESH_TOKEN)
-          return new Response("forbidden", { status: 403 });
-        const g = url.searchParams.get("game");
-        const out = g ? [await collectGame(env, g)] : await collectAll(env);
-        return json({ ok: true, out });
-      }
-      return env.ASSETS.fetch(req);
-    } catch (e) {
-      return new Response("error: " + (e && e.stack || e), { status: 500 });
-    }
-  },
+  fetch: app.fetch,
   async scheduled(event, env, ctx) {
     ctx.waitUntil(collectAll(env));
   },
