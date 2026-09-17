@@ -55,7 +55,7 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml scan paged` | Classic Era/TBC Anniversary: run a quick seller sample across the AH (Get All omits seller names) |
 | `/ml scan paged fast [start] [stop]` | Classic Era/TBC Anniversary: walk all pages at the server's allowed pace, accepting missing seller names; 20-minute default budget. Optional 1-based page range restricts the walk, e.g. `/ml scan paged fast 400` starts at page 400, `/ml scan paged fast 400 800` stops after page 800 |
 | `/ml scan sellers full` | Classic Era/TBC Anniversary: run an exhaustive paged seller scan for measurement |
-| `/ml scan item <name>` | Classic Era/TBC Anniversary: query the AH for one item by name and print its sellers/prices to chat; doesn't touch stored seller profiles |
+| `/ml scan item <name>` | Classic Era/TBC Anniversary: query the AH for one item by name, print its sellers/prices to chat, and merge that listing into each seller's stored row |
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
 | `/ml who <filter>` | Sample with a raw `/who` filter, e.g. `/ml who z-"Shattrath City"` |
@@ -99,13 +99,15 @@ stopped, or `/ml scan paged fast 1 800` / `/ml scan paged fast 801 1600` to
 split a realm into deliberate chunks across multiple sessions.
 
 For a single item, `/ml scan item <name>` uses `QueryAuctionItems`' built-in
-name search instead of walking pages, e.g. `/ml scan item Shadow Dust`. It's a
-read-only lookup: results (seller, quantity, price) print straight to chat and
-the item's own price history still gets recorded, but it deliberately never
-touches the stored seller profiles or the realm's "latest seller scan"
-marker -- a one-item query folded into that bookkeeping the same way a full
-scan does would make the next seller upload think only that item's sellers
-were observed, and drop everyone else.
+name search instead of walking pages, e.g. `/ml scan item Shadow Dust`.
+Results (seller, quantity, price) print to chat, the item's own price history
+gets recorded, and each matched seller's row for that item is merged into
+their stored profile (new sellers are added; existing sellers just get that
+one listing refreshed, everything else they sell is left alone). It never
+repoints the realm's "latest seller scan" marker the way a full/fast scan
+does -- doing that for a one-item query would make the next seller upload
+think only that item's sellers were observed and drop everyone else -- so it's
+safe to run any time as a top-up between full scans.
 
 On Retail, `/ml scan` uses the browse-summary API: minimum price and total
 quantity are available, but individual auction and seller counts are not. The

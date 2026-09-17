@@ -63,6 +63,54 @@ function Sellers:Record(accSellers, scanStats)
     return n
 end
 
+-- Merge one item's listings from a targeted /ml scan item query into existing
+-- seller profiles. Unlike Record (a full-scan snapshot that REPLACES a
+-- seller's whole listing set and repoints realm.lastSellerScanID at itself),
+-- this only touches the one item found, leaves every other listing alone, and
+-- never reassigns realm.lastSellerScanID -- a single-item lookup must not make
+-- the exporter think it saw the whole realm. A brand new seller (not in any
+-- prior full scan) inherits the realm's current lastSellerScanID so they still
+-- qualify for the next seller upload instead of being silently dropped; an
+-- already-known seller keeps whatever scan last fully captured them.
+-- accSellers is Scanner.acc.sellers: { [owner] = { [itemID] = {q=,l=,n=} } }.
+function Sellers:MergeItem(accSellers, itemID)
+    if not accSellers then return 0 end
+    local realm = ML.realm
+    realm.sellers = realm.sellers or {}
+    local now = time()
+    local n = 0
+
+    for owner, listings in pairs(accSellers) do
+        local li = listings[itemID]
+        if li then
+            n = n + 1
+            local rec = realm.sellers[owner]
+            if not rec then
+                rec = { name = owner, firstSeen = now, seenCount = 0, hist = {},
+                    listings = {}, lastSellerScanID = realm.lastSellerScanID }
+                realm.sellers[owner] = rec
+            end
+            rec.listings = rec.listings or {}
+            rec.listings[itemID] = li
+            rec.lastSeen = now
+            rec.seenCount = (rec.seenCount or 0) + 1
+
+            -- Resummarize from the seller's full current listing set (not just
+            -- this item) so hist keeps reflecting their whole known posting.
+            local items, qty, value = 0, 0, 0
+            for _, l in pairs(rec.listings) do
+                items = items + 1
+                qty = qty + (l.q or 0)
+                value = value + (l.q or 0) * (l.l or 0)
+            end
+            rec.hist = rec.hist or {}
+            U.PushCapped(rec.hist, { t = now, items = items, qty = qty, value = value }, HIST_CAP)
+        end
+    end
+
+    return n
+end
+
 -- Drop sellers not seen within the snapshot retention window so the save stays
 -- bounded. Mirrors Snapshots:Purge's cutoff.
 function Sellers:Purge()

@@ -222,10 +222,11 @@ end
 -- page range -- lets successive fast scans sweep different sections of a big
 -- AH instead of always covering the same pages before the budget runs out.
 -- nameFilter scopes the query to one item's listings (QueryAuctionItems'
--- built-in name search) instead of walking the whole AH; results are reported
--- directly to chat and deliberately never touch realm.sellers/lastSellerScanID
--- (see FinishItemQuery) so a quick lookup can never overwrite the realm-wide
--- seller snapshot the next upload depends on.
+-- built-in name search) instead of walking the whole AH; results print to
+-- chat and merge into existing seller profiles (see FinishItemQuery /
+-- Sellers:MergeItem) without ever repointing realm.lastSellerScanID, so a
+-- quick lookup can update seller rows without overwriting the realm-wide
+-- seller snapshot a real full/fast scan captured.
 function S:StartScan(forcePaged, fullSellerScan, fastPaged, startPage, stopPage, nameFilter)
     if not self.eventDriverReady then
         ML:Print("Scanner initialization failed before its event handler loaded. Enable Lua errors and /reload.")
@@ -319,12 +320,14 @@ function S:Abort(reason)
     ML:Fire("SCAN_ABORT", reason)
 end
 
--- Report a nameFilter scan's results directly to chat instead of folding them
--- into the persistent realm/seller stores. A targeted lookup must never touch
--- realm.sellers or lastSellerScanID: Sellers:Record REPLACES each matched
--- seller's whole listing snapshot with just this query's item and repoints
--- the realm's "latest scan" id at it, which would make the next --sellers
--- export drop every seller not selling this one item. See Finish().
+-- Report a nameFilter scan's results to chat and merge them into existing
+-- seller profiles via Sellers:MergeItem -- NOT Sellers:Record. Record REPLACES
+-- a seller's whole listing snapshot and repoints realm.lastSellerScanID at
+-- itself, which for a one-item query would make the next --sellers export
+-- drop every seller not selling this one item. MergeItem only touches the
+-- found item on each matched seller and leaves realm.lastSellerScanID alone,
+-- so this can safely run any time without corrupting what a real full/fast
+-- scan captured. See Finish().
 function S:FinishItemQuery(itemCount)
     if itemCount == 0 then
         ML:Print('No auctions found for "%s".', self.nameFilter)
@@ -336,8 +339,9 @@ function S:FinishItemQuery(itemCount)
                 if li then rows[#rows + 1] = { owner = owner, q = li.q, l = li.l } end
             end
             table.sort(rows, function(a, b) return (a.l or 0) < (b.l or 0) end)
-            ML:Print("%s: %d auction(s), %d seller(s).", it.name or ("item " .. itemID),
-                it.auctions or 0, #rows)
+            local updated = (self.ownersSeen and ML.Sellers) and ML.Sellers:MergeItem(self.acc.sellers, itemID) or 0
+            ML:Print("%s: %d auction(s), %d seller(s)%s.", it.name or ("item " .. itemID),
+                it.auctions or 0, #rows, updated > 0 and (" (%d seller row(s) updated)"):format(updated) or "")
             for i, r in ipairs(rows) do
                 if i > 25 then
                     ML:Print("  ...and %d more.", #rows - 25)
@@ -346,6 +350,7 @@ function S:FinishItemQuery(itemCount)
                 ML:Print("  %s x%d @ %s", r.owner, r.q or 0, U.MoneyShort(r.l))
             end
         end
+        if self.ownersSeen and ML.Sellers then ML.Sellers:Purge() end
         ML.Snapshots:Record(self.acc.items)
         ML.Snapshots:Purge()
     end
