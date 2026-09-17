@@ -43,6 +43,7 @@ local function resetAccumulator()
     S.scanStats = nil
     S.samplePages = nil
     S.sampleIndex = nil
+    S.stopPage = nil
 end
 
 local function resetSellerStats(full)
@@ -215,7 +216,10 @@ end
 -- forcePaged: skip Get All even when it's available. The bulk dump omits seller
 -- names. By default this samples pages; fullSellerScan walks every page.
 -- fastPaged accepts unresolved owners and applies the seller time budget.
-function S:StartScan(forcePaged, fullSellerScan, fastPaged)
+-- startPage/stopPage (1-based, inclusive) restrict a fullSellerScan walk to a
+-- page range -- lets successive fast scans sweep different sections of a big
+-- AH instead of always covering the same pages before the budget runs out.
+function S:StartScan(forcePaged, fullSellerScan, fastPaged, startPage, stopPage)
     if not self.eventDriverReady then
         ML:Print("Scanner initialization failed before its event handler loaded. Enable Lua errors and /reload.")
         return
@@ -252,6 +256,11 @@ function S:StartScan(forcePaged, fullSellerScan, fastPaged)
         return
     end
 
+    if stopPage and startPage and tonumber(stopPage) < tonumber(startPage) then
+        ML:Print("Invalid page range: stop page (%d) must be >= start page (%d).", stopPage, startPage)
+        return
+    end
+
     resetAccumulator()
     self.scanning = true
     self.scanStartedAt = GetTime and GetTime() or 0
@@ -273,10 +282,17 @@ function S:StartScan(forcePaged, fullSellerScan, fastPaged)
         self.fastPaged = fastPaged == true
         self.sampleIndex = self.sellerFull and nil or 1
         resetSellerStats(self.sellerFull)
+        local rangeNote = ""
+        if self.sellerFull and (startPage or stopPage) then
+            self.page = math.max((tonumber(startPage) or 1) - 1, 0)
+            self.stopPage = stopPage and math.max(tonumber(stopPage) - 1, self.page) or nil
+            rangeNote = string.format(" (pages %d-%s)", self.page + 1,
+                self.stopPage and tostring(self.stopPage + 1) or "end")
+        end
         ML:Print(self.fastPaged
-            and "Running a fast full paged scan (accepting missing seller names; time-bounded)..."
+            and ("Running a fast full paged scan (accepting missing seller names; time-bounded)%s..."):format(rangeNote)
             or self.sellerFull
-            and "Running a full seller scan (paged AH scan; no time cap)..."
+            and ("Running a full seller scan (paged AH scan; no time cap)%s..."):format(rangeNote)
             or "Running a quick seller sample (spread across AH pages)...")
         driver:Show()
         self:QueryCurrentPage()
@@ -654,6 +670,12 @@ function S:ProcessPage()
         self.awaitingPage = false
         self.throttle = throttle
         return false
+    end
+
+    if self.stopPage and self.page >= self.stopPage then
+        self.partialScan = true
+        refreshSellerStats(totalPages)
+        return true
     end
 
     local nextStart = (self.page + 1) * PAGE_SIZE

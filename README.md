@@ -53,7 +53,7 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml` | Open / close the dashboard |
 | `/ml scan` | Run a full AH scan (must be at the Auction House) |
 | `/ml scan paged` | Classic Era/TBC Anniversary: run a quick seller sample across the AH (Get All omits seller names) |
-| `/ml scan paged fast` | Classic Era/TBC Anniversary: walk all pages at the server's allowed pace, accepting missing seller names; 20-minute default budget |
+| `/ml scan paged fast [start] [stop]` | Classic Era/TBC Anniversary: walk all pages at the server's allowed pace, accepting missing seller names; 20-minute default budget. Optional 1-based page range restricts the walk, e.g. `/ml scan paged fast 400` starts at page 400, `/ml scan paged fast 400 800` stops after page 800 |
 | `/ml scan sellers full` | Classic Era/TBC Anniversary: run an exhaustive paged seller scan for measurement |
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
@@ -89,6 +89,13 @@ retried, so seller counts remain observed counts, not a complete census. The
 server's query throttle still applies, and completion in minutes is not
 guaranteed. The default 20-minute budget stops the walk between pages; an
 unfinished walk updates seller profiles without replacing full AH item totals.
+
+On a realm too large to walk in one budget, pass a start/stop page (1-based,
+matching the page numbers shown in scan progress) to sweep a different section
+each run instead of always covering the same early pages and timing out at the
+same spot, e.g. `/ml scan paged fast 800` to resume past where the last run
+stopped, or `/ml scan paged fast 1 800` / `/ml scan paged fast 801 1600` to
+split a realm into deliberate chunks across multiple sessions.
 
 On Retail, `/ml scan` uses the browse-summary API: minimum price and total
 quantity are available, but individual auction and seller counts are not. The
