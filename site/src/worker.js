@@ -947,8 +947,15 @@ async function sellerPage(url, env) {
     const whHref = "https://www.wowhead.com/" + (whBranch ? whBranch + "/" : "") + "item=" + r.id;
     const vsCell = vs === null ? '<td class="mu" data-sort="">—</td>'
       : `<td data-sort="${vs}" class="${vs >= 0 ? "gr" : "rd"}">${vs >= 0 ? "+" : ""}${vs}%</td>`;
+    // No captured name -> item:<id> placeholder (see itemPage). Point the link
+    // itself at Wowhead with rename-on so its tooltip data replaces the text
+    // client-side, same as the item page title and the screener table.
+    const isPlaceholder = /^item:\d+$/.test(name);
+    const nameLink = isPlaceholder
+      ? `<a class="name" href="${whHref}" data-wh-rename-link="true">${esc(name)}</a>`
+      : `<a class="name" href="/item/${encodeURIComponent(slug)}?game=${gameHref("", game)}">${esc(name)}</a>`;
     return `<tr>
-      <td class="l"><a class="ic" href="${whHref}" tabindex="-1" aria-hidden="true"></a><a class="name" href="/item/${encodeURIComponent(slug)}?game=${gameHref("", game)}">${esc(name)}</a></td>
+      <td class="l"><a class="ic" href="${whHref}" tabindex="-1" aria-hidden="true"></a>${nameLink}</td>
       <td data-sort="${r.q || 0}">${(r.q || 0).toLocaleString()}</td>
       <td class="g" data-sort="${r.l || 0}">${gsc(r.l)}</td>
       <td class="mu" data-sort="${r.region || ""}">${gsc(r.region)}</td>
