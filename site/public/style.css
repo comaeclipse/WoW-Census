@@ -12,11 +12,6 @@ body{
   -webkit-font-smoothing:none; image-rendering:pixelated;
 }
 a{color:var(--blue)}
-.crt{position:fixed; inset:0; pointer-events:none; z-index:50;
-  background:repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
-  mix-blend-mode:multiply;}
-.crt::after{content:""; position:absolute; inset:0;
-  background:radial-gradient(ellipse at center, transparent 62%, rgba(0,0,0,.45) 100%);}
 .wrap{max-width:1080px; margin:0 auto; padding:22px 18px 60px; position:relative; z-index:1;}
 
 /* header / cabinet */
