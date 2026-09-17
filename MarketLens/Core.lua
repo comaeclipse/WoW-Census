@@ -235,6 +235,8 @@ SlashCmdList["MARKETLENS"] = function(msg)
         ML.Scanner:StartScan()
     elseif msg == "scan paged" then
         ML.Scanner:StartScan(true)
+    elseif msg == "scan paged fast" then
+        ML.Scanner:StartScan(true, true, true)
     elseif msg == "scan sellers full" then
         ML.Scanner:StartScan(true, true)
     elseif msg == "scan replicate" then

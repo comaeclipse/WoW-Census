@@ -53,6 +53,7 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml` | Open / close the dashboard |
 | `/ml scan` | Run a full AH scan (must be at the Auction House) |
 | `/ml scan paged` | Classic Era/TBC Anniversary: run a quick seller sample across the AH (Get All omits seller names) |
+| `/ml scan paged fast` | Classic Era/TBC Anniversary: walk all pages at the server's allowed pace, accepting missing seller names; 20-minute default budget |
 | `/ml scan sellers full` | Classic Era/TBC Anniversary: run an exhaustive paged seller scan for measurement |
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
@@ -80,6 +81,14 @@ treated as a complete seller-aware item snapshot. Use `/ml scan sellers full` to
 measure whether an exhaustive seller scan is practical on your realm; it uses the
 same local owner-resolution behavior but has no time cap and reports owner
 coverage plus projected full-scan timing as it runs.
+
+Use `/ml scan paged fast` for a full page walk without seller-resolution waits
+or added query delays. It accepts nil seller names immediately and reports the
+percentage of parsed auction rows with known owners. Missing names are not
+retried, so seller counts remain observed counts, not a complete census. The
+server's query throttle still applies, and completion in minutes is not
+guaranteed. The default 20-minute budget stops the walk between pages; an
+unfinished walk updates seller profiles without replacing full AH item totals.
 
 On Retail, `/ml scan` uses the browse-summary API: minimum price and total
 quantity are available, but individual auction and seller counts are not. The

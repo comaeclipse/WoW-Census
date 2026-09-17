@@ -210,7 +210,7 @@ function parseSellerMeta(raw) {
 }
 function sellerMetaLabel(meta) {
   if (!meta) return "seller scan";
-  return meta.partial ? "seller sample" : "full seller scan";
+  return meta.partial ? "paged seller sample" : "all-page seller scan";
 }
 async function fetchSellerMeta(env, game) {
   try {
@@ -929,23 +929,23 @@ async function sellerPage(url, env) {
   </header>
 
   <section class="istats">
-    ${stat("Items listed", (seller.items || 0).toLocaleString())}
-    ${stat("Total quantity", (seller.qty || 0).toLocaleString())}
-    ${stat("Listed value", gsc(seller.value), "g")}
-    ${stat("Usually lists", (avgItems || 0) + " items", "mu")}
+    ${stat("Observed items", (seller.items || 0).toLocaleString())}
+    ${stat("Observed quantity", (seller.qty || 0).toLocaleString())}
+    ${stat("Observed listed value", gsc(seller.value), "g")}
+    ${stat("Average observed items", (avgItems || 0) + " items", "mu")}
   </section>
 
   ${spark ? `<div class="panel"><div class="ptitle">LISTED VALUE OVER TIME</div>${spark}</div>` : ""}
 
   <div class="panel">
-    <div class="ptitle">${smeta && smeta.partial ? "LATEST SAMPLE LISTINGS" : "CURRENT LISTINGS"} <span class="mu">${listings.length} items</span></div>
+    <div class="ptitle">LATEST OBSERVED LISTINGS <span class="mu">${listings.length} items</span></div>
     <div class="tablewrap"><table>
       <thead><tr><th class="l">Item</th><th>Qty</th><th>Their Buyout</th><th>Region Avg</th><th>vs Region</th></tr></thead>
       <tbody>${rows || '<tr><td class="l" colspan="5" style="padding:18px;color:var(--muted)">No current listings.</td></tr>'}</tbody>
     </table></div>
   </div>
 
-  <p class="src">Seller data comes from a legacy paged AH ${esc(sellerLabel)} on ${esc(realmLabel)}${smeta ? ` (${smeta.scannedPages || 0}/${smeta.pages || 0} pages, ${smeta.ownerCoverage || 0}% owner coverage)` : ""}. A seller's listings reflect the latest imported seller data; "usually lists" averages the last ${hist.length || 0} samples.</p>
+  <p class="src">Seller data comes from a legacy paged AH ${esc(sellerLabel)} on ${esc(realmLabel)}${smeta ? ` (${smeta.scannedPages || 0}/${smeta.pages || 0} pages, ${smeta.ownerCoverage || 0}% seller-name coverage across the scan)` : ""}. Listings with unresolved seller names cannot be assigned to a profile, so this seller's items, quantity, and listed value may be understated. Scan coverage is not a completeness estimate for this individual seller. Listings reflect the latest imported observations, not confirmed sales or guaranteed current availability; average observed items uses the last ${hist.length || 0} samples.</p>
 </div>
 </body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=1800" } });

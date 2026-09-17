@@ -37,6 +37,7 @@ local function resetAccumulator()
     S.resolvePasses = 0  -- local re-reads for the current page's owner names
     S.sellerSample = false
     S.sellerFull = false
+    S.fastPaged = false
     S.partialScan = false
     S.scanStartedAt = nil
     S.scanStats = nil
@@ -48,6 +49,7 @@ local function resetSellerStats(full)
     S.scanStats = {
         id = nil,
         full = full == true,
+        fast = S.fastPaged == true,
         partial = false,
         pages = 0,
         scannedPages = 0,
@@ -211,9 +213,9 @@ function S:AtAuctionHouse()
 end
 
 -- forcePaged: skip Get All even when it's available. The bulk dump omits seller
--- names, so this runs a time-bounded legacy page walk that captures a seller
--- sample. It is intentionally not a full-market crawl on very large realms.
-function S:StartScan(forcePaged, fullSellerScan)
+-- names. By default this samples pages; fullSellerScan walks every page.
+-- fastPaged accepts unresolved owners and applies the seller time budget.
+function S:StartScan(forcePaged, fullSellerScan, fastPaged)
     if not self.eventDriverReady then
         ML:Print("Scanner initialization failed before its event handler loaded. Enable Lua errors and /reload.")
         return
@@ -268,9 +270,12 @@ function S:StartScan(forcePaged, fullSellerScan)
         self.mode = "paged"
         self.sellerSample = true
         self.sellerFull = fullSellerScan == true
+        self.fastPaged = fastPaged == true
         self.sampleIndex = self.sellerFull and nil or 1
         resetSellerStats(self.sellerFull)
-        ML:Print(self.sellerFull
+        ML:Print(self.fastPaged
+            and "Running a fast full paged scan (accepting missing seller names; time-bounded)..."
+            or self.sellerFull
             and "Running a full seller scan (paged AH scan; no time cap)..."
             or "Running a quick seller sample (spread across AH pages)...")
         driver:Show()
@@ -301,6 +306,9 @@ function S:Finish()
     -- counts look authoritative.
     if not (self.sellerSample and self.partialScan) then
         ML.realm.ownersAvailable = self.ownersSeen
+        if self.fastPaged and self.scanStats and (self.scanStats.missingOwnerRows or 0) > 0 then
+            ML.realm.ownersAvailable = false
+        end
         ML.realm.auctionsAvailable = self.auctionsAvailable ~= false
         ML.realm.priceDistributionAvailable = self.priceDistributionAvailable ~= false
     end
@@ -561,9 +569,9 @@ function S:ProcessPage()
     local shown, total = GetNumAuctionItems("list")
     shown = shown or 0
     total = total or 0
-    local throttle = ML.db.settings.scanThrottle or 0.5
+    local throttle = self.fastPaged and 0 or (ML.db.settings.scanThrottle or 0.5)
     local resolveDelay = ML.db.settings.ownerResolveDelay or 0.15
-    local resolvePasses = ML.db.settings.ownerResolvePasses or 2
+    local resolvePasses = self.fastPaged and 0 or (ML.db.settings.ownerResolvePasses or 2)
 
     -- Parse the page into a scratch list. On legacy paged scans (Classic
     -- Era / TBC) an auction's owner can be nil on the first
@@ -650,6 +658,13 @@ function S:ProcessPage()
 
     local nextStart = (self.page + 1) * PAGE_SIZE
     if nextStart < total and shown > 0 then
+        local budget = ML.db.settings.sellerSampleSeconds or 1200
+        if self.fastPaged and budget > 0 and GetTime
+            and GetTime() - (self.scanStartedAt or GetTime()) >= budget then
+            self.partialScan = true
+            refreshSellerStats(totalPages)
+            return true
+        end
         self.page = self.page + 1
         self.awaitingPage = false
         self.throttle = throttle
