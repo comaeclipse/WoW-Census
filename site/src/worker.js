@@ -191,6 +191,14 @@ function gameHref(prefix, g) {
 function esc(s) {
   return String(s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 }
+function hasInvalidEncoding(body) {
+  if (JSON.stringify(body).includes("\uFFFD")) return true;
+  if (!body || typeof body !== "object") return false;
+  const damagedName = (value) => typeof value === "string" && value.includes("?");
+  return (Array.isArray(body.characters) && body.characters.some(c => c && [c.k, c.fn, c.n].some(damagedName)))
+    || (Array.isArray(body.observations) && body.observations.some(o => Array.isArray(o) && damagedName(o[0])))
+    || (Array.isArray(body.sellers) && body.sellers.some(s => s && damagedName(s.o)));
+}
 function sellerMeta(body) {
   const m = (body && body.meta) || {};
   return {
@@ -317,10 +325,10 @@ function parseLine(line) {
   return out;
 }
 
-function json(data, ttl) {
+function json(data, ttl, status = 200) {
   const h = { "content-type": "application/json; charset=utf-8" };
   if (ttl) h["cache-control"] = `public, max-age=${ttl}`;
-  return new Response(JSON.stringify(data), { headers: h });
+  return new Response(JSON.stringify(data), { status, headers: h });
 }
 
 function todayBucket() {
@@ -442,6 +450,7 @@ async function importRealm(url, env, req) {
 
   let body;
   try { body = await req.json(); } catch (e) { return json({ error: "invalid json" }); }
+  if (hasInvalidEncoding(body)) return json({ error: "Invalid text encoding. Update the uploader and send UTF-8 JSON." }, 0, 400);
   if (!body || body.type !== "ml-realm-v1" || !body.realm || !body.items)
     return json({ error: "expected an ml-realm-v1 export from /ml export" });
   const realmName = regionGame === "retail" ? stripFaction(body.realm) : body.realm;
@@ -726,6 +735,7 @@ async function importPop(url, env, req) {
 
   let body;
   try { body = await req.json(); } catch (e) { return json({ error: "invalid json" }); }
+  if (hasInvalidEncoding(body)) return json({ error: "Invalid text encoding. Update the uploader and send UTF-8 JSON." }, 0, 400);
   if (!body || !["ml-pop-v1", "ml-pop-v2"].includes(body.type) || !body.realm || !Array.isArray(body.samples))
     return json({ error: "expected an ml-pop-v1 or ml-pop-v2 population export" });
   const game = "realm:" + body.realm;
@@ -800,6 +810,7 @@ async function importSellers(url, env, req) {
 
   let body;
   try { body = await req.json(); } catch (e) { return json({ error: "invalid json" }); }
+  if (hasInvalidEncoding(body)) return json({ error: "Invalid text encoding. Update the uploader and send UTF-8 JSON." }, 0, 400);
   if (!body || body.type !== "ml-sellers-v1" || !body.realm || !Array.isArray(body.sellers))
     return json({ error: "expected an ml-sellers-v1 seller export" });
   const realmName = regionGame === "retail" ? stripFaction(body.realm) : body.realm;

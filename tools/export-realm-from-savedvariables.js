@@ -96,6 +96,10 @@ function table() {
 
 const db = value();
 const realms = db.realms || {};
+if (process.argv.includes("--list-realms")) {
+  process.stdout.write(JSON.stringify(Object.keys(realms)));
+  process.exit(0);
+}
 const realmArg = process.argv.find((a) => a.startsWith("--realm="));
 const wanted = realmArg ? realmArg.slice(8) : null;
 if (wanted && !realms[wanted])

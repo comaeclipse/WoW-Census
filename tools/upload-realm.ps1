@@ -24,6 +24,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$OutputEncoding = New-Object System.Text.UTF8Encoding($false)
+[Console]::OutputEncoding = $OutputEncoding
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $flavorKey = $Flavor.ToLowerInvariant()
@@ -70,7 +72,7 @@ if (-not $files) {
 $file = $files | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 Write-Host "Reading $($file.FullName)"
 
-$content = Get-Content $file.FullName -Raw
+$content = Get-Content $file.FullName -Raw -Encoding UTF8
 if ($content -notmatch '\["export"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
     Write-Host "No export found in SavedVariables." -ForegroundColor Red
     Write-Host "In game: scan, then /reload (or log out) so the addon saves the export, then retry."
@@ -118,7 +120,7 @@ if (-not $Token) { $Token = Read-Host "REFRESH_TOKEN" }
 if ($Token) { Save-Token $Token }
 
 $uri = "$Url/admin/import-realm?token=$([uri]::EscapeDataString($Token))&region=$Region"
-$resp = Invoke-RestMethod -Uri $uri -Method Post -Body $json -ContentType "application/json"
+$resp = Invoke-RestMethod -Uri $uri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($json)) -ContentType "application/json; charset=utf-8"
 
 if ($resp.ok) {
     Write-Host ("Imported {0} items for {1}." -f $resp.items, $resp.realm) -ForegroundColor Green
@@ -151,7 +153,7 @@ if ($content -match '\["popExport"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
         if ($nSamples -gt 0 -or $nCharacters -gt 0) {
             $popUri = "$Url/admin/import-pop?token=$([uri]::EscapeDataString($Token))"
             try {
-                $pr = Invoke-RestMethod -Uri $popUri -Method Post -Body $popJson -ContentType "application/json"
+                $pr = Invoke-RestMethod -Uri $popUri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($popJson)) -ContentType "application/json; charset=utf-8"
                 if ($pr.ok) {
                     Write-Host ("Imported {0} population sample(s) and {1} character(s) for {2}." -f $pr.samples, $pr.characters, $pr.realm) -ForegroundColor Green
                     Write-Host ("Population: {0}/pop?game=realm:{1}" -f $Url, [uri]::EscapeDataString($pr.realm))
@@ -180,7 +182,7 @@ if ($node -and (Test-Path $helper)) {
             if ($nSellers -gt 0) {
                 $sellerUri = "$Url/admin/import-sellers?token=$([uri]::EscapeDataString($Token))&region=$Region"
                 try {
-                    $sr = Invoke-RestMethod -Uri $sellerUri -Method Post -Body $rebuiltSellers -ContentType "application/json"
+                    $sr = Invoke-RestMethod -Uri $sellerUri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($rebuiltSellers)) -ContentType "application/json; charset=utf-8"
                     if ($sr.ok) {
                         Write-Host ("Imported {0} seller(s) with {1} listing(s) for {2}." -f $sr.sellers, $sr.listings, $sr.realm) -ForegroundColor Green
                         if ($sr.meta) {
