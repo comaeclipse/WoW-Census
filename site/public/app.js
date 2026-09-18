@@ -241,6 +241,14 @@
       document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="' + COLS.length + '" style="padding:22px;color:var(--muted)">No data yet.</td></tr>';
       return;
     }
+    // Sorting by "deal" hides every item with no deal (see render()) -- fine
+    // when only some items lack region comparison data, but with none at all
+    // (e.g. a realm on a game the region collector doesn't track yet) that
+    // filter empties the whole table. Fall back to demand instead.
+    if (sortKey === "deal" && !ITEMS.some(function (it) { return it.deal != null; })) {
+      sortKey = defaultSortKey = "demand";
+      sortDir = -1;
+    }
     boot(data);
   }).catch(function () {
     document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="' + COLS.length + '" style="padding:22px;color:var(--red)">Failed to load data.</td></tr>';

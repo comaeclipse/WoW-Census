@@ -74,18 +74,22 @@ $file = $files | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 Write-Host "Reading $($file.FullName)"
 
 $content = Get-Content $file.FullName -Raw -Encoding UTF8
-if ($content -notmatch '\["export"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
-    Write-Host "No export found in SavedVariables." -ForegroundColor Red
-    Write-Host "In game: scan, then /reload (or log out) so the addon saves the export, then retry."
-    exit 1
-}
-# Un-escape the Lua string literal (\" -> ", \\ -> \).
-$json = [regex]::Replace($matches[1], '\\(.)', '$1')
 
-try { $obj = $json | ConvertFrom-Json } catch { Write-Host "Export isn't valid JSON." -ForegroundColor Red; exit 1 }
-if ($obj.type -ne "ml-realm-v1") {
-    Write-Host "Old export format. In game run /reload to load the current addon, then retry." -ForegroundColor Red
-    exit 1
+# The compact ["export"] string is just a cache RefreshExports writes on
+# logout/reload -- if that Lua call errored out (or hasn't run yet this
+# session) the string can be missing even though the realm tables it would
+# have summarized are sitting right there. Treat it as a best-effort hint,
+# not a hard gate: fall through to an empty placeholder and let the node
+# rebuild below (which reads those tables directly) do the real work.
+$obj = [PSCustomObject]@{ realm = $null; items = [PSCustomObject]@{} }
+$json = $null
+if ($content -match '\["export"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
+    $rawJson = [regex]::Replace($matches[1], '\\(.)', '$1')
+    try { $parsed = $rawJson | ConvertFrom-Json } catch { $parsed = $null }
+    if ($parsed -and $parsed.type -eq "ml-realm-v1") { $obj = $parsed; $json = $rawJson }
+}
+if (-not $json) {
+    Write-Host "No usable compact export in SavedVariables -- rebuilding directly from the saved realm tables instead." -ForegroundColor Yellow
 }
 
 # Rebuild from the authoritative realm tables rather than trusting the compact
@@ -134,23 +138,31 @@ if ($itemCount -lt 1) {
 }
 
 # The addon also writes a population export. Rebuild it from the authoritative
-# SavedVariables tables when possible so identity history cannot be stale.
+# SavedVariables tables when possible so identity history cannot be stale --
+# and attempt that rebuild even when the compact ["popExport"] cache string
+# itself is missing (same rationale as the item export above).
+$pop = $null
+$popJson = $null
 if ($content -match '\["popExport"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
     $popJson = [regex]::Replace($matches[1], '\\(.)', '$1')
     try { $pop = $popJson | ConvertFrom-Json } catch { $pop = $null }
-    $helper = Join-Path $scriptDir "export-realm-from-savedvariables.js"
-    $node = Get-Command node -ErrorAction SilentlyContinue
-    if ($node -and (Test-Path $helper)) {
-        $popArgs = @($helper, $file.FullName, "--population", "--flavor=$Flavor")
-        if ($Realm) { $popArgs += "--realm=$Realm" }
-        $rebuiltPop = & $node.Source @popArgs
-        if ($LASTEXITCODE -eq 0 -and $rebuiltPop) {
-            try {
-                $pop = $rebuiltPop | ConvertFrom-Json
-                $popJson = $rebuiltPop
-            } catch { $pop = $null }
-        }
+}
+$helper = Join-Path $scriptDir "export-realm-from-savedvariables.js"
+$node = Get-Command node -ErrorAction SilentlyContinue
+if ($node -and (Test-Path $helper)) {
+    $popArgs = @($helper, $file.FullName, "--population", "--flavor=$Flavor")
+    if ($Realm) { $popArgs += "--realm=$Realm" }
+    $rebuiltPop = & $node.Source @popArgs
+    if ($LASTEXITCODE -eq 0 -and $rebuiltPop) {
+        try {
+            $pop = $rebuiltPop | ConvertFrom-Json
+            $popJson = $rebuiltPop
+        } catch { $pop = $null }
     }
+}
+if (-not $popJson) {
+    Write-Host "No population data to rebuild from SavedVariables (probably no /who scan yet)." -ForegroundColor Yellow
+} else {
     if ($pop -and $pop.type -in @("ml-pop-v1", "ml-pop-v2") -and $pop.samples) {
         $nSamples = ($pop.samples | Measure-Object).Count
         $nCharacters = if ($pop.characters) { ($pop.characters | Measure-Object).Count } else { 0 }

@@ -24,7 +24,17 @@ const GAMES = {
   "classic-beta":        { label: "Forever (Beta)" },
 };
 const DEFAULT_GAME = "classic-progression";
-const ITEMS_CACHE_VERSION = 13;
+// TSM's public "classic-progression" region feed tracks its own long-running
+// progression realms, which have advanced well past TBC (into Cataclysm/MoP
+// content) -- confirmed against TSM's own dashboard and against real TBC
+// Anniversary auction data (which tops out around id 38466). Anything above
+// this cutoff can't be bought/sold/crafted on TBC Anniversary, so it's noise
+// for both the icon lookups (Wowhead's tbc branch can't resolve it) and the
+// demand signal (nobody is trading it here). Set well above TBC's actual
+// max (Sunwell Plateau loot tops out ~35700) to leave room for phases not
+// live yet, while staying well under Wrath+ item ids.
+const TBC_MAX_ITEM_ID = 41000;
+const ITEMS_CACHE_VERSION = 14;
 const REALM_CURRENT_AUCTION_MAX_AGE_SECONDS = 48 * 60 * 60;
 
 function sourceGameKey(flavor) {
@@ -382,6 +392,10 @@ async function collectGame(env, game) {
     if (f.length < 8) continue;
     const id = parseInt(f[0], 10);
     if (!id) continue;
+    // TSM's classic-progression feed carries items from well past TBC (see
+    // TBC_MAX_ITEM_ID above); skip them so they never enter the reference
+    // table this dataset's region view and the realm-upload name join read from.
+    if (game === "classic-progression" && id > TBC_MAX_ITEM_ID) continue;
     const name = f[1];
     const sr = +f[5] || 0, spd = +f[6] || 0;
     const hasDemand = sr > 0 || spd > 0;
@@ -650,8 +664,12 @@ async function apiItems(url, env, ctx) {
   const hit = await cache.match(key);
   if (hit) return hit;
 
+  // Rows past TBC_MAX_ITEM_ID predate this filter landing in collectGame (or
+  // are still sitting in the cache from before it deployed); exclude them at
+  // read time too so the fix is live immediately, not just on the next cron.
+  const idFilter = game === "classic-progression" ? " AND id<=" + TBC_MAX_ITEM_ID : "";
   const { results } = await env.DB.prepare(
-    "SELECT id,name,slug,mv,asp,sr,spd,q,sc,tc,hist,cat,src,crafter FROM items WHERE game=? ORDER BY spd DESC"
+    "SELECT id,name,slug,mv,asp,sr,spd,q,sc,tc,hist,cat,src,crafter FROM items WHERE game=?" + idFilter + " ORDER BY spd DESC"
   ).bind(game).all();
   const rows = results.map((r) => [r.id, r.name, r.slug, r.mv, r.asp, r.sr, r.spd, r.q, r.sc, r.tc, r.hist, r.cat, r.src, r.crafter]);
 
