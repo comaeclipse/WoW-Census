@@ -49,6 +49,12 @@ function sourceGameKey(flavor) {
   return null;
 }
 
+// Wowhead site branch per source flavor (empty = retail). Mirrors app.js's
+// WH_BRANCH map so region and realm-upload links agree on which Wowhead
+// branch resolves an item's icon/tooltip/rename data.
+const WH_BRANCH = { "classic-progression": "tbc", "classic": "classic", "retail": "", "classic-beta": "forever" };
+function whBranchFor(sourceGame) { return WH_BRANCH[sourceGame] != null ? WH_BRANCH[sourceGame] : "tbc"; }
+
 // Column order for the packed /api/items rows. Emitted in the response as
 // `columns` so scripts and LLMs can read the array-of-arrays without guessing.
 // mv/asp/hist are copper; sr is a 0-1 sale rate; spd is sold/day; q (quantity),
@@ -721,11 +727,16 @@ async function itemPage(url, env) {
 
   // No captured name -> item:<id> placeholder. Pull the real name from Wowhead
   // client-side (same source the screener's hover cards use). The branch mirrors
-  // app.js: realms and TBC Anniversary use the tbc site, Classic Era the classic
-  // site, retail the default.
+  // app.js: it's keyed off the dataset's underlying flavor (a realm upload's
+  // source_game), not the game/realm string itself.
   const isPlaceholder = /^item:\d+$/.test(row.name);
-  const whBranch = isRealm ? "tbc"
-    : ({ "classic-progression": "tbc", "classic": "classic", "retail": "" }[game] ?? "tbc");
+  let whBranch;
+  if (isRealm) {
+    const dataset = await env.DB.prepare("SELECT source_game FROM datasets WHERE game=?").bind(game).first();
+    whBranch = whBranchFor(dataset && dataset.source_game);
+  } else {
+    whBranch = whBranchFor(game);
+  }
   const whHref = "https://www.wowhead.com/" + (whBranch ? whBranch + "/" : "") + "item=" + row.id;
   const nameHtml = isPlaceholder
     ? `<a class="iname-wh" href="${whHref}" data-wh-rename-link="true">${esc(row.name)}</a>`
@@ -1039,7 +1050,7 @@ async function sellerPage(url, env) {
   const smeta = await fetchSellerMeta(env, game);
   const sellerLabel = sellerMetaLabel(smeta);
   const dataset = await env.DB.prepare("SELECT source_game FROM datasets WHERE game=?").bind(game).first();
-  const whBranch = ({ classic: "classic", "classic-progression": "tbc", retail: "" })[dataset && dataset.source_game] ?? "tbc";
+  const whBranch = whBranchFor(dataset && dataset.source_game);
   const lastSeen = seller.last_seen ? new Date(seller.last_seen * 1000).toISOString().slice(0, 10) : "—";
   const stat = (k, v, cls) => `<div class="tile"><div class="k">${esc(k)}</div><div class="v ${cls || ""}">${esc(v)}</div></div>`;
 
