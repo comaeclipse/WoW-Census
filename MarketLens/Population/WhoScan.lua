@@ -312,6 +312,32 @@ function Pop:Purge()
     return removed
 end
 
+-- Distinct zone names seen across every captured character in this realm
+-- bucket, with a count. Plain eyeballing of the roster to spot new/renamed
+-- zones (e.g. a fresh beta) instead of guessing against remembered zone lists.
+function Pop:DumpZones()
+    local store = ML.realm and ML.realm.population
+    local characters = store and store.characters
+    if not characters or not next(characters) then
+        ML:Print("No population data yet -- run /ml who first.")
+        return
+    end
+    local counts = {}
+    for _, c in pairs(characters) do
+        local zone = c.zone
+        if zone and zone ~= "" then
+            counts[zone] = (counts[zone] or 0) + 1
+        end
+    end
+    local zones = {}
+    for zone in pairs(counts) do zones[#zones + 1] = zone end
+    table.sort(zones)
+    ML:Print("%d distinct zone(s) captured for %s:", #zones, ML:RealmKey())
+    for _, zone in ipairs(zones) do
+        ML:Print("  %s (%d)", zone, counts[zone])
+    end
+end
+
 -- Unique-character metrics from the rolling observation window. These are
 -- characters, not Battle.net accounts; /who cannot associate alts or renames.
 function Pop:CharacterStats()

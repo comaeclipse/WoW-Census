@@ -253,6 +253,8 @@ SlashCmdList["MARKETLENS"] = function(msg)
     elseif msg == "who" or msg:match("^who%s") then
         -- Slash execution is a hardware event, so SendWho is allowed here.
         ML.Population:Scan(raw:sub(4))
+    elseif msg == "zones" then
+        if ML.Population.DumpZones then ML.Population:DumpZones() end
     elseif msg == "purge" then
         local snaps = ML.Snapshots:Purge()
         local pops  = ML.Population:Purge()
