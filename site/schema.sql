@@ -1,29 +1,35 @@
 -- Two tables: latest snapshot per item (fast index + slug lookup), and a
 -- daily history row per item (the time series the graphs draw). History is
--- day-bucketed (ts = YYYYMMDD) with a composite PK so re-running the collector
--- on the same day replaces rather than duplicates.
+-- day-bucketed (ts = YYYYMMDD) with a composite PK so re-uploading a realm on
+-- the same day replaces rather than duplicates.
+--
+-- Only realm datasets ("realm:<Realm-Faction>", uploaded from the addon) carry
+-- market data. The mv/asp/sr/spd/hist columns predate that: sr/spd/hist are
+-- unused for realm rows, and rows keyed by a bare flavor ("classic-progression",
+-- "classic", "retail") are frozen leftovers kept only to resolve item names.
 
 CREATE TABLE IF NOT EXISTS items (
-  game       TEXT    NOT NULL,      -- classic-progression | classic | retail
+  game       TEXT    NOT NULL,      -- realm:<Realm-Faction> (or a legacy bare flavor key)
   id         INTEGER NOT NULL,      -- WoW item id
   name       TEXT    NOT NULL,
   slug       TEXT    NOT NULL,      -- url-safe name, e.g. fel-iron-ore
-  mv         INTEGER,               -- region market value (copper)
-  asp        INTEGER,               -- region avg sale price (copper)
-  sr         REAL,                  -- region sale rate 0..1
-  spd        REAL,                  -- region sold per day
-  hist       INTEGER,               -- TSM smoothed historical price (copper)
-  updated_at TEXT,                  -- upstream scan time (ISO)
-  q          INTEGER,               -- realm scan quantity (NULL for region datasets)
+  mv         INTEGER,               -- realm listed value = q * asp (copper)
+  asp        INTEGER,               -- realm buyout, weighted median unit price (copper)
+  sr         REAL,                  -- unused (legacy)
+  spd        REAL,                  -- unused (legacy)
+  hist       INTEGER,               -- unused (legacy)
+  updated_at TEXT,                  -- upload time (ISO)
+  q          INTEGER,               -- realm quantity listed in the latest scan
+  pq         INTEGER,               -- quantity in the scan before it (NULL when no earlier snapshot)
   sc         INTEGER,               -- realm seller count (NULL when unavailable)
   tc         INTEGER,               -- realm top-seller concentration 0-100 (NULL when sellers unknown)
-  cat        TEXT,                  -- addon-computed market (NULL for region datasets; site maps it to a chip)
+  cat        TEXT,                  -- addon-computed market (site maps it to a chip)
   src        TEXT,                  -- source axis: crafted | gathered | disenchant | ... (NULL when unknown)
   crafter    TEXT,                  -- producing/gathering profession for src (NULL when unknown)
   PRIMARY KEY (game, id)
 );
 CREATE INDEX IF NOT EXISTS idx_items_slug ON items(game, slug);
-CREATE INDEX IF NOT EXISTS idx_items_spd  ON items(game, spd DESC);
+CREATE INDEX IF NOT EXISTS idx_items_q    ON items(game, q DESC);
 
 CREATE TABLE IF NOT EXISTS history (
   game TEXT    NOT NULL,
@@ -33,6 +39,7 @@ CREATE TABLE IF NOT EXISTS history (
   asp  INTEGER,
   sr   REAL,
   spd  REAL,
+  q    INTEGER,                     -- quantity at each snapshot
   PRIMARY KEY (game, id, ts)
 );
 CREATE INDEX IF NOT EXISTS idx_history_item ON history(game, id, ts);

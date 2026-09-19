@@ -1,15 +1,15 @@
-// MarketLens Arcade — index screener. Region datasets and uploaded realms.
+// MarketLens Arcade — index screener for uploaded realm datasets.
 (function () {
   "use strict";
   var params = new URLSearchParams(location.search);
-  var game = params.get("game") || "classic-progression";
+  var game = params.get("game") || "";
   var isRealm = game.indexOf("realm:") === 0;
 
-  // Wowhead site branch per dataset (empty = retail). Its tooltips.js reads this
-  // path off each link to pick the right icon + tooltip data. Uploaded realm
+  // Wowhead site branch per source flavor (empty = retail). Its tooltips.js reads
+  // this path off each link to pick the right icon + tooltip data. Uploaded realm
   // datasets receive their source flavor from the API.
   var WH_BRANCH = { "classic-progression": "tbc", "classic": "classic", "retail": "", "classic-beta": "forever" };
-  var whBranch = isRealm ? "tbc" : (WH_BRANCH[game] != null ? WH_BRANCH[game] : "tbc");
+  var whBranch = "tbc";
   function whItem(id) { return "https://www.wowhead.com/" + (whBranch ? whBranch + "/" : "") + "item=" + id; }
   function whRefresh() {
     if (window.$WowheadPower && $WowheadPower.refreshLinks) {
@@ -18,10 +18,6 @@
   }
 
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-  function scale100(v, mn, mx) { return mx === mn ? 0 : clamp((v - mn) / (mx - mn) * 100, 0, 100); }
-  function demand(sr, spd) {
-    return Math.round(clamp(0.75 * scale100(sr, 0, 0.5) + 0.25 * scale100(Math.log(1 + spd), 0, Math.log(101)), 0, 100));
-  }
   function gs(cop) {
     cop = Math.round(cop || 0);
     var g = Math.floor(cop / 10000), s = Math.floor((cop % 10000) / 100), c = cop % 100;
@@ -40,7 +36,6 @@
   // the realm name itself (spaces etc). Region games have no special chars.
   function gameParam(g) { return g.indexOf("realm:") === 0 ? "realm:" + encodeURIComponent(g.slice(6)) : encodeURIComponent(g); }
   function href(g) { return "/?game=" + gameParam(g); }
-  var GAME_LABEL = { "classic": "Classic Era", "classic-progression": "TBC Anniversary", "retail": "Retail" };
   var GAME_SHORT = { "classic": "Era", "classic-progression": "TBC", "retail": "Retail" };
   var GAME_ORDER = ["classic", "classic-progression", "retail"];
   function splitRealm(label) { var i = label.lastIndexOf("-"); return i > 0 ? [label.slice(0, i), label.slice(i + 1)] : [label, ""]; }
@@ -101,11 +96,6 @@
     if (market) { var m = MARKET_MAP[market]; if (m) return m; }
     return classify(name);
   }
-  function meter(d) {
-    var on = Math.round(d / 10), h = "";
-    for (var i = 0; i < 10; i++) h += i < on ? '<i class="' + (d >= 80 ? "hi" : "on") + '"></i>' : "<i></i>";
-    return h;
-  }
   function confidence(data) {
     var ageH = data.updatedAt ? (Date.now() - Date.parse(data.updatedAt)) / 3.6e6 : 999;
     var fresh = clamp((120 - ageH) / (120 - 24) * 100, 0, 100);
@@ -133,23 +123,19 @@
       '<div class="mdrop">' + items + '</div></div>';
   }
   function buildMenu(list) {
-    var region = {}, realms = { "classic": [], "classic-progression": [], "retail": [] }, other = [];
+    var realms = { "classic": [], "classic-progression": [], "retail": [] }, other = [];
     var cur = null;
     list.forEach(function (x) {
       if (x.game === game) cur = x;
-      if (x.realm) { if (x.hasItems) (realms[x.sourceGame] ? realms[x.sourceGame] : other).push(x); }
-      else region[x.game] = x;
+      if (x.realm && x.hasItems) (realms[x.sourceGame] ? realms[x.sourceGame] : other).push(x);
     });
     // A realm belongs to its source game; a realm with no recorded flavor lands
     // in the catch-all until its next upload stamps one.
     var curSrc = cur && cur.sourceGame;
-    var activeGroup = isRealm ? (realms[curSrc] ? curSrc : "other") : game;
+    var activeGroup = isRealm ? (realms[curSrc] ? curSrc : "other") : "";
 
     var html = GAME_ORDER.map(function (gm) {
-      var items = "";
-      if (region[gm]) items += '<a class="mitem reg" href="' + href(gm) + '" aria-current="' + (game === gm) + '">Region screener</a>';
-      if (realms[gm].length) items += '<div class="msep"></div>' + realmItems(realms[gm]);
-      return group(GAME_SHORT[gm] || gm, activeGroup === gm, items);
+      return realms[gm].length ? group(GAME_SHORT[gm] || gm, activeGroup === gm, realmItems(realms[gm])) : "";
     }).join("");
     if (other.length) html += group("Realms", activeGroup === "other", realmItems(other));
     html += '<a class="mtop" href="/pop">Population</a>';
@@ -157,16 +143,24 @@
     document.getElementById("games").innerHTML = html;
   }
 
+  // There is no cross-realm screener: a bare "/" (or a stale region link) goes to
+  // the realm that was uploaded most recently.
+  function goToLatestRealm(list) {
+    var realms = list.filter(function (x) { return x.realm && x.hasItems; })
+      .sort(function (a, b) { return String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")); });
+    if (realms.length) { location.replace(href(realms[0].game)); return; }
+    document.getElementById("meta").innerHTML = "no data yet";
+    document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="' + COLS.length + '" style="padding:22px;color:var(--muted)">No realm data has been uploaded yet.</td></tr>';
+  }
+
   fetch("/api/games").then(function (r) { return r.json(); }).then(function (g) {
     buildMenu(g.games || []);
+    if (!isRealm) goToLatestRealm(g.games || []);
   }).catch(function () {
-    document.getElementById("games").innerHTML =
-      GAME_ORDER.map(function (gm) {
-        return '<a class="game" href="' + href(gm) + '" aria-current="' + (gm === game) + '">' + (GAME_SHORT[gm] || gm) + "</a>";
-      }).join("") + '<a class="game" href="/pop">Population</a>';
+    document.getElementById("games").innerHTML = '<a class="game" href="/pop">Population</a>';
   });
 
-  var defaultSortKey = isRealm ? "deal" : "demand";
+  var defaultSortKey = "q";
   var ITEMS = [], curCat = params.get("cat") || "All", search = params.get("q") || "", CAP = 300;
   var sortKey = params.get("sort") || defaultSortKey;
   var sortDir = params.get("dir") === "asc" ? 1 : -1;
@@ -174,21 +168,12 @@
   // `w` fixes each column's width so sorting (which reorders rows and moves the
   // sort arrow) can't reflow the auto-layout and make the columns jump. The Item
   // column has no width and absorbs the remaining space. See table-layout:fixed.
-  var COLS = isRealm ? [
+  var COLS = [
     { k: "name", t: "Item", l: true },
     { k: "cat", t: "Market", l: true, w: 160 },
     { k: "asp", t: "Realm Buyout", w: 140 },
-    { k: "q", t: "Qty", w: 80 },
-    { k: "demand", t: "Demand", w: 150 },
-    { k: "deal", t: "vs Region", w: 110 },
-  ] : [
-    { k: "name", t: "Item", l: true },
-    { k: "cat", t: "Market", l: true, w: 160 },
-    { k: "demand", t: "Demand", w: 150 },
-    { k: "sr", t: "Rate", w: 80 },
-    { k: "spd", t: "Sold/Day", w: 100 },
-    { k: "asp", t: "Avg Sale (g/s)", w: 140 },
-    { k: "mv", t: "Mkt Val (g)", w: 120 },
+    { k: "q", t: "Qty", w: 90 },
+    { k: "dq", t: "% vs Last Scan", w: 150 },
   ];
   if (CATS.indexOf(curCat) < 0) curCat = "All";
   if (!COLS.some(function (c) { return c.k === sortKey; })) sortKey = defaultSortKey;
@@ -225,15 +210,15 @@
     });
   }
 
-  fetch("/api/items?game=" + encodeURIComponent(game)).then(function (r) { return r.json(); }).then(function (data) {
-    if (isRealm && WH_BRANCH[data.sourceGame] != null) whBranch = WH_BRANCH[data.sourceGame];
+  if (isRealm) fetch("/api/items?game=" + encodeURIComponent(game)).then(function (r) { return r.json(); }).then(function (data) {
+    if (WH_BRANCH[data.sourceGame] != null) whBranch = WH_BRANCH[data.sourceGame];
     ITEMS = (data.items || []).map(function (r) {
-      var o = { id: r[0], name: r[1], slug: r[2], mv: r[3], asp: r[4], sr: r[5], spd: r[6], q: r[7], sc: r[8], tc: r[9], hist: r[10] };
-      o.src = r[12] || null;      // crafted | gathered | disenchant | ...
-      o.crafter = r[13] || null;  // producing/gathering profession
-      o.cat = catFor(r[11], o.name, o.src);
-      o.demand = demand(o.sr, o.spd);
-      o.deal = (isRealm && o.hist > 0 && o.asp > 0) ? Math.round((o.hist - o.asp) / o.hist * 100) : null;
+      // Column order matches the API's `columns`: id,name,slug,mv,asp,q,pq,sc,tc,cat,src,crafter
+      var o = { id: r[0], name: r[1], slug: r[2], mv: r[3], asp: r[4], q: r[5] || 0, pq: r[6], sc: r[7], tc: r[8] };
+      o.src = r[10] || null;      // crafted | gathered | disenchant | ...
+      o.crafter = r[11] || null;  // producing/gathering profession
+      o.cat = catFor(r[9], o.name, o.src);
+      o.dq = qtyChange(o.q, o.pq);
       return o;
     });
     if (!ITEMS.length) {
@@ -241,55 +226,46 @@
       document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="' + COLS.length + '" style="padding:22px;color:var(--muted)">No data yet.</td></tr>';
       return;
     }
-    // Sorting by "deal" hides every item with no deal (see render()) -- fine
-    // when only some items lack region comparison data, but with none at all
-    // (e.g. a realm on a game the region collector doesn't track yet) that
-    // filter empties the whole table. Fall back to demand instead.
-    if (sortKey === "deal" && !ITEMS.some(function (it) { return it.deal != null; })) {
-      sortKey = defaultSortKey = "demand";
-      sortDir = -1;
-    }
     boot(data);
   }).catch(function () {
     document.getElementById("rows").innerHTML = '<tr><td class="l" colspan="' + COLS.length + '" style="padding:22px;color:var(--red)">Failed to load data.</td></tr>';
   });
 
+  // % change in listed quantity since the previous scan. null = no earlier scan
+  // to compare with; Infinity = the item wasn't listed then but is now.
+  function qtyChange(q, pq) {
+    if (pq == null) return null;
+    if (pq > 0) return (q - pq) / pq * 100;
+    return q > 0 ? Infinity : null;
+  }
+  function fmtPct(d) { return (d >= 0 ? "+" : "") + Math.round(d) + "%"; }
+
   function boot(data) {
-    var top = ITEMS.slice().sort(function (a, b) { return b.demand - a.demand; })[0];
     var c = confidence(data);
     var ageStr = c.ageH < 48 ? Math.round(c.ageH) + "h" : Math.round(c.ageH / 24) + "d";
-    var scope = isRealm ? "REALM <b>" + esc(game.slice(6)) + "</b>" : "REGION <b>US</b>";
     document.getElementById("meta").innerHTML =
-      scope + " &middot; " + ITEMS.length.toLocaleString() + " items<br>" +
+      "REALM <b>" + esc(game.slice(6)) + "</b> &middot; " + ITEMS.length.toLocaleString() + " items<br>" +
       '<span style="font-size:15px">DATA CONFIDENCE ' + bar(c.pct) +
       '<b style="color:' + (c.pct >= 70 ? "var(--green)" : c.pct >= 40 ? "var(--gold)" : "var(--red)") + '">' + c.pct + '%</b></span><br>' +
       '<span style="font-size:15px;color:var(--muted)">updated ' + ageStr + ' ago &middot; ' + c.days + ' day' + (c.days === 1 ? "" : "s") + ' history</span>';
 
-    if (isRealm) {
-      // Retail market is faction-agnostic; its population lives under per-faction
-      // keys, so point at the chooser rather than a single faction.
-      var popHref = data.sourceGame === "retail" ? "/pop" : "/pop?game=" + gameParam(game);
-      document.getElementById("meta").innerHTML +=
-        '<br><a href="' + popHref + '" style="font-size:15px">&#9654; POPULATION SURVEY</a>';
-    }
-    if (isRealm) {
-      var bestDeal = ITEMS.filter(function (x) { return x.deal != null; }).sort(function (a, b) { return b.deal - a.deal; })[0];
-      var value = ITEMS.reduce(function (s, x) { return s + (x.mv || 0); }, 0);
-      document.getElementById("tiles").innerHTML =
-        tile("Items on realm", ITEMS.length.toLocaleString(), "with region demand data") +
-        tile("Hottest item", top.name, "demand " + top.demand + "/100", "gr") +
-        tile("Best deal", bestDeal ? bestDeal.name : "—", bestDeal ? "+" + bestDeal.deal + "% vs region" : "", "gr") +
-        tile("Listed value", big(value) + "g", "on the auction house");
-    } else {
-      var move = {}, turn = 0;
-      ITEMS.forEach(function (it) { move[it.cat] = (move[it.cat] || 0) + it.spd; turn += it.spd * it.asp; });
-      var busiest = Object.keys(move).filter(function (k) { return k !== "Other"; }).sort(function (a, b) { return move[b] - move[a]; })[0];
-      document.getElementById("tiles").innerHTML =
-        tile("Items tracked", ITEMS.length.toLocaleString(), "with region sale data") +
-        tile("Hottest item", top.name, "demand " + top.demand + "/100", "gr") +
-        tile("Busiest market", busiest, Math.round(move[busiest]).toLocaleString() + " sold / day") +
-        tile("Region turnover", big(turn) + "g", "changing hands / day");
-    }
+    // Retail market is faction-agnostic; its population lives under per-faction
+    // keys, so point at the chooser rather than a single faction.
+    var popHref = data.sourceGame === "retail" ? "/pop" : "/pop?game=" + gameParam(game);
+    document.getElementById("meta").innerHTML +=
+      '<br><a href="' + popHref + '" style="font-size:15px">&#9654; POPULATION SURVEY</a>';
+
+    // Biggest movers: only items that had a meaningful stack last scan, so a
+    // 1 -> 3 blip doesn't outrank a real supply swing.
+    var movers = ITEMS.filter(function (x) { return x.pq >= 10 && isFinite(x.dq); });
+    var rise = movers.slice().sort(function (a, b) { return b.dq - a.dq; })[0];
+    var fall = movers.slice().sort(function (a, b) { return a.dq - b.dq; })[0];
+    var value = ITEMS.reduce(function (s, x) { return s + (x.mv || 0); }, 0);
+    document.getElementById("tiles").innerHTML =
+      tile("Items on realm", ITEMS.length.toLocaleString(), "listed in the latest scan") +
+      tile("Listed value", big(value) + "g", "on the auction house") +
+      tile("Biggest stock rise", rise && rise.dq > 0 ? rise.name : "\u2014", rise && rise.dq > 0 ? fmtPct(rise.dq) + " since last scan" : "", "gr") +
+      tile("Biggest stock drop", fall && fall.dq < 0 ? fall.name : "\u2014", fall && fall.dq < 0 ? fmtPct(fall.dq) + " since last scan" : "");
     document.getElementById("chips").innerHTML = CATS.map(function (ct) {
       return '<button class="chip" data-cat="' + esc(ct) + '" aria-pressed="' + (ct === curCat) + '">' + esc(ct) + "</button>";
     }).join("");
@@ -312,9 +288,11 @@
       return '<th class="' + (c.l ? "l" : "") + '" data-k="' + c.k + '">' + c.t + " " + ar + "</th>";
     }).join("");
   }
-  function dealCell(d) {
+  function qtyCell(d) {
     if (d == null) return '<td class="mu">--</td>';
-    return '<td class="' + (d >= 0 ? "gr" : "rd") + '">' + (d >= 0 ? "+" : "") + d + "%</td>";
+    if (d === Infinity) return '<td class="gr">new</td>';
+    var r = Math.round(d);
+    return '<td class="' + (r > 0 ? "gr" : r < 0 ? "rd" : "mu") + '">' + (r > 0 ? "+" : "") + r + "%</td>";
   }
   // Source axis badge: where an item's supply comes from, and (for crafted /
   // gathered) the profession that produces it -- the "can a seller make more?"
@@ -338,13 +316,13 @@
     var rows = ITEMS.filter(function (it) {
       if (curCat !== "All" && it.cat !== curCat) return false;
       if (q && it.name.toLowerCase().indexOf(q) < 0) return false;
-      if (sortKey === "deal" && it.deal == null) return false; // hide non-deals when sorting deals
       return true;
     });
     rows.sort(function (a, b) {
       var x = a[sortKey], y = b[sortKey];
       if (x == null) x = -Infinity; if (y == null) y = -Infinity;
-      return typeof x === "string" ? sortDir * x.localeCompare(y) : sortDir * (x - y);
+      if (typeof x === "string") return sortDir * x.localeCompare(y);
+      return x === y ? 0 : sortDir * (x < y ? -1 : 1);
     });
     var shown = rows.slice(0, CAP), h = "";
     for (var i = 0; i < shown.length; i++) {
@@ -352,8 +330,8 @@
       var ic = '<a class="ic" href="' + whItem(it.id) + '" tabindex="-1" aria-hidden="true"></a>';
       var link;
       if (/^item:\d+$/.test(it.name)) {
-        // No captured name (the addon scan never cached it and region data
-        // doesn't cover this item), so it's an item:<id> placeholder. Point the
+        // No captured name (the addon scan never cached it and no reference
+        // name is known for this item), so it's an item:<id> placeholder. Point the
         // link at Wowhead with rename on — its tooltip data fills the real name
         // client-side (same source as the hover card). A click still routes to
         // our own item page via the delegated handler below.
@@ -362,17 +340,9 @@
       } else {
         link = '<a class="name" href="/item/' + encodeURIComponent(it.slug || it.id) + '?game=' + gameParam(game) + '">' + esc(it.name) + "</a>";
       }
-      var dm = '<td><span class="meter">' + meter(it.demand) + '</span><span class="dv ' + (it.demand >= 80 ? "g" : it.demand >= 45 ? "gr" : "mu") + '">' + it.demand + "</span></td>";
-      if (isRealm) {
-        h += "<tr><td class=\"l\">" + ic + link + "</td>" + catCell(it) +
-          '<td class="g">' + gs(it.asp) + "</td><td>" + (it.q || 0).toLocaleString() + "</td>" +
-          dm + dealCell(it.deal) + "</tr>";
-      } else {
-        h += "<tr><td class=\"l\">" + ic + link + "</td>" + catCell(it) + dm +
-          '<td class="' + (it.sr >= 0.35 ? "gr" : it.sr < 0.1 ? "rd" : "") + '">' + Math.round(it.sr * 100) + "%</td>" +
-          "<td>" + (it.spd >= 10 ? Math.round(it.spd) : it.spd.toFixed(1)) + "</td>" +
-          '<td class="g">' + gs(it.asp) + '</td><td class="mu">' + big(it.mv) + "</td></tr>";
-      }
+      h += "<tr><td class=\"l\">" + ic + link + "</td>" + catCell(it) +
+        '<td class="g">' + gs(it.asp) + "</td><td>" + (it.q || 0).toLocaleString() + "</td>" +
+        qtyCell(it.dq) + "</tr>";
     }
     document.getElementById("rows").innerHTML = h || '<tr><td class="l" colspan="' + COLS.length + '" style="padding:20px;color:var(--muted)">No items match.</td></tr>';
     whRefresh(); // re-scan the freshly rendered rows for Wowhead icons/tooltips

@@ -48,13 +48,6 @@ function Sat:Score(itemID)
     -- Local oversupply: a lot of units sitting on the realm.
     push(0.20, U.Scale100(latest.q, 50, 2000))
 
-    -- Region slow-mover: a low sale rate means demand can't absorb supply.
-    -- This is the strongest one-scan saturation signal.
-    local sr = ML.Region:SaleRate(itemID)
-    if sr then
-        push(0.30, U.Scale100(1 - sr, 0.5, 0.97)) -- sr 0.5 -> 0, sr 0.03 -> ~100
-    end
-
     -- Multi-scan signals (need history)
 
     local w = T:Primary(itemID)

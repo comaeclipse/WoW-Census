@@ -23,14 +23,14 @@ never claiming data it cannot observe — see *What it measures* below.
 MarketLens/   the in-game addon — drop this folder into Interface/AddOns
   MarketLens.toc, Core.lua
   AH/         Parser (one row), Scanner (paged scan + per-item aggregation)
-  Analytics/  Snapshots, Trends, Region, Demand, Saturation, Scores
+  Analytics/  Snapshots, Trends, Demand, Saturation, Scores
   Population/  WhoScan (/who sampling, storage, class→demand heuristic)
-  Data/       Professions, Categories, curated Items, TSM region datasets
+  Data/       Professions, Categories, curated Items, item sources
   UI/         MainFrame (drill-down engine), tables, Population, Tooltips, Minimap
   Utils/      Tables (stats), Money (copper formatting)
   Libs/       embedded LibStub + LibAHTab (native AH tab on modern clients)
 site/         Cloudflare Worker, D1 schema, and static frontend
-tools/        out-of-game scripts (TSM region fetch, realm/population upload)
+tools/        out-of-game scripts (realm/population upload, data builders)
 archive/      early prototypes
 ```
 
@@ -118,14 +118,7 @@ or for the Auction House to close; it does not invent a client-side timeout.
 
 ### Retail data workflow
 
-Generate the Retail region reference once, and refresh it whenever you want a
-new regional sale-rate snapshot:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\update-data.ps1 -Flavor retail
-```
-
-Then `/reload`, open the Retail Auction House, run `/ml scan`, and wait for the
+`/reload`, open the Retail Auction House, run `/ml scan`, and wait for the
 summary scan to complete. Run `/reload` again to flush the export to disk. To
 send that realm snapshot to the companion site:
 
@@ -137,10 +130,9 @@ Use `-Flavor tbc-anniversary` for TBC Anniversary, `-Flavor classic-era` for
 Classic Era, or `-Flavor retail` for Retail. `-Flavor classic` is retained as a
 legacy alias for TBC Anniversary uploads.
 
-The first scan immediately supplies market, minimum buyout, quantity,
-saturation, regional demand, and local-vs-region analysis. Local supply and
-price trends become meaningful after repeated scans over several hours or
-days. Seller concentration, individual-auction turnover, and true price-depth
+The first scan immediately supplies market, minimum buyout, quantity, and
+saturation. Demand, local supply, and price trends become meaningful after
+repeated scans over several hours or days. Seller concentration, individual-auction turnover, and true price-depth
 statistics remain unavailable from a Retail summary scan and are shown as
 unavailable rather than zero.
 
@@ -155,31 +147,6 @@ Blizzard's Classic API exposes **listings**, not sales. MarketLens is rigorous a
 
 Until an item has `minimumSamples` (default 3) snapshots *and* a comparison window,
 its Demand/Opportunity shows "collecting data".
-
-## Region demand data (TradeSkillMaster)
-
-Local scans can't observe actual sales. To fix that, MarketLens can import
-**TradeSkillMaster's public region data** (`saleRate`, `soldPerDay`,
-`avgSalePrice`) — real sell-through data TSM publishes as free, key-less CSVs.
-
-WoW addons can't fetch URLs, so a small out-of-game script does the download
-(the same trick TSM's own desktop app uses):
-
-```
-tools/update-data.ps1
-```
-
-Right-click → Run with PowerShell (or `powershell -File tools\update-data.ps1`).
-It writes `MarketLens/Data/TSMRegion.lua`; `/reload` in-game to pick it up.
-Re-run it when you want fresh data (the region file updates ~daily). Options:
-`-Region eu`, `-Flavor tbc-anniversary`, `-Flavor classic-era`, `-Flavor retail`,
-`-GameType <TSM slug>`, `-Out <path>`.
-
-When present, region data becomes the **authoritative demand signal** (tooltips
-tag it `(region)` vs `(local)`), and MarketLens computes a **local-vs-region deal
-signal** — items cheaper on your realm than they sell for region-wide. Data is
-attributed to TSM in the UI. Without it, MarketLens falls back to local demand
-inference. Source: <https://public-data.tradeskillmaster.com>.
 
 ## Observed population (`/who` sampling)
 

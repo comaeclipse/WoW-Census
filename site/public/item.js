@@ -1,10 +1,11 @@
-// MarketLens item page — draws region price history (SVG) and, when present,
-// overlays your own realm history imported from the addon's /ml export.
+// MarketLens item page — draws the realm's price + quantity history (SVG) and,
+// when present, overlays your own realm history imported from the addon's
+// /ml export.
 (function () {
   "use strict";
   var ITEM = window.ITEM || {};
   var PTS = (window.POINTS || []).map(function (p) {
-    return { d: ymdToMs(p.ts), asp: p.asp || 0, mv: p.mv || 0, sr: p.sr || 0 };
+    return { d: ymdToMs(p.ts), asp: p.asp || 0, mv: p.mv || 0, q: p.q || 0 };
   });
 
   // No captured name -> the H1 link (.iname-wh) has data-wh-rename-link so
@@ -70,7 +71,7 @@
 
   if (PTS.length === 0) {
     chart.innerHTML = '<div style="padding:40px 10px;text-align:center;color:var(--muted)">No history yet.</div>';
-    hint.textContent = "HISTORY STARTS BUILDING FROM THE SITE'S FIRST DAILY COLLECTION.";
+    hint.textContent = "HISTORY BUILDS UP AS SCANS ARE UPLOADED.";
     mountImport();
     return;
   }
@@ -92,11 +93,11 @@
     if (REALM) REALM.forEach(function (p) { vals.push(p.w); });
     vals = vals.filter(function (v) { return v > 0; });
     var vMax = vals.length ? Math.max.apply(null, vals) : 1;
-    var srMax = Math.max.apply(null, PTS.map(function (p) { return p.sr; }).concat([0.1]));
+    var qMax = Math.max.apply(null, PTS.map(function (p) { return p.q; }).concat([1]));
 
     function x(d) { return pl + (dMax === dMin ? 0.5 : (d - dMin) / (dMax - dMin)) * iw; }
     function yv(v) { return pt + ih - (v / vMax) * ih; }
-    function ys(s) { return pt + ih - (s / srMax) * ih; }
+    function yq(n) { return pt + ih - (n / qMax) * ih; }
 
     var svg = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" role="img" aria-label="price history">';
     for (var g = 0; g <= 4; g++) {
@@ -111,7 +112,7 @@
     });
 
     svg += line(PTS, function (p) { return x(p.d); }, function (p) { return yv(p.mv); }, "var(--blue)", 2);
-    svg += line(PTS, function (p) { return x(p.d); }, function (p) { return ys(p.sr); }, "var(--green)", 2, "3 3");
+    svg += line(PTS, function (p) { return x(p.d); }, function (p) { return yq(p.q); }, "var(--green)", 2, "3 3");
     svg += line(PTS, function (p) { return x(p.d); }, function (p) { return yv(p.asp); }, "var(--gold)", 3);
     if (REALM) svg += line(REALM, function (p) { return x(p.d); }, function (p) { return yv(p.w); }, "var(--gold)", 2, "6 4");
 
@@ -122,8 +123,8 @@
 
     document.getElementById("range").textContent = "· " + fmtDate(dMin) + "–" + fmtDate(dMax) + " · " + PTS.length + " day" + (PTS.length === 1 ? "" : "s");
     hint.innerHTML = PTS.length < 3
-      ? "ONLY " + PTS.length + " SNAPSHOT" + (PTS.length === 1 ? "" : "S") + " SO FAR — THE TREND FILLS IN AS THE DAILY COLLECTOR RUNS."
-      : (REALM ? "DASHED GOLD = YOUR REALM (imported). SOLID = REGION-WIDE." : "");
+      ? "ONLY " + PTS.length + " DAY" + (PTS.length === 1 ? "" : "S") + " OF SCANS SO FAR — THE TREND FILLS IN AS MORE SCANS ARE UPLOADED."
+      : "DASHED GREEN = QUANTITY LISTED (SCALED TO ITS OWN MAX)." + (REALM ? " DASHED GOLD = YOUR IMPORTED /ml EXPORT." : "");
   }
 
   function line(data, fx, fy, color, w, dash) {

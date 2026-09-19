@@ -13,7 +13,6 @@ ML.Scanner    = ML.Scanner    or {}
 ML.Parser     = ML.Parser     or {}
 ML.Snapshots  = ML.Snapshots  or {}
 ML.Trends     = ML.Trends     or {}
-ML.Region     = ML.Region     or {}
 ML.Demand     = ML.Demand     or {}
 ML.Saturation = ML.Saturation or {}
 ML.Scores     = ML.Scores     or {}

@@ -29,33 +29,18 @@ function Dem:Label(score)
     return "Very Low", ""
 end
 
--- Region (TSM) demand: authoritative, from saleRate + soldPerDay. Available the
--- moment data is imported, no local history required.
-local function regionScore(itemID)
-    local sr  = ML.Region:SaleRate(itemID) or 0
-    local spd = ML.Region:SoldPerDay(itemID) or 0
-    local rate = U.Scale100(sr, 0, 0.5)                                -- 0.5+ sells -> 100
-    local vol  = U.Scale100(math.log(1 + spd), 0, math.log(1 + 100))  -- volume, log-scaled
-    return U.Round(U.Clamp(0.75 * rate + 0.25 * vol, 0, 100))
-end
-
--- Returns score(0-100), label, samples, source ("region"|"local"). When neither
--- region data nor enough local history exists, score is nil ("collecting").
+-- Returns score(0-100), label, samples. Until enough local history exists the
+-- score is nil ("collecting").
 function Dem:Score(itemID)
-    if ML.Region:HasData(itemID) then
-        local score = regionScore(itemID)
-        return score, (self:Label(score)), nil, "region"
-    end
-
     local samples = Snap:SampleCount(itemID)
     local minimum = ML.db.settings.minimumSamples or 3
     if samples < minimum then
-        return nil, "Collecting data", samples, "local"
+        return nil, "Collecting data", samples
     end
 
     local w = T:Primary(itemID)
     if not w then
-        return nil, "Collecting data", samples, "local"
+        return nil, "Collecting data", samples
     end
 
     local supplyScore = U.Scale100(-w.supplyPct, 0, 0.5)          -- 50% drain -> 100
@@ -87,5 +72,5 @@ function Dem:Score(itemID)
 
     score = U.Round(U.Clamp(score, 0, 100))
     local label = self:Label(score)
-    return score, label, samples, "local"
+    return score, label, samples
 end

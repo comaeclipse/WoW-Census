@@ -123,50 +123,6 @@ function IT:Rows(model, nav)
     return out
 end
 
--- Deals view: local price vs region average sale
-
-function IT:DealColumns()
-    return {
-        { label = "Item",       width = 168, justify = "LEFT"  },
-        { label = "Your buyout",width = 84,  justify = "RIGHT" },
-        { label = "Region avg", width = 84,  justify = "RIGHT" },
-        { label = "Margin",     width = 60,  justify = "RIGHT" },
-        { label = "Rate",       width = 48,  justify = "RIGHT" },
-        { label = "Sold/day",   width = 58,  justify = "RIGHT" },
-    }
-end
-
-function IT:DealRows(model)
-    local rows = {}
-    for _, row in pairs(model.items) do
-        -- Only real opportunities: cheaper here than region-wide, and it sells.
-        if row.dealPct and row.dealPct >= 0.10
-            and (row.saleRate or 0) >= 0.05
-            and row.latest.l and row.latest.l > 0 then
-            row._dealScore = row.dealPct * (row.saleRate or 0)
-            rows[#rows + 1] = row
-        end
-    end
-    table.sort(rows, function(a, b) return a._dealScore > b._dealScore end)
-
-    local out = {}
-    for _, row in ipairs(rows) do
-        out[#out + 1] = {
-            itemID = row.itemID,
-            icon   = itemIcon(row.itemID),
-            cells  = {
-                itemName(row),
-                U.MoneyShort(row.latest.l),
-                U.MoneyShort(row.regionAvg),
-                string.format("|cff40c040+%.0f%%|r", row.dealPct * 100),
-                string.format("%.0f%%", (row.saleRate or 0) * 100),
-                string.format("%.1f", row.soldPerDay or 0),
-            },
-        }
-    end
-    return out
-end
-
 -- Flat views across every item.
 function IT:FlatRows(model, mode)
     local rows = {}

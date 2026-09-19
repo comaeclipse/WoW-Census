@@ -1,15 +1,15 @@
 # MarketLens site (Cloudflare Workers + D1)
 
-An 8-bit auction-house screener with per-item pages and historical price graphs,
-powered by TradeSkillMaster's public region data. The Worker fetches the CSVs
-server-side (they send no CORS header, so a browser can't), stores a daily
-snapshot per item in D1, and serves the site.
+An 8-bit auction-house screener with per-item pages and historical price and
+quantity graphs, built from realm scans the MarketLens addon uploads
+(`POST /admin/import-realm`, see `tools/upload-realm.ps1`). The Worker stores the
+latest snapshot per item plus a daily history row in D1 and serves the site.
 
 ```
 site/
-├── wrangler.toml      config: assets, D1 binding, daily cron, GAMES
+├── wrangler.toml      config: assets, D1 binding
 ├── schema.sql         items (latest) + history (daily time series)
-├── src/worker.js      routing, JSON API, SSR item pages, cron collector
+├── src/worker.js      routing, JSON API, SSR item pages, realm import
 └── public/            index.html · app.js · item.js · style.css
 ```
 
@@ -17,14 +17,14 @@ site/
 
 | Route | What |
 | --- | --- |
-| `/` | arcade screener (reads `/api/items`) |
-| `/item/<slug>` or `/item/<id>` | item page + price-history graph |
-| `/api/items?game=` | latest snapshot for a dataset (JSON, edge-cached 1h) |
+| `/` | arcade screener for a realm (reads `/api/items`); bare `/` redirects to the most recently uploaded realm |
+| `/item/<slug>` or `/item/<id>` | item page + price/quantity history graph |
+| `/api/items?game=realm:<name>` | latest snapshot for a realm (JSON, edge-cached 1h) |
 | `/api/history?game=&id=` | daily time series for one item |
-| `/admin/refresh?token=&game=` | manual collect (seed after deploy) |
-| cron `0 10 * * *` | collect every dataset in `GAMES` |
+| `/admin/import-realm?token=&region=` | upload a realm's `/ml export` |
 
-Datasets (`GAMES` in wrangler.toml): `classic-progression`, `classic`, `retail` (region US).
+The screener's last column is the % change in listed quantity since the previous
+scan (`items.pq` holds that scan's quantity).
 
 ## Deploy
 
@@ -42,26 +42,22 @@ wrangler d1 execute marketlens --remote --file=schema.sql
 # existing databases: apply new migration files as they appear
 wrangler d1 execute marketlens --remote --file=migrate-seller-meta.sql
 
-# 3. set the admin token used by /admin/refresh
+# 3. set the admin token used by the /admin/* endpoints
 wrangler secret put REFRESH_TOKEN     # type any long random string
 
 # 4. deploy
 wrangler deploy
-
-# 5. seed now (don't wait for the cron). One call per dataset:
-curl "https://marketlens.<you>.workers.dev/admin/refresh?token=YOURTOKEN&game=classic-progression"
-curl "https://marketlens.<you>.workers.dev/admin/refresh?token=YOURTOKEN&game=classic"
-curl "https://marketlens.<you>.workers.dev/admin/refresh?token=YOURTOKEN&game=retail"
 ```
 
-Then open the Worker URL. Add a custom domain in the Cloudflare dashboard
+Then upload a realm scan with `tools/upload-realm.ps1` and open the Worker URL. Add a custom domain in the Cloudflare dashboard
 (Workers → your worker → Domains & Routes) to get e.g. `marketlens.dev/item/fel-iron-ore`.
 
 ## History
 
-Graphs accrue **forward** — one snapshot per item per UTC day. There is no past
-data to import (TSM's `historical` column is a single smoothed number, not a
-series), so a fresh item shows one point until the collector has run a few days.
+Graphs come from the snapshots in each upload: the addon keeps up to ~14 days of
+scans per item and every upload replays them, bucketed per UTC day (several scans
+on one day collapse into that day's last one). The screener's "% vs last scan"
+uses the item's previous snapshot itself, so same-day scans still count.
 
 Your **own realm** history is available immediately: in game run `/ml export`,
 copy, and paste it into the "overlay your realm history" box on any item page
@@ -69,10 +65,9 @@ copy, and paste it into the "overlay your realm history" box on any item page
 
 ## Notes / free-tier
 
-- D1 free tier allows 100k row writes/day. One daily collection of all three
-  datasets is well under that. If you add many datasets or collect more often,
-  either drop some from `GAMES` or move the cron to per-game schedules.
-- `retail` is the largest file (~2.4 MB). If a single cron run times out, give
-  each dataset its own cron that calls `/admin/refresh?game=...`.
-- Porting to other regions/versions is just more entries in `GAMES` + the
-  `GAMES` list in `public/app.js` — the CSV schema is identical across them.
+- D1 free tier allows 100k row writes/day. Each realm upload rewrites that
+  realm's `items` rows and replays its snapshot history, so very frequent
+  uploads of large realms add up.
+- Rows keyed by a bare flavor (`classic-progression`, `classic`, `retail`) are
+  frozen leftovers from the retired region collector. They're read only to look
+  up item names for items the addon didn't cache.

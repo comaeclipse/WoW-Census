@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MarketLens Arcade</title>
-<meta name="description" content="8-bit auction-house market screener powered by TradeSkillMaster region data.">
+<meta name="description" content="8-bit auction-house market screener built from MarketLens addon realm scans.">
 <!-- Machine-readable data. The screener table on this page is filled client-side
      from the JSON API, so a non-JS fetch of this HTML sees only a placeholder.
      Read the data directly instead:
-       /api/games                      list every dataset (region + uploaded realms)
+       /api/games                      list every uploaded realm dataset
        /api/items?game=<game>          latest market snapshot (see its `columns`)
-       /api/history?game=<game>&id=<n> daily price/demand series for one item
+       /api/history?game=<game>&id=<n> daily price/quantity series for one item
        /api/population?game=realm:<realm>  observed class/race/demand survey
-     <game> is a key like "classic-progression" or "realm:Ashkandi-Alliance".
+     <game> is a realm key like "realm:Ashkandi-Alliance".
      See /llms.txt for the full field reference. -->
-<link rel="alternate" type="application/json" href="/api/items?game=classic-progression" title="Market data (JSON)">
+<link rel="alternate" type="application/json" href="/api/games" title="Datasets (JSON)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
@@ -24,7 +24,7 @@
 <div class="wrap">
   <header class="cab">
     <a class="logo" href="/">MARKET<b>LENS</b></a>
-    <div class="tag">Region Screener</div>
+    <div class="tag">Realm Screener</div>
     <div class="meta" id="meta">loading&hellip; <span class="blink">&#9608;</span></div>
   </header>
 
@@ -44,14 +44,14 @@
     <table>
       <colgroup id="cols"></colgroup>
       <thead><tr id="head"></tr></thead>
-      <tbody id="rows"><tr><td class="l" colspan="7" style="padding:22px;color:var(--muted)">Loading region data&hellip;</td></tr></tbody>
+      <tbody id="rows"><tr><td class="l" colspan="5" style="padding:22px;color:var(--muted)">Loading realm data&hellip;</td></tr></tbody>
     </table>
     <div class="foot" id="foot"></div>
   </div>
 
   <p class="src">
-    Demand is inferred from region sale rate &amp; volume &mdash; never observed sales.<br>
-    Data: TradeSkillMaster public data &middot; companion to the MarketLens addon. Click any item for price history.
+    Qty change compares each item's listed quantity with the scan before it &mdash; listings, not observed sales.<br>
+    Data: MarketLens addon auction house scans. Click any item for price history.
   </p>
 </div>
 <!-- Wowhead item icons + authentic hover tooltips. iconizeLinks turns the empty
@@ -60,6 +60,6 @@
      script which game data to use, so one script serves every dataset. -->
 <script>const whTooltips = { colorLinks: false, iconizeLinks: true, renameLinks: false };</script>
 <script src="https://wow.zamimg.com/js/tooltips.js" defer></script>
-<script src="/app.js?v=share-state-1"></script>
+<script src="/app.js?v=qty-change-1"></script>
 </body>
 </html>

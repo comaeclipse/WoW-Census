@@ -31,9 +31,7 @@ function Tip:Append(tooltip, itemID)
     end
     tooltip:AddLine("|cff33aaffMarketLens|r  |cff888888(" .. (row.class.market or "?") .. ")|r" .. srcTag)
 
-    local srcTag = row.demandSource == "region" and " |cff808080(region)|r"
-                or row.demandSource == "local" and " |cff808080(local)|r" or ""
-    local demand = row.demand and (UI.ScoreText(row.demand) .. " " .. (row.demandLabel or "") .. srcTag)
+    local demand = row.demand and (UI.ScoreText(row.demand) .. " " .. (row.demandLabel or ""))
         or string.format("|cff888888collecting %d/%d|r", row.samples or 0,
             ML.db.settings.minimumSamples or 3)
     tooltip:AddDoubleLine("Demand", demand)
@@ -41,26 +39,6 @@ function Tip:Append(tooltip, itemID)
     if row.opportunity then
         tooltip:AddDoubleLine("Opportunity",
             (row.oppIcon or "") .. " " .. UI.ScoreText(row.opportunity))
-    end
-
-    -- TSM region cross-reference: real sale data + local-vs-region deal.
-    if row.saleRate then
-        tooltip:AddLine(" ")
-        tooltip:AddDoubleLine("Sells (region)",
-            string.format("%.0f%% |cff888888rate|r  \194\183  %.1f/day",
-                (row.saleRate or 0) * 100, row.soldPerDay or 0))
-        if row.regionAvg then
-            tooltip:AddDoubleLine("Region avg sale", U.MoneyShort(row.regionAvg))
-        end
-        if row.dealPct then
-            local hex = row.dealPct >= 0 and "ff40c040" or "ffc04040"
-            tooltip:AddDoubleLine("Local vs region",
-                string.format("|c%s%+.0f%%|r", hex, row.dealPct * 100))
-            if row.isDeal then
-                tooltip:AddLine("Buy-low opportunity: cheaper here than it sells region-wide.",
-                    0.3, 0.9, 0.3, true)
-            end
-        end
     end
 
     tooltip:AddDoubleLine("Listed price", U.MoneyShort(row.latest.w))
@@ -78,14 +56,6 @@ function Tip:Append(tooltip, itemID)
         tooltip:AddDoubleLine("Top seller share",
             string.format("|cffffcc00%d%%|r (%s)", row.competition.concentration,
                 row.competition.level))
-    end
-
-    if row.saleRate and ML.Region.Meta then
-        local m = ML.Region:Meta()
-        if m then
-            tooltip:AddLine(string.format("|cff707070Region data: TSM (%s) \194\183 %s|r",
-                m.region or "?", ML.Region:Age() or "?"))
-        end
     end
 end
 

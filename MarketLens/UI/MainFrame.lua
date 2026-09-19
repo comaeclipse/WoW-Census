@@ -13,7 +13,7 @@ local ICON_GUTTER  = 22   -- left space reserved for a row icon
 local BOARD_W      = 560
 local BOARD_H      = 392
 
-UI.view    = "markets"                     -- markets | items | trends | deals | population
+UI.view    = "markets"                     -- markets | items | trends | population
 UI.nav     = { level = 0 }                 -- drill state for the markets view
 UI.popMode = "class"                       -- population: class | race | demand | characters
 
@@ -97,9 +97,8 @@ function UI:BuildBoard()
     local t1 = makeSubTab(board, "Markets",    "markets")
     local t2 = makeSubTab(board, "Items",      "items", t1)
     local t3 = makeSubTab(board, "Trends",     "trends", t2)
-    local t4 = makeSubTab(board, "Deals",      "deals", t3)
-    local t5 = makeSubTab(board, "Population", "population", t4)
-    self.subtabs = { t1, t2, t3, t4, t5 }
+    local t4 = makeSubTab(board, "Population", "population", t3)
+    self.subtabs = { t1, t2, t3, t4 }
 
     local scan = CreateFrame("Button", nil, board, "UIPanelButtonTemplate")
     scan:SetSize(120, 22)
@@ -329,8 +328,8 @@ local function popCrumb(mode)
         POP_NAME[mode] or "Class", agg.observed, agg.samples, POP_HINT[mode] or "Race")
 end
 
--- Data confidence 0-100 from scan freshness, snapshot depth, and whether
--- region (TSM) data is loaded. Mirrors the site's freshness indicator.
+-- Data confidence 0-100 from scan freshness and snapshot depth. Mirrors the
+-- site's freshness indicator.
 function UI:Confidence()
     local last = ML.realm.lastScan
     if not last then return 0 end
@@ -343,8 +342,7 @@ function UI:Confidence()
     end
     local avg = items > 0 and tot / items or 0
     local depth = ML.Util.Clamp((avg - 1) / (6 - 1) * 100, 0, 100)
-    local region = ML.Region:IsLoaded() and 100 or 0
-    return ML.Util.Round(0.45 * fresh + 0.30 * depth + 0.25 * region)
+    return ML.Util.Round(0.60 * fresh + 0.40 * depth)
 end
 
 function UI:Refresh()
@@ -363,18 +361,10 @@ function UI:Refresh()
             when = "just now"
         end
     end
-    local regionLine = ""
-    if ML.Region:IsLoaded() then
-        local m = ML.Region:Meta()
-        regionLine = string.format("\n|cff707070Region demand: TSM %s \194\183 %s|r",
-            m.region or "?", ML.Region:Age() or "?")
-    else
-        regionLine = "\n|cff707070Region demand: not imported (run update-data)|r"
-    end
     local conf = self:Confidence()
     local confLine = string.format("\n|cff808080Confidence:|r %s", UI.ScoreText(conf))
-    self.board.subtitle:SetText(string.format("%s\n|cff808080Last scan:|r %s%s%s",
-        ML:RealmKey(), when, confLine, regionLine))
+    self.board.subtitle:SetText(string.format("%s\n|cff808080Last scan:|r %s%s",
+        ML:RealmKey(), when, confLine))
 
     local mod, cols, entries
     if self.view == "markets" then
@@ -387,11 +377,6 @@ function UI:Refresh()
         cols = ML.UI.ItemTable:Columns(2)
         entries = ML.UI.ItemTable:FlatRows(self.model, "opportunity")
         self.board.crumb:Hide()
-    elseif self.view == "deals" then
-        cols = ML.UI.ItemTable:DealColumns()
-        entries = ML.UI.ItemTable:DealRows(self.model)
-        self.board.crumb:Show()
-        self.board.crumb.text:SetText("|cff808080Cheaper on your realm than the region average sale price \226\128\148 buy-low / flip candidates|r")
     elseif self.view == "population" then
         local mode = self.popMode or "class"
         cols = ML.UI.PopTable:Columns(mode)

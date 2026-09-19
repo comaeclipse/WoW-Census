@@ -22,8 +22,6 @@ Data/ItemSources.lua
 Data/ItemSourcesGen.lua
 Data/GearCoverageGen.lua
 Data/Items.lua
-Data/TSMRegion.lua
-Data/TSMRegionRetail.lua
 
 AH/Parser.lua
 AH/Scanner.lua
@@ -31,7 +29,6 @@ AH/Scanner.lua
 Analytics/Snapshots.lua
 Analytics/Sellers.lua
 Analytics/Trends.lua
-Analytics/Region.lua
 Analytics/Demand.lua
 Analytics/Saturation.lua
 Analytics/Scores.lua

@@ -39,7 +39,7 @@ function Sc:Item(itemID)
     local latest, rec = Snap:Latest(itemID)
     if not latest then return nil end
 
-    local demand, demandLabel, samples, demandSource = Dem:Score(itemID)
+    local demand, demandLabel, samples = Dem:Score(itemID)
     local saturation = Sat:Score(itemID) or 0
     local scarcity = 100 - saturation
     local w = T:Primary(itemID)
@@ -51,18 +51,6 @@ function Sc:Item(itemID)
     -- Thin-market proxy: how far the median sits above the lowest listing.
     local thinness = latest.m > 0 and (latest.m - latest.l) / latest.m or 0
 
-    -- Region (TSM) cross-reference: real sale data + local-vs-region deal signal.
-    local regionAvg  = ML.Region:AvgSalePrice(itemID)
-    local saleRate   = ML.Region:SaleRate(itemID)
-    local soldPerDay = ML.Region:SoldPerDay(itemID)
-    local dealPct, isDeal
-    if regionAvg and regionAvg > 0 and latest.l and latest.l > 0 then
-        -- Positive = your realm's lowest buyout sits below what it sells for
-        -- region-wide, i.e. a buy-low / undercut-value opportunity.
-        dealPct = (regionAvg - latest.l) / regionAvg
-        isDeal = dealPct >= 0.15 and (saleRate or 0) >= 0.10
-    end
-
     local row = {
         itemID       = itemID,
         name         = rec.name or ("item:" .. itemID),
@@ -73,13 +61,7 @@ function Sc:Item(itemID)
         pricePct     = pricePct,
         demand       = demand,
         demandLabel  = demandLabel,
-        demandSource = demandSource,
         samples      = samples,
-        regionAvg    = regionAvg,
-        saleRate     = saleRate,
-        soldPerDay   = soldPerDay,
-        dealPct      = dealPct,
-        isDeal       = isDeal,
         saturation   = saturation,
         scarcity     = scarcity,
         marketValue  = marketValue,
@@ -120,19 +102,8 @@ local function newAgg()
              value = 0, count = 0, sellers = 0 }
 end
 
--- Aggregation weight: money velocity (region copper/day changing hands) when we
--- have region data, else fall back to locally-listed value. This stops expensive
--- slow-movers from dominating a market's demand -- a cheap item that actually
--- sells counts for what it moves, not what it's listed at.
-local function velocityWeight(row)
-    if row.soldPerDay and row.regionAvg and row.soldPerDay > 0 and row.regionAvg > 0 then
-        return math.max(row.soldPerDay * row.regionAvg, 1)
-    end
-    return math.max(row.marketValue, 1)
-end
-
 local function addToAgg(agg, row)
-    local w = velocityWeight(row)          -- weight for the scored metrics
+    local w = math.max(row.marketValue, 1)  -- weight for the scored metrics: listed value
     agg.value = agg.value + row.marketValue -- market SIZE stays listed-value
     agg.count = agg.count + 1
     agg.sellers = agg.sellers + (row.latest.s or 0)

@@ -8,13 +8,11 @@ import { Hono } from "hono";
 //   GET  /item/<slug|id>?game=     server-rendered item page + history graph
 //   GET  /seller/<slug|name>?game= server-rendered seller profile (realm only)
 //   POST /admin/import-sellers?token=&region=  upload seller profiles (paged scans)
-//   GET  /admin/refresh?token=&game=   manual collect (seed after deploy)
 //   GET  /admin/resolve-names?token=&region=&limit=  backfill item:<id> names
 //                                   from Blizzard's Item API (bounded batch)
-//   cron                           daily collect of every dataset in env.GAMES
 //
-// Data source: TradeSkillMaster public data (CSVs have no CORS header, so the
-// browser can't fetch them — the Worker fetches server-side and serves JSON).
+// Data source: realm scans uploaded from the MarketLens addon
+// (POST /admin/import-realm).
 
 const REGION = "us";
 const GAMES = {
@@ -24,17 +22,7 @@ const GAMES = {
   "classic-beta":        { label: "Forever (Beta)" },
 };
 const DEFAULT_GAME = "classic-progression";
-// TSM's public "classic-progression" region feed tracks its own long-running
-// progression realms, which have advanced well past TBC (into Cataclysm/MoP
-// content) -- confirmed against TSM's own dashboard and against real TBC
-// Anniversary auction data (which tops out around id 38466). Anything above
-// this cutoff can't be bought/sold/crafted on TBC Anniversary, so it's noise
-// for both the icon lookups (Wowhead's tbc branch can't resolve it) and the
-// demand signal (nobody is trading it here). Set well above TBC's actual
-// max (Sunwell Plateau loot tops out ~35700) to leave room for phases not
-// live yet, while staying well under Wrath+ item ids.
-const TBC_MAX_ITEM_ID = 41000;
-const ITEMS_CACHE_VERSION = 14;
+const ITEMS_CACHE_VERSION = 15;
 const REALM_CURRENT_AUCTION_MAX_AGE_SECONDS = 48 * 60 * 60;
 
 function sourceGameKey(flavor) {
@@ -57,14 +45,12 @@ function whBranchFor(sourceGame) { return WH_BRANCH[sourceGame] != null ? WH_BRA
 
 // Column order for the packed /api/items rows. Emitted in the response as
 // `columns` so scripts and LLMs can read the array-of-arrays without guessing.
-// mv/asp/hist are copper; sr is a 0-1 sale rate; spd is sold/day; q (quantity),
-// sc (seller count), tc (top-seller concentration 0-100), cat (category), src
-// (source: crafted/gathered/...) and crafter (producing profession) are
-// realm-upload only, else null.
-const ITEM_COLUMNS = ["id", "name", "slug", "mv", "asp", "sr", "spd", "q", "sc", "tc", "hist", "cat", "src", "crafter"];
-
-const csvUrl = (game) =>
-  `https://public-data.tradeskillmaster.com/${game}/${REGION}/region/items.csv`;
+// mv is the listed value (q * buyout) and asp the realm buyout, both copper; q
+// is the quantity listed in the latest scan and pq the quantity in the scan
+// before it (NULL when there was no earlier scan); sc (seller count), tc
+// (top-seller concentration 0-100), cat (category), src (source:
+// crafted/gathered/...) and crafter (producing profession) may be null.
+const ITEM_COLUMNS = ["id", "name", "slug", "mv", "asp", "q", "pq", "sc", "tc", "cat", "src", "crafter"];
 
 const BNET_API_BASE = `https://${REGION}.api.blizzard.com`;
 const BNET_OAUTH_URL = `https://oauth.battle.net/token`;
@@ -258,14 +244,6 @@ function shortDate(ts) {
   if (Number.isNaN(d.getTime())) return "Unknown";
   return d.toISOString().slice(0, 16).replace("T", " ");
 }
-function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-function scale100(v, mn, mx) { return mx === mn ? 0 : clamp(((v - mn) / (mx - mn)) * 100, 0, 100); }
-function demandScore(sr, spd) {
-  const rate = scale100(sr, 0, 0.5);
-  const vol = scale100(Math.log(1 + spd), 0, Math.log(101));
-  return Math.round(clamp(0.75 * rate + 0.25 * vol, 0, 100));
-}
-
 // Locale-independent class token -> [display name, WoW class color]. Used to
 // label and tint the class distribution on the population page.
 const CLASS_META = {
@@ -333,37 +311,10 @@ function bigGold(cop) {
   return "" + g;
 }
 
-// RFC4180-ish CSV line parser (handles quoted fields with doubled quotes).
-function parseLine(line) {
-  const out = [];
-  let i = 0, cur = "", q = false;
-  while (i < line.length) {
-    const ch = line[i];
-    if (q) {
-      if (ch === '"') {
-        if (line[i + 1] === '"') { cur += '"'; i += 2; continue; }
-        q = false; i++; continue;
-      }
-      cur += ch; i++;
-    } else {
-      if (ch === '"') { q = true; i++; }
-      else if (ch === ",") { out.push(cur); cur = ""; i++; }
-      else { cur += ch; i++; }
-    }
-  }
-  out.push(cur);
-  return out;
-}
-
 function json(data, ttl, status = 200) {
   const h = { "content-type": "application/json; charset=utf-8" };
   if (ttl) h["cache-control"] = `public, max-age=${ttl}`;
   return new Response(JSON.stringify(data), { status, headers: h });
-}
-
-function todayBucket() {
-  const d = new Date();
-  return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
 }
 
 // D1 limits bound parameters (~100) per query, so inline escaped literals
@@ -380,61 +331,6 @@ async function bulkInsert(db, table, cols, rows, per) {
     const values = chunk.map((r) => "(" + r.map(sqlVal).join(",") + ")").join(",");
     await db.prepare(`INSERT OR REPLACE INTO ${table} (${colList}) VALUES ${values}`).run();
   }
-}
-
-async function collectGame(env, game) {
-  if (!GAMES[game]) return { game, error: "unknown game" };
-  const res = await fetch(csvUrl(game), { cf: { cacheTtl: 300 } });
-  if (!res.ok) return { game, error: "fetch " + res.status };
-  const text = await res.text();
-  const lines = text.split("\n");
-  const ts = todayBucket();
-
-  const itemRows = [], histRows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].replace(/\r$/, "");
-    if (!line) continue;
-    const f = parseLine(line);
-    if (f.length < 8) continue;
-    const id = parseInt(f[0], 10);
-    if (!id) continue;
-    // TSM's classic-progression feed carries items from well past TBC (see
-    // TBC_MAX_ITEM_ID above); skip them so they never enter the reference
-    // table this dataset's region view and the realm-upload name join read from.
-    if (game === "classic-progression" && id > TBC_MAX_ITEM_ID) continue;
-    const name = f[1];
-    const sr = +f[5] || 0, spd = +f[6] || 0;
-    const hasDemand = sr > 0 || spd > 0;
-    // Every item still gets a row -- realm uploads join on this table purely
-    // to resolve names (importRealm's rr.name fallback, seller/item page item
-    // names) for items TSM reports zero region sale-rate on, and dropping
-    // those rows entirely left ~1 in 3 live AH listings on TBC Anniversary
-    // realms unnamed. Zero out mv/asp/hist instead of trusting whatever the
-    // CSV carries for a no-signal item, so a stale/leftover value can never
-    // be read downstream as real region demand.
-    const mv = hasDemand ? Math.round(+f[2] || 0) : 0;
-    const hist = hasDemand ? Math.round(+f[3] || 0) : 0;
-    const asp = hasDemand ? Math.round(+f[4] || 0) : 0;
-    itemRows.push([game, id, name, slugify(name), mv, asp, sr, spd, hist, f[7] || ""]);
-    if (hasDemand) histRows.push([game, id, ts, mv, asp, sr, spd]);
-  }
-
-  await bulkInsert(env.DB, "items",
-    ["game", "id", "name", "slug", "mv", "asp", "sr", "spd", "hist", "updated_at"], itemRows, 150);
-  await bulkInsert(env.DB, "history",
-    ["game", "id", "ts", "mv", "asp", "sr", "spd"], histRows, 200);
-
-  return { game, count: itemRows.length };
-}
-
-async function collectAll(env) {
-  const games = (env.GAMES || DEFAULT_GAME).split(",").map((s) => s.trim()).filter(Boolean);
-  const results = [];
-  for (const g of games) {
-    try { results.push(await collectGame(env, g)); }
-    catch (e) { results.push({ game: g, error: String(e) }); }
-  }
-  return results;
 }
 
 // bnetStaticNamespaceForGame maps our "classic-progression" key to
@@ -463,8 +359,8 @@ async function bnetItemName(token, id, namespace) {
 // relying on the client-side Wowhead rename trick (data-wh-rename-link),
 // which only fires after an extra async round-trip in the browser -- causing
 // the visible name to pop in late and the page to reflow around it. This
-// resolves names once, server-side, and writes them into BOTH the region
-// reference table (so future realm uploads' rr.name fallback finds them
+// resolves names once, server-side, and writes them into BOTH the flavor's
+// reference rows (so future realm uploads' rr.name fallback finds them
 // without hitting Blizzard again) and any already-uploaded realm rows still
 // showing the placeholder (so the fix is visible immediately, not just on
 // the next scan). Bounded per call (default 40 items) to stay well under
@@ -529,7 +425,7 @@ function dayBucketFromUnix(sec) {
   return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
 }
 
-// List every dataset present (region datasets + uploaded realms) for the selector.
+// List every dataset present (uploaded realms, plus realms known only from population data) for the selector.
 async function apiGames(env) {
   const itemRows = (await env.DB.prepare(
     "SELECT game, COUNT(*) c, MAX(updated_at) u FROM items GROUP BY game"
@@ -565,8 +461,7 @@ async function apiGames(env) {
   return json({ games }, 120);
 }
 
-// Import a realm's addon export (/ml export). Stores it as game "realm:<name>",
-// joining region sale data by itemID so demand + the deal signal work.
+// Import a realm's addon export (/ml export). Stores it as game "realm:<name>".
 async function importRealm(url, env, req) {
   if (!env.REFRESH_TOKEN || url.searchParams.get("token") !== env.REFRESH_TOKEN)
     return new Response("forbidden", { status: 403 });
@@ -582,7 +477,9 @@ async function importRealm(url, env, req) {
   const capabilities = body.capabilities || {};
   const sellersAvailable = capabilities.sellers !== false;
 
-  const reg = await env.DB.prepare("SELECT id,name,sr,spd,asp FROM items WHERE game=?").bind(regionGame).all();
+  // Frozen reference rows for the flavor -- used only to resolve names for items
+  // the addon scan never cached (new names come from /admin/resolve-names).
+  const reg = await env.DB.prepare("SELECT id,name FROM items WHERE game=?").bind(regionGame).all();
   const rmap = new Map();
   for (const r of reg.results) rmap.set(r.id, r);
 
@@ -616,8 +513,8 @@ async function importRealm(url, env, req) {
     const snaps = rec && rec.s;
     if (!snaps || !snaps.length) continue;
     const rr = rmap.get(id) || {};
-    // Prefer the addon's name; fall back to the region dataset (TSM has every
-    // item's name), since getAll scans often leave names uncached.
+    // Prefer the addon's name; fall back to the flavor's reference rows, since
+    // getAll scans often leave names uncached.
     const name = (rec.n && rec.n.trim()) ? rec.n : (rr.name || ("item:" + id));
     const last = snaps[snaps.length - 1];
     if ((Number(last[0]) || 0) >= currentCutoffUnix) {
@@ -631,23 +528,25 @@ async function importRealm(url, env, req) {
       // held at ~18s), which poisoned mv (=q*price) and asp. Median is outlier-
       // robust; fall back to w only when a median wasn't recorded.
       const unit = last[5] || last[6] || 0;
+      // Quantity in the scan before this one, for the "% since last scan" column.
+      // NULL (not 0) when there is no earlier snapshot, so it reads as "unknown".
+      const pq = snaps.length > 1 ? (snaps[snaps.length - 2][1] || 0) : null;
       const cat = (rec.m && String(rec.m).trim()) ? String(rec.m) : null;
       const src = (rec.src && String(rec.src).trim()) ? String(rec.src) : null;
       const crafter = (rec.cr && String(rec.cr).trim()) ? String(rec.cr) : null;
-      itemRows.push([game, id, name, slugify(name), q * unit, unit, rr.sr || 0, rr.spd || 0, rr.asp || 0,
-        new Date().toISOString(), q, sc, tc, cat, src, crafter]);
+      itemRows.push([game, id, name, slugify(name), q * unit, unit,
+        new Date().toISOString(), q, pq, sc, tc, cat, src, crafter]);
     }
     for (const sn of snaps) {
       const u = sn[5] || sn[6] || 0;
-      histRows.push([game, id, dayBucketFromUnix(sn[0]), (sn[1] || 0) * u, u,
-        rr.sr || 0, rr.spd || 0, sn[1] || 0]);
+      histRows.push([game, id, dayBucketFromUnix(sn[0]), (sn[1] || 0) * u, u, sn[1] || 0]);
     }
   }
   await env.DB.prepare("DELETE FROM items WHERE game=?").bind(game).run();
   await bulkInsert(env.DB, "items",
-    ["game", "id", "name", "slug", "mv", "asp", "sr", "spd", "hist", "updated_at", "q", "sc", "tc", "cat", "src", "crafter"], itemRows, 120);
+    ["game", "id", "name", "slug", "mv", "asp", "updated_at", "q", "pq", "sc", "tc", "cat", "src", "crafter"], itemRows, 120);
   await bulkInsert(env.DB, "history",
-    ["game", "id", "ts", "mv", "asp", "sr", "spd", "q"], histRows, 150);
+    ["game", "id", "ts", "mv", "asp", "q"], histRows, 150);
   await env.DB.prepare(
     `INSERT INTO datasets (game, source_game, updated_at)
      VALUES (?, ?, ?)
@@ -663,6 +562,9 @@ async function importRealm(url, env, req) {
 
 async function apiItems(url, env, ctx) {
   const game = pickGame(url);
+  // Only uploaded realms carry market data; the flavor keys are just labels.
+  if (game.indexOf("realm:") !== 0)
+    return json({ game, sourceGame: game, region: REGION, count: 0, updatedAt: null, days: 0, columns: ITEM_COLUMNS, items: [] }, 300);
   const cache = caches.default;
   // Bump the version suffix whenever the response shape changes or stale edge
   // entries need to be retired.
@@ -670,14 +572,10 @@ async function apiItems(url, env, ctx) {
   const hit = await cache.match(key);
   if (hit) return hit;
 
-  // Rows past TBC_MAX_ITEM_ID predate this filter landing in collectGame (or
-  // are still sitting in the cache from before it deployed); exclude them at
-  // read time too so the fix is live immediately, not just on the next cron.
-  const idFilter = game === "classic-progression" ? " AND id<=" + TBC_MAX_ITEM_ID : "";
   const { results } = await env.DB.prepare(
-    "SELECT id,name,slug,mv,asp,sr,spd,q,sc,tc,hist,cat,src,crafter FROM items WHERE game=?" + idFilter + " ORDER BY spd DESC"
+    "SELECT id,name,slug,mv,asp,q,pq,sc,tc,cat,src,crafter FROM items WHERE game=? ORDER BY q DESC"
   ).bind(game).all();
-  const rows = results.map((r) => [r.id, r.name, r.slug, r.mv, r.asp, r.sr, r.spd, r.q, r.sc, r.tc, r.hist, r.cat, r.src, r.crafter]);
+  const rows = results.map((r) => [r.id, r.name, r.slug, r.mv, r.asp, r.q, r.pq, r.sc, r.tc, r.cat, r.src, r.crafter]);
 
   // Freshness metadata for the confidence indicator.
   const meta = await env.DB.prepare("SELECT MAX(updated_at) u FROM items WHERE game=?").bind(game).first();
@@ -697,7 +595,7 @@ async function apiHistory(url, env) {
   const id = parseInt(url.searchParams.get("id"), 10);
   if (!id) return json({ error: "missing id" });
   const { results } = await env.DB.prepare(
-    "SELECT ts,mv,asp,sr,spd FROM history WHERE game=? AND id=? ORDER BY ts"
+    "SELECT ts,mv,asp,q FROM history WHERE game=? AND id=? ORDER BY ts"
   ).bind(game, id).all();
   return json({ game, id, points: results }, 1800);
 }
@@ -706,21 +604,22 @@ async function itemPage(url, env) {
   const game = pickGame(url);
   const key = decodeURIComponent(url.pathname.replace(/^\/item\//, "")).replace(/\/$/, "");
   let row;
-  if (/^\d+$/.test(key)) {
+  if (game.indexOf("realm:") !== 0) {
+    row = null; // no market data outside uploaded realms
+  } else if (/^\d+$/.test(key)) {
     row = await env.DB.prepare("SELECT * FROM items WHERE game=? AND id=?").bind(game, +key).first();
   } else {
-    // slug may not be unique; pick the most-traded match.
+    // slug may not be unique; pick the most-listed match.
     row = await env.DB.prepare(
-      "SELECT * FROM items WHERE game=? AND slug=? ORDER BY spd DESC LIMIT 1"
+      "SELECT * FROM items WHERE game=? AND slug=? ORDER BY q DESC LIMIT 1"
     ).bind(game, key).first();
   }
   if (!row) return new Response(notFound(game, key), { status: 404, headers: { "content-type": "text/html; charset=utf-8" } });
 
   const hist = await env.DB.prepare(
-    "SELECT ts,mv,asp,sr,spd FROM history WHERE game=? AND id=? ORDER BY ts"
+    "SELECT ts,mv,asp,q FROM history WHERE game=? AND id=? ORDER BY ts"
   ).bind(game, row.id).all();
 
-  const demand = demandScore(row.sr, row.spd);
   const isRealm = game.indexOf("realm:") === 0;
   const gameLabel = isRealm ? game.slice(6) : (GAMES[game] ? GAMES[game].label : game);
   const points = JSON.stringify(hist.results || []);
@@ -790,29 +689,28 @@ async function itemPage(url, env) {
         row.src === "crafted" ? "gr" : "")
     : "";
 
-  let statsHtml;
-  if (isRealm) {
-    const deal = row.hist > 0 ? Math.round((row.hist - row.asp) / row.hist * 100) : null;
-    statsHtml =
-      stat("Demand", demand + "/100", demand >= 70 ? "gr" : demand >= 45 ? "g" : "mu") +
-      stat("Realm buyout", gsc(row.asp), "g") +
-      stat("Quantity", (row.q || 0).toLocaleString()) +
-      stat("Sellers", row.sc == null ? "N/A" : row.sc) +
-      // Top-seller share: a high % means one player controls most of the supply
-      // (a market you can undercut or wait out); low means it's spread thin.
-      (row.tc == null || row.sc == null ? "" :
-        stat("Top seller", row.tc + "%", row.tc >= 60 ? "gr" : row.tc >= 30 ? "g" : "mu")) +
-      (deal === null ? "" : stat("vs region", (deal >= 0 ? "+" : "") + deal + "%", deal >= 0 ? "gr" : "rd")) +
-      srcStat;
-  } else {
-    statsHtml =
-      stat("Demand", demand + "/100", demand >= 70 ? "gr" : demand >= 45 ? "g" : "mu") +
-      stat("Sale rate", Math.round(row.sr * 100) + "%") +
-      stat("Sold / day", row.spd >= 10 ? Math.round(row.spd) : row.spd.toFixed(1)) +
-      stat("Avg sale", gsc(row.asp), "g") +
-      stat("Market value", gsc(row.mv), "mu") +
-      srcStat;
+  // Change in listed quantity vs the previous scan (pq is NULL when there was
+  // no earlier snapshot; a 0 -> N jump has no finite percentage).
+  let qtyChange = "";
+  if (row.pq != null) {
+    const cur = row.q || 0;
+    if (row.pq > 0) {
+      const pct = Math.round((cur - row.pq) / row.pq * 100);
+      qtyChange = stat("Qty since last scan", (pct >= 0 ? "+" : "") + pct + "%", pct > 0 ? "gr" : pct < 0 ? "rd" : "mu");
+    } else if (cur > 0) {
+      qtyChange = stat("Qty since last scan", "new", "gr");
+    }
   }
+  const statsHtml =
+    stat("Realm buyout", gsc(row.asp), "g") +
+    stat("Quantity", (row.q || 0).toLocaleString()) +
+    qtyChange +
+    stat("Sellers", row.sc == null ? "N/A" : row.sc) +
+    // Top-seller share: a high % means one player controls most of the supply
+    // (a market you can undercut or wait out); low means it's spread thin.
+    (row.tc == null || row.sc == null ? "" :
+      stat("Top seller", row.tc + "%", row.tc >= 60 ? "gr" : row.tc >= 30 ? "g" : "mu")) +
+    srcStat;
 
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -837,16 +735,16 @@ async function itemPage(url, env) {
     <div class="ptitle">PRICE HISTORY <span class="mu" id="range"></span></div>
     <div id="chart" class="chart"></div>
     <div class="legend">
-      <span><i style="background:var(--gold)"></i> Avg sale</span>
-      <span><i style="background:var(--blue)"></i> Market value</span>
-      <span><i style="background:var(--green)"></i> Sale rate</span>
+      <span><i style="background:var(--gold)"></i> Realm buyout</span>
+      <span><i style="background:var(--blue)"></i> Listed value</span>
+      <span><i style="background:var(--green)"></i> Quantity</span>
     </div>
     <p class="hint" id="hhint"></p>
   </div>
 
   ${sellersHtml}
 
-  <p class="src" id="datasrc">Data: TradeSkillMaster public data (${esc(game)} / ${REGION}). History accrues daily from this site's collector.</p>
+  <p class="src" id="datasrc">Data: MarketLens addon auction house scans (${esc(game)}). History is built from each uploaded scan.</p>
 </div>
 <script>window.ITEM=${JSON.stringify({ id: row.id, name: row.name, game })};window.POINTS=${points};</script>
 <script src="/item.js"></script>${isPlaceholder ? `
@@ -1037,10 +935,8 @@ async function sellerPage(url, env) {
   if (!seller) return new Response(sellerNotFound(game, key),
     { status: 404, headers: { "content-type": "text/html; charset=utf-8" } });
 
-  // For realm datasets items.hist holds the region average sale price (items.asp
-  // is the realm buyout), so hist is the right "vs region" reference here.
   const listRes = await env.DB.prepare(
-    `SELECT sl.id id, sl.q q, sl.l l, i.name name, i.slug slug, i.hist region
+    `SELECT sl.id id, sl.q q, sl.l l, i.name name, i.slug slug
      FROM seller_listings sl LEFT JOIN items i ON i.game = sl.game AND i.id = sl.id
      WHERE sl.game = ? AND sl.owner = ? ORDER BY (sl.q * sl.l) DESC`
   ).bind(game, seller.owner).all();
@@ -1057,11 +953,7 @@ async function sellerPage(url, env) {
   const rows = listings.map((r) => {
     const name = r.name || ("item:" + r.id);
     const slug = r.slug || r.id;
-    // Positive = this seller is priced under the region average sale (a deal).
-    const vs = (r.region && r.l) ? Math.round((r.region - r.l) / r.region * 100) : null;
     const whHref = "https://www.wowhead.com/" + (whBranch ? whBranch + "/" : "") + "item=" + r.id;
-    const vsCell = vs === null ? '<td class="mu" data-sort="">—</td>'
-      : `<td data-sort="${vs}" class="${vs >= 0 ? "gr" : "rd"}">${vs >= 0 ? "+" : ""}${vs}%</td>`;
     // No captured name -> item:<id> placeholder (see itemPage). Point the link
     // itself at Wowhead with rename-on so its tooltip data replaces the text
     // client-side, same as the item page title and the screener table.
@@ -1073,8 +965,6 @@ async function sellerPage(url, env) {
       <td class="l"><a class="ic" href="${whHref}" tabindex="-1" aria-hidden="true"></a>${nameLink}</td>
       <td data-sort="${r.q || 0}">${(r.q || 0).toLocaleString()}</td>
       <td class="g" data-sort="${r.l || 0}">${gsc(r.l)}</td>
-      <td class="mu" data-sort="${r.region || ""}">${gsc(r.region)}</td>
-      ${vsCell}
     </tr>`;
   }).join("");
 
@@ -1111,8 +1001,8 @@ async function sellerPage(url, env) {
   <div class="panel">
     <div class="ptitle">LATEST OBSERVED LISTINGS <span class="mu">${listings.length} items</span></div>
     <div class="tablewrap"><table class="seller-listings">
-      <thead><tr><th class="l" data-type="text">Item</th><th>Qty</th><th>Their Buyout</th><th>Region Avg</th><th>vs Region</th></tr></thead>
-      <tbody>${rows || '<tr><td class="l" colspan="5" style="padding:18px;color:var(--muted)">No current listings.</td></tr>'}</tbody>
+      <thead><tr><th class="l" data-type="text">Item</th><th>Qty</th><th>Their Buyout</th></tr></thead>
+      <tbody>${rows || '<tr><td class="l" colspan="3" style="padding:18px;color:var(--muted)">No current listings.</td></tr>'}</tbody>
     </table></div>
   </div>
 
@@ -1499,14 +1389,6 @@ app.post("/admin/import-sellers", (c) => importSellers(new URL(c.req.url), c.env
 app.all("/admin/bnet-test", (c) => bnetTest(new URL(c.req.url), c.env));
 app.all("/admin/bnet-realm-auctions", (c) => bnetRealmAuctions(new URL(c.req.url), c.env));
 app.all("/admin/resolve-names", (c) => resolveItemNames(new URL(c.req.url), c.env));
-app.all("/admin/refresh", async (c) => {
-  const url = new URL(c.req.url);
-  if (!c.env.REFRESH_TOKEN || url.searchParams.get("token") !== c.env.REFRESH_TOKEN)
-    return new Response("forbidden", { status: 403 });
-  const g = url.searchParams.get("game");
-  const out = g ? [await collectGame(c.env, g)] : await collectAll(c.env);
-  return json({ ok: true, out });
-});
 
 app.all("/pop", (c) => popPage(new URL(c.req.url), c.env));
 app.all("/seller/*", (c) => sellerPage(new URL(c.req.url), c.env));
@@ -1517,7 +1399,4 @@ app.onError((e) => new Response("error: " + (e && e.stack || e), { status: 500 }
 
 export default {
   fetch: app.fetch,
-  async scheduled(event, env, ctx) {
-    ctx.waitUntil(collectAll(env));
-  },
 };
