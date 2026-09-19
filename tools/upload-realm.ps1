@@ -9,7 +9,8 @@
 #
 # The addon writes a fresh export to SavedVariables on logout/reload, so:
 #   1. In game: scan the AH, then /reload (or log out)
-#   2. Run this script
+#   2. (optional) Sanity-check it first: node analyze-realm.js <MarketLens.lua> --realm=<Realm-Faction>
+#   3. Run this script (add -Realm <Realm-Faction> when the save holds several)
 
 param(
     [string]$Token,
@@ -17,9 +18,11 @@ param(
     [string]$Region,
     [string]$Url    = "https://marketlens.skarz.workers.dev",
     [string]$Wow,
-    # Retail only: upload a specific "Realm-Faction" bucket instead of the active
-    # export. Both factions' data live in the account-wide save, so this uploads
-    # either side without swapping characters and reloading. e.g. Nesingwary-Alliance
+    # Upload a specific "Realm-Faction" bucket instead of the active export. Both
+    # factions' data live in the account-wide save, so this uploads either side
+    # without swapping characters and reloading. e.g. Nesingwary-Alliance,
+    # Dreamscythe-Horde. Without it the uploader takes whichever bucket was last
+    # active and warns if the save holds others.
     [string]$Realm
 )
 
@@ -61,6 +64,41 @@ function Load-Token {
         } catch { return $null }
     }
     return $null
+}
+
+# Read the site back after an import and report what actually landed, since the
+# import call only says "ok". Regex over the raw response instead of
+# ConvertFrom-Json: Windows PowerShell 5.1 caps JSON parsing at 2 MB and a big
+# realm's /api/items is larger. Report-only -- it never fails the upload.
+function Test-SiteImport($storedRealm, $uploaded) {
+    try {
+        $game = [uri]::EscapeDataString("realm:$storedRealm")
+        $raw = (Invoke-WebRequest -Uri "$Url/api/items?game=$game" -UseBasicParsing -TimeoutSec 60).Content
+        $count = if ($raw -match '"count":(\d+)') { [int]$matches[1] } else { $null }
+        $updated = if ($raw -match '"updatedAt":"([^"]+)"') { $matches[1] } else { $null }
+        $placeholders = [regex]::Matches($raw, ',"item:\d+",').Count
+
+        if ($null -eq $count) {
+            Write-Host "Verify: couldn't read the item count back from the site." -ForegroundColor Yellow
+        } elseif ($count -lt $uploaded) {
+            Write-Host ("Verify: site lists {0} items but the import reported {1}." -f $count, $uploaded) -ForegroundColor Yellow
+        } else {
+            Write-Host ("Verify: site lists {0} items for {1} ({2} imported)." -f $count, $storedRealm, $uploaded) -ForegroundColor Green
+        }
+        if ($updated) {
+            $age = [DateTimeOffset]::UtcNow - [DateTimeOffset]::Parse($updated, [Globalization.CultureInfo]::InvariantCulture)
+            if ($age.TotalMinutes -gt 10) {
+                Write-Host ("Verify: newest item row on the site is {0:N0} min old ({1}) -- the import may not have written." -f $age.TotalMinutes, $updated) -ForegroundColor Yellow
+            }
+        }
+        if ($placeholders -gt 0) {
+            Write-Host ("Verify: {0} item(s) still show as item:<id> (not in the region table). Backfill: GET {1}/admin/resolve-names?token=...&region={2}&limit=80, repeating until checked=0." -f $placeholders, $Url, $Region) -ForegroundColor Yellow
+        } else {
+            Write-Host "Verify: no unnamed items." -ForegroundColor Green
+        }
+    } catch {
+        Write-Host ("Verify: couldn't read the site back ({0})." -f $_.Exception.Message) -ForegroundColor Yellow
+    }
 }
 
 # Locate the account-wide SavedVariables file (newest if several accounts).
@@ -119,6 +157,24 @@ if ($node -and (Test-Path $helper)) {
 $itemCount = ($obj.items.PSObject.Properties | Measure-Object).Count
 Write-Host ("Realm: {0}  -  {1} items to upload" -f $obj.realm, $itemCount)
 
+# A save can hold several realm/faction buckets. Without -Realm the helper picks
+# the last active one, which is easy to miss -- name the alternatives so a
+# wrong-faction upload can't go by silently.
+if (-not $Realm -and $node -and (Test-Path $helper)) {
+    $realmList = & $node.Source $helper $file.FullName --list-realms
+    if ($LASTEXITCODE -eq 0 -and $realmList) {
+        try {
+            # foreach, not a pipeline: 5.1's ConvertFrom-Json hands back the array
+            # as ONE object when piped, so Where-Object would see a single element.
+            $others = @()
+            foreach ($r in (ConvertFrom-Json -InputObject $realmList)) { if ($r -ne $obj.realm) { $others += $r } }
+            if ($others.Count -gt 0) {
+                Write-Host ("WARNING: this save also holds {0}. Uploading only {1}; re-run with -Realm <name> for another bucket." -f ($others -join ", "), $obj.realm) -ForegroundColor Yellow
+            }
+        } catch { }
+    }
+}
+
 if (-not $Token) { $Token = Load-Token }
 if (-not $Token) { $Token = Read-Host "REFRESH_TOKEN" }
 if ($Token) { Save-Token $Token }
@@ -132,6 +188,7 @@ if ($itemCount -lt 1) {
     if ($resp.ok) {
         Write-Host ("Imported {0} items for {1}." -f $resp.items, $resp.realm) -ForegroundColor Green
         Write-Host ("View: {0}/?game=realm:{1}" -f $Url, [uri]::EscapeDataString($resp.realm))
+        Test-SiteImport $resp.realm $resp.items
     } else {
         Write-Host ("Server error: {0}" -f $resp.error) -ForegroundColor Red
     }
@@ -205,6 +262,15 @@ if ($node -and (Test-Path $helper)) {
                             Write-Host ("Seller scan: {0}/{1} pages, {2}% owner coverage{3}." -f $sr.meta.scannedPages, $sr.meta.pages, $sr.meta.ownerCoverage, $(if ($sr.meta.partial) { " (sample)" } else { "" }))
                         }
                         Write-Host ("Sellers show on each item page ({0}/?game=realm:{1}, open an item)." -f $Url, [uri]::EscapeDataString($sr.realm))
+                        # The export only carries the last scan that captured owners; a
+                        # newer Get All scan leaves it behind, and re-uploading it is a no-op.
+                        $newestSeen = ($sellers.sellers | Measure-Object -Property ls -Maximum).Maximum
+                        if ($newestSeen) {
+                            $sellerAgeH = ([DateTimeOffset]::UtcNow.ToUnixTimeSeconds() - [long]$newestSeen) / 3600
+                            if ($sellerAgeH -gt 24) {
+                                Write-Host ("WARNING: seller data is {0:N1} days old (last seen {1:yyyy-MM-dd HH:mm} UTC). Run /ml scan paged + /reload for fresh sellers." -f ($sellerAgeH / 24), [DateTimeOffset]::FromUnixTimeSeconds([long]$newestSeen)) -ForegroundColor Yellow
+                            }
+                        }
                     } else {
                         Write-Host ("Seller upload error: {0}" -f $sr.error) -ForegroundColor Yellow
                     }
