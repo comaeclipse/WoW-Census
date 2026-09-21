@@ -325,22 +325,30 @@ async function bulkInsert(db, table, cols, rows, per) {
 // static-classic-us, which is Blizzard's actual Classic Progression/SoD
 // product, not TBC Anniversary -- confirmed against a live item lookup, so
 // this is deliberately its own explicit map rather than reusing that helper.
-function itemStaticNamespace(sourceGame) {
-  if (sourceGame === "classic-progression") return "static-classicann-us"; // TBC Anniversary
-  if (sourceGame === "classic") return "static-classic1x-us"; // Classic Era
-  return "static-us"; // retail
+// Blizzard's item API is namespaced per game flavor, and an id only resolves in
+// the namespace(s) that flavor ships. Returned as a list because Forever's beta
+// realms mix modern item ids (which only the retail namespace knows) with
+// vanilla-era ones that retail has since removed -- resolve tries each in turn.
+function itemStaticNamespaces(sourceGame) {
+  if (sourceGame === "classic-progression") return ["static-classicann-us"]; // TBC Anniversary
+  if (sourceGame === "classic") return ["static-classic1x-us"]; // Classic Era
+  if (sourceGame === "classic-beta") return ["static-us", "static-classic1x-us"]; // Forever (Beta)
+  return ["static-us"]; // retail
 }
 
-async function bnetItemName(token, id, namespace) {
-  const u = new URL("/data/wow/item/" + id, BNET_API_BASE);
-  u.searchParams.set("namespace", namespace);
-  u.searchParams.set("locale", "en_US");
-  try {
-    const res = await fetch(u.toString(), { headers: { authorization: "Bearer " + token } });
-    if (!res.ok) return null;
-    const body = await res.json().catch(() => ({}));
-    return (body && body.name) || null;
-  } catch (e) { return null; }
+async function bnetItemName(token, id, namespaces) {
+  for (const namespace of namespaces) {
+    const u = new URL("/data/wow/item/" + id, BNET_API_BASE);
+    u.searchParams.set("namespace", namespace);
+    u.searchParams.set("locale", "en_US");
+    try {
+      const res = await fetch(u.toString(), { headers: { authorization: "Bearer " + token } });
+      if (!res.ok) continue; // not in this namespace -- try the next one
+      const body = await res.json().catch(() => ({}));
+      if (body && body.name) return body.name;
+    } catch (e) { /* try the next namespace */ }
+  }
+  return null;
 }
 
 // Backfill item:<id> placeholders with Blizzard's own item names instead of
@@ -360,7 +368,7 @@ async function resolveItemNames(url, env) {
   const region = url.searchParams.get("region") || DEFAULT_GAME;
   if (!GAMES[region]) return json({ error: "unknown region " + region }, 0, 400);
   const limit = Math.min(Math.max(Number(url.searchParams.get("limit")) || 40, 1), 80);
-  const namespace = itemStaticNamespace(region);
+  const namespaces = itemStaticNamespaces(region);
 
   const ds = await env.DB.prepare("SELECT DISTINCT game FROM datasets WHERE source_game=?").bind(region).all();
   const realmGames = (ds.results || []).map((r) => r.game);
@@ -384,7 +392,7 @@ async function resolveItemNames(url, env) {
   let resolved = 0, failed = 0;
   const now = new Date().toISOString();
   for (const id of idSet) {
-    const name = await bnetItemName(token, id, namespace);
+    const name = await bnetItemName(token, id, namespaces);
     if (!name) { failed++; continue; }
     const slug = slugify(name);
     await env.DB.prepare(
@@ -399,7 +407,7 @@ async function resolveItemNames(url, env) {
     }
     resolved++;
   }
-  return json({ ok: true, region, namespace, realms: realmGames, checked: idSet.size, resolved, failed });
+  return json({ ok: true, region, namespaces, realms: realmGames, checked: idSet.size, resolved, failed });
 }
 
 function pickGame(url) {

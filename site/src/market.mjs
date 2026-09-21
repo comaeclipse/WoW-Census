@@ -61,11 +61,13 @@ const MARKET_STYLE = `
   .mkttable td.l a:hover{color:var(--gold); text-decoration:underline}
   .mkttable th:first-child,.mkttable td:first-child{width:52%}
   .mktgrid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; margin-bottom:22px}
-  @media (max-width:820px){.mktgrid{grid-template-columns:1fr}}`;
+  @media (max-width:820px){.mktgrid{grid-template-columns:1fr}}
+  .vchips{margin-bottom:18px}`;
 
-// snapshot: { items, realms, updatedAt, branch } — items already merged across
-// realms, each { id, name, q, mv, asp, cat }.
-export function renderMarketHtml(snapshot, opts = {}) {
+// One view's worth of markup: the tiles and every panel under them.
+// snapshot: { items, realms, updatedAt, branch } -- items already merged across
+// that view's realms, each { id, name, q, mv, asp, cat }.
+function renderMarketView(snapshot) {
   const items = (snapshot && snapshot.items) || [];
   const realms = (snapshot && snapshot.realms) || [];
   const branch = (snapshot && snapshot.branch) || "";
@@ -101,7 +103,7 @@ export function renderMarketHtml(snapshot, opts = {}) {
     '<div class="tile"><div class="k">Quantity</div><div class="v">' + totalQty.toLocaleString() +
       '</div><div class="s">units on the AH</div></div>' +
     '<div class="tile"><div class="k">Scanned</div><div class="v">' +
-      esc(updatedAt ? String(updatedAt).slice(0, 10) : "&mdash;") +
+      (updatedAt ? esc(String(updatedAt).slice(0, 10)) : "&mdash;") +
       '</div><div class="s">' + esc(realms.join(" · ") || "no realm") + "</div></div>";
 
   const qtyTable = topTable("Most listed items", "By quantity sitting on the auction house.", byQty, branch, [
@@ -122,9 +124,40 @@ export function renderMarketHtml(snapshot, opts = {}) {
 
   const body = items.length
     ? catPanel + '<div class="mktgrid">' + qtyTable + priceTable + "</div>" + valueTable
-    : '<div class="panel"><p class="hint">No auction data uploaded yet for these realms. In game, run /ml scan at the auction house, /reload, then upload with <code>upload-realm.ps1 -Flavor classic-beta</code>.</p></div>';
+    : '<div class="panel"><p class="hint">No auction scan uploaded for ' +
+      esc(realms.join(" · ") || "this faction") + ' yet. In game, run /ml scan at the auction house, ' +
+      '/reload, then upload with <code>upload-realm.ps1 -Flavor classic-beta</code>.</p></div>';
 
-  const nav = opts.nav || "";
+  return '<section class="tiles">' + tiles + "</section>" + body;
+}
+
+// views: [{ key, label, snapshot }] -- "All" plus one per faction. Every view
+// ships in the page and the toggle just swaps which is visible, so the bundle
+// stays a static file with no fetching.
+export function renderMarketHtml(views, opts = {}) {
+  const list = (views || []).filter(Boolean);
+  const active = list.length ? list[0].key : "";
+  const chips = list.length > 1
+    ? '<div class="chips vchips">' + list.map((v) =>
+        '<button class="chip" type="button" data-view="' + esc(v.key) + '" aria-pressed="' +
+        (v.key === active ? "true" : "false") + '">' + esc(v.label) + "</button>").join("") + "</div>"
+    : "";
+  const sections = list.map((v) =>
+    '<div class="vpane" data-view="' + esc(v.key) + '"' + (v.key === active ? "" : ' hidden') + ">" +
+    renderMarketView(v.snapshot) + "</div>").join("");
+
+  const script = list.length > 1 ? `<script>
+(function(){
+  var chips=[].slice.call(document.querySelectorAll(".vchips .chip"));
+  var panes=[].slice.call(document.querySelectorAll(".vpane"));
+  function show(key){
+    chips.forEach(function(c){ c.setAttribute("aria-pressed", c.dataset.view===key?"true":"false"); });
+    panes.forEach(function(p){ p.hidden = p.dataset.view!==key; });
+  }
+  chips.forEach(function(c){ c.addEventListener("click", function(){ show(c.dataset.view); }); });
+})();
+</script>` : "";
+
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>WoW Forever auction house — MarketLens</title>
@@ -139,19 +172,20 @@ ${MARKET_STYLE}
 </head><body>
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">
-  ${nav}
+  ${opts.nav || ""}
   <header class="ihead">
     <h1 class="iname">WoW Forever &mdash; Auction House</h1>
     <div class="itag">Beta realms &middot; observed listings &middot; scanned in game with MarketLens</div>
     ${opts.note ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + "</div>" : ""}
   </header>
-  <section class="tiles">${tiles}</section>
-  ${body}
+  ${chips}
+  ${sections}
   <p class="src">
     An auction house scan observes <b>listings</b>, not sales. Unit price is the weighted median buyout
     asked for an item, and listed value is quantity &times; that price &mdash; what sellers want, not what anyone paid.<br>
     Items a scan could not name appear by id. Companion to the MarketLens addon.
   </p>
 </div>
+${script}
 </body></html>`;
 }

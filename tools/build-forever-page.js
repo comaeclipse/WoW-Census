@@ -89,14 +89,41 @@ async function main() {
   process.stdout.write("Auctions ... ");
   const games = (await getJson(base + "/api/games")).games || [];
   const marketGames = games.filter((g) => g.sourceGame === SOURCE_GAME && g.hasItems);
-  const perRealm = [];
+  const snaps = [];
   for (const g of marketGames) {
     const snap = await getJson(base + "/api/items?game=" + encodeURIComponent(g.game));
-    perRealm.push({ items: snap.items || [], columns: snap.columns, updatedAt: snap.updatedAt });
+    const realm = g.game.replace(/^realm:/, "");
+    snaps.push({
+      realm,
+      faction: (/-(Alliance|Horde)$/.exec(realm) || [, "Neutral"])[1],
+      items: snap.items || [], columns: snap.columns, updatedAt: snap.updatedAt,
+    });
   }
-  const items = mergeItems(perRealm);
-  const updatedAt = perRealm.map((p) => p.updatedAt).filter(Boolean).sort().pop() || null;
-  console.log(items.length.toLocaleString() + " items across " + marketGames.length + " realm dataset(s)");
+  // "All" first, then one view per faction the beta has a realm dataset for --
+  // including a faction with no AH scan yet, whose view then says so rather
+  // than the toggle quietly hiding that side.
+  const factions = [...new Set(games
+    .filter((g) => g.sourceGame === SOURCE_GAME && g.realm)
+    .map((g) => (/-(Alliance|Horde)$/.exec(g.game) || [, "Neutral"])[1]))].sort();
+  const view = (key, label, from) => ({
+    key, label,
+    snapshot: {
+      items: mergeItems(from),
+      realms: from.map((s2) => s2.realm),
+      updatedAt: from.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
+      branch: WH_BRANCH,
+    },
+  });
+  const realmsOf = (f) => games
+    .filter((g) => g.sourceGame === SOURCE_GAME && g.realm && g.game.endsWith("-" + f))
+    .map((g) => g.game.replace(/^realm:/, ""));
+  const views = [view("all", "All", snaps)].concat(factions.map((f) => {
+    const v = view(f, f, snaps.filter((s2) => s2.faction === f));
+    if (!v.snapshot.realms.length) v.snapshot.realms = realmsOf(f);
+    return v;
+  }));
+  console.log(views[0].snapshot.items.length.toLocaleString() + " items across " +
+    marketGames.length + " realm dataset(s): " + (factions.join(", ") || "none"));
 
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(census, {
@@ -104,12 +131,8 @@ async function main() {
     nav: nav("index.html"),
     note: stamp,
   }));
-  fs.writeFileSync(path.join(outDir, "auctionhouse.html"), renderMarketHtml({
-    items,
-    realms: marketGames.map((g) => g.game.replace(/^realm:/, "")),
-    updatedAt,
-    branch: WH_BRANCH,
-  }, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp }));
+  fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
+    renderMarketHtml(views, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp }));
   // The bundle carries its own stylesheet so it renders with nothing else served.
   fs.copyFileSync(path.join(repo, "site/public/style.css"), path.join(outDir, "style.css"));
   fs.writeFileSync(path.join(outDir, "census.json"), JSON.stringify(census, null, 2));
