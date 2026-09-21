@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WoW Forever census — MarketLens</title>
+<meta name="description" content="Observed population census for the WoW Forever beta realms: race and class distribution by faction, sampled via /who.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .chartgrid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start}
+  @media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
+  .census .legend{display:flex; gap:18px; margin:0 0 14px}
+  .census .key{display:inline-flex; align-items:center; gap:7px; font-size:17px; color:var(--muted)}
+  .census .key i{width:13px; height:13px; display:inline-block}
+  .bar{display:grid; grid-template-columns:172px 1fr 62px; align-items:center; gap:10px; margin-bottom:6px}
+  .bar .bl{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-align:right;
+    color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .bar .bt{background:var(--panel2); border:2px solid var(--line); height:20px; padding:1px}
+  .bar .bt i{display:block; height:100%}
+  .bar .bn{text-align:right; color:var(--ink)}
+  @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
+</style>
+</head><body>
+<div class="crt" aria-hidden="true"></div>
+<div class="wrap">
+  <a class="back" href="https://marketlens.skarz.workers.dev/pop">&#9664; MARKETLENS</a>
+  <header class="ihead">
+    <h1 class="iname">WoW Forever &mdash; Observed Census</h1>
+    <div class="itag">Beta realms &middot; both factions &middot; unique characters sampled via /who</div>
+    <div class="itag" style="margin-top:10px;line-height:1.6">Static snapshot built 2026-09-21 21:19Z</div>
+  </header>
+  <section class="tiles"><div class="tile"><div class="k">Characters</div><div class="v">4,056</div><div class="s">unique, all time</div></div><div class="tile"><div class="k">Realms</div><div class="v">1</div><div class="s">Classic Beta PvE</div></div><div class="tile"><div class="k">Scans</div><div class="v">173</div><div class="s">5,768 sightings</div></div><div class="tile"><div class="k">Updated</div><div class="v">2026-09-21</div><div class="s">last sample</div></div></section>
+  <div class="panel census" style="margin-bottom:22px"><div class="ptitle">Population by race</div><p class="hint" style="margin-top:0">Grouped by faction, most populous first.</p><div class="legend"><span class="key"><i style="background:#3f83f8"></i>Alliance</span><span class="key"><i style="background:#d9363e"></i>Horde</span></div><div class="bar"><div class="bl">HUMAN</div><div class="bt"><i style="width:100.00%;background:#3f83f8"></i></div><div class="bn">729</div></div><div class="bar"><div class="bl">NIGHT ELF</div><div class="bt"><i style="width:79.84%;background:#3f83f8"></i></div><div class="bn">582</div></div><div class="bar"><div class="bl">DWARF</div><div class="bt"><i style="width:47.33%;background:#3f83f8"></i></div><div class="bn">345</div></div><div class="bar"><div class="bl">GNOME</div><div class="bt"><i style="width:34.71%;background:#3f83f8"></i></div><div class="bn">253</div></div><div class="bar"><div class="bl">HIGH ORDER SKYBORNE</div><div class="bt"><i style="width:32.78%;background:#3f83f8"></i></div><div class="bn">239</div></div><div class="bar"><div class="bl">UNDEAD</div><div class="bt"><i style="width:86.01%;background:#d9363e"></i></div><div class="bn">627</div></div><div class="bar"><div class="bl">TAUREN</div><div class="bt"><i style="width:58.30%;background:#d9363e"></i></div><div class="bn">425</div></div><div class="bar"><div class="bl">WINDSHAPER SKYBORNE</div><div class="bt"><i style="width:48.56%;background:#d9363e"></i></div><div class="bn">354</div></div><div class="bar"><div class="bl">ORC</div><div class="bt"><i style="width:38.00%;background:#d9363e"></i></div><div class="bn">277</div></div><div class="bar"><div class="bl">TROLL</div><div class="bt"><i style="width:30.86%;background:#d9363e"></i></div><div class="bn">225</div></div></div><div class="chartgrid"><div class="panel census"><div class="ptitle">Class distribution &mdash; Alliance</div><p class="hint" style="margin-top:0">2,148 characters shown</p><div class="bar"><div class="bl">HUNTER</div><div class="bt"><i style="width:100.00%;background:#ABD473"></i></div><div class="bn">370</div></div><div class="bar"><div class="bl">PALADIN</div><div class="bt"><i style="width:89.19%;background:#F58CBA"></i></div><div class="bn">330</div></div><div class="bar"><div class="bl">DRUID</div><div class="bt"><i style="width:71.89%;background:#FF7D0A"></i></div><div class="bn">266</div></div><div class="bar"><div class="bl">WARRIOR</div><div class="bt"><i style="width:71.08%;background:#C79C6E"></i></div><div class="bn">263</div></div><div class="bar"><div class="bl">MAGE</div><div class="bt"><i style="width:61.35%;background:#69CCF0"></i></div><div class="bn">227</div></div><div class="bar"><div class="bl">PRIEST</div><div class="bt"><i style="width:61.35%;background:#FFFFFF"></i></div><div class="bn">227</div></div><div class="bar"><div class="bl">SHAMAN</div><div class="bt"><i style="width:51.35%;background:#0070DE"></i></div><div class="bn">190</div></div><div class="bar"><div class="bl">ROGUE</div><div class="bt"><i style="width:45.14%;background:#FFF569"></i></div><div class="bn">167</div></div><div class="bar"><div class="bl">WARLOCK</div><div class="bt"><i style="width:29.19%;background:#9482C9"></i></div><div class="bn">108</div></div></div><div class="panel census"><div class="ptitle">Class distribution &mdash; Horde</div><p class="hint" style="margin-top:0">1,908 characters shown</p><div class="bar"><div class="bl">PALADIN</div><div class="bt"><i style="width:100.00%;background:#F58CBA"></i></div><div class="bn">355</div></div><div class="bar"><div class="bl">SHAMAN</div><div class="bt"><i style="width:97.75%;background:#0070DE"></i></div><div class="bn">347</div></div><div class="bar"><div class="bl">DRUID</div><div class="bt"><i style="width:76.90%;background:#FF7D0A"></i></div><div class="bn">273</div></div><div class="bar"><div class="bl">WARRIOR</div><div class="bt"><i style="width:62.54%;background:#C79C6E"></i></div><div class="bn">222</div></div><div class="bar"><div class="bl">HUNTER</div><div class="bt"><i style="width:60.85%;background:#ABD473"></i></div><div class="bn">216</div></div><div class="bar"><div class="bl">WARLOCK</div><div class="bt"><i style="width:41.13%;background:#9482C9"></i></div><div class="bn">146</div></div><div class="bar"><div class="bl">ROGUE</div><div class="bt"><i style="width:34.37%;background:#FFF569"></i></div><div class="bn">122</div></div><div class="bar"><div class="bl">MAGE</div><div class="bt"><i style="width:32.96%;background:#69CCF0"></i></div><div class="bn">117</div></div><div class="bar"><div class="bl">PRIEST</div><div class="bt"><i style="width:30.99%;background:#FFFFFF"></i></div><div class="bn">110</div></div></div></div><div class="ptitle" style="margin:26px 0 12px">Per-realm detail</div><nav class="games"><a class="game" href="https://marketlens.skarz.workers.dev/pop?game=realm%3AClassic%20Beta%20PvE-Alliance">Classic Beta PvE-Alliance</a><a class="game" href="https://marketlens.skarz.workers.dev/pop?game=realm%3AClassic%20Beta%20PvE-Horde">Classic Beta PvE-Horde</a></nav>
+  <p class="src">
+    A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
+    Each bar counts unique characters &mdash; one per normalized character name + realm &mdash; so a faction
+    that received more scans does not gain share from the extra scans alone.<br>
+    Characters are not human players/accounts; a rename appears as a new character. Companion to the MarketLens addon.
+  </p>
+</div>
+</body></html>

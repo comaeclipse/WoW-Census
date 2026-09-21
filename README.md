@@ -31,6 +31,7 @@ MarketLens/   the in-game addon — drop this folder into Interface/AddOns
   Libs/       embedded LibStub + LibAHTab (native AH tab on modern clients)
 site/         Cloudflare Worker, D1 schema, and static frontend
 tools/        out-of-game scripts (realm/population upload, data builders)
+pages/        generated static census bundle (drag-and-drop to Cloudflare Pages)
 archive/      early prototypes
 ```
 
@@ -207,6 +208,28 @@ uploaded by `tools/upload-realm.ps1`, stores latest-value and day-bucketed
 history rows per item, and serves per-item price/sale-rate history and realm
 population/census views. Item links and icons follow the correct Wowhead branch
 (Retail vs Classic Era/TBC Anniversary) based on each dataset's recorded flavor.
+
+`/wowforever` is a cross-faction census for the Forever (Beta) realms: one race
+chart grouped by faction and a class chart per faction, counting **unique
+characters** rather than sightings so the faction that happened to get more
+`/who` scans doesn't gain share from the extra scans alone.
+
+### Static census bundle (`pages/`)
+
+`/wowforever` also ships as a standalone bundle with no Worker and no database
+behind it, for dropping onto Cloudflare Pages:
+
+```bash
+node tools/build-forever-page.js
+```
+
+That reads the live census from `/api/forever`, renders it with the same module
+the Worker uses (`site/src/census.mjs`, so the two can't drift), and writes
+`pages/index.html`, `pages/style.css`, and `pages/census.json`. Drag the `pages`
+folder onto **Cloudflare dashboard -> Workers & Pages -> Create -> Pages ->
+Upload assets**. The numbers are frozen at build time -- re-run the script after
+each upload to refresh them. Pass `--url=` to build against a different origin
+(e.g. a local `wrangler dev`) and `--out=` to write somewhere else.
 
 ## Status: v0.1 (MVP)
 
