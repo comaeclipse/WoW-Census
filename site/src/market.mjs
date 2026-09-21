@@ -64,11 +64,34 @@ const MARKET_STYLE = `
   @media (max-width:820px){.mktgrid{grid-template-columns:1fr}}
   .vchips{margin-bottom:18px}`;
 
+// Someone listing a Moon Harvest Pumpkin at 999,999g is not a market -- one
+// such listing was 99% of a faction's entire listed value. Prices that absurd
+// are excluded from the page's totals and top lists, but never silently: the
+// page names what it dropped.
+//
+// The cutoff is data-driven rather than a fixed gold number, since a healthy
+// economy's ceiling rises over time: 50x the 99th-percentile unit price across
+// every realm scanned, floored at 500g so a thin market cannot produce a cutoff
+// low enough to drop a genuine epic. On the beta's current data p99 is 8g and
+// real listings top out near 50g, so the floor governs and the gap to the joke
+// listing is four orders of magnitude -- nothing borderline is at stake.
+const JOKE_FLOOR = 500 * 10000; // copper
+export function jokePriceThreshold(items) {
+  const prices = (items || []).filter((it) => (it.q || 0) > 0 && (it.asp || 0) > 0)
+    .map((it) => it.asp).sort((a, b) => a - b);
+  if (!prices.length) return Infinity;
+  const p99 = prices[Math.floor(0.99 * (prices.length - 1))];
+  return Math.max(50 * p99, JOKE_FLOOR);
+}
+
 // One view's worth of markup: the tiles and every panel under them.
 // snapshot: { items, realms, updatedAt, branch } -- items already merged across
 // that view's realms, each { id, name, q, mv, asp, cat }.
-function renderMarketView(snapshot) {
-  const items = (snapshot && snapshot.items) || [];
+function renderMarketView(snapshot, threshold) {
+  const all = (snapshot && snapshot.items) || [];
+  const joke = all.filter((it) => (it.asp || 0) > threshold)
+    .sort((a, b) => (b.asp || 0) - (a.asp || 0));
+  const items = joke.length ? all.filter((it) => (it.asp || 0) <= threshold) : all;
   const realms = (snapshot && snapshot.realms) || [];
   const branch = (snapshot && snapshot.branch) || "";
   const updatedAt = snapshot && snapshot.updatedAt;
@@ -128,7 +151,18 @@ function renderMarketView(snapshot) {
       esc(realms.join(" · ") || "this faction") + ' yet. In game, run /ml scan at the auction house, ' +
       '/reload, then upload with <code>upload-realm.ps1 -Flavor classic-beta</code>.</p></div>';
 
-  return '<section class="tiles">' + tiles + "</section>" + body;
+  const jokePanel = joke.length
+    ? topTable("Excluded as joke listings",
+        "Priced above " + bigGold(threshold) + " a unit — left out of the totals and lists above.",
+        joke.slice(0, 10), branch, [
+          { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
+          { label: "Unit", cell: (it) => esc(money(it.asp)) },
+          { label: "Qty", cell: (it) => (it.q || 0).toLocaleString() },
+        ])
+    : "";
+
+  return '<section class="tiles">' + tiles + "</section>" + body +
+    (jokePanel ? '<div style="margin-top:22px">' + jokePanel + "</div>" : "");
 }
 
 // views: [{ key, label, snapshot }] -- "All" plus one per faction. Every view
@@ -142,9 +176,15 @@ export function renderMarketHtml(views, opts = {}) {
         '<button class="chip" type="button" data-view="' + esc(v.key) + '" aria-pressed="' +
         (v.key === active ? "true" : "false") + '">' + esc(v.label) + "</button>").join("") + "</div>"
     : "";
+  // One threshold shared by every view -- computed from the widest item set, so
+  // the Alliance and Horde views judge prices by the same yardstick as All.
+  const widest = list.reduce((best, v) =>
+    ((v.snapshot && v.snapshot.items) || []).length > (best.items || []).length ? v.snapshot : best,
+    { items: [] });
+  const threshold = jokePriceThreshold(widest.items);
   const sections = list.map((v) =>
     '<div class="vpane" data-view="' + esc(v.key) + '"' + (v.key === active ? "" : ' hidden') + ">" +
-    renderMarketView(v.snapshot) + "</div>").join("");
+    renderMarketView(v.snapshot, threshold) + "</div>").join("");
 
   const script = list.length > 1 ? `<script>
 (function(){
@@ -183,6 +223,8 @@ ${MARKET_STYLE}
   <p class="src">
     An auction house scan observes <b>listings</b>, not sales. Unit price is the weighted median buyout
     asked for an item, and listed value is quantity &times; that price &mdash; what sellers want, not what anyone paid.<br>
+    Listings priced absurdly above the rest of the market are excluded from the totals and top lists,
+    and named in their own panel rather than dropped quietly.<br>
     Items a scan could not name appear by id. Companion to the MarketLens addon.
   </p>
 </div>
