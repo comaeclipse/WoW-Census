@@ -1176,7 +1176,11 @@ async function popChooserPage(env) {
       return `<a class="game" href="${href}" title="${esc(r.obs || 0)} sightings${updated ? " · updated " + updated : ""}">` +
         `${esc(name)}${fac ? ' <span class="fac">' + esc(fac) + "</span>" : ""}</a>`;
     }).join("");
-    return `<div class="ptitle" style="margin:24px 0 12px">${esc(label)}</div><nav class="games">${btns}</nav>`;
+    // The beta client gets a cross-faction census page; offer it beside its realms.
+    const combined = src === "classic-beta"
+      ? `<a class="game" href="/wowforever" title="Both factions, every beta realm">All realms <span class="fac">both factions</span></a>`
+      : "";
+    return `<div class="ptitle" style="margin:24px 0 12px">${esc(label)}</div><nav class="games">${combined}${btns}</nav>`;
   }).join("");
   if (!rows.length)
     body = '<div class="panel"><p class="hint">No population data uploaded yet. In game, open the Population tab and press Scan Population (or /ml who), then run the uploader.</p></div>';
@@ -1376,6 +1380,185 @@ async function popPage(url, env) {
   }
 }
 
+// Cross-faction census for the Forever (Beta) client. /pop shows one realm and
+// one faction at a time; this rolls every classic-beta dataset into a single
+// Alliance-vs-Horde view. It counts unique characters -- each character once,
+// however many scans caught it -- so the faction that happened to get more
+// /who scans cannot inflate its own share.
+async function loadForeverCensus(env) {
+  const rows = (await env.DB.prepare(
+    `SELECT c.game game, c.race race, c.class_file cf, COUNT(*) n
+     FROM characters c JOIN datasets d ON d.game = c.game
+     WHERE d.source_game = 'classic-beta'
+     GROUP BY c.game, c.race, c.class_file`
+  ).all()).results;
+  const scans = (await env.DB.prepare(
+    `SELECT p.game game, COUNT(*) samples, SUM(p.observed) observed, MAX(p.t) lastT
+     FROM pop_samples p JOIN datasets d ON d.game = p.game
+     WHERE d.source_game = 'classic-beta' GROUP BY p.game`
+  ).all()).results;
+
+  const factions = new Map();
+  const realms = new Set();
+  let lastT = 0;
+  function bucket(game) {
+    const label = game.indexOf("realm:") === 0 ? game.slice(6) : game;
+    const { name, fac } = splitRealm(label);
+    realms.add(name);
+    const key = fac || "Unknown";
+    if (!factions.has(key))
+      factions.set(key, { faction: key, races: {}, classes: {}, characters: 0, samples: 0, observed: 0, games: [] });
+    const f = factions.get(key);
+    if (f.games.indexOf(game) < 0) f.games.push(game);
+    return f;
+  }
+  for (const r of rows) {
+    const f = bucket(r.game);
+    f.characters += r.n;
+    if (r.race) f.races[r.race] = (f.races[r.race] || 0) + r.n;
+    if (r.cf) f.classes[r.cf] = (f.classes[r.cf] || 0) + r.n;
+  }
+  for (const s of scans) {
+    const f = bucket(s.game);
+    f.samples += s.samples || 0;
+    f.observed += s.observed || 0;
+    if ((s.lastT || 0) > lastT) lastT = s.lastT;
+  }
+
+  const order = ["Alliance", "Horde"];
+  const groups = [...factions.values()].sort((a, b) =>
+    ((order.indexOf(a.faction) + 1) || 99) - ((order.indexOf(b.faction) + 1) || 99) || b.characters - a.characters);
+  return { groups, realms: [...realms].sort(), lastT };
+}
+
+const FACTION_COLOR = { Alliance: "#3f83f8", Horde: "#d9363e", Unknown: "#8b90a0" };
+function factionColor(f) { return FACTION_COLOR[f] || FACTION_COLOR.Unknown; }
+
+// One horizontal bar row. `max` scales every bar in a chart against the same
+// value, so bar lengths compare across the whole chart.
+function barRow(label, n, max, color) {
+  const pct = max > 0 ? Math.max((n / max) * 100, 0.6) : 0;
+  return '<div class="bar">' +
+    '<div class="bl">' + esc(label) + "</div>" +
+    '<div class="bt"><i style="width:' + pct.toFixed(2) + "%;background:" + color + '"></i></div>' +
+    '<div class="bn">' + n.toLocaleString() + "</div></div>";
+}
+
+function barChart(entries, max, colorFor, labelFor) {
+  return entries.map(([k, n]) => barRow(labelFor ? labelFor(k) : k, n, max, colorFor(k))).join("");
+}
+
+function sortedEntries(dist) {
+  return Object.keys(dist)
+    .map((k) => [k, dist[k]])
+    .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])));
+}
+
+async function foreverPage(env) {
+  const { groups, realms, lastT } = await loadForeverCensus(env);
+  const total = groups.reduce((a, g) => a + g.characters, 0);
+  const samples = groups.reduce((a, g) => a + g.samples, 0);
+  const sightings = groups.reduce((a, g) => a + g.observed, 0);
+
+  if (!total && !samples) {
+    const empty = '<div class="panel"><p class="hint">No Forever (Beta) population data uploaded yet. ' +
+      "In game on a beta realm, open the Population tab and press Scan Population (or /ml who), then run " +
+      "<code>upload-realm.ps1 -Flavor classic-beta</code>.</p></div>";
+    return foreverHtml(empty, 0, 0, 0, [], lastT);
+  }
+
+  // Race chart: every faction's races in one chart, grouped by faction and
+  // scaled against the single largest race so the faction blocks compare.
+  const raceMax = groups.reduce((m, g) =>
+    Object.values(g.races).reduce((mm, n) => Math.max(mm, n), m), 0);
+  const raceRows = groups.map((g) =>
+    barChart(sortedEntries(g.races), raceMax, () => factionColor(g.faction), (k) => k.toUpperCase())).join("");
+  const legend = groups.map((g) =>
+    '<span class="key"><i style="background:' + factionColor(g.faction) + '"></i>' + esc(g.faction) + "</span>").join("");
+  const racePanel = '<div class="panel census" style="margin-bottom:22px"><div class="ptitle">Population by race</div>' +
+    '<p class="hint" style="margin-top:0">Grouped by faction, most populous first.</p>' +
+    '<div class="legend">' + legend + "</div>" +
+    (raceRows || '<p class="hint">No race data yet.</p>') + "</div>";
+
+  // One class chart per faction, each scaled to its own leader.
+  const classPanels = groups.map((g) => {
+    const entries = sortedEntries(g.classes);
+    const max = entries.length ? entries[0][1] : 0;
+    return '<div class="panel census"><div class="ptitle">Class distribution &mdash; ' + esc(g.faction) + "</div>" +
+      '<p class="hint" style="margin-top:0">' + g.characters.toLocaleString() + " characters shown</p>" +
+      (entries.length
+        ? barChart(entries, max,
+            (k) => "#" + (CLASS_META[k] ? CLASS_META[k][1] : "8b90a0"),
+            (k) => (CLASS_META[k] ? CLASS_META[k][0] : k).toUpperCase())
+        : '<p class="hint">No class data yet.</p>') + "</div>";
+  }).join("");
+
+  const links = groups.map((g) => g.games.map((game) =>
+    '<a class="game" href="/pop?game=' + encodeURIComponent(game) + '">' + esc(game.slice(6)) + "</a>"
+  ).join("")).join("");
+
+  const body = racePanel +
+    '<div class="chartgrid">' + classPanels + "</div>" +
+    '<div class="ptitle" style="margin:26px 0 12px">Per-realm detail</div><nav class="games">' + links + "</nav>";
+  return foreverHtml(body, total, samples, sightings, realms, lastT);
+}
+
+function foreverHtml(body, total, samples, sightings, realms, lastT) {
+  const tiles =
+    '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() +
+      '</div><div class="s">unique, all time</div></div>' +
+    '<div class="tile"><div class="k">Realms</div><div class="v">' + (realms.length || "&mdash;") +
+      '</div><div class="s">' + esc(realms.join(" · ") || "none yet") + "</div></div>" +
+    '<div class="tile"><div class="k">Scans</div><div class="v">' + samples.toLocaleString() +
+      '</div><div class="s">' + sightings.toLocaleString() + " sightings</div></div>" +
+    '<div class="tile"><div class="k">Updated</div><div class="v">' +
+      (lastT ? new Date(lastT * 1000).toISOString().slice(0, 10) : "&mdash;") +
+      '</div><div class="s">last sample</div></div>';
+
+  const html = `<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WoW Forever census — MarketLens</title>
+<meta name="description" content="Observed population census for the WoW Forever beta realms: race and class distribution by faction, sampled via /who.">
+<link rel="alternate" type="application/json" href="/api/games" title="Datasets (JSON)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="stylesheet" href="/style.css">
+<style>
+  .chartgrid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start}
+  @media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
+  .census .legend{display:flex; gap:18px; margin:0 0 14px}
+  .census .key{display:inline-flex; align-items:center; gap:7px; font-size:17px; color:var(--muted)}
+  .census .key i{width:13px; height:13px; display:inline-block}
+  .bar{display:grid; grid-template-columns:172px 1fr 62px; align-items:center; gap:10px; margin-bottom:6px}
+  .bar .bl{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-align:right;
+    color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .bar .bt{background:var(--panel2); border:2px solid var(--line); height:20px; padding:1px}
+  .bar .bt i{display:block; height:100%}
+  .bar .bn{text-align:right; color:var(--ink)}
+  @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
+</style>
+</head><body>
+<div class="crt" aria-hidden="true"></div>
+<div class="wrap">
+  <a class="back" href="/pop">&#9664; POPULATION</a>
+  <header class="ihead">
+    <h1 class="iname">WoW Forever &mdash; Observed Census</h1>
+    <div class="itag">Beta realms &middot; both factions &middot; unique characters sampled via /who</div>
+  </header>
+  <section class="tiles">${tiles}</section>
+  ${body}
+  <p class="src">
+    A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
+    Each bar counts unique characters &mdash; one per normalized character name + realm &mdash; so a faction
+    that received more scans does not gain share from the extra scans alone.<br>
+    Characters are not human players/accounts; a rename appears as a new character. Companion to the MarketLens addon.
+  </p>
+</div>
+</body></html>`;
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } });
+}
+
 const app = new Hono();
 
 app.all("/api/items", (c) => apiItems(new URL(c.req.url), c.env, c.executionCtx));
@@ -1391,6 +1574,7 @@ app.all("/admin/bnet-realm-auctions", (c) => bnetRealmAuctions(new URL(c.req.url
 app.all("/admin/resolve-names", (c) => resolveItemNames(new URL(c.req.url), c.env));
 
 app.all("/pop", (c) => popPage(new URL(c.req.url), c.env));
+app.all("/wowforever", (c) => foreverPage(c.env));
 app.all("/seller/*", (c) => sellerPage(new URL(c.req.url), c.env));
 app.all("/item/*", (c) => itemPage(new URL(c.req.url), c.env));
 
