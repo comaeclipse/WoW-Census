@@ -214,22 +214,32 @@ chart grouped by faction and a class chart per faction, counting **unique
 characters** rather than sightings so the faction that happened to get more
 `/who` scans doesn't gain share from the extra scans alone.
 
-### Static census bundle (`pages/`)
+### Static bundle (`pages/` -> wowcensus.pages.dev)
 
-`/wowforever` also ships as a standalone bundle with no Worker and no database
-behind it, for dropping onto Cloudflare Pages:
+The beta views also ship as a standalone bundle with no Worker and no database
+behind it, published at **https://wowcensus.pages.dev**:
 
 ```bash
-node tools/build-forever-page.js
+node tools/build-forever-page.js            # build pages/ only
+node tools/build-forever-page.js --deploy   # build, then publish to Pages
 ```
 
-That reads the live census from `/api/forever`, renders it with the same module
-the Worker uses (`site/src/census.mjs`, so the two can't drift), and writes
-`pages/index.html`, `pages/style.css`, and `pages/census.json`. Drag the `pages`
-folder onto **Cloudflare dashboard -> Workers & Pages -> Create -> Pages ->
-Upload assets**. The numbers are frozen at build time -- re-run the script after
-each upload to refresh them. Pass `--url=` to build against a different origin
-(e.g. a local `wrangler dev`) and `--out=` to write somewhere else.
+It reads the live data from `/api/forever`, `/api/games`, and `/api/items`, and
+renders it with the same modules the Worker uses (`site/src/census.mjs` and
+`site/src/market.mjs`, so the copies can't drift), writing:
+
+| File | Page |
+| --- | --- |
+| `pages/index.html` | the cross-faction census |
+| `pages/auctionhouse.html` | `/auctionhouse` — biggest markets, most listed items, most expensive listings |
+| `pages/style.css`, `pages/census.json` | stylesheet and raw census numbers |
+
+`--deploy` runs `wrangler pages deploy` against the `wowcensus` project; without
+it the folder can still be dragged onto **Cloudflare dashboard -> Workers &
+Pages -> Create -> Pages -> Upload assets**. The numbers are frozen at build
+time -- re-run after each upload to refresh them. `--url=` builds against a
+different origin (a local `wrangler dev`, say), `--out=` writes elsewhere, and
+`--project=` targets another Pages project.
 
 ## Status: v0.1 (MVP)
 

@@ -24,26 +24,28 @@ const FACTION_COLOR = { Alliance: "#3f83f8", Horde: "#d9363e", Unknown: "#8b90a0
 function factionColor(f) { return FACTION_COLOR[f] || FACTION_COLOR.Unknown; }
 
 // One horizontal bar row. `max` scales every bar in a chart against the same
-// value, so bar lengths compare across the whole chart.
-function barRow(label, n, max, color) {
+// value, so bar lengths compare across the whole chart. `text` is what prints
+// at the right -- a plain count unless the caller formats it (gold, say).
+export function barRow(label, n, max, color, text) {
   const pct = max > 0 ? Math.max((n / max) * 100, 0.6) : 0;
   return '<div class="bar">' +
     '<div class="bl">' + esc(label) + "</div>" +
     '<div class="bt"><i style="width:' + pct.toFixed(2) + "%;background:" + color + '"></i></div>' +
-    '<div class="bn">' + n.toLocaleString() + "</div></div>";
+    '<div class="bn">' + esc(text == null ? n.toLocaleString() : text) + "</div></div>";
 }
 
-function barChart(entries, max, colorFor, labelFor) {
-  return entries.map(([k, n]) => barRow(labelFor ? labelFor(k) : k, n, max, colorFor(k))).join("");
+export function barChart(entries, max, colorFor, labelFor, valueFor) {
+  return entries.map(([k, n]) =>
+    barRow(labelFor ? labelFor(k) : k, n, max, colorFor(k), valueFor ? valueFor(n, k) : null)).join("");
 }
 
-function sortedEntries(dist) {
+export function sortedEntries(dist) {
   return Object.keys(dist)
     .map((k) => [k, dist[k]])
     .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])));
 }
 
-const CENSUS_STYLE = `
+export const CENSUS_STYLE = `
   .chartgrid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start}
   @media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
   .census .legend{display:flex; gap:18px; margin:0 0 14px}
@@ -62,6 +64,7 @@ const CENSUS_STYLE = `
 //                  in the static bundle, which may sit under a subpath)
 // opts.realmHref   game key -> per-realm page URL, or null to drop those links
 // opts.back        { href, label } for the top-left crumb, or null
+// opts.nav         raw markup replacing that crumb (static bundle page nav)
 // opts.note        extra line under the header (the static build stamps its age)
 export function renderCensusHtml(census, opts = {}) {
   const groups = (census && census.groups) || [];
@@ -123,9 +126,11 @@ export function renderCensusHtml(census, opts = {}) {
       (lastT ? new Date(lastT * 1000).toISOString().slice(0, 10) : "&mdash;") +
       '</div><div class="s">last sample</div></div>';
 
-  const back = opts.back
+  // opts.nav wins when the caller supplies its own header strip (the static
+  // bundle links its two pages to each other instead of back to the Worker).
+  const back = opts.nav || (opts.back
     ? '<a class="back" href="' + esc(opts.back.href) + '">&#9664; ' + esc(opts.back.label) + "</a>"
-    : "";
+    : "");
   // The 8px pixel font overflows the body's tight line box, so a second .itag
   // line needs its own breathing room or it collides with the tagline above.
   const note = opts.note
