@@ -32,11 +32,48 @@ const project = arg("project", "wowcensus");
 // Every beta realm dataset shares this source_game; both pages filter on it.
 const SOURCE_GAME = "classic-beta";
 const WH_BRANCH = "forever";
+const ITEM_NAME_CACHE = path.join(__dirname, "forever-item-names.json");
 
 async function getJson(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(url + " -> HTTP " + res.status);
   return res.json();
+}
+
+function readItemNameCache() {
+  try { return JSON.parse(fs.readFileSync(ITEM_NAME_CACHE, "utf8")); }
+  catch (e) {
+    if (e && e.code === "ENOENT") return {};
+    throw e;
+  }
+}
+
+// Forever includes beta-only ids that Blizzard's public item namespaces do
+// not expose. Wowhead's Forever tooltip endpoint does know those ids (and the
+// vanilla ids mixed into the same scans), so resolve only item:<id>
+// placeholders here and retain the result for deterministic future builds.
+async function resolvePlaceholderNames(items) {
+  const cache = readItemNameCache();
+  const missing = items.filter((it) => /^item:\d+$/.test(it.name) && !cache[it.id]);
+  let resolved = 0;
+  for (let i = 0; i < missing.length; i += 12) {
+    await Promise.all(missing.slice(i, i + 12).map(async (it) => {
+      const res = await fetch("https://nether.wowhead.com/forever/tooltip/item/" + it.id);
+      if (!res.ok) return;
+      const body = await res.json().catch(() => null);
+      if (!body || !body.name || /^Item \d+$/.test(body.name)) return;
+      cache[it.id] = body.name;
+      resolved++;
+    }));
+  }
+  if (resolved) {
+    const ordered = Object.fromEntries(Object.entries(cache).sort((a, b) => Number(a[0]) - Number(b[0])));
+    fs.writeFileSync(ITEM_NAME_CACHE, JSON.stringify(ordered, null, 2) + "\n");
+  }
+  for (const it of items) {
+    if (/^item:\d+$/.test(it.name) && cache[it.id]) it.name = cache[it.id];
+  }
+  return { resolved, unresolved: items.filter((it) => /^item:\d+$/.test(it.name)).length };
 }
 
 // The two pages link to each other; the bundle has no Worker behind it, so the
@@ -122,8 +159,17 @@ async function main() {
     if (!v.snapshot.realms.length) v.snapshot.realms = realmsOf(f);
     return v;
   }));
+  const uniqueItems = [...new Map(views.flatMap((v) => v.snapshot.items).map((it) => [it.id, it])).values()];
+  const names = await resolvePlaceholderNames(uniqueItems);
+  // Apply a name learned from either faction to every view containing that id.
+  const resolvedNames = new Map(uniqueItems.map((it) => [it.id, it.name]));
+  for (const v of views) for (const it of v.snapshot.items) {
+    if (/^item:\d+$/.test(it.name) && !/^item:\d+$/.test(resolvedNames.get(it.id) || ""))
+      it.name = resolvedNames.get(it.id);
+  }
   console.log(views[0].snapshot.items.length.toLocaleString() + " items across " +
-    marketGames.length + " realm dataset(s): " + (factions.join(", ") || "none"));
+    marketGames.length + " realm dataset(s): " + (factions.join(", ") || "none") +
+    "; names resolved " + names.resolved + ", unresolved " + names.unresolved);
 
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(census, {
