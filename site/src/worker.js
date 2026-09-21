@@ -1394,41 +1394,70 @@ async function loadForeverCensus(env) {
      WHERE d.source_game = 'classic-beta' GROUP BY p.game`
   ).all()).results;
 
-  const factions = new Map();
+  // One unit per dataset -- a realm/faction pair. Callers that want the whole
+  // beta merged use `groups` below; the static bundle slices `units` per realm
+  // for its realm toggle.
+  const units = new Map();
   const realms = new Set();
   let lastT = 0;
-  function bucket(game) {
-    const label = game.indexOf("realm:") === 0 ? game.slice(6) : game;
-    const { name, fac } = splitRealm(label);
-    realms.add(name);
-    const key = fac || "Unknown";
-    if (!factions.has(key))
-      factions.set(key, { faction: key, races: {}, classes: {}, characters: 0, samples: 0, observed: 0, games: [] });
-    const f = factions.get(key);
-    if (f.games.indexOf(game) < 0) f.games.push(game);
-    return f;
+  function unit(game) {
+    if (!units.has(game)) {
+      const label = game.indexOf("realm:") === 0 ? game.slice(6) : game;
+      const { name, fac } = splitRealm(label);
+      realms.add(name);
+      units.set(game, {
+        game, realm: name, faction: fac || "Unknown",
+        races: {}, classes: {}, characters: 0, samples: 0, observed: 0,
+      });
+    }
+    return units.get(game);
   }
   for (const r of rows) {
-    const f = bucket(r.game);
-    f.characters += r.n;
-    if (r.race) f.races[r.race] = (f.races[r.race] || 0) + r.n;
-    if (r.cf) f.classes[r.cf] = (f.classes[r.cf] || 0) + r.n;
+    const u = unit(r.game);
+    u.characters += r.n;
+    if (r.race) u.races[r.race] = (u.races[r.race] || 0) + r.n;
+    if (r.cf) u.classes[r.cf] = (u.classes[r.cf] || 0) + r.n;
   }
-  for (const s of scans) {
-    const f = bucket(s.game);
-    f.samples += s.samples || 0;
-    f.observed += s.observed || 0;
-    if ((s.lastT || 0) > lastT) lastT = s.lastT;
+  for (const sc of scans) {
+    const u = unit(sc.game);
+    u.samples += sc.samples || 0;
+    u.observed += sc.observed || 0;
+    if ((sc.lastT || 0) > lastT) lastT = sc.lastT;
   }
 
+  return {
+    groups: mergeCensusUnits([...units.values()]),
+    units: [...units.values()],
+    realms: [...realms].sort(),
+    lastT,
+  };
+}
+
+// Roll realm/faction units up into one group per faction, which is what the
+// page charts. Exported shape matches what renderCensusHtml expects.
+function mergeCensusUnits(units) {
+  const byFaction = new Map();
+  for (const u of units) {
+    if (!byFaction.has(u.faction))
+      byFaction.set(u.faction, {
+        faction: u.faction, races: {}, classes: {}, characters: 0, samples: 0, observed: 0, games: [],
+      });
+    const g = byFaction.get(u.faction);
+    g.characters += u.characters;
+    g.samples += u.samples;
+    g.observed += u.observed;
+    if (g.games.indexOf(u.game) < 0) g.games.push(u.game);
+    for (const k in u.races) g.races[k] = (g.races[k] || 0) + u.races[k];
+    for (const k in u.classes) g.classes[k] = (g.classes[k] || 0) + u.classes[k];
+  }
   const order = ["Alliance", "Horde"];
-  const groups = [...factions.values()].sort((a, b) =>
+  return [...byFaction.values()].sort((a, b) =>
     ((order.indexOf(a.faction) + 1) || 99) - ((order.indexOf(b.faction) + 1) || 99) || b.characters - a.characters);
-  return { groups, realms: [...realms].sort(), lastT };
 }
 
 async function foreverPage(env) {
-  return new Response(renderCensusHtml(await loadForeverCensus(env), {
+  const census = await loadForeverCensus(env);
+  return new Response(renderCensusHtml([{ key: "all", label: "All", census }], {
     stylesheet: "/style.css",
     back: { href: "/pop", label: "POPULATION" },
     realmHref: (game) => "/pop?game=" + encodeURIComponent(game),

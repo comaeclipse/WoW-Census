@@ -57,7 +57,55 @@ export const CENSUS_STYLE = `
   .bar .bt{background:var(--panel2); border:2px solid var(--line); height:20px; padding:1px}
   .bar .bt i{display:block; height:100%}
   .bar .bn{text-align:right; color:var(--ink)}
-  @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}`;
+  @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
+  .vchips{margin-bottom:18px}`;
+
+
+// A page can slice its content on more than one axis (realm, faction). Each
+// axis gets a chip row; every combination is rendered up front as a .vpane
+// carrying one data-<dim> per axis, and the script just shows the pane whose
+// attributes match every active chip. Static file, no fetching.
+export function chipRow(dim, options, active) {
+  if (!options || options.length < 2) return "";
+  return '<div class="chips vchips" data-dim="' + esc(dim) + '">' + options.map((o) =>
+    '<button class="chip" type="button" data-key="' + esc(o.key) + '" aria-pressed="' +
+    (o.key === active ? "true" : "false") + '">' + esc(o.label) + "</button>").join("") + "</div>";
+}
+
+export const TOGGLE_SCRIPT = `<script>
+(function(){
+  var rows=[].slice.call(document.querySelectorAll(".vchips[data-dim]"));
+  var panes=[].slice.call(document.querySelectorAll(".vpane"));
+  if(!rows.length||!panes.length) return;
+  var state={};
+  rows.forEach(function(r){
+    var on=r.querySelector('.chip[aria-pressed="true"]')||r.querySelector(".chip");
+    state[r.dataset.dim]=on?on.dataset.key:"";
+  });
+  function apply(){
+    rows.forEach(function(r){
+      [].slice.call(r.querySelectorAll(".chip")).forEach(function(c){
+        c.setAttribute("aria-pressed", c.dataset.key===state[r.dataset.dim]?"true":"false");
+      });
+    });
+    panes.forEach(function(p){
+      var show=true;
+      for(var dim in state){
+        var want=state[dim], has=p.getAttribute("data-"+dim);
+        if(has!==null&&has!==want) show=false;
+      }
+      p.hidden=!show;
+    });
+  }
+  rows.forEach(function(r){
+    r.addEventListener("click", function(e){
+      var c=e.target.closest(".chip"); if(!c||!r.contains(c)) return;
+      state[r.dataset.dim]=c.dataset.key; apply();
+    });
+  });
+  apply();
+})();
+</script>`;
 
 // census: { groups, realms, lastT } from loadForeverCensus (or /api/forever).
 // opts.stylesheet  path to style.css ("/style.css" on the Worker, "style.css"
@@ -66,7 +114,7 @@ export const CENSUS_STYLE = `
 // opts.back        { href, label } for the top-left crumb, or null
 // opts.nav         raw markup replacing that crumb (static bundle page nav)
 // opts.note        extra line under the header (the static build stamps its age)
-export function renderCensusHtml(census, opts = {}) {
+function renderCensusView(census, opts = {}) {
   const groups = (census && census.groups) || [];
   const realms = (census && census.realms) || [];
   const lastT = (census && census.lastT) || 0;
@@ -126,8 +174,19 @@ export function renderCensusHtml(census, opts = {}) {
       (lastT ? new Date(lastT * 1000).toISOString().slice(0, 10) : "&mdash;") +
       '</div><div class="s">last sample</div></div>';
 
-  // opts.nav wins when the caller supplies its own header strip (the static
-  // bundle links its two pages to each other instead of back to the Worker).
+  return '<section class="tiles">' + tiles + "</section>" + body;
+}
+
+// views: [{ key, label, census }] -- one entry per realm scope, plus "All".
+// A single-entry list renders without chips, which is what the Worker page uses.
+export function renderCensusHtml(views, opts = {}) {
+  const list = (views || []).filter(Boolean);
+  const active = list.length ? list[0].key : "";
+  const chips = chipRow("realm", list.map((v) => ({ key: v.key, label: v.label })), active);
+  const panes = list.map((v) =>
+    '<div class="vpane" data-realm="' + esc(v.key) + '"' + (v.key === active ? "" : " hidden") + ">" +
+    renderCensusView(v.census, opts) + "</div>").join("");
+
   const back = opts.nav || (opts.back
     ? '<a class="back" href="' + esc(opts.back.href) + '">&#9664; ' + esc(opts.back.label) + "</a>"
     : "");
@@ -156,14 +215,16 @@ export function renderCensusHtml(census, opts = {}) {
     <div class="itag">Beta realms &middot; both factions &middot; unique characters sampled via /who</div>
     ${note}
   </header>
-  <section class="tiles">${tiles}</section>
-  ${body}
+  ${chips}
+  ${panes}
   <p class="src">
     A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
     Each bar counts unique characters &mdash; one per normalized character name + realm &mdash; so a faction
-    that received more scans does not gain share from the extra scans alone.<br>
+    that received more scans does not gain share from the extra scans alone. A character seen several times
+    in a day still counts once.<br>
     Characters are not human players/accounts; a rename appears as a new character. Companion to the MarketLens addon.
   </p>
 </div>
+${chips ? TOGGLE_SCRIPT : ""}
 </body></html>`;
 }

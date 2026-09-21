@@ -3,28 +3,29 @@
     {
       "faction": "Alliance",
       "races": {
-        "Dwarf": 460,
-        "Gnome": 342,
-        "High Order Skyborne": 509,
-        "Human": 964,
-        "Night Elf": 747
+        "Dwarf": 534,
+        "Gnome": 438,
+        "High Order Skyborne": 609,
+        "Human": 1136,
+        "Night Elf": 824
       },
       "classes": {
-        "HUNTER": 534,
-        "PALADIN": 437,
-        "PRIEST": 291,
-        "ROGUE": 253,
-        "SHAMAN": 249,
-        "WARRIOR": 374,
-        "MAGE": 355,
-        "WARLOCK": 144,
-        "DRUID": 385
+        "HUNTER": 623,
+        "PALADIN": 504,
+        "PRIEST": 338,
+        "ROGUE": 308,
+        "SHAMAN": 289,
+        "WARRIOR": 423,
+        "MAGE": 430,
+        "WARLOCK": 179,
+        "DRUID": 447
       },
-      "characters": 3022,
-      "samples": 103,
-      "observed": 4055,
+      "characters": 3541,
+      "samples": 114,
+      "observed": 4605,
       "games": [
-        "realm:Classic Beta PvE-Alliance"
+        "realm:Classic Beta PvE-Alliance",
+        "realm:Classic Beta PvP 2-Alliance"
       ]
     },
     {
@@ -55,8 +56,89 @@
       ]
     }
   ],
-  "realms": [
-    "Classic Beta PvE"
+  "units": [
+    {
+      "game": "realm:Classic Beta PvE-Alliance",
+      "realm": "Classic Beta PvE",
+      "faction": "Alliance",
+      "races": {
+        "Dwarf": 460,
+        "Gnome": 342,
+        "High Order Skyborne": 509,
+        "Human": 964,
+        "Night Elf": 747
+      },
+      "classes": {
+        "HUNTER": 534,
+        "PALADIN": 437,
+        "PRIEST": 291,
+        "ROGUE": 253,
+        "SHAMAN": 249,
+        "WARRIOR": 374,
+        "MAGE": 355,
+        "WARLOCK": 144,
+        "DRUID": 385
+      },
+      "characters": 3022,
+      "samples": 103,
+      "observed": 4055
+    },
+    {
+      "game": "realm:Classic Beta PvE-Horde",
+      "realm": "Classic Beta PvE",
+      "faction": "Horde",
+      "races": {
+        "Orc": 302,
+        "Tauren": 445,
+        "Troll": 240,
+        "Undead": 678,
+        "Windshaper Skyborne": 388
+      },
+      "classes": {
+        "HUNTER": 237,
+        "MAGE": 127,
+        "ROGUE": 133,
+        "SHAMAN": 374,
+        "WARLOCK": 159,
+        "WARRIOR": 236,
+        "DRUID": 288,
+        "PRIEST": 117,
+        "PALADIN": 382
+      },
+      "characters": 2053,
+      "samples": 105,
+      "observed": 3262
+    },
+    {
+      "game": "realm:Classic Beta PvP 2-Alliance",
+      "realm": "Classic Beta PvP 2",
+      "faction": "Alliance",
+      "races": {
+        "Dwarf": 74,
+        "Gnome": 96,
+        "High Order Skyborne": 100,
+        "Human": 172,
+        "Night Elf": 77
+      },
+      "classes": {
+        "HUNTER": 89,
+        "PALADIN": 67,
+        "PRIEST": 47,
+        "SHAMAN": 40,
+        "WARRIOR": 49,
+        "MAGE": 75,
+        "ROGUE": 55,
+        "WARLOCK": 35,
+        "DRUID": 62
+      },
+      "characters": 519,
+      "samples": 11,
+      "observed": 550
+    }
   ],
-  "lastT": 1790026827
+  "realms": [
+    "Classic Beta PvE",
+    "Classic Beta PvP 2"
+  ],
+  "lastT": 1790027800
 }

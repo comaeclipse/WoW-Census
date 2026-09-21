@@ -6,7 +6,7 @@
 // Only what a scan actually observes is shown. Listings are not sales, so
 // "popular" here means listed in quantity, never sold.
 
-import { esc, barChart, sortedEntries, CENSUS_STYLE } from "./census.mjs";
+import { esc, barChart, sortedEntries, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
 
 // Copper -> the site's usual g/s/c shorthand.
 function money(cop) {
@@ -165,38 +165,30 @@ function renderMarketView(snapshot, threshold) {
     (jokePanel ? '<div style="margin-top:22px">' + jokePanel + "</div>" : "");
 }
 
-// views: [{ key, label, snapshot }] -- "All" plus one per faction. Every view
-// ships in the page and the toggle just swaps which is visible, so the bundle
-// stays a static file with no fetching.
-export function renderMarketHtml(views, opts = {}) {
+// views: [{ realm, faction, snapshot }] -- one per realm x faction combination,
+// including "all" on either axis. Every combination ships in the page and the
+// chips only swap which is visible, so the bundle stays a static file with no
+// fetching. dims: { realm: [{key,label}], faction: [{key,label}] }.
+export function renderMarketHtml(views, dims = {}, opts = {}) {
   const list = (views || []).filter(Boolean);
-  const active = list.length ? list[0].key : "";
-  const chips = list.length > 1
-    ? '<div class="chips vchips">' + list.map((v) =>
-        '<button class="chip" type="button" data-view="' + esc(v.key) + '" aria-pressed="' +
-        (v.key === active ? "true" : "false") + '">' + esc(v.label) + "</button>").join("") + "</div>"
-    : "";
+  const realmOpts = dims.realm || [];
+  const factionOpts = dims.faction || [];
+  const activeRealm = realmOpts.length ? realmOpts[0].key : "all";
+  const activeFaction = factionOpts.length ? factionOpts[0].key : "all";
+  const chips = chipRow("realm", realmOpts, activeRealm) + chipRow("faction", factionOpts, activeFaction);
+
   // One threshold shared by every view -- computed from the widest item set, so
-  // the Alliance and Horde views judge prices by the same yardstick as All.
+  // each realm and faction view judges prices by the same yardstick as All.
   const widest = list.reduce((best, v) =>
     ((v.snapshot && v.snapshot.items) || []).length > (best.items || []).length ? v.snapshot : best,
     { items: [] });
   const threshold = jokePriceThreshold(widest.items);
-  const sections = list.map((v) =>
-    '<div class="vpane" data-view="' + esc(v.key) + '"' + (v.key === active ? "" : ' hidden') + ">" +
-    renderMarketView(v.snapshot, threshold) + "</div>").join("");
-
-  const script = list.length > 1 ? `<script>
-(function(){
-  var chips=[].slice.call(document.querySelectorAll(".vchips .chip"));
-  var panes=[].slice.call(document.querySelectorAll(".vpane"));
-  function show(key){
-    chips.forEach(function(c){ c.setAttribute("aria-pressed", c.dataset.view===key?"true":"false"); });
-    panes.forEach(function(p){ p.hidden = p.dataset.view!==key; });
-  }
-  chips.forEach(function(c){ c.addEventListener("click", function(){ show(c.dataset.view); }); });
-})();
-</script>` : "";
+  const sections = list.map((v) => {
+    const on = v.realm === activeRealm && v.faction === activeFaction;
+    return '<div class="vpane" data-realm="' + esc(v.realm) + '" data-faction="' + esc(v.faction) + '"' +
+      (on ? "" : " hidden") + ">" + renderMarketView(v.snapshot, threshold) + "</div>";
+  }).join("");
+  const script = chips ? TOGGLE_SCRIPT : "";
 
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

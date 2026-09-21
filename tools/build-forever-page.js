@@ -86,6 +86,28 @@ function nav(current) {
     item("index.html", "Census") + item("auctionhouse.html", "Auction House") + "</nav>";
 }
 
+// Roll realm/faction census units up into one group per faction -- the same
+// shape the census renderer charts, mirroring the Worker's own merge.
+function mergeCensusUnits(units) {
+  const byFaction = new Map();
+  for (const u of units) {
+    if (!byFaction.has(u.faction))
+      byFaction.set(u.faction, {
+        faction: u.faction, races: {}, classes: {}, characters: 0, samples: 0, observed: 0, games: [],
+      });
+    const g = byFaction.get(u.faction);
+    g.characters += u.characters;
+    g.samples += u.samples;
+    g.observed += u.observed;
+    if (g.games.indexOf(u.game) < 0) g.games.push(u.game);
+    for (const k in u.races) g.races[k] = (g.races[k] || 0) + u.races[k];
+    for (const k in u.classes) g.classes[k] = (g.classes[k] || 0) + u.classes[k];
+  }
+  const order = ["Alliance", "Horde"];
+  return [...byFaction.values()].sort((a, b) =>
+    ((order.indexOf(a.faction) + 1) || 99) - ((order.indexOf(b.faction) + 1) || 99) || b.characters - a.characters);
+}
+
 // Merge every beta realm's item snapshot into one market view. Quantity and
 // listed value add up; the unit price is then value/quantity, which is the
 // quantity-weighted price across realms rather than an average of averages.
@@ -136,29 +158,37 @@ async function main() {
       items: snap.items || [], columns: snap.columns, updatedAt: snap.updatedAt,
     });
   }
-  // "All" first, then one view per faction the beta has a realm dataset for --
-  // including a faction with no AH scan yet, whose view then says so rather
+  // Both axes list "All" plus every value the beta has a realm dataset for --
+  // including a combination with no AH scan yet, whose view then says so rather
   // than the toggle quietly hiding that side.
-  const factions = [...new Set(games
-    .filter((g) => g.sourceGame === SOURCE_GAME && g.realm)
-    .map((g) => (/-(Alliance|Horde)$/.exec(g.game) || [, "Neutral"])[1]))].sort();
-  const view = (key, label, from) => ({
-    key, label,
-    snapshot: {
-      items: mergeItems(from),
-      realms: from.map((s2) => s2.realm),
-      updatedAt: from.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
-      branch: WH_BRANCH,
-    },
-  });
-  const realmsOf = (f) => games
-    .filter((g) => g.sourceGame === SOURCE_GAME && g.realm && g.game.endsWith("-" + f))
+  const betaRealms = games.filter((g) => g.sourceGame === SOURCE_GAME && g.realm)
     .map((g) => g.game.replace(/^realm:/, ""));
-  const views = [view("all", "All", snaps)].concat(factions.map((f) => {
-    const v = view(f, f, snaps.filter((s2) => s2.faction === f));
-    if (!v.snapshot.realms.length) v.snapshot.realms = realmsOf(f);
-    return v;
-  }));
+  const factions = [...new Set(betaRealms.map((r) => (/-(Alliance|Horde)$/.exec(r) || [, "Neutral"])[1]))].sort();
+  const realmNames = [...new Set(betaRealms.map((r) => r.replace(/-(Alliance|Horde)$/, "")))].sort();
+
+  const snapshotOf = (from, fallbackRealms) => ({
+    items: mergeItems(from),
+    realms: from.length ? from.map((s2) => s2.realm) : fallbackRealms,
+    updatedAt: from.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
+    branch: WH_BRANCH,
+  });
+  const dims = {
+    realm: [{ key: "all", label: "All realms" }].concat(realmNames.map((r) => ({ key: r, label: r }))),
+    faction: [{ key: "all", label: "Both" }].concat(factions.map((f) => ({ key: f, label: f }))),
+  };
+  const views = [];
+  for (const r of dims.realm) {
+    for (const f of dims.faction) {
+      const from = snaps.filter((s2) =>
+        (r.key === "all" || s2.realm.replace(/-(Alliance|Horde)$/, "") === r.key) &&
+        (f.key === "all" || s2.faction === f.key));
+      const fallback = betaRealms.filter((name) =>
+        (r.key === "all" || name.replace(/-(Alliance|Horde)$/, "") === r.key) &&
+        (f.key === "all" || name.endsWith("-" + f.key)));
+      views.push({ realm: r.key, faction: f.key, snapshot: snapshotOf(from, fallback) });
+    }
+  }
+
   const uniqueItems = [...new Map(views.flatMap((v) => v.snapshot.items).map((it) => [it.id, it])).values()];
   const names = await resolvePlaceholderNames(uniqueItems);
   // Apply a name learned from either faction to every view containing that id.
@@ -168,17 +198,29 @@ async function main() {
       it.name = resolvedNames.get(it.id);
   }
   console.log(views[0].snapshot.items.length.toLocaleString() + " items across " +
-    marketGames.length + " realm dataset(s): " + (factions.join(", ") || "none") +
+    marketGames.length + " realm dataset(s); realms: " + (realmNames.join(", ") || "none") +
+    "; factions: " + (factions.join(", ") || "none") +
     "; names resolved " + names.resolved + ", unresolved " + names.unresolved);
 
   fs.mkdirSync(outDir, { recursive: true });
-  fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(census, {
+  // The census slices on realm only: each view still charts both factions.
+  const censusUnits = census.units || [];
+  const censusRealms = [...new Set(censusUnits.map((u) => u.realm))].sort();
+  const censusView = (key, label, units) => ({
+    key, label,
+    census: { groups: mergeCensusUnits(units), realms: [...new Set(units.map((u) => u.realm))].sort(), lastT: census.lastT },
+  });
+  const censusViews = censusUnits.length
+    ? [censusView("all", "All realms", censusUnits)].concat(
+        censusRealms.map((r) => censusView(r, r, censusUnits.filter((u) => u.realm === r))))
+    : [{ key: "all", label: "All realms", census }];
+  fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
     stylesheet: "style.css",
     nav: nav("index.html"),
     note: stamp,
   }));
   fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
-    renderMarketHtml(views, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp }));
+    renderMarketHtml(views, dims, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp }));
   // The bundle carries its own stylesheet so it renders with nothing else served.
   fs.copyFileSync(path.join(repo, "site/public/style.css"), path.join(outDir, "style.css"));
   fs.writeFileSync(path.join(outDir, "census.json"), JSON.stringify(census, null, 2));
