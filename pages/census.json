@@ -3,26 +3,26 @@
     {
       "faction": "Alliance",
       "races": {
-        "Dwarf": 345,
-        "Gnome": 253,
-        "High Order Skyborne": 239,
-        "Human": 729,
-        "Night Elf": 582
+        "Dwarf": 460,
+        "Gnome": 342,
+        "High Order Skyborne": 509,
+        "Human": 964,
+        "Night Elf": 747
       },
       "classes": {
-        "HUNTER": 370,
-        "PALADIN": 330,
-        "PRIEST": 227,
-        "ROGUE": 167,
-        "SHAMAN": 190,
-        "WARRIOR": 263,
-        "MAGE": 227,
-        "WARLOCK": 108,
-        "DRUID": 266
+        "HUNTER": 534,
+        "PALADIN": 437,
+        "PRIEST": 291,
+        "ROGUE": 253,
+        "SHAMAN": 249,
+        "WARRIOR": 374,
+        "MAGE": 355,
+        "WARLOCK": 144,
+        "DRUID": 385
       },
-      "characters": 2148,
-      "samples": 78,
-      "observed": 3006,
+      "characters": 3022,
+      "samples": 103,
+      "observed": 4055,
       "games": [
         "realm:Classic Beta PvE-Alliance"
       ]
@@ -58,5 +58,5 @@
   "realms": [
     "Classic Beta PvE"
   ],
-  "lastT": 1790024614
+  "lastT": 1790025549
 }
