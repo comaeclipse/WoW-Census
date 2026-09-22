@@ -86,6 +86,19 @@ function nav(current) {
     item("index.html", "Census") + item("auctionhouse.html", "Auction House") + "</nav>";
 }
 
+// Chip labels for realms. Every beta realm is called "Classic Beta <type>",
+// and the client names one of them "Classic Beta PvP 2" -- the trailing number
+// is the realm's own name, not an index we added. Both are noise in a chip, so
+// drop the shared prefix and the trailing number, but only while the shortened
+// labels stay distinct: a beta with both "PvP 1" and "PvP 2" keeps its numbers
+// rather than showing two chips reading "PvP".
+function realmLabels(names) {
+  const short = (n) => n.replace(/^Classic Beta\s+/i, "").trim() || n;
+  const shorter = (n) => short(n).replace(/\s+\d+$/, "").trim() || short(n);
+  const pick = new Set(names.map(shorter)).size === names.length ? shorter : short;
+  return new Map(names.map((n) => [n, pick(n)]));
+}
+
 // Roll realm/faction census units up into one group per faction -- the same
 // shape the census renderer charts, mirroring the Worker's own merge.
 function mergeCensusUnits(units) {
@@ -172,8 +185,10 @@ async function main() {
     updatedAt: from.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
     branch: WH_BRANCH,
   });
+  const marketRealmLabels = realmLabels(realmNames);
   const dims = {
-    realm: [{ key: "all", label: "All realms" }].concat(realmNames.map((r) => ({ key: r, label: r }))),
+    realm: [{ key: "all", label: "All realms" }]
+      .concat(realmNames.map((r) => ({ key: r, label: marketRealmLabels.get(r) }))),
     faction: [{ key: "all", label: "Both" }].concat(factions.map((f) => ({ key: f, label: f }))),
   };
   const views = [];
@@ -210,9 +225,11 @@ async function main() {
     key, label,
     census: { groups: mergeCensusUnits(units), realms: [...new Set(units.map((u) => u.realm))].sort(), lastT: census.lastT },
   });
+  const censusRealmLabels = realmLabels(censusRealms);
   const censusViews = censusUnits.length
     ? [censusView("all", "All realms", censusUnits)].concat(
-        censusRealms.map((r) => censusView(r, r, censusUnits.filter((u) => u.realm === r))))
+        censusRealms.map((r) =>
+          censusView(r, censusRealmLabels.get(r), censusUnits.filter((u) => u.realm === r))))
     : [{ key: "all", label: "All realms", census }];
   fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
     stylesheet: "style.css",
