@@ -31,28 +31,29 @@
     {
       "faction": "Horde",
       "races": {
-        "Orc": 302,
-        "Tauren": 445,
-        "Troll": 240,
-        "Undead": 678,
-        "Windshaper Skyborne": 388
+        "Orc": 517,
+        "Tauren": 569,
+        "Troll": 343,
+        "Undead": 1061,
+        "Windshaper Skyborne": 581
       },
       "classes": {
-        "HUNTER": 237,
-        "MAGE": 127,
-        "ROGUE": 133,
-        "SHAMAN": 374,
-        "WARLOCK": 159,
-        "WARRIOR": 236,
-        "DRUID": 288,
-        "PRIEST": 117,
-        "PALADIN": 382
+        "HUNTER": 396,
+        "MAGE": 221,
+        "ROGUE": 229,
+        "SHAMAN": 508,
+        "WARLOCK": 241,
+        "WARRIOR": 346,
+        "DRUID": 381,
+        "PRIEST": 185,
+        "PALADIN": 564
       },
-      "characters": 2053,
-      "samples": 105,
-      "observed": 3262,
+      "characters": 3071,
+      "samples": 134,
+      "observed": 4532,
       "games": [
-        "realm:Classic Beta PvE-Horde"
+        "realm:Classic Beta PvE-Horde",
+        "realm:Classic Beta PvP 2-Horde"
       ]
     }
   ],
@@ -134,11 +135,37 @@
       "characters": 519,
       "samples": 11,
       "observed": 550
+    },
+    {
+      "game": "realm:Classic Beta PvP 2-Horde",
+      "realm": "Classic Beta PvP 2",
+      "faction": "Horde",
+      "races": {
+        "Orc": 215,
+        "Tauren": 124,
+        "Troll": 103,
+        "Undead": 383,
+        "Windshaper Skyborne": 193
+      },
+      "classes": {
+        "HUNTER": 159,
+        "MAGE": 94,
+        "ROGUE": 96,
+        "SHAMAN": 134,
+        "WARLOCK": 82,
+        "WARRIOR": 110,
+        "DRUID": 93,
+        "PRIEST": 68,
+        "PALADIN": 182
+      },
+      "characters": 1018,
+      "samples": 29,
+      "observed": 1270
     }
   ],
   "realms": [
     "Classic Beta PvE",
     "Classic Beta PvP 2"
   ],
-  "lastT": 1790027800
+  "lastT": 1790038423
 }
