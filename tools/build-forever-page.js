@@ -83,13 +83,13 @@ async function resolvePlaceholderNames(items) {
 // The pages link to each other; the bundle has no Worker behind it, so the
 // header carries no crumb back to one.
 function nav(current) {
-  const item = (href, label) =>
-    '<a class="game"' + (href === current ? ' aria-current="true"' : "") +
+  const item = (href, label, active = href === current) =>
+    '<a class="game"' + (active ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
   const foreverHref = isTbc ? "../index.html" : "index.html";
   const tbcHref = isTbc ? "index.html" : "tbc/index.html";
   return '<nav class="games" style="margin-bottom:10px">' +
-    item(foreverHref, "Forever") + item(tbcHref, "TBC Anniversary") + "</nav>" +
+    item(foreverHref, "Forever", !isTbc) + item(tbcHref, "TBC Anniversary", isTbc) + "</nav>" +
     '<nav class="games" style="margin-bottom:18px">' +
     item("index.html", "Census") + item("auctionhouse.html", "Auction House") +
     item("guilds.html", "Guilds") + "</nav>";
