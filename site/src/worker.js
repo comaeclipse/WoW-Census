@@ -23,7 +23,7 @@ const GAMES = {
   "classic-beta":        { label: "Forever (Beta)" },
 };
 const DEFAULT_GAME = "classic-progression";
-const ITEMS_CACHE_VERSION = 16;
+const ITEMS_CACHE_VERSION = 17;
 const REALM_CURRENT_AUCTION_MAX_AGE_SECONDS = 48 * 60 * 60;
 
 function sourceGameKey(flavor) {
