@@ -1411,6 +1411,12 @@ async function loadForeverCensus(env) {
      FROM pop_samples p JOIN datasets d ON d.game = p.game
      WHERE d.source_game = 'classic-beta' GROUP BY p.game`
   ).all()).results;
+  const guilds = (await env.DB.prepare(
+    `SELECT c.game game, c.guild guild, COUNT(*) members
+     FROM characters c JOIN datasets d ON d.game = c.game
+     WHERE d.source_game = 'classic-beta' AND TRIM(COALESCE(c.guild, '')) <> ''
+     GROUP BY c.game, c.guild`
+  ).all()).results;
 
   // One unit per dataset -- a realm/faction pair. Callers that want the whole
   // beta merged use `groups` below; the static bundle slices `units` per realm
@@ -1425,7 +1431,7 @@ async function loadForeverCensus(env) {
       realms.add(name);
       units.set(game, {
         game, realm: name, faction: fac || "Unknown",
-        races: {}, classes: {}, characters: 0, samples: 0, observed: 0,
+        races: {}, classes: {}, guilds: [], characters: 0, samples: 0, observed: 0,
       });
     }
     return units.get(game);
@@ -1441,6 +1447,12 @@ async function loadForeverCensus(env) {
     u.samples += sc.samples || 0;
     u.observed += sc.observed || 0;
     if ((sc.lastT || 0) > lastT) lastT = sc.lastT;
+  }
+  for (const g of guilds) {
+    unit(g.game).guilds.push({ name: g.guild, members: g.members || 0 });
+  }
+  for (const u of units.values()) {
+    u.guilds.sort((a, b) => b.members - a.members || a.name.localeCompare(b.name));
   }
 
   return {

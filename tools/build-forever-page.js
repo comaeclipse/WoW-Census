@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Builds the static wowcensus bundle in pages/ -- a population census and an
-// auction-house overview for the Forever (Beta) realms -- and optionally
+// auction-house and guild overviews for the Forever (Beta) realms -- and optionally
 // publishes it to Cloudflare Pages.
 //
 //   node tools/build-forever-page.js                 build pages/ only
@@ -76,14 +76,15 @@ async function resolvePlaceholderNames(items) {
   return { resolved, unresolved: items.filter((it) => /^item:\d+$/.test(it.name)).length };
 }
 
-// The two pages link to each other; the bundle has no Worker behind it, so the
+// The pages link to each other; the bundle has no Worker behind it, so the
 // header carries no crumb back to one.
 function nav(current) {
   const item = (href, label) =>
     '<a class="game"' + (href === current ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
   return '<nav class="games" style="margin-bottom:18px">' +
-    item("index.html", "Census") + item("auctionhouse.html", "Auction House") + "</nav>";
+    item("index.html", "Census") + item("auctionhouse.html", "Auction House") +
+    item("guilds.html", "Guilds") + "</nav>";
 }
 
 // Chip labels for realms. Every beta realm is called "Classic Beta <type>",
@@ -158,6 +159,7 @@ async function main() {
   const src = (f) => pathToFileURL(path.join(repo, "site/src", f)).href;
   const { renderCensusHtml } = await import(src("census.mjs"));
   const { renderMarketHtml } = await import(src("market.mjs"));
+  const { renderGuildHtml } = await import(src("guilds.mjs"));
 
   const built = new Date();
   const stamp = "Static snapshot built " + built.toISOString().slice(0, 16).replace("T", " ") + "Z";
@@ -213,6 +215,29 @@ async function main() {
     }
   }
 
+  const guildUnits = census.units || [];
+  const guildViews = [];
+  for (const r of dims.realm) {
+    for (const f of dims.faction) {
+      const from = guildUnits.filter((u) =>
+        (r.key === "all" || u.realm === r.key) &&
+        (f.key === "all" || u.faction === f.key));
+      const guilds = from.flatMap((u) => (u.guilds || []).map((g) => ({
+        name: g.name, members: g.members, realm: u.realm, faction: u.faction,
+      }))).sort((a, b) => b.members - a.members || a.name.localeCompare(b.name));
+      guildViews.push({
+        realm: r.key, faction: f.key,
+        snapshot: {
+          guilds,
+          guildedCharacters: guilds.reduce((sum, g) => sum + g.members, 0),
+          surveyedCharacters: from.reduce((sum, u) => sum + (u.characters || 0), 0),
+          realms: [...new Set(from.map((u) => u.realm))],
+          lastT: census.lastT || 0,
+        },
+      });
+    }
+  }
+
   const uniqueItems = [...new Map(views.flatMap((v) => v.snapshot.items).map((it) => [it.id, it])).values()];
   const names = await resolvePlaceholderNames(uniqueItems);
   // Apply a name learned from either faction to every view containing that id.
@@ -247,12 +272,21 @@ async function main() {
   }));
   fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
     renderMarketHtml(views, dims, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp }));
+  fs.writeFileSync(path.join(outDir, "guilds.html"),
+    renderGuildHtml(guildViews, dims, { stylesheet: "style.css", nav: nav("guilds.html"), note: stamp }));
   // The bundle carries its own stylesheet so it renders with nothing else served.
   fs.copyFileSync(path.join(repo, "site/public/style.css"), path.join(outDir, "style.css"));
-  fs.writeFileSync(path.join(outDir, "census.json"), JSON.stringify(census, null, 2));
+  // Keep the existing public census artifact focused on census data; guilds
+  // are rendered into guilds.html and do not need to duplicate thousands of
+  // rows in this JSON file.
+  const censusJson = {
+    ...census,
+    units: (census.units || []).map(({ guilds, ...unit }) => unit),
+  };
+  fs.writeFileSync(path.join(outDir, "census.json"), JSON.stringify(censusJson, null, 2));
 
   const rel = path.relative(repo, outDir).replace(/\\/g, "/");
-  console.log("Wrote " + rel + "/{index.html,auctionhouse.html,style.css,census.json}");
+  console.log("Wrote " + rel + "/{index.html,auctionhouse.html,guilds.html,style.css,census.json}");
 
   if (!flag("deploy")) {
     console.log("Publish it with:  node tools/build-forever-page.js --deploy");
