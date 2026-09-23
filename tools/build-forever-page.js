@@ -128,12 +128,17 @@ function mergeItems(perRealm) {
   const byId = new Map();
   for (const { items, columns } of perRealm) {
     const col = (name) => columns.indexOf(name);
-    const [iId, iName, iMv, iAsp, iQ, iCat] =
-      ["id", "name", "mv", "asp", "q", "cat"].map(col);
+    const [iId, iName, iMv, iAsp, iQ, iPq, iCat] =
+      ["id", "name", "mv", "asp", "q", "pq", "cat"].map(col);
     for (const row of items) {
       const id = row[iId];
-      const cur = byId.get(id) || { id, name: row[iName], cat: row[iCat], q: 0, mv: 0, asp: 0 };
+      const cur = byId.get(id) || {
+        id, name: row[iName], cat: row[iCat], q: 0, pq: 0,
+        hasPreviousQty: true, mv: 0, asp: 0,
+      };
       cur.q += row[iQ] || 0;
+      if (iPq < 0 || row[iPq] == null) cur.hasPreviousQty = false;
+      else cur.pq += row[iPq] || 0;
       cur.mv += row[iMv] || 0;
       // Prefer a resolved name over an "item:<id>" placeholder from another realm.
       if (/^item:\d+$/.test(cur.name) && !/^item:\d+$/.test(row[iName])) cur.name = row[iName];
@@ -141,7 +146,11 @@ function mergeItems(perRealm) {
       byId.set(id, cur);
     }
   }
-  for (const it of byId.values()) it.asp = it.q > 0 ? Math.round(it.mv / it.q) : 0;
+  for (const it of byId.values()) {
+    it.asp = it.q > 0 ? Math.round(it.mv / it.q) : 0;
+    if (!it.hasPreviousQty) it.pq = null;
+    delete it.hasPreviousQty;
+  }
   return [...byId.values()];
 }
 

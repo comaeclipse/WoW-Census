@@ -23,7 +23,7 @@ const GAMES = {
   "classic-beta":        { label: "Forever (Beta)" },
 };
 const DEFAULT_GAME = "classic-progression";
-const ITEMS_CACHE_VERSION = 15;
+const ITEMS_CACHE_VERSION = 16;
 const REALM_CURRENT_AUCTION_MAX_AGE_SECONDS = 48 * 60 * 60;
 
 function sourceGameKey(flavor) {
@@ -479,6 +479,16 @@ async function importRealm(url, env, req) {
   const rmap = new Map();
   for (const r of reg.results) rmap.set(r.id, r);
 
+  // A fresh install or reset SavedVariables file may carry only the new scan,
+  // while D1 already has the preceding live snapshot. Preserve that comparison
+  // across uploads. Re-uploading the same payload keeps the existing pq instead
+  // of turning it into a misleading comparison against itself.
+  const previous = await env.DB.prepare(
+    "SELECT id,q,pq,updated_at FROM items WHERE game=?"
+  ).bind(game).all();
+  const previousById = new Map();
+  for (const r of previous.results) previousById.set(r.id, r);
+
   // "Current" is relative to this upload's own scan time, not wall-clock now,
   // so an upload of data collected a while ago (e.g. after time offline) still
   // shows as current rather than getting wholesale filtered out. Use the
@@ -526,7 +536,15 @@ async function importRealm(url, env, req) {
       const unit = last[5] || last[6] || 0;
       // Quantity in the scan before this one, for the "% since last scan" column.
       // NULL (not 0) when there is no earlier snapshot, so it reads as "unknown".
-      const pq = snaps.length > 1 ? (snaps[snaps.length - 2][1] || 0) : null;
+      let pq = snaps.length > 1 ? (snaps[snaps.length - 2][1] || 0) : null;
+      if (snaps.length === 1) {
+        const prior = previousById.get(id);
+        if (prior) {
+          const scanUnix = Number(last[0]) || 0;
+          const importedUnix = Date.parse(prior.updated_at || "") / 1000;
+          pq = scanUnix > importedUnix ? (prior.q || 0) : prior.pq;
+        }
+      }
       const cat = (rec.m && String(rec.m).trim()) ? String(rec.m) : null;
       const src = (rec.src && String(rec.src).trim()) ? String(rec.src) : null;
       const crafter = (rec.cr && String(rec.cr).trim()) ? String(rec.cr) : null;

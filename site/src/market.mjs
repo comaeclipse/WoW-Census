@@ -36,6 +36,17 @@ function itemLink(it, branch) {
   return '<a href="' + esc(href) + '" target="_blank" rel="noopener">' + esc(itemLabel(it)) + "</a>";
 }
 
+// Change in listed quantity since the preceding scan. A zero-to-positive move
+// is new supply rather than an infinite percentage; no prior snapshot stays
+// explicitly unavailable instead of being rendered as 0%.
+function qtyChange(it) {
+  if (it.pq == null) return '<span class="mu">&mdash;</span>';
+  if (it.pq === 0) return (it.q || 0) > 0 ? '<span class="gr">NEW</span>' : '<span class="mu">0%</span>';
+  const pct = Math.round(((it.q || 0) - it.pq) / it.pq * 100);
+  const cls = pct > 0 ? "gr" : pct < 0 ? "rd" : "mu";
+  return '<span class="' + cls + '">' + (pct > 0 ? "+" : "") + pct.toLocaleString() + "%</span>";
+}
+
 function topTable(title, hint, items, branch, cols) {
   const head = cols.map((c) => '<th class="' + (c.left ? "l" : "r") + '">' + esc(c.label) + "</th>").join("");
   const body = items.map((it) =>
@@ -86,7 +97,7 @@ export function jokePriceThreshold(items) {
 
 // One view's worth of markup: the tiles and every panel under them.
 // snapshot: { items, realms, updatedAt, branch } -- items already merged across
-// that view's realms, each { id, name, q, mv, asp, cat }.
+// that view's realms, each { id, name, q, pq, mv, asp, cat }.
 function renderMarketView(snapshot, threshold) {
   const all = (snapshot && snapshot.items) || [];
   const joke = all.filter((it) => (it.asp || 0) > threshold)
@@ -132,17 +143,20 @@ function renderMarketView(snapshot, threshold) {
   const qtyTable = topTable("Most listed items", "By quantity sitting on the auction house.", byQty, branch, [
     { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
     { label: "Qty", cell: (it) => (it.q || 0).toLocaleString() },
+    { label: "Change", cell: (it) => qtyChange(it) },
     { label: "Unit", cell: (it) => esc(money(it.asp)) },
   ]);
   const priceTable = topTable("Most expensive items", "Highest unit asking price among items currently listed.", byPrice, branch, [
     { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
     { label: "Unit", cell: (it) => esc(money(it.asp)) },
     { label: "Qty", cell: (it) => (it.q || 0).toLocaleString() },
+    { label: "Change", cell: (it) => qtyChange(it) },
   ]);
   const valueTable = topTable("Deepest markets", "Single items holding the most listed value.", byValue, branch, [
     { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
     { label: "Listed value", cell: (it) => esc(bigGold(it.mv)) },
     { label: "Qty", cell: (it) => (it.q || 0).toLocaleString() },
+    { label: "Change", cell: (it) => qtyChange(it) },
   ]);
 
   const body = items.length
@@ -158,6 +172,7 @@ function renderMarketView(snapshot, threshold) {
           { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
           { label: "Unit", cell: (it) => esc(money(it.asp)) },
           { label: "Qty", cell: (it) => (it.q || 0).toLocaleString() },
+          { label: "Change", cell: (it) => qtyChange(it) },
         ])
     : "";
 
@@ -217,6 +232,7 @@ ${MARKET_STYLE}
     asked for an item, and listed value is quantity &times; that price &mdash; what sellers want, not what anyone paid.<br>
     Listings priced absurdly above the rest of the market are excluded from the totals and top lists,
     and named in their own panel rather than dropped quietly.<br>
+    Change compares listed quantity with the preceding scan; it is net supply movement, not sales.<br>
     Items a scan could not name appear by id. Companion to the MarketLens addon.
   </p>
 </div>
