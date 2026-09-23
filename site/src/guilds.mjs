@@ -69,10 +69,12 @@ export function renderGuildHtml(views, dims = {}, opts = {}) {
       (on ? '' : ' hidden') + '>' + renderGuildView(v.snapshot) + '</div>';
   }).join("");
 
+  const gameLabel = opts.gameLabel || "WoW Forever";
+  const scopeLabel = opts.scopeLabel || "Beta realms";
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WoW Forever guilds — MarketLens</title>
-<meta name="description" content="Most commonly observed guilds in WoW Forever beta population surveys, by realm and faction.">
+<title>${esc(gameLabel)} guilds — MarketLens</title>
+<meta name="description" content="Most commonly observed guilds in ${esc(gameLabel)} population surveys, by realm and faction.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
@@ -80,8 +82,8 @@ export function renderGuildHtml(views, dims = {}, opts = {}) {
 <style>${CENSUS_STYLE}${GUILD_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
   ${opts.nav || ""}
-  <header class="ihead"><h1 class="iname">WoW Forever &mdash; Observed Guilds</h1>
-    <div class="itag">Beta realms &middot; latest known guild &middot; unique characters sampled via /who</div>
+  <header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Observed Guilds</h1>
+    <div class="itag">${esc(scopeLabel)} &middot; latest known guild &middot; unique characters sampled via /who</div>
     ${opts.note ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + '</div>' : ''}
   </header>
   ${chips}${panes}

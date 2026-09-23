@@ -124,9 +124,9 @@ function renderCensusView(census, opts = {}) {
 
   let body;
   if (!total && !samples) {
-    body = '<div class="panel"><p class="hint">No Forever (Beta) population data uploaded yet. ' +
-      "In game on a beta realm, open the Population tab and press Scan Population (or /ml who), then run " +
-      "<code>upload-realm.ps1 -Flavor classic-beta</code>.</p></div>";
+    body = '<div class="panel"><p class="hint">No ' + esc(opts.gameLabel || "WoW Forever") + ' population data uploaded yet. ' +
+      "In game, open the Population tab and press Scan Population (or /ml who), then run " +
+      "<code>upload-realm.ps1 -Flavor " + esc(opts.uploadFlavor || "classic-beta") + "</code>.</p></div>";
   } else {
     // Race chart: every faction's races in one chart, grouped by faction and
     // scaled against the single largest race so the faction blocks compare.
@@ -196,10 +196,12 @@ export function renderCensusHtml(views, opts = {}) {
     ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + "</div>"
     : "";
 
+  const gameLabel = opts.gameLabel || "WoW Forever";
+  const scopeLabel = opts.scopeLabel || "Beta realms";
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WoW Forever census — MarketLens</title>
-<meta name="description" content="Observed population census for the WoW Forever beta realms: race and class distribution by faction, sampled via /who.">
+<title>${esc(gameLabel)} census — MarketLens</title>
+<meta name="description" content="Observed population census for ${esc(gameLabel)}: race and class distribution by faction, sampled via /who.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
@@ -211,8 +213,8 @@ export function renderCensusHtml(views, opts = {}) {
 <div class="wrap">
   ${back}
   <header class="ihead">
-    <h1 class="iname">WoW Forever &mdash; Observed Census</h1>
-    <div class="itag">Beta realms &middot; both factions &middot; unique characters sampled via /who</div>
+    <h1 class="iname">${esc(gameLabel)} &mdash; Observed Census</h1>
+    <div class="itag">${esc(scopeLabel)} &middot; both factions &middot; unique characters sampled via /who</div>
     ${note}
   </header>
   ${chips}

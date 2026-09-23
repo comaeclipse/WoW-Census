@@ -27,11 +27,15 @@ const flag = (name) => args.includes("--" + name);
 
 const base = (arg("url", "https://marketlens.skarz.workers.dev") || "").replace(/\/+$/, "");
 const repo = path.resolve(__dirname, "..");
-const outDir = path.resolve(repo, arg("out", "pages"));
+const sourceGame = arg("source", "classic-beta");
+const isTbc = sourceGame === "classic-progression";
+const outDir = path.resolve(repo, arg("out", isTbc ? "pages/tbc" : "pages"));
 const project = arg("project", "wowcensus");
-// Every beta realm dataset shares this source_game; both pages filter on it.
-const SOURCE_GAME = "classic-beta";
-const WH_BRANCH = "forever";
+const SOURCE_GAME = sourceGame;
+const GAME_LABEL = isTbc ? "TBC Anniversary" : "WoW Forever";
+const SCOPE_LABEL = isTbc ? "Anniversary realms" : "Beta realms";
+const UPLOAD_FLAVOR = isTbc ? "tbc-anniversary" : "classic-beta";
+const WH_BRANCH = isTbc ? "tbc" : "forever";
 const ITEM_NAME_CACHE = path.join(__dirname, "forever-item-names.json");
 
 async function getJson(url) {
@@ -82,7 +86,11 @@ function nav(current) {
   const item = (href, label) =>
     '<a class="game"' + (href === current ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
-  return '<nav class="games" style="margin-bottom:18px">' +
+  const foreverHref = isTbc ? "../index.html" : "index.html";
+  const tbcHref = isTbc ? "index.html" : "tbc/index.html";
+  return '<nav class="games" style="margin-bottom:10px">' +
+    item(foreverHref, "Forever") + item(tbcHref, "TBC Anniversary") + "</nav>" +
+    '<nav class="games" style="margin-bottom:18px">' +
     item("index.html", "Census") + item("auctionhouse.html", "Auction House") +
     item("guilds.html", "Guilds") + "</nav>";
 }
@@ -165,7 +173,7 @@ async function main() {
   const stamp = "Static snapshot built " + built.toISOString().slice(0, 16).replace("T", " ") + "Z";
 
   process.stdout.write("Census   ... ");
-  const census = await getJson(base + "/api/forever");
+  const census = await getJson(base + "/api/census?source=" + encodeURIComponent(SOURCE_GAME));
   const chars = (census.groups || []).reduce((a, g) => a + g.characters, 0);
   console.log(chars.toLocaleString() + " characters, " + (census.groups || []).length + " faction(s)");
 
@@ -194,7 +202,7 @@ async function main() {
     items: mergeItems(from),
     realms: from.length ? from.map((s2) => s2.realm) : fallbackRealms,
     updatedAt: from.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
-    branch: WH_BRANCH,
+    branch: WH_BRANCH, uploadFlavor: UPLOAD_FLAVOR,
   });
   const marketRealmLabels = realmLabels(realmNames);
   const dims = {
@@ -239,7 +247,9 @@ async function main() {
   }
 
   const uniqueItems = [...new Map(views.flatMap((v) => v.snapshot.items).map((it) => [it.id, it])).values()];
-  const names = await resolvePlaceholderNames(uniqueItems);
+  const names = SOURCE_GAME === "classic-beta"
+    ? await resolvePlaceholderNames(uniqueItems)
+    : { resolved: 0, unresolved: uniqueItems.filter((it) => /^item:\d+$/.test(it.name)).length };
   // Apply a name learned from either faction to every view containing that id.
   const resolvedNames = new Map(uniqueItems.map((it) => [it.id, it.name]));
   for (const v of views) for (const it of v.snapshot.items) {
@@ -269,11 +279,14 @@ async function main() {
     stylesheet: "style.css",
     nav: nav("index.html"),
     note: stamp,
+    gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL, uploadFlavor: UPLOAD_FLAVOR,
   }));
   fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
-    renderMarketHtml(views, dims, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp }));
+    renderMarketHtml(views, dims, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp,
+      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL }));
   fs.writeFileSync(path.join(outDir, "guilds.html"),
-    renderGuildHtml(guildViews, dims, { stylesheet: "style.css", nav: nav("guilds.html"), note: stamp }));
+    renderGuildHtml(guildViews, dims, { stylesheet: "style.css", nav: nav("guilds.html"), note: stamp,
+      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL }));
   // The bundle carries its own stylesheet so it renders with nothing else served.
   fs.copyFileSync(path.join(repo, "site/public/style.css"), path.join(outDir, "style.css"));
   // Keep the existing public census artifact focused on census data; guilds

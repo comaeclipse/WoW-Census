@@ -1,0 +1,116 @@
+{
+  "groups": [
+    {
+      "faction": "Alliance",
+      "races": {
+        "Draenei": 703,
+        "Dwarf": 395,
+        "Gnome": 455,
+        "Human": 1289,
+        "Night Elf": 839
+      },
+      "classes": {
+        "HUNTER": 552,
+        "MAGE": 519,
+        "PALADIN": 589,
+        "PRIEST": 295,
+        "SHAMAN": 330,
+        "WARRIOR": 387,
+        "ROGUE": 295,
+        "WARLOCK": 319,
+        "DRUID": 395
+      },
+      "characters": 3681,
+      "samples": 118,
+      "observed": 5095,
+      "games": [
+        "realm:Dreamscythe-Alliance"
+      ]
+    },
+    {
+      "faction": "Horde",
+      "races": {
+        "Blood Elf": 901,
+        "Orc": 489,
+        "Tauren": 424,
+        "Troll": 438,
+        "Undead": 397
+      },
+      "classes": {
+        "HUNTER": 432,
+        "MAGE": 365,
+        "PALADIN": 382,
+        "PRIEST": 218,
+        "ROGUE": 225,
+        "WARLOCK": 267,
+        "SHAMAN": 271,
+        "WARRIOR": 237,
+        "DRUID": 252
+      },
+      "characters": 2649,
+      "samples": 86,
+      "observed": 3558,
+      "games": [
+        "realm:Dreamscythe-Horde"
+      ]
+    }
+  ],
+  "units": [
+    {
+      "game": "realm:Dreamscythe-Alliance",
+      "realm": "Dreamscythe",
+      "faction": "Alliance",
+      "races": {
+        "Draenei": 703,
+        "Dwarf": 395,
+        "Gnome": 455,
+        "Human": 1289,
+        "Night Elf": 839
+      },
+      "classes": {
+        "HUNTER": 552,
+        "MAGE": 519,
+        "PALADIN": 589,
+        "PRIEST": 295,
+        "SHAMAN": 330,
+        "WARRIOR": 387,
+        "ROGUE": 295,
+        "WARLOCK": 319,
+        "DRUID": 395
+      },
+      "characters": 3681,
+      "samples": 118,
+      "observed": 5095
+    },
+    {
+      "game": "realm:Dreamscythe-Horde",
+      "realm": "Dreamscythe",
+      "faction": "Horde",
+      "races": {
+        "Blood Elf": 901,
+        "Orc": 489,
+        "Tauren": 424,
+        "Troll": 438,
+        "Undead": 397
+      },
+      "classes": {
+        "HUNTER": 432,
+        "MAGE": 365,
+        "PALADIN": 382,
+        "PRIEST": 218,
+        "ROGUE": 225,
+        "WARLOCK": 267,
+        "SHAMAN": 271,
+        "WARRIOR": 237,
+        "DRUID": 252
+      },
+      "characters": 2649,
+      "samples": 86,
+      "observed": 3558
+    }
+  ],
+  "realms": [
+    "Dreamscythe"
+  ],
+  "lastT": 1790198872
+}

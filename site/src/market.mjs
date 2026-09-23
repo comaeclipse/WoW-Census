@@ -163,7 +163,7 @@ function renderMarketView(snapshot, threshold) {
     ? catPanel + '<div class="mktgrid">' + qtyTable + priceTable + "</div>" + valueTable
     : '<div class="panel"><p class="hint">No auction scan uploaded for ' +
       esc(realms.join(" · ") || "this faction") + ' yet. In game, run /ml scan at the auction house, ' +
-      '/reload, then upload with <code>upload-realm.ps1 -Flavor classic-beta</code>.</p></div>';
+      '/reload, then upload with <code>upload-realm.ps1 -Flavor ' + esc(snapshot.uploadFlavor || "classic-beta") + '</code>.</p></div>';
 
   const jokePanel = joke.length
     ? topTable("Excluded as joke listings",
@@ -205,10 +205,12 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
   }).join("");
   const script = chips ? TOGGLE_SCRIPT : "";
 
+  const gameLabel = opts.gameLabel || "WoW Forever";
+  const scopeLabel = opts.scopeLabel || "Beta realms";
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WoW Forever auction house — MarketLens</title>
-<meta name="description" content="High-level auction house overview for the WoW Forever beta realms: biggest markets, most listed items, and the most expensive listings.">
+<title>${esc(gameLabel)} auction house — MarketLens</title>
+<meta name="description" content="High-level auction house overview for ${esc(gameLabel)}: biggest markets, most listed items, and the most expensive listings.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
@@ -221,8 +223,8 @@ ${MARKET_STYLE}
 <div class="wrap">
   ${opts.nav || ""}
   <header class="ihead">
-    <h1 class="iname">WoW Forever &mdash; Auction House</h1>
-    <div class="itag">Beta realms &middot; observed listings &middot; scanned in game with MarketLens</div>
+    <h1 class="iname">${esc(gameLabel)} &mdash; Auction House</h1>
+    <div class="itag">${esc(scopeLabel)} &middot; observed listings &middot; scanned in game with MarketLens</div>
     ${opts.note ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + "</div>" : ""}
   </header>
   ${chips}

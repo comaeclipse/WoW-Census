@@ -1404,24 +1404,24 @@ async function popPage(url, env) {
 // Alliance-vs-Horde view. It counts unique characters -- each character once,
 // however many scans caught it -- so the faction that happened to get more
 // /who scans cannot inflate its own share.
-async function loadForeverCensus(env) {
+async function loadCensus(env, sourceGame = "classic-beta") {
   const rows = (await env.DB.prepare(
     `SELECT c.game game, c.race race, c.class_file cf, COUNT(*) n
      FROM characters c JOIN datasets d ON d.game = c.game
-     WHERE d.source_game = 'classic-beta'
+     WHERE d.source_game = ?
      GROUP BY c.game, c.race, c.class_file`
-  ).all()).results;
+  ).bind(sourceGame).all()).results;
   const scans = (await env.DB.prepare(
     `SELECT p.game game, COUNT(*) samples, SUM(p.observed) observed, MAX(p.t) lastT
      FROM pop_samples p JOIN datasets d ON d.game = p.game
-     WHERE d.source_game = 'classic-beta' GROUP BY p.game`
-  ).all()).results;
+     WHERE d.source_game = ? GROUP BY p.game`
+  ).bind(sourceGame).all()).results;
   const guilds = (await env.DB.prepare(
     `SELECT c.game game, c.guild guild, COUNT(*) members
      FROM characters c JOIN datasets d ON d.game = c.game
-     WHERE d.source_game = 'classic-beta' AND TRIM(COALESCE(c.guild, '')) <> ''
+     WHERE d.source_game = ? AND TRIM(COALESCE(c.guild, '')) <> ''
      GROUP BY c.game, c.guild`
-  ).all()).results;
+  ).bind(sourceGame).all()).results;
 
   // One unit per dataset -- a realm/faction pair. Callers that want the whole
   // beta merged use `groups` below; the static bundle slices `units` per realm
@@ -1491,7 +1491,7 @@ function mergeCensusUnits(units) {
 }
 
 async function foreverPage(env) {
-  const census = await loadForeverCensus(env);
+  const census = await loadCensus(env, "classic-beta");
   return new Response(renderCensusHtml([{ key: "all", label: "All", census }], {
     stylesheet: "/style.css",
     back: { href: "/pop", label: "POPULATION" },
@@ -1502,7 +1502,14 @@ async function foreverPage(env) {
 // The same census as /wowforever, as JSON. tools/build-forever-page.js reads it
 // to bake the static pages/ bundle without needing D1 credentials.
 async function apiForever(env) {
-  return json(await loadForeverCensus(env), 300);
+  return json(await loadCensus(env, "classic-beta"), 300);
+}
+
+async function apiCensus(url, env) {
+  const sourceGame = url.searchParams.get("source") || "classic-beta";
+  if (!["classic-beta", "classic-progression", "classic", "retail"].includes(sourceGame))
+    return json({ error: "unknown source game" }, 400);
+  return json(await loadCensus(env, sourceGame), 300);
 }
 
 const app = new Hono();
@@ -1511,6 +1518,7 @@ app.all("/api/items", (c) => apiItems(new URL(c.req.url), c.env, c.executionCtx)
 app.all("/api/history", (c) => apiHistory(new URL(c.req.url), c.env));
 app.all("/api/games", (c) => apiGames(c.env));
 app.all("/api/population", (c) => apiPopulation(new URL(c.req.url), c.env));
+app.all("/api/census", (c) => apiCensus(new URL(c.req.url), c.env));
 
 app.post("/admin/import-realm", (c) => importRealm(new URL(c.req.url), c.env, c.req.raw));
 app.post("/admin/import-pop", (c) => importPop(new URL(c.req.url), c.env, c.req.raw));
