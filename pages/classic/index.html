@@ -1,0 +1,77 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Classic Era census — MarketLens</title>
+<meta name="description" content="Observed population census for Classic Era: race and class distribution by faction, sampled via /who.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .chartgrid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start}
+  @media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
+  .census .legend{display:flex; gap:18px; margin:0 0 14px}
+  .census .key{display:inline-flex; align-items:center; gap:7px; font-size:17px; color:var(--muted)}
+  .census .key i{width:13px; height:13px; display:inline-block}
+  .bar{display:grid; grid-template-columns:172px 1fr 62px; align-items:center; gap:10px; margin-bottom:6px}
+  .bar .bl{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-align:right;
+    color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .bar .bt{background:var(--panel2); border:2px solid var(--line); height:20px; padding:1px}
+  .bar .bt i{display:block; height:100%}
+  .bar .bn{text-align:right; color:var(--ink)}
+  @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
+  .vchips{margin-bottom:18px}
+</style>
+</head><body>
+<div class="crt" aria-hidden="true"></div>
+<div class="wrap">
+  <nav class="games" style="margin-bottom:10px"><a class="game" href="../index.html">Forever</a><a class="game" href="../tbc/index.html">TBC Anniversary</a><a class="game" aria-current="true" href="index.html">Classic Era</a></nav><nav class="games" style="margin-bottom:18px"><a class="game" aria-current="true" href="index.html">Census</a><a class="game" href="auctionhouse.html">Auction House</a><a class="game" href="guilds.html">Guilds</a></nav>
+  <header class="ihead">
+    <h1 class="iname">Classic Era &mdash; Observed Census</h1>
+    <div class="itag">Classic Era realms &middot; both factions &middot; unique characters sampled via /who</div>
+    <div class="itag" style="margin-top:10px;line-height:1.6">Static snapshot built 2026-09-23 22:43Z</div>
+  </header>
+  <div class="chips vchips" data-dim="realm"><button class="chip" type="button" data-key="all" aria-pressed="true">All realms</button><button class="chip" type="button" data-key="Ashkandi" aria-pressed="false">Ashkandi</button><button class="chip" type="button" data-key="Old Blanchy" aria-pressed="false">Old Blanchy</button></div>
+  <div class="vpane" data-realm="all"><section class="tiles"><div class="tile"><div class="k">Characters</div><div class="v">3,144</div><div class="s">unique, all time</div></div><div class="tile"><div class="k">Realms</div><div class="v">2</div><div class="s">Ashkandi · Old Blanchy</div></div><div class="tile"><div class="k">Scans</div><div class="v">169</div><div class="s">4,763 sightings</div></div><div class="tile"><div class="k">Updated</div><div class="v">2026-09-17</div><div class="s">last sample</div></div></section><div class="panel census" style="margin-bottom:22px"><div class="ptitle">Population by race</div><p class="hint" style="margin-top:0">Grouped by faction, most populous first.</p><div class="legend"><span class="key"><i style="background:#3f83f8"></i>Alliance</span><span class="key"><i style="background:#d9363e"></i>Horde</span></div><div class="bar"><div class="bl">HUMAN</div><div class="bt"><i style="width:100.00%;background:#3f83f8"></i></div><div class="bn">993</div></div><div class="bar"><div class="bl">NIGHT ELF</div><div class="bt"><i style="width:56.50%;background:#3f83f8"></i></div><div class="bn">561</div></div><div class="bar"><div class="bl">DWARF</div><div class="bt"><i style="width:34.64%;background:#3f83f8"></i></div><div class="bn">344</div></div><div class="bar"><div class="bl">GNOME</div><div class="bt"><i style="width:30.41%;background:#3f83f8"></i></div><div class="bn">302</div></div><div class="bar"><div class="bl">UNDEAD</div><div class="bt"><i style="width:29.81%;background:#d9363e"></i></div><div class="bn">296</div></div><div class="bar"><div class="bl">ORC</div><div class="bt"><i style="width:25.88%;background:#d9363e"></i></div><div class="bn">257</div></div><div class="bar"><div class="bl">TROLL</div><div class="bt"><i style="width:21.05%;background:#d9363e"></i></div><div class="bn">209</div></div><div class="bar"><div class="bl">TAUREN</div><div class="bt"><i style="width:18.33%;background:#d9363e"></i></div><div class="bn">182</div></div></div><div class="chartgrid"><div class="panel census"><div class="ptitle">Class distribution &mdash; Alliance</div><p class="hint" style="margin-top:0">2,200 characters shown</p><div class="bar"><div class="bl">MAGE</div><div class="bt"><i style="width:100.00%;background:#69CCF0"></i></div><div class="bn">395</div></div><div class="bar"><div class="bl">WARRIOR</div><div class="bt"><i style="width:97.97%;background:#C79C6E"></i></div><div class="bn">387</div></div><div class="bar"><div class="bl">HUNTER</div><div class="bt"><i style="width:86.58%;background:#ABD473"></i></div><div class="bn">342</div></div><div class="bar"><div class="bl">PALADIN</div><div class="bt"><i style="width:68.86%;background:#F58CBA"></i></div><div class="bn">272</div></div><div class="bar"><div class="bl">PRIEST</div><div class="bt"><i style="width:62.53%;background:#FFFFFF"></i></div><div class="bn">247</div></div><div class="bar"><div class="bl">ROGUE</div><div class="bt"><i style="width:51.65%;background:#FFF569"></i></div><div class="bn">204</div></div><div class="bar"><div class="bl">DRUID</div><div class="bt"><i style="width:51.14%;background:#FF7D0A"></i></div><div class="bn">202</div></div><div class="bar"><div class="bl">WARLOCK</div><div class="bt"><i style="width:38.23%;background:#9482C9"></i></div><div class="bn">151</div></div></div><div class="panel census"><div class="ptitle">Class distribution &mdash; Horde</div><p class="hint" style="margin-top:0">944 characters shown</p><div class="bar"><div class="bl">WARRIOR</div><div class="bt"><i style="width:100.00%;background:#C79C6E"></i></div><div class="bn">192</div></div><div class="bar"><div class="bl">HUNTER</div><div class="bt"><i style="width:76.56%;background:#ABD473"></i></div><div class="bn">147</div></div><div class="bar"><div class="bl">MAGE</div><div class="bt"><i style="width:68.75%;background:#69CCF0"></i></div><div class="bn">132</div></div><div class="bar"><div class="bl">SHAMAN</div><div class="bt"><i style="width:67.19%;background:#0070DE"></i></div><div class="bn">129</div></div><div class="bar"><div class="bl">PRIEST</div><div class="bt"><i style="width:52.60%;background:#FFFFFF"></i></div><div class="bn">101</div></div><div class="bar"><div class="bl">WARLOCK</div><div class="bt"><i style="width:46.88%;background:#9482C9"></i></div><div class="bn">90</div></div><div class="bar"><div class="bl">DRUID</div><div class="bt"><i style="width:40.63%;background:#FF7D0A"></i></div><div class="bn">78</div></div><div class="bar"><div class="bl">ROGUE</div><div class="bt"><i style="width:39.06%;background:#FFF569"></i></div><div class="bn">75</div></div></div></div></div><div class="vpane" data-realm="Ashkandi" hidden><section class="tiles"><div class="tile"><div class="k">Characters</div><div class="v">3,144</div><div class="s">unique, all time</div></div><div class="tile"><div class="k">Realms</div><div class="v">1</div><div class="s">Ashkandi</div></div><div class="tile"><div class="k">Scans</div><div class="v">152</div><div class="s">4,460 sightings</div></div><div class="tile"><div class="k">Updated</div><div class="v">2026-09-17</div><div class="s">last sample</div></div></section><div class="panel census" style="margin-bottom:22px"><div class="ptitle">Population by race</div><p class="hint" style="margin-top:0">Grouped by faction, most populous first.</p><div class="legend"><span class="key"><i style="background:#3f83f8"></i>Alliance</span><span class="key"><i style="background:#d9363e"></i>Horde</span></div><div class="bar"><div class="bl">HUMAN</div><div class="bt"><i style="width:100.00%;background:#3f83f8"></i></div><div class="bn">993</div></div><div class="bar"><div class="bl">NIGHT ELF</div><div class="bt"><i style="width:56.50%;background:#3f83f8"></i></div><div class="bn">561</div></div><div class="bar"><div class="bl">DWARF</div><div class="bt"><i style="width:34.64%;background:#3f83f8"></i></div><div class="bn">344</div></div><div class="bar"><div class="bl">GNOME</div><div class="bt"><i style="width:30.41%;background:#3f83f8"></i></div><div class="bn">302</div></div><div class="bar"><div class="bl">UNDEAD</div><div class="bt"><i style="width:29.81%;background:#d9363e"></i></div><div class="bn">296</div></div><div class="bar"><div class="bl">ORC</div><div class="bt"><i style="width:25.88%;background:#d9363e"></i></div><div class="bn">257</div></div><div class="bar"><div class="bl">TROLL</div><div class="bt"><i style="width:21.05%;background:#d9363e"></i></div><div class="bn">209</div></div><div class="bar"><div class="bl">TAUREN</div><div class="bt"><i style="width:18.33%;background:#d9363e"></i></div><div class="bn">182</div></div></div><div class="chartgrid"><div class="panel census"><div class="ptitle">Class distribution &mdash; Alliance</div><p class="hint" style="margin-top:0">2,200 characters shown</p><div class="bar"><div class="bl">MAGE</div><div class="bt"><i style="width:100.00%;background:#69CCF0"></i></div><div class="bn">395</div></div><div class="bar"><div class="bl">WARRIOR</div><div class="bt"><i style="width:97.97%;background:#C79C6E"></i></div><div class="bn">387</div></div><div class="bar"><div class="bl">HUNTER</div><div class="bt"><i style="width:86.58%;background:#ABD473"></i></div><div class="bn">342</div></div><div class="bar"><div class="bl">PALADIN</div><div class="bt"><i style="width:68.86%;background:#F58CBA"></i></div><div class="bn">272</div></div><div class="bar"><div class="bl">PRIEST</div><div class="bt"><i style="width:62.53%;background:#FFFFFF"></i></div><div class="bn">247</div></div><div class="bar"><div class="bl">ROGUE</div><div class="bt"><i style="width:51.65%;background:#FFF569"></i></div><div class="bn">204</div></div><div class="bar"><div class="bl">DRUID</div><div class="bt"><i style="width:51.14%;background:#FF7D0A"></i></div><div class="bn">202</div></div><div class="bar"><div class="bl">WARLOCK</div><div class="bt"><i style="width:38.23%;background:#9482C9"></i></div><div class="bn">151</div></div></div><div class="panel census"><div class="ptitle">Class distribution &mdash; Horde</div><p class="hint" style="margin-top:0">944 characters shown</p><div class="bar"><div class="bl">WARRIOR</div><div class="bt"><i style="width:100.00%;background:#C79C6E"></i></div><div class="bn">192</div></div><div class="bar"><div class="bl">HUNTER</div><div class="bt"><i style="width:76.56%;background:#ABD473"></i></div><div class="bn">147</div></div><div class="bar"><div class="bl">MAGE</div><div class="bt"><i style="width:68.75%;background:#69CCF0"></i></div><div class="bn">132</div></div><div class="bar"><div class="bl">SHAMAN</div><div class="bt"><i style="width:67.19%;background:#0070DE"></i></div><div class="bn">129</div></div><div class="bar"><div class="bl">PRIEST</div><div class="bt"><i style="width:52.60%;background:#FFFFFF"></i></div><div class="bn">101</div></div><div class="bar"><div class="bl">WARLOCK</div><div class="bt"><i style="width:46.88%;background:#9482C9"></i></div><div class="bn">90</div></div><div class="bar"><div class="bl">DRUID</div><div class="bt"><i style="width:40.63%;background:#FF7D0A"></i></div><div class="bn">78</div></div><div class="bar"><div class="bl">ROGUE</div><div class="bt"><i style="width:39.06%;background:#FFF569"></i></div><div class="bn">75</div></div></div></div></div><div class="vpane" data-realm="Old Blanchy" hidden><section class="tiles"><div class="tile"><div class="k">Characters</div><div class="v">0</div><div class="s">unique, all time</div></div><div class="tile"><div class="k">Realms</div><div class="v">1</div><div class="s">Old Blanchy</div></div><div class="tile"><div class="k">Scans</div><div class="v">17</div><div class="s">303 sightings</div></div><div class="tile"><div class="k">Updated</div><div class="v">2026-09-17</div><div class="s">last sample</div></div></section><div class="panel census" style="margin-bottom:22px"><div class="ptitle">Population by race</div><p class="hint" style="margin-top:0">Grouped by faction, most populous first.</p><div class="legend"><span class="key"><i style="background:#3f83f8"></i>Alliance</span></div><p class="hint">No race data yet.</p></div><div class="chartgrid"><div class="panel census"><div class="ptitle">Class distribution &mdash; Alliance</div><p class="hint" style="margin-top:0">0 characters shown</p><p class="hint">No class data yet.</p></div></div></div>
+  <p class="src">
+    A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
+    Each bar counts unique characters &mdash; one per normalized character name + realm &mdash; so a faction
+    that received more scans does not gain share from the extra scans alone. A character seen several times
+    in a day still counts once.<br>
+    Characters are not human players/accounts; a rename appears as a new character. Companion to the MarketLens addon.
+  </p>
+</div>
+<script>
+(function(){
+  var rows=[].slice.call(document.querySelectorAll(".vchips[data-dim]"));
+  var panes=[].slice.call(document.querySelectorAll(".vpane"));
+  if(!rows.length||!panes.length) return;
+  var state={};
+  rows.forEach(function(r){
+    var on=r.querySelector('.chip[aria-pressed="true"]')||r.querySelector(".chip");
+    state[r.dataset.dim]=on?on.dataset.key:"";
+  });
+  function apply(){
+    rows.forEach(function(r){
+      [].slice.call(r.querySelectorAll(".chip")).forEach(function(c){
+        c.setAttribute("aria-pressed", c.dataset.key===state[r.dataset.dim]?"true":"false");
+      });
+    });
+    panes.forEach(function(p){
+      var show=true;
+      for(var dim in state){
+        var want=state[dim], has=p.getAttribute("data-"+dim);
+        if(has!==null&&has!==want) show=false;
+      }
+      p.hidden=!show;
+    });
+  }
+  rows.forEach(function(r){
+    r.addEventListener("click", function(e){
+      var c=e.target.closest(".chip"); if(!c||!r.contains(c)) return;
+      state[r.dataset.dim]=c.dataset.key; apply();
+    });
+  });
+  apply();
+})();
+</script>
+</body></html>

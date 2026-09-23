@@ -28,14 +28,20 @@ const flag = (name) => args.includes("--" + name);
 const base = (arg("url", "https://marketlens.skarz.workers.dev") || "").replace(/\/+$/, "");
 const repo = path.resolve(__dirname, "..");
 const sourceGame = arg("source", "classic-beta");
-const isTbc = sourceGame === "classic-progression";
-const outDir = path.resolve(repo, arg("out", isTbc ? "pages/tbc" : "pages"));
+const editions = {
+  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", scope: "Beta realms", flavor: "classic-beta", branch: "forever" },
+  "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", scope: "Anniversary realms", flavor: "tbc-anniversary", branch: "tbc" },
+  classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", scope: "Classic Era realms", flavor: "classic-era", branch: "classic" },
+};
+const edition = editions[sourceGame];
+if (!edition) throw new Error("unsupported Pages source game: " + sourceGame);
+const outDir = path.resolve(repo, arg("out", edition.dir));
 const project = arg("project", "wowcensus");
 const SOURCE_GAME = sourceGame;
-const GAME_LABEL = isTbc ? "TBC Anniversary" : "WoW Forever";
-const SCOPE_LABEL = isTbc ? "Anniversary realms" : "Beta realms";
-const UPLOAD_FLAVOR = isTbc ? "tbc-anniversary" : "classic-beta";
-const WH_BRANCH = isTbc ? "tbc" : "forever";
+const GAME_LABEL = edition.label;
+const SCOPE_LABEL = edition.scope;
+const UPLOAD_FLAVOR = edition.flavor;
+const WH_BRANCH = edition.branch;
 const ITEM_NAME_CACHE = path.join(__dirname, "forever-item-names.json");
 
 async function getJson(url) {
@@ -86,10 +92,12 @@ function nav(current) {
   const item = (href, label, active = href === current) =>
     '<a class="game"' + (active ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
-  const foreverHref = isTbc ? "../index.html" : "index.html";
-  const tbcHref = isTbc ? "index.html" : "tbc/index.html";
+  const inRoot = SOURCE_GAME === "classic-beta";
+  const hrefFor = (source, dir) => source === SOURCE_GAME ? "index.html" :
+    (inRoot ? dir.replace(/^pages\/?/, "") + (dir === "pages" ? "index.html" : "/index.html") :
+      (dir === "pages" ? "../index.html" : "../" + dir.replace(/^pages\//, "") + "/index.html"));
   return '<nav class="games" style="margin-bottom:10px">' +
-    item(foreverHref, "Forever", !isTbc) + item(tbcHref, "TBC Anniversary", isTbc) + "</nav>" +
+    Object.entries(editions).map(([source, e]) => item(hrefFor(source, e.dir), e.nav, source === SOURCE_GAME)).join("") + "</nav>" +
     '<nav class="games" style="margin-bottom:18px">' +
     item("index.html", "Census") + item("auctionhouse.html", "Auction House") +
     item("guilds.html", "Guilds") + "</nav>";
@@ -179,7 +187,7 @@ async function main() {
 
   process.stdout.write("Auctions ... ");
   const games = (await getJson(base + "/api/games")).games || [];
-  const marketGames = games.filter((g) => g.sourceGame === SOURCE_GAME && g.hasItems);
+  const marketGames = games.filter((g) => g.sourceGame === SOURCE_GAME && g.realm && g.hasItems);
   const snaps = [];
   for (const g of marketGames) {
     const snap = await getJson(base + "/api/items?game=" + encodeURIComponent(g.game));

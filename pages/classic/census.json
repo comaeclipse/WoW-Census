@@ -1,0 +1,120 @@
+{
+  "groups": [
+    {
+      "faction": "Alliance",
+      "races": {
+        "Dwarf": 344,
+        "Gnome": 302,
+        "Human": 993,
+        "Night Elf": 561
+      },
+      "classes": {
+        "HUNTER": 342,
+        "PALADIN": 272,
+        "PRIEST": 247,
+        "ROGUE": 204,
+        "WARRIOR": 387,
+        "MAGE": 395,
+        "WARLOCK": 151,
+        "DRUID": 202
+      },
+      "characters": 2200,
+      "samples": 119,
+      "observed": 3586,
+      "games": [
+        "realm:Ashkandi-Alliance",
+        "realm:Old Blanchy-Alliance"
+      ]
+    },
+    {
+      "faction": "Horde",
+      "races": {
+        "Orc": 257,
+        "Tauren": 182,
+        "Troll": 209,
+        "Undead": 296
+      },
+      "classes": {
+        "HUNTER": 147,
+        "ROGUE": 75,
+        "SHAMAN": 129,
+        "WARLOCK": 90,
+        "WARRIOR": 192,
+        "DRUID": 78,
+        "MAGE": 132,
+        "PRIEST": 101
+      },
+      "characters": 944,
+      "samples": 50,
+      "observed": 1177,
+      "games": [
+        "realm:Ashkandi-Horde"
+      ]
+    }
+  ],
+  "units": [
+    {
+      "game": "realm:Ashkandi-Alliance",
+      "realm": "Ashkandi",
+      "faction": "Alliance",
+      "races": {
+        "Dwarf": 344,
+        "Gnome": 302,
+        "Human": 993,
+        "Night Elf": 561
+      },
+      "classes": {
+        "HUNTER": 342,
+        "PALADIN": 272,
+        "PRIEST": 247,
+        "ROGUE": 204,
+        "WARRIOR": 387,
+        "MAGE": 395,
+        "WARLOCK": 151,
+        "DRUID": 202
+      },
+      "characters": 2200,
+      "samples": 102,
+      "observed": 3283
+    },
+    {
+      "game": "realm:Ashkandi-Horde",
+      "realm": "Ashkandi",
+      "faction": "Horde",
+      "races": {
+        "Orc": 257,
+        "Tauren": 182,
+        "Troll": 209,
+        "Undead": 296
+      },
+      "classes": {
+        "HUNTER": 147,
+        "ROGUE": 75,
+        "SHAMAN": 129,
+        "WARLOCK": 90,
+        "WARRIOR": 192,
+        "DRUID": 78,
+        "MAGE": 132,
+        "PRIEST": 101
+      },
+      "characters": 944,
+      "samples": 50,
+      "observed": 1177
+    },
+    {
+      "game": "realm:Old Blanchy-Alliance",
+      "realm": "Old Blanchy",
+      "faction": "Alliance",
+      "races": {},
+      "classes": {},
+      "characters": 0,
+      "samples": 17,
+      "observed": 303
+    }
+  ],
+  "realms": [
+    "Ashkandi",
+    "Old Blanchy"
+  ],
+  "lastT": 1789655646
+}
