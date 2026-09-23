@@ -3,26 +3,26 @@
     {
       "faction": "Alliance",
       "races": {
-        "Dwarf": 617,
-        "Gnome": 561,
-        "High Order Skyborne": 800,
-        "Human": 1371,
-        "Night Elf": 1016
+        "Dwarf": 698,
+        "Gnome": 659,
+        "High Order Skyborne": 940,
+        "Human": 1580,
+        "Night Elf": 1182
       },
       "classes": {
-        "HUNTER": 804,
-        "PALADIN": 580,
-        "PRIEST": 402,
-        "ROGUE": 389,
-        "SHAMAN": 334,
-        "WARRIOR": 506,
-        "MAGE": 554,
-        "WARLOCK": 226,
-        "DRUID": 570
+        "HUNTER": 959,
+        "PALADIN": 666,
+        "PRIEST": 448,
+        "ROGUE": 460,
+        "SHAMAN": 371,
+        "WARRIOR": 574,
+        "MAGE": 635,
+        "WARLOCK": 277,
+        "DRUID": 669
       },
-      "characters": 4365,
-      "samples": 137,
-      "observed": 5735,
+      "characters": 5059,
+      "samples": 160,
+      "observed": 6795,
       "games": [
         "realm:Classic Beta PvE-Alliance",
         "realm:Classic Beta PvP 2-Alliance"
@@ -115,26 +115,26 @@
       "realm": "Classic Beta PvP 2",
       "faction": "Alliance",
       "races": {
-        "Dwarf": 157,
-        "Gnome": 219,
-        "High Order Skyborne": 291,
-        "Human": 407,
-        "Night Elf": 269
+        "Dwarf": 238,
+        "Gnome": 317,
+        "High Order Skyborne": 431,
+        "Human": 616,
+        "Night Elf": 435
       },
       "classes": {
-        "HUNTER": 270,
-        "PALADIN": 143,
-        "PRIEST": 111,
-        "ROGUE": 136,
-        "SHAMAN": 85,
-        "WARRIOR": 132,
-        "MAGE": 199,
-        "WARLOCK": 82,
-        "DRUID": 185
+        "HUNTER": 425,
+        "PALADIN": 229,
+        "PRIEST": 157,
+        "ROGUE": 207,
+        "SHAMAN": 122,
+        "WARRIOR": 200,
+        "MAGE": 280,
+        "WARLOCK": 133,
+        "DRUID": 284
       },
-      "characters": 1343,
-      "samples": 34,
-      "observed": 1680
+      "characters": 2037,
+      "samples": 57,
+      "observed": 2740
     },
     {
       "game": "realm:Classic Beta PvP 2-Horde",
@@ -167,5 +167,5 @@
     "Classic Beta PvE",
     "Classic Beta PvP 2"
   ],
-  "lastT": 1790039281
+  "lastT": 1790130669
 }

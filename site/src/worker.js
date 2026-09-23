@@ -23,7 +23,7 @@ const GAMES = {
   "classic-beta":        { label: "Forever (Beta)" },
 };
 const DEFAULT_GAME = "classic-progression";
-const ITEMS_CACHE_VERSION = 17;
+const ITEMS_CACHE_VERSION = 18;
 const REALM_CURRENT_AUCTION_MAX_AGE_SECONDS = 48 * 60 * 60;
 
 function sourceGameKey(flavor) {
@@ -406,6 +406,11 @@ async function resolveItemNames(url, env) {
       ).bind(name, slug, g, id).run();
     }
     resolved++;
+  }
+  if (resolved && typeof caches !== "undefined") {
+    for (const game of realmGames) {
+      await caches.default.delete(new Request(url.origin + "/api/items?game=" + game + "&v=" + ITEMS_CACHE_VERSION));
+    }
   }
   return json({ ok: true, region, namespaces, realms: realmGames, checked: idSet.size, resolved, failed });
 }
