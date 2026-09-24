@@ -1,0 +1,184 @@
+{
+  "groups": [
+    {
+      "faction": "Alliance",
+      "races": {
+        "Dark Iron Dwarf": 6,
+        "Dracthyr": 17,
+        "Draenei": 43,
+        "Dwarf": 30,
+        "Earthen": 1,
+        "Gnome": 22,
+        "Haranir": 8,
+        "Human": 90,
+        "Kul Tiran": 8,
+        "Lightforged Draenei": 12,
+        "Mechagnome": 3,
+        "Night Elf": 116,
+        "Pandaren": 9,
+        "Void Elf": 36,
+        "Worgen": 10
+      },
+      "classes": {
+        "HUNTER": 58,
+        "PALADIN": 54,
+        "SHAMAN": 32,
+        "WARRIOR": 36,
+        "EVOKER": 12,
+        "MAGE": 39,
+        "PRIEST": 25,
+        "WARLOCK": 28,
+        "DEATHKNIGHT": 26,
+        "MONK": 15,
+        "ROGUE": 16,
+        "DRUID": 48,
+        "DEMONHUNTER": 22
+      },
+      "characters": 411,
+      "samples": 89,
+      "observed": 1200,
+      "games": [
+        "realm:Nesingwary-Alliance",
+        "realm:Stormrage-Alliance"
+      ]
+    },
+    {
+      "faction": "Horde",
+      "races": {
+        "Blood Elf": 24,
+        "Dracthyr": 4,
+        "Earthen": 1,
+        "Goblin": 2,
+        "Haranir": 1,
+        "Highmountain Tauren": 3,
+        "Mag'har Orc": 3,
+        "Nightborne": 3,
+        "Orc": 5,
+        "Pandaren": 2,
+        "Tauren": 6,
+        "Troll": 6,
+        "Undead": 9,
+        "Vulpera": 1,
+        "Zandalari Troll": 4
+      },
+      "classes": {
+        "DEATHKNIGHT": 5,
+        "DEMONHUNTER": 1,
+        "HUNTER": 10,
+        "MAGE": 7,
+        "PALADIN": 10,
+        "PRIEST": 8,
+        "WARLOCK": 11,
+        "EVOKER": 1,
+        "DRUID": 7,
+        "MONK": 3,
+        "SHAMAN": 6,
+        "WARRIOR": 4,
+        "ROGUE": 1
+      },
+      "characters": 74,
+      "samples": 8,
+      "observed": 84,
+      "games": [
+        "realm:Nesingwary-Horde"
+      ]
+    }
+  ],
+  "units": [
+    {
+      "game": "realm:Nesingwary-Alliance",
+      "realm": "Nesingwary",
+      "faction": "Alliance",
+      "races": {
+        "Dark Iron Dwarf": 6,
+        "Dracthyr": 17,
+        "Draenei": 43,
+        "Dwarf": 30,
+        "Earthen": 1,
+        "Gnome": 22,
+        "Haranir": 8,
+        "Human": 90,
+        "Kul Tiran": 8,
+        "Lightforged Draenei": 12,
+        "Mechagnome": 3,
+        "Night Elf": 116,
+        "Pandaren": 9,
+        "Void Elf": 36,
+        "Worgen": 10
+      },
+      "classes": {
+        "HUNTER": 58,
+        "PALADIN": 54,
+        "SHAMAN": 32,
+        "WARRIOR": 36,
+        "EVOKER": 12,
+        "MAGE": 39,
+        "PRIEST": 25,
+        "WARLOCK": 28,
+        "DEATHKNIGHT": 26,
+        "MONK": 15,
+        "ROGUE": 16,
+        "DRUID": 48,
+        "DEMONHUNTER": 22
+      },
+      "characters": 411,
+      "samples": 69,
+      "observed": 790
+    },
+    {
+      "game": "realm:Nesingwary-Horde",
+      "realm": "Nesingwary",
+      "faction": "Horde",
+      "races": {
+        "Blood Elf": 24,
+        "Dracthyr": 4,
+        "Earthen": 1,
+        "Goblin": 2,
+        "Haranir": 1,
+        "Highmountain Tauren": 3,
+        "Mag'har Orc": 3,
+        "Nightborne": 3,
+        "Orc": 5,
+        "Pandaren": 2,
+        "Tauren": 6,
+        "Troll": 6,
+        "Undead": 9,
+        "Vulpera": 1,
+        "Zandalari Troll": 4
+      },
+      "classes": {
+        "DEATHKNIGHT": 5,
+        "DEMONHUNTER": 1,
+        "HUNTER": 10,
+        "MAGE": 7,
+        "PALADIN": 10,
+        "PRIEST": 8,
+        "WARLOCK": 11,
+        "EVOKER": 1,
+        "DRUID": 7,
+        "MONK": 3,
+        "SHAMAN": 6,
+        "WARRIOR": 4,
+        "ROGUE": 1
+      },
+      "characters": 74,
+      "samples": 8,
+      "observed": 84
+    },
+    {
+      "game": "realm:Stormrage-Alliance",
+      "realm": "Stormrage",
+      "faction": "Alliance",
+      "races": {},
+      "classes": {},
+      "characters": 0,
+      "samples": 20,
+      "observed": 410
+    }
+  ],
+  "realms": [
+    "Nesingwary",
+    "Stormrage"
+  ],
+  "lastT": 1790214105
+}

@@ -32,6 +32,7 @@ const editions = {
   "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", scope: "Beta realms", flavor: "classic-beta", branch: "forever" },
   "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", scope: "Anniversary realms", flavor: "tbc-anniversary", branch: "tbc" },
   classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", scope: "Classic Era realms", flavor: "classic-era", branch: "classic" },
+  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", scope: "Retail realms", flavor: "retail", branch: "", factionlessMarket: true },
 };
 const edition = editions[sourceGame];
 if (!edition) throw new Error("unsupported Pages source game: " + sourceGame);
@@ -203,7 +204,7 @@ async function main() {
   // than the toggle quietly hiding that side.
   const betaRealms = games.filter((g) => g.sourceGame === SOURCE_GAME && g.realm)
     .map((g) => g.game.replace(/^realm:/, ""));
-  const factions = [...new Set(betaRealms.map((r) => (/-(Alliance|Horde)$/.exec(r) || [, "Neutral"])[1]))].sort();
+  const factions = [...new Set((census.units || []).map((u) => u.faction).filter((f) => f && f !== "Unknown"))].sort();
   const realmNames = [...new Set(betaRealms.map((r) => r.replace(/-(Alliance|Horde)$/, "")))].sort();
 
   const snapshotOf = (from, fallbackRealms) => ({
@@ -218,9 +219,15 @@ async function main() {
       .concat(realmNames.map((r) => ({ key: r, label: marketRealmLabels.get(r) }))),
     faction: [{ key: "all", label: "Both" }].concat(factions.map((f) => ({ key: f, label: f }))),
   };
+  // Retail auction houses are cross-faction. Population and guild census data
+  // remain faction-specific, but the market must not imply an Alliance/Horde
+  // split that Blizzard's Retail API does not provide.
+  const marketDims = edition.factionlessMarket
+    ? { realm: dims.realm, faction: [{ key: "all", label: "Cross-faction" }] }
+    : dims;
   const views = [];
-  for (const r of dims.realm) {
-    for (const f of dims.faction) {
+  for (const r of marketDims.realm) {
+    for (const f of marketDims.faction) {
       const from = snaps.filter((s2) =>
         (r.key === "all" || s2.realm.replace(/-(Alliance|Horde)$/, "") === r.key) &&
         (f.key === "all" || s2.faction === f.key));
@@ -290,7 +297,7 @@ async function main() {
     gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL, uploadFlavor: UPLOAD_FLAVOR,
   }));
   fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
-    renderMarketHtml(views, dims, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp,
+    renderMarketHtml(views, marketDims, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp,
       gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL }));
   fs.writeFileSync(path.join(outDir, "guilds.html"),
     renderGuildHtml(guildViews, dims, { stylesheet: "style.css", nav: nav("guilds.html"), note: stamp,
