@@ -29,24 +29,24 @@
     {
       "faction": "Horde",
       "races": {
-        "Orc": 257,
-        "Tauren": 182,
-        "Troll": 209,
-        "Undead": 296
+        "Orc": 342,
+        "Tauren": 238,
+        "Troll": 279,
+        "Undead": 402
       },
       "classes": {
-        "HUNTER": 147,
-        "ROGUE": 75,
-        "SHAMAN": 129,
-        "WARLOCK": 90,
-        "WARRIOR": 192,
-        "DRUID": 78,
-        "MAGE": 132,
-        "PRIEST": 101
+        "HUNTER": 185,
+        "ROGUE": 106,
+        "SHAMAN": 169,
+        "WARLOCK": 117,
+        "WARRIOR": 269,
+        "DRUID": 104,
+        "MAGE": 181,
+        "PRIEST": 130
       },
-      "characters": 944,
-      "samples": 50,
-      "observed": 1177,
+      "characters": 1261,
+      "samples": 67,
+      "observed": 1563,
       "games": [
         "realm:Ashkandi-Horde"
       ]
@@ -82,24 +82,24 @@
       "realm": "Ashkandi",
       "faction": "Horde",
       "races": {
-        "Orc": 257,
-        "Tauren": 182,
-        "Troll": 209,
-        "Undead": 296
+        "Orc": 342,
+        "Tauren": 238,
+        "Troll": 279,
+        "Undead": 402
       },
       "classes": {
-        "HUNTER": 147,
-        "ROGUE": 75,
-        "SHAMAN": 129,
-        "WARLOCK": 90,
-        "WARRIOR": 192,
-        "DRUID": 78,
-        "MAGE": 132,
-        "PRIEST": 101
+        "HUNTER": 185,
+        "ROGUE": 106,
+        "SHAMAN": 169,
+        "WARLOCK": 117,
+        "WARRIOR": 269,
+        "DRUID": 104,
+        "MAGE": 181,
+        "PRIEST": 130
       },
-      "characters": 944,
-      "samples": 50,
-      "observed": 1177
+      "characters": 1261,
+      "samples": 67,
+      "observed": 1563
     },
     {
       "game": "realm:Old Blanchy-Alliance",
@@ -116,5 +116,5 @@
     "Ashkandi",
     "Old Blanchy"
   ],
-  "lastT": 1789655646
+  "lastT": 1790209312
 }
