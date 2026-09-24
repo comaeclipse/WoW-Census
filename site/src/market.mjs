@@ -100,7 +100,8 @@ export function jokePriceThreshold(items) {
 // that view's realms, each { id, name, q, pq, mv, asp, cat }.
 function renderMarketView(snapshot, threshold) {
   const all = (snapshot && snapshot.items) || [];
-  const joke = all.filter((it) => (it.asp || 0) > threshold)
+  const aggregateOnly = snapshot && snapshot.aggregateOnly;
+  const joke = aggregateOnly ? [] : all.filter((it) => (it.asp || 0) > threshold)
     .sort((a, b) => (b.asp || 0) - (a.asp || 0));
   const items = joke.length ? all.filter((it) => (it.asp || 0) <= threshold) : all;
   const realms = (snapshot && snapshot.realms) || [];
@@ -118,22 +119,29 @@ function renderMarketView(snapshot, threshold) {
   const cats = {};
   for (const it of items) {
     const k = it.cat || "Uncategorized";
-    cats[k] = (cats[k] || 0) + (it.mv || 0);
+    cats[k] = (cats[k] || 0) + (aggregateOnly ? (it.q || 0) : (it.mv || 0));
   }
   const catEntries = sortedEntries(cats).slice(0, 14);
   const catMax = catEntries.length ? catEntries[0][1] : 0;
   const catPanel = '<div class="panel census" style="margin-bottom:22px">' +
-    '<div class="ptitle">Where the gold sits &mdash; listed value by market</div>' +
-    '<p class="hint" style="margin-top:0">Quantity listed &times; unit price, summed per market.</p>' +
+    '<div class="ptitle">' + (aggregateOnly
+      ? 'Where supply sits &mdash; listed quantity by market'
+      : 'Where the gold sits &mdash; listed value by market') + '</div>' +
+    '<p class="hint" style="margin-top:0">' + (aggregateOnly
+      ? 'Total units currently listed, summed per market.'
+      : 'Quantity listed &times; unit price, summed per market.') + '</p>' +
     (catEntries.length
-      ? barChart(catEntries, catMax, () => "var(--gold)", (k) => k.toUpperCase(), (v) => bigGold(v))
+      ? barChart(catEntries, catMax, () => "var(--gold)", (k) => k.toUpperCase(),
+          (v) => aggregateOnly ? v.toLocaleString() + " units" : bigGold(v))
       : '<p class="hint">No market data yet.</p>') + "</div>";
 
   const tiles =
     '<div class="tile"><div class="k">Items listed</div><div class="v">' + items.length.toLocaleString() +
       '</div><div class="s">distinct items seen</div></div>' +
-    '<div class="tile"><div class="k">Listed value</div><div class="v">' + esc(bigGold(totalValue)) +
-      '</div><div class="s">asking prices, not sales</div></div>' +
+    (aggregateOnly
+      ? '<div class="tile"><div class="k">Price coverage</div><div class="v">MINIMUM</div><div class="s">aggregate browse summaries</div></div>'
+      : '<div class="tile"><div class="k">Listed value</div><div class="v">' + esc(bigGold(totalValue)) +
+        '</div><div class="s">asking prices, not sales</div></div>') +
     '<div class="tile"><div class="k">Quantity</div><div class="v">' + totalQty.toLocaleString() +
       '</div><div class="s">units on the AH</div></div>' +
     '<div class="tile"><div class="k">Scanned</div><div class="v">' +
@@ -144,11 +152,12 @@ function renderMarketView(snapshot, threshold) {
     { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
     { label: "Qty", cell: (it) => (it.q || 0).toLocaleString() },
     { label: "Change", cell: (it) => qtyChange(it) },
-    { label: "Unit", cell: (it) => esc(money(it.asp)) },
+    { label: aggregateOnly ? "Min unit" : "Unit", cell: (it) => esc(money(it.asp)) },
   ]);
-  const priceTable = topTable("Most expensive items", "Highest unit asking price among items currently listed.", byPrice, branch, [
+  const priceTable = topTable(aggregateOnly ? "Highest minimum prices" : "Most expensive items",
+    aggregateOnly ? "Highest minimum asking price in Retail's aggregate summary." : "Highest unit asking price among items currently listed.", byPrice, branch, [
     { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
-    { label: "Unit", cell: (it) => esc(money(it.asp)) },
+    { label: aggregateOnly ? "Min unit" : "Unit", cell: (it) => esc(money(it.asp)) },
     { label: "Qty", cell: (it) => (it.q || 0).toLocaleString() },
     { label: "Change", cell: (it) => qtyChange(it) },
   ]);
@@ -160,7 +169,7 @@ function renderMarketView(snapshot, threshold) {
   ]);
 
   const body = items.length
-    ? catPanel + '<div class="mktgrid">' + qtyTable + priceTable + "</div>" + valueTable
+    ? catPanel + '<div class="mktgrid">' + qtyTable + priceTable + "</div>" + (aggregateOnly ? "" : valueTable)
     : '<div class="panel"><p class="hint">No auction scan uploaded for ' +
       esc(realms.join(" · ") || "this faction") + ' yet. In game, run /ml scan at the auction house, ' +
       '/reload, then upload with <code>upload-realm.ps1 -Flavor ' + esc(snapshot.uploadFlavor || "classic-beta") + '</code>.</p></div>';
@@ -204,6 +213,7 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
       (on ? "" : " hidden") + ">" + renderMarketView(v.snapshot, threshold) + "</div>";
   }).join("");
   const script = chips ? TOGGLE_SCRIPT : "";
+  const aggregateOnly = list.some((v) => v.snapshot && v.snapshot.aggregateOnly);
 
   const gameLabel = opts.gameLabel || "WoW Forever";
   const scopeLabel = opts.scopeLabel || "Beta realms";
@@ -230,8 +240,9 @@ ${MARKET_STYLE}
   ${chips}
   ${sections}
   <p class="src">
-    An auction house scan observes <b>listings</b>, not sales. Unit price is the weighted median buyout
-    asked for an item, and listed value is quantity &times; that price &mdash; what sellers want, not what anyone paid.<br>
+    ${aggregateOnly
+      ? "Retail scans observe aggregate browse summaries, not individual auctions or sales. Quantity is total listed supply and unit price is the minimum observed asking price. True listed value is unavailable, so market charts use units.<br>"
+      : "An auction house scan observes <b>listings</b>, not sales. Unit price is the weighted median buyout asked for an item, and listed value is quantity &times; that price &mdash; what sellers want, not what anyone paid.<br>"}
     Listings priced absurdly above the rest of the market are excluded from the totals and top lists,
     and named in their own panel rather than dropped quietly.<br>
     Change compares listed quantity with the preceding scan; it is net supply movement, not sales.<br>

@@ -32,7 +32,7 @@ const editions = {
   "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", scope: "Beta realms", flavor: "classic-beta", branch: "forever" },
   "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", scope: "Anniversary realms", flavor: "tbc-anniversary", branch: "tbc" },
   classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", scope: "Classic Era realms", flavor: "classic-era", branch: "classic" },
-  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", scope: "Retail realms", flavor: "retail", branch: "", factionlessMarket: true },
+  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", scope: "Retail realms", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity" },
 };
 const edition = editions[sourceGame];
 if (!edition) throw new Error("unsupported Pages source game: " + sourceGame);
@@ -212,6 +212,7 @@ async function main() {
     realms: from.length ? from.map((s2) => s2.realm) : fallbackRealms,
     updatedAt: from.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
     branch: WH_BRANCH, uploadFlavor: UPLOAD_FLAVOR,
+    aggregateOnly: edition.marketMetric === "quantity",
   });
   const marketRealmLabels = realmLabels(realmNames);
   const dims = {
