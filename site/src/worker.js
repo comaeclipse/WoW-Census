@@ -95,6 +95,7 @@ function bnetNamespaceForGame(game) {
     return "dynamic-classicann-us";
   const g = sourceGameKey(game) || game;
   if (g === "classic") return "dynamic-classic1x-us";
+  if (g === "mop-classic") return "dynamic-classic-us";
   if (g === "classic-progression") return "dynamic-classic-us";
   return "dynamic-us";
 }
@@ -105,6 +106,7 @@ function bnetStaticNamespaceForGame(game) {
     return "static-classicann-us";
   const g = sourceGameKey(game) || game;
   if (g === "classic") return "static-classic1x-us";
+  if (g === "mop-classic") return "static-classic-us";
   if (g === "classic-progression") return "static-classic-us";
   return "static-us";
 }
@@ -335,6 +337,9 @@ async function bulkInsert(db, table, cols, rows, per) {
 function itemStaticNamespaces(sourceGame) {
   if (sourceGame === "classic-progression") return ["static-classicann-us"]; // TBC Anniversary
   if (sourceGame === "classic") return ["static-classic1x-us"]; // Classic Era
+  // MoP's AH can still contain legacy items removed from the progression data
+  // namespace, so fall back to Era and Retail for those few historical IDs.
+  if (sourceGame === "mop-classic") return ["static-classic-us", "static-classic1x-us", "static-us"];
   if (sourceGame === "classic-beta") return ["static-us", "static-classic1x-us"]; // Forever (Beta)
   return ["static-us"]; // retail
 }
@@ -392,23 +397,37 @@ async function resolveItemNames(url, env) {
   try { token = await bnetToken(env); }
   catch (e) { return json({ error: String(e && e.message || e) }, 0, 502); }
 
+  // Blizzard lookups dominate this maintenance route. Resolve a modest number
+  // concurrently, then keep the D1 writes ordered and deterministic.
+  const namesById = new Map();
+  const ids = [...idSet];
+  for (let i = 0; i < ids.length; i += 20) {
+    const chunk = ids.slice(i, i + 20);
+    const names = await Promise.all(chunk.map((id) => bnetItemName(token, id, namespaces)));
+    chunk.forEach((id, j) => namesById.set(id, names[j]));
+  }
+
   let resolved = 0, failed = 0;
   const now = new Date().toISOString();
+  const writes = [];
   for (const id of idSet) {
-    const name = await bnetItemName(token, id, namespaces);
+    const name = namesById.get(id);
     if (!name) { failed++; continue; }
     const slug = slugify(name);
-    await env.DB.prepare(
+    writes.push(env.DB.prepare(
       `INSERT INTO items (game,id,name,slug,mv,asp,sr,spd,hist,updated_at)
        VALUES (?,?,?,?,0,0,0,0,0,?)
        ON CONFLICT(game,id) DO UPDATE SET name=excluded.name, slug=excluded.slug, updated_at=excluded.updated_at`
-    ).bind(region, id, name, slug, now).run();
+    ).bind(region, id, name, slug, now));
     for (const g of realmGames) {
-      await env.DB.prepare(
+      writes.push(env.DB.prepare(
         "UPDATE items SET name=?, slug=? WHERE game=? AND id=? AND name LIKE 'item:%'"
-      ).bind(name, slug, g, id).run();
+      ).bind(name, slug, g, id));
     }
     resolved++;
+  }
+  for (let i = 0; i < writes.length; i += 50) {
+    await env.DB.batch(writes.slice(i, i + 50));
   }
   if (resolved && typeof caches !== "undefined") {
     for (const game of realmGames) {
