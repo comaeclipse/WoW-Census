@@ -3,24 +3,24 @@
     {
       "faction": "Alliance",
       "races": {
-        "Dwarf": 344,
-        "Gnome": 302,
-        "Human": 993,
-        "Night Elf": 561
+        "Dwarf": 416,
+        "Gnome": 381,
+        "Human": 1273,
+        "Night Elf": 709
       },
       "classes": {
-        "HUNTER": 342,
-        "PALADIN": 272,
-        "PRIEST": 247,
-        "ROGUE": 204,
-        "WARRIOR": 387,
-        "MAGE": 395,
-        "WARLOCK": 151,
-        "DRUID": 202
+        "HUNTER": 436,
+        "PALADIN": 348,
+        "PRIEST": 309,
+        "ROGUE": 259,
+        "WARRIOR": 480,
+        "MAGE": 507,
+        "WARLOCK": 196,
+        "DRUID": 244
       },
-      "characters": 2200,
-      "samples": 119,
-      "observed": 3586,
+      "characters": 2779,
+      "samples": 141,
+      "observed": 4253,
       "games": [
         "realm:Ashkandi-Alliance",
         "realm:Old Blanchy-Alliance"
@@ -58,24 +58,24 @@
       "realm": "Ashkandi",
       "faction": "Alliance",
       "races": {
-        "Dwarf": 344,
-        "Gnome": 302,
-        "Human": 993,
-        "Night Elf": 561
+        "Dwarf": 416,
+        "Gnome": 381,
+        "Human": 1273,
+        "Night Elf": 709
       },
       "classes": {
-        "HUNTER": 342,
-        "PALADIN": 272,
-        "PRIEST": 247,
-        "ROGUE": 204,
-        "WARRIOR": 387,
-        "MAGE": 395,
-        "WARLOCK": 151,
-        "DRUID": 202
+        "HUNTER": 436,
+        "PALADIN": 348,
+        "PRIEST": 309,
+        "ROGUE": 259,
+        "WARRIOR": 480,
+        "MAGE": 507,
+        "WARLOCK": 196,
+        "DRUID": 244
       },
-      "characters": 2200,
-      "samples": 102,
-      "observed": 3283
+      "characters": 2779,
+      "samples": 124,
+      "observed": 3950
     },
     {
       "game": "realm:Ashkandi-Horde",
@@ -116,5 +116,5 @@
     "Ashkandi",
     "Old Blanchy"
   ],
-  "lastT": 1790209312
+  "lastT": 1790210224
 }

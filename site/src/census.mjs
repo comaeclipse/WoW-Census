@@ -78,10 +78,30 @@ export const TOGGLE_SCRIPT = `<script>
   var panes=[].slice.call(document.querySelectorAll(".vpane"));
   if(!rows.length||!panes.length) return;
   var state={};
+  var defaults={};
+  function slug(v){return String(v||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
   rows.forEach(function(r){
     var on=r.querySelector('.chip[aria-pressed="true"]')||r.querySelector(".chip");
     state[r.dataset.dim]=on?on.dataset.key:"";
+    defaults[r.dataset.dim]=state[r.dataset.dim];
   });
+  function readUrl(){
+    var q=new URLSearchParams(location.search);
+    rows.forEach(function(r){
+      var wanted=q.get(r.dataset.dim); state[r.dataset.dim]=defaults[r.dataset.dim]; if(!wanted) return;
+      var match=[].slice.call(r.querySelectorAll(".chip")).find(function(c){return slug(c.dataset.key)===slug(wanted);});
+      if(match) state[r.dataset.dim]=match.dataset.key;
+    });
+  }
+  function writeUrl(){
+    var u=new URL(location.href);
+    rows.forEach(function(r){
+      var key=state[r.dataset.dim];
+      if(!key||key==="all") u.searchParams.delete(r.dataset.dim);
+      else u.searchParams.set(r.dataset.dim,slug(key));
+    });
+    history.pushState(null,"",u.pathname+(u.search?u.search:"")+u.hash);
+  }
   function apply(){
     rows.forEach(function(r){
       [].slice.call(r.querySelectorAll(".chip")).forEach(function(c){
@@ -100,10 +120,11 @@ export const TOGGLE_SCRIPT = `<script>
   rows.forEach(function(r){
     r.addEventListener("click", function(e){
       var c=e.target.closest(".chip"); if(!c||!r.contains(c)) return;
-      state[r.dataset.dim]=c.dataset.key; apply();
+      state[r.dataset.dim]=c.dataset.key; apply(); writeUrl();
     });
   });
-  apply();
+  window.addEventListener("popstate",function(){readUrl();apply();});
+  readUrl(); apply();
 })();
 </script>`;
 
