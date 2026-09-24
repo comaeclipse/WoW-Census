@@ -16,6 +16,18 @@ local PAGE_SIZE  = 50
 local READ_BATCH = 150   -- rows per frame when reading a getAll dump
 local BROWSE_REPLY_TIMEOUT = 30
 
+-- MoP Classic exposes some legacy AH globals for compatibility even though its
+-- live auction house uses C_AuctionHouse. The presence of QueryAuctionItems is
+-- therefore not a reliable API-generation test on that client.
+local function usesModernAuctionHouse()
+    if not (C_AuctionHouse and C_AuctionHouse.SendBrowseQuery) then return false end
+    if WOW_PROJECT_ID and WOW_PROJECT_MISTS_CLASSIC
+       and WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+        return true
+    end
+    return type(QueryAuctionItems) ~= "function"
+end
+
 S.scanning = false
 S.atAH = false
 S.mode = nil
@@ -245,10 +257,10 @@ function S:StartScan(forcePaged, fullSellerScan, fastPaged, startPage, stopPage,
     -- the normal browse-summary API by default: replicate is globally
     -- throttled and can be silently ignored, while browse is the reliable path
     -- for a full market summary.
+    if usesModernAuctionHouse() then
+        return self:StartModern()
+    end
     if type(QueryAuctionItems) ~= "function" then
-        if C_AuctionHouse and C_AuctionHouse.SendBrowseQuery then
-            return self:StartModern()
-        end
         ML:Print("This client has no supported Auction House scan API.")
         return
     end
@@ -518,7 +530,7 @@ function S:StartModern()
     self.browseAction = nil
     ML.Data.classifyCache = {}
     ML.realm.ownersAvailable = false
-    ML:Print("Starting full scan (Retail summary)...")
+    ML:Print("Starting full scan (auction summaries)...")
     ML:Fire("SCAN_START")
     self:QueueBrowseAction("start")
 end
@@ -806,15 +818,15 @@ registerEvent("AUCTION_HOUSE_CLOSED")
 registerEvent("PLAYER_INTERACTION_MANAGER_FRAME_SHOW")
 registerEvent("PLAYER_INTERACTION_MANAGER_FRAME_HIDE")
 
-if type(QueryAuctionItems) == "function" then
-    registerEvent("AUCTION_ITEM_LIST_UPDATE")
-else
+if usesModernAuctionHouse() then
     registerEvent("REPLICATE_ITEM_LIST_UPDATE")
     registerEvent("AUCTION_HOUSE_BROWSE_RESULTS_UPDATED")
     registerEvent("AUCTION_HOUSE_BROWSE_RESULTS_ADDED")
     registerEvent("AUCTION_HOUSE_BROWSE_FAILURE")
     registerEvent("AUCTION_HOUSE_THROTTLED_MESSAGE_DROPPED")
     registerEvent("AUCTION_HOUSE_THROTTLED_SYSTEM_READY")
+else
+    registerEvent("AUCTION_ITEM_LIST_UPDATE")
 end
 
 local AUCTIONEER = Enum and Enum.PlayerInteractionType and Enum.PlayerInteractionType.Auctioneer

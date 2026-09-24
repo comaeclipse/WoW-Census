@@ -640,7 +640,7 @@ function UI:OnScanProgress(p)
         self:SetStatus(string.format("Reading auctions...\n|cffffffff%d / %d|r",
             p.done or 0, p.total or 0))
     elseif p.mode == "browse" then
-        self:SetStatus(string.format("Scanning Retail summaries...\n|cffffffff%d results read|r",
+        self:SetStatus(string.format("Scanning auction summaries...\n|cffffffff%d results read|r",
             p.rows or 0))
     elseif p.resolving and p.resolving > 0 then
         local st = p.stats or {}
