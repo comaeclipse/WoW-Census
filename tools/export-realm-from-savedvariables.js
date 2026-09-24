@@ -118,6 +118,7 @@ function normalizeFlavor(flavor) {
   if (["classic-era", "era", "classic"].includes(f)) return "classic-era";
   if (f === "retail") return "retail";
   if (["classic-beta", "forever", "classicbeta"].includes(f)) return "classic-beta";
+  if (["mop-classic", "mists-classic", "mop", "mists"].includes(f)) return "mop-classic";
   throw new Error(`unknown flavor: ${flavor}`);
 }
 

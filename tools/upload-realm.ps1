@@ -5,6 +5,7 @@
 # TBC:    powershell -File upload-realm.ps1 -Flavor tbc-anniversary
 # Era:    powershell -File upload-realm.ps1 -Flavor classic-era
 # Retail: powershell -File upload-realm.ps1 -Flavor retail
+# MoP:    powershell -File upload-realm.ps1 -Flavor mop-classic
 #         (double-click "Run with PowerShell" and it will prompt for the token)
 #
 # The addon writes a fresh export to SavedVariables on logout/reload, so:
@@ -18,6 +19,7 @@ param(
     [string]$Region,
     [string]$Url    = "https://marketlens.skarz.workers.dev",
     [string]$Wow,
+    [switch]$PopulationOnly,
     # Upload a specific "Realm-Faction" bucket instead of the active export. Both
     # factions' data live in the account-wide save, so this uploads either side
     # without swapping characters and reloading. e.g. Nesingwary-Alliance,
@@ -34,17 +36,18 @@ $OutputEncoding = New-Object System.Text.UTF8Encoding($false)
 $flavorKey = $Flavor.ToLowerInvariant()
 if ($flavorKey -in @("classic", "anniversary", "tbc")) { $flavorKey = "tbc-anniversary" }
 if ($flavorKey -in @("forever", "classicbeta")) { $flavorKey = "classic-beta" }
-if ($flavorKey -notin @("tbc-anniversary", "classic-era", "retail", "classic-beta")) {
-    Write-Host "Unknown flavor '$Flavor'. Use tbc-anniversary, classic-era, retail, or classic-beta." -ForegroundColor Red
+if ($flavorKey -in @("mists", "mop", "mists-classic")) { $flavorKey = "mop-classic" }
+if ($flavorKey -notin @("tbc-anniversary", "classic-era", "retail", "classic-beta", "mop-classic")) {
+    Write-Host "Unknown flavor '$Flavor'. Use tbc-anniversary, classic-era, retail, classic-beta, or mop-classic." -ForegroundColor Red
     exit 1
 }
 $Flavor = $flavorKey
 
 if (-not $Region) {
-    $Region = if ($Flavor -eq "retail") { "retail" } elseif ($Flavor -eq "classic-era") { "classic" } elseif ($Flavor -eq "classic-beta") { "classic-beta" } else { "classic-progression" }
+    $Region = if ($Flavor -eq "retail") { "retail" } elseif ($Flavor -eq "classic-era") { "classic" } elseif ($Flavor -eq "classic-beta") { "classic-beta" } elseif ($Flavor -eq "mop-classic") { "mop-classic" } else { "classic-progression" }
 }
 if (-not $Wow) {
-    $wowFolder = if ($Flavor -eq "retail") { "_retail_" } elseif ($Flavor -eq "classic-era") { "_classic_era_" } elseif ($Flavor -eq "classic-beta") { "_classic_beta_" } else { "_anniversary_" }
+    $wowFolder = if ($Flavor -eq "retail") { "_retail_" } elseif ($Flavor -eq "classic-era") { "_classic_era_" } elseif ($Flavor -eq "classic-beta") { "_classic_beta_" } elseif ($Flavor -eq "mop-classic") { "_classic_" } else { "_anniversary_" }
     $Wow = Join-Path "C:\Program Files (x86)\World of Warcraft" $wowFolder
 }
 
@@ -179,7 +182,9 @@ if (-not $Token) { $Token = Load-Token }
 if (-not $Token) { $Token = Read-Host "REFRESH_TOKEN" }
 if ($Token) { Save-Token $Token }
 
-if ($itemCount -lt 1) {
+if ($PopulationOnly) {
+    Write-Host "Population-only mode -- skipping the market upload." -ForegroundColor Yellow
+} elseif ($itemCount -lt 1) {
     Write-Host "No AH items in this export yet (no auction house scan) -- skipping the market upload, still trying population/sellers below." -ForegroundColor Yellow
 } else {
     $uri = "$Url/admin/import-realm?token=$([uri]::EscapeDataString($Token))&region=$Region"

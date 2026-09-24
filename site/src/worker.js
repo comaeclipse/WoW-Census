@@ -21,6 +21,7 @@ const GAMES = {
   "classic":             { label: "Classic Era" },
   "retail":              { label: "Retail" },
   "classic-beta":        { label: "Forever (Beta)" },
+  "mop-classic":         { label: "Mists of Pandaria Classic" },
 };
 const DEFAULT_GAME = "classic-progression";
 const ITEMS_CACHE_VERSION = 18;
@@ -35,6 +36,8 @@ function sourceGameKey(flavor) {
   if (f === "retail") return "retail";
   if (f === "classic-beta" || f === "forever" || f === "classicbeta")
     return "classic-beta";
+  if (f === "mop-classic" || f === "mists-classic" || f === "mop" || f === "mists")
+    return "mop-classic";
   return null;
 }
 
@@ -1176,7 +1179,7 @@ async function popChooserPage(env) {
      GROUP BY p.game ORDER BY obs DESC`
   ).all()).results;
 
-  const order = ["classic-progression", "classic", "retail", "classic-beta"];
+  const order = ["mop-classic", "classic-progression", "classic", "retail", "classic-beta"];
   const groups = new Map();
   for (const r of rows) {
     const src = GAMES[r.src] ? r.src : "other";
@@ -1507,7 +1510,7 @@ async function apiForever(env) {
 
 async function apiCensus(url, env) {
   const sourceGame = url.searchParams.get("source") || "classic-beta";
-  if (!["classic-beta", "classic-progression", "classic", "retail"].includes(sourceGame))
+  if (!["classic-beta", "classic-progression", "classic", "retail", "mop-classic"].includes(sourceGame))
     return json({ error: "unknown source game" }, 400);
   return json(await loadCensus(env, sourceGame), 300);
 }

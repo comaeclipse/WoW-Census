@@ -1,0 +1,71 @@
+{
+  "groups": [
+    {
+      "faction": "Alliance",
+      "races": {
+        "Draenei": 42,
+        "Dwarf": 18,
+        "Gnome": 24,
+        "Human": 116,
+        "Night Elf": 69,
+        "Pandaren": 20,
+        "Worgen": 44
+      },
+      "classes": {
+        "DEATHKNIGHT": 28,
+        "HUNTER": 38,
+        "MAGE": 31,
+        "MONK": 18,
+        "PALADIN": 41,
+        "PRIEST": 29,
+        "SHAMAN": 29,
+        "WARRIOR": 33,
+        "ROGUE": 23,
+        "WARLOCK": 24,
+        "DRUID": 39
+      },
+      "characters": 333,
+      "samples": 11,
+      "observed": 333,
+      "games": [
+        "realm:Nazgrim-Alliance"
+      ]
+    }
+  ],
+  "units": [
+    {
+      "game": "realm:Nazgrim-Alliance",
+      "realm": "Nazgrim",
+      "faction": "Alliance",
+      "races": {
+        "Draenei": 42,
+        "Dwarf": 18,
+        "Gnome": 24,
+        "Human": 116,
+        "Night Elf": 69,
+        "Pandaren": 20,
+        "Worgen": 44
+      },
+      "classes": {
+        "DEATHKNIGHT": 28,
+        "HUNTER": 38,
+        "MAGE": 31,
+        "MONK": 18,
+        "PALADIN": 41,
+        "PRIEST": 29,
+        "SHAMAN": 29,
+        "WARRIOR": 33,
+        "ROGUE": 23,
+        "WARLOCK": 24,
+        "DRUID": 39
+      },
+      "characters": 333,
+      "samples": 11,
+      "observed": 333
+    }
+  ],
+  "realms": [
+    "Nazgrim"
+  ],
+  "lastT": 1790217512
+}
