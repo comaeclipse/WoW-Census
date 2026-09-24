@@ -130,10 +130,17 @@ try { sourceMap = require("./item-sources.json"); } catch (e) { /* not generated
 
 const items = {};
 for (const [id, rec] of Object.entries(realm.items || {})) {
-  const snaps = Object.keys(rec.snaps || {}).sort((a, b) => Number(a) - Number(b)).map((k) => {
+  const rawSnaps = Object.keys(rec.snaps || {}).sort((a, b) => Number(a) - Number(b)).map((k) => {
     const s = rec.snaps[k];
     return [s.t || 0, s.q || 0, s.a || 0, s.s || 0, s.l || 0, s.m || 0, s.w || 0, s.tc || 0];
   });
+  // A paged seller scan is useful for owner profiles, but pagination observes a
+  // moving auction house and is not an authoritative per-item market snapshot.
+  // Do not use the latest seller-scan point as the previous quantity for Get All
+  // percentage changes. Keep it only when it is the sole observation available.
+  const sellerT = Number(realm.lastSellerSample) || 0;
+  const marketSnaps = sellerT ? rawSnaps.filter((s) => Number(s[0]) !== sellerT) : rawSnaps;
+  const snaps = marketSnaps.length ? marketSnaps : rawSnaps;
   // rec.class is the addon's { profession, sector, market, source, crafter }
   // classification, computed from the real item class/subclass/equip-slot at
   // scan time. Carry the market so the site categorizes properly instead of
