@@ -30,6 +30,37 @@
       "games": [
         "realm:Nazgrim-Alliance"
       ]
+    },
+    {
+      "faction": "Horde",
+      "races": {
+        "Blood Elf": 165,
+        "Goblin": 22,
+        "Orc": 87,
+        "Pandaren": 33,
+        "Tauren": 67,
+        "Troll": 66,
+        "Undead": 78
+      },
+      "classes": {
+        "DEATHKNIGHT": 24,
+        "HUNTER": 66,
+        "MAGE": 49,
+        "MONK": 48,
+        "PALADIN": 62,
+        "PRIEST": 37,
+        "ROGUE": 48,
+        "WARLOCK": 56,
+        "WARRIOR": 47,
+        "SHAMAN": 44,
+        "DRUID": 37
+      },
+      "characters": 518,
+      "samples": 26,
+      "observed": 657,
+      "games": [
+        "realm:Nazgrim-Horde"
+      ]
     }
   ],
   "units": [
@@ -62,10 +93,40 @@
       "characters": 710,
       "samples": 27,
       "observed": 740
+    },
+    {
+      "game": "realm:Nazgrim-Horde",
+      "realm": "Nazgrim",
+      "faction": "Horde",
+      "races": {
+        "Blood Elf": 165,
+        "Goblin": 22,
+        "Orc": 87,
+        "Pandaren": 33,
+        "Tauren": 67,
+        "Troll": 66,
+        "Undead": 78
+      },
+      "classes": {
+        "DEATHKNIGHT": 24,
+        "HUNTER": 66,
+        "MAGE": 49,
+        "MONK": 48,
+        "PALADIN": 62,
+        "PRIEST": 37,
+        "ROGUE": 48,
+        "WARLOCK": 56,
+        "WARRIOR": 47,
+        "SHAMAN": 44,
+        "DRUID": 37
+      },
+      "characters": 518,
+      "samples": 26,
+      "observed": 657
     }
   ],
   "realms": [
     "Nazgrim"
   ],
-  "lastT": 1790294454
+  "lastT": 1790295446
 }
