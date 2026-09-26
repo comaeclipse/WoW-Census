@@ -31,26 +31,26 @@
     {
       "faction": "Horde",
       "races": {
-        "Orc": 560,
-        "Tauren": 665,
-        "Troll": 397,
-        "Undead": 1278,
-        "Windshaper Skyborne": 712
+        "Orc": 739,
+        "Tauren": 804,
+        "Troll": 521,
+        "Undead": 1668,
+        "Windshaper Skyborne": 889
       },
       "classes": {
-        "HUNTER": 462,
-        "MAGE": 260,
-        "ROGUE": 257,
-        "SHAMAN": 591,
-        "WARLOCK": 285,
-        "WARRIOR": 391,
-        "DRUID": 465,
-        "PRIEST": 231,
-        "PALADIN": 670
+        "HUNTER": 603,
+        "MAGE": 320,
+        "ROGUE": 357,
+        "SHAMAN": 721,
+        "WARLOCK": 387,
+        "WARRIOR": 500,
+        "DRUID": 573,
+        "PRIEST": 342,
+        "PALADIN": 818
       },
-      "characters": 3612,
-      "samples": 150,
-      "observed": 5158,
+      "characters": 4621,
+      "samples": 173,
+      "observed": 6262,
       "games": [
         "realm:Classic Beta PvE-Horde",
         "realm:Classic Beta PvP 2-Horde"
@@ -141,31 +141,31 @@
       "realm": "Classic Beta PvP 2",
       "faction": "Horde",
       "races": {
-        "Orc": 215,
-        "Tauren": 124,
-        "Troll": 103,
-        "Undead": 383,
-        "Windshaper Skyborne": 193
+        "Orc": 394,
+        "Tauren": 263,
+        "Troll": 227,
+        "Undead": 773,
+        "Windshaper Skyborne": 370
       },
       "classes": {
-        "HUNTER": 159,
-        "MAGE": 94,
-        "ROGUE": 96,
-        "SHAMAN": 134,
-        "WARLOCK": 82,
-        "WARRIOR": 110,
-        "DRUID": 93,
-        "PRIEST": 68,
-        "PALADIN": 182
+        "HUNTER": 300,
+        "MAGE": 154,
+        "ROGUE": 196,
+        "SHAMAN": 264,
+        "WARLOCK": 184,
+        "WARRIOR": 219,
+        "DRUID": 201,
+        "PRIEST": 179,
+        "PALADIN": 330
       },
-      "characters": 1018,
-      "samples": 29,
-      "observed": 1270
+      "characters": 2027,
+      "samples": 52,
+      "observed": 2374
     }
   ],
   "realms": [
     "Classic Beta PvE",
     "Classic Beta PvP 2"
   ],
-  "lastT": 1790441752
+  "lastT": 1790443851
 }
