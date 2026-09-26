@@ -6,7 +6,7 @@
 // Only what a scan actually observes is shown. Listings are not sales, so
 // "popular" here means listed in quantity, never sold.
 
-import { esc, barChart, sortedEntries, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
+import { esc, realmName, barChart, sortedEntries, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
 
 // Copper -> the site's usual g/s/c shorthand.
 function money(cop) {
@@ -146,7 +146,7 @@ function renderMarketView(snapshot, threshold) {
       '</div><div class="s">units on the AH</div></div>' +
     '<div class="tile"><div class="k">Scanned</div><div class="v">' +
       (updatedAt ? esc(String(updatedAt).slice(0, 10)) : "&mdash;") +
-      '</div><div class="s">' + esc(realms.join(" · ") || "no realm") + "</div></div>";
+      '</div><div class="s">' + esc(realms.map(realmName).join(" · ") || "no realm") + "</div></div>";
 
   const qtyTable = topTable("Most listed items", "By quantity sitting on the auction house.", byQty, branch, [
     { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
@@ -171,7 +171,7 @@ function renderMarketView(snapshot, threshold) {
   const body = items.length
     ? catPanel + '<div class="mktgrid">' + qtyTable + priceTable + "</div>" + (aggregateOnly ? "" : valueTable)
     : '<div class="panel"><p class="hint">No auction scan uploaded for ' +
-      esc(realms.join(" · ") || "this faction") + ' yet. In game, run /ml scan at the auction house, ' +
+      esc(realms.map(realmName).join(" · ") || "this faction") + ' yet. In game, run /ml scan at the auction house, ' +
       '/reload, then upload with <code>upload-realm.ps1 -Flavor ' + esc(snapshot.uploadFlavor || "classic-beta") + '</code>.</p></div>';
 
   const jokePanel = joke.length

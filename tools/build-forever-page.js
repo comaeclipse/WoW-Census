@@ -111,9 +111,10 @@ function nav(current) {
 // drop the shared prefix and the trailing number, but only while the shortened
 // labels stay distinct: a beta with both "PvP 1" and "PvP 2" keeps its numbers
 // rather than showing two chips reading "PvP".
+let realmName; // census.mjs's display-name helper, loaded in main()
 function realmLabels(names) {
   const short = (n) => n.replace(/^Classic Beta\s+/i, "").trim() || n;
-  const shorter = (n) => short(n).replace(/\s+\d+$/, "").trim() || short(n);
+  const shorter = realmName;
   const pick = new Set(names.map(shorter)).size === names.length ? shorter : short;
   return new Map(names.map((n) => [n, pick(n)]));
 }
@@ -175,7 +176,9 @@ function mergeItems(perRealm) {
 
 async function main() {
   const src = (f) => pathToFileURL(path.join(repo, "site/src", f)).href;
-  const { renderCensusHtml } = await import(src("census.mjs"));
+  const censusMod = await import(src("census.mjs"));
+  const { renderCensusHtml } = censusMod;
+  realmName = censusMod.realmName;
   const { renderMarketHtml } = await import(src("market.mjs"));
   const { renderGuildHtml } = await import(src("guilds.mjs"));
 

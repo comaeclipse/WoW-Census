@@ -109,6 +109,13 @@
     return '<span class="meter" style="margin:0 6px 0 0">' + h + "</span>";
   }
 
+  // Beta realms are internally "Classic Beta PvE" / "Classic Beta PvP 2"; show
+  // PvE / PvP. Mirrors realmName() in site/src/census.mjs.
+  function realmName(n) {
+    n = String(n || "").replace(/^realm:/, "");
+    if (!/^Classic Beta\s+/i.test(n)) return n;
+    return n.replace(/^Classic Beta\s+/i, "").replace(/\s+\d+(?=-|$)/, "").trim() || n;
+  }
   function realmItems(rs) {
     return rs.slice().sort(function (a, b) { return a.label.localeCompare(b.label); }).map(function (x) {
       var p = splitRealm(x.label);
@@ -244,7 +251,7 @@
     var c = confidence(data);
     var ageStr = c.ageH < 48 ? Math.round(c.ageH) + "h" : Math.round(c.ageH / 24) + "d";
     document.getElementById("meta").innerHTML =
-      "REALM <b>" + esc(game.slice(6)) + "</b> &middot; " + ITEMS.length.toLocaleString() + " items<br>" +
+      "REALM <b>" + esc(realmName(game)) + "</b> &middot; " + ITEMS.length.toLocaleString() + " items<br>" +
       '<span style="font-size:15px">DATA CONFIDENCE ' + bar(c.pct) +
       '<b style="color:' + (c.pct >= 70 ? "var(--green)" : c.pct >= 40 ? "var(--gold)" : "var(--red)") + '">' + c.pct + '%</b></span><br>' +
       '<span style="font-size:15px;color:var(--muted)">updated ' + ageStr + ' ago &middot; ' + c.days + ' day' + (c.days === 1 ? "" : "s") + ' history</span>';

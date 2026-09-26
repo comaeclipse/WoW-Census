@@ -1,0 +1,212 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Font mockup — MarketLens</title>
+<meta name="description" content="Proposed type system for the census site: Warcraft headings, readable pixel labels, arcade numbers.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Cinzel:wght@600;800&family=Marcellus+SC&family=Pixelify+Sans:wght@400;600&family=Jersey+10&family=Silkscreen&family=DotGothic16&family=Almendra:wght@700&family=MedievalSharp&family=Pirata+One&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Each role is a font + size pair so the two modes can differ in both:
+     Press Start 2P needs tiny sizes, the proposed faces need normal ones. */
+  .demo[data-mode="current"]{
+    --f-title:var(--pixel);  --s-title:20px;  --w-title:400; --ls-title:0;
+    --f-sect:var(--pixel);   --s-sect:9px;    --w-sect:400;  --ls-sect:1px;
+    --f-label:var(--pixel);  --s-label:8px;   --ls-label:1px;
+    --f-num:var(--pixel);    --s-num:16px;
+    --f-name:var(--term);    --s-name:20px;
+    --f-guild:var(--term);   --s-guild:20px;
+  }
+  .demo[data-mode="proposed"]{
+    --f-title:"Cinzel", serif;             --s-title:34px; --w-title:800; --ls-title:1px;
+    --f-sect:"Cinzel", serif;              --s-sect:17px;  --w-sect:600;  --ls-sect:1px;
+    --f-label:"Pixelify Sans", monospace;  --s-label:14px; --ls-label:.5px;
+    --f-num:"Jersey 10", monospace;        --s-num:40px;
+    --f-name:"Marcellus SC", serif;        --s-name:19px;
+    --f-guild:"Marcellus SC", serif;       --s-guild:19px;
+  }
+  .demo .iname{font-family:var(--f-title); font-size:var(--s-title); font-weight:var(--w-title); letter-spacing:var(--ls-title);}
+  .demo .ptitle{font-family:var(--f-sect); font-size:var(--s-sect); font-weight:var(--w-sect); letter-spacing:var(--ls-sect);}
+  .demo .itag, .demo .tile .k, .demo .game, .demo th{font-family:var(--f-label); font-size:var(--s-label); letter-spacing:var(--ls-label);}
+  .demo .tile .v{font-family:var(--f-num); font-size:var(--s-num); line-height:1;}
+  .demo td.item{font-family:var(--f-name); font-size:var(--s-name);}
+  .demo td.guild{font-family:var(--f-guild); font-size:var(--s-guild);}
+
+  .switch{position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    background:var(--bg); padding:12px 0; margin-bottom:14px; border-bottom:2px solid var(--line);}
+  .switch button{font-family:var(--pixel); font-size:9px; letter-spacing:1px; text-transform:uppercase;
+    background:var(--panel); color:var(--muted); border:2px solid var(--line); box-shadow:3px 3px 0 var(--shadow);
+    padding:9px 12px; cursor:pointer;}
+  .switch button[aria-pressed="true"]{color:var(--bg); background:var(--gold); border-color:var(--gold);}
+  .switch .note{color:var(--muted); font-size:18px;}
+
+  .demo .tiles .tile .v{margin-top:10px;}
+  .demo table{min-width:0; table-layout:auto;}
+  .demo td.item, .demo td.guild{white-space:normal;}
+  .demo td, .demo th{padding:8px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .demo th{color:var(--gold); text-transform:uppercase; border-bottom-width:2px;}
+  .demo td.r, .demo th.r{text-align:right;}
+  .demo .gr{color:var(--green);}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:22px;}
+  @media (max-width:820px){.two{grid-template-columns:1fr} .tiles{grid-template-columns:repeat(2,1fr)}}
+
+  .roles td, .roles th{padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:middle; text-align:left;}
+  .roles{min-width:0; table-layout:auto;}
+  .roles th{font-family:var(--pixel); font-size:8px; letter-spacing:1px; color:var(--gold); text-transform:uppercase;}
+  .roles .where{color:var(--muted); font-size:18px;}
+  .roles .was{font-size:18px; color:var(--muted); white-space:nowrap;}
+  .scroll{overflow-x:auto;}
+
+  .specs{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px;}
+  .spec .nm{font-family:var(--pixel); font-size:8px; letter-spacing:1px; color:var(--muted); text-transform:uppercase; margin-bottom:12px;}
+  .spec .big{font-size:30px; color:var(--gold); line-height:1.2; margin-bottom:8px; overflow-wrap:anywhere;}
+  .spec .small{font-size:18px; color:var(--ink); line-height:1.35;}
+  .spec .use{margin-top:12px; color:var(--muted); font-size:17px;}
+  .tag2{display:inline-block; font-family:var(--pixel); font-size:7px; letter-spacing:1px; padding:4px 6px; margin-left:6px;
+    border:2px solid var(--line); color:var(--muted); vertical-align:middle;}
+  .tag2.pick{color:var(--bg); background:var(--green); border-color:var(--green);}
+  h2.sec{font-family:var(--pixel); font-size:11px; color:var(--gold); letter-spacing:1px; text-transform:uppercase; margin:34px 0 14px;}
+</style>
+</head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
+
+  <div class="itag" style="margin-bottom:8px">MarketLens &middot; design mockup &middot; not linked from the site</div>
+  <h1 class="iname">Font mockup</h1>
+  <p style="max-width:760px">The site keeps its identity: <b>Press Start 2P</b> for the logo and <b>VT323</b> for body text.
+  The proposal adds Warcraft-style headings and swaps the 7&ndash;9px Press Start labels, which are hard to read at that size,
+  for a pixel face that holds up small. Flip the switch to compare the same page section both ways.</p>
+
+  <div class="switch" role="group" aria-label="Font set">
+    <button type="button" data-set="current" aria-pressed="false">Current</button>
+    <button type="button" data-set="proposed" aria-pressed="true">Proposed</button>
+    <span class="note">Sample data: Dreamscythe (TBC Anniversary), 26 Sep 2026</span>
+  </div>
+
+  <div class="demo" data-mode="proposed">
+    <div class="itag" style="margin-bottom:8px">TBC Anniversary &middot; both factions &middot; unique characters sampled via /who</div>
+    <h1 class="iname">Dreamscythe Census</h1>
+
+    <nav class="games" style="margin:14px 0 18px">
+      <a class="game" aria-current="true" href="#">All</a>
+      <a class="game" href="#">Alliance</a><a class="game" href="#">Horde</a>
+    </nav>
+
+    <div class="tiles">
+      <div class="tile"><div class="k">Characters</div><div class="v">7,940</div><div class="s">unique, all time</div></div>
+      <div class="tile"><div class="k">Alliance</div><div class="v">4,852</div><div class="s">61% of sampled</div></div>
+      <div class="tile"><div class="k">Horde</div><div class="v">3,088</div><div class="s">39% of sampled</div></div>
+      <div class="tile"><div class="k">Auctions</div><div class="v">77,146</div><div class="s">Horde AH, 16:25 UTC</div></div>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <div class="ptitle">Most listed items</div>
+        <table>
+          <thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Change</th><th class="r">Unit</th></tr></thead>
+          <tbody>
+            <tr><td class="item"><a href="#">Adamantite Stinger</a></td><td class="r">35,248</td><td class="r gr">+100%</td><td class="r">78c</td></tr>
+            <tr><td class="item"><a href="#">Adamantite Shells</a></td><td class="r">32,627</td><td class="r gr">+88%</td><td class="r">1s 4c</td></tr>
+            <tr><td class="item"><a href="#">Mark of Sargeras</a></td><td class="r">14,455</td><td class="r gr">+28%</td><td class="r">65s 34c</td></tr>
+            <tr><td class="item"><a href="#">Strange Dust</a></td><td class="r">14,347</td><td class="r gr">+39%</td><td class="r">6s 1c</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <div class="ptitle">Most observed guilds</div>
+        <table>
+          <thead><tr><th class="r" style="width:40px">#</th><th>Guild</th><th>Faction</th><th class="r">Members</th></tr></thead>
+          <tbody>
+            <tr><td class="r">1</td><td class="guild">&lt;Healer Has Aggro&gt;</td><td>Alliance</td><td class="r">86</td></tr>
+            <tr><td class="r">2</td><td class="guild">&lt;Elite Guard&gt;</td><td>Alliance</td><td class="r">69</td></tr>
+            <tr><td class="r">3</td><td class="guild">&lt;Soul Reapers&gt;</td><td>Alliance</td><td class="r">66</td></tr>
+            <tr><td class="r">6</td><td class="guild">&lt;honour&gt;</td><td>Horde</td><td class="r">42</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec">Where each font goes</h2>
+  <div class="panel scroll">
+    <table class="roles">
+      <thead><tr><th>Element</th><th>Now</th><th>Proposed</th><th>Where on the site</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:'Press Start 2P';font-size:16px;color:var(--gold)">MARKETLENS</td>
+          <td class="was">Press Start 2P</td><td>Press Start 2P <span class="tag2">unchanged</span></td>
+          <td class="where">Logo / site name in the header</td></tr>
+        <tr><td style="font-family:'Cinzel';font-weight:800;font-size:26px;color:var(--gold)">Dreamscythe Census</td>
+          <td class="was">Press Start 2P 20px</td><td>Cinzel 800</td>
+          <td class="where">Page titles: census, auction house, guilds, item and seller pages</td></tr>
+        <tr><td style="font-family:'Cinzel';font-weight:600;font-size:17px;color:var(--gold)">Class Distribution</td>
+          <td class="was">Press Start 2P 9px</td><td>Cinzel 600</td>
+          <td class="where">Panel and section titles</td></tr>
+        <tr><td style="font-family:'Pixelify Sans';font-size:14px;color:var(--muted)">CHARACTERS &middot; QTY &middot; PVE</td>
+          <td class="was">Press Start 2P 7&ndash;8px</td><td>Pixelify Sans</td>
+          <td class="where">Tile labels, table headers, realm/faction chips, nav tabs, hints</td></tr>
+        <tr><td style="font-family:'Jersey 10';font-size:40px;color:var(--gold);line-height:1">77,146</td>
+          <td class="was">Press Start 2P 16px</td><td>Jersey 10</td>
+          <td class="where">Big stat numbers in tiles</td></tr>
+        <tr><td style="font-family:'Marcellus SC';font-size:19px">Mark of Sargeras</td>
+          <td class="was">VT323</td><td>Marcellus SC</td>
+          <td class="where">Item and guild names (closest free match to WoW's Friz Quadrata)</td></tr>
+        <tr><td style="font-family:'VT323';font-size:20px">Each bar counts unique characters</td>
+          <td class="was">VT323</td><td>VT323 <span class="tag2">unchanged</span></td>
+          <td class="where">Body text, numbers in tables, descriptions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="sec">Alternates considered</h2>
+  <div class="specs">
+    <div class="panel spec"><div class="nm">Cinzel <span class="tag2 pick">picked</span></div>
+      <div class="big" style="font-family:'Cinzel';font-weight:800">Auction House</div>
+      <div class="small" style="font-family:'Cinzel'">Carved Roman capitals &mdash; the fantasy-MMO heading look.</div>
+      <div class="use">Headings</div></div>
+    <div class="panel spec"><div class="nm">Pixelify Sans <span class="tag2 pick">picked</span></div>
+      <div class="big" style="font-family:'Pixelify Sans';font-weight:600">DEEPEST MARKETS</div>
+      <div class="small" style="font-family:'Pixelify Sans'">Pixel font with real weights; stays legible at 12&ndash;14px.</div>
+      <div class="use">Labels, chips, table headers</div></div>
+    <div class="panel spec"><div class="nm">Jersey 10 <span class="tag2 pick">picked</span></div>
+      <div class="big" style="font-family:'Jersey 10';font-size:46px;line-height:1">1,976,473g</div>
+      <div class="small" style="font-family:'Jersey 10';font-size:24px">Scoreboard numerals, condensed.</div>
+      <div class="use">Stat tiles</div></div>
+    <div class="panel spec"><div class="nm">Marcellus SC <span class="tag2 pick">picked</span></div>
+      <div class="big" style="font-family:'Marcellus SC'">Healer Has Aggro</div>
+      <div class="small" style="font-family:'Marcellus SC'">Flared small caps, close to the in-game UI font.</div>
+      <div class="use">Item and guild names</div></div>
+    <div class="panel spec"><div class="nm">Silkscreen</div>
+      <div class="big" style="font-family:'Silkscreen'">PVE &middot; PVP</div>
+      <div class="small" style="font-family:'Silkscreen'">Tiny crisp caps, tighter than Pixelify.</div>
+      <div class="use">Alternative for tags and tabs</div></div>
+    <div class="panel spec"><div class="nm">DotGothic16</div>
+      <div class="big" style="font-family:'DotGothic16'">Sightings 5,320</div>
+      <div class="small" style="font-family:'DotGothic16'">Dot-matrix, Japanese-arcade flavor.</div>
+      <div class="use">Alternative body font to VT323</div></div>
+    <div class="panel spec"><div class="nm">Almendra</div>
+      <div class="big" style="font-family:'Almendra';font-weight:700">Hellfire Peninsula</div>
+      <div class="small" style="font-family:'Almendra'">Hand-lettered medieval; use sparingly.</div>
+      <div class="use">Flavor text, zone names</div></div>
+    <div class="panel spec"><div class="nm">MedievalSharp</div>
+      <div class="big" style="font-family:'MedievalSharp'">Shattrath City</div>
+      <div class="small" style="font-family:'MedievalSharp'">Rougher, more tavern-sign than Almendra.</div>
+      <div class="use">Flavor text</div></div>
+    <div class="panel spec"><div class="nm">Pirata One</div>
+      <div class="big" style="font-family:'Pirata One'">&lt;Church of Beef&gt;</div>
+      <div class="small" style="font-family:'Pirata One'">Blackletter; strong on short names.</div>
+      <div class="use">Guild names, as an alternative to Marcellus SC</div></div>
+  </div>
+
+</div>
+<script>
+  (function () {
+    var demo = document.querySelector(".demo");
+    var btns = document.querySelectorAll(".switch button");
+    btns.forEach(function (b) {
+      b.addEventListener("click", function () {
+        demo.setAttribute("data-mode", b.dataset.set);
+        btns.forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      });
+    });
+  })();
+</script>
+</body></html>

@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { CLASS_META, esc, renderCensusHtml } from "./census.mjs";
+import { CLASS_META, esc, realmName, renderCensusHtml } from "./census.mjs";
 
 // MarketLens — Cloudflare Worker
 // Routes:
@@ -478,7 +478,7 @@ async function apiGames(env) {
       game: e.game, count: e.count, updatedAt: e.updatedAt, realm,
       hasItems: e.hasItems, hasPop: e.hasPop,
       sourceGame: realm ? (source.get(e.game) || null) : e.game,
-      label: realm ? e.game.slice(6) : (GAMES[e.game] ? GAMES[e.game].label : e.game),
+      label: realm ? realmName(e.game) : (GAMES[e.game] ? GAMES[e.game].label : e.game),
     };
   });
   return json({ games }, 120);
@@ -662,7 +662,7 @@ async function itemPage(url, env) {
   ).bind(game, row.id).all();
 
   const isRealm = game.indexOf("realm:") === 0;
-  const gameLabel = isRealm ? game.slice(6) : (GAMES[game] ? GAMES[game].label : game);
+  const gameLabel = isRealm ? realmName(game) : (GAMES[game] ? GAMES[game].label : game);
   const points = JSON.stringify(hist.results || []);
 
   // No captured name -> item:<id> placeholder. Pull the real name from Wowhead
@@ -983,7 +983,7 @@ async function sellerPage(url, env) {
   ).bind(game, seller.owner).all();
   const listings = listRes.results || [];
 
-  const realmLabel = game.slice(6);
+  const realmLabel = realmName(game);
   const smeta = await fetchSellerMeta(env, game);
   const sellerLabel = sellerMetaLabel(smeta);
   const dataset = await env.DB.prepare("SELECT source_game FROM datasets WHERE game=?").bind(game).first();
@@ -1215,7 +1215,7 @@ async function popChooserPage(env) {
       const href = "/pop?game=realm:" + encodeURIComponent(realm);
       const updated = r.lastT ? new Date(r.lastT * 1000).toISOString().slice(0, 10) : "";
       return `<a class="game" href="${href}" title="${esc(r.obs || 0)} sightings${updated ? " · updated " + updated : ""}">` +
-        `${esc(name)}${fac ? ' <span class="fac">' + esc(fac) + "</span>" : ""}</a>`;
+        `${esc(realmName(name))}${fac ? ' <span class="fac">' + esc(fac) + "</span>" : ""}</a>`;
     }).join("");
     // The beta client gets a cross-faction census page; offer it beside its realms.
     const combined = src === "classic-beta"
@@ -1280,7 +1280,7 @@ async function popPage(url, env) {
     }
   }
   const backHref = hasItems ? gameHref("/?game=", marketGame) : "/";
-  const backLabel = hasItems ? esc(marketGame.slice(6)) + " MARKET" : "MARKETLENS";
+  const backLabel = hasItems ? esc(realmName(marketGame)) + " MARKET" : "MARKETLENS";
 
   const scanLabel = p.samples + " /who scan" + (p.samples === 1 ? "" : "s");
   const tiles =
@@ -1328,8 +1328,8 @@ async function popPage(url, env) {
   const empty = p.samples === 0;
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(realm)} population — MarketLens</title>
-<meta name="description" content="Observed population survey for ${esc(realm)}: class and race distribution sampled via /who.">
+<title>${esc(realmName(realm))} population — MarketLens</title>
+<meta name="description" content="Observed population survey for ${esc(realmName(realm))}: class and race distribution sampled via /who.">
 <link rel="alternate" type="application/json" href="/api/population?game=${gameHref("", game)}" title="Population survey (JSON)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1358,7 +1358,7 @@ async function popPage(url, env) {
 <div class="wrap">
   <a class="back" href="${backHref}">&#9664; ${backLabel}</a>
   <header class="ihead">
-    <h1 class="iname">${esc(realm)} &mdash; Observed Population</h1>
+    <h1 class="iname">${esc(realmName(realm))} &mdash; Observed Population</h1>
     <div class="itag">${esc(p.faction || "")} &middot; ${sightings.toLocaleString()} sightings &middot; ${p.samples} scan${p.samples === 1 ? "" : "s"} &middot; sampled via /who</div>
   </header>
   <section class="tiles tiles5">${tiles}</section>

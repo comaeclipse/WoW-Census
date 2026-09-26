@@ -2,7 +2,7 @@
 // surveyed characters grouped by their latest observed guild, never accounts or
 // a claim about a guild's complete/current roster.
 
-import { esc, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
+import { esc, realmName, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
 
 const GUILD_STYLE = `
   .guildtable{width:100%;border-collapse:collapse;table-layout:fixed}
@@ -19,7 +19,7 @@ const GUILD_STYLE = `
 
 function scopeLabel(g, snapshot) {
   const manyRealms = (snapshot.realms || []).length > 1;
-  return [manyRealms ? g.realm.replace(/^Classic Beta\s+/i, "") : "", g.faction]
+  return [manyRealms ? realmName(g.realm) : "", g.faction]
     .filter(Boolean).join(" · ");
 }
 
@@ -45,7 +45,7 @@ function renderGuildView(snapshot) {
       '</div><div class="s">unique characters</div></div>' +
     '<div class="tile"><div class="k">Updated</div><div class="v">' +
       (lastT ? new Date(lastT * 1000).toISOString().slice(0, 10) : '&mdash;') +
-      '</div><div class="s">' + esc(realms.join(' · ') || 'no realm') + '</div></div>';
+      '</div><div class="s">' + esc(realms.map(realmName).join(' · ') || 'no realm') + '</div></div>';
 
   const body = rows
     ? '<div class="panel census"><div class="ptitle">Most popular observed guilds</div>' +

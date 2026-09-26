@@ -10,6 +10,15 @@ export function esc(s) {
   return String(s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 }
 
+// Blizzard's beta realms are internally "Classic Beta PvE" / "Classic Beta PvP 2";
+// players just call them PvE and PvP. Display-only -- the raw names stay the
+// data keys. Handles "-Faction" suffixes and "realm:" game keys.
+export function realmName(name) {
+  const s = String(name == null ? "" : name).replace(/^realm:/, "");
+  if (!/^Classic Beta\s+/i.test(s)) return s;
+  return s.replace(/^Classic Beta\s+/i, "").replace(/\s+\d+(?=-|$)/, "").trim() || s;
+}
+
 export const CLASS_META = {
   WARRIOR: ["Warrior", "C79C6E"], PALADIN: ["Paladin", "F58CBA"],
   HUNTER:  ["Hunter", "ABD473"],  ROGUE:   ["Rogue", "FFF569"],
@@ -178,7 +187,7 @@ function renderCensusView(census, opts = {}) {
     const links = opts.realmHref
       ? groups.map((g) => g.games.map((game) =>
           '<a class="game" href="' + esc(opts.realmHref(game)) + '">' +
-          esc(game.indexOf("realm:") === 0 ? game.slice(6) : game) + "</a>").join("")).join("")
+          esc(realmName(game)) + "</a>").join("")).join("")
       : "";
     body = racePanel + '<div class="chartgrid">' + classPanels + "</div>" +
       (links ? '<div class="ptitle" style="margin:26px 0 12px">Per-realm detail</div><nav class="games">' + links + "</nav>" : "");
@@ -188,7 +197,7 @@ function renderCensusView(census, opts = {}) {
     '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() +
       '</div><div class="s">unique, all time</div></div>' +
     '<div class="tile"><div class="k">Realms</div><div class="v">' + (realms.length || "&mdash;") +
-      '</div><div class="s">' + esc(realms.join(" · ") || "none yet") + "</div></div>" +
+      '</div><div class="s">' + esc(realms.map(realmName).join(" · ") || "none yet") + "</div></div>" +
     '<div class="tile"><div class="k">Scans</div><div class="v">' + samples.toLocaleString() +
       '</div><div class="s">' + sightings.toLocaleString() + " sightings</div></div>" +
     '<div class="tile"><div class="k">Updated</div><div class="v">' +
