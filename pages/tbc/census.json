@@ -30,26 +30,26 @@
     {
       "faction": "Horde",
       "races": {
-        "Blood Elf": 901,
-        "Orc": 489,
-        "Tauren": 424,
-        "Troll": 438,
-        "Undead": 397
+        "Blood Elf": 1049,
+        "Orc": 573,
+        "Tauren": 499,
+        "Troll": 509,
+        "Undead": 458
       },
       "classes": {
-        "HUNTER": 432,
-        "MAGE": 365,
-        "PALADIN": 382,
-        "PRIEST": 218,
-        "ROGUE": 225,
-        "WARLOCK": 267,
-        "SHAMAN": 271,
-        "WARRIOR": 237,
-        "DRUID": 252
+        "HUNTER": 491,
+        "MAGE": 414,
+        "PALADIN": 455,
+        "PRIEST": 253,
+        "ROGUE": 257,
+        "WARLOCK": 316,
+        "SHAMAN": 329,
+        "WARRIOR": 276,
+        "DRUID": 297
       },
-      "characters": 2649,
-      "samples": 86,
-      "observed": 3558,
+      "characters": 3088,
+      "samples": 104,
+      "observed": 4140,
       "games": [
         "realm:Dreamscythe-Horde"
       ]
@@ -87,30 +87,30 @@
       "realm": "Dreamscythe",
       "faction": "Horde",
       "races": {
-        "Blood Elf": 901,
-        "Orc": 489,
-        "Tauren": 424,
-        "Troll": 438,
-        "Undead": 397
+        "Blood Elf": 1049,
+        "Orc": 573,
+        "Tauren": 499,
+        "Troll": 509,
+        "Undead": 458
       },
       "classes": {
-        "HUNTER": 432,
-        "MAGE": 365,
-        "PALADIN": 382,
-        "PRIEST": 218,
-        "ROGUE": 225,
-        "WARLOCK": 267,
-        "SHAMAN": 271,
-        "WARRIOR": 237,
-        "DRUID": 252
+        "HUNTER": 491,
+        "MAGE": 414,
+        "PALADIN": 455,
+        "PRIEST": 253,
+        "ROGUE": 257,
+        "WARLOCK": 316,
+        "SHAMAN": 329,
+        "WARRIOR": 276,
+        "DRUID": 297
       },
-      "characters": 2649,
-      "samples": 86,
-      "observed": 3558
+      "characters": 3088,
+      "samples": 104,
+      "observed": 4140
     }
   ],
   "realms": [
     "Dreamscythe"
   ],
-  "lastT": 1790439746
+  "lastT": 1790440141
 }
