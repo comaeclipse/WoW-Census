@@ -3,26 +3,26 @@
     {
       "faction": "Alliance",
       "races": {
-        "Draenei": 845,
-        "Dwarf": 464,
-        "Gnome": 534,
-        "Human": 1499,
-        "Night Elf": 1020
+        "Draenei": 950,
+        "Dwarf": 515,
+        "Gnome": 580,
+        "Human": 1685,
+        "Night Elf": 1122
       },
       "classes": {
-        "HUNTER": 651,
-        "MAGE": 614,
-        "PALADIN": 698,
-        "PRIEST": 353,
-        "SHAMAN": 388,
-        "WARRIOR": 450,
-        "ROGUE": 359,
-        "WARLOCK": 374,
-        "DRUID": 475
+        "HUNTER": 737,
+        "MAGE": 672,
+        "PALADIN": 787,
+        "PRIEST": 390,
+        "SHAMAN": 435,
+        "WARRIOR": 497,
+        "ROGUE": 405,
+        "WARLOCK": 413,
+        "DRUID": 516
       },
-      "characters": 4362,
-      "samples": 138,
-      "observed": 5938,
+      "characters": 4852,
+      "samples": 160,
+      "observed": 6656,
       "games": [
         "realm:Dreamscythe-Alliance"
       ]
@@ -61,26 +61,26 @@
       "realm": "Dreamscythe",
       "faction": "Alliance",
       "races": {
-        "Draenei": 845,
-        "Dwarf": 464,
-        "Gnome": 534,
-        "Human": 1499,
-        "Night Elf": 1020
+        "Draenei": 950,
+        "Dwarf": 515,
+        "Gnome": 580,
+        "Human": 1685,
+        "Night Elf": 1122
       },
       "classes": {
-        "HUNTER": 651,
-        "MAGE": 614,
-        "PALADIN": 698,
-        "PRIEST": 353,
-        "SHAMAN": 388,
-        "WARRIOR": 450,
-        "ROGUE": 359,
-        "WARLOCK": 374,
-        "DRUID": 475
+        "HUNTER": 737,
+        "MAGE": 672,
+        "PALADIN": 787,
+        "PRIEST": 390,
+        "SHAMAN": 435,
+        "WARRIOR": 497,
+        "ROGUE": 405,
+        "WARLOCK": 413,
+        "DRUID": 516
       },
-      "characters": 4362,
-      "samples": 138,
-      "observed": 5938
+      "characters": 4852,
+      "samples": 160,
+      "observed": 6656
     },
     {
       "game": "realm:Dreamscythe-Horde",
@@ -112,5 +112,5 @@
   "realms": [
     "Dreamscythe"
   ],
-  "lastT": 1790208936
+  "lastT": 1790439746
 }
