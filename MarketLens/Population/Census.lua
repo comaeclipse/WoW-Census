@@ -300,6 +300,7 @@ function C:Children(n, st)
         end
         return kids, true, kind
     elseif kind == "zone" then
+        if not prof.zoneFallback then return kids, false, kind end -- stays a lower bound
         for _, zone in ipairs(zoneList(prof, n, self:History())) do
             kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = n.class, race = n.race, zone = zone }
         end
@@ -502,8 +503,15 @@ function C:Settle(st, quiet)
     end
     -- Drop anything planned above the current level cap (e.g. a census started
     -- before the Forever beta cap was pinned).
-    local maxL = self:Profile().maxLevel
-    while st.queue[1] and st.queue[1].lo > maxL do table.remove(st.queue, 1) end
+    local prof = self:Profile()
+    while st.queue[1] and st.queue[1].lo > prof.maxLevel do table.remove(st.queue, 1) end
+    -- Profiles without zone fallback drop zone queries planned before that
+    -- changed (they sit at the back of the queue).
+    if not prof.zoneFallback then
+        for i = #st.queue, 1, -1 do
+            if st.queue[i].zone then table.remove(st.queue, i) end
+        end
+    end
     return st.queue[1]
 end
 
