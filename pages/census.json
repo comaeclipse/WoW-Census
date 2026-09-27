@@ -3,26 +3,26 @@
     {
       "faction": "Alliance",
       "races": {
-        "Dwarf": 1212,
-        "Gnome": 1043,
-        "High Order Skyborne": 1603,
-        "Human": 2758,
-        "Night Elf": 1813
+        "Dwarf": 1523,
+        "Gnome": 1385,
+        "High Order Skyborne": 1992,
+        "Human": 3281,
+        "Night Elf": 2168
       },
       "classes": {
-        "HUNTER": 1647,
-        "PALADIN": 1200,
-        "PRIEST": 846,
-        "ROGUE": 962,
-        "SHAMAN": 478,
-        "WARRIOR": 1183,
-        "MAGE": 830,
-        "WARLOCK": 398,
-        "DRUID": 885
+        "HUNTER": 1912,
+        "PALADIN": 1376,
+        "PRIEST": 1122,
+        "ROGUE": 1170,
+        "SHAMAN": 603,
+        "WARRIOR": 1441,
+        "MAGE": 1078,
+        "WARLOCK": 570,
+        "DRUID": 1077
       },
-      "characters": 8429,
-      "samples": 327,
-      "observed": 10931,
+      "characters": 10349,
+      "samples": 387,
+      "observed": 13575,
       "games": [
         "realm:Classic Beta PvE-Alliance",
         "realm:Classic Beta PvP 2-Alliance"
@@ -63,27 +63,27 @@
       "realm": "Classic Beta PvE",
       "faction": "Alliance",
       "races": {
-        "Dwarf": 852,
-        "Gnome": 575,
-        "High Order Skyborne": 1012,
-        "Human": 1761,
-        "Night Elf": 1183
+        "Dwarf": 1163,
+        "Gnome": 917,
+        "High Order Skyborne": 1401,
+        "Human": 2284,
+        "Night Elf": 1538
       },
       "classes": {
-        "HUNTER": 1037,
-        "PALADIN": 833,
-        "PRIEST": 582,
-        "ROGUE": 641,
-        "SHAMAN": 291,
-        "WARRIOR": 864,
-        "MAGE": 440,
-        "WARLOCK": 184,
-        "DRUID": 511
+        "HUNTER": 1302,
+        "PALADIN": 1009,
+        "PRIEST": 858,
+        "ROGUE": 849,
+        "SHAMAN": 416,
+        "WARRIOR": 1122,
+        "MAGE": 688,
+        "WARLOCK": 356,
+        "DRUID": 703
       },
-      "zoneCharacters": 5383,
-      "characters": 5383,
-      "samples": 248,
-      "observed": 7141
+      "zoneCharacters": 7303,
+      "characters": 7303,
+      "samples": 308,
+      "observed": 9785
     },
     {
       "game": "realm:Classic Beta PvE-Horde",
@@ -171,6 +171,6 @@
     "Classic Beta PvE",
     "Classic Beta PvP 2"
   ],
-  "lastT": 1790540937,
+  "lastT": 1790545749,
   "zoneWindowDays": 30
 }
