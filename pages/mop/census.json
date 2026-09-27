@@ -34,30 +34,30 @@
     {
       "faction": "Horde",
       "races": {
-        "Blood Elf": 165,
-        "Goblin": 22,
-        "Orc": 87,
-        "Pandaren": 33,
-        "Tauren": 67,
-        "Troll": 66,
-        "Undead": 78
+        "Blood Elf": 514,
+        "Goblin": 94,
+        "Orc": 292,
+        "Pandaren": 138,
+        "Tauren": 239,
+        "Troll": 272,
+        "Undead": 263
       },
       "classes": {
-        "DEATHKNIGHT": 24,
-        "HUNTER": 66,
-        "MAGE": 49,
-        "MONK": 48,
-        "PALADIN": 62,
-        "PRIEST": 37,
-        "ROGUE": 48,
-        "WARLOCK": 56,
-        "WARRIOR": 47,
-        "SHAMAN": 44,
-        "DRUID": 37
+        "DEATHKNIGHT": 104,
+        "HUNTER": 240,
+        "MAGE": 156,
+        "MONK": 141,
+        "PALADIN": 210,
+        "PRIEST": 154,
+        "ROGUE": 142,
+        "WARLOCK": 185,
+        "WARRIOR": 155,
+        "SHAMAN": 169,
+        "DRUID": 156
       },
-      "characters": 518,
-      "samples": 26,
-      "observed": 657,
+      "characters": 1812,
+      "samples": 132,
+      "observed": 3025,
       "games": [
         "realm:Nazgrim-Horde"
       ]
@@ -100,36 +100,36 @@
       "realm": "Nazgrim",
       "faction": "Horde",
       "races": {
-        "Blood Elf": 165,
-        "Goblin": 22,
-        "Orc": 87,
-        "Pandaren": 33,
-        "Tauren": 67,
-        "Troll": 66,
-        "Undead": 78
+        "Blood Elf": 514,
+        "Goblin": 94,
+        "Orc": 292,
+        "Pandaren": 138,
+        "Tauren": 239,
+        "Troll": 272,
+        "Undead": 263
       },
       "classes": {
-        "DEATHKNIGHT": 24,
-        "HUNTER": 66,
-        "MAGE": 49,
-        "MONK": 48,
-        "PALADIN": 62,
-        "PRIEST": 37,
-        "ROGUE": 48,
-        "WARLOCK": 56,
-        "WARRIOR": 47,
-        "SHAMAN": 44,
-        "DRUID": 37
+        "DEATHKNIGHT": 104,
+        "HUNTER": 240,
+        "MAGE": 156,
+        "MONK": 141,
+        "PALADIN": 210,
+        "PRIEST": 154,
+        "ROGUE": 142,
+        "WARLOCK": 185,
+        "WARRIOR": 155,
+        "SHAMAN": 169,
+        "DRUID": 156
       },
-      "zoneCharacters": 518,
-      "characters": 518,
-      "samples": 26,
-      "observed": 657
+      "zoneCharacters": 1812,
+      "characters": 1812,
+      "samples": 132,
+      "observed": 3025
     }
   ],
   "realms": [
     "Nazgrim"
   ],
-  "lastT": 1790529352,
+  "lastT": 1790536386,
   "zoneWindowDays": 30
 }
