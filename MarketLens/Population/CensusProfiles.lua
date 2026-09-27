@@ -236,10 +236,15 @@ local function observedCap()
     return best
 end
 
--- Decade bands up to the live cap, the cap on its own (everyone piles up
--- there), and one catch-all band above it in case the cap was just raised.
-local function foreverBands(apiMax)
-    local cap = math.min(observedCap() or apiMax, apiMax)
+-- The beta's current level cap: /ml census cap <n> when set, else the level
+-- the population has piled up at, else the API's (possibly ruleset) cap.
+function P.ForeverCap(apiMax)
+    local set = ML.db and ML.db.settings.censusLevelCap
+    return set or math.min(observedCap() or apiMax, apiMax)
+end
+
+-- Decade bands up to the cap, then the cap on its own (everyone piles up there).
+local function foreverBands(cap)
     local bands, lo = {}, 1
     while lo < cap do
         local hi = math.min(lo + 9 - (lo == 1 and 1 or 0), cap - 1)
@@ -247,7 +252,6 @@ local function foreverBands(apiMax)
         lo = hi + 1
     end
     bands[#bands + 1] = { cap, cap }
-    if apiMax > cap then bands[#bands + 1] = { cap + 1, apiMax } end
     return bands
 end
 
@@ -262,6 +266,7 @@ function P.Current()
     local id = P.DetectID()
     local def = P.profiles[id]
     local maxL = (GetMaxPlayerLevel and GetMaxPlayerLevel()) or 60
+    if def.dynamicBands then maxL = P.ForeverCap(maxL) end
     local bands = def.dynamicBands and foreverBands(maxL) or def.bands
     local hot = {}
     for _, z in ipairs(def.hotspots[faction] or {}) do hot[#hot + 1] = z end

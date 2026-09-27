@@ -492,6 +492,10 @@ function C:RunNext()
         st.inflight = nil
         st.retries = st.retries + 1
     end
+    -- Drop anything planned above the current level cap (e.g. a census started
+    -- before the Forever beta cap was pinned).
+    local maxL = self:Profile().maxLevel
+    while st.queue[1] and st.queue[1].lo > maxL do table.remove(st.queue, 1) end
     local n = st.queue[1]
     if not n then self:Finish(); return end
     if Pop:Scan(self:Filter(n), "census") then
@@ -645,3 +649,12 @@ function C:IsActive()
 end
 
 ML:On("POP_SCAN_COMPLETE", function(sample, tag) C:OnScanComplete(sample, tag) end)
+
+-- The client refused to send our /who: put the query back at the front.
+ML:On("POP_SCAN_FAILED", function(_, tag)
+    local st = C:State()
+    if tag ~= "census" or not st or not st.inflight then return end
+    table.insert(st.queue, 1, st.inflight)
+    st.inflight = nil
+    ML:Fire("CENSUS_CHANGED")
+end)

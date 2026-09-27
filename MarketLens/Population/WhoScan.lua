@@ -509,11 +509,31 @@ function Pop:Latest()
     return store.samples[#store.samples]
 end
 
+-- Blizzard refused a protected call we made ("Interface action failed because
+-- of an AddOn"). Name the function instead of leaving a bare error, and if it
+-- was our /who, release the pending scan so the caller can retry at once.
+function Pop:OnActionBlocked(event, addon, func)
+    if addon ~= ML.ADDON then return end
+    ML:Print("|cffff4040Blizzard blocked %s()|r (%s).", tostring(func), event)
+    if self.pending then
+        self.pending = false
+        setWhoToUi(false)
+        local tag = self.pendingTag
+        self.pendingTag, self.pendingSweepID = nil, nil
+        ML:Print("That /who was not sent. If the button keeps failing on this client, use |cffffff00/ml census next|r (or /ml who) from chat or a keybound macro.")
+        ML:Fire("POP_SCAN_FAILED", self.pendingFilter, tag)
+    end
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("WHO_LIST_UPDATE")
-frame:SetScript("OnEvent", function(_, event)
+frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
+frame:RegisterEvent("ADDON_ACTION_BLOCKED")
+frame:SetScript("OnEvent", function(_, event, ...)
     if event == "WHO_LIST_UPDATE" then
         Pop:Capture()
+    else
+        Pop:OnActionBlocked(event, ...)
     end
 end)
 

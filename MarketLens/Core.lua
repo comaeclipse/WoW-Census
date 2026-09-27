@@ -307,6 +307,12 @@ SlashCmdList["MARKETLENS"] = function(msg)
         ML.Population.Census:Status()
     elseif msg == "census profile" then
         ML.Population.Census:PrintProfile()
+    elseif msg:match("^census cap%s") then
+        -- Forever beta: pin the census to the current level cap (or "auto").
+        local n = tonumber(msg:match("^census cap%s+(%d+)$"))
+        ML.db.settings.censusLevelCap = n
+        ML.Population.Census.profile = nil
+        ML:Print("Census level cap: %s.", n and tostring(n) or "auto (from observed levels)")
     elseif msg == "census forget" then
         ML.Population.Census:Forget()
     elseif msg == "zones" then
