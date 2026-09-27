@@ -45,47 +45,88 @@
     {
       "faction": "Horde",
       "races": {
-        "Blood Elf": 139,
-        "Dracthyr": 19,
-        "Earthen": 2,
-        "Goblin": 20,
-        "Haranir": 16,
-        "Highmountain Tauren": 14,
-        "Mag'har Orc": 23,
-        "Nightborne": 18,
-        "Orc": 61,
-        "Pandaren": 9,
-        "Tauren": 40,
-        "Troll": 26,
-        "Undead": 37,
-        "Vulpera": 27,
-        "Zandalari Troll": 23
+        "Blood Elf": 243,
+        "Dracthyr": 39,
+        "Earthen": 8,
+        "Goblin": 24,
+        "Haranir": 32,
+        "Highmountain Tauren": 19,
+        "Mag'har Orc": 36,
+        "Nightborne": 30,
+        "Orc": 104,
+        "Pandaren": 18,
+        "Tauren": 70,
+        "Troll": 48,
+        "Undead": 57,
+        "Vulpera": 38,
+        "Zandalari Troll": 43
       },
       "classes": {
-        "DEATHKNIGHT": 45,
-        "DEMONHUNTER": 12,
-        "HUNTER": 57,
-        "MAGE": 36,
-        "PALADIN": 59,
-        "PRIEST": 38,
-        "WARLOCK": 41,
-        "EVOKER": 12,
-        "DRUID": 43,
-        "MONK": 24,
-        "SHAMAN": 54,
-        "WARRIOR": 37,
-        "ROGUE": 16
+        "DEATHKNIGHT": 70,
+        "DEMONHUNTER": 30,
+        "HUNTER": 92,
+        "MAGE": 67,
+        "MONK": 45,
+        "PALADIN": 104,
+        "PRIEST": 55,
+        "ROGUE": 33,
+        "WARLOCK": 68,
+        "WARRIOR": 56,
+        "EVOKER": 26,
+        "SHAMAN": 80,
+        "DRUID": 83
       },
-      "characters": 474,
-      "samples": 51,
-      "observed": 673,
+      "characters": 809,
+      "samples": 67,
+      "observed": 1160,
       "games": [
+        "realm:Illidan-Horde",
         "realm:Nesingwary-Horde",
         "realm:Stormrage-Horde"
       ]
     }
   ],
   "units": [
+    {
+      "game": "realm:Illidan-Horde",
+      "realm": "Illidan",
+      "faction": "Horde",
+      "races": {
+        "Blood Elf": 104,
+        "Dracthyr": 20,
+        "Earthen": 6,
+        "Goblin": 4,
+        "Haranir": 16,
+        "Highmountain Tauren": 5,
+        "Mag'har Orc": 13,
+        "Nightborne": 12,
+        "Orc": 43,
+        "Pandaren": 9,
+        "Tauren": 30,
+        "Troll": 22,
+        "Undead": 20,
+        "Vulpera": 11,
+        "Zandalari Troll": 20
+      },
+      "classes": {
+        "DEATHKNIGHT": 25,
+        "DEMONHUNTER": 18,
+        "HUNTER": 35,
+        "MAGE": 31,
+        "MONK": 21,
+        "PALADIN": 45,
+        "PRIEST": 17,
+        "ROGUE": 17,
+        "WARLOCK": 27,
+        "WARRIOR": 19,
+        "EVOKER": 14,
+        "SHAMAN": 26,
+        "DRUID": 40
+      },
+      "characters": 335,
+      "samples": 16,
+      "observed": 487
+    },
     {
       "game": "realm:Nesingwary-Alliance",
       "realm": "Nesingwary",
@@ -248,8 +289,9 @@
     }
   ],
   "realms": [
+    "Illidan",
     "Nesingwary",
     "Stormrage"
   ],
-  "lastT": 1790519217
+  "lastT": 1790520543
 }
