@@ -309,6 +309,11 @@ SlashCmdList["MARKETLENS"] = function(msg)
         ML.Population.Census:Status()
     elseif msg == "census profile" then
         ML.Population.Census:PrintProfile()
+    elseif msg == "census fixed on" or msg == "census fixed off" then
+        -- Applies to the next census started on this client.
+        ML.db.settings.censusFixed = (msg == "census fixed on")
+        ML:Print("Census list: %s.", ML.db.settings.censusFixed
+            and "fixed -- decided at start, never grows" or "adaptive -- capped queries are split")
     elseif msg == "census chat on" or msg == "census chat off" then
         ML.Population.Census:SetViaChat(msg == "census chat on")
     elseif msg:match("^census cap%s") then

@@ -33,6 +33,7 @@ local HISTORY_DAYS = 7     -- recent-sighting window used to weight splits and p
 local LEARN_DAYS = 14      -- how long a learned "this cell caps" split is trusted
 local ZONE_SPLITS = 4      -- zones tried for a fully-pinned capped cell
 local MIN_ZONE_SUPPORT = 3 -- recent sightings a zone needs to be worth a query
+local FIXED_SPLIT_AT = 40  -- fixed list: split a cell up front once this many were seen recently
 local DEFAULT_BUDGET = 300 -- max queries a single census may plan
 local MERGE_TARGET = 40    -- merge learned level parts while their last counts sum under this
 local MAX_PRESPLIT_DEPTH = 8 -- level -> class -> level -> race chains, with room for nested level splits
@@ -380,10 +381,29 @@ function C:Learn(n, kind, kids)
     store.censusLearned[nodeKey(n)] = e
 end
 
+-- Fixed-list mode: the whole query list is decided when the census starts and
+-- never grows; a query that still hits the cap is recorded as a lower bound
+-- (and learned, so the next census's list splits it up front). On by default
+-- where adaptive splitting would snowball (the Forever beta); /ml census fixed
+-- on|off overrides it per client.
+function C:Fixed(st)
+    if st and st.fixed ~= nil then return st.fixed end
+    local set = ML.db.settings.censusFixed
+    if set ~= nil then return set end
+    return self:Profile().fixedPlan and true or false
+end
+
+-- Whether planning should split a node up front: known to cap, or (fixed
+-- list) recent sightings alone already put it near the cap.
+function C:ShouldPreSplit(n, st)
+    if self:Learned(n) then return true end
+    return st.fixed and self:Weight(n) >= FIXED_SPLIT_AT
+end
+
 -- Replace any node we already know caps with its children, recursively.
 function C:Expand(nodes, st, out, depth)
     for _, n in ipairs(nodes) do
-        if depth < MAX_PRESPLIT_DEPTH and splitsExhaustively(n) and self:Learned(n) then
+        if depth < MAX_PRESPLIT_DEPTH and splitsExhaustively(n) and self:ShouldPreSplit(n, st) then
             st.preSplit = st.preSplit + 1
             self:Expand((self:Children(n, st)), st, out, depth + 1)
         else
@@ -469,7 +489,10 @@ function C:Start(budget)
         budget = budget or ML.db.settings.censusBudget or DEFAULT_BUDGET,
         ratioObs = 0, ratioHist = 0,
     }
+    st.fixed = self:Fixed()
     store.census = st
+    -- A fixed list is planned from recent sightings taken at face value.
+    if st.fixed then st.ratioObs, st.ratioHist = 1, 1 end
 
     -- Highest levels first: if the census is stopped early, the most
     -- economically relevant part of the population is already covered.
@@ -481,9 +504,11 @@ function C:Start(budget)
         end
     end
     self:Enqueue(backbone, st, false)
-    ML:Print("Census started: |cffffffff%s|r %s, %d queries planned%s. Press |cffffff00Run Next|r (or /ml census next) for each.",
-        prof.label, prof.faction, #st.queue,
-        st.preSplit > 0 and string.format(" (%d pre-split from earlier runs)", st.preSplit) or "")
+    if st.fixed then st.ratioObs, st.ratioHist = 0, 0 end
+    ML:Print("Census started: |cffffffff%s|r %s, %s%d queries%s.",
+        prof.label, prof.faction, st.fixed and "fixed list of " or "", #st.queue,
+        st.fixed and " -- it will not grow; anything over 50 is recorded as 50+"
+            or (st.preSplit > 0 and string.format(" planned (%d pre-split from earlier runs)", st.preSplit) or " planned"))
     ML:Fire("CENSUS_CHANGED")
     self:PromptNext()
 end
@@ -621,6 +646,12 @@ function C:OnScanComplete(sample, tag)
         elseif not n.zone then
             st.unresolved = st.unresolved + 1 -- zones cannot fully cover this cell
         end
+        if self:Fixed(st) then
+            -- Fixed list: record the lower bound, learn the split for next
+            -- time, and add nothing to this census.
+            if exhaustive then st.unresolved = st.unresolved + 1 end
+            kids = {}
+        end
         -- Exact splits go next (depth-first keeps a cell's parts together);
         -- zone fallbacks go to the back, so every class and race is covered
         -- before any lower-bound cell gets extra digging. A census stopped
@@ -631,7 +662,7 @@ function C:OnScanComplete(sample, tag)
         -- site's capped_count reflects real coverage gaps only.
         local sweep = store.sweeps[st.sweepID]
         local q = sweep and sweep.queries and sweep.queries[#sweep.queries]
-        if exhaustive and last.split == #kids and q and q.filter == sample.filter then
+        if exhaustive and #kids > 0 and last.split == #kids and q and q.filter == sample.filter then
             q.split = true
         end
     else

@@ -159,6 +159,8 @@ P.profiles = {
         -- level, class and race pinned stays a lower bound instead of being dug
         -- into by zone (102 zone queries once found ~10 players each).
         noZoneFallback = true,
+        -- Decide the whole query list up front; never grow it mid-census.
+        fixedPlan = true,
         -- Bands are generated from the live level cap (it moves during beta).
         dynamicBands = true,
         classes = { Alliance = ALL_CLASSIC, Horde = ALL_CLASSIC },
@@ -280,6 +282,6 @@ function P.Current()
         classes = def.classes[faction], races = def.races[faction],
         racesByClass = def.racesByClass, hotspots = hot,
         capAt = def.capAt or 49, maxLevel = maxL,
-        zoneFallback = not def.noZoneFallback,
+        zoneFallback = not def.noZoneFallback, fixedPlan = def.fixedPlan,
     }
 end
