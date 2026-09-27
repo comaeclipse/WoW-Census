@@ -290,8 +290,9 @@ async function main() {
       })).sort((a, b) => b.characters - a.characters || a.name.localeCompare(b.name));
       geographyViews.push({ realm: r.key, faction: f.key, snapshot: {
         zones,
-        characters: from.reduce((sum, u) => sum + (u.characters || 0), 0),
+        characters: from.reduce((sum, u) => sum + (u.zoneCharacters || 0), 0),
         realms: [...new Set(from.map((u) => u.realm))], lastT: census.lastT || 0,
+        windowDays: census.zoneWindowDays || 0,
       }});
     }
   }

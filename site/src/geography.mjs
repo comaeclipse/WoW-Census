@@ -1,5 +1,6 @@
-// Last-known-location footprint for the static census bundle. These are
-// observed character locations, not movement history or proof of an activity.
+// Recent location footprint for the static census bundle: characters seen in
+// the dataset's latest rolling window, each at its latest observed location.
+// Not movement history or proof of an activity.
 
 import { esc, realmName, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
 
@@ -29,6 +30,7 @@ const GEO_STYLE = `
   .geotable th:nth-child(2),.geotable td:nth-child(2){width:16%}
   .geotable th:nth-child(3),.geotable td:nth-child(3){width:15%}
   .geotable th:nth-child(4),.geotable td:nth-child(4){width:24%;text-align:left}
+  .styles .geobar{grid-template-columns:minmax(90px,150px) 1fr 44px}
   .signal{border-left:3px solid var(--blue);padding:0 0 0 12px;margin:0 0 16px}
   .signal b{display:block;font-family:var(--pixel);font-size:8px;color:var(--gold);line-height:1.6;text-transform:uppercase}
   .signal span{display:block;color:var(--muted);margin-top:4px;line-height:1.25}
@@ -42,7 +44,14 @@ function activityHint(z, observedMax) {
   return "Leveling / progression";
 }
 
+const PLAY_STYLES = ["High-level / endgame", "Leveling / progression", "Capital hub", "Starting / early"];
+
+function windowLabel(days) {
+  return days ? "last " + days + " days" : "all time";
+}
+
 function renderView(snapshot) {
+  const win = windowLabel(snapshot.windowDays);
   const zones = (snapshot.zones || []).filter((z) => z.name !== "Unknown");
   const total = snapshot.characters || zones.reduce((n, z) => n + z.characters, 0);
   const max = zones.length ? zones[0].characters : 0;
@@ -53,8 +62,8 @@ function renderView(snapshot) {
   const capitalPct = total ? Math.round(capitalCount / total * 100) : 0;
   const updated = snapshot.lastT ? new Date(snapshot.lastT * 1000).toISOString().slice(0, 10) : "&mdash;";
   const tiles = '<section class="tiles">' +
-    '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() + '</div><div class="s">unique, cumulative</div></div>' +
-    '<div class="tile"><div class="k">Locations</div><div class="v">' + zones.length.toLocaleString() + '</div><div class="s">latest-known locations</div></div>' +
+    '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() + '</div><div class="s">unique, ' + win + '</div></div>' +
+    '<div class="tile"><div class="k">Locations</div><div class="v">' + zones.length.toLocaleString() + '</div><div class="s">with recent sightings</div></div>' +
     '<div class="tile"><div class="k">Top 5 share</div><div class="v">' + top5Pct + '%</div><div class="s">observed concentration</div></div>' +
     '<div class="tile"><div class="k">Updated</div><div class="v">' + updated + '</div><div class="s">last population sample</div></div></section>';
 
@@ -70,8 +79,22 @@ function renderView(snapshot) {
   const rows = zones.slice(0, 50).map((z) => '<tr><td>' + esc(z.name) + '</td><td>' + z.characters.toLocaleString() +
     '</td><td>' + (total ? (z.characters / total * 100).toFixed(1) : '0.0') + '%</td><td>' +
     esc(activityHint(z, observedMax)) + ' · avg ' + (z.avgLevel || '&mdash;') + '</td></tr>').join("");
+  const styleCounts = new Map(PLAY_STYLES.map((k) => [k, 0]));
+  for (const z of zones) {
+    const k = activityHint(z, observedMax);
+    styleCounts.set(k, styleCounts.get(k) + z.characters);
+  }
+  const located = zones.reduce((n, z) => n + z.characters, 0);
+  const styleMax = Math.max(1, ...styleCounts.values());
+  const styleBars = PLAY_STYLES.map((k) => '<div class="geobar"><div class="name">' + esc(k.toUpperCase()) +
+    '</div><div class="track"><i style="width:' + (styleCounts.get(k) / styleMax * 100).toFixed(1) +
+    '%"></i></div><div class="value">' + (located ? Math.round(styleCounts.get(k) / located * 100) : 0) +
+    '%</div></div>').join("");
   const top = zones[0];
-  const signals = '<div class="panel"><div class="ptitle">How to read this</div>' +
+  const signals = '<div class="panel"><div class="ptitle">Play-style mix</div>' +
+    '<p class="hint" style="margin-top:0">Recent characters grouped by the kind of location they were last seen in.</p>' +
+    '<div class="styles">' + styleBars + '</div>' +
+    '<div class="ptitle" style="margin-top:18px">How to read this</div>' +
     '<div class="signal"><b>Strongest cluster</b><span>' + esc(top.name) + ' contains ' +
       (total ? (top.characters / total * 100).toFixed(1) : '0.0') + '% of observed characters in this selection.</span></div>' +
     '<div class="signal"><b>Top-five concentration</b><span>' + top5Pct +
@@ -79,8 +102,8 @@ function renderView(snapshot) {
     '<div class="signal"><b>Capital footprint</b><span>' + capitalPct +
       '% were last observed in recognized capitals. This is consistent with services, social, travel, or idle time—not proof of any one activity.</span></div>' +
     '<div class="signal"><b>Level context</b><span>Average level helps separate starting, progression, and high-level clusters. Activity labels are interpretation hints only.</span></div></div>';
-  return tiles + '<div class="geogrid"><div><div class="panel census" style="margin-bottom:18px"><div class="ptitle">Cumulative latest-known locations</div>' +
-    '<p class="hint" style="margin-top:0">Every unique character observed over the dataset lifetime counts once at their most recently recorded location. Inactive characters remain until observed elsewhere.</p>' + bars + moreBars + '</div>' +
+  return tiles + '<div class="geogrid"><div><div class="panel census" style="margin-bottom:18px"><div class="ptitle">Where players are &middot; ' + win + '</div>' +
+    '<p class="hint" style="margin-top:0">Each character seen in the ' + win + ' of scans counts once at their most recently recorded location. Characters not seen in that window drop out.</p>' + bars + moreBars + '</div>' +
     '<div class="panel census"><div class="ptitle">Location detail</div><table class="geotable"><thead><tr><th>Location</th><th>Characters</th><th>Share</th><th>Activity hint</th></tr></thead><tbody>' +
     rows + '</tbody></table></div></div>' + signals + '</div>';
 }
@@ -104,11 +127,11 @@ export function renderGeographyHtml(views, dims = {}, opts = {}) {
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}${GEO_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">${opts.nav || ""}
 <header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Geography</h1>
-<div class="itag">${esc(scopeLabel)} &middot; last known locations &middot; unique characters sampled via /who</div>
+<div class="itag">${esc(scopeLabel)} &middot; recent locations &middot; unique characters sampled via /who</div>
 ${opts.note ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + '</div>' : ''}</header>
 ${chips}${panes}
 <p class="src">This is an observed-location footprint, not a live map or movement history.<br>
-Each character counts once at the latest location where a /who scan caught them. Targeted queries, the server result cap, scan timing, and differently sized locations affect the ranking.<br>
+Each character seen in the latest rolling window of scans counts once at the latest location where a /who scan caught them. Targeted queries, the server result cap, scan timing, and differently sized locations affect the ranking.<br>
 Activity labels are conservative interpretation hints; location alone cannot prove questing, raiding, gathering, trading, PvP, or player intent.</p>
 </div>${chips ? TOGGLE_SCRIPT : ""}</body></html>`;
 }

@@ -858,8 +858,12 @@ async function importPop(url, env, req) {
     await env.DB.prepare(`INSERT INTO characters
       (game,source_game,character_key,full_name,name,realm,guild,level,race,class,class_file,zone,first_seen,last_seen,seen_count)
       VALUES ${values} ON CONFLICT(game,source_game,character_key) DO UPDATE SET
-      full_name=excluded.full_name,name=excluded.name,realm=excluded.realm,guild=excluded.guild,
-      level=excluded.level,race=excluded.race,class=excluded.class,class_file=excluded.class_file,zone=excluded.zone,
+      full_name=excluded.full_name,name=excluded.name,realm=excluded.realm,
+      ${["guild", "level", "race", "class", "class_file", "zone"].map((col) =>
+        // Descriptive fields follow the newest sighting, so re-uploading an
+        // older export (e.g. a .bak rescue) cannot roll a character back.
+        col + "=CASE WHEN excluded.last_seen>=characters.last_seen THEN excluded." + col +
+        " ELSE characters." + col + " END").join(",")},
       first_seen=MIN(characters.first_seen,excluded.first_seen),
       last_seen=MAX(characters.last_seen,excluded.last_seen),seen_count=MAX(characters.seen_count,excluded.seen_count)`).run();
   }
@@ -1137,13 +1141,16 @@ async function loadPopUnique(env, game) {
 }
 
 // Unique characters grouped by their last-known zone — a footprint of where the
-// /who scans caught the population, not a targeted zone census.
+// /who scans caught the population, not a targeted zone census. Uses the same
+// rolling window as the census geography (see ZONE_WINDOW_DAYS).
 async function loadZoneStats(env, game) {
   return (await env.DB.prepare(
     `SELECT COALESCE(NULLIF(zone, ''), 'Unknown') zone, COUNT(*) chars,
        CAST(ROUND(AVG(level)) AS INT) avg_level
-     FROM characters WHERE game = ? GROUP BY zone ORDER BY chars DESC`
-  ).bind(game).all()).results;
+     FROM characters
+     WHERE game = ? AND last_seen >= (SELECT MAX(last_seen) FROM characters WHERE game = ?) - ?
+     GROUP BY zone ORDER BY chars DESC`
+  ).bind(game, game, ZONE_WINDOW_DAYS * 86400).all()).results;
 }
 
 async function loadCharacterStats(env, game) {
@@ -1368,7 +1375,7 @@ async function popPage(url, env) {
     zones.length + ' zones</div>' +
     '<table class="poptable"><thead><tr><th class="l">Zone</th><th>Chars</th><th>Avg lvl</th><th class="l">&nbsp;</th></tr></thead><tbody>' +
     (zoneBody || '<tr><td class="l mu" colspan="4" style="padding:16px">No zone data yet.</td></tr>') +
-    '</tbody></table><p class="hint">Where each observed character was last caught by /who &mdash; a footprint of the scans, not a targeted zone census.</p></div>';
+    '</tbody></table><p class="hint">Where characters seen in the latest ' + ZONE_WINDOW_DAYS + ' days of scans were last caught by /who &mdash; a footprint of the scans, not a targeted zone census.</p></div>';
 
   const empty = p.samples === 0;
   const html = `<!doctype html><html lang="en"><head>
@@ -1471,6 +1478,8 @@ async function popPage(url, env) {
 // Alliance-vs-Horde view. It counts unique characters -- each character once,
 // however many scans caught it -- so the faction that happened to get more
 // /who scans cannot inflate its own share.
+const ZONE_WINDOW_DAYS = 30;
+
 async function loadCensus(env, sourceGame = "classic-beta") {
   const rows = (await env.DB.prepare(
     `SELECT c.game game, c.race race, c.class_file cf, COUNT(*) n
@@ -1489,13 +1498,19 @@ async function loadCensus(env, sourceGame = "classic-beta") {
      WHERE d.source_game = ? AND TRIM(COALESCE(c.guild, '')) <> ''
      GROUP BY c.game, c.guild`
   ).bind(sourceGame).all()).results;
+  // Geography is a rolling window, not a lifetime tally: only characters seen
+  // within ZONE_WINDOW_DAYS of that dataset's newest sighting count, so players
+  // who stopped showing up age out instead of pinning their last zone forever.
+  // Anchoring on the dataset's own latest scan (rather than wall-clock now)
+  // keeps a realm that simply hasn't been scanned lately from going blank.
   const zones = (await env.DB.prepare(
     `SELECT c.game game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') zone,
        COUNT(*) characters, CAST(ROUND(AVG(c.level)) AS INT) avgLevel, MAX(c.level) maxLevel
      FROM characters c JOIN datasets d ON d.game = c.game
-     WHERE d.source_game = ?
+     JOIN (SELECT game, MAX(last_seen) latest FROM characters GROUP BY game) m ON m.game = c.game
+     WHERE d.source_game = ? AND c.last_seen >= m.latest - ?
      GROUP BY c.game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown')`
-  ).bind(sourceGame).all()).results;
+  ).bind(sourceGame, ZONE_WINDOW_DAYS * 86400).all()).results;
 
   // One unit per dataset -- a realm/faction pair. Callers that want the whole
   // beta merged use `groups` below; the static bundle slices `units` per realm
@@ -1510,7 +1525,8 @@ async function loadCensus(env, sourceGame = "classic-beta") {
       realms.add(name);
       units.set(game, {
         game, realm: name, faction: fac || "Unknown",
-        races: {}, classes: {}, guilds: [], zones: [], characters: 0, samples: 0, observed: 0,
+        races: {}, classes: {}, guilds: [], zones: [], zoneCharacters: 0,
+        characters: 0, samples: 0, observed: 0,
       });
     }
     return units.get(game);
@@ -1531,6 +1547,7 @@ async function loadCensus(env, sourceGame = "classic-beta") {
     unit(g.game).guilds.push({ name: g.guild, members: g.members || 0 });
   }
   for (const z of zones) {
+    unit(z.game).zoneCharacters += z.characters || 0;
     unit(z.game).zones.push({
       name: z.zone, characters: z.characters || 0,
       avgLevel: z.avgLevel || 0, maxLevel: z.maxLevel || 0,
@@ -1546,6 +1563,7 @@ async function loadCensus(env, sourceGame = "classic-beta") {
     units: [...units.values()],
     realms: [...realms].sort(),
     lastT,
+    zoneWindowDays: ZONE_WINDOW_DAYS,
   };
 }
 
