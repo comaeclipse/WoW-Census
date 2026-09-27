@@ -78,6 +78,7 @@
         "WARLOCK": 413,
         "DRUID": 516
       },
+      "zoneCharacters": 4852,
       "characters": 4852,
       "samples": 160,
       "observed": 6656
@@ -104,6 +105,7 @@
         "WARRIOR": 276,
         "DRUID": 297
       },
+      "zoneCharacters": 3088,
       "characters": 3088,
       "samples": 104,
       "observed": 4140
@@ -112,5 +114,6 @@
   "realms": [
     "Dreamscythe"
   ],
-  "lastT": 1790440141
+  "lastT": 1790440141,
+  "zoneWindowDays": 30
 }

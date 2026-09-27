@@ -123,6 +123,7 @@
         "SHAMAN": 26,
         "DRUID": 40
       },
+      "zoneCharacters": 335,
       "characters": 335,
       "samples": 16,
       "observed": 487
@@ -163,6 +164,7 @@
         "DRUID": 57,
         "DEMONHUNTER": 24
       },
+      "zoneCharacters": 528,
       "characters": 528,
       "samples": 99,
       "observed": 1249
@@ -203,6 +205,7 @@
         "DRUID": 18,
         "MONK": 7
       },
+      "zoneCharacters": 201,
       "characters": 201,
       "samples": 25,
       "observed": 455
@@ -243,6 +246,7 @@
         "DRUID": 121,
         "DEMONHUNTER": 37
       },
+      "zoneCharacters": 895,
       "characters": 895,
       "samples": 56,
       "observed": 1427
@@ -283,6 +287,7 @@
         "SHAMAN": 48,
         "DRUID": 36
       },
+      "zoneCharacters": 400,
       "characters": 400,
       "samples": 43,
       "observed": 589
@@ -293,5 +298,6 @@
     "Nesingwary",
     "Stormrage"
   ],
-  "lastT": 1790527324
+  "lastT": 1790527324,
+  "zoneWindowDays": 30
 }

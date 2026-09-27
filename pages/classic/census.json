@@ -74,6 +74,7 @@
         "WARLOCK": 225,
         "DRUID": 264
       },
+      "zoneCharacters": 3076,
       "characters": 3076,
       "samples": 133,
       "observed": 4340
@@ -98,6 +99,7 @@
         "MAGE": 217,
         "PRIEST": 163
       },
+      "zoneCharacters": 1510,
       "characters": 1510,
       "samples": 75,
       "observed": 1880
@@ -122,6 +124,7 @@
         "WARLOCK": 42,
         "DRUID": 47
       },
+      "zoneCharacters": 526,
       "characters": 526,
       "samples": 33,
       "observed": 904
@@ -146,6 +149,7 @@
         "MAGE": 62,
         "PRIEST": 40
       },
+      "zoneCharacters": 400,
       "characters": 400,
       "samples": 24,
       "observed": 605
@@ -155,5 +159,6 @@
     "Ashkandi",
     "Old Blanchy"
   ],
-  "lastT": 1790470409
+  "lastT": 1790470409,
+  "zoneWindowDays": 30
 }

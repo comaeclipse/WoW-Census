@@ -80,6 +80,7 @@
         "WARLOCK": 182,
         "DRUID": 506
       },
+      "zoneCharacters": 3673,
       "characters": 3673,
       "samples": 121,
       "observed": 4843
@@ -106,6 +107,7 @@
         "PRIEST": 163,
         "PALADIN": 488
       },
+      "zoneCharacters": 2594,
       "characters": 2594,
       "samples": 121,
       "observed": 3888
@@ -132,6 +134,7 @@
         "WARLOCK": 214,
         "DRUID": 374
       },
+      "zoneCharacters": 3046,
       "characters": 3046,
       "samples": 79,
       "observed": 3790
@@ -158,6 +161,7 @@
         "PRIEST": 179,
         "PALADIN": 330
       },
+      "zoneCharacters": 2027,
       "characters": 2027,
       "samples": 52,
       "observed": 2374
@@ -167,5 +171,6 @@
     "Classic Beta PvE",
     "Classic Beta PvP 2"
   ],
-  "lastT": 1790443851
+  "lastT": 1790443851,
+  "zoneWindowDays": 30
 }

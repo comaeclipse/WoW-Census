@@ -90,6 +90,7 @@
         "WARLOCK": 55,
         "DRUID": 79
       },
+      "zoneCharacters": 710,
       "characters": 710,
       "samples": 27,
       "observed": 740
@@ -120,6 +121,7 @@
         "SHAMAN": 44,
         "DRUID": 37
       },
+      "zoneCharacters": 518,
       "characters": 518,
       "samples": 26,
       "observed": 657
@@ -128,5 +130,6 @@
   "realms": [
     "Nazgrim"
   ],
-  "lastT": 1790295446
+  "lastT": 1790295446,
+  "zoneWindowDays": 30
 }
