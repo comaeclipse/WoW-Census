@@ -358,6 +358,12 @@ function Pop:RecordSweepQuery(sample, roster, sweepID)
         observed = sample.observed or 0, total = sample.total or sample.observed or 0,
         capped = (sample.total or 0) > (sample.observed or 0) or self:IsCapped(sample.observed),
     }
+    -- Every character this query returned (not just the latest sighting), so
+    -- overlap between queries can be measured: that is what capture-recapture
+    -- estimates, and the test of whether /who returns a random 50, rest on.
+    local keys = {}
+    for key in pairs(roster or {}) do keys[#keys + 1] = key end
+    sweep.queries[queryIndex].keys = keys
     for key, seen in pairs(roster or {}) do
         sweep.observations[key] = {
             key = key, queryIndex = queryIndex, observedAt = sample.t,
