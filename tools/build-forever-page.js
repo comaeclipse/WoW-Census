@@ -102,7 +102,7 @@ function nav(current) {
     Object.entries(editions).map(([source, e]) => item(hrefFor(source, e.dir), e.nav, source === SOURCE_GAME)).join("") + "</nav>" +
     '<nav class="games" style="margin-bottom:18px">' +
     item("index.html", "Census") + item("auctionhouse.html", "Auction House") +
-    item("guilds.html", "Guilds") + "</nav>";
+    item("guilds.html", "Guilds") + item("geography.html", "Geography") + "</nav>";
 }
 
 // Chip labels for realms. Every beta realm is called "Classic Beta <type>",
@@ -181,6 +181,7 @@ async function main() {
   realmName = censusMod.realmName;
   const { renderMarketHtml } = await import(src("market.mjs"));
   const { renderGuildHtml } = await import(src("guilds.mjs"));
+  const { renderGeographyHtml } = await import(src("geography.mjs"));
 
   const built = new Date();
   const stamp = "Static snapshot built " + built.toISOString().slice(0, 16).replace("T", " ") + "Z";
@@ -255,6 +256,7 @@ async function main() {
 
   const guildUnits = census.units || [];
   const guildViews = [];
+  const geographyViews = [];
   for (const r of dims.realm) {
     for (const f of dims.faction) {
       const from = guildUnits.filter((u) =>
@@ -273,6 +275,24 @@ async function main() {
           lastT: census.lastT || 0,
         },
       });
+      const byZone = new Map();
+      for (const u of from) for (const z of (u.zones || [])) {
+        const cur = byZone.get(z.name) || { name: z.name, characters: 0, levelSum: 0, maxLevel: 0 };
+        cur.characters += z.characters || 0;
+        cur.levelSum += (z.avgLevel || 0) * (z.characters || 0);
+        cur.maxLevel = Math.max(cur.maxLevel, z.maxLevel || 0);
+        byZone.set(z.name, cur);
+      }
+      const zones = [...byZone.values()].map((z) => ({
+        name: z.name, characters: z.characters,
+        avgLevel: z.characters ? Math.round(z.levelSum / z.characters) : 0,
+        maxLevel: z.maxLevel,
+      })).sort((a, b) => b.characters - a.characters || a.name.localeCompare(b.name));
+      geographyViews.push({ realm: r.key, faction: f.key, snapshot: {
+        zones,
+        characters: from.reduce((sum, u) => sum + (u.characters || 0), 0),
+        realms: [...new Set(from.map((u) => u.realm))], lastT: census.lastT || 0,
+      }});
     }
   }
 
@@ -317,6 +337,9 @@ async function main() {
   fs.writeFileSync(path.join(outDir, "guilds.html"),
     renderGuildHtml(guildViews, dims, { stylesheet: "style.css", nav: nav("guilds.html"), note: stamp,
       gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL }));
+  fs.writeFileSync(path.join(outDir, "geography.html"),
+    renderGeographyHtml(geographyViews, dims, { stylesheet: "style.css", nav: nav("geography.html"), note: stamp,
+      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL }));
   // The bundle carries its own stylesheet so it renders with nothing else served.
   fs.copyFileSync(path.join(repo, "site/public/style.css"), path.join(outDir, "style.css"));
   // Keep the existing public census artifact focused on census data; guilds
@@ -324,12 +347,12 @@ async function main() {
   // rows in this JSON file.
   const censusJson = {
     ...census,
-    units: (census.units || []).map(({ guilds, ...unit }) => unit),
+    units: (census.units || []).map(({ guilds, zones, ...unit }) => unit),
   };
   fs.writeFileSync(path.join(outDir, "census.json"), JSON.stringify(censusJson, null, 2));
 
   const rel = path.relative(repo, outDir).replace(/\\/g, "/");
-  console.log("Wrote " + rel + "/{index.html,auctionhouse.html,guilds.html,style.css,census.json}");
+  console.log("Wrote " + rel + "/{index.html,auctionhouse.html,guilds.html,geography.html,style.css,census.json}");
 
   if (!flag("deploy")) {
     console.log("Publish it with:  node tools/build-forever-page.js --deploy");

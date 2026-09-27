@@ -1444,6 +1444,13 @@ async function loadCensus(env, sourceGame = "classic-beta") {
      WHERE d.source_game = ? AND TRIM(COALESCE(c.guild, '')) <> ''
      GROUP BY c.game, c.guild`
   ).bind(sourceGame).all()).results;
+  const zones = (await env.DB.prepare(
+    `SELECT c.game game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') zone,
+       COUNT(*) characters, CAST(ROUND(AVG(c.level)) AS INT) avgLevel, MAX(c.level) maxLevel
+     FROM characters c JOIN datasets d ON d.game = c.game
+     WHERE d.source_game = ?
+     GROUP BY c.game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown')`
+  ).bind(sourceGame).all()).results;
 
   // One unit per dataset -- a realm/faction pair. Callers that want the whole
   // beta merged use `groups` below; the static bundle slices `units` per realm
@@ -1458,7 +1465,7 @@ async function loadCensus(env, sourceGame = "classic-beta") {
       realms.add(name);
       units.set(game, {
         game, realm: name, faction: fac || "Unknown",
-        races: {}, classes: {}, guilds: [], characters: 0, samples: 0, observed: 0,
+        races: {}, classes: {}, guilds: [], zones: [], characters: 0, samples: 0, observed: 0,
       });
     }
     return units.get(game);
@@ -1478,8 +1485,15 @@ async function loadCensus(env, sourceGame = "classic-beta") {
   for (const g of guilds) {
     unit(g.game).guilds.push({ name: g.guild, members: g.members || 0 });
   }
+  for (const z of zones) {
+    unit(z.game).zones.push({
+      name: z.zone, characters: z.characters || 0,
+      avgLevel: z.avgLevel || 0, maxLevel: z.maxLevel || 0,
+    });
+  }
   for (const u of units.values()) {
     u.guilds.sort((a, b) => b.members - a.members || a.name.localeCompare(b.name));
+    u.zones.sort((a, b) => b.characters - a.characters || a.name.localeCompare(b.name));
   }
 
   return {
