@@ -570,7 +570,6 @@ function C:RunNext()
     end
     if self:ViaChat() then
         -- Nothing to send from here: type the query in for the player.
-        ML:Print("Census is in chat mode: press Enter on the /ml who it types for you (/ml census chat off to disable).")
         self:PromptNext()
         return
     end
@@ -623,6 +622,9 @@ function C:OnScanComplete(sample, tag)
         end
     end
     st.last = last
+    -- One line per step: progress, query, result.
+    ML:Print("|cff808080%d/%d|r %s |cff808080=|r %s", st.done, st.done + #st.queue, sample.filter or "",
+        last.capped and string.format("|cffff8040%d, split %d|r", observed, last.split) or tostring(observed))
 
     if #st.queue == 0 then
         self:Finish()

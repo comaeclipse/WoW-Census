@@ -207,7 +207,8 @@ function Pop:Scan(filter, tag)
     self.pendingSweepID = store.activeSweepID
     self.lastSend = now
     setWhoToUi(true)
-    ML:Print("Population scan: |cffffffff%s|r ...", filter)
+    -- The census prints its own one-line step summary instead.
+    if tag ~= "census" then ML:Print("Population scan: |cffffffff%s|r ...", filter) end
     ML:Fire("POP_SCAN_START", filter)
     sendWho(filter)
     return true
@@ -266,9 +267,11 @@ function Pop:Capture()
     self.pendingTag = nil
     -- The server's "total" is capped alongside the list, so it never says how
     -- many players really matched; flag the cap instead of quoting it.
-    ML:Print("%s: %d result(s)%s; recorded %d unique character(s).",
-        sample.filter or "", observed,
-        self:IsCapped(observed) and " |cffff8040(capped \226\128\148 more exist)|r" or "", unique)
+    if tag ~= "census" then
+        ML:Print("%s: %d result(s)%s; recorded %d unique character(s).",
+            sample.filter or "", observed,
+            self:IsCapped(observed) and " |cffff8040(capped \226\128\148 more exist)|r" or "", unique)
+    end
     ML:Fire("POP_SCAN_COMPLETE", sample, tag)
 end
 
@@ -520,7 +523,10 @@ function Pop:OnActionBlocked(event, addon, func)
         setWhoToUi(false)
         local tag = self.pendingTag
         self.pendingTag, self.pendingSweepID = nil, nil
-        ML:Print("That /who was not sent. If the button keeps failing on this client, use |cffffff00/ml census next|r (or /ml who) from chat or a keybound macro.")
+        -- A census recovers on its own (chat mode); only guide manual scans.
+        if tag ~= "census" then
+            ML:Print("That /who was not sent. Type it as |cffffff00/ml who <filter>|r in chat instead.")
+        end
         ML:Fire("POP_SCAN_FAILED", self.pendingFilter, tag)
     end
 end
