@@ -41,15 +41,18 @@ local MAX_PRESPLIT_DEPTH = 8 -- level -> class -> level -> race chains, with roo
 -- Node helpers. A node is { lo=, hi=, class=token?, race=?, zone=? }.
 
 local function nodeKey(n)
+    if n.refreshFilter then return "refresh|" .. n.refreshFilter end
     return string.format("%d-%d|%s|%s|%s", n.lo, n.hi, n.class or "", n.race or "", n.zone or "")
 end
 
 -- Level, class and race splits partition their parent; a zone split does not.
 local function splitsExhaustively(n)
+    if n.refreshFilter then return false end
     return n.hi > n.lo or not n.class or not n.race
 end
 
 function C:Filter(n)
+    if n.refreshFilter then return n.refreshFilter end
     local parts = { n.lo == n.hi and tostring(n.lo) or (n.lo .. "-" .. n.hi) }
     if n.class then parts[#parts + 1] = 'c-"' .. P.ClassName(n.class) .. '"' end
     if n.race then parts[#parts + 1] = 'r-"' .. n.race .. '"' end
@@ -396,6 +399,7 @@ end
 -- Whether planning should split a node up front: known to cap, or (fixed
 -- list) recent sightings alone already put it near the cap.
 function C:ShouldPreSplit(n, st)
+    if n.refreshFilter then return false end
     if self:Learned(n) then return true end
     return st.fixed and self:Weight(n) >= FIXED_SPLIT_AT
 end
@@ -494,13 +498,29 @@ function C:Start(budget)
     -- A fixed list is planned from recent sightings taken at face value.
     if st.fixed then st.ratioObs, st.ratioHist = 1, 1 end
 
-    -- Highest levels first: if the census is stopped early, the most
-    -- economically relevant part of the population is already covered.
     local backbone = {}
-    for i = #prof.bands, 1, -1 do
-        local b = prof.bands[i]
-        if b[1] <= prof.maxLevel then
-            backbone[#backbone + 1] = { lo = b[1], hi = math.min(b[2], prof.maxLevel) }
+    if prof.simpleRefresh then
+        -- Forever and Retail are enormous, realmless populations. This is a
+        -- deliberately small refresh sample, not an attempt to enumerate
+        -- everyone online: levels 1-20, then every faction race and class.
+        for level = 1, math.min(prof.maxLevel, 20) do
+            backbone[#backbone + 1] = { refreshFilter = tostring(level) }
+        end
+        for _, race in ipairs(prof.races) do
+            backbone[#backbone + 1] = { refreshFilter = 'r-"' .. race .. '"' }
+        end
+        for _, class in ipairs(prof.classes) do
+            backbone[#backbone + 1] = { refreshFilter = 'c-"' .. P.ClassName(class) .. '"' }
+        end
+        st.fixed = true
+    else
+        -- Highest levels first: if the census is stopped early, the most
+        -- economically relevant part of the population is already covered.
+        for i = #prof.bands, 1, -1 do
+            local b = prof.bands[i]
+            if b[1] <= prof.maxLevel then
+                backbone[#backbone + 1] = { lo = b[1], hi = math.min(b[2], prof.maxLevel) }
+            end
         end
     end
     self:Enqueue(backbone, st, false)
@@ -529,7 +549,7 @@ function C:Settle(st, quiet)
     -- Drop anything planned above the current level cap (e.g. a census started
     -- before the Forever beta cap was pinned).
     local prof = self:Profile()
-    while st.queue[1] and st.queue[1].lo > prof.maxLevel do table.remove(st.queue, 1) end
+    while st.queue[1] and st.queue[1].lo and st.queue[1].lo > prof.maxLevel do table.remove(st.queue, 1) end
     -- Profiles without zone fallback drop zone queries planned before that
     -- changed (they sit at the back of the queue).
     if not prof.zoneFallback then
@@ -640,7 +660,8 @@ function C:OnScanComplete(sample, tag)
     if Pop:IsCapped(observed) then
         last.capped = true
         st.capped = st.capped + 1
-        local kids, exhaustive, kind = self:Children(n, st)
+        local kids, exhaustive, kind = {}, false, nil
+        if not n.refreshFilter then kids, exhaustive, kind = self:Children(n, st) end
         if exhaustive then
             self:Learn(n, kind, kids)
         elseif not n.zone then

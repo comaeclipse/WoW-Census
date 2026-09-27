@@ -133,6 +133,7 @@ P.profiles = {
     },
     ["retail"] = {
         label = "Retail",
+        simpleRefresh = true,
         -- Retail's population sits at the cap; low bands are near-empty.
         bands = { {1,59}, {60,79}, {80,84}, {85,89}, {90,90} },
         classes = {
@@ -155,6 +156,7 @@ P.profiles = {
     },
     ["forever"] = {
         label = "WoW: Forever (beta)",
+        simpleRefresh = true,
         -- The beta piles thousands into a few levels: a cell still over 50 with
         -- level, class and race pinned stays a lower bound instead of being dug
         -- into by zone (102 zone queries once found ~10 players each).
@@ -283,5 +285,6 @@ function P.Current()
         racesByClass = def.racesByClass, hotspots = hot,
         capAt = def.capAt or 49, maxLevel = maxL,
         zoneFallback = not def.noZoneFallback, fixedPlan = def.fixedPlan,
+        simpleRefresh = def.simpleRefresh,
     }
 end

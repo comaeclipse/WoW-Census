@@ -67,6 +67,7 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml census cap <n>` / `auto` | Forever beta: pin the census level cap (default: the level the population has piled up at) |
 | `/ml census chat on` / `off` | Chat mode: the census types each `/ml who <filter>` into chat for you to send with Enter. Turns on automatically if the client blocks the census's own `/who` (the Forever beta does) |
 | `/ml census fixed on` / `off` | Fixed list: plan every query when the census starts and never add more; a query still over 50 is recorded as 50+ (and split up front next time). Default on the Forever beta |
+| Forever beta / Retail census | Uses a fixed refresh list: levels 1-20, then each faction race, then each class; capped queries remain 50+ and never spawn extra work |
 | `/ml census forget` | Drop learned splits so the next census starts from the plain backbone |
 | `/ml sweep start [label]` | Start an explicit geographic collection sweep; subsequent `/ml who` results are attached to it |
 | `/ml sweep status` | Show the active sweep's query, character, and capped-query counts |

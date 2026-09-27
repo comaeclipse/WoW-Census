@@ -31,26 +31,26 @@
     {
       "faction": "Horde",
       "races": {
-        "Orc": 739,
-        "Tauren": 804,
-        "Troll": 521,
-        "Undead": 1668,
-        "Windshaper Skyborne": 889
+        "Orc": 888,
+        "Tauren": 964,
+        "Troll": 688,
+        "Undead": 1998,
+        "Windshaper Skyborne": 1144
       },
       "classes": {
-        "HUNTER": 603,
-        "MAGE": 320,
-        "ROGUE": 357,
-        "SHAMAN": 721,
-        "WARLOCK": 387,
-        "WARRIOR": 500,
-        "DRUID": 573,
-        "PRIEST": 342,
-        "PALADIN": 818
+        "HUNTER": 776,
+        "MAGE": 401,
+        "ROGUE": 438,
+        "SHAMAN": 848,
+        "WARLOCK": 491,
+        "WARRIOR": 608,
+        "DRUID": 716,
+        "PRIEST": 437,
+        "PALADIN": 967
       },
-      "characters": 4621,
-      "samples": 173,
-      "observed": 6262,
+      "characters": 5682,
+      "samples": 207,
+      "observed": 7962,
       "games": [
         "realm:Classic Beta PvE-Horde",
         "realm:Classic Beta PvP 2-Horde"
@@ -90,27 +90,27 @@
       "realm": "Classic Beta PvE",
       "faction": "Horde",
       "races": {
-        "Orc": 345,
-        "Tauren": 541,
-        "Troll": 294,
-        "Undead": 895,
-        "Windshaper Skyborne": 519
+        "Orc": 494,
+        "Tauren": 701,
+        "Troll": 461,
+        "Undead": 1225,
+        "Windshaper Skyborne": 774
       },
       "classes": {
-        "HUNTER": 303,
-        "MAGE": 166,
-        "ROGUE": 161,
-        "SHAMAN": 457,
-        "WARLOCK": 203,
-        "WARRIOR": 281,
-        "DRUID": 372,
-        "PRIEST": 163,
-        "PALADIN": 488
+        "HUNTER": 476,
+        "MAGE": 247,
+        "ROGUE": 242,
+        "SHAMAN": 584,
+        "WARLOCK": 307,
+        "WARRIOR": 389,
+        "DRUID": 515,
+        "PRIEST": 258,
+        "PALADIN": 637
       },
-      "zoneCharacters": 2594,
-      "characters": 2594,
-      "samples": 121,
-      "observed": 3888
+      "zoneCharacters": 3655,
+      "characters": 3655,
+      "samples": 155,
+      "observed": 5588
     },
     {
       "game": "realm:Classic Beta PvP 2-Alliance",
@@ -171,6 +171,6 @@
     "Classic Beta PvE",
     "Classic Beta PvP 2"
   ],
-  "lastT": 1790545749,
+  "lastT": 1790547111,
   "zoneWindowDays": 30
 }
