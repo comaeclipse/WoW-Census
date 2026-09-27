@@ -211,16 +211,26 @@ async function main() {
   const factions = [...new Set((census.units || []).map((u) => u.faction).filter((f) => f && f !== "Unknown"))].sort();
   const realmNames = [...new Set(betaRealms.map((r) => r.replace(/-(Alliance|Horde)$/, "")))].sort();
 
-  const snapshotOf = (from, fallbackRealms) => ({
-    items: mergeItems(from),
-    realms: from.length ? from.map((s2) => s2.realm) : fallbackRealms,
-    updatedAt: from.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
+  const snapshotOf = (from, fallbackRealms) => {
+    // Retail's commodity auction house is regional and cross-realm. Multiple
+    // realm uploads are repeated captures of the same market, not independent
+    // inventories that can be added together. Use the newest capture for the
+    // aggregate view; the realm chips still expose each capture separately.
+    const selected = edition.factionlessMarket && from.length > 1
+      ? [from.reduce((latest, snap) =>
+          String(snap.updatedAt || "") > String(latest.updatedAt || "") ? snap : latest)]
+      : from;
+    return {
+    items: mergeItems(selected),
+    realms: selected.length ? selected.map((s2) => s2.realm) : fallbackRealms,
+    updatedAt: selected.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
     branch: WH_BRANCH, uploadFlavor: UPLOAD_FLAVOR,
     aggregateOnly: edition.marketMetric === "quantity",
-  });
+    };
+  };
   const marketRealmLabels = realmLabels(realmNames);
   const dims = {
-    realm: [{ key: "all", label: "All realms" }]
+    realm: [{ key: "all", label: edition.factionlessMarket ? "Latest regional scan" : "All realms" }]
       .concat(realmNames.map((r) => ({ key: r, label: marketRealmLabels.get(r) }))),
     faction: [{ key: "all", label: "Both" }].concat(factions.map((f) => ({ key: f, label: f }))),
   };
@@ -326,7 +336,10 @@ async function main() {
     return;
   }
   console.log("\nDeploying to Cloudflare Pages project \"" + project + "\" ...");
-  const r = spawnSync("npx", ["--yes", "wrangler@latest", "pages", "deploy", outDir,
+  // Publish the complete tree. Deploying only an edition subdirectory makes it
+  // the project root and leaves canonical paths such as /retail/* stale.
+  const deployDir = path.join(repo, "pages");
+  const r = spawnSync("npx", ["--yes", "wrangler@latest", "pages", "deploy", deployDir,
     "--project-name", project, "--commit-dirty=true"], { stdio: "inherit", shell: true });
   if (r.status !== 0) throw new Error("wrangler pages deploy exited " + r.status);
 }
