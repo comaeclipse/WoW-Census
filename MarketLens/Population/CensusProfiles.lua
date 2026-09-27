@@ -219,14 +219,35 @@ function P.DetectID()
     return P.profiles[flavor] and flavor or "tbc-anniversary"
 end
 
-local function foreverBands(maxL)
+-- The live beta cap: the highest level at least 3 characters on this realm
+-- bucket reached in the last week (3 so one odd sighting cannot move it).
+-- GetMaxPlayerLevel() may report the ruleset's cap rather than the beta's.
+local function observedCap()
+    local store = ML.realm and ML.realm.population
+    local cutoff = time() - 7 * 86400
+    local perLevel, best = {}, nil
+    for _, c in pairs(store and store.characters or {}) do
+        local L = tonumber(c.level) or 0
+        if L > 0 and (c.lastSeen or 0) >= cutoff then
+            perLevel[L] = (perLevel[L] or 0) + 1
+            if perLevel[L] >= 3 and (not best or L > best) then best = L end
+        end
+    end
+    return best
+end
+
+-- Decade bands up to the live cap, the cap on its own (everyone piles up
+-- there), and one catch-all band above it in case the cap was just raised.
+local function foreverBands(apiMax)
+    local cap = math.min(observedCap() or apiMax, apiMax)
     local bands, lo = {}, 1
-    while lo < maxL do
-        local hi = math.min(lo + 9 - (lo == 1 and 1 or 0), maxL - 1)
+    while lo < cap do
+        local hi = math.min(lo + 9 - (lo == 1 and 1 or 0), cap - 1)
         bands[#bands + 1] = { lo, hi }
         lo = hi + 1
     end
-    bands[#bands + 1] = { maxL, maxL }
+    bands[#bands + 1] = { cap, cap }
+    if apiMax > cap then bands[#bands + 1] = { cap + 1, apiMax } end
     return bands
 end
 
