@@ -108,7 +108,11 @@ function UI:BuildBoard()
     -- scan can be launched straight from OnClick.
     scan:SetScript("OnClick", function()
         if UI.view == "population" then
-            ML.Population:Scan()
+            if ML.Population.Census:IsActive() then
+                ML.Population.Census:RunNext()
+            else
+                ML.Population:Scan()
+            end
         else
             ML.Scanner:StartScan()
         end
@@ -120,6 +124,18 @@ function UI:BuildBoard()
     refresh:SetPoint("RIGHT", scan, "LEFT", -6, 0)
     refresh:SetText("Refresh")
     refresh:SetScript("OnClick", function() UI:Refresh() end)
+
+    -- Population only: start/stop an adaptive census. Kept far from the scan
+    -- button (which becomes Run Next) so a stray click cannot end a census.
+    local census = CreateFrame("Button", nil, board, "UIPanelButtonTemplate")
+    census:SetSize(100, 22)
+    census:SetPoint("BOTTOMLEFT", 12, 10)
+    census:SetScript("OnClick", function()
+        local C = ML.Population.Census
+        if C:IsActive() then C:Stop() else C:Start(); UI:ShowCensus() end
+    end)
+    census:Hide()
+    board.censusButton = census
 
     local crumb = CreateFrame("Button", nil, board)
     crumb:SetSize(400, 16)
@@ -276,8 +292,8 @@ function UI:NavigateUp()
     self:Refresh()
 end
 
--- Population tab cycles class -> race -> demand -> unique characters.
-local POP_NEXT = { class = "race", race = "demand", demand = "characters", characters = "class" }
+-- Population tab cycles class -> race -> demand -> unique characters -> census.
+local POP_NEXT = { class = "race", race = "demand", demand = "characters", characters = "census", census = "class" }
 function UI:CyclePopMode()
     self.popMode = POP_NEXT[self.popMode or "class"] or "class"
     self:Refresh()
@@ -316,9 +332,14 @@ local function crumbLabel(nav)
     end
 end
 
-local POP_NAME = { class = "Class", race = "Race", demand = "Inferred profession demand", characters = "Unique characters" }
-local POP_HINT = { class = "Race", race = "Demand", demand = "Unique characters", characters = "Class" }
+local POP_NAME = { class = "Class", race = "Race", demand = "Inferred profession demand", characters = "Unique characters", census = "Census" }
+local POP_HINT = { class = "Race", race = "Demand", demand = "Unique characters", characters = "Census", census = "Class" }
 local function popCrumb(mode)
+    if mode == "census" then
+        local active = ML.Population.Census:IsActive()
+        return string.format("|cff33aaffCensus|r  |cff808080\194\183 %s \226\128\148 click for Class|r",
+            active and "one /who per Run Next press" or "adaptive /who sweep of your faction")
+    end
     local agg = ML.Population and ML.Population:Aggregate()
     if not agg then
         return "|cff808080No samples yet \226\128\148 press Scan Population (a /who of the realm; works anywhere)|r"
@@ -393,6 +414,10 @@ function UI:Refresh()
     if not (ML.Scanner.scanning or (ML.Population and ML.Population.pending)) then
         self.board.scanButton:SetText(self:ScanButtonLabel())
     end
+    local pop = self.view == "population"
+    self.board.hint:SetShown(not pop)
+    self.board.censusButton:SetShown(pop)
+    self.board.censusButton:SetText(ML.Population.Census:IsActive() and "Stop Census" or "Start Census")
 
     self:ApplyColumns(cols)
     self.entries = entries
@@ -616,7 +641,31 @@ function UI:SetStatus(text, show)
 end
 
 function UI:ScanButtonLabel()
-    return (self.view == "population") and "Scan Population" or "Scan Auction House"
+    if self.view ~= "population" then return "Scan Auction House" end
+    return ML.Population.Census:IsActive() and "Run Next" or "Scan Population"
+end
+
+-- Open the board on the Population tab's census view.
+function UI:ShowCensus()
+    self:BuildBoard()
+    if not self.board:IsShown() then self:Toggle() end
+    self.popMode = "census"
+    self:SetView("population")
+end
+
+-- After a /who returns, hold Run Next disabled until the client-side cooldown
+-- clears, so the next press is never swallowed by the throttle.
+function UI:GateRunNext()
+    local wait = ML.Population:CooldownRemaining()
+    if wait <= 0 or not ML.Population.Census:IsActive() then return end
+    local b = self.board.scanButton
+    b:Disable()
+    C_Timer.After(wait, function()
+        if not (ML.Population.pending or ML.Scanner.scanning) then
+            b:Enable()
+            b:SetText(UI:ScanButtonLabel())
+        end
+    end)
 end
 
 function UI:SetScanBusy(busy)
@@ -687,11 +736,14 @@ function UI:OnPopScanDone(sample)
     if not self.board then return end
     self:SetScanBusy(false)
     if self.view ~= "population" then return end
-    if sample then
-        self:SetStatus(string.format("Sampled %d of %d online\n|cffffffff%s|r",
-            sample.observed or 0, sample.total or 0, sample.filter or ""))
+    -- The census view shows each result in its own table; skip the overlay.
+    if sample and self.popMode ~= "census" then
+        local capped = ML.Population:IsCapped(sample.observed)
+        self:SetStatus(string.format("%d result(s)%s\n|cffffffff%s|r",
+            sample.observed or 0, capped and " (capped)" or "", sample.filter or ""))
     end
     self:Refresh()
+    self:GateRunNext()
     if C_Timer and C_Timer.After then
         C_Timer.After(4, function()
             if not (ML.Population and ML.Population.pending) then UI:SetStatus("", false) end
@@ -708,6 +760,9 @@ function UI:Init()
     ML:On("SCAN_ABORT",    function(reason) UI:OnScanDone("Scan aborted: " .. tostring(reason)) end)
     ML:On("POP_SCAN_START",    function() UI:OnPopScanStart() end)
     ML:On("POP_SCAN_COMPLETE", function(sample) UI:OnPopScanDone(sample) end)
+    ML:On("CENSUS_CHANGED", function()
+        if UI.board:IsShown() and UI.view == "population" then UI:Refresh() end
+    end)
 
     -- Attach the native tab when the AH opens; hide our board when it closes.
     local ah = CreateFrame("Frame")

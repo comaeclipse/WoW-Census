@@ -54,6 +54,7 @@ end
 local DEFAULT_SETTINGS = {
     snapshotRetentionDays = 14,
     populationRetentionDays = 35, -- daily identity observations retained for 30-day metrics
+    censusBudget          = 300, -- max /who queries one census may plan
     minimumSamples        = 3,   -- snapshots needed before demand is scored
     scanThrottle          = 0.5, -- seconds between paged AH queries
     sellerSampleSeconds   = 1200, -- hard budget for /ml scan paged seller sampling
@@ -289,6 +290,25 @@ SlashCmdList["MARKETLENS"] = function(msg)
     elseif msg == "who" or msg:match("^who%s") then
         -- Slash execution is a hardware event, so SendWho is allowed here.
         ML.Population:Scan(raw:sub(4))
+    elseif msg == "census" then
+        local C = ML.Population.Census
+        if C:IsActive() then C:RunNext() else C:Start() end
+        if ML.UI.ShowCensus then ML.UI:ShowCensus() end
+    elseif msg == "census next" then
+        -- Hardware event: a macro with /ml census next can step it by key.
+        -- Never starts a new census, so a finished run is not silently restarted.
+        ML.Population.Census:RunNext()
+    elseif msg:match("^census start%s*%d*$") then
+        ML.Population.Census:Start(tonumber(msg:match("(%d+)$")))
+        if ML.UI.ShowCensus then ML.UI:ShowCensus() end
+    elseif msg == "census stop" then
+        ML.Population.Census:Stop()
+    elseif msg == "census status" then
+        ML.Population.Census:Status()
+    elseif msg == "census profile" then
+        ML.Population.Census:PrintProfile()
+    elseif msg == "census forget" then
+        ML.Population.Census:Forget()
     elseif msg == "zones" then
         if ML.Population.DumpZones then ML.Population:DumpZones() end
     elseif msg == "sweep start" or msg:match("^sweep start%s+") then

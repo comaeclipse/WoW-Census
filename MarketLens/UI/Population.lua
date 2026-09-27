@@ -30,6 +30,13 @@ local function className(token)
 end
 
 function PT:Columns(mode)
+    if mode == "census" then
+        return {
+            { label = "Census",  width = 120, justify = "LEFT" },
+            { label = "",        width = 170, justify = "LEFT" },
+            { label = "",        width = 210, justify = "LEFT" },
+        }
+    end
     if mode == "characters" then
         return {
             { label = "Metric",     width = 190, justify = "LEFT"  },
@@ -80,7 +87,75 @@ local function distRows(dist, colorFn, nameFn)
     return out
 end
 
+local GRAY, WHITE, WARN, OK = "|cff808080", "|cffffffff", "|cffff8040", "|cff40c040"
+
+local function censusIdleRows(last)
+    local prof, why = ML.Population.Profiles.Current()
+    local out = {}
+    if not prof then
+        out[#out + 1] = { cells = { "Profile", GRAY .. "--|r", why } }
+    else
+        out[#out + 1] = { cells = { "Profile", WHITE .. prof.label .. "|r " .. prof.faction, ML:RealmKey() } }
+        out[#out + 1] = { cells = { "Backbone", #prof.bands .. " level bands", "Split further only where /who caps" } }
+        local store = ML.Population:Store()
+        out[#out + 1] = { cells = { "Learned splits", tostring(U.CountKeys(store.censusLearned or {})),
+            "Cells pre-split from earlier runs" } }
+        out[#out + 1] = { cells = { "", "", "" } }
+        out[#out + 1] = { cells = { "", "|cffffd100Press Start Census|r", GRAY .. "then Run Next once per query|r" } }
+    end
+    if last then
+        out[#out + 1] = { cells = { "", "", "" } }
+        out[#out + 1] = { cells = { "Last census", date("%b %d %H:%M", last.finishedAt or 0),
+            (last.status == "complete" and OK or WARN) .. (last.status or "?") .. "|r"
+            .. (last.stopped and GRAY .. " (stopped)|r" or "") } }
+        out[#out + 1] = { cells = { "Queries run", tostring(last.done or 0),
+            string.format("%d overflow, %d pre-split", last.generated or 0, last.preSplit or 0) } }
+        out[#out + 1] = { cells = { "Unique characters", tostring(last.unique or 0),
+            string.format("%d duplicate sightings removed", math.max((last.rows or 0) - (last.unique or 0), 0)) } }
+        out[#out + 1] = { cells = { "Unresolved cells", tostring(last.unresolved or 0),
+            (last.unresolved or 0) > 0 and "Still capped \226\128\148 counts are a lower bound" or "Every cell under the cap" } }
+    end
+    return out
+end
+
+local function censusRows()
+    local s, last = ML.Population.Census:Summary()
+    if not s then return censusIdleRows(last) end
+    local out = {}
+    out[#out + 1] = { cells = { "Profile", WHITE .. s.label .. "|r " .. s.faction, ML:RealmKey() } }
+    out[#out + 1] = { cells = { "Progress", string.format("%s%d|r / %d", WHITE, s.done, s.total),
+        bar(s.total > 0 and s.done / s.total or 0) } }
+    local l = s.last
+    if l then
+        local result
+        if not l.capped then
+            result = string.format("%s%d players|r |TInterface\\RaidFrame\\ReadyCheck-Ready:12|t", OK, l.observed)
+        elseif l.split > 0 then
+            result = string.format("%s%d \226\128\148 capped, split into %d|r", WARN, l.observed, l.split)
+        else
+            result = string.format("%s%d \226\128\148 capped, cannot split further|r", WARN, l.observed)
+        end
+        out[#out + 1] = { cells = { "Last", l.filter or "", result } }
+    end
+    if s.inflight then
+        out[#out + 1] = { cells = { "Waiting on", WHITE .. s.inflight .. "|r", GRAY .. "Run Next retries it if no reply|r" } }
+    end
+    out[#out + 1] = { cells = { "Next", s.next and (WHITE .. s.next .. "|r") or GRAY .. "--|r", "" } }
+    out[#out + 1] = { cells = { "", "", "" } }
+    out[#out + 1] = { cells = { "Overflow queries", tostring(s.generated), "Added when a query hit the cap" } }
+    out[#out + 1] = { cells = { "Pre-split", tostring(s.preSplit), "Capped last time, skipped straight to parts" } }
+    out[#out + 1] = { cells = { "Unique characters", tostring(s.unique), "Collected by this census" } }
+    out[#out + 1] = { cells = { "Duplicates removed", tostring(s.duplicates), "Same character seen twice" } }
+    out[#out + 1] = { cells = { "Unresolved cells", tostring(s.unresolved),
+        s.overBudget and WARN .. "Query budget reached|r" or "Capped after every split (lower bound)" } }
+    if (s.retries or 0) > 0 then
+        out[#out + 1] = { cells = { "Retried", tostring(s.retries), "Queries the server dropped" } }
+    end
+    return out
+end
+
 function PT:Rows(mode)
+    if mode == "census" then return censusRows() end
     if mode == "characters" then
         local s = ML.Population:CharacterStats()
         return {

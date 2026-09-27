@@ -119,6 +119,7 @@ function normalizeFlavor(flavor) {
   if (f === "retail") return "retail";
   if (["classic-beta", "forever", "classicbeta"].includes(f)) return "classic-beta";
   if (["mop-classic", "mists-classic", "mop", "mists"].includes(f)) return "mop-classic";
+  if (["sod", "season-of-discovery"].includes(f)) return "sod";
   throw new Error(`unknown flavor: ${flavor}`);
 }
 
@@ -250,7 +251,9 @@ if (process.argv.includes("--sellers")) {
     const queries = Object.keys(sweep.queries || {}).sort((a, b) => Number(a) - Number(b)).map((k) => sweep.queries[k]);
     let cappedCount = 0;
     queries.forEach((q, i) => {
-      if (q.capped === true) cappedCount++;
+      // A census splits a capped query into children that cover it exactly
+      // (q.split); only caps left uncovered are real coverage gaps.
+      if (q.capped === true && q.split !== true) cappedCount++;
       sweepQueries.push([
         id, q.index || i + 1, q.t || 0, q.filter || "",
         q.observed || 0, q.total || q.observed || 0, q.capped === true,

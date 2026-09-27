@@ -60,6 +60,11 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
 | `/ml who <filter>` | Sample with a raw `/who` filter, e.g. `/ml who z-"Shattrath City"` |
+| `/ml census` | Start an adaptive census for this client + faction, or run its next query if one is active |
+| `/ml census next` | Run the census's next `/who` (bind it to a key with a macro); never starts a new census |
+| `/ml census start [budget]` / `stop` / `status` | Start (optional max query count, default 300), stop as partial, or print progress |
+| `/ml census profile` | Show the detected scan profile, its level backbone, and learned splits |
+| `/ml census forget` | Drop learned splits so the next census starts from the plain backbone |
 | `/ml sweep start [label]` | Start an explicit geographic collection sweep; subsequent `/ml who` results are attached to it |
 | `/ml sweep status` | Show the active sweep's query, character, and capped-query counts |
 | `/ml sweep complete` | Close the active sweep as complete after all intended queries finish |
@@ -159,7 +164,7 @@ The **Population** tab samples who is actually online. Press **Scan Population**
 (or `/ml who`) and MarketLens issues one `/who`, captures the returned roster,
 and aggregates it into **Class**, **Race**, an inferred **profession demand**
 ranking, and **unique/returning character** metrics. Click the crumb line to
-cycle those four views.
+cycle those views, plus the **Census** view (below).
 
 Blizzard's rules shape how this works, and MarketLens respects them:
 
@@ -200,6 +205,31 @@ metadata and one latest location observation per unique character within that
 sweep, separately from the lifetime character's latest-known zone. Historical
 population data from before this format remains valid but is not backfilled into
 fabricated sweeps.
+
+### Adaptive census
+
+**Start Census** on the Population tab, or `/ml census`, turns the scan button
+into **Run Next**. Each press sends exactly one `/who`. MarketLens decides which
+one from the result of the last:
+
+- It detects the scan profile from the client and your faction: Retail, WoW:
+  Forever beta, Classic Era, Hardcore, Season of Discovery, TBC Anniversary, or
+  MoP Classic, each × Alliance/Horde (`Population/CensusProfiles.lua`).
+- It starts from a coarse, **disjoint** level backbone, highest levels first.
+  Every online player matches exactly one backbone query.
+- A capped query is split into parts that cover it exactly. A level range splits
+  into narrower ranges, weighted by recent sightings. A range too dense per level
+  splits by class. A single level splits by class, then by race.
+- A cell still capped with level, class and race all pinned falls back to its
+  hottest zones. It then counts as **unresolved**, meaning the census is a lower
+  bound and its sweep closes as partial.
+- Every split is remembered per realm bucket for 14 days. The next census skips
+  straight to the parts instead of spending a press on a query it knows will cap.
+
+A census runs inside its own sweep, so the site gets the same geography and
+query data as a manual sweep. Capped queries that were fully split are marked
+`split` and don't count toward the sweep's capped (coverage-gap) total. State
+survives `/reload`. If a `/who` never answers, the next press retries it.
 
 The **inferred profession demand** ranking is a *heuristic*: it weights each
 observed class toward the crafting markets that class buys from (plate → Blacksmithing,

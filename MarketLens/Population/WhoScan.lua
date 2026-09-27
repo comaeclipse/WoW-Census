@@ -28,6 +28,7 @@ local SCAN_CAP = 1000   -- retained samples per realm (also purged by retention)
 
 Pop.pending = false
 Pop.lastSend = 0
+Pop.COOLDOWN = COOLDOWN
 
 -- API shims: C_FriendList (Classic/Retail) with legacy global fallbacks
 
@@ -176,8 +177,10 @@ function Pop:ProfessionDemand(agg)
 end
 
 -- Kick off one population sample. MUST be reached from a hardware event
--- (a button or slash-command press) or Blizzard drops the SendWho.
-function Pop:Scan(filter)
+-- (a button or slash-command press) or Blizzard drops the SendWho. `tag`
+-- rides along to POP_SCAN_COMPLETE so a caller (the census) can recognize its
+-- own result. Returns true when the query was actually sent.
+function Pop:Scan(filter, tag)
     filter = filter and filter:gsub("^%s+", ""):gsub("%s+$", "") or ""
     if filter == "" then
         local maxL = (GetMaxPlayerLevel and GetMaxPlayerLevel()) or 70
@@ -190,15 +193,16 @@ function Pop:Scan(filter)
     -- server (SendWho throttling) and let this press start a fresh one.
     if self.pending and now - self.lastSend < COOLDOWN then
         ML:Print("Population scan already in progress...")
-        return
+        return false
     end
     if now - self.lastSend < COOLDOWN then
         ML:Print("Population scans are throttled \226\128\148 wait a few seconds and retry.")
-        return
+        return false
     end
 
     self.pending = true
     self.pendingFilter = filter
+    self.pendingTag = tag
     local store = self:Store()
     self.pendingSweepID = store.activeSweepID
     self.lastSend = now
@@ -206,6 +210,12 @@ function Pop:Scan(filter)
     ML:Print("Population scan: |cffffffff%s|r ...", filter)
     ML:Fire("POP_SCAN_START", filter)
     sendWho(filter)
+    return true
+end
+
+-- Seconds until the client-side cooldown lets another SendWho through.
+function Pop:CooldownRemaining()
+    return math.max(COOLDOWN - (GetTime() - self.lastSend), 0)
 end
 
 -- Fold the current WHO_LIST results into a stored sample. Called on
@@ -252,9 +262,14 @@ function Pop:Capture()
     local unique = self:Record(sample, roster)
     self:RecordSweepQuery(sample, roster, self.pendingSweepID)
     self.pendingSweepID = nil
-    ML:Print("Sampled %d of %d online player(s); recorded %d unique character(s).",
-        observed, sample.total, unique)
-    ML:Fire("POP_SCAN_COMPLETE", sample)
+    local tag = self.pendingTag
+    self.pendingTag = nil
+    -- The server's "total" is capped alongside the list, so it never says how
+    -- many players really matched; flag the cap instead of quoting it.
+    ML:Print("%s: %d result(s)%s; recorded %d unique character(s).",
+        sample.filter or "", observed,
+        self:IsCapped(observed) and " |cffff8040(capped \226\128\148 more exist)|r" or "", unique)
+    ML:Fire("POP_SCAN_COMPLETE", sample, tag)
 end
 
 function Pop:Store()
@@ -270,7 +285,7 @@ end
 -- coverage merely because queries were run: the collector closes it as either
 -- complete or partial. Every query and its deduplicated character locations
 -- are retained independently of the lifetime/latest-known character table.
-function Pop:StartSweep(label)
+function Pop:StartSweep(label, quiet)
     local store = self:Store()
     if store.activeSweepID then
         self:FinishSweep("partial")
@@ -285,7 +300,9 @@ function Pop:StartSweep(label)
         queries = {}, observations = {},
     }
     store.activeSweepID = id
-    ML:Print("Started population sweep |cffffffff%s|r. Run /ml who filters, then /ml sweep complete or /ml sweep partial.", id)
+    if not quiet then
+        ML:Print("Started population sweep |cffffffff%s|r. Run /ml who filters, then /ml sweep complete or /ml sweep partial.", id)
+    end
     ML:Fire("POP_SWEEP_CHANGED", store.sweeps[id])
     return id
 end
@@ -336,7 +353,7 @@ function Pop:RecordSweepQuery(sample, roster, sweepID)
     sweep.queries[queryIndex] = {
         index = queryIndex, t = sample.t, filter = sample.filter,
         observed = sample.observed or 0, total = sample.total or sample.observed or 0,
-        capped = (sample.total or 0) > (sample.observed or 0) or (sample.observed or 0) >= 50,
+        capped = (sample.total or 0) > (sample.observed or 0) or self:IsCapped(sample.observed),
     }
     for key, seen in pairs(roster or {}) do
         sweep.observations[key] = {

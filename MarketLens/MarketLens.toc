@@ -34,6 +34,8 @@ Analytics/Saturation.lua
 Analytics/Scores.lua
 
 Population/WhoScan.lua
+Population/CensusProfiles.lua
+Population/Census.lua
 
 UI/MainFrame.lua
 UI/MarketTable.lua
