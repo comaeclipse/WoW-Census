@@ -225,7 +225,7 @@ if ($node -and (Test-Path $helper)) {
 if (-not $popJson) {
     Write-Host "No population data to rebuild from SavedVariables (probably no /who scan yet)." -ForegroundColor Yellow
 } else {
-    if ($pop -and $pop.type -in @("ml-pop-v1", "ml-pop-v2") -and $pop.samples) {
+    if ($pop -and $pop.type -in @("ml-pop-v1", "ml-pop-v2", "ml-pop-v3") -and $pop.samples) {
         $nSamples = ($pop.samples | Measure-Object).Count
         $nCharacters = if ($pop.characters) { ($pop.characters | Measure-Object).Count } else { 0 }
         if ($nSamples -gt 0 -or $nCharacters -gt 0) {
@@ -234,6 +234,9 @@ if (-not $popJson) {
                 $pr = Invoke-RestMethod -Uri $popUri -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($popJson)) -ContentType "application/json; charset=utf-8"
                 if ($pr.ok) {
                     Write-Host ("Imported {0} population sample(s) and {1} character(s) for {2}." -f $pr.samples, $pr.characters, $pr.realm) -ForegroundColor Green
+                    if ($null -ne $pr.sweeps) {
+                        Write-Host ("Sweeps: {0}, queries: {1}, location observations: {2}." -f $pr.sweeps, $pr.sweepQueries, $pr.locationObservations) -ForegroundColor Green
+                    }
                     Write-Host ("Population: {0}/pop?game=realm:{1}" -f $Url, [uri]::EscapeDataString($pr.realm))
                 } else {
                     Write-Host ("Population upload error: {0}" -f $pr.error) -ForegroundColor Yellow

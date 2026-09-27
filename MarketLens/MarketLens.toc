@@ -2,7 +2,7 @@
 ## Title: MarketLens
 ## Notes: Auction House market + population analytics for Classic Era, TBC Anniversary, and Retail
 ## Author: skarz
-## Version: 0.1.0
+## Version: 0.1.1
 ## SavedVariables: MarketLensDB
 ## X-Category: Auction House & Vendors
 

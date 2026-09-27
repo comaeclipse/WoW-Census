@@ -199,6 +199,8 @@ function Pop:Scan(filter)
 
     self.pending = true
     self.pendingFilter = filter
+    local store = self:Store()
+    self.pendingSweepID = store.activeSweepID
     self.lastSend = now
     setWhoToUi(true)
     ML:Print("Population scan: |cffffffff%s|r ...", filter)
@@ -248,6 +250,8 @@ function Pop:Capture()
         races    = races,
     }
     local unique = self:Record(sample, roster)
+    self:RecordSweepQuery(sample, roster, self.pendingSweepID)
+    self.pendingSweepID = nil
     ML:Print("Sampled %d of %d online player(s); recorded %d unique character(s).",
         observed, sample.total, unique)
     ML:Fire("POP_SCAN_COMPLETE", sample)
@@ -258,7 +262,90 @@ function Pop:Store()
     realm.population = realm.population or { samples = {}, characters = {} }
     realm.population.samples = realm.population.samples or {}
     realm.population.characters = realm.population.characters or {}
+    realm.population.sweeps = realm.population.sweeps or {}
     return realm.population
+end
+
+-- A sweep is an explicitly bounded collection session. It does not claim
+-- coverage merely because queries were run: the collector closes it as either
+-- complete or partial. Every query and its deduplicated character locations
+-- are retained independently of the lifetime/latest-known character table.
+function Pop:StartSweep(label)
+    local store = self:Store()
+    if store.activeSweepID then
+        self:FinishSweep("partial")
+        ML:Print("Previous active sweep was closed as partial.")
+    end
+    store.nextSweepSeq = (store.nextSweepSeq or 0) + 1
+    local started = time()
+    local id = tostring(started) .. "-" .. tostring(store.nextSweepSeq)
+    store.sweeps[id] = {
+        id = id, startedAt = started, completedAt = 0, status = "active",
+        label = trim(label), faction = UnitFactionGroup and UnitFactionGroup("player") or "Neutral",
+        queries = {}, observations = {},
+    }
+    store.activeSweepID = id
+    ML:Print("Started population sweep |cffffffff%s|r. Run /ml who filters, then /ml sweep complete or /ml sweep partial.", id)
+    ML:Fire("POP_SWEEP_CHANGED", store.sweeps[id])
+    return id
+end
+
+function Pop:FinishSweep(status)
+    local store = self:Store()
+    local id = store.activeSweepID
+    local sweep = id and store.sweeps[id]
+    if not sweep then
+        ML:Print("No population sweep is active.")
+        return nil
+    end
+    status = status == "complete" and "complete" or "partial"
+    sweep.status = status
+    sweep.completedAt = time()
+    store.activeSweepID = nil
+    local chars = 0
+    for _ in pairs(sweep.observations or {}) do chars = chars + 1 end
+    ML:Print("Closed sweep |cffffffff%s|r as %s: %d queries, %d unique characters.",
+        id, status, #(sweep.queries or {}), chars)
+    ML:Fire("POP_SWEEP_CHANGED", sweep)
+    return sweep
+end
+
+function Pop:SweepStatus()
+    local store = self:Store()
+    local sweep = store.activeSweepID and store.sweeps[store.activeSweepID]
+    if not sweep then
+        ML:Print("No population sweep is active.")
+        return nil
+    end
+    local chars, capped = 0, 0
+    for _ in pairs(sweep.observations or {}) do chars = chars + 1 end
+    for _, q in ipairs(sweep.queries or {}) do if q.capped then capped = capped + 1 end end
+    ML:Print("Sweep %s: %d queries, %d unique characters, %d capped queries.",
+        sweep.id, #(sweep.queries or {}), chars, capped)
+    return sweep
+end
+
+function Pop:RecordSweepQuery(sample, roster, sweepID)
+    if not sweepID then return end
+    local store = self:Store()
+    local sweep = store.sweeps[sweepID]
+    if not sweep or sweep.status ~= "active" then return end
+    sweep.queries = sweep.queries or {}
+    sweep.observations = sweep.observations or {}
+    local queryIndex = #sweep.queries + 1
+    sweep.queries[queryIndex] = {
+        index = queryIndex, t = sample.t, filter = sample.filter,
+        observed = sample.observed or 0, total = sample.total or sample.observed or 0,
+        capped = (sample.total or 0) > (sample.observed or 0) or (sample.observed or 0) >= 50,
+    }
+    for key, seen in pairs(roster or {}) do
+        sweep.observations[key] = {
+            key = key, queryIndex = queryIndex, observedAt = sample.t,
+            zone = seen.zone or "", level = seen.level or 0,
+            classFile = seen.classFile or "", race = seen.race or "",
+        }
+    end
+    ML:Fire("POP_SWEEP_CHANGED", sweep)
 end
 
 function Pop:Record(sample, roster)
@@ -308,6 +395,10 @@ function Pop:Purge()
         for day in pairs(c.days or {}) do
             if (tonumber(day) or 0) < cutoffDay then c.days[day] = nil end
         end
+    end
+    for id, sweep in pairs(store.sweeps or {}) do
+        local ended = sweep.completedAt or sweep.startedAt or 0
+        if sweep.status ~= "active" and ended < cutoff then store.sweeps[id] = nil end
     end
     return removed
 end

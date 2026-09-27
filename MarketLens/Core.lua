@@ -5,7 +5,7 @@ MarketLens = MarketLens or {}
 local ML = MarketLens
 
 ML.ADDON = ADDON
-ML.VERSION = "0.1.0"
+ML.VERSION = "0.1.1"
 ML.DB_VERSION = 3
 
 -- Modules populate these tables as their files load (see .toc order).
@@ -185,13 +185,46 @@ function ML:BuildPopExport()
             end
         end
     end
+    local sweeps, sweepQueries, locationObservations = {}, {}, {}
+    if pop and pop.sweeps then
+        for id, sweep in pairs(pop.sweeps) do
+            local queryCount, cappedCount = 0, 0
+            for _, q in ipairs(sweep.queries or {}) do
+                queryCount = queryCount + 1
+                if q.capped then cappedCount = cappedCount + 1 end
+                sweepQueries[#sweepQueries + 1] = string.format(
+                    '[%s,%d,%d,%s,%d,%d,%s]', jstr(id), q.index or queryCount,
+                    q.t or 0, jstr(q.filter), q.observed or 0, q.total or q.observed or 0,
+                    q.capped and "true" or "false")
+            end
+            local characterCount = 0
+            for key, o in pairs(sweep.observations or {}) do
+                characterCount = characterCount + 1
+                locationObservations[#locationObservations + 1] = string.format(
+                    '[%s,%s,%d,%d,%s,%d,%s,%s]', jstr(id), jstr(key),
+                    o.queryIndex or 0, o.observedAt or 0, jstr(o.zone), o.level or 0,
+                    jstr(o.classFile), jstr(o.race))
+            end
+            sweeps[#sweeps + 1] = string.format(
+                '{"id":%s,"startedAt":%d,"completedAt":%d,"status":%s,"label":%s,"faction":%s,"queryCount":%d,"characterCount":%d,"cappedCount":%d}',
+                jstr(id), sweep.startedAt or 0, sweep.completedAt or 0,
+                jstr(sweep.status or "partial"), jstr(sweep.label), jstr(sweep.faction),
+                queryCount, characterCount, cappedCount)
+        end
+    end
     table.sort(characters)
     table.sort(observations)
-    return '{"type":"ml-pop-v2","realm":' .. jstr(self:RealmKey())
+    table.sort(sweeps)
+    table.sort(sweepQueries)
+    table.sort(locationObservations)
+    return '{"type":"ml-pop-v3","realm":' .. jstr(self:RealmKey())
         .. ',"flavor":' .. jstr(self:GameFlavor())
         .. ',"exportedAt":' .. time() .. ',"samples":[' .. table.concat(samples, ",")
         .. '],"characters":[' .. table.concat(characters, ",")
-        .. '],"observations":[' .. table.concat(observations, ",") .. "]}"
+        .. '],"observations":[' .. table.concat(observations, ",")
+        .. '],"sweeps":[' .. table.concat(sweeps, ",")
+        .. '],"sweepQueries":[' .. table.concat(sweepQueries, ",")
+        .. '],"locationObservations":[' .. table.concat(locationObservations, ",") .. "]}"
 end
 
 -- Refresh both on-disk export strings so the companion uploader can read them.
@@ -218,6 +251,7 @@ boot:SetScript("OnEvent", function(_, event, arg1)
         -- Keep the on-disk exports fresh after each scan (flushed on logout/reload).
         ML:On("SCAN_COMPLETE", function() ML:RefreshExports() end)
         ML:On("POP_SCAN_COMPLETE", function() ML:RefreshExports() end)
+        ML:On("POP_SWEEP_CHANGED", function() ML:RefreshExports() end)
         ML:Print("v%s loaded. Type |cffffff00/ml|r to open, |cffffff00/ml scan|r at the AH.", ML.VERSION)
     elseif event == "PLAYER_LOGOUT" then
         -- Stash fresh single-line JSON exports into SavedVariables so the
@@ -257,6 +291,15 @@ SlashCmdList["MARKETLENS"] = function(msg)
         ML.Population:Scan(raw:sub(4))
     elseif msg == "zones" then
         if ML.Population.DumpZones then ML.Population:DumpZones() end
+    elseif msg == "sweep start" or msg:match("^sweep start%s+") then
+        local label = raw:match("^[Ss][Ww][Ee][Ee][Pp]%s+[Ss][Tt][Aa][Rr][Tt]%s*(.*)$") or ""
+        ML.Population:StartSweep(label)
+    elseif msg == "sweep complete" then
+        ML.Population:FinishSweep("complete")
+    elseif msg == "sweep partial" then
+        ML.Population:FinishSweep("partial")
+    elseif msg == "sweep status" then
+        ML.Population:SweepStatus()
     elseif msg == "purge" then
         local snaps = ML.Snapshots:Purge()
         local pops  = ML.Population:Purge()

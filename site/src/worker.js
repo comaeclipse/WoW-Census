@@ -826,8 +826,8 @@ async function importPop(url, env, req) {
   let body;
   try { body = await req.json(); } catch (e) { return json({ error: "invalid json" }); }
   if (hasInvalidEncoding(body)) return json({ error: "Invalid text encoding. Update the uploader and send UTF-8 JSON." }, 0, 400);
-  if (!body || !["ml-pop-v1", "ml-pop-v2"].includes(body.type) || !body.realm || !Array.isArray(body.samples))
-    return json({ error: "expected an ml-pop-v1 or ml-pop-v2 population export" });
+  if (!body || !["ml-pop-v1", "ml-pop-v2", "ml-pop-v3"].includes(body.type) || !body.realm || !Array.isArray(body.samples))
+    return json({ error: "expected an ml-pop-v1, ml-pop-v2, or ml-pop-v3 population export" });
   const game = "realm:" + body.realm;
   let sourceGame = sourceGameKey(body.flavor);
   if (!sourceGame) {
@@ -878,6 +878,49 @@ async function importPop(url, env, req) {
       first_seen=MIN(character_observations.first_seen,excluded.first_seen),
       last_seen=MAX(character_observations.last_seen,excluded.last_seen)`).run();
   }
+
+  const sweepRows = [];
+  for (const s of (body.sweeps || [])) {
+    if (!s || !s.id || !s.startedAt || !["active", "complete", "partial"].includes(s.status)) continue;
+    sweepRows.push([game, sourceGame, String(s.id), s.startedAt, s.completedAt || null,
+      s.status, s.label || "", s.faction || "", s.queryCount || 0,
+      s.characterCount || 0, s.cappedCount || 0]);
+  }
+  for (let i = 0; i < sweepRows.length; i += 50) {
+    const values = sweepRows.slice(i, i + 50).map((r) => "(" + r.map(sqlVal).join(",") + ")").join(",");
+    await env.DB.prepare(`INSERT INTO population_sweeps
+      (game,source_game,sweep_id,started_at,completed_at,status,label,faction,query_count,character_count,capped_count)
+      VALUES ${values} ON CONFLICT(game,source_game,sweep_id) DO UPDATE SET
+      started_at=MIN(population_sweeps.started_at,excluded.started_at),
+      completed_at=MAX(COALESCE(population_sweeps.completed_at,0),COALESCE(excluded.completed_at,0)),
+      status=CASE
+        WHEN population_sweeps.status IN ('complete','partial') THEN population_sweeps.status
+        ELSE excluded.status END,
+      label=excluded.label,faction=excluded.faction,
+      query_count=MAX(population_sweeps.query_count,excluded.query_count),
+      character_count=MAX(population_sweeps.character_count,excluded.character_count),
+      capped_count=MAX(population_sweeps.capped_count,excluded.capped_count)`).run();
+  }
+
+  const sweepQueryRows = [];
+  for (const q of (body.sweepQueries || [])) {
+    if (!Array.isArray(q) || !q[0] || !q[1] || !q[2]) continue;
+    sweepQueryRows.push([game, sourceGame, String(q[0]), q[1], q[2], q[3] || "",
+      q[4] || 0, q[5] || q[4] || 0, q[6] === true ? 1 : 0]);
+  }
+  if (sweepQueryRows.length) await bulkInsert(env.DB, "population_sweep_queries",
+    ["game","source_game","sweep_id","query_index","observed_at","filter","observed","total","capped"],
+    sweepQueryRows, 70);
+
+  const locationRows = [];
+  for (const o of (body.locationObservations || [])) {
+    if (!Array.isArray(o) || !o[0] || !o[1] || !o[3]) continue;
+    locationRows.push([game, sourceGame, String(o[0]), normalizeCharacterKey(o[1], sourceGame),
+      o[2] || 0, o[3], o[4] || "", o[5] || 0, o[6] || "", o[7] || ""]);
+  }
+  if (locationRows.length) await bulkInsert(env.DB, "character_location_observations",
+    ["game","source_game","sweep_id","character_key","query_index","observed_at","zone","level","class_file","race"],
+    locationRows, 60);
   await env.DB.prepare(
     `INSERT INTO datasets (game, source_game, updated_at)
      VALUES (?, ?, ?)
@@ -887,7 +930,9 @@ async function importPop(url, env, req) {
   ).bind(game, sourceGame, new Date().toISOString()).run();
   if (!rows.length && !characterRows.length) return json({ error: "no population data in export" });
   return json({ ok: true, realm: body.realm, sourceGame, samples: rows.length,
-    characters: characterRows.length, observations: observationRows.length });
+    characters: characterRows.length, observations: observationRows.length,
+    sweeps: sweepRows.length, sweepQueries: sweepQueryRows.length,
+    locationObservations: locationRows.length });
 }
 
 // Import a realm's seller profiles (ml-sellers-v1). Owner names come only from

@@ -60,6 +60,10 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
 | `/ml who <filter>` | Sample with a raw `/who` filter, e.g. `/ml who z-"Shattrath City"` |
+| `/ml sweep start [label]` | Start an explicit geographic collection sweep; subsequent `/ml who` results are attached to it |
+| `/ml sweep status` | Show the active sweep's query, character, and capped-query counts |
+| `/ml sweep complete` | Close the active sweep as complete after all intended queries finish |
+| `/ml sweep partial` | Close an interrupted or incomplete sweep without presenting it as complete |
 | `/ml purge` | Drop snapshots / population samples older than the retention window |
 | `/ml debug` | Toggle debug logging |
 | `/ml reset` | Wipe the database |
@@ -175,6 +179,27 @@ time. `first_seen`, `last_seen`, lifetime sighting count, and a rolling 35-day
 daily observation history accumulate independently for Classic Era,
 TBC Anniversary, and Retail. This supports unique-today/7-day/30-day, new,
 returning, 3+-active-day, and returning-character-rate metrics.
+
+For comparable geography collection, wrap a deliberate set of `/who` queries in
+an explicit sweep:
+
+```text
+/ml sweep start retail-evening
+/ml who z-"Dornogal"
+/ml who z-"Stormwind City"
+...run the rest of the intended filters...
+/ml sweep complete
+```
+
+Wait for each query's result before issuing the next. Use `/ml sweep partial`
+when the intended query set was interrupted or could not be finished. A result
+at or above the server cap is recorded as capped; closing a sweep as complete
+does not conceal capped queries. Starting another sweep while one is active
+automatically closes the older one as partial. Each sweep retains its query
+metadata and one latest location observation per unique character within that
+sweep, separately from the lifetime character's latest-known zone. Historical
+population data from before this format remains valid but is not backfilled into
+fabricated sweeps.
 
 The **inferred profession demand** ranking is a *heuristic*: it weights each
 observed class toward the crafting markets that class buys from (plate → Blacksmithing,

@@ -243,10 +243,37 @@ if (process.argv.includes("--sellers")) {
       observations.push([key, Number(day), d.count || 0, d.firstSeen || 0, d.lastSeen || 0]);
     }
   }
+  const sweeps = [];
+  const sweepQueries = [];
+  const locationObservations = [];
+  for (const [id, sweep] of Object.entries((realm.population && realm.population.sweeps) || {})) {
+    const queries = Object.keys(sweep.queries || {}).sort((a, b) => Number(a) - Number(b)).map((k) => sweep.queries[k]);
+    let cappedCount = 0;
+    queries.forEach((q, i) => {
+      if (q.capped === true) cappedCount++;
+      sweepQueries.push([
+        id, q.index || i + 1, q.t || 0, q.filter || "",
+        q.observed || 0, q.total || q.observed || 0, q.capped === true,
+      ]);
+    });
+    const observed = Object.entries(sweep.observations || {});
+    for (const [key, o] of observed) {
+      locationObservations.push([
+        id, key, o.queryIndex || 0, o.observedAt || 0, o.zone || "",
+        o.level || 0, o.classFile || "", o.race || "",
+      ]);
+    }
+    sweeps.push({
+      id, startedAt: sweep.startedAt || 0, completedAt: sweep.completedAt || 0,
+      status: sweep.status || "partial", label: sweep.label || "", faction: sweep.faction || "",
+      queryCount: queries.length, characterCount: observed.length, cappedCount,
+    });
+  }
   if (!samples.length && !characters.length) throw new Error("population export contains zero data");
   process.stdout.write(JSON.stringify({
-    type: "ml-pop-v2", realm: realmName, flavor,
+    type: "ml-pop-v3", realm: realmName, flavor,
     exportedAt: Math.floor(Date.now() / 1000), samples, characters, observations,
+    sweeps, sweepQueries, locationObservations,
   }));
 } else {
   if (!Object.keys(items).length) throw new Error("realm export contains zero items");
