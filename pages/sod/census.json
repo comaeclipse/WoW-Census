@@ -1,0 +1,61 @@
+{
+  "groups": [
+    {
+      "faction": "Horde",
+      "races": {
+        "Orc": 48,
+        "Tauren": 23,
+        "Troll": 23,
+        "Undead": 34
+      },
+      "classes": {
+        "HUNTER": 25,
+        "ROGUE": 7,
+        "SHAMAN": 29,
+        "WARLOCK": 16,
+        "WARRIOR": 16,
+        "DRUID": 11,
+        "MAGE": 14,
+        "PRIEST": 10
+      },
+      "characters": 128,
+      "samples": 13,
+      "observed": 210,
+      "games": [
+        "realm:Wild Growth-Horde"
+      ]
+    }
+  ],
+  "units": [
+    {
+      "game": "realm:Wild Growth-Horde",
+      "realm": "Wild Growth",
+      "faction": "Horde",
+      "races": {
+        "Orc": 48,
+        "Tauren": 23,
+        "Troll": 23,
+        "Undead": 34
+      },
+      "classes": {
+        "HUNTER": 25,
+        "ROGUE": 7,
+        "SHAMAN": 29,
+        "WARLOCK": 16,
+        "WARRIOR": 16,
+        "DRUID": 11,
+        "MAGE": 14,
+        "PRIEST": 10
+      },
+      "zoneCharacters": 128,
+      "characters": 128,
+      "samples": 13,
+      "observed": 210
+    }
+  ],
+  "realms": [
+    "Wild Growth"
+  ],
+  "lastT": 1790531206,
+  "zoneWindowDays": 30
+}

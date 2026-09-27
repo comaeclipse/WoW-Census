@@ -32,6 +32,7 @@ const editions = {
   "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", scope: "Beta realms", flavor: "classic-beta", branch: "forever" },
   "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", scope: "Anniversary realms", flavor: "tbc-anniversary", branch: "tbc" },
   classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", scope: "Classic Era realms", flavor: "classic-era", branch: "classic" },
+  sod: { dir: "pages/sod", label: "Season of Discovery", nav: "SoD", scope: "Season of Discovery realms", flavor: "sod", branch: "classic" },
   "mop-classic": { dir: "pages/mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", scope: "MoP Classic realms", flavor: "mop-classic", branch: "mop-classic" },
   retail: { dir: "pages/retail", label: "Retail", nav: "Retail", scope: "Retail realms", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity" },
 };

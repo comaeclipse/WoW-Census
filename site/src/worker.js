@@ -22,6 +22,7 @@ const GAMES = {
   "retail":              { label: "Retail" },
   "classic-beta":        { label: "Forever (Beta)" },
   "mop-classic":         { label: "Mists of Pandaria Classic" },
+  "sod":                 { label: "Season of Discovery" },
 };
 const DEFAULT_GAME = "classic-progression";
 const ITEMS_CACHE_VERSION = 18;
@@ -38,13 +39,14 @@ function sourceGameKey(flavor) {
     return "classic-beta";
   if (f === "mop-classic" || f === "mists-classic" || f === "mop" || f === "mists")
     return "mop-classic";
+  if (f === "sod" || f === "season-of-discovery") return "sod";
   return null;
 }
 
 // Wowhead site branch per source flavor (empty = retail). Mirrors app.js's
 // WH_BRANCH map so region and realm-upload links agree on which Wowhead
 // branch resolves an item's icon/tooltip/rename data.
-const WH_BRANCH = { "classic-progression": "tbc", "classic": "classic", "retail": "", "classic-beta": "forever" };
+const WH_BRANCH = { "classic-progression": "tbc", "classic": "classic", "retail": "", "classic-beta": "forever", "sod": "classic" };
 function whBranchFor(sourceGame) { return WH_BRANCH[sourceGame] != null ? WH_BRANCH[sourceGame] : "tbc"; }
 
 // Column order for the packed /api/items rows. Emitted in the response as
@@ -95,6 +97,7 @@ function bnetNamespaceForGame(game) {
     return "dynamic-classicann-us";
   const g = sourceGameKey(game) || game;
   if (g === "classic") return "dynamic-classic1x-us";
+  if (g === "sod") return "dynamic-classic1x-us"; // SoD runs on the Era (1.x) client
   if (g === "mop-classic") return "dynamic-classic-us";
   if (g === "classic-progression") return "dynamic-classic-us";
   return "dynamic-us";
@@ -106,6 +109,7 @@ function bnetStaticNamespaceForGame(game) {
     return "static-classicann-us";
   const g = sourceGameKey(game) || game;
   if (g === "classic") return "static-classic1x-us";
+  if (g === "sod") return "static-classic1x-us";
   if (g === "mop-classic") return "static-classic-us";
   if (g === "classic-progression") return "static-classic-us";
   return "static-us";
@@ -341,6 +345,9 @@ function itemStaticNamespaces(sourceGame) {
   // namespace, so fall back to Era and Retail for those few historical IDs.
   if (sourceGame === "mop-classic") return ["static-classic-us", "static-classic1x-us", "static-us"];
   if (sourceGame === "classic-beta") return ["static-us", "static-classic1x-us"]; // Forever (Beta)
+  // Season of Discovery runs on the Era client but adds its own item ids;
+  // which namespace carries them is unverified, so try each in turn.
+  if (sourceGame === "sod") return ["static-classic1x-us", "static-classic-us", "static-us"];
   return ["static-us"]; // retail
 }
 
@@ -1250,7 +1257,7 @@ async function popChooserPage(env) {
      GROUP BY p.game ORDER BY obs DESC`
   ).all()).results;
 
-  const order = ["mop-classic", "classic-progression", "classic", "retail", "classic-beta"];
+  const order = ["mop-classic", "classic-progression", "classic", "sod", "retail", "classic-beta"];
   const groups = new Map();
   for (const r of rows) {
     const src = GAMES[r.src] ? r.src : "other";
@@ -1606,7 +1613,7 @@ async function apiForever(env) {
 
 async function apiCensus(url, env) {
   const sourceGame = url.searchParams.get("source") || "classic-beta";
-  if (!["classic-beta", "classic-progression", "classic", "retail", "mop-classic"].includes(sourceGame))
+  if (!["classic-beta", "classic-progression", "classic", "retail", "mop-classic", "sod"].includes(sourceGame))
     return json({ error: "unknown source game" }, 400);
   return json(await loadCensus(env, sourceGame), 300);
 }
