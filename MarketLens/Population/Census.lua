@@ -473,19 +473,16 @@ function C:Start(budget)
         prof.label, prof.faction, #st.queue,
         st.preSplit > 0 and string.format(" (%d pre-split from earlier runs)", st.preSplit) or "")
     ML:Fire("CENSUS_CHANGED")
+    self:PromptNext()
 end
 
--- Must be reached from a hardware event (button click or slash command).
-function C:RunNext()
-    local st = self:State()
-    if not st then
-        ML:Print("No census is running -- |cffffff00/ml census start|r.")
-        return
-    end
+-- Get the queue ready for its next send. Returns the next node, or nil when
+-- the last /who is still in flight (quiet=false prints why).
+function C:Settle(st, quiet)
     if st.inflight then
         if Pop.pending and GetTime() - Pop.lastSend < Pop.COOLDOWN then
-            ML:Print("Still waiting on the last /who...")
-            return
+            if not quiet then ML:Print("Still waiting on the last /who...") end
+            return nil
         end
         -- No WHO_LIST_UPDATE came back (throttled or a /reload): retry it.
         table.insert(st.queue, 1, st.inflight)
@@ -496,13 +493,93 @@ function C:RunNext()
     -- before the Forever beta cap was pinned).
     local maxL = self:Profile().maxLevel
     while st.queue[1] and st.queue[1].lo > maxL do table.remove(st.queue, 1) end
-    local n = st.queue[1]
-    if not n then self:Finish(); return end
-    if Pop:Scan(self:Filter(n), "census") then
-        table.remove(st.queue, 1)
-        st.inflight = n
-        ML:Fire("CENSUS_CHANGED")
+    return st.queue[1]
+end
+
+local function trim(s) return (tostring(s or ""):gsub("^%s+", ""):gsub("%s+$", "")) end
+
+-- Some clients (the Forever beta) block SendWho from the census's own code
+-- path but allow it when the filter arrives as a typed /ml who. In chat mode,
+-- Run Next types the next query into the chat box; the player sends it with
+-- Enter, and TryChatQuery recognizes it as the census step.
+function C:ViaChat()
+    return ML.db.settings.censusViaChat
+end
+
+function C:SetViaChat(on)
+    ML.db.settings.censusViaChat = on or nil
+    ML:Print("Census chat mode %s.", on
+        and "|cff40c040on|r -- press Enter on each /ml who the census types for you"
+        or "off -- Run Next sends queries directly")
+    if on then self:PromptNext() end
+    ML:Fire("CENSUS_CHANGED")
+end
+
+-- Put the next census query into the chat box once the cooldown allows it.
+function C:PromptNext()
+    local st = self:State()
+    if not st or not self:ViaChat() then return end
+    local n = self:Settle(st, true)
+    if not n then return end
+    local filter = self:Filter(n)
+    C_Timer.After(Pop:CooldownRemaining(), function()
+        local s = self:State()
+        if not s or s.inflight or not s.queue[1] or self:Filter(s.queue[1]) ~= filter then return end
+        local open = ChatFrame_OpenChat or (ChatFrameUtil and ChatFrameUtil.OpenChat)
+        if open then
+            open("/ml who " .. filter)
+        else
+            ML:Print("Next: |cffffff00/ml who %s|r", filter)
+        end
+    end)
+end
+
+-- A typed /ml who: if it is the census's next query, run it as that step.
+-- Returns true when the census took it.
+function C:TryChatQuery(filter)
+    local st = self:State()
+    if not st then return false end
+    filter = trim(filter)
+    local n = self:Settle(st, true)
+    if not n or self:Filter(n) ~= filter then return false end
+    self:Send(st, n, filter)
+    return true
+end
+
+-- Mark the node in flight BEFORE sending: a refused SendWho raises
+-- ADDON_ACTION_BLOCKED during the call itself, and its handler must find the
+-- query to put it back.
+function C:Send(st, n, filter)
+    table.remove(st.queue, 1)
+    st.inflight = n
+    if not Pop:Scan(filter, "census") and st.inflight == n then
+        -- Not sent (client cooldown): leave it next in line.
+        table.insert(st.queue, 1, n)
+        st.inflight = nil
+        return
     end
+    ML:Fire("CENSUS_CHANGED")
+end
+
+-- Must be reached from a hardware event (button click or slash command).
+function C:RunNext()
+    local st = self:State()
+    if not st then
+        ML:Print("No census is running -- |cffffff00/ml census start|r.")
+        return
+    end
+    if self:ViaChat() then
+        -- Nothing to send from here: type the query in for the player.
+        ML:Print("Census is in chat mode: press Enter on the /ml who it types for you (/ml census chat off to disable).")
+        self:PromptNext()
+        return
+    end
+    local n = self:Settle(st)
+    if not n then
+        if not st.inflight then self:Finish() end
+        return
+    end
+    self:Send(st, n, self:Filter(n))
 end
 
 function C:OnScanComplete(sample, tag)
@@ -551,6 +628,7 @@ function C:OnScanComplete(sample, tag)
         self:Finish()
     else
         ML:Fire("CENSUS_CHANGED")
+        self:PromptNext()
     end
 end
 
@@ -650,11 +728,13 @@ end
 
 ML:On("POP_SCAN_COMPLETE", function(sample, tag) C:OnScanComplete(sample, tag) end)
 
--- The client refused to send our /who: put the query back at the front.
+-- The client refused to send our /who: put the query back at the front, and
+-- switch to chat mode, the path this client does accept.
 ML:On("POP_SCAN_FAILED", function(_, tag)
     local st = C:State()
     if tag ~= "census" or not st or not st.inflight then return end
     table.insert(st.queue, 1, st.inflight)
     st.inflight = nil
     ML:Fire("CENSUS_CHANGED")
+    if C:ViaChat() then C:PromptNext() else C:SetViaChat(true) end
 end)

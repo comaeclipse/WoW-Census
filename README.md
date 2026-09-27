@@ -65,6 +65,7 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml census start [budget]` / `stop` / `status` | Start (optional max query count, default 300), stop as partial, or print progress |
 | `/ml census profile` | Show the detected scan profile, its level backbone, and learned splits |
 | `/ml census cap <n>` / `auto` | Forever beta: pin the census level cap (default: the level the population has piled up at) |
+| `/ml census chat on` / `off` | Chat mode: the census types each `/ml who <filter>` into chat for you to send with Enter. Turns on automatically if the client blocks the census's own `/who` (the Forever beta does) |
 | `/ml census forget` | Drop learned splits so the next census starts from the plain backbone |
 | `/ml sweep start [label]` | Start an explicit geographic collection sweep; subsequent `/ml who` results are attached to it |
 | `/ml sweep status` | Show the active sweep's query, character, and capped-query counts |

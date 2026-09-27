@@ -289,7 +289,9 @@ SlashCmdList["MARKETLENS"] = function(msg)
         if ML.Scanner.StartReplicate then ML.Scanner:StartReplicate() end
     elseif msg == "who" or msg:match("^who%s") then
         -- Slash execution is a hardware event, so SendWho is allowed here.
-        ML.Population:Scan(raw:sub(4))
+        -- A typed query matching the census's next step runs as that step.
+        local filter = raw:sub(4)
+        if not ML.Population.Census:TryChatQuery(filter) then ML.Population:Scan(filter) end
     elseif msg == "census" then
         local C = ML.Population.Census
         if C:IsActive() then C:RunNext() else C:Start() end
@@ -307,6 +309,8 @@ SlashCmdList["MARKETLENS"] = function(msg)
         ML.Population.Census:Status()
     elseif msg == "census profile" then
         ML.Population.Census:PrintProfile()
+    elseif msg == "census chat on" or msg == "census chat off" then
+        ML.Population.Census:SetViaChat(msg == "census chat on")
     elseif msg:match("^census cap%s") then
         -- Forever beta: pin the census to the current level cap (or "auto").
         local n = tonumber(msg:match("^census cap%s+(%d+)$"))
