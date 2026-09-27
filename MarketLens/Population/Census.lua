@@ -33,6 +33,7 @@ local HISTORY_DAYS = 7     -- recent-sighting window used to weight splits and p
 local LEARN_DAYS = 14      -- how long a learned "this cell caps" split is trusted
 local ZONE_SPLITS = 6      -- hotspot zones tried for a fully-pinned capped cell
 local DEFAULT_BUDGET = 300 -- max queries a single census may plan
+local MERGE_TARGET = 40    -- merge learned level parts while their last counts sum under this
 local MAX_PRESPLIT_DEPTH = 8 -- level -> class -> level -> race chains, with room for nested level splits
 
 -- Node helpers. A node is { lo=, hi=, class=token?, race=?, zone=? }.
@@ -57,6 +58,7 @@ end
 function C:State()
     local store = Pop:Store()
     store.censusLearned = store.censusLearned or {}
+    store.censusSeen = store.censusSeen or {} -- last uncapped count per node, for Compact
     return store.census, store
 end
 
@@ -119,7 +121,7 @@ end
 -- Split a capped level range into k contiguous parts of roughly equal recent
 -- weight, k sized so each part lands near TARGET; without a calibrated
 -- estimate we just halve. Class/race pins carry over to the parts.
-function C:SplitLevels(n, st)
+function C:SplitLevels(n, st, known)
     local width = n.hi - n.lo + 1
     local counts = {}
     for _, c in ipairs(self:History().recent) do
@@ -136,7 +138,7 @@ function C:SplitLevels(n, st)
     end
 
     local k = 2
-    local est = self:Estimate(n, st)
+    local est = known or self:Estimate(n, st)
     if width <= 3 then
         k = width
     elseif est then
@@ -228,10 +230,22 @@ end
 -- Which dimension to split a capped node on. A wide level range whose levels
 -- would each overflow on their own is split by class first: that keeps leaves
 -- near TARGET instead of shattering every level into near-empty class cells.
+--
+-- Returns the kind plus, when known, the node's true online count (the sum of
+-- its children's last results), which SplitLevels uses instead of an estimate.
 function C:SplitKind(n, st)
     local learned = self:Learned(n)
-    if learned and learned.kind then return learned.kind end
     local width = n.hi - n.lo + 1
+    if learned and learned.kind == "class" and width > 1 then
+        -- The first split was chosen from an estimate. Now that the class
+        -- children have run, their sum is the range's real size: if the levels
+        -- fit under the cap on their own, a level split is far cheaper (87-88
+        -- took 11 class queries of 1-7 players; 87 + 88 would have taken 2).
+        local total = self:ChildSum(n)
+        if total and total / width <= self:Profile().capAt * 0.8 then return "level", total end
+        return "class"
+    end
+    if learned and learned.kind then return learned.kind end
     if width > 1 then
         if not n.class then
             local est = self:Estimate(n, st)
@@ -249,7 +263,7 @@ end
 -- split kind (stored so the next census can replay the identical split).
 function C:Children(n, st)
     local prof = self:Profile()
-    local kind = self:SplitKind(n, st)
+    local kind, total = self:SplitKind(n, st)
     local kids = {}
     if kind == "level" then
         local learned = self:Learned(n)
@@ -257,8 +271,11 @@ function C:Children(n, st)
             for i = 1, #learned.levels, 2 do
                 kids[#kids + 1] = { lo = learned.levels[i], hi = learned.levels[i + 1], class = n.class, race = n.race }
             end
+            kids = self:Compact(n, learned, kids)
         else
-            kids = self:SplitLevels(n, st)
+            kids = self:SplitLevels(n, st, total)
+            -- Switched from a learned class split: persist the new plan.
+            if learned then self:Learn(n, kind, kids) end
         end
         return kids, true, kind
     elseif kind == "class" then
@@ -278,6 +295,63 @@ function C:Children(n, st)
         return kids, false, kind
     end
     return kids, false, nil
+end
+
+-- Sum of the class children's last results: the node's real online count.
+-- nil unless every child has a fresh result and none of them still caps.
+function C:ChildSum(n)
+    local _, store = self:State()
+    local cutoff = time() - LEARN_DAYS * 86400
+    local total = 0
+    for _, token in ipairs(self:Profile().classes) do
+        local k = { lo = n.lo, hi = n.hi, class = token }
+        if self:Learned(k) then return nil end
+        local s = store.censusSeen[nodeKey(k)]
+        if not s or s.t < cutoff then return nil end
+        total = total + s.n
+    end
+    return total
+end
+
+-- Merge adjacent parts of a learned level split whose last results together
+-- fit comfortably under the cap. A first split sized from estimates is often
+-- finer than needed (60-69 went to five parts averaging 15); this lets the
+-- next census use the real counts. The merged partition is saved back, and a
+-- part that later overflows is simply split again.
+function C:Compact(n, learned, kids)
+    local _, store = self:State()
+    local cutoff = time() - LEARN_DAYS * 86400
+    local function count(k)
+        if self:Learned(k) then return nil end -- still caps: never merge it
+        local s = store.censusSeen[nodeKey(k)]
+        return s and s.t >= cutoff and s.n or nil
+    end
+    local out, cur, curN, curT = {}, nil, nil, nil
+    local function flush()
+        if not cur then return end
+        out[#out + 1] = cur
+        if curN then store.censusSeen[nodeKey(cur)] = { t = curT, n = curN } end
+    end
+    for _, k in ipairs(kids) do
+        local c = count(k)
+        local t = c and store.censusSeen[nodeKey(k)].t
+        if cur and curN and c and curN + c <= MERGE_TARGET then
+            cur = { lo = cur.lo, hi = k.hi, class = n.class, race = n.race }
+            curN, curT = curN + c, math.min(curT, t)
+        else
+            flush()
+            cur, curN, curT = k, c, t
+        end
+    end
+    flush()
+    if #out < #kids then
+        learned.levels = {}
+        for _, k in ipairs(out) do
+            learned.levels[#learned.levels + 1] = k.lo
+            learned.levels[#learned.levels + 1] = k.hi
+        end
+    end
+    return out
 end
 
 -- Remember that a node caps and exactly how it was split.
@@ -331,6 +405,36 @@ function C:PurgeLearned()
     for key, e in pairs(store.censusLearned) do
         if type(e) ~= "table" or (e.t or 0) < cutoff then store.censusLearned[key] = nil end
     end
+    for key, s in pairs(store.censusSeen) do
+        if (s.t or 0) < cutoff then store.censusSeen[key] = nil end
+    end
+end
+
+-- Seed censusSeen from the latest census sweep's uncapped level and
+-- level+class queries, so splits learned before counts were recorded can be
+-- compacted or re-chosen right away.
+function C:SeedSeen()
+    local _, store = self:State()
+    local latest
+    for _, sweep in pairs(store.sweeps or {}) do
+        if (sweep.label or ""):match("^census ") and (not latest or sweep.startedAt > latest.startedAt) then
+            latest = sweep
+        end
+    end
+    local tokenOf = {}
+    for _, token in ipairs(self:Profile().classes) do tokenOf[P.ClassName(token)] = token end
+    for _, q in ipairs(latest and latest.queries or {}) do
+        local f = q.filter or ""
+        local levels, className = f:match('^(%S+) c%-"([^"]+)"$')
+        levels = levels or f
+        local lo, hi = levels:match("^(%d+)%-(%d+)$")
+        if not lo then lo = levels:match("^(%d+)$"); hi = lo end
+        local class = className and tokenOf[className]
+        if lo and not q.capped and (class or not className) then
+            local key = nodeKey({ lo = tonumber(lo), hi = tonumber(hi), class = class })
+            if not store.censusSeen[key] then store.censusSeen[key] = { t = q.t, n = q.observed or 0 } end
+        end
+    end
 end
 
 function C:Start(budget)
@@ -343,6 +447,7 @@ function C:Start(budget)
         return
     end
     self:PurgeLearned()
+    self:SeedSeen()
 
     local sweepID = Pop:StartSweep("census " .. prof.id, true)
     st = {
@@ -426,6 +531,7 @@ function C:OnScanComplete(sample, tag)
         end
     else
         store.censusLearned[key] = nil
+        if not n.zone then store.censusSeen[key] = { t = time(), n = observed } end
         -- Calibrate online/sighting: uncapped counts are exact.
         if not n.zone then
             local raw = self:Weight(n)

@@ -225,6 +225,9 @@ one from the result of the last:
   bound and its sweep closes as partial.
 - Every split is remembered per realm bucket for 14 days. The next census skips
   straight to the parts instead of spending a press on a query it knows will cap.
+  Each run also tightens those splits from real counts. Small neighbouring level
+  ranges merge, and a class split whose levels turn out to fit under the cap on
+  their own becomes a level split.
 
 A census runs inside its own sweep, so the site gets the same geography and
 query data as a manual sweep. Capped queries that were fully split are marked
