@@ -16,6 +16,13 @@ const GEO_STYLE = `
   .geobar .track{height:21px;padding:2px;background:var(--panel2);border:2px solid var(--line)}
   .geobar .track i{display:block;height:100%;background:var(--blue)}
   .geobar .value{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+  .geomore{margin-top:10px;border-top:2px solid var(--line);padding-top:8px}
+  .geomore summary{width:max-content;list-style:none;cursor:pointer;font-family:var(--pixel);font-size:8px;
+    color:var(--gold);letter-spacing:1px;text-transform:uppercase;padding:7px 0}
+  .geomore summary::-webkit-details-marker{display:none}
+  .geomore summary:hover{color:var(--ink)}
+  .geomore .more-open{display:none}.geomore[open] .more-open{display:inline}.geomore[open] .more-closed{display:none}
+  .geomore .morebars{padding-top:8px}
   .geotable{width:100%;min-width:0;table-layout:fixed}
   .geotable th,.geotable td{padding:7px 8px}
   .geotable th:nth-child(1),.geotable td:nth-child(1){width:45%;text-align:left}
@@ -46,15 +53,20 @@ function renderView(snapshot) {
   const capitalPct = total ? Math.round(capitalCount / total * 100) : 0;
   const updated = snapshot.lastT ? new Date(snapshot.lastT * 1000).toISOString().slice(0, 10) : "&mdash;";
   const tiles = '<section class="tiles">' +
-    '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() + '</div><div class="s">unique, last known location</div></div>' +
-    '<div class="tile"><div class="k">Locations</div><div class="v">' + zones.length.toLocaleString() + '</div><div class="s">distinct reported names</div></div>' +
+    '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() + '</div><div class="s">unique, cumulative</div></div>' +
+    '<div class="tile"><div class="k">Locations</div><div class="v">' + zones.length.toLocaleString() + '</div><div class="s">latest-known locations</div></div>' +
     '<div class="tile"><div class="k">Top 5 share</div><div class="v">' + top5Pct + '%</div><div class="s">observed concentration</div></div>' +
     '<div class="tile"><div class="k">Updated</div><div class="v">' + updated + '</div><div class="s">last population sample</div></div></section>';
 
   if (!zones.length) return tiles + '<div class="panel"><p class="hint">No location data has been observed for this selection yet.</p></div>';
-  const bars = zones.slice(0, 15).map((z) => '<div class="geobar"><div class="name">' + esc(z.name.toUpperCase()) +
+  const renderBars = (list) => list.map((z) => '<div class="geobar"><div class="name">' + esc(z.name.toUpperCase()) +
     '</div><div class="track"><i style="width:' + (max ? Math.max(.8, z.characters / max * 100) : 0).toFixed(1) +
     '%"></i></div><div class="value">' + z.characters.toLocaleString() + '</div></div>').join("");
+  const bars = renderBars(zones.slice(0, 15));
+  const moreBars = zones.length > 15
+    ? '<details class="geomore"><summary><span class="more-closed">&#8595; See more</span><span class="more-open">&#8593; See less</span></summary>' +
+      '<div class="morebars">' + renderBars(zones.slice(15)) + '</div></details>'
+    : '';
   const rows = zones.slice(0, 50).map((z) => '<tr><td>' + esc(z.name) + '</td><td>' + z.characters.toLocaleString() +
     '</td><td>' + (total ? (z.characters / total * 100).toFixed(1) : '0.0') + '%</td><td>' +
     esc(activityHint(z, observedMax)) + ' · avg ' + (z.avgLevel || '&mdash;') + '</td></tr>').join("");
@@ -67,8 +79,8 @@ function renderView(snapshot) {
     '<div class="signal"><b>Capital footprint</b><span>' + capitalPct +
       '% were last observed in recognized capitals. This is consistent with services, social, travel, or idle time—not proof of any one activity.</span></div>' +
     '<div class="signal"><b>Level context</b><span>Average level helps separate starting, progression, and high-level clusters. Activity labels are interpretation hints only.</span></div></div>';
-  return tiles + '<div class="geogrid"><div><div class="panel census" style="margin-bottom:18px"><div class="ptitle">Top observed locations</div>' +
-    '<p class="hint" style="margin-top:0">Unique characters ranked by latest known location.</p>' + bars + '</div>' +
+  return tiles + '<div class="geogrid"><div><div class="panel census" style="margin-bottom:18px"><div class="ptitle">Cumulative latest-known locations</div>' +
+    '<p class="hint" style="margin-top:0">Every unique character observed over the dataset lifetime counts once at their most recently recorded location. Inactive characters remain until observed elsewhere.</p>' + bars + moreBars + '</div>' +
     '<div class="panel census"><div class="ptitle">Location detail</div><table class="geotable"><thead><tr><th>Location</th><th>Characters</th><th>Share</th><th>Activity hint</th></tr></thead><tbody>' +
     rows + '</tbody></table></div></div>' + signals + '</div>';
 }
