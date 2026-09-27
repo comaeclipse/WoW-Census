@@ -71,10 +71,14 @@ function renderView(snapshot) {
   const renderBars = (list) => list.map((z) => '<div class="geobar"><div class="name">' + esc(z.name.toUpperCase()) +
     '</div><div class="track"><i style="width:' + (max ? Math.max(.8, z.characters / max * 100) : 0).toFixed(1) +
     '%"></i></div><div class="value">' + z.characters.toLocaleString() + '</div></div>').join("");
-  const bars = renderBars(zones.slice(0, 15));
-  const moreBars = zones.length > 15
+  // The table below already limits detail to 50 locations. Keep the expandable
+  // bars to that same useful ceiling instead of repeating hundreds of tiny
+  // rows in every pre-rendered realm/faction pane.
+  const visibleZones = zones.slice(0, 50);
+  const bars = renderBars(visibleZones.slice(0, 15));
+  const moreBars = visibleZones.length > 15
     ? '<details class="geomore"><summary><span class="more-closed">&#8595; See more</span><span class="more-open">&#8593; See less</span></summary>' +
-      '<div class="morebars">' + renderBars(zones.slice(15)) + '</div></details>'
+      '<div class="morebars">' + renderBars(visibleZones.slice(15)) + '</div></details>'
     : '';
   const rows = zones.slice(0, 50).map((z) => '<tr><td>' + esc(z.name) + '</td><td>' + z.characters.toLocaleString() +
     '</td><td>' + (total ? (z.characters / total * 100).toFixed(1) : '0.0') + '%</td><td>' +
@@ -122,6 +126,7 @@ export function renderGeographyHtml(views, dims = {}, opts = {}) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(gameLabel)} geography — MarketLens</title>
 <meta name="description" content="Observed character location concentration for ${esc(gameLabel)}, sampled via /who.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' geography — MarketLens">\n<meta property="og:description" content="Observed character location concentration for ' + esc(gameLabel) + ', sampled via /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}${GEO_STYLE}</style>

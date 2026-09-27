@@ -75,6 +75,7 @@ export function renderGuildHtml(views, dims = {}, opts = {}) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(gameLabel)} guilds — MarketLens</title>
 <meta name="description" content="Most commonly observed guilds in ${esc(gameLabel)} population surveys, by realm and faction.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' guilds — MarketLens">\n<meta property="og:description" content="Most commonly observed guilds in ' + esc(gameLabel) + ' population surveys.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">

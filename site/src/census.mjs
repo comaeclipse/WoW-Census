@@ -232,6 +232,7 @@ export function renderCensusHtml(views, opts = {}) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(gameLabel)} census — MarketLens</title>
 <meta name="description" content="Observed population census for ${esc(gameLabel)}: race and class distribution by faction, sampled via /who.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' census — MarketLens">\n<meta property="og:description" content="Observed population census for ' + esc(gameLabel) + ', sampled via /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">

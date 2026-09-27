@@ -1,0 +1,83 @@
+/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/auctionhouse
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/guilds
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/tbc/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/tbc/auctionhouse
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/tbc/guilds
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/tbc/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/classic/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/classic/auctionhouse
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/classic/guilds
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/classic/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/sod/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/sod/auctionhouse
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/sod/guilds
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/sod/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/mop/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/mop/auctionhouse
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/mop/guilds
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/mop/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/retail/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/retail/auctionhouse
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/retail/guilds
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/retail/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.json
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600

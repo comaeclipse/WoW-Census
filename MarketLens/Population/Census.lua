@@ -589,11 +589,24 @@ function C:PromptNext()
     C_Timer.After(Pop:CooldownRemaining(), function()
         local s = self:State()
         if not s or s.inflight or not s.queue[1] or self:Filter(s.queue[1]) ~= filter then return end
+        local command = "/ml who " .. filter
+        -- Never leave chat-mode progress dependent on the edit box opening.
+        -- Forever occasionally drops ChatFrame_OpenChat after a long series of
+        -- commands, so keep the exact command visible as a reliable fallback.
+        ML:Print("Next: |cffffff00%s|r", command)
         local open = ChatFrame_OpenChat or (ChatFrameUtil and ChatFrameUtil.OpenChat)
         if open then
-            open("/ml who " .. filter)
-        else
-            ML:Print("Next: |cffffff00/ml who %s|r", filter)
+            open(command)
+            -- A chat box can close immediately when this callback lands on the
+            -- tail of the previous Enter. If no edit box remains active, try
+            -- once more on the next frame; the printed command still remains.
+            C_Timer.After(0.1, function()
+                local current = self:State()
+                if not current or current.inflight or not current.queue[1]
+                    or self:Filter(current.queue[1]) ~= filter then return end
+                local active = ChatEdit_GetActiveWindow and ChatEdit_GetActiveWindow()
+                if not active then open(command) end
+            end)
         end
     end)
 end

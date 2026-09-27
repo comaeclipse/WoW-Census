@@ -221,6 +221,7 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(gameLabel)} auction house — MarketLens</title>
 <meta name="description" content="High-level auction house overview for ${esc(gameLabel)}: biggest markets, most listed items, and the most expensive listings.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' auction house — MarketLens">\n<meta property="og:description" content="Auction house overview for ' + esc(gameLabel) + ': biggest markets and most listed items.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">

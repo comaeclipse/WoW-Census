@@ -15,6 +15,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { pathToFileURL } = require("url");
 const { spawnSync } = require("child_process");
 
@@ -46,6 +47,17 @@ const SCOPE_LABEL = edition.scope;
 const UPLOAD_FLAVOR = edition.flavor;
 const WH_BRANCH = edition.branch;
 const ITEM_NAME_CACHE = path.join(__dirname, "forever-item-names.json");
+const SITE_ORIGIN = "https://wowcensus.pages.dev";
+
+function editionPath(source) {
+  const dir = editions[source].dir.replace(/^pages\/?/, "");
+  return dir ? "/" + dir + "/" : "/";
+}
+
+function pagePath(source, page) {
+  const root = editionPath(source);
+  return page === "index" ? root : root + page;
+}
 
 async function getJson(url) {
   const res = await fetch(url);
@@ -92,18 +104,47 @@ async function resolvePlaceholderNames(items) {
 // The pages link to each other; the bundle has no Worker behind it, so the
 // header carries no crumb back to one.
 function nav(current) {
-  const item = (href, label, active = href === current) =>
+  const currentPage = current.replace(/\.html$/, "");
+  const item = (href, label, active = href === currentPage) =>
     '<a class="game"' + (active ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
-  const inRoot = SOURCE_GAME === "classic-beta";
-  const hrefFor = (source, dir) => source === SOURCE_GAME ? "index.html" :
-    (inRoot ? dir.replace(/^pages\/?/, "") + (dir === "pages" ? "index.html" : "/index.html") :
-      (dir === "pages" ? "../index.html" : "../" + dir.replace(/^pages\//, "") + "/index.html"));
   return '<nav class="games" style="margin-bottom:10px">' +
-    Object.entries(editions).map(([source, e]) => item(hrefFor(source, e.dir), e.nav, source === SOURCE_GAME)).join("") + "</nav>" +
+    Object.entries(editions).map(([source, e]) => item(pagePath(source, "index"), e.nav, source === SOURCE_GAME)).join("") + "</nav>" +
     '<nav class="games" style="margin-bottom:18px">' +
-    item("index.html", "Census") + item("auctionhouse.html", "Auction House") +
-    item("guilds.html", "Guilds") + item("geography.html", "Geography") + "</nav>";
+    item(pagePath(SOURCE_GAME, "index"), "Census", currentPage === "index") +
+    item(pagePath(SOURCE_GAME, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
+    item(pagePath(SOURCE_GAME, "guilds"), "Guilds", currentPage === "guilds") +
+    item(pagePath(SOURCE_GAME, "geography"), "Geography", currentPage === "geography") + "</nav>";
+}
+
+function writeCrawlAndCacheFiles() {
+  const pagesRoot = path.join(repo, "pages");
+  const routes = Object.keys(editions).flatMap((source) =>
+    ["index", "auctionhouse", "guilds", "geography"].map((page) => pagePath(source, page)));
+  const urls = routes.map((route) => SITE_ORIGIN + route);
+  const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    urls.map((url) => "  <url><loc>" + url + "</loc></url>").join("\n") +
+    "\n</urlset>\n";
+  fs.writeFileSync(path.join(pagesRoot, "robots.txt"),
+    "User-agent: *\nAllow: /\n\nSitemap: " + SITE_ORIGIN + "/sitemap.xml\n");
+  fs.writeFileSync(path.join(pagesRoot, "sitemap.xml"), sitemap);
+  const htmlHeaders = routes.map((route) => route +
+    "\n  Cache-Control: public, max-age=300, stale-while-revalidate=86400").join("\n\n");
+  fs.writeFileSync(path.join(pagesRoot, "_headers"), htmlHeaders + `
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.json
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+`);
 }
 
 // Chip labels for realms. Every beta realm is called "Classic Beta <type>",
@@ -314,6 +355,11 @@ async function main() {
     "; names resolved " + names.resolved + ", unresolved " + names.unresolved);
 
   fs.mkdirSync(outDir, { recursive: true });
+  const css = fs.readFileSync(path.join(repo, "site/public/style.css"));
+  const cssName = "style." + crypto.createHash("sha256").update(css).digest("hex").slice(0, 12) + ".css";
+  for (const name of fs.readdirSync(outDir)) {
+    if (/^style(?:\.[a-f0-9]{12})?\.css$/.test(name)) fs.rmSync(path.join(outDir, name));
+  }
   // The census slices on realm only: each view still charts both factions.
   const censusUnits = census.units || [];
   const censusRealms = [...new Set(censusUnits.map((u) => u.realm))].sort();
@@ -328,22 +374,26 @@ async function main() {
           censusView(r, censusRealmLabels.get(r), censusUnits.filter((u) => u.realm === r))))
     : [{ key: "all", label: "All realms", census }];
   fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
-    stylesheet: "style.css",
+    stylesheet: cssName,
     nav: nav("index.html"),
     note: stamp,
     gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL, uploadFlavor: UPLOAD_FLAVOR,
+    canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "index"),
   }));
   fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
-    renderMarketHtml(views, marketDims, { stylesheet: "style.css", nav: nav("auctionhouse.html"), note: stamp,
-      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL }));
+    renderMarketHtml(views, marketDims, { stylesheet: cssName, nav: nav("auctionhouse.html"), note: stamp,
+      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL,
+      canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "auctionhouse") }));
   fs.writeFileSync(path.join(outDir, "guilds.html"),
-    renderGuildHtml(guildViews, dims, { stylesheet: "style.css", nav: nav("guilds.html"), note: stamp,
-      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL }));
+    renderGuildHtml(guildViews, dims, { stylesheet: cssName, nav: nav("guilds.html"), note: stamp,
+      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL,
+      canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "guilds") }));
   fs.writeFileSync(path.join(outDir, "geography.html"),
-    renderGeographyHtml(geographyViews, dims, { stylesheet: "style.css", nav: nav("geography.html"), note: stamp,
-      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL }));
+    renderGeographyHtml(geographyViews, dims, { stylesheet: cssName, nav: nav("geography.html"), note: stamp,
+      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL,
+      canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "geography") }));
   // The bundle carries its own stylesheet so it renders with nothing else served.
-  fs.copyFileSync(path.join(repo, "site/public/style.css"), path.join(outDir, "style.css"));
+  fs.writeFileSync(path.join(outDir, cssName), css);
   // Keep the existing public census artifact focused on census data; guilds
   // are rendered into guilds.html and do not need to duplicate thousands of
   // rows in this JSON file.
@@ -352,9 +402,10 @@ async function main() {
     units: (census.units || []).map(({ guilds, zones, ...unit }) => unit),
   };
   fs.writeFileSync(path.join(outDir, "census.json"), JSON.stringify(censusJson, null, 2));
+  writeCrawlAndCacheFiles();
 
   const rel = path.relative(repo, outDir).replace(/\\/g, "/");
-  console.log("Wrote " + rel + "/{index.html,auctionhouse.html,guilds.html,geography.html,style.css,census.json}");
+  console.log("Wrote " + rel + "/{index.html,auctionhouse.html,guilds.html,geography.html," + cssName + ",census.json}");
 
   if (!flag("deploy")) {
     console.log("Publish it with:  node tools/build-forever-page.js --deploy");

@@ -294,7 +294,9 @@ renders it with the same modules the Worker uses (`site/src/census.mjs` and
 | --- | --- |
 | `pages/index.html` | the cross-faction census |
 | `pages/auctionhouse.html` | `/auctionhouse` — biggest markets, most listed items, most expensive listings |
-| `pages/style.css`, `pages/census.json` | stylesheet and raw census numbers |
+| `pages/style.<hash>.css`, `pages/census.json` | immutable fingerprinted stylesheet and raw census numbers |
+| `pages/robots.txt`, `pages/sitemap.xml` | crawler policy and clean canonical route discovery |
+| `pages/_headers` | Pages caching rules for HTML, JSON, and fingerprinted assets |
 
 `--deploy` runs `wrangler pages deploy` against the `wowcensus` project; without
 it the folder can still be dragged onto **Cloudflare dashboard -> Workers &
