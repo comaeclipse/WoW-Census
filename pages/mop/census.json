@@ -3,30 +3,30 @@
     {
       "faction": "Alliance",
       "races": {
-        "Draenei": 78,
-        "Dwarf": 56,
-        "Gnome": 50,
-        "Human": 243,
-        "Night Elf": 140,
-        "Pandaren": 58,
-        "Worgen": 85
+        "Draenei": 137,
+        "Dwarf": 110,
+        "Gnome": 99,
+        "Human": 453,
+        "Night Elf": 267,
+        "Pandaren": 101,
+        "Worgen": 145
       },
       "classes": {
-        "DEATHKNIGHT": 46,
-        "HUNTER": 90,
-        "MAGE": 68,
-        "MONK": 43,
-        "PALADIN": 94,
-        "PRIEST": 64,
-        "SHAMAN": 49,
-        "WARRIOR": 75,
-        "ROGUE": 47,
-        "WARLOCK": 55,
-        "DRUID": 79
+        "DEATHKNIGHT": 88,
+        "HUNTER": 167,
+        "MAGE": 126,
+        "MONK": 76,
+        "PALADIN": 176,
+        "PRIEST": 109,
+        "SHAMAN": 83,
+        "WARRIOR": 133,
+        "ROGUE": 102,
+        "WARLOCK": 107,
+        "DRUID": 145
       },
-      "characters": 710,
-      "samples": 27,
-      "observed": 740,
+      "characters": 1312,
+      "samples": 43,
+      "observed": 1383,
       "games": [
         "realm:Nazgrim-Alliance"
       ]
@@ -69,31 +69,31 @@
       "realm": "Nazgrim",
       "faction": "Alliance",
       "races": {
-        "Draenei": 78,
-        "Dwarf": 56,
-        "Gnome": 50,
-        "Human": 243,
-        "Night Elf": 140,
-        "Pandaren": 58,
-        "Worgen": 85
+        "Draenei": 137,
+        "Dwarf": 110,
+        "Gnome": 99,
+        "Human": 453,
+        "Night Elf": 267,
+        "Pandaren": 101,
+        "Worgen": 145
       },
       "classes": {
-        "DEATHKNIGHT": 46,
-        "HUNTER": 90,
-        "MAGE": 68,
-        "MONK": 43,
-        "PALADIN": 94,
-        "PRIEST": 64,
-        "SHAMAN": 49,
-        "WARRIOR": 75,
-        "ROGUE": 47,
-        "WARLOCK": 55,
-        "DRUID": 79
+        "DEATHKNIGHT": 88,
+        "HUNTER": 167,
+        "MAGE": 126,
+        "MONK": 76,
+        "PALADIN": 176,
+        "PRIEST": 109,
+        "SHAMAN": 83,
+        "WARRIOR": 133,
+        "ROGUE": 102,
+        "WARLOCK": 107,
+        "DRUID": 145
       },
-      "zoneCharacters": 710,
-      "characters": 710,
-      "samples": 27,
-      "observed": 740
+      "zoneCharacters": 1312,
+      "characters": 1312,
+      "samples": 43,
+      "observed": 1383
     },
     {
       "game": "realm:Nazgrim-Horde",
@@ -130,6 +130,6 @@
   "realms": [
     "Nazgrim"
   ],
-  "lastT": 1790295446,
+  "lastT": 1790529352,
   "zoneWindowDays": 30
 }
