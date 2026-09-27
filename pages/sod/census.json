@@ -1,6 +1,31 @@
 {
   "groups": [
     {
+      "faction": "Alliance",
+      "races": {
+        "Dwarf": 26,
+        "Gnome": 16,
+        "Human": 99,
+        "Night Elf": 51
+      },
+      "classes": {
+        "HUNTER": 26,
+        "PALADIN": 44,
+        "PRIEST": 11,
+        "ROGUE": 16,
+        "WARRIOR": 22,
+        "MAGE": 18,
+        "WARLOCK": 30,
+        "DRUID": 25
+      },
+      "characters": 192,
+      "samples": 15,
+      "observed": 241,
+      "games": [
+        "realm:Wild Growth-Alliance"
+      ]
+    },
+    {
       "faction": "Horde",
       "races": {
         "Orc": 48,
@@ -27,6 +52,31 @@
     }
   ],
   "units": [
+    {
+      "game": "realm:Wild Growth-Alliance",
+      "realm": "Wild Growth",
+      "faction": "Alliance",
+      "races": {
+        "Dwarf": 26,
+        "Gnome": 16,
+        "Human": 99,
+        "Night Elf": 51
+      },
+      "classes": {
+        "HUNTER": 26,
+        "PALADIN": 44,
+        "PRIEST": 11,
+        "ROGUE": 16,
+        "WARRIOR": 22,
+        "MAGE": 18,
+        "WARLOCK": 30,
+        "DRUID": 25
+      },
+      "zoneCharacters": 192,
+      "characters": 192,
+      "samples": 15,
+      "observed": 241
+    },
     {
       "game": "realm:Wild Growth-Horde",
       "realm": "Wild Growth",
@@ -56,6 +106,6 @@
   "realms": [
     "Wild Growth"
   ],
-  "lastT": 1790531206,
+  "lastT": 1790531398,
   "zoneWindowDays": 30
 }
