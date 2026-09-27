@@ -159,6 +159,59 @@ if (popRes.error) {
   console.log(`Level 70: ${characters.filter((c) => c.l === 70).length} of ${characters.length}`);
   console.log(`Top classes: ${top(tally("class"), 4)}`);
   console.log(`Top zones:   ${top(tally("z"), 4)}`);
+  censusCoverage(popRes.data);
+}
+
+// Coverage of the newest census sweep. A cell still capped with level, class
+// and race pinned is a lower bound; where the census also queried zones inside
+// it, the overlap between the cell's own 50 and the zone results gives a
+// Chapman capture-recapture estimate of its real size. That assumes /who hands
+// back an unbiased 50 of the matches, so treat it as a rough guide.
+function censusCoverage(pop) {
+  const sweeps = (pop.sweeps || []).filter((s) => /^census /.test(s.label || ""));
+  if (!sweeps.length) return;
+  const sw = sweeps.sort((a, b) => b.startedAt - a.startedAt)[0];
+  const qs = (pop.sweepQueries || []).filter((q) => q[0] === sw.id)
+    .map(([, index, t, filter, observed, , capped]) => ({ index, t, filter, observed, capped }))
+    .sort((a, b) => a.index - b.index);
+  const obs = (pop.locationObservations || []).filter((o) => o[0] === sw.id)
+    .map(([, key, queryIndex, , zone, level, classFile, race]) => ({ key, queryIndex, zone, level, classFile, race }));
+  const credited = {};
+  for (const o of obs) credited[o.queryIndex] = (credited[o.queryIndex] || 0) + 1;
+  const zeros = qs.filter((q) => q.observed === 0).length;
+  const zoneQs = qs.filter((q) => / z-"/.test(q.filter)).length;
+  const span = qs.length > 1 ? qs[qs.length - 1].t - qs[0].t : 0;
+  console.log(`\nCensus sweep ${sw.id} (${sw.status}): ${qs.length} queries in ${Math.round(span / 60)} min, ` +
+    `${obs.length} unique characters, ${zeros} empty queries, ${zoneQs} zone-fallback queries`);
+
+  const norm = (s) => String(s).toUpperCase().replace(/[^A-Z]/g, "");
+  let seenCells = 0, estCells = 0, lowerBound = 0;
+  const cells = [];
+  for (const q of qs) {
+    const m = q.filter.match(/^(\d+)(?:-(\d+))? c-"([^"]+)" r-"([^"]+)"$/);
+    if (!m || !q.capped) continue;
+    const lo = +m[1], hi = +(m[2] || m[1]);
+    const seen = obs.filter((o) => o.level >= lo && o.level <= hi && norm(o.classFile) === norm(m[3]) && o.race === m[4]).length;
+    const kids = qs.filter((x) => x.filter.startsWith(q.filter + " z-"));
+    const b = kids.reduce((s, x) => s + (credited[x.index] || 0), 0);
+    const overlap = q.observed - (credited[q.index] || 0);
+    if (!kids.length || overlap <= 0) { lowerBound += seen; cells.push(`${m[3]} ${m[4]} >=${seen}`); continue; }
+    const n = Math.round((q.observed + 1) * (b + 1) / (overlap + 1) - 1); // Chapman
+    seenCells += seen; estCells += Math.max(n, seen);
+    cells.push(`${m[3]} ${m[4]} ~${Math.max(n, seen)}`);
+  }
+  if (!cells.length) {
+    console.log("Coverage: every cell resolved under the /who cap -- the census saw everyone it queried.");
+    return;
+  }
+  const estTotal = obs.length - seenCells + estCells;
+  console.log(`Unresolved cells (still capped with level+class+race pinned): ${cells.length}`);
+  console.log(`  ${cells.join(", ")}`);
+  if (estCells) {
+    console.log(`Estimated online in those cells ~${estCells} vs ${seenCells} seen; overall ~${estTotal} ` +
+      `-> coverage ~${Math.round(100 * obs.length / estTotal)}%${lowerBound ? ` (plus ${cells.filter((c) => c.includes(">=")).length} cell(s) with no estimate)` : ""}`);
+    flags.push(`Census coverage is only ~${Math.round(100 * obs.length / estTotal)}% (rough capture-recapture estimate); ${cells.length} cell(s) exceed what /who can list.`);
+  }
 }
 
 // ---- Flags -----------------------------------------------------------------

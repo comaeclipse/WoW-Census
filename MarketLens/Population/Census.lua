@@ -31,7 +31,8 @@ Pop.Census = C
 local TARGET = 35          -- aim each level split at about this many online players
 local HISTORY_DAYS = 7     -- recent-sighting window used to weight splits and pick zones
 local LEARN_DAYS = 14      -- how long a learned "this cell caps" split is trusted
-local ZONE_SPLITS = 6      -- hotspot zones tried for a fully-pinned capped cell
+local ZONE_SPLITS = 4      -- zones tried for a fully-pinned capped cell
+local MIN_ZONE_SUPPORT = 3 -- recent sightings a zone needs to be worth a query
 local DEFAULT_BUDGET = 300 -- max queries a single census may plan
 local MERGE_TARGET = 40    -- merge learned level parts while their last counts sum under this
 local MAX_PRESPLIT_DEPTH = 8 -- level -> class -> level -> race chains, with room for nested level splits
@@ -199,23 +200,33 @@ local function zoneList(prof, n, hist)
             end
         end
     end
+    -- Only zones with real support: a zone this cell was seen in once or
+    -- twice almost always comes back empty (44 of 102 beta zone queries did).
+    local function ranked()
+        local zones = {}
+        for z, c in pairs(counts) do
+            if c >= MIN_ZONE_SUPPORT then zones[#zones + 1] = z end
+        end
+        table.sort(zones, function(a, b)
+            if counts[a] ~= counts[b] then return counts[a] > counts[b] end
+            return a < b
+        end)
+        return zones
+    end
     tally(true)
-    if not next(counts) then tally(false) end
-
-    local zones = {}
-    for z in pairs(counts) do zones[#zones + 1] = z end
-    table.sort(zones, function(a, b)
-        if counts[a] ~= counts[b] then return counts[a] > counts[b] end
-        return a < b
-    end)
-    local out, seen = {}, {}
+    local zones = ranked()
+    if #zones < 2 then
+        counts = {}
+        tally(false) -- fall back to where anyone at these levels gathers
+        zones = ranked()
+    end
+    local out = {}
     for _, z in ipairs(zones) do
         if #out >= ZONE_SPLITS then break end
-        out[#out + 1] = z; seen[z] = true
+        out[#out + 1] = z
     end
-    for _, z in ipairs(prof.hotspots) do
-        if #out >= ZONE_SPLITS then break end
-        if not seen[z] then out[#out + 1] = z; seen[z] = true end
+    if #out == 0 then -- no history at all: the profile's biggest hubs
+        for i = 1, math.min(2, #prof.hotspots) do out[#out + 1] = prof.hotspots[i] end
     end
     return out
 end
@@ -553,9 +564,11 @@ function C:Send(st, n, filter)
     table.remove(st.queue, 1)
     st.inflight = n
     if not Pop:Scan(filter, "census") and st.inflight == n then
-        -- Not sent (client cooldown): leave it next in line.
+        -- Not sent (client cooldown): leave it next in line, and in chat
+        -- mode type it again once the cooldown clears.
         table.insert(st.queue, 1, n)
         st.inflight = nil
+        self:PromptNext()
         return
     end
     ML:Fire("CENSUS_CHANGED")
@@ -600,7 +613,11 @@ function C:OnScanComplete(sample, tag)
         elseif not n.zone then
             st.unresolved = st.unresolved + 1 -- zones cannot fully cover this cell
         end
-        last.split = self:Enqueue(kids, st, true)
+        -- Exact splits go next (depth-first keeps a cell's parts together);
+        -- zone fallbacks go to the back, so every class and race is covered
+        -- before any lower-bound cell gets extra digging. A census stopped
+        -- early then still has the whole picture.
+        last.split = self:Enqueue(kids, st, exhaustive)
         st.generated = st.generated + last.split
         -- Tell the sweep export this cap is covered by its children, so the
         -- site's capped_count reflects real coverage gaps only.
