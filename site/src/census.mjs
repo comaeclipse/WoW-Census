@@ -233,9 +233,8 @@ export function renderCensusHtml(views, opts = {}) {
 <title>${esc(gameLabel)} census — MarketLens</title>
 <meta name="description" content="Observed population census for ${esc(gameLabel)}: race and class distribution by faction, sampled via /who.">
 ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' census — MarketLens">\n<meta property="og:description" content="Observed population census for ' + esc(gameLabel) + ', sampled via /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "/style.css")}">
 <style>${CENSUS_STYLE}
 </style>

@@ -764,9 +764,8 @@ async function itemPage(url, env) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(row.name)} — MarketLens</title>
 <link rel="alternate" type="application/json" href="/api/history?game=${gameHref("", game)}&id=${row.id}" title="Price history (JSON)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
 </head><body>
 <div class="crt" aria-hidden="true"></div>
@@ -1073,9 +1072,8 @@ async function sellerPage(url, env) {
   const html = `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(seller.owner)} — seller — MarketLens</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
 </head><body>
 <div class="crt" aria-hidden="true"></div>
@@ -1290,9 +1288,8 @@ async function popChooserPage(env) {
 <title>Population survey — MarketLens</title>
 <meta name="description" content="Choose a realm to view its observed population survey (class and race distribution sampled via /who).">
 <link rel="alternate" type="application/json" href="/api/games" title="Datasets (JSON)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
 </head><body>
 <div class="crt" aria-hidden="true"></div>
@@ -1390,9 +1387,8 @@ async function popPage(url, env) {
 <title>${esc(realmName(realm))} population — MarketLens</title>
 <meta name="description" content="Observed population survey for ${esc(realmName(realm))}: class and race distribution sampled via /who.">
 <link rel="alternate" type="application/json" href="/api/population?game=${gameHref("", game)}" title="Population survey (JSON)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
 <style>
   table.poptable{min-width:0}

@@ -1,3 +1,17 @@
+@font-face{
+  font-family:"Press Start 2P";
+  src:url("/fonts/press-start-2p-latin.woff2") format("woff2");
+  font-style:normal;
+  font-weight:400;
+  font-display:optional;
+}
+@font-face{
+  font-family:"VT323";
+  src:url("/fonts/vt323-latin.woff2") format("woff2");
+  font-style:normal;
+  font-weight:400;
+  font-display:optional;
+}
 :root{
   --bg:#0d0f17; --panel:#161a28; --panel2:#1e2334; --ink:#eae7d6;
   --muted:#8b90a0; --gold:#ffce43; --green:#66d16b; --red:#e8595f;

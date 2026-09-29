@@ -136,6 +136,9 @@ function writeCrawlAndCacheFiles() {
 /*.css
   Cache-Control: public, max-age=31536000, immutable
 
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /*.json
   Cache-Control: public, max-age=300, stale-while-revalidate=3600
 
@@ -395,6 +398,13 @@ async function main() {
   // The bundle carries its own stylesheet so it renders with nothing else served.
   fs.writeFileSync(path.join(outDir, cssName), css);
   // Keep the existing public census artifact focused on census data; guilds
+  // Font URLs are root-relative so every edition shares one immutable copy.
+  const sourceFonts = path.join(repo, "site/public/fonts");
+  const outputFonts = path.join(repo, "pages/fonts");
+  fs.mkdirSync(outputFonts, { recursive: true });
+  for (const name of fs.readdirSync(sourceFonts)) {
+    fs.copyFileSync(path.join(sourceFonts, name), path.join(outputFonts, name));
+  }
   // are rendered into guilds.html and do not need to duplicate thousands of
   // rows in this JSON file.
   const censusJson = {
