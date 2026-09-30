@@ -1,0 +1,61 @@
+# wowcensus
+
+> Static World of Warcraft population census, auction-house, guild and zone
+> pages, sampled in-game by the MarketLens addon (/who scans and AH scans).
+> Numbers are frozen at build time and republished after each upload.
+
+A /who sample shows currently-visible online players (server-capped), not a
+full census. Auction quantities are listings, not sales. Money is in copper
+(10000 copper = 1 gold).
+
+## WoW Forever
+
+- [Census](https://wowcensus.pages.dev/): observed population, faction balance, race and class mix
+- [Auction house](https://wowcensus.pages.dev/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.pages.dev/guilds): observed guild activity by realm and faction
+- [Geography](https://wowcensus.pages.dev/geography): player activity by zone from latest-known character locations
+- [census.json](https://wowcensus.pages.dev/census.json): the census data behind the page, as JSON
+
+## TBC Anniversary
+
+- [Census](https://wowcensus.pages.dev/tbc/): observed population, faction balance, race and class mix
+- [Auction house](https://wowcensus.pages.dev/tbc/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.pages.dev/tbc/guilds): observed guild activity by realm and faction
+- [Geography](https://wowcensus.pages.dev/tbc/geography): player activity by zone from latest-known character locations
+- [census.json](https://wowcensus.pages.dev/tbc/census.json): the census data behind the page, as JSON
+
+## Classic Era
+
+- [Census](https://wowcensus.pages.dev/classic/): observed population, faction balance, race and class mix
+- [Auction house](https://wowcensus.pages.dev/classic/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.pages.dev/classic/guilds): observed guild activity by realm and faction
+- [Geography](https://wowcensus.pages.dev/classic/geography): player activity by zone from latest-known character locations
+- [census.json](https://wowcensus.pages.dev/classic/census.json): the census data behind the page, as JSON
+
+## Season of Discovery
+
+- [Census](https://wowcensus.pages.dev/sod/): observed population, faction balance, race and class mix
+- [Auction house](https://wowcensus.pages.dev/sod/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.pages.dev/sod/guilds): observed guild activity by realm and faction
+- [Geography](https://wowcensus.pages.dev/sod/geography): player activity by zone from latest-known character locations
+- [census.json](https://wowcensus.pages.dev/sod/census.json): the census data behind the page, as JSON
+
+## Mists of Pandaria Classic
+
+- [Census](https://wowcensus.pages.dev/mop/): observed population, faction balance, race and class mix
+- [Auction house](https://wowcensus.pages.dev/mop/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.pages.dev/mop/guilds): observed guild activity by realm and faction
+- [Geography](https://wowcensus.pages.dev/mop/geography): player activity by zone from latest-known character locations
+- [census.json](https://wowcensus.pages.dev/mop/census.json): the census data behind the page, as JSON
+
+## Retail
+
+- [Census](https://wowcensus.pages.dev/retail/): observed population, faction balance, race and class mix
+- [Auction house](https://wowcensus.pages.dev/retail/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.pages.dev/retail/guilds): observed guild activity by realm and faction
+- [Geography](https://wowcensus.pages.dev/retail/geography): player activity by zone from latest-known character locations
+- [census.json](https://wowcensus.pages.dev/retail/census.json): the census data behind the page, as JSON
+
+## Live API
+
+- [MarketLens llms.txt](https://marketlens.skarz.workers.dev/llms.txt): the live JSON API these pages are built from

@@ -1,0 +1,88 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "wowcensus",
+    "documentationUrl": "https://wowcensus.pages.dev/llms.txt"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:wowcensus.pages.dev:docs:llms-txt",
+      "displayName": "wowcensus site guide",
+      "type": "text/markdown",
+      "url": "https://wowcensus.pages.dev/llms.txt",
+      "description": "Index of every census, auction-house, guild and geography page on this site."
+    },
+    {
+      "identifier": "urn:air:wowcensus.pages.dev:census:forever",
+      "displayName": "WoW Forever census data",
+      "type": "application/json",
+      "url": "https://wowcensus.pages.dev/census.json",
+      "description": "Observed WoW Forever population by realm and faction: race and class counts from sampled in-game /who results.",
+      "tags": [
+        "world-of-warcraft",
+        "census",
+        "population"
+      ]
+    },
+    {
+      "identifier": "urn:air:wowcensus.pages.dev:census:tbc",
+      "displayName": "TBC Anniversary census data",
+      "type": "application/json",
+      "url": "https://wowcensus.pages.dev/tbc/census.json",
+      "description": "Observed TBC Anniversary population by realm and faction: race and class counts from sampled in-game /who results.",
+      "tags": [
+        "world-of-warcraft",
+        "census",
+        "population"
+      ]
+    },
+    {
+      "identifier": "urn:air:wowcensus.pages.dev:census:classic",
+      "displayName": "Classic Era census data",
+      "type": "application/json",
+      "url": "https://wowcensus.pages.dev/classic/census.json",
+      "description": "Observed Classic Era population by realm and faction: race and class counts from sampled in-game /who results.",
+      "tags": [
+        "world-of-warcraft",
+        "census",
+        "population"
+      ]
+    },
+    {
+      "identifier": "urn:air:wowcensus.pages.dev:census:sod",
+      "displayName": "Season of Discovery census data",
+      "type": "application/json",
+      "url": "https://wowcensus.pages.dev/sod/census.json",
+      "description": "Observed Season of Discovery population by realm and faction: race and class counts from sampled in-game /who results.",
+      "tags": [
+        "world-of-warcraft",
+        "census",
+        "population"
+      ]
+    },
+    {
+      "identifier": "urn:air:wowcensus.pages.dev:census:mop",
+      "displayName": "Mists of Pandaria Classic census data",
+      "type": "application/json",
+      "url": "https://wowcensus.pages.dev/mop/census.json",
+      "description": "Observed Mists of Pandaria Classic population by realm and faction: race and class counts from sampled in-game /who results.",
+      "tags": [
+        "world-of-warcraft",
+        "census",
+        "population"
+      ]
+    },
+    {
+      "identifier": "urn:air:wowcensus.pages.dev:census:retail",
+      "displayName": "Retail census data",
+      "type": "application/json",
+      "url": "https://wowcensus.pages.dev/retail/census.json",
+      "description": "Observed Retail population by realm and faction: race and class counts from sampled in-game /who results.",
+      "tags": [
+        "world-of-warcraft",
+        "census",
+        "population"
+      ]
+    }
+  ]
+}

@@ -134,6 +134,7 @@ function writeCrawlAndCacheFiles() {
   fs.writeFileSync(path.join(pagesRoot, "robots.txt"),
     "User-agent: *\nAllow: /\n\nSitemap: " + SITE_ORIGIN + "/sitemap.xml\n");
   fs.writeFileSync(path.join(pagesRoot, "sitemap.xml"), sitemap);
+  writeAgentDiscoveryFiles(pagesRoot);
   const htmlHeaders = routes.map((route) => route +
     "\n  Cache-Control: public, max-age=300, stale-while-revalidate=86400").join("\n\n");
   fs.writeFileSync(path.join(pagesRoot, "_headers"), htmlHeaders + `
@@ -153,9 +154,83 @@ function writeCrawlAndCacheFiles() {
 /robots.txt
   Cache-Control: public, max-age=86400
 
+/llms.txt
+  Cache-Control: public, max-age=3600
+
 /sitemap.xml
   Cache-Control: public, max-age=3600
 `);
+}
+
+// llms.txt and /.well-known/ai-catalog.json for agent crawlers, plus a real
+// 404 page: without a top-level 404.html, Pages answers every unknown path
+// with index.html and a 200, so agents probing for these files got HTML.
+function writeAgentDiscoveryFiles(pagesRoot) {
+  const sections = [
+    ["index", "Census", "observed population, faction balance, race and class mix"],
+    ["auctionhouse", "Auction house", "item supply, asking prices and listed value from recent scans"],
+    ["guilds", "Guilds", "observed guild activity by realm and faction"],
+    ["geography", "Geography", "player activity by zone from latest-known character locations"],
+  ];
+  const withCensus = Object.keys(editions).filter((source) =>
+    fs.existsSync(path.join(repo, editions[source].dir, "census.json")));
+  const llms = [
+    "# wowcensus",
+    "",
+    "> Static World of Warcraft population census, auction-house, guild and zone",
+    "> pages, sampled in-game by the MarketLens addon (/who scans and AH scans).",
+    "> Numbers are frozen at build time and republished after each upload.",
+    "",
+    "A /who sample shows currently-visible online players (server-capped), not a",
+    "full census. Auction quantities are listings, not sales. Money is in copper",
+    "(10000 copper = 1 gold).",
+    "",
+    ...Object.keys(editions).flatMap((source) => [
+      "## " + editions[source].label,
+      "",
+      ...sections.map(([page, label, blurb]) =>
+        "- [" + label + "](" + SITE_ORIGIN + pagePath(source, page) + "): " + blurb),
+      ...(withCensus.includes(source)
+        ? ["- [census.json](" + SITE_ORIGIN + editionPath(source) + "census.json): the census data behind the page, as JSON"]
+        : []),
+      "",
+    ]),
+    "## Live API",
+    "",
+    "- [MarketLens llms.txt](https://marketlens.skarz.workers.dev/llms.txt): the live JSON API these pages are built from",
+    "",
+  ].join("\n");
+  fs.writeFileSync(path.join(pagesRoot, "llms.txt"), llms);
+
+  const catalog = {
+    specVersion: "1.0",
+    host: { displayName: "wowcensus", documentationUrl: SITE_ORIGIN + "/llms.txt" },
+    entries: [
+      {
+        identifier: "urn:air:wowcensus.pages.dev:docs:llms-txt",
+        displayName: "wowcensus site guide",
+        type: "text/markdown",
+        url: SITE_ORIGIN + "/llms.txt",
+        description: "Index of every census, auction-house, guild and geography page on this site.",
+      },
+      ...withCensus.map((source) => ({
+        identifier: "urn:air:wowcensus.pages.dev:census:" + (editions[source].dir.replace(/^pages\/?/, "") || "forever"),
+        displayName: editions[source].label + " census data",
+        type: "application/json",
+        url: SITE_ORIGIN + editionPath(source) + "census.json",
+        description: "Observed " + editions[source].label + " population by realm and faction: race and class counts from sampled in-game /who results.",
+        tags: ["world-of-warcraft", "census", "population"],
+      })),
+    ],
+  };
+  fs.mkdirSync(path.join(pagesRoot, ".well-known"), { recursive: true });
+  fs.writeFileSync(path.join(pagesRoot, ".well-known", "ai-catalog.json"), JSON.stringify(catalog, null, 2) + "\n");
+
+  fs.writeFileSync(path.join(pagesRoot, "404.html"),
+    '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>Not found</title><meta name="robots" content="noindex"></head>' +
+    '<body><h1>Not found</h1><p><a href="/">wowcensus home</a></p></body></html>\n');
 }
 
 // Chip labels for realms. Every beta realm is called "Classic Beta <type>",
