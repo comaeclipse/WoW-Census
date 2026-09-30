@@ -17,7 +17,7 @@
       "displayName": "WoW Forever census data",
       "type": "application/json",
       "url": "https://wowcensus.pages.dev/census.json",
-      "description": "Observed WoW Forever population by realm and faction: race and class counts from sampled in-game /who results.",
+      "description": "WoW Forever population by realm and faction: race and class counts from sampled in-game /who results.",
       "tags": [
         "world-of-warcraft",
         "census",
@@ -29,7 +29,7 @@
       "displayName": "TBC Anniversary census data",
       "type": "application/json",
       "url": "https://wowcensus.pages.dev/tbc/census.json",
-      "description": "Observed TBC Anniversary population by realm and faction: race and class counts from sampled in-game /who results.",
+      "description": "TBC Anniversary population by realm and faction: race and class counts from sampled in-game /who results.",
       "tags": [
         "world-of-warcraft",
         "census",
@@ -41,7 +41,7 @@
       "displayName": "Classic Era census data",
       "type": "application/json",
       "url": "https://wowcensus.pages.dev/classic/census.json",
-      "description": "Observed Classic Era population by realm and faction: race and class counts from sampled in-game /who results.",
+      "description": "Classic Era population by realm and faction: race and class counts from sampled in-game /who results.",
       "tags": [
         "world-of-warcraft",
         "census",
@@ -53,7 +53,7 @@
       "displayName": "Season of Discovery census data",
       "type": "application/json",
       "url": "https://wowcensus.pages.dev/sod/census.json",
-      "description": "Observed Season of Discovery population by realm and faction: race and class counts from sampled in-game /who results.",
+      "description": "Season of Discovery population by realm and faction: race and class counts from sampled in-game /who results.",
       "tags": [
         "world-of-warcraft",
         "census",
@@ -65,7 +65,7 @@
       "displayName": "Mists of Pandaria Classic census data",
       "type": "application/json",
       "url": "https://wowcensus.pages.dev/mop/census.json",
-      "description": "Observed Mists of Pandaria Classic population by realm and faction: race and class counts from sampled in-game /who results.",
+      "description": "Mists of Pandaria Classic population by realm and faction: race and class counts from sampled in-game /who results.",
       "tags": [
         "world-of-warcraft",
         "census",
@@ -77,7 +77,7 @@
       "displayName": "Retail census data",
       "type": "application/json",
       "url": "https://wowcensus.pages.dev/retail/census.json",
-      "description": "Observed Retail population by realm and faction: race and class counts from sampled in-game /who results.",
+      "description": "Retail population by realm and faction: race and class counts from sampled in-game /who results.",
       "tags": [
         "world-of-warcraft",
         "census",

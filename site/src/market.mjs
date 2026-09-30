@@ -232,6 +232,7 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">
 <style>${CENSUS_STYLE}
 ${MARKET_STYLE}
@@ -248,7 +249,7 @@ ${MARKET_STYLE}
   ${sections}
   <p class="src">
     ${aggregateOnly
-      ? "Retail scans observe aggregate browse summaries, not individual auctions or sales. Quantity is total listed supply and unit price is the minimum observed asking price. True listed value is unavailable, so market charts use units.<br>"
+      ? "Retail scans capture aggregate browse summaries, not individual auctions or sales. Quantity is total listed supply and unit price is the minimum recorded asking price. True listed value is unavailable, so market charts use units.<br>"
       : "An auction house scan observes <b>listings</b>, not sales. Unit price is the weighted median buyout asked for an item, and listed value is quantity &times; that price &mdash; what sellers want, not what anyone paid.<br>"}
     Listings priced absurdly above the rest of the market are excluded from the totals and top lists,
     and named in their own panel rather than dropped quietly.<br>

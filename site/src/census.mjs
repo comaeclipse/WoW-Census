@@ -74,7 +74,7 @@ function comboCards(groups) {
       '<img src="' + esc(classIcon(token)) + '" alt="' + esc(className) + ' icon" loading="lazy"></div>' +
       '<div><div class="combofaction">' + esc(g.faction) + '</div>' +
       '<div class="comboname">' + esc(race) + ' ' + esc(className) + '</div>' +
-      '<div class="combostat">' + top[1].toLocaleString() + ' characters &middot; ' + share + '% of observed ' + esc(g.faction) + '</div></div>' +
+      '<div class="combostat">' + top[1].toLocaleString() + ' characters &middot; ' + share + '% of sampled ' + esc(g.faction) + '</div></div>' +
       '</article>';
   }).filter(Boolean).join("");
   return cards ? '<section class="combos"><div class="ptitle">Most popular race + class</div><div class="combogrid">' + cards + '</div></section>' : "";
@@ -293,12 +293,13 @@ export function renderCensusHtml(views, opts = {}) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
 <title>${esc(seoGameLabel)} census</title>
-<meta name="description" content="Observed ${esc(seoGameLabel)} realm population, faction balance, race and class distribution from sampled in-game /who results.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' census">\n<meta property="og:description" content="Observed ' + esc(seoGameLabel) + ' realm population, faction balance, race and class distribution from sampled in-game /who results.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<meta name="description" content="${esc(seoGameLabel)} realm population, faction balance, race and class distribution from sampled in-game /who results.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' census">\n<meta property="og:description" content="' + esc(seoGameLabel) + ' realm population, faction balance, race and class distribution from sampled in-game /who results.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "/style.css")}">
 <style>${CENSUS_STYLE}
 </style>
@@ -307,19 +308,11 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 <div class="wrap">
   ${back}
   <header class="ihead">
-    <h1 class="iname">${esc(gameLabel)} &mdash; Observed Census</h1>
+    <h1 class="iname">${gameLabel === "WoW Forever" ? "WoW Forever Beta" : esc(gameLabel) + " &mdash; Census"}</h1>
     ${notes}
   </header>
   ${chips}
   ${panes}
-  <p class="src">
-    A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
-    Race and class bars count unique characters &mdash; one per normalized character name + realm &mdash; seen in the
-    latest ${CENSUS_WINDOW_DAYS} days of census /who queries (level, class and race filters; zone queries, which favor
-    whoever idles in cities, are left out). A realm with no census passes yet uses its latest ${CENSUS_WINDOW_DAYS} days
-    of sightings. A character seen several times still counts once, so extra scans add no share on their own.<br>
-    Characters are not human players/accounts; a rename appears as a new character. Data comes from companion-addon scans.
-  </p>
   ${generatedNote}
 </div>
 ${chips ? TOGGLE_SCRIPT : ""}

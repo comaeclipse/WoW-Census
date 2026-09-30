@@ -37,7 +37,7 @@ function renderGuildView(snapshot) {
     '<td class="members">' + g.members.toLocaleString() + '</td></tr>').join("");
 
   const tiles =
-    '<div class="tile"><div class="k">Guilds observed</div><div class="v">' + guilds.length.toLocaleString() +
+    '<div class="tile"><div class="k">Guilds found</div><div class="v">' + guilds.length.toLocaleString() +
       '</div><div class="s">distinct realm guilds</div></div>' +
     '<div class="tile"><div class="k">Guilded characters</div><div class="v">' + guilded.toLocaleString() +
       '</div><div class="s">latest known guild</div></div>' +
@@ -48,11 +48,11 @@ function renderGuildView(snapshot) {
       '</div><div class="s">' + esc(realms.map(realmName).join(' · ') || 'no realm') + '</div></div>';
 
   const body = rows
-    ? '<div class="panel census"><div class="ptitle">Most popular observed guilds</div>' +
-      '<p class="hint" style="margin-top:0">Ranked by unique surveyed characters whose latest observed guild matches this name.</p>' +
+    ? '<div class="panel census"><div class="ptitle">Most popular guilds</div>' +
+      '<p class="hint" style="margin-top:0">Ranked by unique surveyed characters whose latest recorded guild matches this name.</p>' +
       '<table class="guildtable"><thead><tr><th class="rank">#</th><th>Guild</th><th class="scope">Realm · faction</th>' +
       '<th class="members">Characters</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
-    : '<div class="panel"><p class="hint">No guilded characters have been observed for this selection yet.</p></div>';
+    : '<div class="panel"><p class="hint">No guilded characters were found for this selection yet.</p></div>';
   return '<section class="tiles">' + tiles + '</section>' + body;
 }
 
@@ -80,22 +80,23 @@ export function renderGuildHtml(views, dims = {}, opts = {}) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
 <title>${esc(seoGameLabel)} guilds</title>
-<meta name="description" content="Observed ${esc(seoGameLabel)} guild activity by realm and faction, based on characters found in sampled in-game /who results.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' guilds">\n<meta property="og:description" content="Observed ' + esc(seoGameLabel) + ' guild activity by realm and faction, based on characters found in sampled in-game /who results.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<meta name="description" content="${esc(seoGameLabel)} guild activity by realm and faction, based on characters found in sampled in-game /who results.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' guilds">\n<meta property="og:description" content="' + esc(seoGameLabel) + ' guild activity by realm and faction, based on characters found in sampled in-game /who results.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">
 <style>${CENSUS_STYLE}${GUILD_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
   ${opts.nav || ""}
-  <header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Observed Guilds</h1>
+  <header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Guilds</h1>
     ${notes}
   </header>
   ${chips}${panes}
   <p class="src">Guild counts come from sampled /who results, not complete guild rosters.<br>
-    Each character counts once under its latest observed guild. Unguilded characters are excluded, and identically named guilds
+    Each character counts once under its latest recorded guild. Unguilded characters are excluded, and identically named guilds
     on different realms remain separate. Characters are not human players/accounts.</p>
   ${generatedNote}
 </div>${chips ? TOGGLE_SCRIPT : ""}</body></html>`;

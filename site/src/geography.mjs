@@ -38,13 +38,13 @@ const GEO_STYLE = `
 `;
 
 function activityHint(z, observedMax) {
-  if (CAPITALS.has(z.name)) return "Capital hub";
-  if ((z.avgLevel || 0) <= 10) return "Starting / early";
-  if (observedMax > 0 && (z.avgLevel || 0) >= observedMax * .88) return "High-level / endgame";
-  return "Leveling / progression";
+  if (CAPITALS.has(z.name)) return "Capital";
+  if ((z.avgLevel || 0) <= 10) return "Starting";
+  if (observedMax > 0 && (z.avgLevel || 0) >= observedMax * .88) return "End game";
+  return "Leveling";
 }
 
-const PLAY_STYLES = ["High-level / endgame", "Leveling / progression", "Capital hub", "Starting / early"];
+const PLAY_STYLES = ["End game", "Leveling", "Capital", "Starting"];
 
 function windowLabel(days) {
   return days ? "last " + days + " days" : "all time";
@@ -64,10 +64,10 @@ function renderView(snapshot) {
   const tiles = '<section class="tiles">' +
     '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() + '</div><div class="s">unique, ' + win + '</div></div>' +
     '<div class="tile"><div class="k">Locations</div><div class="v">' + zones.length.toLocaleString() + '</div><div class="s">with recent sightings</div></div>' +
-    '<div class="tile"><div class="k">Top 5 share</div><div class="v">' + top5Pct + '%</div><div class="s">observed concentration</div></div>' +
+    '<div class="tile"><div class="k">Top 5 share</div><div class="v">' + top5Pct + '%</div><div class="s">location concentration</div></div>' +
     '<div class="tile"><div class="k">Updated</div><div class="v">' + updated + '</div><div class="s">last population sample</div></div></section>';
 
-  if (!zones.length) return tiles + '<div class="panel"><p class="hint">No location data has been observed for this selection yet.</p></div>';
+  if (!zones.length) return tiles + '<div class="panel"><p class="hint">No location data is available for this selection yet.</p></div>';
   const renderBars = (list) => list.map((z) => '<div class="geobar"><div class="name">' + esc(z.name.toUpperCase()) +
     '</div><div class="track"><i style="width:' + (max ? Math.max(.8, z.characters / max * 100) : 0).toFixed(1) +
     '%"></i></div><div class="value">' + z.characters.toLocaleString() + '</div></div>').join("");
@@ -100,15 +100,15 @@ function renderView(snapshot) {
     '<div class="styles">' + styleBars + '</div>' +
     '<div class="ptitle" style="margin-top:18px">How to read this</div>' +
     '<div class="signal"><b>Strongest cluster</b><span>' + esc(top.name) + ' contains ' +
-      (total ? (top.characters / total * 100).toFixed(1) : '0.0') + '% of observed characters in this selection.</span></div>' +
+      (total ? (top.characters / total * 100).toFixed(1) : '0.0') + '% of characters in this selection.</span></div>' +
     '<div class="signal"><b>Top-five concentration</b><span>' + top5Pct +
       '% indicates how much the footprint is concentrated in its five leading locations.</span></div>' +
     '<div class="signal"><b>Capital footprint</b><span>' + capitalPct +
-      '% were last observed in recognized capitals. This is consistent with services, social, travel, or idle time—not proof of any one activity.</span></div>' +
+      '% were last recorded in recognized capitals. This is consistent with services, social, travel, or idle time—not proof of any one activity.</span></div>' +
     '<div class="signal"><b>Level context</b><span>Average level helps separate starting, progression, and high-level clusters. Activity labels are interpretation hints only.</span></div></div>';
   return tiles + '<div class="geogrid"><div><div class="panel census" style="margin-bottom:18px"><div class="ptitle">Where players are &middot; ' + win + '</div>' +
     '<p class="hint" style="margin-top:0">Each character seen in the ' + win + ' of scans counts once at their most recently recorded location. Characters not seen in that window drop out.</p>' + bars + moreBars + '</div>' +
-    '<div class="panel census"><div class="ptitle">Location detail</div><table class="geotable"><thead><tr><th>Location</th><th>Characters</th><th>Share</th><th>Activity hint</th></tr></thead><tbody>' +
+    '<div class="panel census"><div class="ptitle">Location detail</div><table class="geotable"><thead><tr><th>Location</th><th>Characters</th><th>Share</th><th>Activity</th></tr></thead><tbody>' +
     rows + '</tbody></table></div></div>' + signals + '</div>';
 }
 
@@ -131,18 +131,19 @@ export function renderGeographyHtml(views, dims = {}, opts = {}) {
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
 <title>${esc(seoGameLabel)} player activity by zone</title>
-<meta name="description" content="Observed ${esc(seoGameLabel)} player activity by zone, realm, and faction from latest-known character locations collected through /who.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' player activity by zone">\n<meta property="og:description" content="Observed ' + esc(seoGameLabel) + ' player activity by zone, realm, and faction from latest-known character locations collected through /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<meta name="description" content="${esc(seoGameLabel)} player activity by zone, realm, and faction from latest-known character locations collected through /who.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' player activity by zone">\n<meta property="og:description" content="' + esc(seoGameLabel) + ' player activity by zone, realm, and faction from latest-known character locations collected through /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}${GEO_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">${opts.nav || ""}
 <header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Geography</h1>
 ${notes}</header>
 ${chips}${panes}
-<p class="src">This is an observed-location footprint, not a live map or movement history.<br>
+<p class="src">This is a latest-known location footprint, not a live map or movement history.<br>
 Each character seen in the latest rolling window of scans counts once at the latest location where a /who scan caught them. Targeted queries, the server result cap, scan timing, and differently sized locations affect the ranking.<br>
 Activity labels are conservative interpretation hints; location alone cannot prove questing, raiding, gathering, trading, PvP, or player intent.</p>
 ${generatedNote}

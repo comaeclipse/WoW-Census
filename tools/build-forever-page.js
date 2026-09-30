@@ -167,9 +167,9 @@ function writeCrawlAndCacheFiles() {
 // with index.html and a 200, so agents probing for these files got HTML.
 function writeAgentDiscoveryFiles(pagesRoot) {
   const sections = [
-    ["index", "Census", "observed population, faction balance, race and class mix"],
+    ["index", "Census", "sampled population, faction balance, race and class mix"],
     ["auctionhouse", "Auction house", "item supply, asking prices and listed value from recent scans"],
-    ["guilds", "Guilds", "observed guild activity by realm and faction"],
+    ["guilds", "Guilds", "sampled guild activity by realm and faction"],
     ["geography", "Geography", "player activity by zone from latest-known character locations"],
   ];
   const withCensus = Object.keys(editions).filter((source) =>
@@ -218,7 +218,7 @@ function writeAgentDiscoveryFiles(pagesRoot) {
         displayName: editions[source].label + " census data",
         type: "application/json",
         url: SITE_ORIGIN + editionPath(source) + "census.json",
-        description: "Observed " + editions[source].label + " population by realm and faction: race and class counts from sampled in-game /who results.",
+        description: editions[source].label + " population by realm and faction: race and class counts from sampled in-game /who results.",
         tags: ["world-of-warcraft", "census", "population"],
       })),
     ],
