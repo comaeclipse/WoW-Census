@@ -463,23 +463,23 @@ async function main() {
   fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
     stylesheet: cssName,
     nav: nav("index.html"),
-    notes: ["Latest census observation: " + utcTimestamp(census.lastT), generatedNote],
+    notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
     gameLabel: GAME_LABEL, uploadFlavor: UPLOAD_FLAVOR,
     canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "index"),
   }));
   fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
     renderMarketHtml(views, marketDims, { stylesheet: cssName, nav: nav("auctionhouse.html"),
-      notes: ["Latest auction scan: " + utcTimestamp(views[0] && views[0].snapshot.updatedAt), generatedNote],
+      notes: ["Latest auction scan: " + utcTimestamp(views[0] && views[0].snapshot.updatedAt)], generatedNote,
       gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "auctionhouse") }));
   fs.writeFileSync(path.join(outDir, "guilds.html"),
     renderGuildHtml(guildViews, dims, { stylesheet: cssName, nav: nav("guilds.html"),
-      notes: ["Latest census observation: " + utcTimestamp(census.lastT), generatedNote],
+      notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
       gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "guilds") }));
   fs.writeFileSync(path.join(outDir, "geography.html"),
     renderGeographyHtml(geographyViews, dims, { stylesheet: cssName, nav: nav("geography.html"),
-      notes: ["Latest location observation: " + utcTimestamp(census.lastT), generatedNote],
+      notes: ["Latest location observation: " + utcTimestamp(census.lastT)], generatedNote,
       gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "geography") }));
   // The bundle carries its own stylesheet so it renders with nothing else served.

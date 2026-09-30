@@ -72,6 +72,9 @@ export function renderGuildHtml(views, dims = {}, opts = {}) {
   const gameLabel = opts.gameLabel || "WoW Forever";
   const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
+  const generatedNote = opts.generatedNote
+    ? '<div class="itag" style="margin-top:16px;line-height:1.6">' + esc(opts.generatedNote) + "</div>"
+    : "";
   const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -94,5 +97,6 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
   <p class="src">Guild counts come from sampled /who results, not complete guild rosters.<br>
     Each character counts once under its latest observed guild. Unguilded characters are excluded, and identically named guilds
     on different realms remain separate. Characters are not human players/accounts.</p>
+  ${generatedNote}
 </div>${chips ? TOGGLE_SCRIPT : ""}</body></html>`;
 }

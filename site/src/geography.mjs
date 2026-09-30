@@ -123,6 +123,9 @@ export function renderGeographyHtml(views, dims = {}, opts = {}) {
   const gameLabel = opts.gameLabel || "WoW Forever";
   const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
+  const generatedNote = opts.generatedNote
+    ? '<div class="itag" style="margin-top:16px;line-height:1.6">' + esc(opts.generatedNote) + "</div>"
+    : "";
   const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -142,5 +145,6 @@ ${chips}${panes}
 <p class="src">This is an observed-location footprint, not a live map or movement history.<br>
 Each character seen in the latest rolling window of scans counts once at the latest location where a /who scan caught them. Targeted queries, the server result cap, scan timing, and differently sized locations affect the ranking.<br>
 Activity labels are conservative interpretation hints; location alone cannot prove questing, raiding, gathering, trading, PvP, or player intent.</p>
+${generatedNote}
 </div>${chips ? TOGGLE_SCRIPT : ""}</body></html>`;
 }

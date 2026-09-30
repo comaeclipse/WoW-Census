@@ -6,6 +6,10 @@
 // same census object so the two never drift apart -- only the links and the
 // stylesheet path differ.
 
+// Race/class shares cover characters seen in this many days of census /who
+// queries (see loadCensus in worker.js).
+export const CENSUS_WINDOW_DAYS = 14;
+
 export function esc(s) {
   return String(s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 }
@@ -254,7 +258,7 @@ function renderCensusView(census, opts = {}) {
     '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() +
       '</div><div class="s">unique, all time</div></div>' +
     '<div class="tile"><div class="k">Realms</div><div class="v">' + (realms.length || "&mdash;") +
-      '</div><div class="s">' + esc(realms.map(realmName).join(" · ") || "none yet") + "</div></div>" +
+      "</div></div>" +
     '<div class="tile"><div class="k">Scans</div><div class="v">' + samples.toLocaleString() +
       '</div><div class="s">' + sightings.toLocaleString() + " sightings</div></div>" +
     '<div class="tile"><div class="k">Updated</div><div class="v">' +
@@ -279,6 +283,9 @@ export function renderCensusHtml(views, opts = {}) {
     : "");
   const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
+  const generatedNote = opts.generatedNote
+    ? '<div class="itag" style="margin-top:16px;line-height:1.6">' + esc(opts.generatedNote) + "</div>"
+    : "";
 
   const gameLabel = opts.gameLabel || "WoW Forever";
   const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
@@ -307,11 +314,13 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
   ${panes}
   <p class="src">
     A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
-    Each bar counts unique characters &mdash; one per normalized character name + realm &mdash; so a faction
-    that received more scans does not gain share from the extra scans alone. A character seen several times
-    in a day still counts once.<br>
+    Race and class bars count unique characters &mdash; one per normalized character name + realm &mdash; seen in the
+    latest ${CENSUS_WINDOW_DAYS} days of census /who queries (level, class and race filters; zone queries, which favor
+    whoever idles in cities, are left out). A realm with no census passes yet uses its latest ${CENSUS_WINDOW_DAYS} days
+    of sightings. A character seen several times still counts once, so extra scans add no share on their own.<br>
     Characters are not human players/accounts; a rename appears as a new character. Data comes from companion-addon scans.
   </p>
+  ${generatedNote}
 </div>
 ${chips ? TOGGLE_SCRIPT : ""}
 </body></html>`;

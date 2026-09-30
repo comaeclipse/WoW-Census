@@ -218,6 +218,9 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
   const gameLabel = opts.gameLabel || "WoW Forever";
   const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
+  const generatedNote = opts.generatedNote
+    ? '<div class="itag" style="margin-top:16px;line-height:1.6">' + esc(opts.generatedNote) + "</div>"
+    : "";
   const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -252,6 +255,7 @@ ${MARKET_STYLE}
     Change compares listed quantity with the preceding scan; it is net supply movement, not sales.<br>
     Items a scan could not name appear by id. Data comes from companion-addon scans.
   </p>
+  ${generatedNote}
 </div>
 ${script}
 </body></html>`;
