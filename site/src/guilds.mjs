@@ -95,9 +95,6 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
     ${notes}
   </header>
   <div class="page-controls">${navigation.pages || ""}${chips}</div>${panes}
-  <p class="src">Guild counts come from sampled /who results, not complete guild rosters.<br>
-    Each character counts once under its latest recorded guild. Unguilded characters are excluded, and identically named guilds
-    on different realms remain separate. Characters are not human players/accounts.</p>
   ${generatedNote}
 </div>${chips ? TOGGLE_SCRIPT : ""}</body></html>`;
 }

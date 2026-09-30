@@ -1,6 +1,9 @@
 /
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/combos
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /auctionhouse
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -11,6 +14,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /tbc/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/tbc/combos
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /tbc/auctionhouse
@@ -25,6 +31,9 @@
 /classic/
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/classic/combos
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /classic/auctionhouse
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -35,6 +44,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /sod/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/sod/combos
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /sod/auctionhouse
@@ -49,6 +61,9 @@
 /mop/
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/mop/combos
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /mop/auctionhouse
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -59,6 +74,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /retail/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/retail/combos
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /retail/auctionhouse
@@ -84,6 +102,9 @@
 
 /robots.txt
   Cache-Control: public, max-age=86400
+
+/llms.txt
+  Cache-Control: public, max-age=3600
 
 /sitemap.xml
   Cache-Control: public, max-age=3600

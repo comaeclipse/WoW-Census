@@ -1300,10 +1300,6 @@ async function popChooserPage(env) {
     <div class="itag">Choose a realm &middot; observed via /who</div>
   </header>
   ${body}
-  <p class="src">
-    A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
-    Companion to the MarketLens addon. Realms appear here once population samples are uploaded.
-  </p>
 </div>
 </body></html>`;
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } });
@@ -1419,11 +1415,6 @@ async function popPage(url, env) {
   <section class="tiles tiles5">${tiles}</section>
   ${empty ? '<div class="panel"><p class="hint">No population samples uploaded yet. In game, open the Population tab and press Scan Population (or /ml who), then upload.</p></div>'
     : '<div class="panelgrid">' + identityPanel + '<div class="panelcol">' + classPanel + racePanel + demandPanel + '</div></div>' + zonePanel}
-  <p class="src">
-    A /who returns a sample of currently-visible online players (server-capped ~50), not a census.<br>
-    ${perDay ? "Each character is counted once per day, however many scans ran that day" : "Tables count raw sightings across all scans"}. Unique metrics use normalized character name + realm + game flavor.<br>
-    Characters are not human players/accounts; a rename appears as a new character. Companion to the MarketLens addon.
-  </p>
 </div>
 <script>
 (function(){

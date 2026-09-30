@@ -11,6 +11,7 @@ full census. Auction quantities are listings, not sales. Money is in copper
 ## WoW Forever
 
 - [Census](https://wowcensus.pages.dev/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.pages.dev/combos): the complete observed race and class combination breakdown
 - [Auction house](https://wowcensus.pages.dev/auctionhouse): item supply, asking prices and listed value from recent scans
 - [Guilds](https://wowcensus.pages.dev/guilds): sampled guild activity by realm and faction
 - [Geography](https://wowcensus.pages.dev/geography): player activity by zone from latest-known character locations
@@ -19,6 +20,7 @@ full census. Auction quantities are listings, not sales. Money is in copper
 ## TBC Anniversary
 
 - [Census](https://wowcensus.pages.dev/tbc/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.pages.dev/tbc/combos): the complete observed race and class combination breakdown
 - [Auction house](https://wowcensus.pages.dev/tbc/auctionhouse): item supply, asking prices and listed value from recent scans
 - [Guilds](https://wowcensus.pages.dev/tbc/guilds): sampled guild activity by realm and faction
 - [Geography](https://wowcensus.pages.dev/tbc/geography): player activity by zone from latest-known character locations
@@ -27,6 +29,7 @@ full census. Auction quantities are listings, not sales. Money is in copper
 ## Classic Era
 
 - [Census](https://wowcensus.pages.dev/classic/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.pages.dev/classic/combos): the complete observed race and class combination breakdown
 - [Auction house](https://wowcensus.pages.dev/classic/auctionhouse): item supply, asking prices and listed value from recent scans
 - [Guilds](https://wowcensus.pages.dev/classic/guilds): sampled guild activity by realm and faction
 - [Geography](https://wowcensus.pages.dev/classic/geography): player activity by zone from latest-known character locations
@@ -35,6 +38,7 @@ full census. Auction quantities are listings, not sales. Money is in copper
 ## Season of Discovery
 
 - [Census](https://wowcensus.pages.dev/sod/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.pages.dev/sod/combos): the complete observed race and class combination breakdown
 - [Auction house](https://wowcensus.pages.dev/sod/auctionhouse): item supply, asking prices and listed value from recent scans
 - [Guilds](https://wowcensus.pages.dev/sod/guilds): sampled guild activity by realm and faction
 - [Geography](https://wowcensus.pages.dev/sod/geography): player activity by zone from latest-known character locations
@@ -43,6 +47,7 @@ full census. Auction quantities are listings, not sales. Money is in copper
 ## Mists of Pandaria Classic
 
 - [Census](https://wowcensus.pages.dev/mop/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.pages.dev/mop/combos): the complete observed race and class combination breakdown
 - [Auction house](https://wowcensus.pages.dev/mop/auctionhouse): item supply, asking prices and listed value from recent scans
 - [Guilds](https://wowcensus.pages.dev/mop/guilds): sampled guild activity by realm and faction
 - [Geography](https://wowcensus.pages.dev/mop/geography): player activity by zone from latest-known character locations
@@ -51,6 +56,7 @@ full census. Auction quantities are listings, not sales. Money is in copper
 ## Retail
 
 - [Census](https://wowcensus.pages.dev/retail/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.pages.dev/retail/combos): the complete observed race and class combination breakdown
 - [Auction house](https://wowcensus.pages.dev/retail/auctionhouse): item supply, asking prices and listed value from recent scans
 - [Guilds](https://wowcensus.pages.dev/retail/guilds): sampled guild activity by realm and faction
 - [Geography](https://wowcensus.pages.dev/retail/geography): player activity by zone from latest-known character locations

@@ -10,7 +10,7 @@
       "displayName": "wowcensus site guide",
       "type": "text/markdown",
       "url": "https://wowcensus.pages.dev/llms.txt",
-      "description": "Index of every census, auction-house, guild and geography page on this site."
+      "description": "Index of every census, race-and-class, auction-house, guild and geography page on this site."
     },
     {
       "identifier": "urn:air:wowcensus.pages.dev:census:forever",

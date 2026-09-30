@@ -104,10 +104,10 @@ function renderView(snapshot) {
     '<div class="signal"><b>Top-five concentration</b><span>' + top5Pct +
       '% indicates how much the footprint is concentrated in its five leading locations.</span></div>' +
     '<div class="signal"><b>Capital footprint</b><span>' + capitalPct +
-      '% were last recorded in recognized capitals. This is consistent with services, social, travel, or idle time—not proof of any one activity.</span></div>' +
-    '<div class="signal"><b>Level context</b><span>Average level helps separate starting, progression, and high-level clusters. Activity labels are interpretation hints only.</span></div></div>';
+      '% were last recorded in recognized capitals.</span></div>' +
+    '<div class="signal"><b>Level context</b><span>Average level adds context for each location.</span></div></div>';
   return tiles + '<div class="geogrid"><div><div class="panel census" style="margin-bottom:18px"><div class="ptitle">Where players are &middot; ' + win + '</div>' +
-    '<p class="hint" style="margin-top:0">Each character seen in the ' + win + ' of scans counts once at their most recently recorded location. Characters not seen in that window drop out.</p>' + bars + moreBars + '</div>' +
+    bars + moreBars + '</div>' +
     '<div class="panel census"><div class="ptitle">Location detail</div><table class="geotable"><thead><tr><th>Location</th><th>Characters</th><th>Share</th><th>Activity</th></tr></thead><tbody>' +
     rows + '</tbody></table></div></div>' + signals + '</div>';
 }
@@ -144,9 +144,6 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 <header class="ihead"><div class="page-heading"><h1 class="iname">${esc(gameLabel)} &mdash; Geography</h1>${navigation.games || ""}</div>
 ${notes}</header>
 <div class="page-controls">${navigation.pages || ""}${chips}</div>${panes}
-<p class="src">This is a latest-known location footprint, not a live map or movement history.<br>
-Each character seen in the latest rolling window of scans counts once at the latest location where a /who scan caught them. Targeted queries, the server result cap, scan timing, and differently sized locations affect the ranking.<br>
-Activity labels are conservative interpretation hints; location alone cannot prove questing, raiding, gathering, trading, PvP, or player intent.</p>
 ${generatedNote}
 </div>${chips ? TOGGLE_SCRIPT : ""}</body></html>`;
 }

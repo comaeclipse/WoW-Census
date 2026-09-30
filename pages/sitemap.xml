@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://wowcensus.pages.dev/</loc></url>
+  <url><loc>https://wowcensus.pages.dev/combos</loc></url>
   <url><loc>https://wowcensus.pages.dev/auctionhouse</loc></url>
   <url><loc>https://wowcensus.pages.dev/guilds</loc></url>
   <url><loc>https://wowcensus.pages.dev/geography</loc></url>
   <url><loc>https://wowcensus.pages.dev/tbc/</loc></url>
+  <url><loc>https://wowcensus.pages.dev/tbc/combos</loc></url>
   <url><loc>https://wowcensus.pages.dev/tbc/auctionhouse</loc></url>
   <url><loc>https://wowcensus.pages.dev/tbc/guilds</loc></url>
   <url><loc>https://wowcensus.pages.dev/tbc/geography</loc></url>
   <url><loc>https://wowcensus.pages.dev/classic/</loc></url>
+  <url><loc>https://wowcensus.pages.dev/classic/combos</loc></url>
   <url><loc>https://wowcensus.pages.dev/classic/auctionhouse</loc></url>
   <url><loc>https://wowcensus.pages.dev/classic/guilds</loc></url>
   <url><loc>https://wowcensus.pages.dev/classic/geography</loc></url>
   <url><loc>https://wowcensus.pages.dev/sod/</loc></url>
+  <url><loc>https://wowcensus.pages.dev/sod/combos</loc></url>
   <url><loc>https://wowcensus.pages.dev/sod/auctionhouse</loc></url>
   <url><loc>https://wowcensus.pages.dev/sod/guilds</loc></url>
   <url><loc>https://wowcensus.pages.dev/sod/geography</loc></url>
   <url><loc>https://wowcensus.pages.dev/mop/</loc></url>
+  <url><loc>https://wowcensus.pages.dev/mop/combos</loc></url>
   <url><loc>https://wowcensus.pages.dev/mop/auctionhouse</loc></url>
   <url><loc>https://wowcensus.pages.dev/mop/guilds</loc></url>
   <url><loc>https://wowcensus.pages.dev/mop/geography</loc></url>
   <url><loc>https://wowcensus.pages.dev/retail/</loc></url>
+  <url><loc>https://wowcensus.pages.dev/retail/combos</loc></url>
   <url><loc>https://wowcensus.pages.dev/retail/auctionhouse</loc></url>
   <url><loc>https://wowcensus.pages.dev/retail/guilds</loc></url>
   <url><loc>https://wowcensus.pages.dev/retail/geography</loc></url>

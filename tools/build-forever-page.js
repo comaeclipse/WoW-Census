@@ -30,12 +30,12 @@ const base = (arg("url", "https://marketlens.skarz.workers.dev") || "").replace(
 const repo = path.resolve(__dirname, "..");
 const sourceGame = arg("source", "classic-beta");
 const editions = {
-  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever" },
-  "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc" },
-  classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic" },
-  sod: { dir: "pages/sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic" },
-  "mop-classic": { dir: "pages/mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", flavor: "mop-classic", branch: "mop-classic" },
-  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity" },
+  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever", comboBlurb: "Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta." },
+  "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc", comboBlurb: "TBC Anniversary’s smaller era roster makes race and class choices a direct view of the currently visible progression community." },
+  classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic", comboBlurb: "Classic Era keeps the original-era roster, so the mix reflects the characters currently active in its long-lived realms rather than modern class availability." },
+  sod: { dir: "pages/sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic", comboBlurb: "Season of Discovery class balance and player activity can shift sharply between phases, so treat the mix as a current activity signal rather than a durable meta ranking." },
+  "mop-classic": { dir: "pages/mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", flavor: "mop-classic", branch: "mop-classic", comboBlurb: "MoP Classic includes its era-specific roster and progression, so the mix captures who is visibly active during this phase rather than a prediction of endgame demand." },
+  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity", comboBlurb: "Retail’s broad modern roster and cross-faction play make this a view of the current population mix." },
 };
 const edition = editions[sourceGame];
 if (!edition) throw new Error("unsupported Pages source game: " + sourceGame);
@@ -117,7 +117,7 @@ function nav(current) {
     games: '<nav class="games game-nav">' +
       Object.entries(editions).map(([source, e]) => item(pagePath(source, "index"), e.nav, source === SOURCE_GAME)).join("") + "</nav>",
     pages: '<nav class="games page-nav">' +
-      item(pagePath(SOURCE_GAME, "index"), "Census", currentPage === "index") +
+    item(pagePath(SOURCE_GAME, "index"), "Census", currentPage === "index" || currentPage === "combos") +
       item(pagePath(SOURCE_GAME, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
       item(pagePath(SOURCE_GAME, "guilds"), "Guilds", currentPage === "guilds") +
       item(pagePath(SOURCE_GAME, "geography"), "Geography", currentPage === "geography") + "</nav>",
@@ -127,7 +127,7 @@ function nav(current) {
 function writeCrawlAndCacheFiles() {
   const pagesRoot = path.join(repo, "pages");
   const routes = Object.keys(editions).flatMap((source) =>
-    ["index", "auctionhouse", "guilds", "geography"].map((page) => pagePath(source, page)));
+    ["index", "combos", "auctionhouse", "guilds", "geography"].map((page) => pagePath(source, page)));
   const urls = routes.map((route) => SITE_ORIGIN + route);
   const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
@@ -170,6 +170,7 @@ function writeCrawlAndCacheFiles() {
 function writeAgentDiscoveryFiles(pagesRoot) {
   const sections = [
     ["index", "Census", "sampled population, faction balance, race and class mix"],
+    ["combos", "Race + class", "the complete observed race and class combination breakdown"],
     ["auctionhouse", "Auction house", "item supply, asking prices and listed value from recent scans"],
     ["guilds", "Guilds", "sampled guild activity by realm and faction"],
     ["geography", "Geography", "player activity by zone from latest-known character locations"],
@@ -213,7 +214,7 @@ function writeAgentDiscoveryFiles(pagesRoot) {
         displayName: "wowcensus site guide",
         type: "text/markdown",
         url: SITE_ORIGIN + "/llms.txt",
-        description: "Index of every census, auction-house, guild and geography page on this site.",
+        description: "Index of every census, race-and-class, auction-house, guild and geography page on this site.",
       },
       ...withCensus.map((source) => ({
         identifier: "urn:air:wowcensus.pages.dev:census:" + (editions[source].dir.replace(/^pages\/?/, "") || "forever"),
@@ -308,7 +309,7 @@ function mergeItems(perRealm) {
 async function main() {
   const src = (f) => pathToFileURL(path.join(repo, "site/src", f)).href;
   const censusMod = await import(src("census.mjs"));
-  const { renderCensusHtml } = censusMod;
+  const { renderCensusHtml, renderComboBreakdownHtml } = censusMod;
   realmName = censusMod.realmName;
   const { renderMarketHtml } = await import(src("market.mjs"));
   const { renderGuildHtml } = await import(src("guilds.mjs"));
@@ -465,9 +466,16 @@ async function main() {
   fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
     stylesheet: cssName,
     nav: nav("index.html"),
+    comboHref: pagePath(SOURCE_GAME, "combos"),
     notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
     gameLabel: GAME_LABEL, uploadFlavor: UPLOAD_FLAVOR,
     canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "index"),
+  }));
+  fs.writeFileSync(path.join(outDir, "combos.html"), renderComboBreakdownHtml(censusViews[0].census, {
+    stylesheet: cssName, nav: nav("combos.html"),
+    notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
+    gameLabel: GAME_LABEL, flavorNote: edition.comboBlurb,
+    canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "combos"),
   }));
   fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
     renderMarketHtml(views, marketDims, { stylesheet: cssName, nav: nav("auctionhouse.html"),
@@ -506,7 +514,7 @@ async function main() {
   writeCrawlAndCacheFiles();
 
   const rel = path.relative(repo, outDir).replace(/\\/g, "/");
-  console.log("Wrote " + rel + "/{index.html,auctionhouse.html,guilds.html,geography.html," + cssName + ",census.json}");
+  console.log("Wrote " + rel + "/{index.html,combos.html,auctionhouse.html,guilds.html,geography.html," + cssName + ",census.json}");
 
   if (!flag("deploy")) {
     console.log("Publish it with:  node tools/build-forever-page.js --deploy");

@@ -62,7 +62,7 @@ function iconUrl(name) { return ICON_ROOT + name + ".jpg"; }
 function classIcon(token) { return iconUrl("classicon_" + String(token || "warrior").toLowerCase()); }
 function raceIcon(race) { return iconUrl(RACE_ICON[race] || "inv_misc_questionmark"); }
 
-function comboCards(groups) {
+function comboCards(groups, opts = {}) {
   const cards = groups.map((g) => {
     const top = sortedEntries(g.combos || {})[0];
     if (!top) return "";
@@ -74,10 +74,48 @@ function comboCards(groups) {
       '<img src="' + esc(classIcon(token)) + '" alt="' + esc(className) + ' icon" loading="lazy"></div>' +
       '<div><div class="combofaction">' + esc(g.faction) + '</div>' +
       '<div class="comboname">' + esc(race) + ' ' + esc(className) + '</div>' +
-      '<div class="combostat">' + top[1].toLocaleString() + ' characters &middot; ' + share + '% of sampled ' + esc(g.faction) + '</div></div>' +
+      '<div class="combostat">' + top[1].toLocaleString() + ' characters &middot; ' + share + '% of ' + esc(g.faction) + '</div></div>' +
       '</article>';
   }).filter(Boolean).join("");
-  return cards ? '<section class="combos"><div class="ptitle">Most popular race + class</div><div class="combogrid">' + cards + '</div></section>' : "";
+  const more = opts.comboHref
+    ? '<a class="combo-more" href="' + esc(opts.comboHref) + '">See more</a>'
+    : "";
+  return cards ? '<section class="combos"><div class="ptitle combo-title">Most popular race + class' + more + '</div><div class="combogrid">' + cards + '</div></section>' : "";
+}
+
+function comboLabel(key) {
+  const [race, token] = String(key || "").split("\t");
+  return { race, token, className: CLASS_META[token] ? CLASS_META[token][0] : token };
+}
+
+function comboAnalysis(groups, flavorNote) {
+  const leaders = groups.map((g) => {
+    const top = sortedEntries(g.combos || {})[0];
+    if (!top) return "";
+    const combo = comboLabel(top[0]);
+    const share = g.characters ? ((top[1] / g.characters) * 100).toFixed(1) : "0.0";
+    return combo.race + " " + combo.className + " leads the observed " + g.faction +
+      " sample (" + share + "% of its characters)";
+  }).filter(Boolean);
+  return (flavorNote ? flavorNote + " " : "") +
+    (leaders.length ? leaders.join("; ") + "." : "");
+}
+
+function comboBreakdown(groups) {
+  return groups.map((g) => {
+    const rows = sortedEntries(g.combos || {}).map(([key, count]) => {
+      const combo = comboLabel(key);
+      const share = g.characters ? ((count / g.characters) * 100).toFixed(1) : "0.0";
+      return '<tr><td class="combo-name"><img src="' + esc(raceIcon(combo.race)) + '" alt="" loading="lazy">' +
+        '<img src="' + esc(classIcon(combo.token)) + '" alt="" loading="lazy">' + esc(combo.race) + " " + esc(combo.className) +
+        '</td><td>' + count.toLocaleString() + '</td><td>' + share + "%</td></tr>";
+    }).join("");
+    return '<section class="panel combo-panel"><div class="ptitle">' + esc(g.faction) + ' race + class</div>' +
+      '<p class="hint" style="margin-top:0">' + g.characters.toLocaleString() + ' observed characters, most common first.</p>' +
+      '<div class="tablewrap"><table class="combo-table"><thead><tr><th class="l">Combination</th><th>Characters</th><th>Share</th></tr></thead><tbody>' +
+      (rows || '<tr><td colspan="3" class="l">No race + class data yet.</td></tr>') +
+      '</tbody></table></div></section>';
+  }).join("");
 }
 
 // One horizontal bar row. `max` scales every bar in a chart against the same
@@ -117,6 +155,8 @@ export const CENSUS_STYLE = `
   @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
   .vchips{margin-bottom:18px}
   .combos{margin:0 0 22px}.combos>.ptitle{margin:0 0 10px}
+  .combo-title{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .combo-more{color:var(--blue);font-family:var(--term);font-size:20px;font-weight:400;letter-spacing:0;text-transform:none}
   .combogrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .combocard{display:flex;align-items:center;gap:16px;padding:15px 17px;background:var(--panel);
     border:2px solid var(--line);border-left:5px solid var(--fac);box-shadow:4px 4px 0 rgba(0,0,0,.32)}
@@ -126,6 +166,8 @@ export const CENSUS_STYLE = `
   .combofaction{font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--fac);margin-bottom:7px}
   .comboname{font-family:var(--pixel);font-size:11px;line-height:1.5;color:var(--ink);margin-bottom:5px}
   .combostat{color:var(--muted);font-size:17px}
+  .combo-panel{margin-bottom:22px}.combo-table{min-width:0}.combo-table th,.combo-table td{width:auto}.combo-table th:nth-child(1),.combo-table td:nth-child(1){width:64%}
+  .combo-name{display:flex;align-items:center;gap:7px}.combo-name img{width:24px;height:24px;border:1px solid var(--line);background:#111}
   @media (max-width:760px){.combogrid{grid-template-columns:1fr}}
   @media (max-width:420px){.combocard{padding:12px;gap:11px}.comboicons{min-width:82px}
     .comboicons img{width:48px;height:48px}.comboname{font-size:9px}}`;
@@ -250,7 +292,7 @@ function renderCensusView(census, opts = {}) {
           '<a class="game" href="' + esc(opts.realmHref(game)) + '">' +
           esc(realmName(game)) + "</a>").join("")).join("")
       : "";
-    body = comboCards(groups) + racePanel + '<div class="chartgrid">' + classPanels + "</div>" +
+    body = comboCards(groups, opts) + racePanel + '<div class="chartgrid">' + classPanels + "</div>" +
       (links ? '<div class="ptitle" style="margin:26px 0 12px">Per-realm detail</div><nav class="games">' + links + "</nav>" : "");
   }
 
@@ -266,6 +308,36 @@ function renderCensusView(census, opts = {}) {
       '</div><div class="s">last sample</div></div>';
 
   return '<section class="tiles">' + tiles + "</section>" + body;
+}
+
+export function renderComboBreakdownHtml(census, opts = {}) {
+  const groups = (census && census.groups) || [];
+  const navigation = opts.nav && typeof opts.nav === "object" ? opts.nav : { games: opts.nav || "", pages: "" };
+  const gameLabel = opts.gameLabel || "WoW Forever";
+  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
+  const notes = (opts.notes || []).map((note, i) =>
+    '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
+  const generatedNote = opts.generatedNote
+    ? '<div class="itag" style="margin-top:16px;line-height:1.6">' + esc(opts.generatedNote) + "</div>"
+    : "";
+  return `<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
+<title>${esc(seoGameLabel)} race and class breakdown</title>
+<meta name="description" content="${esc(seoGameLabel)} observed race and class combinations from sampled in-game /who results.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">' : ""}
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}</style>
+</head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
+<header class="ihead"><div class="page-heading"><h1 class="iname">${esc(gameLabel)} &mdash; Race + Class</h1>${navigation.games || ""}</div>${notes}</header>
+<div class="page-controls">${navigation.pages || ""}</div>
+<section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div><p class="hint" style="margin:0">${esc(comboAnalysis(groups, opts.flavorNote))}</p></section>
+${comboBreakdown(groups)}${generatedNote}
+</div></body></html>`;
 }
 
 // views: [{ key, label, census }] -- one entry per realm scope, plus "All".

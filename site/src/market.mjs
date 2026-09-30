@@ -213,7 +213,6 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
       (on ? "" : " hidden") + ">" + renderMarketView(v.snapshot, threshold) + "</div>";
   }).join("");
   const script = chips ? TOGGLE_SCRIPT : "";
-  const aggregateOnly = list.some((v) => v.snapshot && v.snapshot.aggregateOnly);
 
   const gameLabel = opts.gameLabel || "WoW Forever";
   const navigation = opts.nav && typeof opts.nav === "object" ? opts.nav : { games: opts.nav || "", pages: "" };
@@ -247,15 +246,6 @@ ${MARKET_STYLE}
   </header>
   <div class="page-controls">${navigation.pages || ""}${chips}</div>
   ${sections}
-  <p class="src">
-    ${aggregateOnly
-      ? "Retail scans capture aggregate browse summaries, not individual auctions or sales. Quantity is total listed supply and unit price is the minimum recorded asking price. True listed value is unavailable, so market charts use units.<br>"
-      : "An auction house scan observes <b>listings</b>, not sales. Unit price is the weighted median buyout asked for an item, and listed value is quantity &times; that price &mdash; what sellers want, not what anyone paid.<br>"}
-    Listings priced absurdly above the rest of the market are excluded from the totals and top lists,
-    and named in their own panel rather than dropped quietly.<br>
-    Change compares listed quantity with the preceding scan; it is net supply movement, not sales.<br>
-    Items a scan could not name appear by id. Data comes from companion-addon scans.
-  </p>
   ${generatedNote}
 </div>
 ${script}
