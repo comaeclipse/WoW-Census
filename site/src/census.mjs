@@ -281,6 +281,7 @@ export function renderCensusHtml(views, opts = {}) {
   const back = opts.nav || (opts.back
     ? '<a class="back" href="' + esc(opts.back.href) + '">&#9664; ' + esc(opts.back.label) + "</a>"
     : "");
+  const navigation = back && typeof back === "object" ? back : { games: back, pages: "" };
   const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
   const generatedNote = opts.generatedNote
@@ -306,12 +307,11 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 </head><body>
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">
-  ${back}
   <header class="ihead">
-    <h1 class="iname">${gameLabel === "WoW Forever" ? "WoW Forever Beta" : esc(gameLabel) + " &mdash; Census"}</h1>
+    <div class="page-heading"><h1 class="iname">${gameLabel === "WoW Forever" ? "WoW Forever Beta" : esc(gameLabel) + " &mdash; Census"}</h1>${navigation.games || ""}</div>
     ${notes}
   </header>
-  ${chips}
+  <div class="page-controls">${navigation.pages || ""}${chips}</div>
   ${panes}
   ${generatedNote}
 </div>

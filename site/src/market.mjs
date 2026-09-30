@@ -216,6 +216,7 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
   const aggregateOnly = list.some((v) => v.snapshot && v.snapshot.aggregateOnly);
 
   const gameLabel = opts.gameLabel || "WoW Forever";
+  const navigation = opts.nav && typeof opts.nav === "object" ? opts.nav : { games: opts.nav || "", pages: "" };
   const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
   const generatedNote = opts.generatedNote
@@ -240,12 +241,11 @@ ${MARKET_STYLE}
 </head><body>
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">
-  ${opts.nav || ""}
   <header class="ihead">
-    <h1 class="iname">${esc(gameLabel)} &mdash; Auction House</h1>
+    <div class="page-heading"><h1 class="iname">${esc(gameLabel)} &mdash; Auction House</h1>${navigation.games || ""}</div>
     ${notes}
   </header>
-  ${chips}
+  <div class="page-controls">${navigation.pages || ""}${chips}</div>
   ${sections}
   <p class="src">
     ${aggregateOnly

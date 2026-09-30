@@ -113,13 +113,15 @@ function nav(current) {
   const item = (href, label, active = href === currentPage) =>
     '<a class="game"' + (active ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
-  return '<nav class="games" style="margin-bottom:10px">' +
-    Object.entries(editions).map(([source, e]) => item(pagePath(source, "index"), e.nav, source === SOURCE_GAME)).join("") + "</nav>" +
-    '<nav class="games" style="margin-bottom:18px">' +
-    item(pagePath(SOURCE_GAME, "index"), "Census", currentPage === "index") +
-    item(pagePath(SOURCE_GAME, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
-    item(pagePath(SOURCE_GAME, "guilds"), "Guilds", currentPage === "guilds") +
-    item(pagePath(SOURCE_GAME, "geography"), "Geography", currentPage === "geography") + "</nav>";
+  return {
+    games: '<nav class="games game-nav">' +
+      Object.entries(editions).map(([source, e]) => item(pagePath(source, "index"), e.nav, source === SOURCE_GAME)).join("") + "</nav>",
+    pages: '<nav class="games page-nav">' +
+      item(pagePath(SOURCE_GAME, "index"), "Census", currentPage === "index") +
+      item(pagePath(SOURCE_GAME, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
+      item(pagePath(SOURCE_GAME, "guilds"), "Guilds", currentPage === "guilds") +
+      item(pagePath(SOURCE_GAME, "geography"), "Geography", currentPage === "geography") + "</nav>",
+  };
 }
 
 function writeCrawlAndCacheFiles() {

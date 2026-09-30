@@ -51,6 +51,12 @@ a{color:var(--blue)}
 
 /* game selector (chooser pages + nav fallback) */
 .games{display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; margin-bottom:16px;}
+.page-heading{display:flex; align-items:flex-start; justify-content:space-between; gap:16px;}
+.page-heading .game-nav{justify-content:flex-end; margin:0 0 10px auto;}
+.page-controls{display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px 20px; margin-bottom:18px;}
+.page-controls .page-nav{margin:0;}
+.page-controls .vchips{margin:0 0 0 auto;}
+@media (max-width:760px){.page-heading{display:block}.page-heading .game-nav{justify-content:flex-start;margin-left:0}.page-controls{display:block}.page-controls .page-nav{margin-bottom:12px}.page-controls .vchips{margin-left:0}}
 .game{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-transform:uppercase;
   color:var(--ink); background:var(--panel); border:2px solid var(--line);
   box-shadow:3px 3px 0 var(--shadow); padding:8px 10px; cursor:pointer; text-decoration:none;

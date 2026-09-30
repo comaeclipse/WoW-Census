@@ -121,6 +121,7 @@ export function renderGeographyHtml(views, dims = {}, opts = {}) {
     '" data-faction="' + esc(v.faction) + '"' +
     (v.realm === activeRealm && v.faction === activeFaction ? '' : ' hidden') + '>' + renderView(v.snapshot) + '</div>').join("");
   const gameLabel = opts.gameLabel || "WoW Forever";
+  const navigation = opts.nav && typeof opts.nav === "object" ? opts.nav : { games: opts.nav || "", pages: "" };
   const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
   const generatedNote = opts.generatedNote
@@ -139,10 +140,10 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}${GEO_STYLE}</style>
-</head><body><div class="crt" aria-hidden="true"></div><div class="wrap">${opts.nav || ""}
-<header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Geography</h1>
+</head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
+<header class="ihead"><div class="page-heading"><h1 class="iname">${esc(gameLabel)} &mdash; Geography</h1>${navigation.games || ""}</div>
 ${notes}</header>
-${chips}${panes}
+<div class="page-controls">${navigation.pages || ""}${chips}</div>${panes}
 <p class="src">This is a latest-known location footprint, not a live map or movement history.<br>
 Each character seen in the latest rolling window of scans counts once at the latest location where a /who scan caught them. Targeted queries, the server result cap, scan timing, and differently sized locations affect the ranking.<br>
 Activity labels are conservative interpretation hints; location alone cannot prove questing, raiding, gathering, trading, PvP, or player intent.</p>

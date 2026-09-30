@@ -70,6 +70,7 @@ export function renderGuildHtml(views, dims = {}, opts = {}) {
   }).join("");
 
   const gameLabel = opts.gameLabel || "WoW Forever";
+  const navigation = opts.nav && typeof opts.nav === "object" ? opts.nav : { games: opts.nav || "", pages: "" };
   const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
   const generatedNote = opts.generatedNote
@@ -90,11 +91,10 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">
 <style>${CENSUS_STYLE}${GUILD_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
-  ${opts.nav || ""}
-  <header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Guilds</h1>
+  <header class="ihead"><div class="page-heading"><h1 class="iname">${esc(gameLabel)} &mdash; Guilds</h1>${navigation.games || ""}</div>
     ${notes}
   </header>
-  ${chips}${panes}
+  <div class="page-controls">${navigation.pages || ""}${chips}</div>${panes}
   <p class="src">Guild counts come from sampled /who results, not complete guild rosters.<br>
     Each character counts once under its latest recorded guild. Unguilded characters are excluded, and identically named guilds
     on different realms remain separate. Characters are not human players/accounts.</p>
