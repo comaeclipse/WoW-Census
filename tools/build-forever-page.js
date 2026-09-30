@@ -110,6 +110,7 @@ async function resolvePlaceholderNames(items) {
 // header carries no crumb back to one.
 function nav(current) {
   const currentPage = current.replace(/\.html$/, "");
+  const pageLabels = { index: "Census", combos: "Race + Class", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography" };
   const item = (href, label, active = href === currentPage) =>
     '<a class="game"' + (active ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
@@ -121,6 +122,9 @@ function nav(current) {
       item(pagePath(SOURCE_GAME, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
       item(pagePath(SOURCE_GAME, "guilds"), "Guilds", currentPage === "guilds") +
       item(pagePath(SOURCE_GAME, "geography"), "Geography", currentPage === "geography") + "</nav>",
+    breadcrumbs: '<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="' +
+      pagePath(SOURCE_GAME, "index") + '">' + edition.nav + '</a><span aria-hidden="true">/</span><span aria-current="page">' +
+      pageLabels[currentPage] + "</span></nav>",
   };
 }
 

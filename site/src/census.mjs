@@ -314,6 +314,7 @@ export function renderComboBreakdownHtml(census, opts = {}) {
   const groups = (census && census.groups) || [];
   const navigation = opts.nav && typeof opts.nav === "object" ? opts.nav : { games: opts.nav || "", pages: "" };
   const gameLabel = opts.gameLabel || "WoW Forever";
+  const heading = navigation.games ? "WoWCensus" : gameLabel + " — Race + Class";
   const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   const notes = (opts.notes || []).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
@@ -333,7 +334,7 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">' :
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
-<header class="ihead"><div class="page-heading"><h1 class="iname">${esc(gameLabel)} &mdash; Race + Class</h1>${navigation.games || ""}</div>${notes}</header>
+<header class="ihead"><div class="page-heading"><h1 class="iname">${esc(heading)}</h1>${navigation.games || ""}</div>${navigation.breadcrumbs || notes}</header>
 <div class="page-controls">${navigation.pages || ""}</div>
 <section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div><p class="hint" style="margin:0">${esc(comboAnalysis(groups, opts.flavorNote))}</p></section>
 ${comboBreakdown(groups)}${generatedNote}
@@ -361,6 +362,7 @@ export function renderCensusHtml(views, opts = {}) {
     : "";
 
   const gameLabel = opts.gameLabel || "WoW Forever";
+  const heading = navigation.games ? "WoWCensus" : (gameLabel === "WoW Forever" ? "WoW Forever Beta" : gameLabel + " — Census");
   const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -380,8 +382,8 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">
   <header class="ihead">
-    <div class="page-heading"><h1 class="iname">${gameLabel === "WoW Forever" ? "WoW Forever Beta" : esc(gameLabel) + " &mdash; Census"}</h1>${navigation.games || ""}</div>
-    ${notes}
+    <div class="page-heading"><h1 class="iname">${esc(heading)}</h1>${navigation.games || ""}</div>
+    ${navigation.breadcrumbs || notes}
   </header>
   <div class="page-controls">${navigation.pages || ""}${chips}</div>
   ${panes}
