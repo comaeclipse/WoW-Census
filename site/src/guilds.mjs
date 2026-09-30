@@ -70,12 +70,17 @@ export function renderGuildHtml(views, dims = {}, opts = {}) {
   }).join("");
 
   const gameLabel = opts.gameLabel || "WoW Forever";
-  const scopeLabel = opts.scopeLabel || "Beta realms";
+  const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
+    '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
+  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(gameLabel)} guilds — MarketLens</title>
-<meta name="description" content="Most commonly observed guilds in ${esc(gameLabel)} population surveys, by realm and faction.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' guilds — MarketLens">\n<meta property="og:description" content="Most commonly observed guilds in ' + esc(gameLabel) + ' population surveys.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
+<title>${esc(seoGameLabel)} guilds</title>
+<meta name="description" content="Observed ${esc(seoGameLabel)} guild activity by realm and faction, based on characters found in sampled in-game /who results.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' guilds">\n<meta property="og:description" content="Observed ' + esc(seoGameLabel) + ' guild activity by realm and faction, based on characters found in sampled in-game /who results.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">
@@ -83,8 +88,7 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
   ${opts.nav || ""}
   <header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Observed Guilds</h1>
-    <div class="itag">${esc(scopeLabel)} &middot; latest known guild &middot; unique characters sampled via /who</div>
-    ${opts.note ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + '</div>' : ''}
+    ${notes}
   </header>
   ${chips}${panes}
   <p class="src">Guild counts come from sampled /who results, not complete guild rosters.<br>

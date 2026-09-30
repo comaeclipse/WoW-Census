@@ -216,12 +216,17 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
   const aggregateOnly = list.some((v) => v.snapshot && v.snapshot.aggregateOnly);
 
   const gameLabel = opts.gameLabel || "WoW Forever";
-  const scopeLabel = opts.scopeLabel || "Beta realms";
+  const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
+    '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
+  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(gameLabel)} auction house — MarketLens</title>
-<meta name="description" content="High-level auction house overview for ${esc(gameLabel)}: biggest markets, most listed items, and the most expensive listings.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' auction house — MarketLens">\n<meta property="og:description" content="Auction house overview for ' + esc(gameLabel) + ': biggest markets and most listed items.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
+<title>${esc(seoGameLabel)} auction house</title>
+<meta name="description" content="${esc(seoGameLabel)} auction house snapshot with item supply, asking prices, listed value, and market changes from recent scans.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' auction house">\n<meta property="og:description" content="' + esc(seoGameLabel) + ' auction house snapshot with item supply, asking prices, listed value, and market changes from recent scans.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">
@@ -234,8 +239,7 @@ ${MARKET_STYLE}
   ${opts.nav || ""}
   <header class="ihead">
     <h1 class="iname">${esc(gameLabel)} &mdash; Auction House</h1>
-    <div class="itag">${esc(scopeLabel)} &middot; observed listings &middot; scanned in game with MarketLens</div>
-    ${opts.note ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + "</div>" : ""}
+    ${notes}
   </header>
   ${chips}
   ${sections}
@@ -246,7 +250,7 @@ ${MARKET_STYLE}
     Listings priced absurdly above the rest of the market are excluded from the totals and top lists,
     and named in their own panel rather than dropped quietly.<br>
     Change compares listed quantity with the preceding scan; it is net supply movement, not sales.<br>
-    Items a scan could not name appear by id. Companion to the MarketLens addon.
+    Items a scan could not name appear by id. Data comes from companion-addon scans.
   </p>
 </div>
 ${script}

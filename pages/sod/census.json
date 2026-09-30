@@ -18,6 +18,26 @@
         "WARLOCK": 30,
         "DRUID": 25
       },
+      "combos": {
+        "Dwarf\tHUNTER": 9,
+        "Dwarf\tPALADIN": 11,
+        "Dwarf\tPRIEST": 4,
+        "Dwarf\tROGUE": 1,
+        "Dwarf\tWARRIOR": 1,
+        "Gnome\tMAGE": 4,
+        "Gnome\tWARLOCK": 11,
+        "Gnome\tWARRIOR": 1,
+        "Human\tMAGE": 14,
+        "Human\tPALADIN": 33,
+        "Human\tPRIEST": 7,
+        "Human\tROGUE": 9,
+        "Human\tWARLOCK": 19,
+        "Human\tWARRIOR": 17,
+        "Night Elf\tDRUID": 25,
+        "Night Elf\tHUNTER": 17,
+        "Night Elf\tROGUE": 6,
+        "Night Elf\tWARRIOR": 3
+      },
       "characters": 192,
       "samples": 15,
       "observed": 241,
@@ -28,24 +48,46 @@
     {
       "faction": "Horde",
       "races": {
-        "Orc": 48,
-        "Tauren": 23,
-        "Troll": 23,
-        "Undead": 34
+        "Orc": 81,
+        "Tauren": 41,
+        "Troll": 49,
+        "Undead": 62
       },
       "classes": {
-        "HUNTER": 25,
-        "ROGUE": 7,
-        "SHAMAN": 29,
-        "WARLOCK": 16,
-        "WARRIOR": 16,
-        "DRUID": 11,
-        "MAGE": 14,
-        "PRIEST": 10
+        "HUNTER": 38,
+        "ROGUE": 19,
+        "SHAMAN": 47,
+        "WARLOCK": 30,
+        "WARRIOR": 26,
+        "DRUID": 24,
+        "MAGE": 24,
+        "PRIEST": 25
       },
-      "characters": 128,
-      "samples": 13,
-      "observed": 210,
+      "combos": {
+        "Orc\tHUNTER": 22,
+        "Orc\tROGUE": 6,
+        "Orc\tSHAMAN": 23,
+        "Orc\tWARLOCK": 15,
+        "Orc\tWARRIOR": 15,
+        "Tauren\tDRUID": 24,
+        "Tauren\tHUNTER": 1,
+        "Tauren\tSHAMAN": 14,
+        "Tauren\tWARRIOR": 2,
+        "Troll\tHUNTER": 15,
+        "Troll\tMAGE": 9,
+        "Troll\tPRIEST": 9,
+        "Troll\tROGUE": 5,
+        "Troll\tSHAMAN": 10,
+        "Troll\tWARRIOR": 1,
+        "Undead\tMAGE": 15,
+        "Undead\tPRIEST": 16,
+        "Undead\tROGUE": 8,
+        "Undead\tWARLOCK": 15,
+        "Undead\tWARRIOR": 8
+      },
+      "characters": 233,
+      "samples": 22,
+      "observed": 405,
       "games": [
         "realm:Wild Growth-Horde"
       ]
@@ -72,6 +114,26 @@
         "WARLOCK": 30,
         "DRUID": 25
       },
+      "combos": {
+        "Dwarf\tHUNTER": 9,
+        "Dwarf\tPALADIN": 11,
+        "Dwarf\tPRIEST": 4,
+        "Dwarf\tROGUE": 1,
+        "Dwarf\tWARRIOR": 1,
+        "Gnome\tMAGE": 4,
+        "Gnome\tWARLOCK": 11,
+        "Gnome\tWARRIOR": 1,
+        "Human\tMAGE": 14,
+        "Human\tPALADIN": 33,
+        "Human\tPRIEST": 7,
+        "Human\tROGUE": 9,
+        "Human\tWARLOCK": 19,
+        "Human\tWARRIOR": 17,
+        "Night Elf\tDRUID": 25,
+        "Night Elf\tHUNTER": 17,
+        "Night Elf\tROGUE": 6,
+        "Night Elf\tWARRIOR": 3
+      },
       "zoneCharacters": 192,
       "characters": 192,
       "samples": 15,
@@ -82,30 +144,52 @@
       "realm": "Wild Growth",
       "faction": "Horde",
       "races": {
-        "Orc": 48,
-        "Tauren": 23,
-        "Troll": 23,
-        "Undead": 34
+        "Orc": 81,
+        "Tauren": 41,
+        "Troll": 49,
+        "Undead": 62
       },
       "classes": {
-        "HUNTER": 25,
-        "ROGUE": 7,
-        "SHAMAN": 29,
-        "WARLOCK": 16,
-        "WARRIOR": 16,
-        "DRUID": 11,
-        "MAGE": 14,
-        "PRIEST": 10
+        "HUNTER": 38,
+        "ROGUE": 19,
+        "SHAMAN": 47,
+        "WARLOCK": 30,
+        "WARRIOR": 26,
+        "DRUID": 24,
+        "MAGE": 24,
+        "PRIEST": 25
       },
-      "zoneCharacters": 128,
-      "characters": 128,
-      "samples": 13,
-      "observed": 210
+      "combos": {
+        "Orc\tHUNTER": 22,
+        "Orc\tROGUE": 6,
+        "Orc\tSHAMAN": 23,
+        "Orc\tWARLOCK": 15,
+        "Orc\tWARRIOR": 15,
+        "Tauren\tDRUID": 24,
+        "Tauren\tHUNTER": 1,
+        "Tauren\tSHAMAN": 14,
+        "Tauren\tWARRIOR": 2,
+        "Troll\tHUNTER": 15,
+        "Troll\tMAGE": 9,
+        "Troll\tPRIEST": 9,
+        "Troll\tROGUE": 5,
+        "Troll\tSHAMAN": 10,
+        "Troll\tWARRIOR": 1,
+        "Undead\tMAGE": 15,
+        "Undead\tPRIEST": 16,
+        "Undead\tROGUE": 8,
+        "Undead\tWARLOCK": 15,
+        "Undead\tWARRIOR": 8
+      },
+      "zoneCharacters": 233,
+      "characters": 233,
+      "samples": 22,
+      "observed": 405
     }
   ],
   "realms": [
     "Wild Growth"
   ],
-  "lastT": 1790531398,
+  "lastT": 1790647703,
   "zoneWindowDays": 30
 }

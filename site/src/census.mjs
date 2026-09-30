@@ -32,6 +32,50 @@ export const CLASS_META = {
 const FACTION_COLOR = { Alliance: "#3f83f8", Horde: "#d9363e", Unknown: "#8b90a0" };
 function factionColor(f) { return FACTION_COLOR[f] || FACTION_COLOR.Unknown; }
 
+const ICON_ROOT = "https://wow.zamimg.com/images/wow/icons/large/";
+const RACE_ICON = {
+  Human: "achievement_character_human_male", Dwarf: "achievement_character_dwarf_male",
+  Gnome: "achievement_character_gnome_male", "Night Elf": "achievement_character_nightelf_male",
+  Orc: "achievement_character_orc_male", Tauren: "achievement_character_tauren_male",
+  Troll: "achievement_character_troll_male", Undead: "achievement_character_undead_male",
+  Scourge: "achievement_character_undead_male",
+  "Blood Elf": "achievement_character_bloodelf_male", Draenei: "achievement_character_draenei_male",
+  Goblin: "race_goblin_male", Pandaren: "race_pandaren_male", Worgen: "race_worgen_male",
+  Nightborne: "achievement_alliedrace_nightborne",
+  "Highmountain Tauren": "achievement_alliedrace_highmountaintauren",
+  "Void Elf": "achievement_alliedrace_voidelf",
+  "Lightforged Draenei": "achievement_alliedrace_lightforgeddraenei",
+  "Dark Iron Dwarf": "achievement_alliedrace_darkirondwarf",
+  "Mag'har Orc": "achievement_alliedrace_magharorc",
+  "Kul Tiran": "achievement_alliedrace_kultiranhuman",
+  "Zandalari Troll": "achievement_alliedrace_zandalaritroll",
+  Mechagnome: "achievement_alliedrace_mechagnome", Vulpera: "achievement_alliedrace_vulpera",
+  Dracthyr: "race_dracthyr_male",
+  "High Order Skyborne": "achievement_character_bloodelf_male",
+  "Windshaper Skyborne": "achievement_character_bloodelf_male",
+};
+function iconUrl(name) { return ICON_ROOT + name + ".jpg"; }
+function classIcon(token) { return iconUrl("classicon_" + String(token || "warrior").toLowerCase()); }
+function raceIcon(race) { return iconUrl(RACE_ICON[race] || "inv_misc_questionmark"); }
+
+function comboCards(groups) {
+  const cards = groups.map((g) => {
+    const top = sortedEntries(g.combos || {})[0];
+    if (!top) return "";
+    const [race, token] = top[0].split("\t");
+    const className = CLASS_META[token] ? CLASS_META[token][0] : token;
+    const share = g.characters ? ((top[1] / g.characters) * 100).toFixed(1) : "0.0";
+    return '<article class="combocard" style="--fac:' + factionColor(g.faction) + '">' +
+      '<div class="comboicons"><img src="' + esc(raceIcon(race)) + '" alt="' + esc(race) + ' icon" loading="lazy">' +
+      '<img src="' + esc(classIcon(token)) + '" alt="' + esc(className) + ' icon" loading="lazy"></div>' +
+      '<div><div class="combofaction">' + esc(g.faction) + '</div>' +
+      '<div class="comboname">' + esc(race) + ' ' + esc(className) + '</div>' +
+      '<div class="combostat">' + top[1].toLocaleString() + ' characters &middot; ' + share + '% of observed ' + esc(g.faction) + '</div></div>' +
+      '</article>';
+  }).filter(Boolean).join("");
+  return cards ? '<section class="combos"><div class="ptitle">Most popular race + class</div><div class="combogrid">' + cards + '</div></section>' : "";
+}
+
 // One horizontal bar row. `max` scales every bar in a chart against the same
 // value, so bar lengths compare across the whole chart. `text` is what prints
 // at the right -- a plain count unless the caller formats it (gold, say).
@@ -67,7 +111,20 @@ export const CENSUS_STYLE = `
   .bar .bt i{display:block; height:100%}
   .bar .bn{text-align:right; color:var(--ink)}
   @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
-  .vchips{margin-bottom:18px}`;
+  .vchips{margin-bottom:18px}
+  .combos{margin:0 0 22px}.combos>.ptitle{margin:0 0 10px}
+  .combogrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .combocard{display:flex;align-items:center;gap:16px;padding:15px 17px;background:var(--panel);
+    border:2px solid var(--line);border-left:5px solid var(--fac);box-shadow:4px 4px 0 rgba(0,0,0,.32)}
+  .comboicons{display:flex;min-width:98px}.comboicons img{width:56px;height:56px;object-fit:cover;
+    border:3px solid #b99b55;box-shadow:2px 2px 0 #000;background:#111;image-rendering:auto}
+  .comboicons img+img{margin-left:-14px;margin-top:12px}
+  .combofaction{font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--fac);margin-bottom:7px}
+  .comboname{font-family:var(--pixel);font-size:11px;line-height:1.5;color:var(--ink);margin-bottom:5px}
+  .combostat{color:var(--muted);font-size:17px}
+  @media (max-width:760px){.combogrid{grid-template-columns:1fr}}
+  @media (max-width:420px){.combocard{padding:12px;gap:11px}.comboicons{min-width:82px}
+    .comboicons img{width:48px;height:48px}.comboname{font-size:9px}}`;
 
 
 // A page can slice its content on more than one axis (realm, faction). Each
@@ -143,7 +200,7 @@ export const TOGGLE_SCRIPT = `<script>
 // opts.realmHref   game key -> per-realm page URL, or null to drop those links
 // opts.back        { href, label } for the top-left crumb, or null
 // opts.nav         raw markup replacing that crumb (static bundle page nav)
-// opts.note        extra line under the header (the static build stamps its age)
+// opts.notes       extra lines under the header (data freshness and static build time)
 function renderCensusView(census, opts = {}) {
   const groups = (census && census.groups) || [];
   const realms = (census && census.realms) || [];
@@ -189,7 +246,7 @@ function renderCensusView(census, opts = {}) {
           '<a class="game" href="' + esc(opts.realmHref(game)) + '">' +
           esc(realmName(game)) + "</a>").join("")).join("")
       : "";
-    body = racePanel + '<div class="chartgrid">' + classPanels + "</div>" +
+    body = comboCards(groups) + racePanel + '<div class="chartgrid">' + classPanels + "</div>" +
       (links ? '<div class="ptitle" style="margin:26px 0 12px">Per-realm detail</div><nav class="games">' + links + "</nav>" : "");
   }
 
@@ -220,19 +277,19 @@ export function renderCensusHtml(views, opts = {}) {
   const back = opts.nav || (opts.back
     ? '<a class="back" href="' + esc(opts.back.href) + '">&#9664; ' + esc(opts.back.label) + "</a>"
     : "");
-  // The 8px pixel font overflows the body's tight line box, so a second .itag
-  // line needs its own breathing room or it collides with the tagline above.
-  const note = opts.note
-    ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + "</div>"
-    : "";
+  const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
+    '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
 
   const gameLabel = opts.gameLabel || "WoW Forever";
-  const scopeLabel = opts.scopeLabel || "Beta realms";
+  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(gameLabel)} census — MarketLens</title>
-<meta name="description" content="Observed population census for ${esc(gameLabel)}: race and class distribution by faction, sampled via /who.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' census — MarketLens">\n<meta property="og:description" content="Observed population census for ' + esc(gameLabel) + ', sampled via /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
+<title>${esc(seoGameLabel)} census</title>
+<meta name="description" content="Observed ${esc(seoGameLabel)} realm population, faction balance, race and class distribution from sampled in-game /who results.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' census">\n<meta property="og:description" content="Observed ' + esc(seoGameLabel) + ' realm population, faction balance, race and class distribution from sampled in-game /who results.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "/style.css")}">
@@ -244,8 +301,7 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
   ${back}
   <header class="ihead">
     <h1 class="iname">${esc(gameLabel)} &mdash; Observed Census</h1>
-    <div class="itag">${esc(scopeLabel)} &middot; both factions &middot; unique characters sampled via /who</div>
-    ${note}
+    ${notes}
   </header>
   ${chips}
   ${panes}
@@ -254,7 +310,7 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
     Each bar counts unique characters &mdash; one per normalized character name + realm &mdash; so a faction
     that received more scans does not gain share from the extra scans alone. A character seen several times
     in a day still counts once.<br>
-    Characters are not human players/accounts; a rename appears as a new character. Companion to the MarketLens addon.
+    Characters are not human players/accounts; a rename appears as a new character. Data comes from companion-addon scans.
   </p>
 </div>
 ${chips ? TOGGLE_SCRIPT : ""}

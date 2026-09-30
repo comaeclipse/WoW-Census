@@ -121,19 +121,23 @@ export function renderGeographyHtml(views, dims = {}, opts = {}) {
     '" data-faction="' + esc(v.faction) + '"' +
     (v.realm === activeRealm && v.faction === activeFaction ? '' : ' hidden') + '>' + renderView(v.snapshot) + '</div>').join("");
   const gameLabel = opts.gameLabel || "WoW Forever";
-  const scopeLabel = opts.scopeLabel || "Beta realms";
+  const notes = (opts.notes || (opts.note ? [opts.note] : [])).map((note, i) =>
+    '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
+  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(gameLabel)} geography — MarketLens</title>
-<meta name="description" content="Observed character location concentration for ${esc(gameLabel)}, sampled via /who.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(gameLabel) + ' geography — MarketLens">\n<meta property="og:description" content="Observed character location concentration for ' + esc(gameLabel) + ', sampled via /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
+<title>${esc(seoGameLabel)} player activity by zone</title>
+<meta name="description" content="Observed ${esc(seoGameLabel)} player activity by zone, realm, and faction from latest-known character locations collected through /who.">
+${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' player activity by zone">\n<meta property="og:description" content="Observed ' + esc(seoGameLabel) + ' player activity by zone, realm, and faction from latest-known character locations collected through /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}${GEO_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">${opts.nav || ""}
 <header class="ihead"><h1 class="iname">${esc(gameLabel)} &mdash; Geography</h1>
-<div class="itag">${esc(scopeLabel)} &middot; recent locations &middot; unique characters sampled via /who</div>
-${opts.note ? '<div class="itag" style="margin-top:10px;line-height:1.6">' + esc(opts.note) + '</div>' : ''}</header>
+${notes}</header>
 ${chips}${panes}
 <p class="src">This is an observed-location footprint, not a live map or movement history.<br>
 Each character seen in the latest rolling window of scans counts once at the latest location where a /who scan caught them. Targeted queries, the server result cap, scan timing, and differently sized locations affect the ranking.<br>

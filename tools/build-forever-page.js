@@ -30,12 +30,12 @@ const base = (arg("url", "https://marketlens.skarz.workers.dev") || "").replace(
 const repo = path.resolve(__dirname, "..");
 const sourceGame = arg("source", "classic-beta");
 const editions = {
-  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", scope: "Beta realms", flavor: "classic-beta", branch: "forever" },
-  "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", scope: "Anniversary realms", flavor: "tbc-anniversary", branch: "tbc" },
-  classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", scope: "Classic Era realms", flavor: "classic-era", branch: "classic" },
-  sod: { dir: "pages/sod", label: "Season of Discovery", nav: "SoD", scope: "Season of Discovery realms", flavor: "sod", branch: "classic" },
-  "mop-classic": { dir: "pages/mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", scope: "MoP Classic realms", flavor: "mop-classic", branch: "mop-classic" },
-  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", scope: "Retail realms", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity" },
+  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever" },
+  "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc" },
+  classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic" },
+  sod: { dir: "pages/sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic" },
+  "mop-classic": { dir: "pages/mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", flavor: "mop-classic", branch: "mop-classic" },
+  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity" },
 };
 const edition = editions[sourceGame];
 if (!edition) throw new Error("unsupported Pages source game: " + sourceGame);
@@ -43,7 +43,6 @@ const outDir = path.resolve(repo, arg("out", edition.dir));
 const project = arg("project", "wowcensus");
 const SOURCE_GAME = sourceGame;
 const GAME_LABEL = edition.label;
-const SCOPE_LABEL = edition.scope;
 const UPLOAD_FLAVOR = edition.flavor;
 const WH_BRANCH = edition.branch;
 const ITEM_NAME_CACHE = path.join(__dirname, "forever-item-names.json");
@@ -57,6 +56,12 @@ function editionPath(source) {
 function pagePath(source, page) {
   const root = editionPath(source);
   return page === "index" ? root : root + page;
+}
+
+function utcTimestamp(value) {
+  if (!value) return "unavailable";
+  const date = typeof value === "number" ? new Date(value * 1000) : new Date(value);
+  return Number.isNaN(date.getTime()) ? "unavailable" : date.toISOString().slice(0, 16).replace("T", " ") + "Z";
 }
 
 async function getJson(url) {
@@ -139,6 +144,9 @@ function writeCrawlAndCacheFiles() {
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
+/favicon*
+  Cache-Control: public, max-age=86400
+
 /*.json
   Cache-Control: public, max-age=300, stale-while-revalidate=3600
 
@@ -171,7 +179,7 @@ function mergeCensusUnits(units) {
   for (const u of units) {
     if (!byFaction.has(u.faction))
       byFaction.set(u.faction, {
-        faction: u.faction, races: {}, classes: {}, characters: 0, samples: 0, observed: 0, games: [],
+        faction: u.faction, races: {}, classes: {}, combos: {}, characters: 0, samples: 0, observed: 0, games: [],
       });
     const g = byFaction.get(u.faction);
     g.characters += u.characters;
@@ -180,6 +188,7 @@ function mergeCensusUnits(units) {
     if (g.games.indexOf(u.game) < 0) g.games.push(u.game);
     for (const k in u.races) g.races[k] = (g.races[k] || 0) + u.races[k];
     for (const k in u.classes) g.classes[k] = (g.classes[k] || 0) + u.classes[k];
+    for (const k in (u.combos || {})) g.combos[k] = (g.combos[k] || 0) + u.combos[k];
   }
   const order = ["Alliance", "Horde"];
   return [...byFaction.values()].sort((a, b) =>
@@ -229,7 +238,7 @@ async function main() {
   const { renderGeographyHtml } = await import(src("geography.mjs"));
 
   const built = new Date();
-  const stamp = "Static snapshot built " + built.toISOString().slice(0, 16).replace("T", " ") + "Z";
+  const generatedNote = "Page generated: " + utcTimestamp(built.toISOString());
 
   process.stdout.write("Census   ... ");
   const census = await getJson(base + "/api/census?source=" + encodeURIComponent(SOURCE_GAME));
@@ -379,25 +388,27 @@ async function main() {
   fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
     stylesheet: cssName,
     nav: nav("index.html"),
-    note: stamp,
-    gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL, uploadFlavor: UPLOAD_FLAVOR,
+    notes: ["Latest census observation: " + utcTimestamp(census.lastT), generatedNote],
+    gameLabel: GAME_LABEL, uploadFlavor: UPLOAD_FLAVOR,
     canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "index"),
   }));
   fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
-    renderMarketHtml(views, marketDims, { stylesheet: cssName, nav: nav("auctionhouse.html"), note: stamp,
-      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL,
+    renderMarketHtml(views, marketDims, { stylesheet: cssName, nav: nav("auctionhouse.html"),
+      notes: ["Latest auction scan: " + utcTimestamp(views[0] && views[0].snapshot.updatedAt), generatedNote],
+      gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "auctionhouse") }));
   fs.writeFileSync(path.join(outDir, "guilds.html"),
-    renderGuildHtml(guildViews, dims, { stylesheet: cssName, nav: nav("guilds.html"), note: stamp,
-      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL,
+    renderGuildHtml(guildViews, dims, { stylesheet: cssName, nav: nav("guilds.html"),
+      notes: ["Latest census observation: " + utcTimestamp(census.lastT), generatedNote],
+      gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "guilds") }));
   fs.writeFileSync(path.join(outDir, "geography.html"),
-    renderGeographyHtml(geographyViews, dims, { stylesheet: cssName, nav: nav("geography.html"), note: stamp,
-      gameLabel: GAME_LABEL, scopeLabel: SCOPE_LABEL,
+    renderGeographyHtml(geographyViews, dims, { stylesheet: cssName, nav: nav("geography.html"),
+      notes: ["Latest location observation: " + utcTimestamp(census.lastT), generatedNote],
+      gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "geography") }));
   // The bundle carries its own stylesheet so it renders with nothing else served.
   fs.writeFileSync(path.join(outDir, cssName), css);
-  // Keep the existing public census artifact focused on census data; guilds
   // Font URLs are root-relative so every edition shares one immutable copy.
   const sourceFonts = path.join(repo, "site/public/fonts");
   const outputFonts = path.join(repo, "pages/fonts");
@@ -405,6 +416,9 @@ async function main() {
   for (const name of fs.readdirSync(sourceFonts)) {
     fs.copyFileSync(path.join(sourceFonts, name), path.join(outputFonts, name));
   }
+  fs.copyFileSync(path.join(repo, "site/public/favicon.ico"), path.join(repo, "pages/favicon.ico"));
+  fs.copyFileSync(path.join(repo, "site/public/favicon-96.png"), path.join(repo, "pages/favicon-96.png"));
+  // Keep the existing public census artifact focused on census data; guilds
   // are rendered into guilds.html and do not need to duplicate thousands of
   // rows in this JSON file.
   const censusJson = {
