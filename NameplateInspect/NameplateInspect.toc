@@ -1,0 +1,7 @@
+## Interface: 11509, 20506, 50504, 120007, 120100, 160001
+## Title: Nameplate Inspect
+## Notes: Caches nearby player specializations and talents across WoW clients.
+## Version: 3.0.3
+## SavedVariables: NameplateInspectDB
+
+NameplateInspect.lua
