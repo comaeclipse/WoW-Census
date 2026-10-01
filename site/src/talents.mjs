@@ -27,10 +27,10 @@ export function renderTalentsHtml(data, opts={}) {
     .talent-filters select{color:var(--ink);background:var(--panel2);border:2px solid var(--line);font-family:var(--term);font-size:18px;padding:6px 10px;max-width:230px}
     .talent-section{margin-top:22px}.talent-empty{margin:0}
     .talent-combo-table{min-width:0}.talent-combo-table th:first-child,.talent-combo-table td:first-child{width:72%}
-    .talent-combo-table th:nth-child(2),.talent-combo-table td:nth-child(2){width:12%;font-size:16px}
+    .talent-combo-table th:nth-child(2),.talent-combo-table td:nth-child(2){width:12%}
     .talent-combo-table th:nth-child(3),.talent-combo-table td:nth-child(3){width:16%}
     .talent-combo-table th:not(:first-child),.talent-combo-table td:not(:first-child){padding-left:6px;padding-right:6px}
-    .talent-combo-table .combo-name{display:table-cell;text-align:left;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.4;font-size:16px}
+    .talent-combo-table .combo-name{display:table-cell;text-align:left;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.4}
     .talent-combo-table .combo-name img{vertical-align:middle;margin-right:7px;flex:none}
     .talent-popularity-table{table-layout:auto}.talent-popularity-table td:nth-child(2){white-space:normal;text-overflow:clip}
     @media(max-width:1050px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
