@@ -8,7 +8,7 @@
   // Wowhead site branch per source flavor (empty = retail). Its tooltips.js reads
   // this path off each link to pick the right icon + tooltip data. Uploaded realm
   // datasets receive their source flavor from the API.
-  var WH_BRANCH = { "classic-progression": "tbc", "classic": "classic", "retail": "", "classic-beta": "forever", "sod": "classic" };
+  var WH_BRANCH = { "classic-progression": "tbc", "classic": "classic", "retail": "", "classic-beta": "forever", "sod": "classic", "mop-classic": "mop-classic" };
   var whBranch = "tbc";
   function whItem(id) { return "https://www.wowhead.com/" + (whBranch ? whBranch + "/" : "") + "item=" + id; }
   function whRefresh() {

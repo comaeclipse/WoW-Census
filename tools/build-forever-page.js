@@ -46,7 +46,6 @@ const base = (arg("url", "https://marketlens.skarz.workers.dev") || "").replace(
 const repo = path.resolve(__dirname, "..");
 const SOURCE_GAME = arg("source", "classic-beta");
 const project = arg("project", "wowcensus");
-const ITEM_NAME_CACHE = path.join(__dirname, "forever-item-names.json");
 
 // Edition config, data shaping and page rendering live in site/src/edition.mjs,
 // shared with the edge renderer in pages/_worker.js. Loaded in main().
@@ -58,26 +57,32 @@ async function getJson(url) {
   return res.json();
 }
 
-function readItemNameCache() {
-  try { return JSON.parse(fs.readFileSync(ITEM_NAME_CACHE, "utf8")); }
+// One cache per Wowhead branch (EDITIONS[].branch): the same id can name a
+// different item -- or none -- on different branches, and SoD shares Era's.
+const itemNameCache = (branch) => path.join(__dirname, "item-names", (branch || "retail") + ".json");
+const isPlaceholder = (name) => /^item:\d+$/.test(name);
+
+function readItemNameCache(branch) {
+  try { return JSON.parse(fs.readFileSync(itemNameCache(branch), "utf8")); }
   catch (e) {
     if (e && e.code === "ENOENT") return {};
     throw e;
   }
 }
 
-// Forever includes beta-only ids that Blizzard's public item namespaces do
-// not expose. Wowhead's Forever tooltip endpoint does know those ids (and the
-// vanilla ids mixed into the same scans), so resolve only item:<id>
-// placeholders here and retain the result for deterministic future builds.
-async function resolvePlaceholderNames(items) {
-  const cache = readItemNameCache();
-  const missing = items.filter((it) => /^item:\d+$/.test(it.name) && !cache[it.id]);
+// Blizzard's item API misses some ids the scans contain: Forever's beta-only
+// items, and retail ids its static namespace has never exposed. Wowhead's
+// tooltip endpoint knows them, so resolve only item:<id> placeholders here
+// and retain the result for deterministic future builds.
+async function resolvePlaceholderNames(branch, items) {
+  const cache = readItemNameCache(branch);
+  const prefix = branch ? branch + "/" : "";
+  const missing = items.filter((it) => isPlaceholder(it.name) && !cache[it.id]);
   let resolved = 0;
   for (let i = 0; i < missing.length; i += 12) {
     await Promise.all(missing.slice(i, i + 12).map(async (it) => {
-      const res = await fetch("https://nether.wowhead.com/forever/tooltip/item/" + it.id);
-      if (!res.ok) return;
+      const res = await fetch("https://nether.wowhead.com/" + prefix + "tooltip/item/" + it.id).catch(() => null);
+      if (!res || !res.ok) return;
       const body = await res.json().catch(() => null);
       if (!body || !body.name || /^Item \d+$/.test(body.name)) return;
       cache[it.id] = body.name;
@@ -86,25 +91,25 @@ async function resolvePlaceholderNames(items) {
   }
   if (resolved) {
     const ordered = Object.fromEntries(Object.entries(cache).sort((a, b) => Number(a[0]) - Number(b[0])));
-    writeFile(ITEM_NAME_CACHE, JSON.stringify(ordered, null, 2) + "\n");
+    fs.mkdirSync(path.dirname(itemNameCache(branch)), { recursive: true });
+    writeFile(itemNameCache(branch), JSON.stringify(ordered, null, 2) + "\n");
   }
   for (const it of items) {
-    if (/^item:\d+$/.test(it.name) && cache[it.id]) it.name = cache[it.id];
+    if (isPlaceholder(it.name) && cache[it.id]) it.name = cache[it.id];
   }
-  return { resolved, unresolved: items.filter((it) => /^item:\d+$/.test(it.name)).length };
+  return { resolved, unresolved: items.filter((it) => isPlaceholder(it.name)).length };
 }
 
 // Name the auction-house items still showing "item:<id>" placeholders.
 async function resolveModelNames(source, models) {
+  const { EDITIONS } = await import(pathToFileURL(path.join(repo, "site/src/edition.mjs")).href);
   const views = models.auctionhouse.views;
   const uniqueItems = [...new Map(views.flatMap((v) => v.snapshot.items).map((it) => [it.id, it])).values()];
-  const names = source === "classic-beta"
-    ? await resolvePlaceholderNames(uniqueItems)
-    : { resolved: 0, unresolved: uniqueItems.filter((it) => /^item:\d+$/.test(it.name)).length };
+  const names = await resolvePlaceholderNames(EDITIONS[source].branch, uniqueItems);
   // Apply a name learned from either faction to every view containing that id.
   const resolvedNames = new Map(uniqueItems.map((it) => [it.id, it.name]));
   for (const v of views) for (const it of v.snapshot.items) {
-    if (/^item:\d+$/.test(it.name) && !/^item:\d+$/.test(resolvedNames.get(it.id) || ""))
+    if (isPlaceholder(it.name) && !isPlaceholder(resolvedNames.get(it.id) || ""))
       it.name = resolvedNames.get(it.id);
   }
   return names;
