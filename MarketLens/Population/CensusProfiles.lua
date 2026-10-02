@@ -157,14 +157,13 @@ P.profiles = {
     },
     ["forever"] = {
         label = "WoW: Forever (beta)",
-        simpleRefresh = true,
-        -- The beta piles thousands into a few levels: a cell still over 50 with
-        -- level, class and race pinned stays a lower bound instead of being dug
-        -- into by zone (102 zone queries once found ~10 players each).
-        -- Passive adaptive scans reach zones only after level, class, race and
-        -- high-yield name-letter refinements. Manual fixed refreshes never do.
-        -- Decide the whole query list up front; never grow it mid-census.
-        fixedPlan = true,
+        -- One census: every level from focusFrom to the cap is enumerated as
+        -- level x class x race (rare pairs as one range query), and a cell that
+        -- still caps is covered by name letters. Below focusFrom is a light
+        -- per-level pass. Never dug into by zone: 108 zone queries found ~10
+        -- players each.
+        focusFrom = 20,
+        noZoneFallback = true,
         -- Bands are generated from the live level cap (it moves during beta).
         dynamicBands = true,
         -- The announced cap. Observed levels lag a raise by days (the old cap's
@@ -287,6 +286,6 @@ function P.Current()
         racesByClass = def.racesByClass, hotspots = hot,
         capAt = def.capAt or 49, maxLevel = maxL,
         zoneFallback = not def.noZoneFallback, fixedPlan = def.fixedPlan,
-        simpleRefresh = def.simpleRefresh,
+        simpleRefresh = def.simpleRefresh, focusFrom = def.focusFrom,
     }
 end

@@ -68,12 +68,13 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml census next` | Run the census's next `/who` (bind it to a key with a macro); never starts a new census |
 | `/ml census passive on` / `off` | Let normal movement, turning, zooming, and world clicks advance an active census whenever its next query is eligible |
 | `/ml census auto on` / `off` | Start a census at login; combine with passive mode for hands-off collection while playing |
-| `/ml census start [budget]` / `stop` / `status` | Start (optional max query count, default 300), stop as partial, or print progress |
+| `/ml census start` / `stop` / `status` | Start, stop as partial, or print progress. On the Forever beta the census enumerates levels 20 to the cap by level x class x race (name letters for capped cells), in random order |
 | `/ml census profile` | Show the detected scan profile, its level backbone, and learned splits |
 | `/ml census cap <n>` / `auto` | Forever beta: pin the census level cap (default: the level the population has piled up at) |
 | `/ml census chat on` / `off` | Chat mode: the census types each `/ml who <filter>` into chat for you to send with Enter. Turns on automatically if the client blocks the census's own `/who` (the Forever beta does) |
-| `/ml census fixed on` / `off` | Fixed list: plan every query when the census starts and never add more; a query still over 50 is recorded as 50+ (and split up front next time). Default on the Forever beta |
-| Forever beta / Retail census | Uses a fixed refresh list: levels 1-20, then each faction race, then each class; capped queries remain 50+ and never spawn extra work |
+| `/ml census fixed on` / `off` | Fixed list: plan every query when the census starts and never add more; a query still over 50 is recorded as 50+ (and split up front next time). Not used by the Forever beta census |
+| Forever beta census | One plan, no budget: levels 20 to the cap as level x class x race (pairs too rare to fill a level run as one range query), levels below 20 one query per level. A capped class+race cell adds name-letter queries chosen to stay under 50; nothing is dug into by zone. Every query, including added ones, lands at a random spot in the queue |
+| Retail census | Fixed refresh list: levels 1-20, then each faction race, then each class; capped queries remain 50+ |
 | `/ml census forget` | Drop learned splits so the next census starts from the plain backbone |
 | `/ml sweep start [label]` | Start an explicit geographic collection sweep; subsequent `/ml who` results are attached to it |
 | `/ml sweep status` | Show the active sweep's query, character, and capped-query counts |

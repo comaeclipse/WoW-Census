@@ -60,7 +60,6 @@ end
 local DEFAULT_SETTINGS = {
     snapshotRetentionDays = 14,
     populationRetentionDays = 35, -- daily identity observations retained for 30-day metrics
-    censusBudget          = 300, -- max /who queries one census may plan
     censusPassive         = false, -- advance an active census from normal play input
     censusAutoStart       = false, -- start/resume a census when this character logs in
     specRetentionDays     = 35, -- successful inspect observations retained
@@ -357,8 +356,8 @@ SlashCmdList["MARKETLENS"] = function(msg)
         -- Hardware event: a macro with /ml census next can step it by key.
         -- Never starts a new census, so a finished run is not silently restarted.
         ML.Population.Census:RunNext()
-    elseif msg:match("^census start%s*%d*$") then
-        ML.Population.Census:Start(tonumber(msg:match("(%d+)$")))
+    elseif msg == "census start" then
+        ML.Population.Census:Start()
     elseif msg == "census stop" then
         ML.Population.Census:Stop()
     elseif msg == "census status" then
