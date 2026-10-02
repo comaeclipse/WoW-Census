@@ -292,6 +292,7 @@ The beta views also ship as a standalone bundle with no Worker and no database
 behind it, published at **https://wowcensus.io**:
 
 ```bash
+npm ci --prefix site                     # install build dependencies
 node tools/build-forever-page.js            # build pages/ only
 node tools/build-forever-page.js --deploy   # build, then publish to Pages
 ```
@@ -307,6 +308,12 @@ renders it with the same modules the Worker uses (`site/src/census.mjs` and
 | `pages/style.<hash>.css`, `pages/census.json` | immutable fingerprinted stylesheet and raw census numbers |
 | `pages/robots.txt`, `pages/sitemap.xml` | crawler policy and clean canonical route discovery |
 | `pages/_headers` | Pages caching rules for HTML, JSON, and fingerprinted assets |
+| `pages/*.md`, `pages/<edition>/*.md` | content-only Markdown variants for agents |
+
+The build also writes `pages/_worker.js` and `pages/_routes.json`. On content
+pages, `Accept: text/markdown` selects the Markdown variant; requests without
+that header continue to receive the same HTML. Only content-page routes invoke
+the Pages Function. Deploy the complete `pages/` directory after rebuilding.
 
 `--deploy` runs `wrangler pages deploy` against the `wowcensus` project; without
 it the folder can still be dragged onto **Cloudflare dashboard -> Workers &

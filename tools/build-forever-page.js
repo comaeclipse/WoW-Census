@@ -543,6 +543,9 @@ async function main() {
   };
   writeFile(path.join(outDir, "census.json"), JSON.stringify(censusJson, null, 2));
   writeCrawlAndCacheFiles();
+  // Rebuild Markdown for every edition because Pages is always deployed as one tree.
+  const markdown = spawnSync(process.execPath, [path.join(__dirname, "build-markdown-pages.js")], { stdio: "inherit" });
+  if (markdown.status !== 0) throw new Error("Markdown page build failed");
 
   const rel = path.relative(repo, outDir).replace(/\\/g, "/");
   console.log("Wrote " + rel + "/{index.html,combos.html,auctionhouse.html,guilds.html,geography.html,talents.html," + cssName + ",census.json,inspects.json}");

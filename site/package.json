@@ -1,5 +1,10 @@
 {
   "dependencies": {
     "hono": "^4.13.8"
+  },
+  "devDependencies": {
+    "linkedom": "^0.18.13",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2"
   }
 }
