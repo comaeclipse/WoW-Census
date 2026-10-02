@@ -16,13 +16,21 @@ const crypto = require("crypto");
 const repo = path.resolve(__dirname, "..");
 const RENDER_MODULES = ["edition.mjs", "census.mjs", "market.mjs", "guilds.mjs", "geography.mjs", "talents.mjs"];
 
+// Normalize line endings so checkouts with different autocrlf agree: a CRLF
+// working copy must not stamp published pages with a layout (or stylesheet
+// name) the deployed bundle never had.
+const readLf = (file) => fs.readFileSync(file, "utf8").replace(/\r\n/g, "\n");
+
+// The stylesheet as bundled, and its content-hashed file name.
+function stylesheet() {
+  const css = readLf(path.join(repo, "site/public/style.css"));
+  return { css, name: "style." + crypto.createHash("sha256").update(css).digest("hex").slice(0, 12) + ".css" };
+}
+
 function layout() {
-  const css = fs.readFileSync(path.join(repo, "site/public/style.css"));
-  const cssName = "style." + crypto.createHash("sha256").update(css).digest("hex").slice(0, 12) + ".css";
+  const cssName = stylesheet().name;
   const hash = crypto.createHash("sha256");
-  // Normalize line endings so checkouts with different autocrlf agree.
-  for (const name of RENDER_MODULES)
-    hash.update(fs.readFileSync(path.join(repo, "site/src", name), "utf8").replace(/\r\n/g, "\n"));
+  for (const name of RENDER_MODULES) hash.update(readLf(path.join(repo, "site/src", name)));
   hash.update(cssName);
   return { id: hash.digest("hex").slice(0, 12), css: cssName };
 }
@@ -33,7 +41,7 @@ function writeLayout() {
   return current;
 }
 
-module.exports = { layout, writeLayout };
+module.exports = { stylesheet, layout, writeLayout };
 
 if (require.main === module) {
   console.log(JSON.stringify(process.argv.includes("--write") ? writeLayout() : layout()));

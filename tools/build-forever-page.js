@@ -252,8 +252,7 @@ async function main() {
     "; names resolved " + names.resolved + ", unresolved " + names.unresolved);
 
   fs.mkdirSync(outDir, { recursive: true });
-  const css = fs.readFileSync(path.join(repo, "site/public/style.css"));
-  const cssName = "style." + crypto.createHash("sha256").update(css).digest("hex").slice(0, 12) + ".css";
+  const { css, name: cssName } = require("./layout-id").stylesheet();
   for (const name of fs.readdirSync(outDir)) {
     if (/^style(?:\.[a-f0-9]{12})?\.css$/.test(name)) fs.rmSync(path.join(outDir, name));
   }

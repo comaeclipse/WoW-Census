@@ -3,13 +3,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import crypto from 'node:crypto';
+import { createRequire } from 'node:module';
 
 const root = new URL('../', import.meta.url);
 const read = (p) => fs.readFileSync(new URL(p, root), 'utf8');
 const exists = (p) => fs.existsSync(new URL(p, root));
-const css = read('site/public/style.css');
-const cssName = 'style.' + crypto.createHash('sha256').update(fs.readFileSync(new URL('site/public/style.css', root))).digest('hex').slice(0, 12) + '.css';
+const { css, name: cssName } = createRequire(import.meta.url)('./layout-id.js').stylesheet();
 const editions = { '': 'Forever', tbc: 'TBC Anniversary', classic: 'Classic Era', sod: 'SoD', mop: 'MoP Classic', retail: 'Retail' };
 const pages = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents'];
 const files = Object.keys(editions).flatMap((dir) => pages.map((page) => ({ dir, page, file: 'pages/' + (dir ? dir + '/' : '') + page + '.html' })));
