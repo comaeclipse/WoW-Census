@@ -44,6 +44,20 @@ function namespaceId() {
   return hit[1];
 }
 
+// Old revisions stay readable for a while (a visitor mid-switch, a rollback),
+// then expire on their own.
+const REVISION_TTL = 30 * 86400;
+
+function bulkPut(entries) {
+  const file = path.join(os.tmpdir(), "wowcensus-pages-" + process.pid + ".json");
+  fs.writeFileSync(file, JSON.stringify(entries));
+  try {
+    const r = spawnSync("npx", ["--yes", "wrangler@latest", "kv", "bulk", "put", JSON.stringify(file),
+      "--namespace-id=" + namespaceId(), "--remote"], { stdio: "inherit", shell: true, cwd: repo });
+    if (r.status !== 0) throw new Error("wrangler kv bulk put exited " + r.status);
+  } finally { fs.rmSync(file, { force: true }); }
+}
+
 async function main() {
   const shared = await import(pathToFileURL(path.join(repo, "site/src/edition.mjs")).href);
   const sources = arg("source", Object.keys(shared.EDITIONS).join(",")).split(",");
@@ -57,7 +71,12 @@ async function main() {
       ", these pages use " + current.id + ".\n  They are published, but served only once this layout is deployed.");
 
   const generatedAt = new Date().toISOString();
+  // Pages are written under a fresh revision and never change afterwards, so
+  // the edge can cache them indefinitely; the small rev:<source> pointer, written
+  // only once every page is stored, is what moves the site to the new data.
+  const rev = Date.now().toString(36);
   const entries = [];
+  const pointers = [];
   for (const source of sources) {
     const started = Date.now();
     const data = await shared.fetchEditionData(source, (p) => getJson(api + p));
@@ -69,24 +88,20 @@ async function main() {
       const html = shared.renderEditionPage(source, page, models[page],
         { stylesheet: shared.editionPath(source) + current.css, generatedAt });
       bytes += Buffer.byteLength(html);
-      const metadata = { layout: current.id, generatedAt };
-      entries.push({ key: "page:" + source + ":" + page, value: html, metadata });
+      entries.push({ key: "page:" + source + ":" + page + ":" + rev, value: html, expiration_ttl: REVISION_TTL });
       // The Markdown companion served to Accept: text/markdown clients.
-      entries.push({ key: "md:" + source + ":" + page, value: htmlToMarkdown(html), metadata });
+      entries.push({ key: "md:" + source + ":" + page + ":" + rev, value: htmlToMarkdown(html), expiration_ttl: REVISION_TTL });
     }
+    pointers.push({ key: "rev:" + source, value: rev, metadata: { layout: current.id, generatedAt } });
     console.log(source.padEnd(20) + shared.PAGES.length + " pages, " + Math.round(bytes / 1024) + " KB, " +
       (Date.now() - started) + " ms");
   }
 
   if (args.includes("--dry-run")) return;
-  const file = path.join(os.tmpdir(), "wowcensus-pages-" + process.pid + ".json");
-  fs.writeFileSync(file, JSON.stringify(entries));
-  try {
-    const r = spawnSync("npx", ["--yes", "wrangler@latest", "kv", "bulk", "put", JSON.stringify(file),
-      "--namespace-id=" + namespaceId(), "--remote"], { stdio: "inherit", shell: true, cwd: repo });
-    if (r.status !== 0) throw new Error("wrangler kv bulk put exited " + r.status);
-  } finally { fs.rmSync(file, { force: true }); }
-  console.log("Published " + entries.length / 2 + " pages (+ Markdown) with layout " + current.id + " (KV edge caches refresh within ~5 min).");
+  bulkPut(entries);
+  bulkPut(pointers);
+  console.log("Published " + entries.length / 2 + " pages (+ Markdown) as revision " + rev + " with layout " +
+    current.id + "; live within about a minute.");
 }
 
 main().catch((e) => { console.error(String((e && e.message) || e)); process.exit(1); });

@@ -5,11 +5,11 @@ url: "https://wowcensus.io/"
 ---
 
 # WoW Forever & Classic+ Population Census – WoWCensus
-Characters: 27,439 (unique, all time)
+Characters: 28,894 (unique, all time)
 
 Realms: 2
 
-Scans: 1,752 (71,407 sightings)
+Scans: 1,816 (73,951 sightings)
 
 Updated: 2026-10-02 (last sample)
 
@@ -25,7 +25,7 @@ Horde
 
 Undead Priest
 
-1,204 characters · 8.6% of Horde
+1,306 characters · 8.4% of Horde
 
 ## Population by race
 
@@ -55,23 +55,23 @@ DWARF
 
 UNDEAD
 
-3,887
-
-WINDSHAPER SKYBORNE
-
-2,682
+4,305
 
 ORC
 
-2,652
+2,925
+
+WINDSHAPER SKYBORNE
+
+2,854
 
 TROLL
 
-2,489
+2,752
 
 TAUREN
 
-2,317
+2,646
 
 ## Class distribution — Alliance
 
@@ -115,49 +115,49 @@ SHAMAN
 
 ## Class distribution — Horde
 
-14,027 characters shown
+15,482 characters shown
 
 SHAMAN
 
-2,896
+3,027
 
 WARRIOR
 
-1,966
+2,332
 
 HUNTER
 
-1,824
+2,113
 
 PRIEST
 
-1,821
+1,987
 
 ROGUE
 
-1,205
-
-MAGE
-
-1,189
+1,308
 
 PALADIN
 
-1,171
+1,304
+
+MAGE
+
+1,286
 
 DRUID
 
-1,109
+1,201
 
 WARLOCK
 
-846
+924
 
-Characters: 22,832 (unique, all time)
+Characters: 23,519 (unique, all time)
 
 Realms: 1
 
-Scans: 1,563 (62,343 sightings)
+Scans: 1,584 (63,266 sightings)
 
 Updated: 2026-10-02 (last sample)
 
@@ -173,7 +173,7 @@ Horde
 
 Undead Priest
 
-1,143 characters · 9.2% of Horde
+1,219 characters · 9.3% of Horde
 
 ## Population by race
 
@@ -203,23 +203,23 @@ GNOME
 
 UNDEAD
 
-3,504
+3,740
 
 WINDSHAPER SKYBORNE
 
-2,426
+2,546
 
 ORC
 
-2,254
+2,370
 
 TROLL
 
-2,161
+2,278
 
 TAUREN
 
-2,121
+2,219
 
 ## Class distribution — Alliance
 
@@ -263,49 +263,49 @@ SHAMAN
 
 ## Class distribution — Horde
 
-12,466 characters shown
+13,153 characters shown
 
 SHAMAN
 
-2,674
+2,718
 
 PRIEST
 
-1,706
+1,819
 
 HUNTER
 
-1,593
+1,756
 
 WARRIOR
 
-1,548
+1,636
 
 PALADIN
 
-1,093
-
-DRUID
-
-1,044
+1,169
 
 MAGE
 
-1,030
+1,098
+
+DRUID
+
+1,083
 
 ROGUE
 
-993
+1,057
 
 WARLOCK
 
-785
+817
 
-Characters: 4,607 (unique, all time)
+Characters: 5,375 (unique, all time)
 
 Realms: 1
 
-Scans: 189 (9,064 sightings)
+Scans: 232 (10,685 sightings)
 
 Updated: 2026-10-02 (last sample)
 
@@ -319,9 +319,9 @@ Human Paladin
 
 Horde
 
-Orc Warrior
+Tauren Warrior
 
-153 characters · 9.8% of Horde
+219 characters · 9.4% of Horde
 
 ## Population by race
 
@@ -349,25 +349,25 @@ DWARF
 
 360
 
-ORC
-
-398
-
 UNDEAD
 
-383
+565
+
+ORC
+
+555
 
 TROLL
 
-328
-
-WINDSHAPER SKYBORNE
-
-256
+474
 
 TAUREN
 
-196
+427
+
+WINDSHAPER SKYBORNE
+
+308
 
 ## Class distribution — Alliance
 
@@ -411,52 +411,52 @@ SHAMAN
 
 ## Class distribution — Horde
 
-1,561 characters shown
+2,329 characters shown
 
 WARRIOR
 
-418
+696
 
 HUNTER
 
-231
+357
 
 SHAMAN
 
-222
+309
 
 ROGUE
 
-212
+251
 
 MAGE
 
-159
+188
 
 PRIEST
 
-115
+168
 
 PALADIN
 
-78
+135
 
 DRUID
 
-65
+118
 
 WARLOCK
 
-61
+107
 
 ## Inspected talent builds
 
-1,520 nearby players inspected · 1,307 with selected talents · 487 linked to retained census characters
+2,027 nearby players inspected · 1,763 with selected talents · 534 linked to retained census characters
 
-1,033 unlinked inspections. Nearby inspect samples have their own coverage and do not measure population-wide specialization shares.
+1,493 unlinked inspections. Nearby inspect samples have their own coverage and do not measure population-wide specialization shares.
 
-Latest inspection: 2026-10-02 02:15Z
+Latest inspection: 2026-10-02 16:56Z
 
 [Explore talents](/talents)
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

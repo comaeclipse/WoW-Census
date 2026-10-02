@@ -109,7 +109,7 @@ Highest unit asking price among items currently listed.
 | [Fishing Tournament!](https://www.wowhead.com/tbc/item=19978) | 6,969g 69s | 1 | — |
 | [Mantle of Thieves](https://www.wowhead.com/tbc/item=2264) | 6,876g 74s | 2 | 0% |
 | [Quillward Harness](https://www.wowhead.com/tbc/item=10583) | 6,458g 9s | 1 | 0% |
-| [Item 14485](https://www.wowhead.com/tbc/item=14485) | 6,083g 51s | 1 | 0% |
+| [Pattern: Wizardweave Leggings](https://www.wowhead.com/tbc/item=14485) | 6,083g 51s | 1 | 0% |
 | [Wind Dancer Boots](https://www.wowhead.com/tbc/item=13260) | 5,866g 51s | 1 | 0% |
 | [Tome of Polymorph: Turtle](https://www.wowhead.com/tbc/item=22739) | 5,600g 0s | 2 | \-33% |
 
@@ -247,7 +247,7 @@ Highest unit asking price among items currently listed.
 | [Abyssal War Beads](https://www.wowhead.com/tbc/item=20695) | 7,042g 15s | 1 | 0% |
 | [Fishing Tournament!](https://www.wowhead.com/tbc/item=19978) | 6,969g 69s | 1 | — |
 | [Quillward Harness](https://www.wowhead.com/tbc/item=10583) | 6,458g 9s | 1 | 0% |
-| [Item 14485](https://www.wowhead.com/tbc/item=14485) | 6,083g 51s | 1 | 0% |
+| [Pattern: Wizardweave Leggings](https://www.wowhead.com/tbc/item=14485) | 6,083g 51s | 1 | 0% |
 | [Wind Dancer Boots](https://www.wowhead.com/tbc/item=13260) | 5,866g 51s | 1 | 0% |
 | [Recipe: Dirge's Kickin' Chimaerok Chops](https://www.wowhead.com/tbc/item=21025) | 5,450g 0s | 1 | 0% |
 
@@ -515,7 +515,7 @@ Highest unit asking price among items currently listed.
 | [Fishing Tournament!](https://www.wowhead.com/tbc/item=19978) | 6,969g 69s | 1 | — |
 | [Mantle of Thieves](https://www.wowhead.com/tbc/item=2264) | 6,876g 74s | 2 | 0% |
 | [Quillward Harness](https://www.wowhead.com/tbc/item=10583) | 6,458g 9s | 1 | 0% |
-| [Item 14485](https://www.wowhead.com/tbc/item=14485) | 6,083g 51s | 1 | 0% |
+| [Pattern: Wizardweave Leggings](https://www.wowhead.com/tbc/item=14485) | 6,083g 51s | 1 | 0% |
 | [Wind Dancer Boots](https://www.wowhead.com/tbc/item=13260) | 5,866g 51s | 1 | 0% |
 | [Tome of Polymorph: Turtle](https://www.wowhead.com/tbc/item=22739) | 5,600g 0s | 2 | \-33% |
 
@@ -653,7 +653,7 @@ Highest unit asking price among items currently listed.
 | [Abyssal War Beads](https://www.wowhead.com/tbc/item=20695) | 7,042g 15s | 1 | 0% |
 | [Fishing Tournament!](https://www.wowhead.com/tbc/item=19978) | 6,969g 69s | 1 | — |
 | [Quillward Harness](https://www.wowhead.com/tbc/item=10583) | 6,458g 9s | 1 | 0% |
-| [Item 14485](https://www.wowhead.com/tbc/item=14485) | 6,083g 51s | 1 | 0% |
+| [Pattern: Wizardweave Leggings](https://www.wowhead.com/tbc/item=14485) | 6,083g 51s | 1 | 0% |
 | [Wind Dancer Boots](https://www.wowhead.com/tbc/item=13260) | 5,866g 51s | 1 | 0% |
 | [Recipe: Dirge's Kickin' Chimaerok Chops](https://www.wowhead.com/tbc/item=21025) | 5,450g 0s | 1 | 0% |
 
@@ -817,4 +817,4 @@ Single items holding the most listed value.
 | [Encrypted Twilight Text](https://www.wowhead.com/tbc/item=20404) | 15k g | 5,097 | +21% |
 | [Brilliant Crimson Spinel](https://www.wowhead.com/tbc/item=32196) | 14k g | 12 | +100% |
 
-Page generated: 2026-10-02 15:10Z
+Page generated: 2026-10-02 17:42Z

@@ -7,7 +7,7 @@ url: "https://wowcensus.io/combos"
 # WoW Forever Race & Class Breakdown – WoWCensus
 ## What this sample shows
 
-Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta. Dwarf Shaman leads the observed Alliance sample (7.1% of its characters); Undead Priest leads the observed Horde sample (8.6% of its characters).
+Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta. Dwarf Shaman leads the observed Alliance sample (7.1% of its characters); Undead Priest leads the observed Horde sample (8.4% of its characters).
 
 ## Alliance race + class
 
@@ -46,37 +46,37 @@ Forever Beta is still evolving, so this snapshot is most useful for reading the 
 
 ## Horde race + class
 
-14,027 observed characters, most common first.
+15,482 observed characters, most common first.
 
 | Combination | Characters | Share |
 | --- | --- | --- |
-| Undead Priest | 1,204 | 8.6% |
-| Undead Paladin | 1,171 | 8.3% |
-| Windshaper Skyborne Shaman | 955 | 6.8% |
-| Tauren Shaman | 776 | 5.5% |
-| Orc Shaman | 710 | 5.1% |
-| Troll Priest | 617 | 4.4% |
-| Orc Warrior | 595 | 4.2% |
-| Tauren Druid | 589 | 4.2% |
-| Windshaper Skyborne Hunter | 529 | 3.8% |
-| Windshaper Skyborne Druid | 520 | 3.7% |
-| Tauren Warrior | 515 | 3.7% |
-| Undead Mage | 457 | 3.3% |
-| Troll Shaman | 455 | 3.2% |
-| Orc Hunter | 439 | 3.1% |
-| Tauren Hunter | 437 | 3.1% |
-| Troll Hunter | 419 | 3.0% |
-| Undead Rogue | 407 | 2.9% |
-| Troll Mage | 378 | 2.7% |
-| Windshaper Skyborne Rogue | 360 | 2.6% |
-| Orc Mage | 354 | 2.5% |
-| Undead Warrior | 335 | 2.4% |
-| Windshaper Skyborne Warrior | 318 | 2.3% |
-| Undead Warlock | 313 | 2.2% |
-| Orc Warlock | 289 | 2.1% |
-| Orc Rogue | 265 | 1.9% |
-| Troll Warlock | 244 | 1.7% |
-| Troll Warrior | 203 | 1.4% |
-| Troll Rogue | 173 | 1.2% |
+| Undead Priest | 1,306 | 8.4% |
+| Undead Paladin | 1,304 | 8.4% |
+| Windshaper Skyborne Shaman | 980 | 6.3% |
+| Tauren Shaman | 800 | 5.2% |
+| Orc Shaman | 780 | 5.0% |
+| Tauren Warrior | 716 | 4.6% |
+| Troll Priest | 681 | 4.4% |
+| Orc Warrior | 653 | 4.2% |
+| Tauren Druid | 641 | 4.1% |
+| Windshaper Skyborne Hunter | 609 | 3.9% |
+| Windshaper Skyborne Druid | 560 | 3.6% |
+| Orc Hunter | 523 | 3.4% |
+| Undead Mage | 495 | 3.2% |
+| Troll Hunter | 492 | 3.2% |
+| Tauren Hunter | 489 | 3.2% |
+| Troll Shaman | 467 | 3.0% |
+| Undead Rogue | 456 | 2.9% |
+| Troll Mage | 412 | 2.7% |
+| Undead Warrior | 391 | 2.5% |
+| Orc Mage | 379 | 2.4% |
+| Windshaper Skyborne Rogue | 379 | 2.4% |
+| Undead Warlock | 353 | 2.3% |
+| Windshaper Skyborne Warrior | 326 | 2.1% |
+| Orc Warlock | 302 | 2.0% |
+| Orc Rogue | 288 | 1.9% |
+| Troll Warlock | 269 | 1.7% |
+| Troll Warrior | 246 | 1.6% |
+| Troll Rogue | 185 | 1.2% |
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

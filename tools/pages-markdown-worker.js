@@ -4,7 +4,9 @@
 //
 // A content page is served from KV when tools/publish-pages.js has published it
 // with the layout this deploy carries -- fresh data without a redeploy -- and
-// from the deploy's static copy otherwise.
+// from the deploy's static copy otherwise. Published pages are immutable
+// revisions behind a small per-edition pointer, so the edge cache holds each
+// page body indefinitely and only the pointer is re-read (about once a minute).
 import LAYOUT from "./_layout.json";
 import { PAGES, sourceForPath, pagePath } from "../site/src/edition.mjs";
 
@@ -37,27 +39,39 @@ function withHeaders(response, set) {
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
-// The published copy of a page ("page") or its Markdown ("md"), or null when it
+// The published copy of a page ("page") or its Markdown ("md") as
+// { body, tier } -- tier "edge" from the edge cache, "kv" from KV -- or null when it
 // is unpublished or was rendered with a different layout than this deploy's.
 // Only canonical paths are answered here, so Pages still redirects "/tbc" and
 // "/tbc/auctionhouse.html" to their canonical form.
-async function published(env, kind, hit, pathname) {
-  if (!env.PAGES_KV || !hit.source || pathname !== pagePath(hit.source, hit.page)) return null;
-  const { value, metadata } = await env.PAGES_KV.getWithMetadata(`${kind}:${hit.source}:${hit.page}`, { type: 'text', cacheTtl: 300 });
-  return value && metadata && metadata.layout === LAYOUT.id ? value : null;
+async function published(env, ctx, kind, hit, url) {
+  if (!env.PAGES_KV || !hit.source || url.pathname !== pagePath(hit.source, hit.page)) return null;
+  const pointer = await env.PAGES_KV.getWithMetadata(`rev:${hit.source}`, { cacheTtl: 60 });
+  if (!pointer.value || !pointer.metadata || pointer.metadata.layout !== LAYOUT.id) return null;
+  const key = `${kind}:${hit.source}:${hit.page}:${pointer.value}`;
+  // A revision never changes, so the edge cache may keep it as long as it likes.
+  const cacheKey = new Request(`${url.origin}/__published/${encodeURIComponent(key)}`);
+  const cached = await caches.default.match(cacheKey);
+  if (cached) return { body: cached.body, tier: 'edge' };
+  const value = await env.PAGES_KV.get(key, { type: 'text', cacheTtl: 86400 });
+  if (value === null) return null;
+  ctx.waitUntil(caches.default.put(cacheKey, new Response(value, {
+    headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
+  })));
+  return { body: value, tier: 'kv' };
 }
 
 export default {
-  async fetch(request, env) {
-    const { pathname } = new URL(request.url);
-    const hit = contentPage(pathname);
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const hit = contentPage(url.pathname);
     if (!hit || !['GET', 'HEAD'].includes(request.method)) return env.ASSETS.fetch(request);
     const markdown = acceptsMarkdown(request.headers.get('Accept') || '');
     const contentType = markdown ? 'text/markdown; charset=utf-8' : 'text/html; charset=utf-8';
 
-    const body = await published(env, markdown ? 'md' : 'page', hit, pathname);
-    if (body !== null) return withHeaders(new Response(body), {
-      'Content-Type': contentType, 'Cache-Control': HTML_CACHE, 'X-Page-Source': 'kv',
+    const page = await published(env, ctx, markdown ? 'md' : 'page', hit, url);
+    if (page) return withHeaders(new Response(page.body), {
+      'Content-Type': contentType, 'Cache-Control': HTML_CACHE, 'X-Page-Source': page.tier,
     });
 
     if (!markdown) {

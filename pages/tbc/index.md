@@ -311,4 +311,4 @@ Latest inspection: 2026-10-01 17:33Z
 
 [Explore talents](/tbc/talents)
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

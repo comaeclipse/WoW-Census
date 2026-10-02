@@ -5,13 +5,13 @@ url: "https://wowcensus.io/classic/"
 ---
 
 # WoW Classic Era Population Census – WoWCensus
-Characters: 5,201 (unique, all time)
+Characters: 4,618 (unique, all time)
 
 Realms: 3
 
-Scans: 404 (12,475 sightings)
+Scans: 442 (13,252 sightings)
 
-Updated: 2026-10-01 (last sample)
+Updated: 2026-10-02 (last sample)
 
 ## Most popular race + class
 
@@ -19,13 +19,13 @@ Alliance
 
 Human Mage
 
-426 characters · 12.1% of Alliance
+421 characters · 13.0% of Alliance
 
 Horde
 
 Undead Mage
 
-159 characters · 9.5% of Horde
+135 characters · 9.8% of Horde
 
 ## Population by race
 
@@ -35,107 +35,107 @@ AllianceHorde
 
 HUMAN
 
-1,704
+1,575
 
 NIGHT ELF
 
-850
-
-DWARF
-
-490
+764
 
 GNOME
 
-481
+452
+
+DWARF
+
+444
 
 UNDEAD
 
-561
+476
 
 ORC
 
-401
+337
 
 TROLL
 
-376
+298
 
 TAUREN
 
-338
+272
 
 ## Class distribution — Alliance
 
-3,525 characters shown
+3,235 characters shown
 
 MAGE
 
-702
+684
 
 WARRIOR
 
-574
+519
 
 HUNTER
 
-538
+489
 
 PALADIN
 
-480
+438
 
 PRIEST
 
-360
+323
 
 ROGUE
 
-311
+276
 
 DRUID
 
-293
+264
 
 WARLOCK
 
-267
+242
 
 ## Class distribution — Horde
 
-1,676 characters shown
+1,383 characters shown
 
 WARRIOR
 
-319
+257
 
 HUNTER
 
-267
+222
 
 MAGE
 
-245
+202
 
 SHAMAN
 
-224
+185
 
 PRIEST
 
-182
+156
 
 WARLOCK
 
-168
+141
 
 DRUID
 
-138
+116
 
 ROGUE
 
-133
+104
 
 Characters: 2,928 (unique, all time)
 
@@ -143,7 +143,7 @@ Realms: 1
 
 Scans: 263 (8,125 sightings)
 
-Updated: 2026-10-01 (last sample)
+Updated: 2026-10-02 (last sample)
 
 ## Most popular race + class
 
@@ -269,13 +269,13 @@ ROGUE
 
 93
 
-Characters: 926 (unique, all time)
+Characters: 343 (unique, all time)
 
 Realms: 1
 
-Scans: 57 (1,509 sightings)
+Scans: 95 (2,286 sightings)
 
-Updated: 2026-10-01 (last sample)
+Updated: 2026-10-02 (last sample)
 
 ## Most popular race + class
 
@@ -283,13 +283,13 @@ Alliance
 
 Human Mage
 
-76 characters · 14.4% of Alliance
+71 characters · 30.1% of Alliance
 
 Horde
 
 Undead Mage
 
-36 characters · 9.0% of Horde
+12 characters · 11.2% of Horde
 
 ## Population by race
 
@@ -299,107 +299,107 @@ AllianceHorde
 
 HUMAN
 
-263
+134
 
 NIGHT ELF
 
-131
-
-DWARF
-
-74
+45
 
 GNOME
 
-58
+29
+
+DWARF
+
+28
 
 UNDEAD
 
-117
-
-TROLL
-
-101
+32
 
 ORC
 
-93
+29
 
 TAUREN
 
-89
+23
+
+TROLL
+
+23
 
 ## Class distribution — Alliance
 
-526 characters shown
+236 characters shown
 
 MAGE
 
-105
-
-WARRIOR
-
-78
-
-HUNTER
-
-77
+87
 
 PALADIN
 
-75
-
-PRIEST
-
-53
-
-ROGUE
-
-49
-
-DRUID
-
-47
-
-WARLOCK
-
-42
-
-## Class distribution — Horde
-
-400 characters shown
-
-WARRIOR
-
-78
-
-MAGE
-
-62
+33
 
 HUNTER
 
-61
+28
 
-SHAMAN
+WARRIOR
 
-54
-
-PRIEST
-
-40
-
-ROGUE
-
-40
-
-WARLOCK
-
-33
+23
 
 DRUID
 
-32
+18
+
+WARLOCK
+
+17
+
+PRIEST
+
+16
+
+ROGUE
+
+14
+
+## Class distribution — Horde
+
+107 characters shown
+
+MAGE
+
+19
+
+HUNTER
+
+16
+
+WARRIOR
+
+16
+
+SHAMAN
+
+15
+
+PRIEST
+
+14
+
+ROGUE
+
+11
+
+DRUID
+
+10
+
+WARLOCK
+
+6
 
 Characters: 1,347 (unique, all time)
 
@@ -407,7 +407,7 @@ Realms: 1
 
 Scans: 84 (2,841 sightings)
 
-Updated: 2026-10-01 (last sample)
+Updated: 2026-10-02 (last sample)
 
 ## Most popular race + class
 
@@ -477,12 +477,12 @@ WARLOCK
 
 ## Inspected talent builds
 
-24 nearby players inspected · 24 with selected talents · 21 linked to retained census characters
+43 nearby players inspected · 43 with selected talents · 34 linked to retained census characters
 
-3 unlinked inspections. Nearby inspect samples have their own coverage and do not measure population-wide specialization shares.
+9 unlinked inspections. Nearby inspect samples have their own coverage and do not measure population-wide specialization shares.
 
-Latest inspection: 2026-10-01 18:26Z
+Latest inspection: 2026-10-02 14:33Z
 
 [Explore talents](/classic/talents)
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

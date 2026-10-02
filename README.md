@@ -337,7 +337,12 @@ uploaded edition automatically (`-NoPublish` skips it). The Pages Function
 serves a KV page on its canonical path when the page was rendered with the
 deployed layout -- the hash in `pages/_layout.json`, from `tools/layout-id.js`
 -- and the deploy's static file otherwise, so a page rendered by other layout
-code is never served. Edge caches pick up a publish within about 5 minutes.
+code is never served. Each publish stores its pages under a new revision key
+that never changes, then flips a small `rev:<source>` pointer; the Pages
+Function re-reads only the pointer (about once a minute) and keeps page bodies
+in the edge cache indefinitely (`X-Page-Source: edge`, or `kv` on a cache
+miss). A publish is live within about a minute; old revisions expire after 30
+days.
 Rendering happens at publish time, not per request: shaping the auction-house
 model alone takes tens of milliseconds of CPU.
 

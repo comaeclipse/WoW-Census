@@ -5,13 +5,13 @@ url: "https://wowcensus.io/classic/guilds"
 ---
 
 # WoW Classic Era Guilds by Realm – WoWCensus
-Guilds found: 432 (distinct realm guilds)
+Guilds found: 435 (distinct realm guilds)
 
-Guilded characters: 3,893 (latest known guild)
+Guilded characters: 3,981 (latest known guild)
 
-Surveyed: 5,201 (unique characters)
+Surveyed: 4,618 (unique characters)
 
-Updated: 2026-10-01 (Ashkandi · Westfall · Old Blanchy)
+Updated: 2026-10-02 (Ashkandi · Old Blanchy · Westfall)
 
 ## Most popular guilds
 
@@ -23,22 +23,22 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 2 | <Temple-Windseeker> | Ashkandi · Horde | 94 |
 | 3 | <HorsemenOfTheApocalypse-Mankrik> | Ashkandi · Horde | 87 |
 | 4 | <Baines Bruisers-Mankrik> | Ashkandi · Horde | 80 |
-| 5 | <The Old Gods-Azuresong> | Old Blanchy · Horde | 72 |
-| 6 | <Kamikaze Squirrels-Mankrik> | Ashkandi · Horde | 71 |
-| 7 | <Molten Soft Core> | Ashkandi · Horde | 71 |
-| 8 | <Cairns Chosen Elite-Mankrik> | Ashkandi · Horde | 70 |
-| 9 | <Dodecahedron-Azuresong> | Old Blanchy · Horde | 65 |
+| 5 | <The Old Gods-Azuresong> | Old Blanchy · Horde | 79 |
+| 6 | <Dodecahedron-Azuresong> | Old Blanchy · Horde | 73 |
+| 7 | <Kamikaze Squirrels-Mankrik> | Ashkandi · Horde | 71 |
+| 8 | <Molten Soft Core> | Ashkandi · Horde | 71 |
+| 9 | <Cairns Chosen Elite-Mankrik> | Ashkandi · Horde | 70 |
 | 10 | <Loot The Dog> | Ashkandi · Horde | 65 |
 | 11 | <Silvermoon Loyalists-Westfall> | Ashkandi · Alliance | 64 |
 | 12 | <SATURDAY NIGHT RAIDS-Mankrik> | Ashkandi · Alliance | 63 |
 | 13 | <The Syndicate-Mankrik> | Ashkandi · Horde | 58 |
 | 14 | <Klaatu Barada Nikto-Westfall> | Ashkandi · Horde | 56 |
-| 15 | <Bloodhoof Braves-Mankrik> | Ashkandi · Horde | 52 |
-| 16 | <Built Horde Tough-Windseeker> | Ashkandi · Horde | 51 |
-| 17 | <The Outcast-Mankrik> | Ashkandi · Horde | 48 |
-| 18 | <VOID-Mankrik> | Ashkandi · Horde | 48 |
-| 19 | <boat-Myzrael> | Old Blanchy · Horde | 45 |
-| 20 | <Get Off My Lawn> | Old Blanchy · Alliance | 45 |
+| 15 | <Get Off My Lawn> | Old Blanchy · Alliance | 55 |
+| 16 | <Bloodhoof Braves-Mankrik> | Ashkandi · Horde | 52 |
+| 17 | <boat-Myzrael> | Old Blanchy · Horde | 51 |
+| 18 | <Built Horde Tough-Windseeker> | Ashkandi · Horde | 51 |
+| 19 | <The Outcast-Mankrik> | Ashkandi · Horde | 48 |
+| 20 | <VOID-Mankrik> | Ashkandi · Horde | 48 |
 | 21 | <Slayer-Mankrik> | Ashkandi · Alliance | 43 |
 | 22 | <Critical Damage-Westfall> | Ashkandi · Alliance | 41 |
 | 23 | <Aces and Eights-Pagle> | Ashkandi · Alliance | 39 |
@@ -49,84 +49,84 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 28 | <Chuck Norris-Mankrik> | Ashkandi · Alliance | 34 |
 | 29 | <The Nightwatch-Westfall> | Ashkandi · Alliance | 33 |
 | 30 | <To Be Determined> | Ashkandi · Alliance | 33 |
-| 31 | <UNSUPERVISED-Westfall> | Ashkandi · Alliance | 32 |
-| 32 | <OnlyNoobs-Mankrik> | Ashkandi · Alliance | 31 |
-| 33 | <Starfall-Mankrik> | Ashkandi · Alliance | 31 |
-| 34 | <The Silver Hand> | Ashkandi · Alliance | 30 |
-| 35 | <Unity-Pagle> | Ashkandi · Alliance | 30 |
-| 36 | <Event Horizon-Pagle> | Westfall · Alliance | 29 |
-| 37 | <Hammer of Khaz Modan-Westfall> | Ashkandi · Alliance | 29 |
-| 38 | <Benevolence-Mankrik> | Ashkandi · Alliance | 27 |
-| 39 | <Adventurers For Hire> | Ashkandi · Horde | 26 |
-| 40 | <Average At Best> | Westfall · Alliance | 26 |
-| 41 | <We Are Charlie Kirk-Mankrik> | Ashkandi · Alliance | 26 |
-| 42 | <Silvermoon Loyalists> | Westfall · Alliance | 25 |
-| 43 | <Stonehenge-Azuresong> | Old Blanchy · Alliance | 25 |
-| 44 | <Aces and Eights-Pagle> | Westfall · Alliance | 24 |
-| 45 | <Enlightened-Myzrael> | Old Blanchy · Alliance | 24 |
-| 46 | <Euphoria-Westfall> | Ashkandi · Alliance | 24 |
-| 47 | <Go With The Flow-Windseeker> | Ashkandi · Alliance | 24 |
-| 48 | <Waiting for Forever-Windseeker> | Westfall · Alliance | 24 |
-| 49 | <Flowers in the Rain-Atiesh> | Old Blanchy · Alliance | 23 |
-| 50 | <Heartless> | Westfall · Alliance | 23 |
-| 51 | <Heartless-Westfall> | Ashkandi · Alliance | 23 |
-| 52 | <Home Sweet Home-Mankrik> | Ashkandi · Alliance | 23 |
-| 53 | <Blood Reign-Mankrik> | Ashkandi · Alliance | 22 |
-| 54 | <Challenge Accepted-Azuresong> | Old Blanchy · Horde | 22 |
+| 31 | <Stonehenge-Azuresong> | Old Blanchy · Alliance | 32 |
+| 32 | <UNSUPERVISED-Westfall> | Ashkandi · Alliance | 32 |
+| 33 | <OnlyNoobs-Mankrik> | Ashkandi · Alliance | 31 |
+| 34 | <Starfall-Mankrik> | Ashkandi · Alliance | 31 |
+| 35 | <Flowers in the Rain-Atiesh> | Old Blanchy · Alliance | 30 |
+| 36 | <The Silver Hand> | Ashkandi · Alliance | 30 |
+| 37 | <Unity-Pagle> | Ashkandi · Alliance | 30 |
+| 38 | <Event Horizon-Pagle> | Westfall · Alliance | 29 |
+| 39 | <Hammer of Khaz Modan-Westfall> | Ashkandi · Alliance | 29 |
+| 40 | <Enlightened-Myzrael> | Old Blanchy · Alliance | 28 |
+| 41 | <Benevolence-Mankrik> | Ashkandi · Alliance | 27 |
+| 42 | <Adventurers For Hire> | Ashkandi · Horde | 26 |
+| 43 | <Average At Best> | Westfall · Alliance | 26 |
+| 44 | <Challenge Accepted-Azuresong> | Old Blanchy · Horde | 26 |
+| 45 | <We Are Charlie Kirk-Mankrik> | Ashkandi · Alliance | 26 |
+| 46 | <Silvermoon Loyalists> | Westfall · Alliance | 25 |
+| 47 | <Aces and Eights-Pagle> | Westfall · Alliance | 24 |
+| 48 | <Euphoria-Westfall> | Ashkandi · Alliance | 24 |
+| 49 | <Go With The Flow-Windseeker> | Ashkandi · Alliance | 24 |
+| 50 | <Waiting for Forever-Windseeker> | Westfall · Alliance | 24 |
+| 51 | <Heartless> | Westfall · Alliance | 23 |
+| 52 | <Heartless-Westfall> | Ashkandi · Alliance | 23 |
+| 53 | <Home Sweet Home-Mankrik> | Ashkandi · Alliance | 23 |
+| 54 | <Blood Reign-Mankrik> | Ashkandi · Alliance | 22 |
 | 55 | <Older Than Dirt-Mankrik> | Ashkandi · Alliance | 22 |
 | 56 | <Fabled> | Ashkandi · Alliance | 21 |
 | 57 | <LoFi Café-Mankrik> | Ashkandi · Alliance | 21 |
 | 58 | <M O I S T-Mankrik> | Ashkandi · Alliance | 20 |
 | 59 | <Positivity-Mankrik> | Ashkandi · Alliance | 20 |
-| 60 | <Mass Invite-Mankrik> | Ashkandi · Alliance | 19 |
-| 61 | <Average Pugs> | Ashkandi · Horde | 18 |
-| 62 | <Spirit Sanctum-Pagle> | Ashkandi · Horde | 18 |
-| 63 | <Balanced-Westfall> | Ashkandi · Horde | 17 |
-| 64 | <Dawnfire-Myzrael> | Old Blanchy · Alliance | 17 |
-| 65 | <Delusions of Grandeur-Myzrael> | Old Blanchy · Alliance | 17 |
+| 60 | <Dawnfire-Myzrael> | Old Blanchy · Alliance | 19 |
+| 61 | <Delusions of Grandeur-Myzrael> | Old Blanchy · Alliance | 19 |
+| 62 | <Mass Invite-Mankrik> | Ashkandi · Alliance | 19 |
+| 63 | <Average Pugs> | Ashkandi · Horde | 18 |
+| 64 | <Spirit Sanctum-Pagle> | Ashkandi · Horde | 18 |
+| 65 | <Balanced-Westfall> | Ashkandi · Horde | 17 |
 | 66 | <Eclipse-Pagle> | Westfall · Alliance | 17 |
-| 67 | <Pugs not drugs-Pagle> | Ashkandi · Alliance | 16 |
-| 68 | <Chaos-Mankrik> | Ashkandi · Alliance | 15 |
-| 69 | <Dead Mans Hand-Westfall> | Ashkandi · Horde | 15 |
-| 70 | <Older Than Dirt-Mankrik> | Westfall · Alliance | 15 |
-| 71 | <Timeless Guardians-Westfall> | Ashkandi · Alliance | 15 |
-| 72 | <Blood Reign-Mankrik> | Westfall · Alliance | 14 |
-| 73 | <Chuck Norris-Mankrik> | Westfall · Alliance | 14 |
-| 74 | <Excessive Gaming-Windseeker> | Ashkandi · Alliance | 14 |
-| 75 | <LoFi Café-Mankrik> | Westfall · Alliance | 14 |
-| 76 | <no name> | Ashkandi · Alliance | 14 |
-| 77 | <Slayer-Mankrik> | Westfall · Alliance | 14 |
-| 78 | <WOW FOREVER WAITING ROOM-Mankrik> | Ashkandi · Alliance | 14 |
-| 79 | <Disavowed-Mankrik> | Ashkandi · Alliance | 13 |
-| 80 | <FDS CLT-Mankrik> | Ashkandi · Alliance | 13 |
-| 81 | <Hooligans and Hunters-Mankrik> | Ashkandi · Alliance | 13 |
-| 82 | <Knights of Stormwind> | Westfall · Alliance | 13 |
-| 83 | <Lich Please> | Ashkandi · Alliance | 13 |
-| 84 | <Scum-Mankrik> | Ashkandi · Alliance | 13 |
-| 85 | <The Lionguard> | Ashkandi · Alliance | 13 |
-| 86 | <Crayon Scribblez-Mankrik> | Ashkandi · Horde | 12 |
-| 87 | <Milone Trading-Mankrik> | Ashkandi · Alliance | 12 |
-| 88 | <Moonsong Order-Mankrik> | Ashkandi · Alliance | 12 |
-| 89 | <Platos Stepchildren-Ashkandi> | Westfall · Alliance | 12 |
-| 90 | <Rønin øf Azerøth-Azuresong> | Old Blanchy · Horde | 12 |
-| 91 | <SATURDAY NIGHT RAIDS-Mankrik> | Westfall · Alliance | 12 |
-| 92 | <STORM-Myzrael> | Old Blanchy · Alliance | 12 |
-| 93 | <UNSUPERVISED> | Westfall · Alliance | 12 |
-| 94 | <Aftermath> | Ashkandi · Horde | 11 |
-| 95 | <Chill Vibes-Mankrik> | Ashkandi · Alliance | 11 |
-| 96 | <Disposable Heroes> | Ashkandi · Alliance | 11 |
-| 97 | <Eclipse-Pagle> | Ashkandi · Alliance | 11 |
-| 98 | <Euphoria> | Westfall · Alliance | 11 |
-| 99 | <Mass Invite-Mankrik> | Westfall · Alliance | 11 |
-| 100 | <Renegades and Heretics-Pagle> | Ashkandi · Alliance | 11 |
+| 67 | <The Wanted-Azuresong> | Old Blanchy · Alliance | 17 |
+| 68 | <Pugs not drugs-Pagle> | Ashkandi · Alliance | 16 |
+| 69 | <STORM-Myzrael> | Old Blanchy · Alliance | 16 |
+| 70 | <Chaos-Mankrik> | Ashkandi · Alliance | 15 |
+| 71 | <Dead Mans Hand-Westfall> | Ashkandi · Horde | 15 |
+| 72 | <Older Than Dirt-Mankrik> | Westfall · Alliance | 15 |
+| 73 | <Timeless Guardians-Westfall> | Ashkandi · Alliance | 15 |
+| 74 | <Blood Reign-Mankrik> | Westfall · Alliance | 14 |
+| 75 | <Chuck Norris-Mankrik> | Westfall · Alliance | 14 |
+| 76 | <Excessive Gaming-Windseeker> | Ashkandi · Alliance | 14 |
+| 77 | <LoFi Café-Mankrik> | Westfall · Alliance | 14 |
+| 78 | <no name> | Ashkandi · Alliance | 14 |
+| 79 | <Slayer-Mankrik> | Westfall · Alliance | 14 |
+| 80 | <WOW FOREVER WAITING ROOM-Mankrik> | Ashkandi · Alliance | 14 |
+| 81 | <Disavowed-Mankrik> | Ashkandi · Alliance | 13 |
+| 82 | <FDS CLT-Mankrik> | Ashkandi · Alliance | 13 |
+| 83 | <Hooligans and Hunters-Mankrik> | Ashkandi · Alliance | 13 |
+| 84 | <Knights of Stormwind> | Westfall · Alliance | 13 |
+| 85 | <Lich Please> | Ashkandi · Alliance | 13 |
+| 86 | <Scum-Mankrik> | Ashkandi · Alliance | 13 |
+| 87 | <The Lionguard> | Ashkandi · Alliance | 13 |
+| 88 | <Crayon Scribblez-Mankrik> | Ashkandi · Horde | 12 |
+| 89 | <Milone Trading-Mankrik> | Ashkandi · Alliance | 12 |
+| 90 | <Moonsong Order-Mankrik> | Ashkandi · Alliance | 12 |
+| 91 | <Platos Stepchildren-Ashkandi> | Westfall · Alliance | 12 |
+| 92 | <Rønin øf Azerøth-Azuresong> | Old Blanchy · Horde | 12 |
+| 93 | <SATURDAY NIGHT RAIDS-Mankrik> | Westfall · Alliance | 12 |
+| 94 | <UNSUPERVISED> | Westfall · Alliance | 12 |
+| 95 | <Aftermath> | Ashkandi · Horde | 11 |
+| 96 | <Chill Vibes-Mankrik> | Ashkandi · Alliance | 11 |
+| 97 | <Disposable Heroes> | Ashkandi · Alliance | 11 |
+| 98 | <Eclipse-Pagle> | Ashkandi · Alliance | 11 |
+| 99 | <Euphoria> | Westfall · Alliance | 11 |
+| 100 | <Jolly Roger-Azuresong> | Old Blanchy · Alliance | 11 |
 
-Guilds found: 340 (distinct realm guilds)
+Guilds found: 342 (distinct realm guilds)
 
-Guilded characters: 2,364 (latest known guild)
+Guilded characters: 2,421 (latest known guild)
 
-Surveyed: 3,525 (unique characters)
+Surveyed: 3,235 (unique characters)
 
-Updated: 2026-10-01 (Westfall · Ashkandi · Old Blanchy)
+Updated: 2026-10-02 (Old Blanchy · Westfall · Ashkandi)
 
 ## Most popular guilds
 
@@ -136,7 +136,7 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | --- | --- | --- | --- |
 | 1 | <Silvermoon Loyalists-Westfall> | Ashkandi · Alliance | 64 |
 | 2 | <SATURDAY NIGHT RAIDS-Mankrik> | Ashkandi · Alliance | 63 |
-| 3 | <Get Off My Lawn> | Old Blanchy · Alliance | 45 |
+| 3 | <Get Off My Lawn> | Old Blanchy · Alliance | 55 |
 | 4 | <Slayer-Mankrik> | Ashkandi · Alliance | 43 |
 | 5 | <Critical Damage-Westfall> | Ashkandi · Alliance | 41 |
 | 6 | <Aces and Eights-Pagle> | Ashkandi · Alliance | 39 |
@@ -146,24 +146,24 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 10 | <Chuck Norris-Mankrik> | Ashkandi · Alliance | 34 |
 | 11 | <The Nightwatch-Westfall> | Ashkandi · Alliance | 33 |
 | 12 | <To Be Determined> | Ashkandi · Alliance | 33 |
-| 13 | <UNSUPERVISED-Westfall> | Ashkandi · Alliance | 32 |
-| 14 | <OnlyNoobs-Mankrik> | Ashkandi · Alliance | 31 |
-| 15 | <Starfall-Mankrik> | Ashkandi · Alliance | 31 |
-| 16 | <The Silver Hand> | Ashkandi · Alliance | 30 |
-| 17 | <Unity-Pagle> | Ashkandi · Alliance | 30 |
-| 18 | <Event Horizon-Pagle> | Westfall · Alliance | 29 |
-| 19 | <Hammer of Khaz Modan-Westfall> | Ashkandi · Alliance | 29 |
-| 20 | <Benevolence-Mankrik> | Ashkandi · Alliance | 27 |
-| 21 | <Average At Best> | Westfall · Alliance | 26 |
-| 22 | <We Are Charlie Kirk-Mankrik> | Ashkandi · Alliance | 26 |
-| 23 | <Silvermoon Loyalists> | Westfall · Alliance | 25 |
-| 24 | <Stonehenge-Azuresong> | Old Blanchy · Alliance | 25 |
-| 25 | <Aces and Eights-Pagle> | Westfall · Alliance | 24 |
-| 26 | <Enlightened-Myzrael> | Old Blanchy · Alliance | 24 |
-| 27 | <Euphoria-Westfall> | Ashkandi · Alliance | 24 |
-| 28 | <Go With The Flow-Windseeker> | Ashkandi · Alliance | 24 |
-| 29 | <Waiting for Forever-Windseeker> | Westfall · Alliance | 24 |
-| 30 | <Flowers in the Rain-Atiesh> | Old Blanchy · Alliance | 23 |
+| 13 | <Stonehenge-Azuresong> | Old Blanchy · Alliance | 32 |
+| 14 | <UNSUPERVISED-Westfall> | Ashkandi · Alliance | 32 |
+| 15 | <OnlyNoobs-Mankrik> | Ashkandi · Alliance | 31 |
+| 16 | <Starfall-Mankrik> | Ashkandi · Alliance | 31 |
+| 17 | <Flowers in the Rain-Atiesh> | Old Blanchy · Alliance | 30 |
+| 18 | <The Silver Hand> | Ashkandi · Alliance | 30 |
+| 19 | <Unity-Pagle> | Ashkandi · Alliance | 30 |
+| 20 | <Event Horizon-Pagle> | Westfall · Alliance | 29 |
+| 21 | <Hammer of Khaz Modan-Westfall> | Ashkandi · Alliance | 29 |
+| 22 | <Enlightened-Myzrael> | Old Blanchy · Alliance | 28 |
+| 23 | <Benevolence-Mankrik> | Ashkandi · Alliance | 27 |
+| 24 | <Average At Best> | Westfall · Alliance | 26 |
+| 25 | <We Are Charlie Kirk-Mankrik> | Ashkandi · Alliance | 26 |
+| 26 | <Silvermoon Loyalists> | Westfall · Alliance | 25 |
+| 27 | <Aces and Eights-Pagle> | Westfall · Alliance | 24 |
+| 28 | <Euphoria-Westfall> | Ashkandi · Alliance | 24 |
+| 29 | <Go With The Flow-Windseeker> | Ashkandi · Alliance | 24 |
+| 30 | <Waiting for Forever-Windseeker> | Westfall · Alliance | 24 |
 | 31 | <Heartless> | Westfall · Alliance | 23 |
 | 32 | <Heartless-Westfall> | Ashkandi · Alliance | 23 |
 | 33 | <Home Sweet Home-Mankrik> | Ashkandi · Alliance | 23 |
@@ -173,75 +173,75 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 37 | <LoFi Café-Mankrik> | Ashkandi · Alliance | 21 |
 | 38 | <M O I S T-Mankrik> | Ashkandi · Alliance | 20 |
 | 39 | <Positivity-Mankrik> | Ashkandi · Alliance | 20 |
-| 40 | <Mass Invite-Mankrik> | Ashkandi · Alliance | 19 |
-| 41 | <Dawnfire-Myzrael> | Old Blanchy · Alliance | 17 |
-| 42 | <Delusions of Grandeur-Myzrael> | Old Blanchy · Alliance | 17 |
+| 40 | <Dawnfire-Myzrael> | Old Blanchy · Alliance | 19 |
+| 41 | <Delusions of Grandeur-Myzrael> | Old Blanchy · Alliance | 19 |
+| 42 | <Mass Invite-Mankrik> | Ashkandi · Alliance | 19 |
 | 43 | <Eclipse-Pagle> | Westfall · Alliance | 17 |
-| 44 | <Pugs not drugs-Pagle> | Ashkandi · Alliance | 16 |
-| 45 | <Chaos-Mankrik> | Ashkandi · Alliance | 15 |
-| 46 | <Older Than Dirt-Mankrik> | Westfall · Alliance | 15 |
-| 47 | <Timeless Guardians-Westfall> | Ashkandi · Alliance | 15 |
-| 48 | <Blood Reign-Mankrik> | Westfall · Alliance | 14 |
-| 49 | <Chuck Norris-Mankrik> | Westfall · Alliance | 14 |
-| 50 | <Excessive Gaming-Windseeker> | Ashkandi · Alliance | 14 |
-| 51 | <LoFi Café-Mankrik> | Westfall · Alliance | 14 |
-| 52 | <no name> | Ashkandi · Alliance | 14 |
-| 53 | <Slayer-Mankrik> | Westfall · Alliance | 14 |
-| 54 | <WOW FOREVER WAITING ROOM-Mankrik> | Ashkandi · Alliance | 14 |
-| 55 | <Disavowed-Mankrik> | Ashkandi · Alliance | 13 |
-| 56 | <FDS CLT-Mankrik> | Ashkandi · Alliance | 13 |
-| 57 | <Hooligans and Hunters-Mankrik> | Ashkandi · Alliance | 13 |
-| 58 | <Knights of Stormwind> | Westfall · Alliance | 13 |
-| 59 | <Lich Please> | Ashkandi · Alliance | 13 |
-| 60 | <Scum-Mankrik> | Ashkandi · Alliance | 13 |
-| 61 | <The Lionguard> | Ashkandi · Alliance | 13 |
-| 62 | <Milone Trading-Mankrik> | Ashkandi · Alliance | 12 |
-| 63 | <Moonsong Order-Mankrik> | Ashkandi · Alliance | 12 |
-| 64 | <Platos Stepchildren-Ashkandi> | Westfall · Alliance | 12 |
-| 65 | <SATURDAY NIGHT RAIDS-Mankrik> | Westfall · Alliance | 12 |
-| 66 | <STORM-Myzrael> | Old Blanchy · Alliance | 12 |
-| 67 | <UNSUPERVISED> | Westfall · Alliance | 12 |
-| 68 | <Chill Vibes-Mankrik> | Ashkandi · Alliance | 11 |
-| 69 | <Disposable Heroes> | Ashkandi · Alliance | 11 |
-| 70 | <Eclipse-Pagle> | Ashkandi · Alliance | 11 |
-| 71 | <Euphoria> | Westfall · Alliance | 11 |
-| 72 | <Mass Invite-Mankrik> | Westfall · Alliance | 11 |
-| 73 | <Renegades and Heretics-Pagle> | Ashkandi · Alliance | 11 |
-| 74 | <The Unyielding-Mankrik> | Ashkandi · Alliance | 11 |
-| 75 | <To Be Determined-Ashkandi> | Westfall · Alliance | 11 |
-| 76 | <Acts of War-Mankrik> | Ashkandi · Alliance | 10 |
-| 77 | <Critical Damage> | Westfall · Alliance | 10 |
-| 78 | <Exodus-Ashkandi> | Westfall · Alliance | 10 |
-| 79 | <Hooligans and Hunters-Mankrik> | Westfall · Alliance | 10 |
-| 80 | <no name-Ashkandi> | Westfall · Alliance | 10 |
-| 81 | <The Nightwatch> | Westfall · Alliance | 10 |
-| 82 | <The Wanted-Azuresong> | Old Blanchy · Alliance | 10 |
-| 83 | <Thunder and Ice-Mankrik> | Ashkandi · Alliance | 10 |
-| 84 | <Vengeance-Mankrik> | Ashkandi · Alliance | 10 |
-| 85 | <Casual Play-Mankrik> | Westfall · Alliance | 9 |
-| 86 | <Disposable Heroes-Ashkandi> | Westfall · Alliance | 9 |
-| 87 | <Forever Knights-Westfall> | Ashkandi · Alliance | 9 |
-| 88 | <Jolly Roger-Azuresong> | Old Blanchy · Alliance | 9 |
+| 44 | <The Wanted-Azuresong> | Old Blanchy · Alliance | 17 |
+| 45 | <Pugs not drugs-Pagle> | Ashkandi · Alliance | 16 |
+| 46 | <STORM-Myzrael> | Old Blanchy · Alliance | 16 |
+| 47 | <Chaos-Mankrik> | Ashkandi · Alliance | 15 |
+| 48 | <Older Than Dirt-Mankrik> | Westfall · Alliance | 15 |
+| 49 | <Timeless Guardians-Westfall> | Ashkandi · Alliance | 15 |
+| 50 | <Blood Reign-Mankrik> | Westfall · Alliance | 14 |
+| 51 | <Chuck Norris-Mankrik> | Westfall · Alliance | 14 |
+| 52 | <Excessive Gaming-Windseeker> | Ashkandi · Alliance | 14 |
+| 53 | <LoFi Café-Mankrik> | Westfall · Alliance | 14 |
+| 54 | <no name> | Ashkandi · Alliance | 14 |
+| 55 | <Slayer-Mankrik> | Westfall · Alliance | 14 |
+| 56 | <WOW FOREVER WAITING ROOM-Mankrik> | Ashkandi · Alliance | 14 |
+| 57 | <Disavowed-Mankrik> | Ashkandi · Alliance | 13 |
+| 58 | <FDS CLT-Mankrik> | Ashkandi · Alliance | 13 |
+| 59 | <Hooligans and Hunters-Mankrik> | Ashkandi · Alliance | 13 |
+| 60 | <Knights of Stormwind> | Westfall · Alliance | 13 |
+| 61 | <Lich Please> | Ashkandi · Alliance | 13 |
+| 62 | <Scum-Mankrik> | Ashkandi · Alliance | 13 |
+| 63 | <The Lionguard> | Ashkandi · Alliance | 13 |
+| 64 | <Milone Trading-Mankrik> | Ashkandi · Alliance | 12 |
+| 65 | <Moonsong Order-Mankrik> | Ashkandi · Alliance | 12 |
+| 66 | <Platos Stepchildren-Ashkandi> | Westfall · Alliance | 12 |
+| 67 | <SATURDAY NIGHT RAIDS-Mankrik> | Westfall · Alliance | 12 |
+| 68 | <UNSUPERVISED> | Westfall · Alliance | 12 |
+| 69 | <Chill Vibes-Mankrik> | Ashkandi · Alliance | 11 |
+| 70 | <Disposable Heroes> | Ashkandi · Alliance | 11 |
+| 71 | <Eclipse-Pagle> | Ashkandi · Alliance | 11 |
+| 72 | <Euphoria> | Westfall · Alliance | 11 |
+| 73 | <Jolly Roger-Azuresong> | Old Blanchy · Alliance | 11 |
+| 74 | <Mass Invite-Mankrik> | Westfall · Alliance | 11 |
+| 75 | <Renegades and Heretics-Pagle> | Ashkandi · Alliance | 11 |
+| 76 | <The Unyielding-Mankrik> | Ashkandi · Alliance | 11 |
+| 77 | <To Be Determined-Ashkandi> | Westfall · Alliance | 11 |
+| 78 | <Acts of War-Mankrik> | Ashkandi · Alliance | 10 |
+| 79 | <Critical Damage> | Westfall · Alliance | 10 |
+| 80 | <Exodus-Ashkandi> | Westfall · Alliance | 10 |
+| 81 | <Hooligans and Hunters-Mankrik> | Westfall · Alliance | 10 |
+| 82 | <no name-Ashkandi> | Westfall · Alliance | 10 |
+| 83 | <The Nightwatch> | Westfall · Alliance | 10 |
+| 84 | <Thunder and Ice-Mankrik> | Ashkandi · Alliance | 10 |
+| 85 | <Vengeance-Mankrik> | Ashkandi · Alliance | 10 |
+| 86 | <Casual Play-Mankrik> | Westfall · Alliance | 9 |
+| 87 | <Disposable Heroes-Ashkandi> | Westfall · Alliance | 9 |
+| 88 | <Forever Knights-Westfall> | Ashkandi · Alliance | 9 |
 | 89 | <The Moonlit Oath> | Westfall · Alliance | 9 |
 | 90 | <The Moonlit Oath-Westfall> | Ashkandi · Alliance | 9 |
 | 91 | <Wipe Team Six-Mankrik> | Ashkandi · Alliance | 9 |
 | 92 | <Fabled-Ashkandi> | Westfall · Alliance | 8 |
 | 93 | <Keeping The Peace> | Ashkandi · Alliance | 8 |
 | 94 | <Benevolence-Mankrik> | Westfall · Alliance | 7 |
-| 95 | <Cozy Adventures-Windseeker> | Ashkandi · Alliance | 7 |
-| 96 | <OnlyNoobs-Mankrik> | Westfall · Alliance | 7 |
-| 97 | <Pugs not drugs-Pagle> | Westfall · Alliance | 7 |
-| 98 | <Unity-Pagle> | Westfall · Alliance | 7 |
-| 99 | <AltorEgo-Ashkandi> | Westfall · Alliance | 6 |
-| 100 | <Citadel-Azuresong> | Old Blanchy · Alliance | 6 |
+| 95 | <Citadel-Azuresong> | Old Blanchy · Alliance | 7 |
+| 96 | <Cozy Adventures-Windseeker> | Ashkandi · Alliance | 7 |
+| 97 | <Munchkin Express-Azuresong> | Old Blanchy · Alliance | 7 |
+| 98 | <OnlyNoobs-Mankrik> | Westfall · Alliance | 7 |
+| 99 | <Pugs not drugs-Pagle> | Westfall · Alliance | 7 |
+| 100 | <Unity-Pagle> | Westfall · Alliance | 7 |
 
-Guilds found: 92 (distinct realm guilds)
+Guilds found: 93 (distinct realm guilds)
 
-Guilded characters: 1,529 (latest known guild)
+Guilded characters: 1,560 (latest known guild)
 
-Surveyed: 1,676 (unique characters)
+Surveyed: 1,383 (unique characters)
 
-Updated: 2026-10-01 (Ashkandi · Old Blanchy)
+Updated: 2026-10-02 (Ashkandi · Old Blanchy)
 
 ## Most popular guilds
 
@@ -253,22 +253,22 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 2 | <Temple-Windseeker> | Ashkandi · Horde | 94 |
 | 3 | <HorsemenOfTheApocalypse-Mankrik> | Ashkandi · Horde | 87 |
 | 4 | <Baines Bruisers-Mankrik> | Ashkandi · Horde | 80 |
-| 5 | <The Old Gods-Azuresong> | Old Blanchy · Horde | 72 |
-| 6 | <Kamikaze Squirrels-Mankrik> | Ashkandi · Horde | 71 |
-| 7 | <Molten Soft Core> | Ashkandi · Horde | 71 |
-| 8 | <Cairns Chosen Elite-Mankrik> | Ashkandi · Horde | 70 |
-| 9 | <Dodecahedron-Azuresong> | Old Blanchy · Horde | 65 |
+| 5 | <The Old Gods-Azuresong> | Old Blanchy · Horde | 79 |
+| 6 | <Dodecahedron-Azuresong> | Old Blanchy · Horde | 73 |
+| 7 | <Kamikaze Squirrels-Mankrik> | Ashkandi · Horde | 71 |
+| 8 | <Molten Soft Core> | Ashkandi · Horde | 71 |
+| 9 | <Cairns Chosen Elite-Mankrik> | Ashkandi · Horde | 70 |
 | 10 | <Loot The Dog> | Ashkandi · Horde | 65 |
 | 11 | <The Syndicate-Mankrik> | Ashkandi · Horde | 58 |
 | 12 | <Klaatu Barada Nikto-Westfall> | Ashkandi · Horde | 56 |
 | 13 | <Bloodhoof Braves-Mankrik> | Ashkandi · Horde | 52 |
-| 14 | <Built Horde Tough-Windseeker> | Ashkandi · Horde | 51 |
-| 15 | <The Outcast-Mankrik> | Ashkandi · Horde | 48 |
-| 16 | <VOID-Mankrik> | Ashkandi · Horde | 48 |
-| 17 | <boat-Myzrael> | Old Blanchy · Horde | 45 |
+| 14 | <boat-Myzrael> | Old Blanchy · Horde | 51 |
+| 15 | <Built Horde Tough-Windseeker> | Ashkandi · Horde | 51 |
+| 16 | <The Outcast-Mankrik> | Ashkandi · Horde | 48 |
+| 17 | <VOID-Mankrik> | Ashkandi · Horde | 48 |
 | 18 | <Pugs not drugs-Windseeker> | Ashkandi · Horde | 37 |
 | 19 | <Adventurers For Hire> | Ashkandi · Horde | 26 |
-| 20 | <Challenge Accepted-Azuresong> | Old Blanchy · Horde | 22 |
+| 20 | <Challenge Accepted-Azuresong> | Old Blanchy · Horde | 26 |
 | 21 | <Average Pugs> | Ashkandi · Horde | 18 |
 | 22 | <Spirit Sanctum-Pagle> | Ashkandi · Horde | 18 |
 | 23 | <Balanced-Westfall> | Ashkandi · Horde | 17 |
@@ -276,14 +276,14 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 25 | <Crayon Scribblez-Mankrik> | Ashkandi · Horde | 12 |
 | 26 | <Rønin øf Azerøth-Azuresong> | Old Blanchy · Horde | 12 |
 | 27 | <Aftermath> | Ashkandi · Horde | 11 |
-| 28 | <StoneWay-Mankrik> | Ashkandi · Horde | 9 |
-| 29 | <Wildvine Brewing Co-Mankrik> | Ashkandi · Horde | 9 |
-| 30 | <QuestsNFriends-Mankrik> | Ashkandi · Horde | 8 |
-| 31 | <R is for RAWR-Windseeker> | Ashkandi · Horde | 7 |
-| 32 | <Deja vu> | Ashkandi · Horde | 6 |
-| 33 | <Vengeance Denied-Mankrik> | Ashkandi · Horde | 5 |
-| 34 | <Brood of Ryleh-Westfall> | Ashkandi · Horde | 4 |
-| 35 | <Challenge Altcepted-Atiesh> | Old Blanchy · Horde | 4 |
+| 28 | <Challenge Altcepted-Atiesh> | Old Blanchy · Horde | 9 |
+| 29 | <StoneWay-Mankrik> | Ashkandi · Horde | 9 |
+| 30 | <Wildvine Brewing Co-Mankrik> | Ashkandi · Horde | 9 |
+| 31 | <QuestsNFriends-Mankrik> | Ashkandi · Horde | 8 |
+| 32 | <R is for RAWR-Windseeker> | Ashkandi · Horde | 7 |
+| 33 | <Deja vu> | Ashkandi · Horde | 6 |
+| 34 | <Vengeance Denied-Mankrik> | Ashkandi · Horde | 5 |
+| 35 | <Brood of Ryleh-Westfall> | Ashkandi · Horde | 4 |
 | 36 | <Pink Pony Bandits-Mankrik> | Ashkandi · Horde | 4 |
 | 37 | <The Other Gods-Azuresong> | Old Blanchy · Horde | 4 |
 | 38 | <UNLOAD THE TOADS-Westfall> | Ashkandi · Horde | 4 |
@@ -306,41 +306,42 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 55 | <Altaholics Anonymous-Westfall> | Ashkandi · Horde | 1 |
 | 56 | <Aslyum Saint Society> | Ashkandi · Horde | 1 |
 | 57 | <Bedllum Aeternum-Pagle> | Ashkandi · Horde | 1 |
-| 58 | <Disposable Villains-Westfall> | Ashkandi · Horde | 1 |
-| 59 | <Enigmatic-Mankrik> | Ashkandi · Horde | 1 |
-| 60 | <Fashion Lizard-Windseeker> | Ashkandi · Horde | 1 |
-| 61 | <For the Horde-Mankrik> | Ashkandi · Horde | 1 |
-| 62 | <Fresh Never Frozen-Mankrik> | Ashkandi · Horde | 1 |
-| 63 | <Fundead> | Ashkandi · Horde | 1 |
-| 64 | <Happy Horde-Westfall> | Ashkandi · Horde | 1 |
-| 65 | <Hip Thrusters-Mankrik> | Ashkandi · Horde | 1 |
-| 66 | <Horse Girl Esports-Westfall> | Ashkandi · Horde | 1 |
-| 67 | <Is a Living Legend-Westfall> | Ashkandi · Horde | 1 |
-| 68 | <It Only Hurts When I PvP-Mankrik> | Ashkandi · Horde | 1 |
-| 69 | <Knights Who Say Ni-Azuresong> | Old Blanchy · Horde | 1 |
-| 70 | <Management-Mankrik> | Ashkandi · Horde | 1 |
-| 71 | <Midnight Striders-Windseeker> | Ashkandi · Horde | 1 |
-| 72 | <Munters University-Mankrik> | Ashkandi · Horde | 1 |
-| 73 | <Naga Stole My Bike-Mankrik> | Ashkandi · Horde | 1 |
-| 74 | <No Running> | Ashkandi · Horde | 1 |
-| 75 | <Occult-Windseeker> | Ashkandi · Horde | 1 |
-| 76 | <Opertoonz-Mankrik> | Ashkandi · Horde | 1 |
-| 77 | <R I D A H Z-Windseeker> | Ashkandi · Horde | 1 |
-| 78 | <Rat Patrol-Windseeker> | Ashkandi · Horde | 1 |
-| 79 | <Second Wind-Mankrik> | Ashkandi · Horde | 1 |
-| 80 | <Shinobi Gang-Atiesh> | Old Blanchy · Horde | 1 |
-| 81 | <Smug Walrus-Mankrik> | Ashkandi · Horde | 1 |
-| 82 | <Solo Dingers-Mankrik> | Ashkandi · Horde | 1 |
-| 83 | <Spook the Dog-Mankrik> | Ashkandi · Horde | 1 |
-| 84 | <store brand rend-Mankrik> | Ashkandi · Horde | 1 |
-| 85 | <supernatural-Mankrik> | Ashkandi · Horde | 1 |
-| 86 | <The Blacktooth-Windseeker> | Ashkandi · Horde | 1 |
-| 87 | <The Obsidian Blade> | Ashkandi · Horde | 1 |
-| 88 | <The Old Guard-Westfall> | Ashkandi · Horde | 1 |
-| 89 | <The Silver Hand-Pagle> | Ashkandi · Horde | 1 |
-| 90 | <TheLost-Westfall> | Ashkandi · Horde | 1 |
-| 91 | <ThunderChickens Ho-Mankrik> | Ashkandi · Horde | 1 |
-| 92 | <YOLO-Mankrik> | Ashkandi · Horde | 1 |
+| 58 | <Buba Yaga> | Old Blanchy · Horde | 1 |
+| 59 | <Disposable Villains-Westfall> | Ashkandi · Horde | 1 |
+| 60 | <Enigmatic-Mankrik> | Ashkandi · Horde | 1 |
+| 61 | <Fashion Lizard-Windseeker> | Ashkandi · Horde | 1 |
+| 62 | <For the Horde-Mankrik> | Ashkandi · Horde | 1 |
+| 63 | <Fresh Never Frozen-Mankrik> | Ashkandi · Horde | 1 |
+| 64 | <Fundead> | Ashkandi · Horde | 1 |
+| 65 | <Happy Horde-Westfall> | Ashkandi · Horde | 1 |
+| 66 | <Hip Thrusters-Mankrik> | Ashkandi · Horde | 1 |
+| 67 | <Horse Girl Esports-Westfall> | Ashkandi · Horde | 1 |
+| 68 | <Is a Living Legend-Westfall> | Ashkandi · Horde | 1 |
+| 69 | <It Only Hurts When I PvP-Mankrik> | Ashkandi · Horde | 1 |
+| 70 | <Knights Who Say Ni-Azuresong> | Old Blanchy · Horde | 1 |
+| 71 | <Management-Mankrik> | Ashkandi · Horde | 1 |
+| 72 | <Midnight Striders-Windseeker> | Ashkandi · Horde | 1 |
+| 73 | <Munters University-Mankrik> | Ashkandi · Horde | 1 |
+| 74 | <Naga Stole My Bike-Mankrik> | Ashkandi · Horde | 1 |
+| 75 | <No Running> | Ashkandi · Horde | 1 |
+| 76 | <Occult-Windseeker> | Ashkandi · Horde | 1 |
+| 77 | <Opertoonz-Mankrik> | Ashkandi · Horde | 1 |
+| 78 | <R I D A H Z-Windseeker> | Ashkandi · Horde | 1 |
+| 79 | <Rat Patrol-Windseeker> | Ashkandi · Horde | 1 |
+| 80 | <Second Wind-Mankrik> | Ashkandi · Horde | 1 |
+| 81 | <Shinobi Gang-Atiesh> | Old Blanchy · Horde | 1 |
+| 82 | <Smug Walrus-Mankrik> | Ashkandi · Horde | 1 |
+| 83 | <Solo Dingers-Mankrik> | Ashkandi · Horde | 1 |
+| 84 | <Spook the Dog-Mankrik> | Ashkandi · Horde | 1 |
+| 85 | <store brand rend-Mankrik> | Ashkandi · Horde | 1 |
+| 86 | <supernatural-Mankrik> | Ashkandi · Horde | 1 |
+| 87 | <The Blacktooth-Windseeker> | Ashkandi · Horde | 1 |
+| 88 | <The Obsidian Blade> | Ashkandi · Horde | 1 |
+| 89 | <The Old Guard-Westfall> | Ashkandi · Horde | 1 |
+| 90 | <The Silver Hand-Pagle> | Ashkandi · Horde | 1 |
+| 91 | <TheLost-Westfall> | Ashkandi · Horde | 1 |
+| 92 | <ThunderChickens Ho-Mankrik> | Ashkandi · Horde | 1 |
+| 93 | <YOLO-Mankrik> | Ashkandi · Horde | 1 |
 
 Guilds found: 271 (distinct realm guilds)
 
@@ -348,7 +349,7 @@ Guilded characters: 2,795 (latest known guild)
 
 Surveyed: 2,928 (unique characters)
 
-Updated: 2026-10-01 (Ashkandi)
+Updated: 2026-10-02 (Ashkandi)
 
 ## Most popular guilds
 
@@ -463,7 +464,7 @@ Guilded characters: 1,494 (latest known guild)
 
 Surveyed: 1,652 (unique characters)
 
-Updated: 2026-10-01 (Ashkandi)
+Updated: 2026-10-02 (Ashkandi)
 
 ## Most popular guilds
 
@@ -578,7 +579,7 @@ Guilded characters: 1,301 (latest known guild)
 
 Surveyed: 1,276 (unique characters)
 
-Updated: 2026-10-01 (Ashkandi)
+Updated: 2026-10-02 (Ashkandi)
 
 ## Most popular guilds
 
@@ -669,66 +670,13 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 81 | <ThunderChickens Ho-Mankrik> | Horde | 1 |
 | 82 | <YOLO-Mankrik> | Horde | 1 |
 
-Guilds found: 38 (distinct realm guilds)
+Guilds found: 41 (distinct realm guilds)
 
-Guilded characters: 460 (latest known guild)
+Guilded characters: 548 (latest known guild)
 
-Surveyed: 926 (unique characters)
+Surveyed: 343 (unique characters)
 
-Updated: 2026-10-01 (Old Blanchy)
-
-## Most popular guilds
-
-Ranked by unique surveyed characters whose latest recorded guild matches this name.
-
-| # | Guild | Realm · faction | Characters |
-| --- | --- | --- | --- |
-| 1 | <The Old Gods-Azuresong> | Horde | 72 |
-| 2 | <Dodecahedron-Azuresong> | Horde | 65 |
-| 3 | <boat-Myzrael> | Horde | 45 |
-| 4 | <Get Off My Lawn> | Alliance | 45 |
-| 5 | <Stonehenge-Azuresong> | Alliance | 25 |
-| 6 | <Enlightened-Myzrael> | Alliance | 24 |
-| 7 | <Flowers in the Rain-Atiesh> | Alliance | 23 |
-| 8 | <Challenge Accepted-Azuresong> | Horde | 22 |
-| 9 | <Dawnfire-Myzrael> | Alliance | 17 |
-| 10 | <Delusions of Grandeur-Myzrael> | Alliance | 17 |
-| 11 | <Rønin øf Azerøth-Azuresong> | Horde | 12 |
-| 12 | <STORM-Myzrael> | Alliance | 12 |
-| 13 | <The Wanted-Azuresong> | Alliance | 10 |
-| 14 | <Jolly Roger-Azuresong> | Alliance | 9 |
-| 15 | <Citadel-Azuresong> | Alliance | 6 |
-| 16 | <Home-Myzrael> | Alliance | 6 |
-| 17 | <Munchkin Express-Azuresong> | Alliance | 5 |
-| 18 | <Obsidian Guard-Azuresong> | Alliance | 5 |
-| 19 | <Challenge Altcepted-Atiesh> | Horde | 4 |
-| 20 | <Crimson Court-Atiesh> | Alliance | 4 |
-| 21 | <Mithril Wardens-Azuresong> | Alliance | 4 |
-| 22 | <The Other Gods-Azuresong> | Horde | 4 |
-| 23 | <New Era-Myzrael> | Alliance | 3 |
-| 24 | <NightSaber Fury-Atiesh> | Alliance | 3 |
-| 25 | <Cosmic Order-Atiesh> | Alliance | 2 |
-| 26 | <Island of Misfit Toons-Azuresong> | Horde | 2 |
-| 27 | <Nostalgia-Azuresong> | Alliance | 2 |
-| 28 | <The Invisible Fleet-Atiesh> | Alliance | 2 |
-| 29 | <Azeroth-Myzrael> | Alliance | 1 |
-| 30 | <Bird Watchers Anonymous-Atiesh> | Alliance | 1 |
-| 31 | <EVIL EYE> | Alliance | 1 |
-| 32 | <Guilded Shadow> | Alliance | 1 |
-| 33 | <Knights Who Say Ni-Azuresong> | Horde | 1 |
-| 34 | <Nagas With Attitude-Atiesh> | Alliance | 1 |
-| 35 | <Shinobi Gang-Atiesh> | Horde | 1 |
-| 36 | <The Fish Empire> | Alliance | 1 |
-| 37 | <The Keepers of Secrets-Atiesh> | Alliance | 1 |
-| 38 | <The Protectorate-Azuresong> | Alliance | 1 |
-
-Guilds found: 28 (distinct realm guilds)
-
-Guilded characters: 232 (latest known guild)
-
-Surveyed: 526 (unique characters)
-
-Updated: 2026-10-01 (Old Blanchy)
+Updated: 2026-10-02 (Old Blanchy)
 
 ## Most popular guilds
 
@@ -736,42 +684,55 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 
 | # | Guild | Realm · faction | Characters |
 | --- | --- | --- | --- |
-| 1 | <Get Off My Lawn> | Alliance | 45 |
-| 2 | <Stonehenge-Azuresong> | Alliance | 25 |
-| 3 | <Enlightened-Myzrael> | Alliance | 24 |
-| 4 | <Flowers in the Rain-Atiesh> | Alliance | 23 |
-| 5 | <Dawnfire-Myzrael> | Alliance | 17 |
-| 6 | <Delusions of Grandeur-Myzrael> | Alliance | 17 |
-| 7 | <STORM-Myzrael> | Alliance | 12 |
-| 8 | <The Wanted-Azuresong> | Alliance | 10 |
-| 9 | <Jolly Roger-Azuresong> | Alliance | 9 |
-| 10 | <Citadel-Azuresong> | Alliance | 6 |
-| 11 | <Home-Myzrael> | Alliance | 6 |
-| 12 | <Munchkin Express-Azuresong> | Alliance | 5 |
-| 13 | <Obsidian Guard-Azuresong> | Alliance | 5 |
-| 14 | <Crimson Court-Atiesh> | Alliance | 4 |
-| 15 | <Mithril Wardens-Azuresong> | Alliance | 4 |
-| 16 | <New Era-Myzrael> | Alliance | 3 |
-| 17 | <NightSaber Fury-Atiesh> | Alliance | 3 |
-| 18 | <Cosmic Order-Atiesh> | Alliance | 2 |
-| 19 | <Nostalgia-Azuresong> | Alliance | 2 |
-| 20 | <The Invisible Fleet-Atiesh> | Alliance | 2 |
-| 21 | <Azeroth-Myzrael> | Alliance | 1 |
-| 22 | <Bird Watchers Anonymous-Atiesh> | Alliance | 1 |
-| 23 | <EVIL EYE> | Alliance | 1 |
-| 24 | <Guilded Shadow> | Alliance | 1 |
-| 25 | <Nagas With Attitude-Atiesh> | Alliance | 1 |
-| 26 | <The Fish Empire> | Alliance | 1 |
-| 27 | <The Keepers of Secrets-Atiesh> | Alliance | 1 |
-| 28 | <The Protectorate-Azuresong> | Alliance | 1 |
+| 1 | <The Old Gods-Azuresong> | Horde | 79 |
+| 2 | <Dodecahedron-Azuresong> | Horde | 73 |
+| 3 | <Get Off My Lawn> | Alliance | 55 |
+| 4 | <boat-Myzrael> | Horde | 51 |
+| 5 | <Stonehenge-Azuresong> | Alliance | 32 |
+| 6 | <Flowers in the Rain-Atiesh> | Alliance | 30 |
+| 7 | <Enlightened-Myzrael> | Alliance | 28 |
+| 8 | <Challenge Accepted-Azuresong> | Horde | 26 |
+| 9 | <Dawnfire-Myzrael> | Alliance | 19 |
+| 10 | <Delusions of Grandeur-Myzrael> | Alliance | 19 |
+| 11 | <The Wanted-Azuresong> | Alliance | 17 |
+| 12 | <STORM-Myzrael> | Alliance | 16 |
+| 13 | <Rønin øf Azerøth-Azuresong> | Horde | 12 |
+| 14 | <Jolly Roger-Azuresong> | Alliance | 11 |
+| 15 | <Challenge Altcepted-Atiesh> | Horde | 9 |
+| 16 | <Citadel-Azuresong> | Alliance | 7 |
+| 17 | <Munchkin Express-Azuresong> | Alliance | 7 |
+| 18 | <Home-Myzrael> | Alliance | 6 |
+| 19 | <Cosmic Order-Atiesh> | Alliance | 5 |
+| 20 | <Crimson Court-Atiesh> | Alliance | 5 |
+| 21 | <Obsidian Guard-Azuresong> | Alliance | 5 |
+| 22 | <Mithril Wardens-Azuresong> | Alliance | 4 |
+| 23 | <The Other Gods-Azuresong> | Horde | 4 |
+| 24 | <EVIL EYE> | Alliance | 3 |
+| 25 | <New Era-Myzrael> | Alliance | 3 |
+| 26 | <NightSaber Fury-Atiesh> | Alliance | 3 |
+| 27 | <Altoholics Anonymous-Atiesh> | Alliance | 2 |
+| 28 | <Island of Misfit Toons-Azuresong> | Horde | 2 |
+| 29 | <Nostalgia-Azuresong> | Alliance | 2 |
+| 30 | <The Invisible Fleet-Atiesh> | Alliance | 2 |
+| 31 | <Azeroth-Myzrael> | Alliance | 1 |
+| 32 | <Bird Watchers Anonymous-Atiesh> | Alliance | 1 |
+| 33 | <Buba Yaga> | Horde | 1 |
+| 34 | <Cryptic Cartel-Azuresong> | Alliance | 1 |
+| 35 | <Guilded Shadow> | Alliance | 1 |
+| 36 | <Knights Who Say Ni-Azuresong> | Horde | 1 |
+| 37 | <Nagas With Attitude-Atiesh> | Alliance | 1 |
+| 38 | <Shinobi Gang-Atiesh> | Horde | 1 |
+| 39 | <The Fish Empire> | Alliance | 1 |
+| 40 | <The Keepers of Secrets-Atiesh> | Alliance | 1 |
+| 41 | <The Protectorate-Azuresong> | Alliance | 1 |
 
-Guilds found: 10 (distinct realm guilds)
+Guilds found: 30 (distinct realm guilds)
 
-Guilded characters: 228 (latest known guild)
+Guilded characters: 289 (latest known guild)
 
-Surveyed: 400 (unique characters)
+Surveyed: 236 (unique characters)
 
-Updated: 2026-10-01 (Old Blanchy)
+Updated: 2026-10-02 (Old Blanchy)
 
 ## Most popular guilds
 
@@ -779,16 +740,62 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 
 | # | Guild | Realm · faction | Characters |
 | --- | --- | --- | --- |
-| 1 | <The Old Gods-Azuresong> | Horde | 72 |
-| 2 | <Dodecahedron-Azuresong> | Horde | 65 |
-| 3 | <boat-Myzrael> | Horde | 45 |
-| 4 | <Challenge Accepted-Azuresong> | Horde | 22 |
+| 1 | <Get Off My Lawn> | Alliance | 55 |
+| 2 | <Stonehenge-Azuresong> | Alliance | 32 |
+| 3 | <Flowers in the Rain-Atiesh> | Alliance | 30 |
+| 4 | <Enlightened-Myzrael> | Alliance | 28 |
+| 5 | <Dawnfire-Myzrael> | Alliance | 19 |
+| 6 | <Delusions of Grandeur-Myzrael> | Alliance | 19 |
+| 7 | <The Wanted-Azuresong> | Alliance | 17 |
+| 8 | <STORM-Myzrael> | Alliance | 16 |
+| 9 | <Jolly Roger-Azuresong> | Alliance | 11 |
+| 10 | <Citadel-Azuresong> | Alliance | 7 |
+| 11 | <Munchkin Express-Azuresong> | Alliance | 7 |
+| 12 | <Home-Myzrael> | Alliance | 6 |
+| 13 | <Cosmic Order-Atiesh> | Alliance | 5 |
+| 14 | <Crimson Court-Atiesh> | Alliance | 5 |
+| 15 | <Obsidian Guard-Azuresong> | Alliance | 5 |
+| 16 | <Mithril Wardens-Azuresong> | Alliance | 4 |
+| 17 | <EVIL EYE> | Alliance | 3 |
+| 18 | <New Era-Myzrael> | Alliance | 3 |
+| 19 | <NightSaber Fury-Atiesh> | Alliance | 3 |
+| 20 | <Altoholics Anonymous-Atiesh> | Alliance | 2 |
+| 21 | <Nostalgia-Azuresong> | Alliance | 2 |
+| 22 | <The Invisible Fleet-Atiesh> | Alliance | 2 |
+| 23 | <Azeroth-Myzrael> | Alliance | 1 |
+| 24 | <Bird Watchers Anonymous-Atiesh> | Alliance | 1 |
+| 25 | <Cryptic Cartel-Azuresong> | Alliance | 1 |
+| 26 | <Guilded Shadow> | Alliance | 1 |
+| 27 | <Nagas With Attitude-Atiesh> | Alliance | 1 |
+| 28 | <The Fish Empire> | Alliance | 1 |
+| 29 | <The Keepers of Secrets-Atiesh> | Alliance | 1 |
+| 30 | <The Protectorate-Azuresong> | Alliance | 1 |
+
+Guilds found: 11 (distinct realm guilds)
+
+Guilded characters: 259 (latest known guild)
+
+Surveyed: 107 (unique characters)
+
+Updated: 2026-10-02 (Old Blanchy)
+
+## Most popular guilds
+
+Ranked by unique surveyed characters whose latest recorded guild matches this name.
+
+| # | Guild | Realm · faction | Characters |
+| --- | --- | --- | --- |
+| 1 | <The Old Gods-Azuresong> | Horde | 79 |
+| 2 | <Dodecahedron-Azuresong> | Horde | 73 |
+| 3 | <boat-Myzrael> | Horde | 51 |
+| 4 | <Challenge Accepted-Azuresong> | Horde | 26 |
 | 5 | <Rønin øf Azerøth-Azuresong> | Horde | 12 |
-| 6 | <Challenge Altcepted-Atiesh> | Horde | 4 |
+| 6 | <Challenge Altcepted-Atiesh> | Horde | 9 |
 | 7 | <The Other Gods-Azuresong> | Horde | 4 |
 | 8 | <Island of Misfit Toons-Azuresong> | Horde | 2 |
-| 9 | <Knights Who Say Ni-Azuresong> | Horde | 1 |
-| 10 | <Shinobi Gang-Atiesh> | Horde | 1 |
+| 9 | <Buba Yaga> | Horde | 1 |
+| 10 | <Knights Who Say Ni-Azuresong> | Horde | 1 |
+| 11 | <Shinobi Gang-Atiesh> | Horde | 1 |
 
 Guilds found: 123 (distinct realm guilds)
 
@@ -796,7 +803,7 @@ Guilded characters: 638 (latest known guild)
 
 Surveyed: 1,347 (unique characters)
 
-Updated: 2026-10-01 (Westfall)
+Updated: 2026-10-02 (Westfall)
 
 ## Most popular guilds
 
@@ -911,7 +918,7 @@ Guilded characters: 638 (latest known guild)
 
 Surveyed: 1,347 (unique characters)
 
-Updated: 2026-10-01 (Westfall)
+Updated: 2026-10-02 (Westfall)
 
 ## Most popular guilds
 
@@ -1026,8 +1033,8 @@ Guilded characters: 0 (latest known guild)
 
 Surveyed: 0 (unique characters)
 
-Updated: 2026-10-01 (no realm)
+Updated: 2026-10-02 (no realm)
 
 No guilded characters were found for this selection yet.
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

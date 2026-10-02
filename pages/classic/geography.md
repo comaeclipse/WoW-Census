@@ -5,149 +5,149 @@ url: "https://wowcensus.io/classic/geography"
 ---
 
 # WoW Classic Era Population by Zone – WoWCensus
-Characters: 7,941 (unique, last 30 days)
+Characters: 8,201 (unique, last 30 days)
 
-Locations: 77 (with recent sightings)
+Locations: 78 (with recent sightings)
 
 Top 5 share: 25% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 STORMWIND CITY
 
-536
+554
 
 THE BARRENS
 
-436
+453
 
 WESTFALL
 
-352
+361
 
 ELWYNN FOREST
 
-329
+344
 
 ORGRIMMAR
 
-320
+333
 
 STRANGLETHORN VALE
 
-309
+313
 
 DUROTAR
 
-273
+280
 
 DARKSHORE
 
-256
+266
 
 DUN MOROGH
 
-254
+264
 
 IRONFORGE
 
-222
+227
 
 TELDRASSIL
 
-220
+227
 
 TIRISFAL GLADES
 
-207
-
-LOCH MODAN
-
-187
-
-DUSKWOOD
-
-176
-
-WETLANDS
-
-173
-
-↓ See more↑ See less
+214
 
 MARAUDON
 
-169
+198
+
+LOCH MODAN
+
+194
+
+DUSKWOOD
+
+180
+
+↓ See more↑ See less
 
 REDRIDGE MOUNTAINS
 
-166
+179
+
+WETLANDS
+
+178
 
 ASHENVALE
 
-162
+166
 
 TANARIS
 
-160
+164
 
 MULGORE
 
-127
+136
 
 SILITHUS
 
-119
+120
 
 UNDERCITY
 
-114
+118
 
 HILLSBRAD FOOTHILLS
 
-112
+114
+
+DESOLACE
+
+108
 
 FELWOOD
 
 108
 
-DESOLACE
+BURNING STEPPES
 
-103
+107
+
+STONETALON MOUNTAINS
+
+105
 
 ARATHI HIGHLANDS
 
-102
+104
 
 AHN'QIRAJ
 
 101
 
-BURNING STEPPES
+DARNASSUS
 
 101
 
-STONETALON MOUNTAINS
-
-100
-
-DARNASSUS
-
-98
-
-THOUSAND NEEDLES
-
-97
-
 FERALAS
 
-95
+101
 
 EASTERN PLAGUELANDS
 
-94
+99
+
+THOUSAND NEEDLES
+
+98
 
 NAXXRAMAS
 
@@ -155,35 +155,35 @@ NAXXRAMAS
 
 SCARLET MONASTERY
 
-91
-
-UN'GORO CRATER
-
-81
+89
 
 SILVERPINE FOREST
 
-80
+87
+
+UN'GORO CRATER
+
+83
 
 BADLANDS
 
-78
+79
 
 THUNDER BLUFF
 
-74
+79
 
 WESTERN PLAGUELANDS
 
-73
+76
 
 WINTERSPRING
 
-66
+70
 
 WAILING CAVERNS
 
-61
+63
 
 SEARING GORGE
 
@@ -193,17 +193,21 @@ THE DEADMINES
 
 50
 
-THE TEMPLE OF ATAL'HAKKAR
-
-46
-
 DUSTWALLOW MARSH
 
 45
 
 THE HINTERLANDS
 
-43
+44
+
+AZSHARA
+
+42
+
+THE TEMPLE OF ATAL'HAKKAR
+
+42
 
 BLACKROCK MOUNTAIN
 
@@ -213,64 +217,60 @@ MOLTEN CORE
 
 41
 
-ZUL'GURUB
-
-40
-
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Stormwind City | 536 | 6.7% | Capital · avg 34 |
-| The Barrens | 436 | 5.5% | Leveling · avg 21 |
-| Westfall | 352 | 4.4% | Leveling · avg 16 |
-| Elwynn Forest | 329 | 4.1% | Leveling · avg 14 |
-| Orgrimmar | 320 | 4.0% | Capital · avg 35 |
-| Stranglethorn Vale | 309 | 3.9% | Leveling · avg 41 |
-| Durotar | 273 | 3.4% | Leveling · avg 12 |
-| Darkshore | 256 | 3.2% | Leveling · avg 19 |
-| Dun Morogh | 254 | 3.2% | Leveling · avg 13 |
-| Ironforge | 222 | 2.8% | Capital · avg 38 |
-| Teldrassil | 220 | 2.8% | Starting · avg 9 |
-| Tirisfal Glades | 207 | 2.6% | Leveling · avg 11 |
-| Loch Modan | 187 | 2.4% | Leveling · avg 18 |
-| Duskwood | 176 | 2.2% | Leveling · avg 29 |
-| Wetlands | 173 | 2.2% | Leveling · avg 32 |
-| Maraudon | 169 | 2.1% | End game · avg 57 |
-| Redridge Mountains | 166 | 2.1% | Leveling · avg 22 |
-| Ashenvale | 162 | 2.0% | Leveling · avg 29 |
-| Tanaris | 160 | 2.0% | Leveling · avg 47 |
-| Mulgore | 127 | 1.6% | Starting · avg 10 |
-| Silithus | 119 | 1.5% | End game · avg 59 |
-| Undercity | 114 | 1.4% | Capital · avg 29 |
-| Hillsbrad Foothills | 112 | 1.4% | Leveling · avg 31 |
-| Felwood | 108 | 1.4% | End game · avg 56 |
-| Desolace | 103 | 1.3% | Leveling · avg 43 |
-| Arathi Highlands | 102 | 1.3% | Leveling · avg 40 |
-| Ahn'Qiraj | 101 | 1.3% | End game · avg 60 |
-| Burning Steppes | 101 | 1.3% | End game · avg 54 |
-| Stonetalon Mountains | 100 | 1.3% | Leveling · avg 27 |
-| Darnassus | 98 | 1.2% | Capital · avg 27 |
-| Thousand Needles | 97 | 1.2% | Leveling · avg 34 |
-| Feralas | 95 | 1.2% | Leveling · avg 49 |
-| Eastern Plaguelands | 94 | 1.2% | End game · avg 58 |
-| Naxxramas | 92 | 1.2% | End game · avg 60 |
-| Scarlet Monastery | 91 | 1.1% | Leveling · avg 37 |
-| Un'Goro Crater | 81 | 1.0% | End game · avg 54 |
-| Silverpine Forest | 80 | 1.0% | Leveling · avg 18 |
-| Badlands | 78 | 1.0% | Leveling · avg 45 |
-| Thunder Bluff | 74 | 0.9% | Capital · avg 27 |
-| Western Plaguelands | 73 | 0.9% | End game · avg 56 |
-| Winterspring | 66 | 0.8% | End game · avg 58 |
-| Wailing Caverns | 61 | 0.8% | Leveling · avg 21 |
-| Searing Gorge | 52 | 0.7% | Leveling · avg 51 |
+| Stormwind City | 554 | 6.8% | Capital · avg 34 |
+| The Barrens | 453 | 5.5% | Leveling · avg 21 |
+| Westfall | 361 | 4.4% | Leveling · avg 16 |
+| Elwynn Forest | 344 | 4.2% | Leveling · avg 13 |
+| Orgrimmar | 333 | 4.1% | Capital · avg 35 |
+| Stranglethorn Vale | 313 | 3.8% | Leveling · avg 41 |
+| Durotar | 280 | 3.4% | Leveling · avg 12 |
+| Darkshore | 266 | 3.2% | Leveling · avg 19 |
+| Dun Morogh | 264 | 3.2% | Leveling · avg 13 |
+| Ironforge | 227 | 2.8% | Capital · avg 38 |
+| Teldrassil | 227 | 2.8% | Starting · avg 9 |
+| Tirisfal Glades | 214 | 2.6% | Leveling · avg 11 |
+| Maraudon | 198 | 2.4% | End game · avg 58 |
+| Loch Modan | 194 | 2.4% | Leveling · avg 18 |
+| Duskwood | 180 | 2.2% | Leveling · avg 29 |
+| Redridge Mountains | 179 | 2.2% | Leveling · avg 22 |
+| Wetlands | 178 | 2.2% | Leveling · avg 32 |
+| Ashenvale | 166 | 2.0% | Leveling · avg 29 |
+| Tanaris | 164 | 2.0% | Leveling · avg 47 |
+| Mulgore | 136 | 1.7% | Starting · avg 10 |
+| Silithus | 120 | 1.5% | End game · avg 59 |
+| Undercity | 118 | 1.4% | Capital · avg 29 |
+| Hillsbrad Foothills | 114 | 1.4% | Leveling · avg 32 |
+| Desolace | 108 | 1.3% | Leveling · avg 44 |
+| Felwood | 108 | 1.3% | End game · avg 56 |
+| Burning Steppes | 107 | 1.3% | End game · avg 54 |
+| Stonetalon Mountains | 105 | 1.3% | Leveling · avg 27 |
+| Arathi Highlands | 104 | 1.3% | Leveling · avg 40 |
+| Ahn'Qiraj | 101 | 1.2% | End game · avg 60 |
+| Darnassus | 101 | 1.2% | Capital · avg 27 |
+| Feralas | 101 | 1.2% | Leveling · avg 50 |
+| Eastern Plaguelands | 99 | 1.2% | End game · avg 58 |
+| Thousand Needles | 98 | 1.2% | Leveling · avg 34 |
+| Naxxramas | 92 | 1.1% | End game · avg 60 |
+| Scarlet Monastery | 89 | 1.1% | Leveling · avg 37 |
+| Silverpine Forest | 87 | 1.1% | Leveling · avg 18 |
+| Un'Goro Crater | 83 | 1.0% | End game · avg 54 |
+| Badlands | 79 | 1.0% | Leveling · avg 45 |
+| Thunder Bluff | 79 | 1.0% | Capital · avg 27 |
+| Western Plaguelands | 76 | 0.9% | End game · avg 56 |
+| Winterspring | 70 | 0.9% | End game · avg 58 |
+| Wailing Caverns | 63 | 0.8% | Leveling · avg 21 |
+| Searing Gorge | 52 | 0.6% | Leveling · avg 51 |
 | The Deadmines | 50 | 0.6% | Leveling · avg 23 |
-| The Temple of Atal'Hakkar | 46 | 0.6% | End game · avg 55 |
-| Dustwallow Marsh | 45 | 0.6% | Leveling · avg 41 |
-| The Hinterlands | 43 | 0.5% | Leveling · avg 51 |
+| Dustwallow Marsh | 45 | 0.5% | Leveling · avg 41 |
+| The Hinterlands | 44 | 0.5% | Leveling · avg 51 |
+| Azshara | 42 | 0.5% | End game · avg 55 |
+| The Temple of Atal'Hakkar | 42 | 0.5% | End game · avg 55 |
 | Blackrock Mountain | 41 | 0.5% | End game · avg 59 |
 | Molten Core | 41 | 0.5% | End game · avg 60 |
-| Zul'Gurub | 40 | 0.5% | End game · avg 60 |
 
 ## Play-style mix
 
@@ -294,7 +294,7 @@ STARTING
 
 ## How to read this
 
-**Strongest cluster**Stormwind City contains 6.7% of characters in this selection.
+**Strongest cluster**Stormwind City contains 6.8% of characters in this selection.
 
 **Top-five concentration**25% indicates how much the footprint is concentrated in its five leading locations.
 
@@ -302,79 +302,83 @@ STARTING
 
 **Level context**Average level adds context for each location.
 
-Characters: 4,949 (unique, last 30 days)
+Characters: 5,126 (unique, last 30 days)
 
-Locations: 71 (with recent sightings)
+Locations: 72 (with recent sightings)
 
 Top 5 share: 35% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 STORMWIND CITY
 
-536
+554
 
 WESTFALL
 
-352
+361
 
 ELWYNN FOREST
 
-327
+342
 
 DARKSHORE
 
-254
+264
 
 DUN MOROGH
 
-254
+264
 
 IRONFORGE
 
-222
+227
 
 TELDRASSIL
 
-220
+227
 
 STRANGLETHORN VALE
 
-205
+208
 
 LOCH MODAN
 
-185
-
-DUSKWOOD
-
-172
-
-WETLANDS
-
-171
+192
 
 REDRIDGE MOUNTAINS
 
-165
+178
 
-TANARIS
+DUSKWOOD
 
-123
+176
+
+WETLANDS
+
+176
 
 MARAUDON
 
-119
+144
+
+TANARIS
+
+126
 
 ASHENVALE
 
-103
+106
 
 ↓ See more↑ See less
 
 DARNASSUS
+
+101
+
+BURNING STEPPES
 
 98
 
@@ -382,41 +386,37 @@ SILITHUS
 
 98
 
-BURNING STEPPES
-
-93
-
 DESOLACE
 
-77
-
-FELWOOD
-
-73
-
-ARATHI HIGHLANDS
-
-69
+81
 
 EASTERN PLAGUELANDS
 
-69
+74
 
-UN'GORO CRATER
+FELWOOD
 
-64
+72
+
+ARATHI HIGHLANDS
+
+71
 
 FERALAS
 
-63
+67
+
+UN'GORO CRATER
+
+66
 
 SCARLET MONASTERY
 
-63
+61
 
 WESTERN PLAGUELANDS
 
-51
+53
 
 THE DEADMINES
 
@@ -424,41 +424,41 @@ THE DEADMINES
 
 BADLANDS
 
-45
+46
 
 SEARING GORGE
 
 38
 
-THE TEMPLE OF ATAL'HAKKAR
-
-37
-
 WINTERSPRING
 
-34
+38
+
+THE TEMPLE OF ATAL'HAKKAR
+
+33
+
+THE BARRENS
+
+32
 
 DUSTWALLOW MARSH
 
 31
 
-ZUL'FARRAK
+HILLSBRAD FOOTHILLS
 
 30
 
-HILLSBRAD FOOTHILLS
-
-29
-
-THE BARRENS
-
-29
-
 THE HINTERLANDS
 
-27
+28
 
 BLACKWING LAIR
+
+26
+
+ZUL'FARRAK
 
 26
 
@@ -472,23 +472,27 @@ BLACKROCK DEPTHS
 
 BLASTED LANDS
 
-21
+22
+
+STONETALON MOUNTAINS
+
+22
 
 SCHOLOMANCE
 
 20
 
-STONETALON MOUNTAINS
-
-20
-
-ALTERAC MOUNTAINS
-
-19
-
 STRATHOLME
 
 19
+
+ULDAMAN
+
+19
+
+ALTERAC MOUNTAINS
+
+18
 
 BLACKROCK MOUNTAIN
 
@@ -496,7 +500,7 @@ BLACKROCK MOUNTAIN
 
 AZSHARA
 
-16
+17
 
 BLACKROCK SPIRE
 
@@ -510,64 +514,60 @@ MOLTEN CORE
 
 13
 
-SHADOWFANG KEEP
-
-13
-
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Stormwind City | 536 | 10.8% | Capital · avg 34 |
-| Westfall | 352 | 7.1% | Leveling · avg 16 |
-| Elwynn Forest | 327 | 6.6% | Leveling · avg 13 |
-| Darkshore | 254 | 5.1% | Leveling · avg 19 |
-| Dun Morogh | 254 | 5.1% | Leveling · avg 13 |
-| Ironforge | 222 | 4.5% | Capital · avg 38 |
-| Teldrassil | 220 | 4.4% | Starting · avg 9 |
-| Stranglethorn Vale | 205 | 4.1% | Leveling · avg 41 |
-| Loch Modan | 185 | 3.7% | Leveling · avg 17 |
-| Duskwood | 172 | 3.5% | Leveling · avg 29 |
-| Wetlands | 171 | 3.5% | Leveling · avg 32 |
-| Redridge Mountains | 165 | 3.3% | Leveling · avg 22 |
-| Tanaris | 123 | 2.5% | Leveling · avg 47 |
-| Maraudon | 119 | 2.4% | End game · avg 57 |
-| Ashenvale | 103 | 2.1% | Leveling · avg 30 |
-| Darnassus | 98 | 2.0% | Capital · avg 27 |
-| Silithus | 98 | 2.0% | End game · avg 59 |
-| Burning Steppes | 93 | 1.9% | End game · avg 53 |
-| Desolace | 77 | 1.6% | Leveling · avg 43 |
-| Felwood | 73 | 1.5% | End game · avg 58 |
-| Arathi Highlands | 69 | 1.4% | Leveling · avg 40 |
-| Eastern Plaguelands | 69 | 1.4% | End game · avg 58 |
-| Un'Goro Crater | 64 | 1.3% | End game · avg 54 |
-| Feralas | 63 | 1.3% | Leveling · avg 49 |
-| Scarlet Monastery | 63 | 1.3% | Leveling · avg 37 |
-| Western Plaguelands | 51 | 1.0% | End game · avg 57 |
+| Stormwind City | 554 | 10.8% | Capital · avg 34 |
+| Westfall | 361 | 7.0% | Leveling · avg 16 |
+| Elwynn Forest | 342 | 6.7% | Leveling · avg 13 |
+| Darkshore | 264 | 5.2% | Leveling · avg 19 |
+| Dun Morogh | 264 | 5.2% | Leveling · avg 13 |
+| Ironforge | 227 | 4.4% | Capital · avg 38 |
+| Teldrassil | 227 | 4.4% | Starting · avg 9 |
+| Stranglethorn Vale | 208 | 4.1% | Leveling · avg 41 |
+| Loch Modan | 192 | 3.7% | Leveling · avg 17 |
+| Redridge Mountains | 178 | 3.5% | Leveling · avg 22 |
+| Duskwood | 176 | 3.4% | Leveling · avg 29 |
+| Wetlands | 176 | 3.4% | Leveling · avg 32 |
+| Maraudon | 144 | 2.8% | End game · avg 58 |
+| Tanaris | 126 | 2.5% | Leveling · avg 47 |
+| Ashenvale | 106 | 2.1% | Leveling · avg 30 |
+| Darnassus | 101 | 2.0% | Capital · avg 27 |
+| Burning Steppes | 98 | 1.9% | End game · avg 54 |
+| Silithus | 98 | 1.9% | End game · avg 59 |
+| Desolace | 81 | 1.6% | Leveling · avg 43 |
+| Eastern Plaguelands | 74 | 1.4% | End game · avg 58 |
+| Felwood | 72 | 1.4% | End game · avg 58 |
+| Arathi Highlands | 71 | 1.4% | Leveling · avg 40 |
+| Feralas | 67 | 1.3% | Leveling · avg 50 |
+| Un'Goro Crater | 66 | 1.3% | End game · avg 54 |
+| Scarlet Monastery | 61 | 1.2% | Leveling · avg 36 |
+| Western Plaguelands | 53 | 1.0% | End game · avg 57 |
 | The Deadmines | 47 | 0.9% | Leveling · avg 22 |
-| Badlands | 45 | 0.9% | Leveling · avg 44 |
-| Searing Gorge | 38 | 0.8% | Leveling · avg 50 |
-| The Temple of Atal'Hakkar | 37 | 0.7% | End game · avg 55 |
-| Winterspring | 34 | 0.7% | End game · avg 58 |
+| Badlands | 46 | 0.9% | Leveling · avg 44 |
+| Searing Gorge | 38 | 0.7% | Leveling · avg 50 |
+| Winterspring | 38 | 0.7% | End game · avg 58 |
+| The Temple of Atal'Hakkar | 33 | 0.6% | End game · avg 55 |
+| The Barrens | 32 | 0.6% | Leveling · avg 41 |
 | Dustwallow Marsh | 31 | 0.6% | Leveling · avg 41 |
-| Zul'Farrak | 30 | 0.6% | Leveling · avg 49 |
-| Hillsbrad Foothills | 29 | 0.6% | Leveling · avg 40 |
-| The Barrens | 29 | 0.6% | Leveling · avg 42 |
-| The Hinterlands | 27 | 0.5% | Leveling · avg 51 |
+| Hillsbrad Foothills | 30 | 0.6% | Leveling · avg 40 |
+| The Hinterlands | 28 | 0.5% | Leveling · avg 51 |
 | Blackwing Lair | 26 | 0.5% | End game · avg 60 |
+| Zul'Farrak | 26 | 0.5% | Leveling · avg 49 |
 | Naxxramas | 25 | 0.5% | End game · avg 60 |
 | Blackrock Depths | 22 | 0.4% | End game · avg 57 |
-| Blasted Lands | 21 | 0.4% | Leveling · avg 52 |
+| Blasted Lands | 22 | 0.4% | Leveling · avg 52 |
+| Stonetalon Mountains | 22 | 0.4% | Leveling · avg 32 |
 | Scholomance | 20 | 0.4% | End game · avg 59 |
-| Stonetalon Mountains | 20 | 0.4% | Leveling · avg 31 |
-| Alterac Mountains | 19 | 0.4% | Leveling · avg 36 |
 | Stratholme | 19 | 0.4% | End game · avg 59 |
+| Uldaman | 19 | 0.4% | Leveling · avg 45 |
+| Alterac Mountains | 18 | 0.4% | Leveling · avg 36 |
 | Blackrock Mountain | 18 | 0.4% | End game · avg 59 |
-| Azshara | 16 | 0.3% | End game · avg 57 |
+| Azshara | 17 | 0.3% | End game · avg 57 |
 | Blackrock Spire | 14 | 0.3% | End game · avg 59 |
 | Dire Maul | 13 | 0.3% | End game · avg 60 |
 | Molten Core | 13 | 0.3% | End game · avg 60 |
-| Shadowfang Keep | 13 | 0.3% | Leveling · avg 25 |
 
 ## Play-style mix
 
@@ -575,7 +575,7 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-17%
+18%
 
 LEVELING
 
@@ -599,43 +599,43 @@ STARTING
 
 **Level context**Average level adds context for each location.
 
-Characters: 2,992 (unique, last 30 days)
+Characters: 3,075 (unique, last 30 days)
 
-Locations: 66 (with recent sightings)
+Locations: 67 (with recent sightings)
 
-Top 5 share: 44% (location concentration)
+Top 5 share: 45% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 THE BARRENS
 
-407
+421
 
 ORGRIMMAR
 
-320
+333
 
 DUROTAR
 
-273
+280
 
 TIRISFAL GLADES
 
-204
+211
 
 MULGORE
 
-124
+133
 
 UNDERCITY
 
-114
+118
 
 STRANGLETHORN VALE
 
-104
+105
 
 AHN'QIRAJ
 
@@ -643,23 +643,23 @@ AHN'QIRAJ
 
 THOUSAND NEEDLES
 
-87
+88
 
 HILLSBRAD FOOTHILLS
 
-83
-
-STONETALON MOUNTAINS
-
-80
+84
 
 SILVERPINE FOREST
 
-77
+84
+
+STONETALON MOUNTAINS
+
+83
 
 THUNDER BLUFF
 
-74
+79
 
 NAXXRAMAS
 
@@ -667,25 +667,29 @@ NAXXRAMAS
 
 ASHENVALE
 
-59
+60
 
 ↓ See more↑ See less
 
 WAILING CAVERNS
 
-58
+60
 
 MARAUDON
 
-50
+54
 
 TANARIS
 
-37
+38
 
 FELWOOD
 
-35
+36
+
+FERALAS
+
+34
 
 ARATHI HIGHLANDS
 
@@ -695,17 +699,13 @@ BADLANDS
 
 33
 
-FERALAS
-
-32
-
 WINTERSPRING
 
 32
 
 ZUL'GURUB
 
-32
+30
 
 MOLTEN CORE
 
@@ -717,35 +717,35 @@ SCARLET MONASTERY
 
 DESOLACE
 
-26
+27
 
 RAGEFIRE CHASM
 
 26
 
-EASTERN PLAGUELANDS
+AZSHARA
 
 25
 
-AZSHARA
+EASTERN PLAGUELANDS
 
-23
+25
 
 BLACKROCK MOUNTAIN
 
 23
 
-RUINS OF AHN'QIRAJ
-
-22
-
 WESTERN PLAGUELANDS
 
-22
+23
 
 SILITHUS
 
-21
+22
+
+RUINS OF AHN'QIRAJ
+
+20
 
 RAZORFEN KRAUL
 
@@ -779,10 +779,6 @@ SEARING GORGE
 
 14
 
-SHADOWFANG KEEP
-
-14
-
 BLACKROCK SPIRE
 
 12
@@ -795,17 +791,21 @@ RAZORFEN DOWNS
 
 11
 
+SHADOWFANG KEEP
+
+11
+
 BLACKROCK DEPTHS
+
+9
+
+BURNING STEPPES
 
 9
 
 THE TEMPLE OF ATAL'HAKKAR
 
 9
-
-BURNING STEPPES
-
-8
 
 WARSONG GULCH
 
@@ -815,40 +815,40 @@ WARSONG GULCH
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| The Barrens | 407 | 13.6% | Leveling · avg 20 |
-| Orgrimmar | 320 | 10.7% | Capital · avg 35 |
-| Durotar | 273 | 9.1% | Leveling · avg 12 |
-| Tirisfal Glades | 204 | 6.8% | Leveling · avg 11 |
-| Mulgore | 124 | 4.1% | Starting · avg 9 |
-| Undercity | 114 | 3.8% | Capital · avg 29 |
-| Stranglethorn Vale | 104 | 3.5% | Leveling · avg 41 |
+| The Barrens | 421 | 13.7% | Leveling · avg 20 |
+| Orgrimmar | 333 | 10.8% | Capital · avg 35 |
+| Durotar | 280 | 9.1% | Leveling · avg 12 |
+| Tirisfal Glades | 211 | 6.9% | Leveling · avg 11 |
+| Mulgore | 133 | 4.3% | Starting · avg 10 |
+| Undercity | 118 | 3.8% | Capital · avg 29 |
+| Stranglethorn Vale | 105 | 3.4% | Leveling · avg 41 |
 | Ahn'Qiraj | 91 | 3.0% | End game · avg 60 |
-| Thousand Needles | 87 | 2.9% | Leveling · avg 34 |
-| Hillsbrad Foothills | 83 | 2.8% | Leveling · avg 28 |
-| Stonetalon Mountains | 80 | 2.7% | Leveling · avg 26 |
-| Silverpine Forest | 77 | 2.6% | Leveling · avg 17 |
-| Thunder Bluff | 74 | 2.5% | Capital · avg 27 |
+| Thousand Needles | 88 | 2.9% | Leveling · avg 34 |
+| Hillsbrad Foothills | 84 | 2.7% | Leveling · avg 29 |
+| Silverpine Forest | 84 | 2.7% | Leveling · avg 17 |
+| Stonetalon Mountains | 83 | 2.7% | Leveling · avg 26 |
+| Thunder Bluff | 79 | 2.6% | Capital · avg 27 |
 | Naxxramas | 67 | 2.2% | End game · avg 60 |
-| Ashenvale | 59 | 2.0% | Leveling · avg 27 |
-| Wailing Caverns | 58 | 1.9% | Leveling · avg 21 |
-| Maraudon | 50 | 1.7% | End game · avg 57 |
-| Tanaris | 37 | 1.2% | Leveling · avg 49 |
-| Felwood | 35 | 1.2% | End game · avg 53 |
+| Ashenvale | 60 | 2.0% | Leveling · avg 27 |
+| Wailing Caverns | 60 | 2.0% | Leveling · avg 21 |
+| Maraudon | 54 | 1.8% | End game · avg 57 |
+| Tanaris | 38 | 1.2% | Leveling · avg 49 |
+| Felwood | 36 | 1.2% | End game · avg 53 |
+| Feralas | 34 | 1.1% | Leveling · avg 50 |
 | Arathi Highlands | 33 | 1.1% | Leveling · avg 38 |
 | Badlands | 33 | 1.1% | Leveling · avg 46 |
-| Feralas | 32 | 1.1% | Leveling · avg 49 |
-| Winterspring | 32 | 1.1% | End game · avg 58 |
-| Zul'Gurub | 32 | 1.1% | End game · avg 60 |
+| Winterspring | 32 | 1.0% | End game · avg 58 |
+| Zul'Gurub | 30 | 1.0% | End game · avg 60 |
 | Molten Core | 28 | 0.9% | End game · avg 60 |
 | Scarlet Monastery | 28 | 0.9% | Leveling · avg 37 |
-| Desolace | 26 | 0.9% | Leveling · avg 45 |
-| Ragefire Chasm | 26 | 0.9% | Leveling · avg 18 |
+| Desolace | 27 | 0.9% | Leveling · avg 45 |
+| Ragefire Chasm | 26 | 0.8% | Leveling · avg 18 |
+| Azshara | 25 | 0.8% | End game · avg 53 |
 | Eastern Plaguelands | 25 | 0.8% | End game · avg 60 |
-| Azshara | 23 | 0.8% | Leveling · avg 52 |
-| Blackrock Mountain | 23 | 0.8% | End game · avg 59 |
-| Ruins of Ahn'Qiraj | 22 | 0.7% | End game · avg 60 |
-| Western Plaguelands | 22 | 0.7% | End game · avg 55 |
-| Silithus | 21 | 0.7% | End game · avg 60 |
+| Blackrock Mountain | 23 | 0.7% | End game · avg 59 |
+| Western Plaguelands | 23 | 0.7% | End game · avg 56 |
+| Silithus | 22 | 0.7% | End game · avg 60 |
+| Ruins of Ahn'Qiraj | 20 | 0.7% | End game · avg 60 |
 | Razorfen Kraul | 19 | 0.6% | Leveling · avg 32 |
 | Un'Goro Crater | 17 | 0.6% | End game · avg 54 |
 | Dire Maul | 16 | 0.5% | Leveling · avg 52 |
@@ -857,13 +857,13 @@ WARSONG GULCH
 | Alterac Mountains | 14 | 0.5% | Leveling · avg 36 |
 | Dustwallow Marsh | 14 | 0.5% | Leveling · avg 40 |
 | Searing Gorge | 14 | 0.5% | End game · avg 56 |
-| Shadowfang Keep | 14 | 0.5% | Leveling · avg 27 |
 | Blackrock Spire | 12 | 0.4% | End game · avg 58 |
 | Stratholme | 12 | 0.4% | End game · avg 60 |
 | Razorfen Downs | 11 | 0.4% | Leveling · avg 41 |
+| Shadowfang Keep | 11 | 0.4% | Leveling · avg 27 |
 | Blackrock Depths | 9 | 0.3% | End game · avg 58 |
+| Burning Steppes | 9 | 0.3% | End game · avg 58 |
 | The Temple of Atal'Hakkar | 9 | 0.3% | End game · avg 54 |
-| Burning Steppes | 8 | 0.3% | End game · avg 58 |
 | Warsong Gulch | 7 | 0.2% | End game · avg 60 |
 
 ## Play-style mix
@@ -872,11 +872,11 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-18%
+19%
 
 LEVELING
 
-61%
+60%
 
 CAPITAL
 
@@ -888,9 +888,9 @@ STARTING
 
 ## How to read this
 
-**Strongest cluster**The Barrens contains 13.6% of characters in this selection.
+**Strongest cluster**The Barrens contains 13.7% of characters in this selection.
 
-**Top-five concentration**44% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**45% indicates how much the footprint is concentrated in its five leading locations.
 
 **Capital footprint**17% were last recorded in recognized capitals.
 
@@ -902,7 +902,7 @@ Locations: 77 (with recent sightings)
 
 Top 5 share: 25% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -1199,7 +1199,7 @@ Locations: 71 (with recent sightings)
 
 Top 5 share: 36% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -1496,7 +1496,7 @@ Locations: 64 (with recent sightings)
 
 Top 5 share: 45% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -1787,99 +1787,119 @@ STARTING
 
 **Level context**Average level adds context for each location.
 
-Characters: 926 (unique, last 30 days)
+Characters: 1,186 (unique, last 30 days)
 
-Locations: 63 (with recent sightings)
+Locations: 66 (with recent sightings)
 
 Top 5 share: 26% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 THE BARRENS
 
-61
+78
 
 STORMWIND CITY
 
-58
+76
 
 STRANGLETHORN VALE
 
-52
+56
 
-WESTFALL
+MARAUDON
 
-39
-
-DUROTAR
-
-34
+54
 
 ELWYNN FOREST
 
-34
+49
+
+WESTFALL
+
+48
 
 ORGRIMMAR
 
-30
+43
 
-ZUL'GURUB
+DUROTAR
 
-27
-
-DUSKWOOD
-
-26
+41
 
 MULGORE
 
+35
+
+DUSKWOOD
+
+30
+
+DUN MOROGH
+
+29
+
+DARKSHORE
+
+27
+
+TELDRASSIL
+
+27
+
+REDRIDGE MOUNTAINS
+
 26
 
-MARAUDON
+WETLANDS
+
+26
+
+↓ See more↑ See less
+
+ZUL'GURUB
 
 25
 
 HILLSBRAD FOOTHILLS
 
+24
+
+IRONFORGE
+
 22
+
+ASHENVALE
+
+20
 
 RUINS OF AHN'QIRAJ
 
-22
-
-WETLANDS
-
-21
-
-SCARLET MONASTERY
-
 20
 
-↓ See more↑ See less
-
-TELDRASSIL
+SILVERPINE FOREST
 
 20
-
-DUN MOROGH
-
-19
 
 BLACKROCK MOUNTAIN
 
 18
 
-DARKSHORE
+SCARLET MONASTERY
 
-17
+18
 
-IRONFORGE
+DESOLACE
 
 17
 
 NAXXRAMAS
+
+17
+
+THOUSAND NEEDLES
 
 17
 
@@ -1887,11 +1907,11 @@ AHN'QIRAJ
 
 16
 
-ASHENVALE
+ARATHI HIGHLANDS
 
 16
 
-THOUSAND NEEDLES
+FERALAS
 
 16
 
@@ -1899,57 +1919,61 @@ FELWOOD
 
 15
 
-ARATHI HIGHLANDS
+TANARIS
+
+15
+
+LOCH MODAN
 
 14
 
-REDRIDGE MOUNTAINS
+STONETALON MOUNTAINS
 
-13
+14
 
-SILVERPINE FOREST
+TIRISFAL GLADES
 
-13
-
-DESOLACE
-
-12
-
-TANARIS
-
-11
-
-THE TEMPLE OF ATAL'HAKKAR
-
-11
+14
 
 UN'GORO CRATER
 
-11
-
-FERALAS
-
-10
-
-BADLANDS
-
-9
-
-STONETALON MOUNTAINS
-
-9
+13
 
 UNDERCITY
 
-9
-
-WESTERN PLAGUELANDS
-
-9
+13
 
 WINTERSPRING
 
+13
+
+EASTERN PLAGUELANDS
+
+12
+
+WESTERN PLAGUELANDS
+
+12
+
+BADLANDS
+
+10
+
+BURNING STEPPES
+
+10
+
+DARNASSUS
+
+10
+
+THUNDER BLUFF
+
 9
+
+AZSHARA
+
+8
 
 BLACKROCK DEPTHS
 
@@ -1959,100 +1983,76 @@ DUSTWALLOW MARSH
 
 8
 
-DARNASSUS
-
-7
-
-EASTERN PLAGUELANDS
-
-7
-
-LOCH MODAN
-
-7
-
 SILITHUS
 
-7
+8
 
 THE HINTERLANDS
 
+8
+
+THE TEMPLE OF ATAL'HAKKAR
+
 7
-
-TIRISFAL GLADES
-
-7
-
-ALTERAC MOUNTAINS
-
-6
-
-AZSHARA
-
-5
-
-SHADOWFANG KEEP
-
-5
 
 WAILING CAVERNS
 
-5
+7
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| The Barrens | 61 | 6.6% | Leveling · avg 20 |
-| Stormwind City | 58 | 6.3% | Capital · avg 30 |
-| Stranglethorn Vale | 52 | 5.6% | Leveling · avg 44 |
-| Westfall | 39 | 4.2% | Leveling · avg 16 |
-| Durotar | 34 | 3.7% | Starting · avg 8 |
-| Elwynn Forest | 34 | 3.7% | Leveling · avg 13 |
-| Orgrimmar | 30 | 3.2% | Capital · avg 24 |
-| Zul'Gurub | 27 | 2.9% | End game · avg 60 |
-| Duskwood | 26 | 2.8% | Leveling · avg 27 |
-| Mulgore | 26 | 2.8% | Starting · avg 9 |
-| Maraudon | 25 | 2.7% | End game · avg 60 |
-| Hillsbrad Foothills | 22 | 2.4% | Leveling · avg 31 |
-| Ruins of Ahn'Qiraj | 22 | 2.4% | End game · avg 60 |
-| Wetlands | 21 | 2.3% | Leveling · avg 32 |
-| Scarlet Monastery | 20 | 2.2% | Leveling · avg 39 |
-| Teldrassil | 20 | 2.2% | Starting · avg 10 |
-| Dun Morogh | 19 | 2.1% | Starting · avg 9 |
-| Blackrock Mountain | 18 | 1.9% | End game · avg 60 |
-| Darkshore | 17 | 1.8% | Leveling · avg 18 |
-| Ironforge | 17 | 1.8% | Capital · avg 34 |
-| Naxxramas | 17 | 1.8% | End game · avg 60 |
-| Ahn'Qiraj | 16 | 1.7% | End game · avg 60 |
-| Ashenvale | 16 | 1.7% | Leveling · avg 27 |
-| Thousand Needles | 16 | 1.7% | Leveling · avg 33 |
-| Felwood | 15 | 1.6% | End game · avg 55 |
-| Arathi Highlands | 14 | 1.5% | Leveling · avg 39 |
-| Redridge Mountains | 13 | 1.4% | Leveling · avg 25 |
-| Silverpine Forest | 13 | 1.4% | Leveling · avg 17 |
-| Desolace | 12 | 1.3% | Leveling · avg 42 |
-| Tanaris | 11 | 1.2% | Leveling · avg 47 |
-| The Temple of Atal'Hakkar | 11 | 1.2% | End game · avg 56 |
-| Un'Goro Crater | 11 | 1.2% | End game · avg 54 |
-| Feralas | 10 | 1.1% | Leveling · avg 47 |
-| Badlands | 9 | 1.0% | Leveling · avg 44 |
-| Stonetalon Mountains | 9 | 1.0% | Leveling · avg 31 |
-| Undercity | 9 | 1.0% | Capital · avg 26 |
-| Western Plaguelands | 9 | 1.0% | End game · avg 56 |
-| Winterspring | 9 | 1.0% | End game · avg 55 |
-| Blackrock Depths | 8 | 0.9% | End game · avg 57 |
-| Dustwallow Marsh | 8 | 0.9% | Leveling · avg 43 |
-| Darnassus | 7 | 0.8% | Capital · avg 26 |
-| Eastern Plaguelands | 7 | 0.8% | End game · avg 59 |
-| Loch Modan | 7 | 0.8% | Leveling · avg 16 |
-| Silithus | 7 | 0.8% | End game · avg 59 |
-| The Hinterlands | 7 | 0.8% | End game · avg 53 |
-| Tirisfal Glades | 7 | 0.8% | Leveling · avg 19 |
-| Alterac Mountains | 6 | 0.6% | Leveling · avg 37 |
-| Azshara | 5 | 0.5% | End game · avg 58 |
-| Shadowfang Keep | 5 | 0.5% | Leveling · avg 24 |
-| Wailing Caverns | 5 | 0.5% | Leveling · avg 22 |
+| The Barrens | 78 | 6.6% | Leveling · avg 20 |
+| Stormwind City | 76 | 6.4% | Capital · avg 28 |
+| Stranglethorn Vale | 56 | 4.7% | Leveling · avg 44 |
+| Maraudon | 54 | 4.6% | End game · avg 60 |
+| Elwynn Forest | 49 | 4.1% | Leveling · avg 12 |
+| Westfall | 48 | 4.0% | Leveling · avg 16 |
+| Orgrimmar | 43 | 3.6% | Capital · avg 25 |
+| Durotar | 41 | 3.5% | Starting · avg 9 |
+| Mulgore | 35 | 3.0% | Leveling · avg 11 |
+| Duskwood | 30 | 2.5% | Leveling · avg 27 |
+| Dun Morogh | 29 | 2.4% | Starting · avg 10 |
+| Darkshore | 27 | 2.3% | Leveling · avg 20 |
+| Teldrassil | 27 | 2.3% | Starting · avg 10 |
+| Redridge Mountains | 26 | 2.2% | Leveling · avg 23 |
+| Wetlands | 26 | 2.2% | Leveling · avg 32 |
+| Zul'Gurub | 25 | 2.1% | End game · avg 60 |
+| Hillsbrad Foothills | 24 | 2.0% | Leveling · avg 33 |
+| Ironforge | 22 | 1.9% | Capital · avg 31 |
+| Ashenvale | 20 | 1.7% | Leveling · avg 27 |
+| Ruins of Ahn'Qiraj | 20 | 1.7% | End game · avg 60 |
+| Silverpine Forest | 20 | 1.7% | Leveling · avg 17 |
+| Blackrock Mountain | 18 | 1.5% | End game · avg 60 |
+| Scarlet Monastery | 18 | 1.5% | Leveling · avg 38 |
+| Desolace | 17 | 1.4% | Leveling · avg 44 |
+| Naxxramas | 17 | 1.4% | End game · avg 60 |
+| Thousand Needles | 17 | 1.4% | Leveling · avg 32 |
+| Ahn'Qiraj | 16 | 1.3% | End game · avg 60 |
+| Arathi Highlands | 16 | 1.3% | Leveling · avg 38 |
+| Feralas | 16 | 1.3% | Leveling · avg 49 |
+| Felwood | 15 | 1.3% | End game · avg 55 |
+| Tanaris | 15 | 1.3% | Leveling · avg 46 |
+| Loch Modan | 14 | 1.2% | Leveling · avg 15 |
+| Stonetalon Mountains | 14 | 1.2% | Leveling · avg 30 |
+| Tirisfal Glades | 14 | 1.2% | Leveling · avg 12 |
+| Un'Goro Crater | 13 | 1.1% | End game · avg 53 |
+| Undercity | 13 | 1.1% | Capital · avg 29 |
+| Winterspring | 13 | 1.1% | End game · avg 56 |
+| Eastern Plaguelands | 12 | 1.0% | End game · avg 59 |
+| Western Plaguelands | 12 | 1.0% | End game · avg 57 |
+| Badlands | 10 | 0.8% | Leveling · avg 44 |
+| Burning Steppes | 10 | 0.8% | End game · avg 57 |
+| Darnassus | 10 | 0.8% | Capital · avg 31 |
+| Thunder Bluff | 9 | 0.8% | Capital · avg 17 |
+| Azshara | 8 | 0.7% | End game · avg 58 |
+| Blackrock Depths | 8 | 0.7% | End game · avg 57 |
+| Dustwallow Marsh | 8 | 0.7% | Leveling · avg 43 |
+| Silithus | 8 | 0.7% | End game · avg 60 |
+| The Hinterlands | 8 | 0.7% | End game · avg 54 |
+| The Temple of Atal'Hakkar | 7 | 0.6% | End game · avg 58 |
+| Wailing Caverns | 7 | 0.6% | Leveling · avg 25 |
 
 ## Play-style mix
 
@@ -2060,19 +2060,19 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-25%
+24%
 
 LEVELING
 
-51%
+53%
 
 CAPITAL
 
-13%
+15%
 
 STARTING
 
-11%
+8%
 
 ## How to read this
 
@@ -2080,99 +2080,119 @@ STARTING
 
 **Top-five concentration**26% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**13% were last recorded in recognized capitals.
+**Capital footprint**15% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
-Characters: 526 (unique, last 30 days)
+Characters: 703 (unique, last 30 days)
 
-Locations: 48 (with recent sightings)
+Locations: 52 (with recent sightings)
 
-Top 5 share: 37% (location concentration)
+Top 5 share: 36% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 STORMWIND CITY
 
-58
-
-WESTFALL
-
-39
-
-STRANGLETHORN VALE
-
-35
+76
 
 ELWYNN FOREST
 
-34
+49
+
+WESTFALL
+
+48
+
+MARAUDON
+
+45
+
+STRANGLETHORN VALE
+
+38
 
 DUSKWOOD
+
+30
+
+DUN MOROGH
+
+29
+
+TELDRASSIL
+
+27
+
+DARKSHORE
 
 26
 
 WETLANDS
 
-21
+26
 
-MARAUDON
+REDRIDGE MOUNTAINS
 
-20
-
-TELDRASSIL
-
-20
-
-DUN MOROGH
-
-19
+25
 
 IRONFORGE
 
-17
+22
 
 NAXXRAMAS
 
 17
 
-DARKSHORE
-
-16
-
-SCARLET MONASTERY
+DESOLACE
 
 15
 
-REDRIDGE MOUNTAINS
-
-12
-
 ASHENVALE
 
-11
+14
 
 ↓ See more↑ See less
 
-DESOLACE
+LOCH MODAN
+
+14
+
+SCARLET MONASTERY
+
+13
+
+EASTERN PLAGUELANDS
 
 11
 
-THE TEMPLE OF ATAL'HAKKAR
+UN'GORO CRATER
 
 11
-
-FELWOOD
-
-10
 
 BADLANDS
 
+10
+
+DARNASSUS
+
+10
+
+WINTERSPRING
+
+10
+
+ARATHI HIGHLANDS
+
 9
 
-UN'GORO CRATER
+FELWOOD
+
+9
+
+FERALAS
 
 9
 
@@ -2180,15 +2200,23 @@ BLACKROCK DEPTHS
 
 8
 
-ARATHI HIGHLANDS
+BURNING STEPPES
+
+8
+
+TANARIS
+
+8
+
+WESTERN PLAGUELANDS
+
+8
+
+STONETALON MOUNTAINS
 
 7
 
-DARNASSUS
-
-7
-
-LOCH MODAN
+THE TEMPLE OF ATAL'HAKKAR
 
 7
 
@@ -2196,39 +2224,23 @@ DUSTWALLOW MARSH
 
 6
 
-EASTERN PLAGUELANDS
+ULDAMAN
 
 6
-
-WESTERN PLAGUELANDS
-
-6
-
-WINTERSPRING
-
-6
-
-FERALAS
-
-5
-
-STONETALON MOUNTAINS
-
-5
-
-TANARIS
-
-5
 
 AZSHARA
 
-4
-
-GATES OF AHN'QIRAJ
-
-4
+5
 
 HILLSBRAD FOOTHILLS
+
+5
+
+THE HINTERLANDS
+
+5
+
+GATES OF AHN'QIRAJ
 
 4
 
@@ -2236,25 +2248,13 @@ SILITHUS
 
 4
 
+THE BARRENS
+
+4
+
 THE DEADMINES
 
 4
-
-THE HINTERLANDS
-
-4
-
-ZUL'FARRAK
-
-4
-
-ALTERAC MOUNTAINS
-
-3
-
-BURNING STEPPES
-
-3
 
 SCHOLOMANCE
 
@@ -2264,6 +2264,14 @@ THOUSAND NEEDLES
 
 3
 
+ALTERAC MOUNTAINS
+
+2
+
+BLASTED LANDS
+
+2
+
 SEARING GORGE
 
 2
@@ -2272,7 +2280,15 @@ STRATHOLME
 
 2
 
-BLASTED LANDS
+SWAMP OF SORROWS
+
+2
+
+ARATHI BASIN
+
+1
+
+DEADWIND PASS
 
 1
 
@@ -2280,66 +2296,60 @@ DIRE MAUL
 
 1
 
-THE BARRENS
-
-1
-
-TIRISFAL GLADES
-
-1
-
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Stormwind City | 58 | 11.0% | Capital · avg 30 |
-| Westfall | 39 | 7.4% | Leveling · avg 16 |
-| Stranglethorn Vale | 35 | 6.7% | Leveling · avg 46 |
-| Elwynn Forest | 34 | 6.5% | Leveling · avg 13 |
-| Duskwood | 26 | 4.9% | Leveling · avg 27 |
-| Wetlands | 21 | 4.0% | Leveling · avg 32 |
-| Maraudon | 20 | 3.8% | End game · avg 60 |
-| Teldrassil | 20 | 3.8% | Starting · avg 10 |
-| Dun Morogh | 19 | 3.6% | Starting · avg 9 |
-| Ironforge | 17 | 3.2% | Capital · avg 34 |
-| Naxxramas | 17 | 3.2% | End game · avg 60 |
-| Darkshore | 16 | 3.0% | Leveling · avg 18 |
-| Scarlet Monastery | 15 | 2.9% | Leveling · avg 39 |
-| Redridge Mountains | 12 | 2.3% | Leveling · avg 24 |
-| Ashenvale | 11 | 2.1% | Leveling · avg 25 |
-| Desolace | 11 | 2.1% | Leveling · avg 42 |
-| The Temple of Atal'Hakkar | 11 | 2.1% | End game · avg 56 |
-| Felwood | 10 | 1.9% | End game · avg 55 |
-| Badlands | 9 | 1.7% | Leveling · avg 44 |
-| Un'Goro Crater | 9 | 1.7% | End game · avg 54 |
-| Blackrock Depths | 8 | 1.5% | End game · avg 57 |
-| Arathi Highlands | 7 | 1.3% | Leveling · avg 38 |
-| Darnassus | 7 | 1.3% | Capital · avg 26 |
-| Loch Modan | 7 | 1.3% | Leveling · avg 16 |
-| Dustwallow Marsh | 6 | 1.1% | Leveling · avg 45 |
-| Eastern Plaguelands | 6 | 1.1% | End game · avg 60 |
-| Western Plaguelands | 6 | 1.1% | End game · avg 56 |
-| Winterspring | 6 | 1.1% | End game · avg 54 |
-| Feralas | 5 | 1.0% | Leveling · avg 48 |
-| Stonetalon Mountains | 5 | 1.0% | Leveling · avg 38 |
-| Tanaris | 5 | 1.0% | Leveling · avg 45 |
-| Azshara | 4 | 0.8% | End game · avg 57 |
-| Gates of Ahn'Qiraj | 4 | 0.8% | End game · avg 60 |
-| Hillsbrad Foothills | 4 | 0.8% | Leveling · avg 38 |
-| Silithus | 4 | 0.8% | End game · avg 59 |
-| The Deadmines | 4 | 0.8% | Leveling · avg 24 |
-| The Hinterlands | 4 | 0.8% | End game · avg 56 |
-| Zul'Farrak | 4 | 0.8% | Leveling · avg 51 |
-| Alterac Mountains | 3 | 0.6% | Leveling · avg 36 |
-| Burning Steppes | 3 | 0.6% | Leveling · avg 43 |
-| Scholomance | 3 | 0.6% | End game · avg 59 |
-| Thousand Needles | 3 | 0.6% | Leveling · avg 39 |
-| Searing Gorge | 2 | 0.4% | Leveling · avg 25 |
-| Stratholme | 2 | 0.4% | End game · avg 59 |
-| Blasted Lands | 1 | 0.2% | Leveling · avg 49 |
-| Dire Maul | 1 | 0.2% | End game · avg 60 |
-| The Barrens | 1 | 0.2% | Leveling · avg 21 |
-| Tirisfal Glades | 1 | 0.2% | Leveling · avg 39 |
+| Stormwind City | 76 | 10.8% | Capital · avg 28 |
+| Elwynn Forest | 49 | 7.0% | Leveling · avg 12 |
+| Westfall | 48 | 6.8% | Leveling · avg 16 |
+| Maraudon | 45 | 6.4% | End game · avg 60 |
+| Stranglethorn Vale | 38 | 5.4% | Leveling · avg 45 |
+| Duskwood | 30 | 4.3% | Leveling · avg 27 |
+| Dun Morogh | 29 | 4.1% | Starting · avg 10 |
+| Teldrassil | 27 | 3.8% | Starting · avg 10 |
+| Darkshore | 26 | 3.7% | Leveling · avg 20 |
+| Wetlands | 26 | 3.7% | Leveling · avg 32 |
+| Redridge Mountains | 25 | 3.6% | Leveling · avg 22 |
+| Ironforge | 22 | 3.1% | Capital · avg 31 |
+| Naxxramas | 17 | 2.4% | End game · avg 60 |
+| Desolace | 15 | 2.1% | Leveling · avg 45 |
+| Ashenvale | 14 | 2.0% | Leveling · avg 25 |
+| Loch Modan | 14 | 2.0% | Leveling · avg 15 |
+| Scarlet Monastery | 13 | 1.8% | Leveling · avg 38 |
+| Eastern Plaguelands | 11 | 1.6% | End game · avg 60 |
+| Un'Goro Crater | 11 | 1.6% | End game · avg 53 |
+| Badlands | 10 | 1.4% | Leveling · avg 44 |
+| Darnassus | 10 | 1.4% | Capital · avg 31 |
+| Winterspring | 10 | 1.4% | End game · avg 56 |
+| Arathi Highlands | 9 | 1.3% | Leveling · avg 38 |
+| Felwood | 9 | 1.3% | End game · avg 56 |
+| Feralas | 9 | 1.3% | Leveling · avg 50 |
+| Blackrock Depths | 8 | 1.1% | End game · avg 57 |
+| Burning Steppes | 8 | 1.1% | End game · avg 58 |
+| Tanaris | 8 | 1.1% | Leveling · avg 45 |
+| Western Plaguelands | 8 | 1.1% | End game · avg 56 |
+| Stonetalon Mountains | 7 | 1.0% | Leveling · avg 37 |
+| The Temple of Atal'Hakkar | 7 | 1.0% | End game · avg 58 |
+| Dustwallow Marsh | 6 | 0.9% | Leveling · avg 45 |
+| Uldaman | 6 | 0.9% | Leveling · avg 48 |
+| Azshara | 5 | 0.7% | End game · avg 57 |
+| Hillsbrad Foothills | 5 | 0.7% | Leveling · avg 40 |
+| The Hinterlands | 5 | 0.7% | End game · avg 56 |
+| Gates of Ahn'Qiraj | 4 | 0.6% | End game · avg 60 |
+| Silithus | 4 | 0.6% | End game · avg 59 |
+| The Barrens | 4 | 0.6% | Leveling · avg 28 |
+| The Deadmines | 4 | 0.6% | Leveling · avg 24 |
+| Scholomance | 3 | 0.4% | End game · avg 59 |
+| Thousand Needles | 3 | 0.4% | Leveling · avg 39 |
+| Alterac Mountains | 2 | 0.3% | Leveling · avg 36 |
+| Blasted Lands | 2 | 0.3% | End game · avg 55 |
+| Searing Gorge | 2 | 0.3% | Leveling · avg 25 |
+| Stratholme | 2 | 0.3% | End game · avg 59 |
+| Swamp of Sorrows | 2 | 0.3% | Leveling · avg 49 |
+| Arathi Basin | 1 | 0.1% | End game · avg 60 |
+| Deadwind Pass | 1 | 0.1% | End game · avg 60 |
+| Dire Maul | 1 | 0.1% | End game · avg 60 |
 
 ## Play-style mix
 
@@ -2347,89 +2357,103 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-22%
+23%
 
 LEVELING
 
-55%
+53%
 
 CAPITAL
 
-16%
+15%
 
 STARTING
 
-7%
+8%
 
 ## How to read this
 
-**Strongest cluster**Stormwind City contains 11.0% of characters in this selection.
+**Strongest cluster**Stormwind City contains 10.8% of characters in this selection.
 
-**Top-five concentration**37% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**36% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**16% were last recorded in recognized capitals.
+**Capital footprint**15% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
-Characters: 400 (unique, last 30 days)
+Characters: 483 (unique, last 30 days)
 
-Locations: 43 (with recent sightings)
+Locations: 44 (with recent sightings)
 
-Top 5 share: 44% (location concentration)
+Top 5 share: 45% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 THE BARRENS
 
-60
-
-DUROTAR
-
-34
+74
 
 ORGRIMMAR
 
-30
+43
 
-ZUL'GURUB
+DUROTAR
 
-27
+41
 
 MULGORE
 
-26
+35
+
+ZUL'GURUB
+
+25
 
 RUINS OF AHN'QIRAJ
 
-22
+20
+
+SILVERPINE FOREST
+
+20
+
+HILLSBRAD FOOTHILLS
+
+19
 
 BLACKROCK MOUNTAIN
 
 18
 
-HILLSBRAD FOOTHILLS
-
-18
-
 STRANGLETHORN VALE
 
-17
+18
 
 AHN'QIRAJ
 
 16
 
-SILVERPINE FOREST
-
-13
-
 THOUSAND NEEDLES
+
+14
+
+TIRISFAL GLADES
 
 13
 
 UNDERCITY
+
+13
+
+MARAUDON
+
+9
+
+↓ See more↑ See less
+
+THUNDER BLUFF
 
 9
 
@@ -2437,41 +2461,31 @@ ARATHI HIGHLANDS
 
 7
 
+FERALAS
+
+7
+
+STONETALON MOUNTAINS
+
+7
+
 TANARIS
 
-6
+7
 
-↓ See more↑ See less
+WAILING CAVERNS
 
-TIRISFAL GLADES
-
-6
+7
 
 ASHENVALE
 
-5
+6
 
 FELWOOD
 
-5
-
-FERALAS
-
-5
-
-MARAUDON
-
-5
+6
 
 SCARLET MONASTERY
-
-5
-
-SHADOWFANG KEEP
-
-5
-
-WAILING CAVERNS
 
 5
 
@@ -2479,11 +2493,11 @@ MOLTEN CORE
 
 4
 
-STONETALON MOUNTAINS
+SILITHUS
 
 4
 
-THUNDER BLUFF
+WESTERN PLAGUELANDS
 
 4
 
@@ -2491,7 +2505,7 @@ ALTERAC MOUNTAINS
 
 3
 
-SILITHUS
+AZSHARA
 
 3
 
@@ -2499,19 +2513,27 @@ THE HINTERLANDS
 
 3
 
-WESTERN PLAGUELANDS
-
-3
-
 WINTERSPRING
 
 3
+
+BURNING STEPPES
+
+2
+
+DESOLACE
+
+2
 
 DUSTWALLOW MARSH
 
 2
 
 SEARING GORGE
+
+2
+
+SHADOWFANG KEEP
 
 2
 
@@ -2523,7 +2545,7 @@ UN'GORO CRATER
 
 2
 
-AZSHARA
+ARATHI BASIN
 
 1
 
@@ -2531,15 +2553,7 @@ BLASTED LANDS
 
 1
 
-BURNING STEPPES
-
-1
-
 DARKSHORE
-
-1
-
-DESOLACE
 
 1
 
@@ -2559,49 +2573,50 @@ WARSONG GULCH
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| The Barrens | 60 | 15.0% | Leveling · avg 20 |
-| Durotar | 34 | 8.5% | Starting · avg 8 |
-| Orgrimmar | 30 | 7.5% | Capital · avg 24 |
-| Zul'Gurub | 27 | 6.8% | End game · avg 60 |
-| Mulgore | 26 | 6.5% | Starting · avg 9 |
-| Ruins of Ahn'Qiraj | 22 | 5.5% | End game · avg 60 |
-| Blackrock Mountain | 18 | 4.5% | End game · avg 60 |
-| Hillsbrad Foothills | 18 | 4.5% | Leveling · avg 29 |
-| Stranglethorn Vale | 17 | 4.3% | Leveling · avg 41 |
-| Ahn'Qiraj | 16 | 4.0% | End game · avg 60 |
-| Silverpine Forest | 13 | 3.3% | Leveling · avg 17 |
-| Thousand Needles | 13 | 3.3% | Leveling · avg 32 |
-| Undercity | 9 | 2.3% | Capital · avg 26 |
-| Arathi Highlands | 7 | 1.8% | Leveling · avg 39 |
-| Tanaris | 6 | 1.5% | Leveling · avg 49 |
-| Tirisfal Glades | 6 | 1.5% | Leveling · avg 16 |
-| Ashenvale | 5 | 1.3% | Leveling · avg 32 |
-| Felwood | 5 | 1.3% | End game · avg 55 |
-| Feralas | 5 | 1.3% | Leveling · avg 45 |
-| Maraudon | 5 | 1.3% | End game · avg 60 |
-| Scarlet Monastery | 5 | 1.3% | Leveling · avg 38 |
-| Shadowfang Keep | 5 | 1.3% | Leveling · avg 24 |
-| Wailing Caverns | 5 | 1.3% | Leveling · avg 22 |
-| Molten Core | 4 | 1.0% | End game · avg 60 |
-| Stonetalon Mountains | 4 | 1.0% | Leveling · avg 22 |
-| Thunder Bluff | 4 | 1.0% | Capital · avg 15 |
-| Alterac Mountains | 3 | 0.8% | Leveling · avg 37 |
-| Silithus | 3 | 0.8% | End game · avg 60 |
-| The Hinterlands | 3 | 0.8% | Leveling · avg 50 |
-| Western Plaguelands | 3 | 0.8% | End game · avg 57 |
-| Winterspring | 3 | 0.8% | End game · avg 57 |
-| Dustwallow Marsh | 2 | 0.5% | Leveling · avg 36 |
-| Searing Gorge | 2 | 0.5% | End game · avg 56 |
-| Swamp of Sorrows | 2 | 0.5% | End game · avg 60 |
-| Un'Goro Crater | 2 | 0.5% | End game · avg 53 |
-| Azshara | 1 | 0.3% | End game · avg 60 |
-| Blasted Lands | 1 | 0.3% | End game · avg 56 |
-| Burning Steppes | 1 | 0.3% | Leveling · avg 52 |
-| Darkshore | 1 | 0.3% | Leveling · avg 15 |
-| Desolace | 1 | 0.3% | Leveling · avg 42 |
-| Eastern Plaguelands | 1 | 0.3% | Leveling · avg 52 |
-| Redridge Mountains | 1 | 0.3% | Leveling · avg 40 |
-| Warsong Gulch | 1 | 0.3% | End game · avg 60 |
+| The Barrens | 74 | 15.3% | Leveling · avg 20 |
+| Orgrimmar | 43 | 8.9% | Capital · avg 25 |
+| Durotar | 41 | 8.5% | Starting · avg 9 |
+| Mulgore | 35 | 7.2% | Leveling · avg 11 |
+| Zul'Gurub | 25 | 5.2% | End game · avg 60 |
+| Ruins of Ahn'Qiraj | 20 | 4.1% | End game · avg 60 |
+| Silverpine Forest | 20 | 4.1% | Leveling · avg 17 |
+| Hillsbrad Foothills | 19 | 3.9% | Leveling · avg 31 |
+| Blackrock Mountain | 18 | 3.7% | End game · avg 60 |
+| Stranglethorn Vale | 18 | 3.7% | Leveling · avg 41 |
+| Ahn'Qiraj | 16 | 3.3% | End game · avg 60 |
+| Thousand Needles | 14 | 2.9% | Leveling · avg 31 |
+| Tirisfal Glades | 13 | 2.7% | Starting · avg 10 |
+| Undercity | 13 | 2.7% | Capital · avg 29 |
+| Maraudon | 9 | 1.9% | End game · avg 57 |
+| Thunder Bluff | 9 | 1.9% | Capital · avg 17 |
+| Arathi Highlands | 7 | 1.4% | Leveling · avg 39 |
+| Feralas | 7 | 1.4% | Leveling · avg 48 |
+| Stonetalon Mountains | 7 | 1.4% | Leveling · avg 22 |
+| Tanaris | 7 | 1.4% | Leveling · avg 48 |
+| Wailing Caverns | 7 | 1.4% | Leveling · avg 25 |
+| Ashenvale | 6 | 1.2% | Leveling · avg 31 |
+| Felwood | 6 | 1.2% | End game · avg 54 |
+| Scarlet Monastery | 5 | 1.0% | Leveling · avg 38 |
+| Molten Core | 4 | 0.8% | End game · avg 60 |
+| Silithus | 4 | 0.8% | End game · avg 60 |
+| Western Plaguelands | 4 | 0.8% | End game · avg 58 |
+| Alterac Mountains | 3 | 0.6% | Leveling · avg 37 |
+| Azshara | 3 | 0.6% | End game · avg 60 |
+| The Hinterlands | 3 | 0.6% | Leveling · avg 50 |
+| Winterspring | 3 | 0.6% | End game · avg 57 |
+| Burning Steppes | 2 | 0.4% | End game · avg 54 |
+| Desolace | 2 | 0.4% | Leveling · avg 39 |
+| Dustwallow Marsh | 2 | 0.4% | Leveling · avg 36 |
+| Searing Gorge | 2 | 0.4% | End game · avg 56 |
+| Shadowfang Keep | 2 | 0.4% | Leveling · avg 24 |
+| Swamp of Sorrows | 2 | 0.4% | End game · avg 60 |
+| Un'Goro Crater | 2 | 0.4% | End game · avg 53 |
+| Arathi Basin | 1 | 0.2% | End game · avg 60 |
+| Blasted Lands | 1 | 0.2% | End game · avg 56 |
+| Darkshore | 1 | 0.2% | Leveling · avg 15 |
+| Eastern Plaguelands | 1 | 0.2% | Leveling · avg 52 |
+| Redridge Mountains | 1 | 0.2% | Leveling · avg 40 |
+| Warsong Gulch | 1 | 0.2% | End game · avg 60 |
 
 ## Play-style mix
 
@@ -2609,27 +2624,27 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-29%
+25%
 
 LEVELING
 
-46%
+50%
 
 CAPITAL
 
-11%
+13%
 
 STARTING
 
-15%
+11%
 
 ## How to read this
 
-**Strongest cluster**The Barrens contains 15.0% of characters in this selection.
+**Strongest cluster**The Barrens contains 15.3% of characters in this selection.
 
-**Top-five concentration**44% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**45% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**11% were last recorded in recognized capitals.
+**Capital footprint**13% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
@@ -2639,7 +2654,7 @@ Locations: 64 (with recent sightings)
 
 Top 5 share: 36% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -2936,7 +2951,7 @@ Locations: 64 (with recent sightings)
 
 Top 5 share: 36% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -3233,8 +3248,8 @@ Locations: 0 (with recent sightings)
 
 Top 5 share: 0% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 No location data is available for this selection yet.
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

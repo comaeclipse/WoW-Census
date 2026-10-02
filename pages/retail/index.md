@@ -5,13 +5,13 @@ url: "https://wowcensus.io/retail/"
 ---
 
 # WoW Retail Population Census – WoWCensus
-Characters: 3,318 (unique, all time)
+Characters: 4,941 (unique, all time)
 
 Realms: 3
 
-Scans: 486 (8,214 sightings)
+Scans: 646 (11,979 sightings)
 
-Updated: 2026-10-01 (last sample)
+Updated: 2026-10-02 (last sample)
 
 ## Most popular race + class
 
@@ -19,13 +19,13 @@ Alliance
 
 Human Warrior
 
-180 characters · 9.1% of Alliance
+193 characters · 7.1% of Alliance
 
 Horde
 
 Blood Elf Paladin
 
-91 characters · 6.8% of Horde
+174 characters · 7.8% of Horde
 
 ## Population by race
 
@@ -35,251 +35,251 @@ AllianceHorde
 
 HUMAN
 
-578
+698
 
 NIGHT ELF
 
-404
+527
 
 DWARF
 
-176
+270
 
 VOID ELF
 
-140
+219
 
 DRACTHYR
 
-111
-
-HARANIR
-
-102
-
-WORGEN
-
-85
+158
 
 DRAENEI
 
-79
-
-GNOME
-
-77
+140
 
 DARK IRON DWARF
 
-64
+123
 
-LIGHTFORGED DRAENEI
+GNOME
 
-47
-
-PANDAREN
-
-41
-
-KUL TIRAN
-
-28
-
-EARTHEN
-
-22
-
-MECHAGNOME
-
-16
-
-BLOOD ELF
-
-368
-
-ORC
-
-152
-
-TAUREN
-
-121
-
-TROLL
-
-94
-
-DRACTHYR
-
-93
-
-UNDEAD
-
-92
-
-ZANDALARI TROLL
-
-72
-
-VULPERA
-
-66
+117
 
 HARANIR
 
-60
+113
 
-MAG'HAR ORC
+WORGEN
 
-54
+99
 
-GOBLIN
+LIGHTFORGED DRAENEI
 
-50
-
-HIGHMOUNTAIN TAUREN
-
-44
-
-NIGHTBORNE
-
-38
+77
 
 PANDAREN
 
-33
+70
+
+KUL TIRAN
+
+40
 
 EARTHEN
 
-11
+31
 
-## Class distribution — Alliance
+MECHAGNOME
 
-1,970 characters shown
+20
 
-WARRIOR
+BLOOD ELF
 
-275
+649
 
-PALADIN
+ORC
 
-217
+269
 
-HUNTER
+TAUREN
 
-194
+207
 
-DRUID
+TROLL
 
-183
+163
 
-SHAMAN
-
-178
-
-DEATH KNIGHT
-
-169
-
-MONK
-
-160
-
-DEMON HUNTER
-
-153
-
-MAGE
+DRACTHYR
 
 145
 
-EVOKER
+UNDEAD
 
-83
+142
 
-WARLOCK
-
-79
-
-PRIEST
-
-75
-
-ROGUE
-
-59
-
-## Class distribution — Horde
-
-1,348 characters shown
-
-DRUID
-
-144
-
-PALADIN
-
-139
-
-SHAMAN
-
-128
-
-WARLOCK
-
-120
-
-WARRIOR
-
-114
-
-DEATH KNIGHT
-
-113
-
-HUNTER
-
-111
-
-MAGE
-
-106
-
-PRIEST
+ZANDALARI TROLL
 
 100
 
+MAG'HAR ORC
+
+94
+
+VULPERA
+
+88
+
+HARANIR
+
+86
+
+NIGHTBORNE
+
+74
+
+GOBLIN
+
+73
+
+PANDAREN
+
+63
+
+HIGHMOUNTAIN TAUREN
+
+60
+
+EARTHEN
+
+26
+
+## Class distribution — Alliance
+
+2,702 characters shown
+
+PALADIN
+
+342
+
+WARRIOR
+
+336
+
+SHAMAN
+
+270
+
+HUNTER
+
+229
+
+DRUID
+
+225
+
+MAGE
+
+220
+
 DEMON HUNTER
 
-76
+205
+
+DEATH KNIGHT
+
+199
 
 MONK
 
-70
+186
 
-EVOKER
+WARLOCK
 
-66
+141
+
+PRIEST
+
+140
 
 ROGUE
 
-61
+107
 
-Characters: 800 (unique, all time)
+EVOKER
+
+102
+
+## Class distribution — Horde
+
+2,239 characters shown
+
+PALADIN
+
+257
+
+DRUID
+
+228
+
+SHAMAN
+
+208
+
+HUNTER
+
+201
+
+WARLOCK
+
+196
+
+DEATH KNIGHT
+
+194
+
+MAGE
+
+180
+
+WARRIOR
+
+174
+
+PRIEST
+
+149
+
+DEMON HUNTER
+
+132
+
+MONK
+
+118
+
+ROGUE
+
+102
+
+EVOKER
+
+100
+
+Characters: 1,691 (unique, all time)
 
 Realms: 1
 
-Scans: 67 (1,729 sightings)
+Scans: 188 (4,316 sightings)
 
-Updated: 2026-10-01 (last sample)
+Updated: 2026-10-02 (last sample)
 
 ## Most popular race + class
 
 Horde
 
-Blood Elf Demon Hunter
+Blood Elf Paladin
 
-55 characters · 6.9% of Horde
+124 characters · 7.3% of Horde
 
 ## Population by race
 
@@ -289,119 +289,119 @@ Horde
 
 BLOOD ELF
 
-198
+479
 
 ORC
 
-87
-
-DRACTHYR
-
-73
+204
 
 TAUREN
 
-71
+157
 
 TROLL
 
-64
+133
+
+DRACTHYR
+
+125
 
 UNDEAD
 
-53
+103
 
 ZANDALARI TROLL
 
-47
-
-HARANIR
-
-40
+75
 
 MAG'HAR ORC
 
-30
+70
 
-GOBLIN
+HARANIR
 
-29
-
-HIGHMOUNTAIN TAUREN
-
-29
-
-VULPERA
-
-29
-
-PANDAREN
-
-22
+66
 
 NIGHTBORNE
 
-18
+54
 
-EARTHEN
+GOBLIN
 
-10
+52
 
-## Class distribution — Horde
+PANDAREN
 
-800 characters shown
+52
 
-DRUID
-
-92
-
-WARLOCK
-
-77
-
-SHAMAN
-
-70
-
-PALADIN
-
-69
-
-WARRIOR
-
-68
-
-MAGE
-
-67
-
-DEATH KNIGHT
-
-63
-
-PRIEST
-
-57
-
-DEMON HUNTER
-
-55
-
-EVOKER
+VULPERA
 
 51
 
+HIGHMOUNTAIN TAUREN
+
+45
+
+EARTHEN
+
+25
+
+## Class distribution — Horde
+
+1,691 characters shown
+
+PALADIN
+
+187
+
+DRUID
+
+176
+
+WARLOCK
+
+153
+
+SHAMAN
+
+150
+
+DEATH KNIGHT
+
+144
+
+MAGE
+
+141
+
 HUNTER
 
-46
+136
+
+WARRIOR
+
+128
+
+DEMON HUNTER
+
+111
+
+PRIEST
+
+106
 
 MONK
 
-44
+92
+
+EVOKER
+
+85
 
 ROGUE
 
-41
+82
 
 Characters: 474 (unique, all time)
 
@@ -409,7 +409,7 @@ Realms: 1
 
 Scans: 225 (2,435 sightings)
 
-Updated: 2026-10-01 (last sample)
+Updated: 2026-10-02 (last sample)
 
 ## Most popular race + class
 
@@ -659,13 +659,13 @@ EVOKER
 
 4
 
-Characters: 2,044 (unique, all time)
+Characters: 2,776 (unique, all time)
 
 Realms: 1
 
-Scans: 194 (4,050 sightings)
+Scans: 233 (5,228 sightings)
 
-Updated: 2026-10-01 (last sample)
+Updated: 2026-10-02 (last sample)
 
 ## Most popular race + class
 
@@ -673,7 +673,7 @@ Alliance
 
 Human Warrior
 
-162 characters · 9.9% of Alliance
+175 characters · 7.4% of Alliance
 
 Horde
 
@@ -689,63 +689,63 @@ AllianceHorde
 
 HUMAN
 
-477
+597
 
 NIGHT ELF
 
-323
+446
 
 DWARF
 
-156
+250
 
 VOID ELF
 
-119
+198
 
 DRACTHYR
 
-100
+147
+
+DRAENEI
+
+114
+
+DARK IRON DWARF
+
+112
 
 HARANIR
+
+110
+
+GNOME
 
 99
 
 WORGEN
 
-68
-
-GNOME
-
-59
-
-DARK IRON DWARF
-
-53
-
-DRAENEI
-
-53
+82
 
 LIGHTFORGED DRAENEI
 
-44
+74
 
 PANDAREN
 
-33
+62
 
 KUL TIRAN
 
-25
+37
 
 EARTHEN
 
-21
+30
 
 MECHAGNOME
 
-14
+18
 
 BLOOD ELF
 
@@ -809,59 +809,59 @@ EARTHEN
 
 ## Class distribution — Alliance
 
-1,644 characters shown
+2,376 characters shown
 
 WARRIOR
 
-242
+303
 
 PALADIN
 
-168
+293
 
 SHAMAN
 
-161
-
-MONK
-
-151
+253
 
 DRUID
 
-149
-
-HUNTER
-
-147
-
-DEATH KNIGHT
-
-144
+191
 
 DEMON HUNTER
 
-138
+190
 
 MAGE
 
-115
+190
 
-EVOKER
+HUNTER
 
-77
+182
+
+MONK
+
+177
+
+DEATH KNIGHT
+
+174
 
 WARLOCK
 
-58
+120
 
 PRIEST
 
-49
+114
+
+EVOKER
+
+96
 
 ROGUE
 
-45
+93
 
 ## Class distribution — Horde
 
@@ -921,12 +921,12 @@ EVOKER
 
 ## Inspected talent builds
 
-12 nearby players inspected · 12 with selected talents · 3 linked to retained census characters
+108 nearby players inspected · 108 with selected talents · 45 linked to retained census characters
 
-9 unlinked inspections. Nearby inspect samples have their own coverage and do not measure population-wide specialization shares.
+63 unlinked inspections. Nearby inspect samples have their own coverage and do not measure population-wide specialization shares.
 
-Latest inspection: 2026-10-01 14:51Z
+Latest inspection: 2026-10-02 15:47Z
 
 [Explore talents](/retail/talents)
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

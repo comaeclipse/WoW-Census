@@ -809,4 +809,4 @@ Single items holding the most listed value.
 | [Opulent Scepter](https://www.wowhead.com/mop-classic/item=15984) | 984k g | 1 | 0% |
 | [Lofty Helm](https://www.wowhead.com/mop-classic/item=14925) | 954k g | 1 | 0% |
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

@@ -5,11 +5,11 @@ url: "https://wowcensus.io/auctionhouse"
 ---
 
 # WoW Forever Auction House Prices – WoWCensus
-Items listed: 3,004 (distinct items seen)
+Items listed: 3,227 (distinct items seen)
 
-Listed value: 75k g (asking prices, not sales)
+Listed value: 95k g (asking prices, not sales)
 
-Quantity: 2,332,956 (units on the AH)
+Quantity: 2,493,651 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -19,17 +19,21 @@ Quantity listed × unit price, summed per market.
 
 ARMOR
 
-17k g
+23k g
 
 WEAPONS
 
-9k g
+12k g
 
-ENCHANTING MATS
+CONSUMABLES
+
+8k g
+
+RECIPES
 
 7k g
 
-CONSUMABLES
+ENCHANTING MATS
 
 6k g
 
@@ -37,19 +41,19 @@ ORE & BARS
 
 5k g
 
-RECIPES
+TRADE GOODS
 
-5k g
+4k g
 
 CLOTH
 
-3k g
-
-TRADE GOODS
-
-3k g
+4k g
 
 LEATHER & HIDES
+
+4k g
+
+BAGS
 
 3k g
 
@@ -57,21 +61,17 @@ HERBS
 
 3k g
 
-BAGS
-
-3k g
-
-POTIONS
+FOOD & DRINK
 
 2k g
 
-FOOD & DRINK
+ELIXIRS
 
-1k g
+2k g
 
 OILS & STONES
 
-1k g
+2k g
 
 ## Most listed items
 
@@ -79,21 +79,21 @@ By quantity sitting on the auction house.
 
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
-| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 332,445 | +4% | 1c |
-| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 248,592 | \-1% | 1c |
-| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 165,956 | \-1% | 1c |
-| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 128,652 | \-8% | 1c |
-| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 108,821 | +12% | 7c |
-| [Exploding Shot](https://www.wowhead.com/forever/item=3465) | 41,233 | \-22% | 19c |
-| [Light Shot](https://www.wowhead.com/forever/item=2516) | 37,234 | +17% | 1c |
-| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 34,096 | \-7% | 37c |
-| [Light Leather](https://www.wowhead.com/forever/item=2318) | 30,986 | +13% | 1s 24c |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 24,581 | 0% | 2s 28c |
-| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 22,717 | \-4% | 56c |
-| [Rough Stone](https://www.wowhead.com/forever/item=2835) | 22,404 | +10% | 4c |
-| [Silverleaf](https://www.wowhead.com/forever/item=765) | 20,698 | +59% | 15c |
-| [Copper Ore](https://www.wowhead.com/forever/item=2770) | 19,867 | \-4% | 1s 25c |
-| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 19,769 | +18% | 1s 36c |
+| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 343,673 | \-10% | 1c |
+| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 189,041 | \-15% | 1c |
+| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 135,507 | \-15% | 1c |
+| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 129,057 | \-9% | 1c |
+| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 110,741 | +20% | 7c |
+| [Light Leather](https://www.wowhead.com/forever/item=2318) | 47,099 | +36% | 58c |
+| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 46,230 | +22% | 39c |
+| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 43,660 | +4% | 40c |
+| [Razor Arrow](https://www.wowhead.com/forever/item=3030) | 40,927 | — | 12c |
+| [Rough Stone](https://www.wowhead.com/forever/item=2835) | 38,874 | +58% | 3c |
+| [Light Shot](https://www.wowhead.com/forever/item=2516) | 37,283 | \-21% | 1c |
+| [Exploding Shot](https://www.wowhead.com/forever/item=3465) | 34,072 | +3% | 23c |
+| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 28,557 | +10% | 1s 33c |
+| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 24,757 | +36% | 1s 82c |
+| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 23,846 | \-14% | 2s 26c |
 
 ## Most expensive items
 
@@ -101,21 +101,21 @@ Highest unit asking price among items currently listed.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
-| [Staff of Jordan](https://www.wowhead.com/forever/item=873) | 400g 27s | 1 | — |
+| [Mantle of Thieves](https://www.wowhead.com/forever/item=2264) | 600g 0s | 1 | 0% |
+| [Recipe: Cleric's Elixir](https://www.wowhead.com/forever/item=250368) | 500g 25s | 2 | — |
+| [Plains Ring](https://www.wowhead.com/forever/item=2039) | 300g 30s | 1 | 0% |
+| [Starfaller](https://www.wowhead.com/forever/item=13063) | 299g 0s | 1 | 0% |
 | [Rugged Armor Kit](https://www.wowhead.com/forever/item=15564) | 100g 16s | 1 | 0% |
-| [Pattern: Herbalist's Gloves](https://www.wowhead.com/forever/item=7361) | 100g 7s | 1 | — |
 | [Footpad's Shirt](https://www.wowhead.com/forever/item=49) | 99g 1s | 3 | 0% |
-| [Recipe: Magic Resistance Potion](https://www.wowhead.com/forever/item=9293) | 69g 69s | 1 | 0% |
-| [Traveler's Backpack](https://www.wowhead.com/forever/item=4500) | 60g 0s | 1 | 0% |
-| [Bearded Boneaxe](https://www.wowhead.com/forever/item=2878) | 50g 39s | 2 | — |
-| [Waylaid Crate: Expert Ingots](https://www.wowhead.com/forever/item=248709) | 50g 1s | 1 | 0% |
-| [Plans: Mithril Spurs](https://www.wowhead.com/forever/item=7989) | 40g 0s | 1 | 0% |
-| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 39g 33s | 13 | +63% |
-| [Troll-hide Bag](https://www.wowhead.com/forever/item=1685) | 39g 29s | 3 | — |
-| [Troll's Bane Leggings](https://www.wowhead.com/forever/item=13114) | 37g 19s | 4 | 0% |
-| [Ranger Bow](https://www.wowhead.com/forever/item=3021) | 34g 44s | 7 | — |
-| [Basalt Necklace](https://www.wowhead.com/forever/item=12028) | 33g 0s | 1 | 0% |
-| [Plans: Golden Scale Shoulders](https://www.wowhead.com/forever/item=3871) | 28g 88s | 1 | 0% |
+| [Traveler's Backpack](https://www.wowhead.com/forever/item=4500) | 70g 88s | 3 | 0% |
+| [Troll-hide Bag](https://www.wowhead.com/forever/item=1685) | 54g 47s | 2 | \-33% |
+| [How to Make Friend](https://www.wowhead.com/forever/item=271646) | 50g 50s | 2 | \-33% |
+| [Girdle of Golem Strength](https://www.wowhead.com/forever/item=9405) | 50g 31s | 1 | — |
+| [Claw of the Shadowmancer](https://www.wowhead.com/forever/item=2912) | 50g 0s | 1 | \-50% |
+| [Looming Gavel](https://www.wowhead.com/forever/item=13048) | 50g 0s | 1 | \-50% |
+| [Troll's Bane Leggings](https://www.wowhead.com/forever/item=13114) | 49g 69s | 4 | \-20% |
+| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 44g 92s | 7 | +40% |
+| [Pattern: Herbalist's Gloves](https://www.wowhead.com/forever/item=7361) | 36g 68s | 3 | — |
 
 ## Deepest markets
 
@@ -123,21 +123,21 @@ Single items holding the most listed value.
 
 | Item | Listed value | Qty | Change |
 | --- | --- | --- | --- |
-| [Greater Magic Essence](https://www.wowhead.com/forever/item=10939) | 1k g | 5,353 | \-2% |
-| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 912 g | 1,063 | +15% |
-| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 758 g | 832 | +41% |
-| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 715 g | 4,592 | +78% |
-| [Bolt of Mageweave](https://www.wowhead.com/forever/item=4339) | 587 g | 1,090 | +31% |
-| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 567 g | 7,842 | +20% |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 559 g | 24,581 | 0% |
-| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 511 g | 13 | +63% |
-| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 480 g | 18,653 | \-8% |
-| [Vision Dust](https://www.wowhead.com/forever/item=11137) | 471 g | 1,136 | \-32% |
-| [Frilled Lichen](https://www.wowhead.com/forever/item=249399) | 465 g | 1,170 | \-2% |
-| [Gloves of the Fang](https://www.wowhead.com/forever/item=10413) | 431 g | 121 | +53% |
-| [Mithril Bar](https://www.wowhead.com/forever/item=3860) | 412 g | 1,932 | +79% |
-| [Staff of Jordan](https://www.wowhead.com/forever/item=873) | 400 g | 1 | — |
-| [Mageweave Bag](https://www.wowhead.com/forever/item=10050) | 397 g | 111 | +18% |
+| [Recipe: Cleric's Elixir](https://www.wowhead.com/forever/item=250368) | 1k g | 2 | — |
+| [Greater Magic Essence](https://www.wowhead.com/forever/item=10939) | 875 g | 11,900 | +49% |
+| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 774 g | 8,966 | +24% |
+| [Iridescent Pearl](https://www.wowhead.com/forever/item=5500) | 735 g | 268 | +14% |
+| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 619 g | 755 | \-16% |
+| [Mantle of Thieves](https://www.wowhead.com/forever/item=2264) | 600 g | 1 | 0% |
+| [Bolt of Silk Cloth](https://www.wowhead.com/forever/item=4305) | 590 g | 1,520 | +31% |
+| [Pristine Leather](https://www.wowhead.com/forever/item=249427) | 571 g | 6,979 | \-0% |
+| [Bolt of Mageweave](https://www.wowhead.com/forever/item=4339) | 565 g | 977 | +9% |
+| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 556 g | 900 | +5% |
+| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 537 g | 23,846 | \-14% |
+| [Recipe: Savory Whimsyfin Delight](https://www.wowhead.com/forever/item=251526) | 484 g | 46 | +24% |
+| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 481 g | 14 | 0% |
+| [Frilled Lichen](https://www.wowhead.com/forever/item=249399) | 466 g | 1,244 | +9% |
+| [Bronze Bar](https://www.wowhead.com/forever/item=2841) | 466 g | 15,582 | +11% |
 
 Items listed: 2,597 (distinct items seen)
 
@@ -273,11 +273,11 @@ Single items holding the most listed value.
 | [Bronze Bar](https://www.wowhead.com/forever/item=2841) | 213 g | 8,149 | \-0% |
 | [Soul Dust](https://www.wowhead.com/forever/item=11083) | 206 g | 2,192 | \-0% |
 
-Items listed: 2,497 (distinct items seen)
+Items listed: 2,818 (distinct items seen)
 
-Listed value: 39k g (asking prices, not sales)
+Listed value: 60k g (asking prices, not sales)
 
-Quantity: 1,123,777 (units on the AH)
+Quantity: 1,284,472 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -287,37 +287,29 @@ Quantity listed × unit price, summed per market.
 
 ARMOR
 
-8k g
+15k g
 
 WEAPONS
 
-4k g
+7k g
 
-ENCHANTING MATS
+RECIPES
 
-3k g
+5k g
 
 CONSUMABLES
 
-3k g
+5k g
 
 ORE & BARS
 
 3k g
 
-RECIPES
+ENCHANTING MATS
 
 3k g
 
-CLOTH
-
-2k g
-
 TRADE GOODS
-
-2k g
-
-HERBS
 
 2k g
 
@@ -325,21 +317,29 @@ LEATHER & HIDES
 
 2k g
 
+CLOTH
+
+2k g
+
 BAGS
 
-1k g
+2k g
 
-POTIONS
+HERBS
 
-981 g
+2k g
 
 FOOD & DRINK
 
-724 g
+2k g
+
+ELIXIRS
+
+2k g
 
 COOKING INGREDIENTS
 
-681 g
+1k g
 
 ## Most listed items
 
@@ -347,21 +347,21 @@ By quantity sitting on the auction house.
 
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
-| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 185,399 | +8% | 1c |
-| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 108,935 | \-4% | 1c |
-| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 93,197 | +1% | 1c |
-| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 43,540 | \-17% | 1c |
-| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 38,677 | +41% | 7c |
-| [Light Shot](https://www.wowhead.com/forever/item=2516) | 25,425 | +27% | 1c |
-| [Light Leather](https://www.wowhead.com/forever/item=2318) | 19,810 | +16% | 1s 29c |
-| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 16,686 | \-13% | 42c |
-| [Silverleaf](https://www.wowhead.com/forever/item=765) | 14,405 | +101% | 13c |
-| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 12,881 | \-8% | 45c |
-| [Crafted Solid Shot](https://www.wowhead.com/forever/item=8069) | 12,200 | +11% | 16c |
-| [Exploding Shot](https://www.wowhead.com/forever/item=3465) | 11,949 | \-50% | 19c |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 11,780 | \-8% | 2s 39c |
-| [Peacebloom](https://www.wowhead.com/forever/item=2447) | 9,590 | +57% | 50c |
-| [Blood Shard](https://www.wowhead.com/forever/item=5075) | 9,283 | +5% | 25c |
+| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 196,627 | \-16% | 1c |
+| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 56,298 | \-18% | 1c |
+| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 50,395 | \-31% | 1c |
+| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 49,384 | \-42% | 1c |
+| [Razor Arrow](https://www.wowhead.com/forever/item=3030) | 40,927 | — | 12c |
+| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 40,597 | +83% | 6c |
+| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 36,394 | +29% | 30c |
+| [Light Leather](https://www.wowhead.com/forever/item=2318) | 35,923 | +47% | 41c |
+| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 26,250 | +7% | 45c |
+| [Light Shot](https://www.wowhead.com/forever/item=2516) | 25,474 | \-28% | 1c |
+| [Rough Stone](https://www.wowhead.com/forever/item=2835) | 24,609 | +124% | 3c |
+| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 20,504 | +46% | 72c |
+| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 18,002 | +17% | 73c |
+| [Peacebloom](https://www.wowhead.com/forever/item=2447) | 12,856 | +36% | 41c |
+| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 11,064 | \-25% | 2s 53c |
 
 ## Most expensive items
 
@@ -369,21 +369,21 @@ Highest unit asking price among items currently listed.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
-| [Staff of Jordan](https://www.wowhead.com/forever/item=873) | 400g 27s | 1 | — |
-| [Pattern: Herbalist's Gloves](https://www.wowhead.com/forever/item=7361) | 100g 7s | 1 | — |
-| [Bearded Boneaxe](https://www.wowhead.com/forever/item=2878) | 80g 0s | 1 | — |
-| [Recipe: Magic Resistance Potion](https://www.wowhead.com/forever/item=9293) | 69g 69s | 1 | 0% |
-| [Traveler's Backpack](https://www.wowhead.com/forever/item=4500) | 60g 0s | 1 | 0% |
-| [Scroll: PEATCHY ATTAX](https://www.wowhead.com/forever/item=213545) | 50g 1s | 1 | — |
-| [Waylaid Crate: Expert Ingots](https://www.wowhead.com/forever/item=248709) | 50g 1s | 1 | 0% |
-| [Plans: Mithril Spurs](https://www.wowhead.com/forever/item=7989) | 40g 0s | 1 | 0% |
-| [Beazel's Basher](https://www.wowhead.com/forever/item=13024) | 40g 0s | 1 | — |
-| [Troll's Bane Leggings](https://www.wowhead.com/forever/item=13114) | 35g 0s | 2 | 0% |
-| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 34g 99s | 2 | — |
-| [Journeyman's Backpack](https://www.wowhead.com/forever/item=3914) | 30g 0s | 3 | +50% |
-| [Plans: Golden Scale Shoulders](https://www.wowhead.com/forever/item=3871) | 28g 88s | 1 | 0% |
-| [Ranger Bow](https://www.wowhead.com/forever/item=3021) | 26g 56s | 3 | — |
-| [Marsh Ring of the Beast](https://www.wowhead.com/forever/item=12012) | 25g 37s | 1 | — |
+| [Mantle of Thieves](https://www.wowhead.com/forever/item=2264) | 600g 0s | 1 | 0% |
+| [Recipe: Cleric's Elixir](https://www.wowhead.com/forever/item=250368) | 500g 25s | 2 | — |
+| [Plains Ring](https://www.wowhead.com/forever/item=2039) | 300g 30s | 1 | 0% |
+| [Starfaller](https://www.wowhead.com/forever/item=13063) | 299g 0s | 1 | 0% |
+| [Traveler's Backpack](https://www.wowhead.com/forever/item=4500) | 70g 88s | 3 | 0% |
+| [Pattern: Filigreed Shadow Circlet](https://www.wowhead.com/forever/item=253982) | 70g 0s | 1 | 0% |
+| [Troll's Bane Leggings](https://www.wowhead.com/forever/item=13114) | 60g 0s | 2 | \-33% |
+| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 55g 69s | 5 | +67% |
+| [How to Make Friend](https://www.wowhead.com/forever/item=271646) | 50g 50s | 2 | \-33% |
+| [Girdle of Golem Strength](https://www.wowhead.com/forever/item=9405) | 50g 31s | 1 | — |
+| [Claw of the Shadowmancer](https://www.wowhead.com/forever/item=2912) | 50g 0s | 1 | \-50% |
+| [Looming Gavel](https://www.wowhead.com/forever/item=13048) | 50g 0s | 1 | \-50% |
+| [Elemental Air](https://www.wowhead.com/forever/item=7069) | 39g 0s | 4 | +33% |
+| [Pattern: Herbalist's Gloves](https://www.wowhead.com/forever/item=7361) | 36g 68s | 3 | — |
+| [Bloodspiller](https://www.wowhead.com/forever/item=7753) | 35g 23s | 2 | 0% |
 
 ## Deepest markets
 
@@ -391,27 +391,27 @@ Single items holding the most listed value.
 
 | Item | Listed value | Qty | Change |
 | --- | --- | --- | --- |
-| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 598 g | 695 | +25% |
-| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 510 g | 3,490 | +139% |
-| [Greater Magic Essence](https://www.wowhead.com/forever/item=10939) | 414 g | 1,908 | \-10% |
-| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 406 g | 498 | +91% |
-| [Staff of Jordan](https://www.wowhead.com/forever/item=873) | 400 g | 1 | — |
-| [Goldthorn](https://www.wowhead.com/forever/item=3821) | 316 g | 640 | +534% |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 281 g | 11,780 | \-8% |
-| [Mithril Bar](https://www.wowhead.com/forever/item=3860) | 272 g | 1,373 | +165% |
-| [Mageweave Bag](https://www.wowhead.com/forever/item=10050) | 263 g | 72 | +31% |
-| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 262 g | 3,589 | +49% |
-| [Light Leather](https://www.wowhead.com/forever/item=2318) | 256 g | 19,810 | +16% |
-| [Small Silk Pack](https://www.wowhead.com/forever/item=4245) | 255 g | 159 | +169% |
-| [Iridescent Pearl](https://www.wowhead.com/forever/item=5500) | 251 g | 83 | +219% |
-| [Spellblasting Potion](https://www.wowhead.com/forever/item=250934) | 250 g | 200 | +900% |
-| [Frilled Lichen](https://www.wowhead.com/forever/item=249399) | 245 g | 583 | \-7% |
+| [Recipe: Cleric's Elixir](https://www.wowhead.com/forever/item=250368) | 1k g | 2 | — |
+| [Iridescent Pearl](https://www.wowhead.com/forever/item=5500) | 621 g | 216 | +19% |
+| [Mantle of Thieves](https://www.wowhead.com/forever/item=2264) | 600 g | 1 | 0% |
+| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 570 g | 7,864 | +29% |
+| [Bolt of Silk Cloth](https://www.wowhead.com/forever/item=4305) | 465 g | 1,357 | +39% |
+| [Pristine Leather](https://www.wowhead.com/forever/item=249427) | 455 g | 4,585 | 0% |
+| [Kingsblood](https://www.wowhead.com/forever/item=3356) | 358 g | 4,522 | +21% |
+| [Stranglekelp](https://www.wowhead.com/forever/item=3820) | 352 g | 2,203 | +32% |
+| [Heavy Stone](https://www.wowhead.com/forever/item=2838) | 322 g | 2,459 | \-10% |
+| [Small Silk Pack](https://www.wowhead.com/forever/item=4245) | 320 g | 227 | +36% |
+| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 306 g | 387 | \-27% |
+| [Golden Pearl](https://www.wowhead.com/forever/item=13926) | 305 g | 90 | +14% |
+| [Recipe: Savory Whimsyfin Delight](https://www.wowhead.com/forever/item=251526) | 300 g | 23 | +64% |
+| [Plains Ring](https://www.wowhead.com/forever/item=2039) | 300 g | 1 | 0% |
+| [Starfaller](https://www.wowhead.com/forever/item=13063) | 299 g | 1 | 0% |
 
-Items listed: 2,649 (distinct items seen)
+Items listed: 2,859 (distinct items seen)
 
-Listed value: 33k g (asking prices, not sales)
+Listed value: 39k g (asking prices, not sales)
 
-Quantity: 1,129,066 (units on the AH)
+Quantity: 1,137,175 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -421,9 +421,13 @@ Quantity listed × unit price, summed per market.
 
 ARMOR
 
-8k g
+9k g
 
 WEAPONS
+
+4k g
+
+CONSUMABLES
 
 3k g
 
@@ -431,19 +435,23 @@ ENCHANTING MATS
 
 3k g
 
-ORE & BARS
+RECIPES
 
 3k g
 
-CONSUMABLES
-
-2k g
-
-RECIPES
+ORE & BARS
 
 2k g
 
 CLOTH
+
+2k g
+
+BAGS
+
+2k g
+
+LEATHER & HIDES
 
 1k g
 
@@ -455,25 +463,17 @@ HERBS
 
 1k g
 
-BAGS
-
-1k g
-
-LEATHER & HIDES
-
-1k g
-
-POTIONS
-
-794 g
-
 OILS & STONES
 
-776 g
+907 g
 
-COOKING INGREDIENTS
+ELIXIRS
 
-555 g
+858 g
+
+FOOD & DRINK
+
+831 g
 
 ## Most listed items
 
@@ -481,21 +481,21 @@ By quantity sitting on the auction house.
 
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
-| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 172,745 | \-6% | 1c |
-| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 120,189 | \-40% | 1c |
-| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 92,524 | \-6% | 1c |
-| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 68,882 | \-26% | 1c |
-| [Light Shot](https://www.wowhead.com/forever/item=2516) | 29,664 | +4% | 1c |
-| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 22,166 | \-28% | 13c |
-| [Exploding Shot](https://www.wowhead.com/forever/item=3465) | 20,823 | \-33% | 18c |
-| [Light Leather](https://www.wowhead.com/forever/item=2318) | 14,446 | \-8% | 1s 8c |
-| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 13,489 | +35% | 1s 42c |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 13,320 | \-3% | 2s 17c |
-| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 12,064 | \-6% | 38c |
-| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 11,704 | \-16% | 24c |
-| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 10,742 | +17% | 2s 68c |
-| [Silverleaf](https://www.wowhead.com/forever/item=765) | 10,405 | +250% | 12c |
-| [Ruined Leather Scraps](https://www.wowhead.com/forever/item=2934) | 10,383 | +41% | 33c |
+| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 139,486 | \-18% | 1c |
+| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 114,111 | \-7% | 1c |
+| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 67,282 | \-29% | 1c |
+| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 56,863 | \-19% | 1c |
+| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 36,193 | +63% | 8c |
+| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 26,777 | +130% | 45c |
+| [Light Leather](https://www.wowhead.com/forever/item=2318) | 23,873 | +77% | 57c |
+| [Rough Stone](https://www.wowhead.com/forever/item=2835) | 22,538 | +154% | 3c |
+| [Exploding Shot](https://www.wowhead.com/forever/item=3465) | 21,823 | +5% | 26c |
+| [Light Shot](https://www.wowhead.com/forever/item=2516) | 19,870 | \-33% | 1c |
+| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 13,926 | +16% | 35c |
+| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 12,823 | +23% | 1s 49c |
+| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 12,295 | \-0% | 2s 16c |
+| [Peacebloom](https://www.wowhead.com/forever/item=2447) | 10,297 | +63% | 34c |
+| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 10,086 | +155% | 2s 66c |
 
 ## Most expensive items
 
@@ -506,18 +506,18 @@ Highest unit asking price among items currently listed.
 | [Rugged Armor Kit](https://www.wowhead.com/forever/item=15564) | 100g 16s | 1 | 0% |
 | [How to Make Friend](https://www.wowhead.com/forever/item=271646) | 100g 0s | 1 | \-50% |
 | [Footpad's Shirt](https://www.wowhead.com/forever/item=49) | 99g 1s | 3 | 0% |
-| [Bearded Boneaxe](https://www.wowhead.com/forever/item=2878) | 80g 0s | 1 | — |
-| [Blueprint: Fishing Rack](https://www.wowhead.com/forever/item=273141) | 45g 3s | 2 | — |
-| [Plans: Mithril Spurs](https://www.wowhead.com/forever/item=7989) | 40g 0s | 1 | 0% |
-| [Troll-hide Bag](https://www.wowhead.com/forever/item=1685) | 39g 29s | 3 | — |
+| [Troll-hide Bag](https://www.wowhead.com/forever/item=1685) | 54g 47s | 2 | \-33% |
+| [Girdle of Golem Strength](https://www.wowhead.com/forever/item=9405) | 50g 31s | 1 | — |
+| [Bearded Boneaxe](https://www.wowhead.com/forever/item=2878) | 49g 0s | 2 | +100% |
+| [Journeyman's Backpack](https://www.wowhead.com/forever/item=3914) | 35g 82s | 2 | \-33% |
+| [Spinel Ring of Intellect](https://www.wowhead.com/forever/item=11970) | 35g 25s | 3 | — |
 | [Basalt Necklace](https://www.wowhead.com/forever/item=12028) | 33g 0s | 1 | 0% |
-| [Journeyman's Backpack](https://www.wowhead.com/forever/item=3914) | 30g 0s | 3 | +50% |
-| [Ranger Bow](https://www.wowhead.com/forever/item=3021) | 29g 69s | 1 | 0% |
-| [Redbeard Crest](https://www.wowhead.com/forever/item=12997) | 27g 29s | 2 | \-50% |
-| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 27g 0s | 5 | +67% |
-| [Evocator's Blade](https://www.wowhead.com/forever/item=2567) | 25g 49s | 1 | — |
+| [Azure Silk Gloves](https://www.wowhead.com/forever/item=4319) | 30g 0s | 1 | — |
+| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 27g 0s | 5 | 0% |
+| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 26g 49s | 4 | +33% |
+| [Double-barreled Shotgun](https://www.wowhead.com/forever/item=2098) | 25g 0s | 1 | \-50% |
+| [Shield of Thorsen](https://www.wowhead.com/forever/item=13079) | 25g 0s | 1 | — |
 | [Rune of Portals](https://www.wowhead.com/forever/item=17032) | 24g 99s | 2 | 0% |
-| [Double Link Tunic](https://www.wowhead.com/forever/item=1717) | 22g 55s | 1 | 0% |
 
 ## Deepest markets
 
@@ -525,21 +525,21 @@ Single items holding the most listed value.
 
 | Item | Listed value | Qty | Change |
 | --- | --- | --- | --- |
-| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 460 g | 643 | +7% |
-| [Greater Magic Essence](https://www.wowhead.com/forever/item=10939) | 448 g | 2,080 | \-21% |
-| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 405 g | 430 | +12% |
-| [Mithril Bar](https://www.wowhead.com/forever/item=3860) | 314 g | 1,318 | +170% |
-| [Gloves of the Fang](https://www.wowhead.com/forever/item=10413) | 313 g | 82 | +30% |
-| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 298 g | 4,101 | \-1% |
+| [Greater Magic Essence](https://www.wowhead.com/forever/item=10939) | 454 g | 5,892 | +193% |
+| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 392 g | 3,647 | +113% |
+| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 389 g | 518 | \-20% |
+| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 375 g | 484 | +14% |
 | [Footpad's Shirt](https://www.wowhead.com/forever/item=49) | 297 g | 3 | 0% |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 289 g | 13,320 | \-3% |
-| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 288 g | 10,742 | +17% |
-| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 282 g | 1,690 | +24% |
-| [Frilled Lichen](https://www.wowhead.com/forever/item=249399) | 259 g | 744 | \-16% |
-| [Spellblasting Potion](https://www.wowhead.com/forever/item=250934) | 250 g | 200 | +900% |
-| [Bronze Bar](https://www.wowhead.com/forever/item=2841) | 219 g | 6,801 | +10% |
-| [Heavy Leather](https://www.wowhead.com/forever/item=4234) | 214 g | 1,940 | +98% |
-| [Goldthorn](https://www.wowhead.com/forever/item=3821) | 210 g | 423 | +288% |
+| [Bolt of Silk Cloth](https://www.wowhead.com/forever/item=4305) | 278 g | 594 | +101% |
+| [Frilled Lichen](https://www.wowhead.com/forever/item=249399) | 276 g | 794 | +10% |
+| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 268 g | 10,086 | +155% |
+| [Silver Ore](https://www.wowhead.com/forever/item=2775) | 266 g | 1,202 | +8% |
+| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 265 g | 12,295 | \-0% |
+| [Recipe: Savory Whimsyfin Delight](https://www.wowhead.com/forever/item=251526) | 259 g | 26 | +63% |
+| [Bolt of Mageweave](https://www.wowhead.com/forever/item=4339) | 248 g | 446 | +25% |
+| [Small Silk Pack](https://www.wowhead.com/forever/item=4245) | 226 g | 132 | +106% |
+| [Bronze Bar](https://www.wowhead.com/forever/item=2841) | 225 g | 7,258 | +6% |
+| [Savory Whimsyfin Delight](https://www.wowhead.com/forever/item=251525) | 221 g | 1,994 | \-5% |
 
 Items listed: 2,269 (distinct items seen)
 
@@ -675,11 +675,11 @@ Single items holding the most listed value.
 | [Tin Bar](https://www.wowhead.com/forever/item=3576) | 133 g | 3,029 | 0% |
 | [Craftsman's Writ: Herbalist's Gloves](https://www.wowhead.com/forever/item=264040) | 128 g | 8 | \-11% |
 
-Items listed: 2,168 (distinct items seen)
+Items listed: 2,497 (distinct items seen)
 
-Listed value: 16k g (asking prices, not sales)
+Listed value: 22k g (asking prices, not sales)
 
-Quantity: 454,252 (units on the AH)
+Quantity: 462,361 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -689,9 +689,17 @@ Quantity listed × unit price, summed per market.
 
 ARMOR
 
-4k g
+5k g
 
 WEAPONS
+
+3k g
+
+CONSUMABLES
+
+2k g
+
+RECIPES
 
 2k g
 
@@ -703,45 +711,37 @@ ENCHANTING MATS
 
 1k g
 
-CONSUMABLES
-
-1k g
-
-RECIPES
-
-1k g
-
-TRADE GOODS
-
-765 g
-
 CLOTH
 
-739 g
-
-HERBS
-
-701 g
+963 g
 
 BAGS
 
-603 g
+938 g
 
 LEATHER & HIDES
 
-591 g
+856 g
 
-POTIONS
+TRADE GOODS
 
-563 g
+807 g
+
+ELIXIRS
+
+652 g
+
+HERBS
+
+578 g
+
+FOOD & DRINK
+
+574 g
 
 OILS & STONES
 
-331 g
-
-COOKING INGREDIENTS
-
-288 g
+462 g
 
 ## Most listed items
 
@@ -749,21 +749,21 @@ By quantity sitting on the auction house.
 
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
-| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 56,059 | \-19% | 1c |
-| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 36,806 | \-38% | 1c |
-| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 34,965 | \-69% | 1c |
-| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 27,905 | \-14% | 1c |
-| [Light Shot](https://www.wowhead.com/forever/item=2516) | 19,569 | +6% | 1c |
-| [Silverleaf](https://www.wowhead.com/forever/item=765) | 8,465 | +475% | 11c |
-| [Light Leather](https://www.wowhead.com/forever/item=2318) | 8,370 | \-22% | 1s 15c |
-| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 6,836 | \-15% | 14c |
-| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 5,793 | \-25% | 29c |
-| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 5,753 | +29% | 2s 85c |
-| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 5,734 | +54% | 1s 92c |
-| [Copper Ore](https://www.wowhead.com/forever/item=2770) | 5,594 | +11% | 1s 89c |
-| [Ruined Leather Scraps](https://www.wowhead.com/forever/item=2934) | 5,117 | +117% | 38c |
-| [Peacebloom](https://www.wowhead.com/forever/item=2447) | 4,855 | +100% | 27c |
-| [Rough Stone](https://www.wowhead.com/forever/item=2835) | 4,310 | +81% | 5c |
+| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 28,887 | \-17% | 1c |
+| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 24,787 | \-33% | 1c |
+| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 22,800 | \-59% | 2c |
+| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 21,549 | +215% | 39c |
+| [Light Leather](https://www.wowhead.com/forever/item=2318) | 17,797 | +113% | 43c |
+| [Rough Stone](https://www.wowhead.com/forever/item=2835) | 17,318 | +302% | 3c |
+| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 15,827 | +779% | 10c |
+| [Light Shot](https://www.wowhead.com/forever/item=2516) | 9,775 | \-50% | 1c |
+| [Peacebloom](https://www.wowhead.com/forever/item=2447) | 8,396 | +73% | 23c |
+| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 8,015 | +38% | 46c |
+| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 7,834 | +36% | 85c |
+| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 7,321 | +448% | 95c |
+| [Razor Arrow](https://www.wowhead.com/forever/item=3030) | 6,535 | — | 24c |
+| [Crafted Solid Shot](https://www.wowhead.com/forever/item=8069) | 5,000 | +108% | 24c |
+| [Bolt of Linen Cloth](https://www.wowhead.com/forever/item=2996) | 4,826 | +93% | 95c |
 
 ## Most expensive items
 
@@ -772,20 +772,20 @@ Highest unit asking price among items currently listed.
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
 | [How to Make Friend](https://www.wowhead.com/forever/item=271646) | 100g 0s | 1 | \-50% |
-| [Bearded Boneaxe](https://www.wowhead.com/forever/item=2878) | 80g 0s | 1 | — |
-| [Blueprint: Fishing Rack](https://www.wowhead.com/forever/item=273141) | 50g 0s | 1 | — |
-| [Feet of the Lynx](https://www.wowhead.com/forever/item=1121) | 40g 0s | 1 | \-67% |
-| [Plans: Mithril Spurs](https://www.wowhead.com/forever/item=7989) | 40g 0s | 1 | 0% |
-| [Journeyman's Backpack](https://www.wowhead.com/forever/item=3914) | 30g 0s | 3 | +50% |
-| [Ranger Bow](https://www.wowhead.com/forever/item=3021) | 29g 69s | 1 | 0% |
-| [Evocator's Blade](https://www.wowhead.com/forever/item=2567) | 25g 49s | 1 | — |
-| [Brawler Gloves](https://www.wowhead.com/forever/item=720) | 25g 0s | 2 | +100% |
-| [Tree Bark Jacket](https://www.wowhead.com/forever/item=1486) | 25g 0s | 1 | — |
+| [Girdle of Golem Strength](https://www.wowhead.com/forever/item=9405) | 50g 31s | 1 | — |
+| [Bearded Boneaxe](https://www.wowhead.com/forever/item=2878) | 49g 0s | 2 | +100% |
+| [Journeyman's Backpack](https://www.wowhead.com/forever/item=3914) | 35g 82s | 2 | \-33% |
+| [Spinel Ring of Intellect](https://www.wowhead.com/forever/item=11970) | 35g 25s | 3 | — |
+| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 34g 99s | 2 | +100% |
+| [Azure Silk Gloves](https://www.wowhead.com/forever/item=4319) | 30g 0s | 1 | — |
+| [Troll-hide Bag](https://www.wowhead.com/forever/item=1685) | 28g 94s | 1 | \-50% |
+| [Double-barreled Shotgun](https://www.wowhead.com/forever/item=2098) | 25g 0s | 1 | \-50% |
+| [Shield of Thorsen](https://www.wowhead.com/forever/item=13079) | 25g 0s | 1 | — |
+| [Thunderwood](https://www.wowhead.com/forever/item=13062) | 22g 49s | 3 | +200% |
+| [Blueprint: Tanning Rack](https://www.wowhead.com/forever/item=273096) | 22g 0s | 7 | +133% |
+| [The Black Knight](https://www.wowhead.com/forever/item=12974) | 21g 0s | 1 | — |
+| [Necrology Robes](https://www.wowhead.com/forever/item=2292) | 20g 20s | 2 | +100% |
 | [Cloudy Windraveled Armguards](https://www.wowhead.com/forever/item=277005) | 20g 1s | 1 | — |
-| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 19g 99s | 1 | — |
-| [Mindthrust Bracers](https://www.wowhead.com/forever/item=1974) | 19g 7s | 1 | 0% |
-| [Troll-hide Bag](https://www.wowhead.com/forever/item=1685) | 18g 94s | 2 | — |
-| [Pattern: Filigreed Pristine Circlet](https://www.wowhead.com/forever/item=253976) | 18g 11s | 3 | +200% |
 
 ## Deepest markets
 
@@ -793,27 +793,27 @@ Single items holding the most listed value.
 
 | Item | Listed value | Qty | Change |
 | --- | --- | --- | --- |
-| [Spellblasting Potion](https://www.wowhead.com/forever/item=250934) | 250 g | 200 | +900% |
-| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 242 g | 371 | +13% |
-| [Goldthorn](https://www.wowhead.com/forever/item=3821) | 196 g | 396 | +383% |
-| [Mithril Bar](https://www.wowhead.com/forever/item=3860) | 193 g | 883 | +1,566% |
-| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 175 g | 225 | +22% |
-| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 163 g | 5,753 | +29% |
-| [Copper Modulator](https://www.wowhead.com/forever/item=4363) | 136 g | 247 | +8% |
-| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 129 g | 865 | +69% |
-| [Heavy Leather](https://www.wowhead.com/forever/item=4234) | 126 g | 1,052 | +985% |
-| [Gloves of the Fang](https://www.wowhead.com/forever/item=10413) | 120 g | 43 | +72% |
-| [Thick Leather](https://www.wowhead.com/forever/item=4304) | 111 g | 466 | +43% |
-| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 110 g | 5,734 | +54% |
-| [Bolt of Runecloth](https://www.wowhead.com/forever/item=14048) | 107 g | 147 | +1,533% |
-| [Copper Ore](https://www.wowhead.com/forever/item=2770) | 105 g | 5,594 | +11% |
-| [Greater Nether Essence](https://www.wowhead.com/forever/item=11175) | 102 g | 17 | +240% |
+| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 239 g | 2,822 | +226% |
+| [Small Silk Pack](https://www.wowhead.com/forever/item=4245) | 204 g | 121 | +128% |
+| [Bolt of Silk Cloth](https://www.wowhead.com/forever/item=4305) | 197 g | 490 | +187% |
+| [Heavy Stone](https://www.wowhead.com/forever/item=2838) | 177 g | 937 | +4% |
+| [Recipe: Savory Whimsyfin Delight](https://www.wowhead.com/forever/item=251526) | 175 g | 14 | +250% |
+| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 172 g | 246 | \-34% |
+| [Blueprint: Tanning Rack](https://www.wowhead.com/forever/item=273096) | 154 g | 7 | +133% |
+| [Savory Whimsyfin Delight](https://www.wowhead.com/forever/item=251525) | 150 g | 1,016 | \-17% |
+| [Iridescent Pearl](https://www.wowhead.com/forever/item=5500) | 149 g | 41 | +95% |
+| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 145 g | 279 | +24% |
+| [Magician's Mantle](https://www.wowhead.com/forever/item=12998) | 143 g | 11 | +450% |
+| [Pristine Leather](https://www.wowhead.com/forever/item=249427) | 142 g | 985 | +2% |
+| [Elixir of Lesser Defense](https://www.wowhead.com/forever/item=3389) | 142 g | 285 | \-16% |
+| [Silver Bar](https://www.wowhead.com/forever/item=2842) | 129 g | 647 | \-21% |
+| [Heavy Leather](https://www.wowhead.com/forever/item=4234) | 128 g | 877 | \-17% |
 
-Items listed: 2,670 (distinct items seen)
+Items listed: 2,886 (distinct items seen)
 
-Listed value: 42k g (asking prices, not sales)
+Listed value: 57k g (asking prices, not sales)
 
-Quantity: 1,203,890 (units on the AH)
+Quantity: 1,356,476 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -823,31 +823,27 @@ Quantity listed × unit price, summed per market.
 
 ARMOR
 
-9k g
+14k g
 
 WEAPONS
 
-6k g
+7k g
 
-ENCHANTING MATS
+RECIPES
 
-4k g
+5k g
 
 CONSUMABLES
 
-3k g
+5k g
 
-RECIPES
+ENCHANTING MATS
 
 3k g
 
 ORE & BARS
 
-2k g
-
-CLOTH
-
-2k g
+3k g
 
 TRADE GOODS
 
@@ -857,25 +853,29 @@ LEATHER & HIDES
 
 2k g
 
+CLOTH
+
+2k g
+
 HERBS
 
-1k g
+2k g
 
 BAGS
 
-1k g
-
-POTIONS
-
-846 g
+2k g
 
 FOOD & DRINK
 
-820 g
+2k g
+
+POTIONS
+
+1k g
 
 ELIXIRS
 
-704 g
+1k g
 
 ## Most listed items
 
@@ -883,21 +883,21 @@ By quantity sitting on the auction house.
 
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
-| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 212,256 | +80% | 1c |
-| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 97,074 | +31% | 1c |
-| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 86,655 | +30% | 6c |
-| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 75,847 | +12% | 1c |
-| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 36,128 | \-11% | 1c |
-| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 22,392 | \-2% | 44c |
-| [Exploding Shot](https://www.wowhead.com/forever/item=3465) | 20,410 | \-7% | 19c |
-| [Light Leather](https://www.wowhead.com/forever/item=2318) | 16,540 | +43% | 1s 37c |
-| [Crafted Solid Shot](https://www.wowhead.com/forever/item=8069) | 14,701 | +18% | 17c |
-| [Rough Stone](https://www.wowhead.com/forever/item=2835) | 12,874 | \-5% | 4c |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 11,261 | +4% | 2s 40c |
-| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 10,653 | \-2% | 77c |
-| [Medium Leather](https://www.wowhead.com/forever/item=2319) | 10,352 | \-6% | 1s 82c |
-| [Silverleaf](https://www.wowhead.com/forever/item=765) | 10,293 | +3% | 18c |
-| [Copper Ore](https://www.wowhead.com/forever/item=2770) | 10,224 | \-14% | 1s 4c |
+| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 229,562 | \-11% | 1c |
+| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 74,548 | +6% | 6c |
+| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 72,194 | 0% | 1c |
+| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 68,225 | +4% | 1c |
+| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 49,555 | \-6% | 1c |
+| [Razor Arrow](https://www.wowhead.com/forever/item=3030) | 34,392 | 0% | 10c |
+| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 29,734 | \-1% | 42c |
+| [Light Leather](https://www.wowhead.com/forever/item=2318) | 23,226 | +9% | 60c |
+| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 19,453 | \-26% | 31c |
+| [Light Shot](https://www.wowhead.com/forever/item=2516) | 17,413 | 0% | 1c |
+| [Rough Stone](https://www.wowhead.com/forever/item=2835) | 16,336 | +4% | 3c |
+| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 15,734 | +2% | 1s 21c |
+| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 14,671 | +3% | 1s 25c |
+| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 14,063 | +4% | 2s 21c |
+| [Copper Ore](https://www.wowhead.com/forever/item=2770) | 13,670 | +24% | 1s 55c |
 
 ## Most expensive items
 
@@ -905,21 +905,21 @@ Highest unit asking price among items currently listed.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
-| [Staff of Jordan](https://www.wowhead.com/forever/item=873) | 400g 27s | 1 | — |
-| [Pattern: Herbalist's Gloves](https://www.wowhead.com/forever/item=7361) | 100g 7s | 1 | — |
-| [Recipe: Magic Resistance Potion](https://www.wowhead.com/forever/item=9293) | 69g 69s | 1 | 0% |
+| [Recipe: Cleric's Elixir](https://www.wowhead.com/forever/item=250368) | 1,000g 1s | 1 | 0% |
+| [Mantle of Thieves](https://www.wowhead.com/forever/item=2264) | 600g 0s | 1 | 0% |
+| [Plains Ring](https://www.wowhead.com/forever/item=2039) | 300g 30s | 1 | 0% |
+| [Starfaller](https://www.wowhead.com/forever/item=13063) | 299g 0s | 1 | 0% |
+| [Traveler's Backpack](https://www.wowhead.com/forever/item=4500) | 70g 88s | 3 | 0% |
+| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 69g 50s | 3 | +50% |
 | [Cutlass](https://www.wowhead.com/forever/item=851) | 60g 0s | 1 | 0% |
-| [Traveler's Backpack](https://www.wowhead.com/forever/item=4500) | 60g 0s | 1 | 0% |
 | [Pattern: Frostweave Tunic](https://www.wowhead.com/forever/item=14466) | 50g 46s | 1 | 0% |
-| [Waylaid Crate: Expert Ingots](https://www.wowhead.com/forever/item=248709) | 50g 1s | 1 | 0% |
-| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 50g 0s | 1 | — |
-| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 47g 4s | 8 | +60% |
-| [Sparkleshell Mantle](https://www.wowhead.com/forever/item=13131) | 42g 50s | 2 | — |
-| [Troll's Bane Leggings](https://www.wowhead.com/forever/item=13114) | 37g 19s | 4 | 0% |
-| [Ranger Bow](https://www.wowhead.com/forever/item=3021) | 35g 23s | 6 | — |
-| [Magician's Mantle](https://www.wowhead.com/forever/item=12998) | 35g 8s | 4 | \-20% |
-| [Plans: Golden Scale Shoulders](https://www.wowhead.com/forever/item=3871) | 28g 88s | 1 | 0% |
-| [Duskbringer](https://www.wowhead.com/forever/item=2205) | 28g 0s | 7 | +75% |
+| [Claw of the Shadowmancer](https://www.wowhead.com/forever/item=2912) | 50g 0s | 1 | \-50% |
+| [Looming Gavel](https://www.wowhead.com/forever/item=13048) | 50g 0s | 1 | \-50% |
+| [Pattern: Herbalist's Gloves](https://www.wowhead.com/forever/item=7361) | 49g 99s | 2 | 0% |
+| [Troll's Bane Leggings](https://www.wowhead.com/forever/item=13114) | 49g 69s | 4 | \-20% |
+| [Duskbringer](https://www.wowhead.com/forever/item=2205) | 39g 21s | 4 | 0% |
+| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 38g 48s | 9 | 0% |
+| [Sparkleshell Mantle](https://www.wowhead.com/forever/item=13131) | 36g 66s | 6 | 0% |
 
 ## Deepest markets
 
@@ -927,21 +927,21 @@ Single items holding the most listed value.
 
 | Item | Listed value | Qty | Change |
 | --- | --- | --- | --- |
-| [Greater Magic Essence](https://www.wowhead.com/forever/item=10939) | 697 g | 3,273 | +17% |
-| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 452 g | 420 | +30% |
-| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 432 g | 2,902 | +137% |
-| [Staff of Jordan](https://www.wowhead.com/forever/item=873) | 400 g | 1 | — |
-| [Bolt of Mageweave](https://www.wowhead.com/forever/item=4339) | 382 g | 727 | +55% |
-| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 376 g | 8 | +60% |
-| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 353 g | 402 | +94% |
-| [Vision Dust](https://www.wowhead.com/forever/item=11137) | 278 g | 536 | \-38% |
-| [Mageweave Bag](https://www.wowhead.com/forever/item=10050) | 277 g | 78 | +24% |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 269 g | 11,261 | +4% |
-| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 268 g | 3,741 | +54% |
-| [Soul Dust](https://www.wowhead.com/forever/item=11083) | 263 g | 2,825 | +6% |
-| [Iridescent Pearl](https://www.wowhead.com/forever/item=5500) | 258 g | 96 | +92% |
-| [Shadowfang](https://www.wowhead.com/forever/item=1482) | 243 g | 10 | +11% |
-| [Small Silk Pack](https://www.wowhead.com/forever/item=4245) | 238 g | 145 | +75% |
+| [Recipe: Cleric's Elixir](https://www.wowhead.com/forever/item=250368) | 1k g | 1 | 0% |
+| [Mantle of Thieves](https://www.wowhead.com/forever/item=2264) | 600 g | 1 | 0% |
+| [Iridescent Pearl](https://www.wowhead.com/forever/item=5500) | 543 g | 209 | +7% |
+| [Greater Magic Essence](https://www.wowhead.com/forever/item=10939) | 420 g | 6,008 | +1% |
+| [Pristine Leather](https://www.wowhead.com/forever/item=249427) | 385 g | 5,158 | \-0% |
+| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 381 g | 5,319 | \-4% |
+| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 346 g | 9 | 0% |
+| [Kingsblood](https://www.wowhead.com/forever/item=3356) | 341 g | 4,558 | +11% |
+| [Stranglekelp](https://www.wowhead.com/forever/item=3820) | 329 g | 2,207 | +47% |
+| [Journeyman's Backpack](https://www.wowhead.com/forever/item=3914) | 328 g | 17 | \-15% |
+| [Ranger Bow](https://www.wowhead.com/forever/item=3021) | 322 g | 30 | +25% |
+| [Bolt of Mageweave](https://www.wowhead.com/forever/item=4339) | 316 g | 531 | \-2% |
+| [Bolt of Silk Cloth](https://www.wowhead.com/forever/item=4305) | 311 g | 926 | +7% |
+| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 310 g | 14,063 | +4% |
+| [Large Glowing Shard](https://www.wowhead.com/forever/item=11139) | 304 g | 44 | \-2% |
 
 Items listed: 2,237 (distinct items seen)
 
@@ -1077,11 +1077,11 @@ Single items holding the most listed value.
 | [Healing Potion](https://www.wowhead.com/forever/item=929) | 125 g | 1,961 | \-1% |
 | [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 125 g | 5,566 | \-3% |
 
-Items listed: 2,212 (distinct items seen)
+Items listed: 2,473 (distinct items seen)
 
-Listed value: 23k g (asking prices, not sales)
+Listed value: 38k g (asking prices, not sales)
 
-Quantity: 669,525 (units on the AH)
+Quantity: 822,111 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -1091,25 +1091,37 @@ Quantity listed × unit price, summed per market.
 
 ARMOR
 
-5k g
+9k g
 
 WEAPONS
 
+4k g
+
+RECIPES
+
 3k g
+
+CONSUMABLES
+
+3k g
+
+ORE & BARS
+
+2k g
 
 ENCHANTING MATS
 
 2k g
 
-CONSUMABLES
+TRADE GOODS
 
 2k g
 
-RECIPES
+HERBS
 
 2k g
 
-ORE & BARS
+LEATHER & HIDES
 
 1k g
 
@@ -1117,33 +1129,21 @@ CLOTH
 
 1k g
 
-TRADE GOODS
+BAGS
 
 1k g
 
-HERBS
-
-959 g
-
-LEATHER & HIDES
-
-927 g
-
-BAGS
-
-856 g
-
 FOOD & DRINK
 
-446 g
+1k g
 
-POTIONS
+ELIXIRS
 
-418 g
+974 g
 
 COOKING INGREDIENTS
 
-392 g
+934 g
 
 ## Most listed items
 
@@ -1151,21 +1151,21 @@ By quantity sitting on the auction house.
 
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
-| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 150,434 | +158% | 1c |
-| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 56,391 | +68% | 1c |
-| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 52,876 | +17% | 1c |
-| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 36,877 | +118% | 4c |
-| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 15,635 | \-23% | 1c |
-| [Light Leather](https://www.wowhead.com/forever/item=2318) | 11,440 | +81% | 1s 40c |
-| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 10,893 | \-4% | 49c |
-| [Exploding Shot](https://www.wowhead.com/forever/item=3465) | 10,749 | \-13% | 18c |
-| [Crafted Solid Shot](https://www.wowhead.com/forever/item=8069) | 9,801 | +29% | 14c |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 7,542 | +5% | 2s 40c |
-| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 6,045 | 0% | 80c |
-| [Silverleaf](https://www.wowhead.com/forever/item=765) | 5,940 | +4% | 16c |
-| [Light Shot](https://www.wowhead.com/forever/item=2516) | 5,856 | +272% | 1c |
-| [Blood Shard](https://www.wowhead.com/forever/item=5075) | 5,492 | +36% | 25c |
-| [Raw Longjaw Mud Snapper](https://www.wowhead.com/forever/item=6289) | 5,257 | +273% | 7c |
+| [Sharp Arrow](https://www.wowhead.com/forever/item=2515) | 167,740 | \-16% | 1c |
+| [Heavy Shot](https://www.wowhead.com/forever/item=2519) | 47,732 | +5% | 1c |
+| [Razor Arrow](https://www.wowhead.com/forever/item=3030) | 34,392 | 0% | 10c |
+| [Rough Arrow](https://www.wowhead.com/forever/item=2512) | 31,511 | 0% | 1c |
+| [Crafted Light Shot](https://www.wowhead.com/forever/item=8067) | 26,584 | \-10% | 1c |
+| [Crafted Heavy Shot](https://www.wowhead.com/forever/item=8068) | 24,770 | +22% | 3c |
+| [Feathered Arrow](https://www.wowhead.com/forever/item=3464) | 18,235 | \-2% | 44c |
+| [Light Leather](https://www.wowhead.com/forever/item=2318) | 18,126 | +13% | 40c |
+| [Light Shot](https://www.wowhead.com/forever/item=2516) | 15,699 | 0% | 1c |
+| [Linen Cloth](https://www.wowhead.com/forever/item=2589) | 14,845 | \-31% | 18c |
+| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 13,183 | +4% | 59c |
+| [Wool Cloth](https://www.wowhead.com/forever/item=2592) | 10,168 | +5% | 64c |
+| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 9,513 | +5% | 2s 70c |
+| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 7,832 | \-32% | 2s 34c |
+| [Raw Longjaw Mud Snapper](https://www.wowhead.com/forever/item=6289) | 7,824 | +2% | 92c |
 
 ## Most expensive items
 
@@ -1173,21 +1173,21 @@ Highest unit asking price among items currently listed.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
-| [Staff of Jordan](https://www.wowhead.com/forever/item=873) | 400g 27s | 1 | — |
-| [Pattern: Herbalist's Gloves](https://www.wowhead.com/forever/item=7361) | 100g 7s | 1 | — |
-| [Recipe: Magic Resistance Potion](https://www.wowhead.com/forever/item=9293) | 69g 69s | 1 | 0% |
-| [Traveler's Backpack](https://www.wowhead.com/forever/item=4500) | 60g 0s | 1 | 0% |
-| [Scroll: PEATCHY ATTAX](https://www.wowhead.com/forever/item=213545) | 50g 1s | 1 | — |
-| [Waylaid Crate: Expert Ingots](https://www.wowhead.com/forever/item=248709) | 50g 1s | 1 | 0% |
-| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 50g 0s | 1 | — |
-| [Beazel's Basher](https://www.wowhead.com/forever/item=13024) | 40g 0s | 1 | — |
-| [Troll's Bane Leggings](https://www.wowhead.com/forever/item=13114) | 35g 0s | 2 | 0% |
-| [Assassin's Blade](https://www.wowhead.com/forever/item=1935) | 30g 0s | 5 | +150% |
-| [Plans: Golden Scale Shoulders](https://www.wowhead.com/forever/item=3871) | 28g 88s | 1 | 0% |
-| [Marsh Ring of the Beast](https://www.wowhead.com/forever/item=12012) | 25g 37s | 1 | — |
-| [Plans: Mithril Shield Spike](https://www.wowhead.com/forever/item=7976) | 25g 0s | 4 | — |
-| [Ranger Bow](https://www.wowhead.com/forever/item=3021) | 25g 0s | 2 | — |
-| [Magician's Mantle](https://www.wowhead.com/forever/item=12998) | 25g 0s | 2 | \-33% |
+| [Recipe: Cleric's Elixir](https://www.wowhead.com/forever/item=250368) | 1,000g 1s | 1 | 0% |
+| [Mantle of Thieves](https://www.wowhead.com/forever/item=2264) | 600g 0s | 1 | 0% |
+| [Plains Ring](https://www.wowhead.com/forever/item=2039) | 300g 30s | 1 | 0% |
+| [Starfaller](https://www.wowhead.com/forever/item=13063) | 299g 0s | 1 | 0% |
+| [Traveler's Backpack](https://www.wowhead.com/forever/item=4500) | 70g 88s | 3 | 0% |
+| [Pattern: Filigreed Shadow Circlet](https://www.wowhead.com/forever/item=253982) | 70g 0s | 1 | 0% |
+| [Thunderbrow Ring](https://www.wowhead.com/forever/item=13097) | 69g 50s | 3 | +50% |
+| [Troll's Bane Leggings](https://www.wowhead.com/forever/item=13114) | 60g 0s | 2 | \-33% |
+| [Claw of the Shadowmancer](https://www.wowhead.com/forever/item=2912) | 50g 0s | 1 | \-50% |
+| [Looming Gavel](https://www.wowhead.com/forever/item=13048) | 50g 0s | 1 | \-50% |
+| [Pattern: Herbalist's Gloves](https://www.wowhead.com/forever/item=7361) | 49g 99s | 2 | 0% |
+| [Elemental Air](https://www.wowhead.com/forever/item=7069) | 39g 0s | 4 | +33% |
+| [Bloodspiller](https://www.wowhead.com/forever/item=7753) | 35g 23s | 2 | 0% |
+| [Recipe: Limited Invulnerability Potion](https://www.wowhead.com/forever/item=3395) | 35g 0s | 1 | \-50% |
+| [Sparkleshell Mantle](https://www.wowhead.com/forever/item=13131) | 32g 0s | 5 | 0% |
 
 ## Deepest markets
 
@@ -1195,20 +1195,20 @@ Single items holding the most listed value.
 
 | Item | Listed value | Qty | Change |
 | --- | --- | --- | --- |
-| [Staff of Jordan](https://www.wowhead.com/forever/item=873) | 400 g | 1 | — |
-| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 380 g | 2,625 | +177% |
-| [Cerulean Dye](https://www.wowhead.com/forever/item=249409) | 356 g | 324 | +42% |
-| [Greater Magic Essence](https://www.wowhead.com/forever/item=10939) | 331 g | 1,529 | +37% |
-| [Large Glimmering Shard](https://www.wowhead.com/forever/item=11084) | 230 g | 273 | +255% |
-| [Frilled Lichen](https://www.wowhead.com/forever/item=249399) | 190 g | 391 | +46% |
-| [Bolt of Mageweave](https://www.wowhead.com/forever/item=4339) | 189 g | 375 | +223% |
-| [Iridescent Pearl](https://www.wowhead.com/forever/item=5500) | 187 g | 62 | +313% |
-| [Mageweave Cloth](https://www.wowhead.com/forever/item=4338) | 185 g | 186 | +709% |
-| [Strange Dust](https://www.wowhead.com/forever/item=10940) | 181 g | 7,542 | +5% |
-| [Mageweave Bag](https://www.wowhead.com/forever/item=10050) | 179 g | 48 | +45% |
-| [Vision Dust](https://www.wowhead.com/forever/item=11137) | 167 g | 304 | \-52% |
-| [Steel Bar](https://www.wowhead.com/forever/item=3859) | 166 g | 490 | +248% |
-| [Small Silk Pack](https://www.wowhead.com/forever/item=4245) | 163 g | 106 | +141% |
-| [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 163 g | 2,253 | +150% |
+| [Recipe: Cleric's Elixir](https://www.wowhead.com/forever/item=250368) | 1k g | 1 | 0% |
+| [Mantle of Thieves](https://www.wowhead.com/forever/item=2264) | 600 g | 1 | 0% |
+| [Iridescent Pearl](https://www.wowhead.com/forever/item=5500) | 471 g | 175 | +9% |
+| [Silk Cloth](https://www.wowhead.com/forever/item=4306) | 330 g | 5,042 | \-4% |
+| [Pristine Leather](https://www.wowhead.com/forever/item=249427) | 313 g | 3,600 | \-0% |
+| [Kingsblood](https://www.wowhead.com/forever/item=3356) | 306 g | 3,825 | +13% |
+| [Plains Ring](https://www.wowhead.com/forever/item=2039) | 300 g | 1 | 0% |
+| [Starfaller](https://www.wowhead.com/forever/item=13063) | 299 g | 1 | 0% |
+| [Stranglekelp](https://www.wowhead.com/forever/item=3820) | 291 g | 1,190 | +141% |
+| [Bolt of Silk Cloth](https://www.wowhead.com/forever/item=4305) | 267 g | 867 | +8% |
+| [Large Glowing Shard](https://www.wowhead.com/forever/item=11139) | 260 g | 39 | \-2% |
+| [Copper Bar](https://www.wowhead.com/forever/item=2840) | 256 g | 9,513 | +5% |
+| [Golden Pearl](https://www.wowhead.com/forever/item=13926) | 253 g | 62 | +2% |
+| [Greater Astral Essence](https://www.wowhead.com/forever/item=11082) | 239 g | 894 | +1% |
+| [Mageweave Cloth](https://www.wowhead.com/forever/item=4338) | 221 g | 316 | +37% |
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

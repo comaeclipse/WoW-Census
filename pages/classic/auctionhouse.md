@@ -5,11 +5,11 @@ url: "https://wowcensus.io/classic/auctionhouse"
 ---
 
 # WoW Classic Era Auction House Prices – WoWCensus
-Items listed: 4,970 (distinct items seen)
+Items listed: 4,974 (distinct items seen)
 
-Listed value: 2.3M g (asking prices, not sales)
+Listed value: 2.2M g (asking prices, not sales)
 
-Quantity: 373,329 (units on the AH)
+Quantity: 367,178 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -19,31 +19,31 @@ Quantity listed × unit price, summed per market.
 
 WEAPONS
 
-513k g
+512k g
 
 RECIPES
 
-478k g
+449k g
 
 ARMOR
 
-438k g
+435k g
 
 QUEST ITEMS
 
-316k g
+318k g
 
 TRADE GOODS
 
-164k g
+160k g
 
 MISCELLANEOUS
 
-158k g
+150k g
 
 CONSUMABLES
 
-111k g
+108k g
 
 CLASS REAGENTS
 
@@ -69,9 +69,9 @@ OFF-HAND
 
 6k g
 
-AMMO
+COSMETIC
 
-688 g
+646 g
 
 ## Most listed items
 
@@ -80,20 +80,20 @@ By quantity sitting on the auction house.
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
 | [Thorium Shells](https://www.wowhead.com/classic/item=15997) | 23,000 | +42% | 1s 42c |
-| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 20,268 | +34% | 22s 30c |
+| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 20,233 | +25% | 20s 77c |
 | [Encrypted Twilight Text](https://www.wowhead.com/classic/item=20404) | 19,973 | +5% | 5g 56s |
-| [Copper Bar](https://www.wowhead.com/classic/item=2840) | 8,663 | +19% | 2s 20c |
-| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 7,611 | +206% | 3g 76s |
-| [Crafted Light Shot](https://www.wowhead.com/classic/item=8067) | 7,400 | — | 8c |
-| [Runecloth](https://www.wowhead.com/classic/item=14047) | 7,260 | +48% | 42s 22c |
+| [Copper Bar](https://www.wowhead.com/classic/item=2840) | 8,214 | +7% | 2s 19c |
+| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 7,611 | +185% | 3g 76s |
 | [Thorium Headed Arrow](https://www.wowhead.com/classic/item=18042) | 7,200 | \-23% | 2s 6c |
-| [Dreamfoil](https://www.wowhead.com/classic/item=13463) | 5,303 | — | 82s 62c |
-| [Crypt Fiend Parts](https://www.wowhead.com/classic/item=22525) | 4,811 | \-15% | 1g 94s |
-| [Stonescale Eel](https://www.wowhead.com/classic/item=13422) | 4,522 | +2% | 1g 65s |
-| [Dense Stone](https://www.wowhead.com/classic/item=12365) | 4,371 | \-23% | 33s 41c |
-| [Dark Iron Scraps](https://www.wowhead.com/classic/item=22528) | 4,328 | — | 20s 21c |
-| [Bone Fragments](https://www.wowhead.com/classic/item=22526) | 4,284 | — | 1g 37s |
-| [Silk Cloth](https://www.wowhead.com/classic/item=4306) | 4,123 | +30% | 6s 7c |
+| [Crafted Light Shot](https://www.wowhead.com/classic/item=8067) | 7,200 | — | 8c |
+| [Runecloth](https://www.wowhead.com/classic/item=14047) | 6,448 | +19% | 45s 83c |
+| [Dreamfoil](https://www.wowhead.com/classic/item=13463) | 5,247 | +88% | 80s 89c |
+| [Dark Iron Scraps](https://www.wowhead.com/classic/item=22528) | 4,978 | — | 19s 40c |
+| [Crypt Fiend Parts](https://www.wowhead.com/classic/item=22525) | 4,822 | \-15% | 1g 94s |
+| [Hi-Impact Mithril Slugs](https://www.wowhead.com/classic/item=10512) | 4,800 | — | 43c |
+| [Stonescale Eel](https://www.wowhead.com/classic/item=13422) | 4,446 | \-2% | 1g 65s |
+| [Dense Stone](https://www.wowhead.com/classic/item=12365) | 4,365 | \-24% | 33s 93c |
+| [Bone Fragments](https://www.wowhead.com/classic/item=22526) | 4,355 | \-25% | 1g 33s |
 
 ## Most expensive items
 
@@ -101,8 +101,8 @@ Highest unit asking price among items currently listed.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
+| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 26,683g 22s | 2 | 0% |
 | [Cloak of Flames](https://www.wowhead.com/classic/item=3475) | 25,000g 0s | 1 | — |
-| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 24,455g 48s | 3 | — |
 | [Pendulum of Doom](https://www.wowhead.com/classic/item=9425) | 18,878g 61s | 9 | +13% |
 | [Pattern: Mooncloth Circlet](https://www.wowhead.com/classic/item=14509) | 14,999g 0s | 1 | \-50% |
 | [Plans: Stronghold Gauntlets](https://www.wowhead.com/classic/item=12720) | 12,000g 0s | 1 | 0% |
@@ -125,33 +125,33 @@ Single items holding the most listed value.
 | --- | --- | --- | --- |
 | [Pendulum of Doom](https://www.wowhead.com/classic/item=9425) | 170k g | 9 | +13% |
 | [Encrypted Twilight Text](https://www.wowhead.com/classic/item=20404) | 111k g | 19,973 | +5% |
-| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 73k g | 3 | — |
 | [Shadowfang](https://www.wowhead.com/classic/item=1482) | 68k g | 27 | \-10% |
+| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 53k g | 2 | 0% |
 | [Assassin's Blade](https://www.wowhead.com/classic/item=1935) | 53k g | 21 | 0% |
-| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 29k g | 7,611 | +206% |
+| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 29k g | 7,611 | +185% |
 | [Cloak of Flames](https://www.wowhead.com/classic/item=3475) | 25k g | 1 | — |
 | [Pattern: Hide of the Wild](https://www.wowhead.com/classic/item=18518) | 25k g | 3 | 0% |
 | [Wartorn Plate Scrap](https://www.wowhead.com/classic/item=22375) | 24k g | 772 | \-6% |
 | [Titanic Leggings](https://www.wowhead.com/classic/item=22385) | 23k g | 11 | +22% |
 | [Recipe: Flask of the Titans](https://www.wowhead.com/classic/item=13519) | 21k g | 4 | 0% |
-| [Large Radiant Shard](https://www.wowhead.com/classic/item=11178) | 18k g | 1,626 | — |
-| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 18k g | 9 | +80% |
+| [Pattern: Rich Purple Silk Shirt](https://www.wowhead.com/classic/item=4354) | 18k g | 9 | +80% |
+| [Large Radiant Shard](https://www.wowhead.com/classic/item=11178) | 17k g | 1,467 | — |
 | [Recipe: Major Rejuvenation Potion](https://www.wowhead.com/classic/item=18257) | 17k g | 3 | +200% |
-| [Pattern: Rich Purple Silk Shirt](https://www.wowhead.com/classic/item=4354) | 16k g | 8 | +100% |
+| [Pattern: Mooncloth Circlet](https://www.wowhead.com/classic/item=14509) | 15k g | 1 | \-50% |
 
 ## Excluded as joke listings
 
-Priced above 84k g a unit — left out of the totals and lists above.
+Priced above 83k g a unit — left out of the totals and lists above.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
 | [Teebu's Blazing Longsword](https://www.wowhead.com/classic/item=1728) | 100,000g 55s | 1 | 0% |
 
-Items listed: 4,336 (distinct items seen)
+Items listed: 4,304 (distinct items seen)
 
 Listed value: 1.7M g (asking prices, not sales)
 
-Quantity: 296,905 (units on the AH)
+Quantity: 289,970 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -159,37 +159,37 @@ Scanned: 2026-10-02
 
 Quantity listed × unit price, summed per market.
 
-RECIPES
-
-372k g
-
 WEAPONS
 
-353k g
+351k g
+
+RECIPES
+
+343k g
 
 ARMOR
 
-289k g
+287k g
 
 QUEST ITEMS
 
-276k g
+277k g
 
 MISCELLANEOUS
 
-133k g
+125k g
 
 TRADE GOODS
 
-123k g
+119k g
 
 CONSUMABLES
 
-90k g
+86k g
 
 CLASS REAGENTS
 
-21k g
+22k g
 
 ENGINEERING SUPPLIES
 
@@ -205,7 +205,7 @@ RELICS
 
 BAGS
 
-9k g
+8k g
 
 OFF-HAND
 
@@ -222,20 +222,20 @@ By quantity sitting on the auction house.
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
 | [Thorium Shells](https://www.wowhead.com/classic/item=15997) | 20,200 | +84% | 1s 48c |
-| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 18,179 | +22% | 18s 89c |
+| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 18,163 | +22% | 19s 1c |
 | [Encrypted Twilight Text](https://www.wowhead.com/classic/item=20404) | 17,049 | +4% | 5g 26s |
-| [Copper Bar](https://www.wowhead.com/classic/item=2840) | 8,172 | +24% | 2s 25c |
-| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 7,262 | +218% | 3g 88s |
-| [Crafted Light Shot](https://www.wowhead.com/classic/item=8067) | 6,600 | +94% | 9c |
+| [Copper Bar](https://www.wowhead.com/classic/item=2840) | 7,772 | +10% | 2s 24c |
+| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 7,262 | +194% | 3g 88s |
+| [Crafted Light Shot](https://www.wowhead.com/classic/item=8067) | 6,400 | +88% | 9c |
 | [Thorium Headed Arrow](https://www.wowhead.com/classic/item=18042) | 6,000 | \-30% | 1s 97c |
-| [Runecloth](https://www.wowhead.com/classic/item=14047) | 5,778 | +142% | 44s 87c |
-| [Dreamfoil](https://www.wowhead.com/classic/item=13463) | 5,050 | +116% | 77s 17c |
-| [Crypt Fiend Parts](https://www.wowhead.com/classic/item=22525) | 4,631 | \-17% | 1g 99s |
-| [Dense Stone](https://www.wowhead.com/classic/item=12365) | 4,015 | \-16% | 34s 62c |
-| [Bone Fragments](https://www.wowhead.com/classic/item=22526) | 3,844 | \-30% | 1g 43s |
-| [Vilebranch Coin](https://www.wowhead.com/classic/item=19702) | 3,702 | \-18% | 2g 40s |
-| [Gurubashi Coin](https://www.wowhead.com/classic/item=19701) | 3,609 | \-10% | 2g 50s |
-| [Wintersbite](https://www.wowhead.com/classic/item=3819) | 3,454 | +16% | 46s 79c |
+| [Runecloth](https://www.wowhead.com/classic/item=14047) | 5,061 | +73% | 49s 59c |
+| [Dreamfoil](https://www.wowhead.com/classic/item=13463) | 4,996 | +115% | 75s 14c |
+| [Crypt Fiend Parts](https://www.wowhead.com/classic/item=22525) | 4,642 | \-17% | 1g 99s |
+| [Dense Stone](https://www.wowhead.com/classic/item=12365) | 3,929 | \-19% | 34s 88c |
+| [Bone Fragments](https://www.wowhead.com/classic/item=22526) | 3,888 | \-28% | 1g 42s |
+| [Vilebranch Coin](https://www.wowhead.com/classic/item=19702) | 3,728 | \-17% | 2g 40s |
+| [Gurubashi Coin](https://www.wowhead.com/classic/item=19701) | 3,633 | \-10% | 2g 50s |
+| [Light Feather](https://www.wowhead.com/classic/item=17056) | 3,466 | +6% | 2g 54s |
 
 ## Most expensive items
 
@@ -243,7 +243,7 @@ Highest unit asking price among items currently listed.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
-| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 24,455g 48s | 3 | — |
+| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 26,683g 22s | 2 | 0% |
 | [Pendulum of Doom](https://www.wowhead.com/classic/item=9425) | 20,000g 99s | 8 | +14% |
 | [Pattern: Mooncloth Circlet](https://www.wowhead.com/classic/item=14509) | 14,999g 0s | 1 | \-50% |
 | [Schematic: Flame Deflector](https://www.wowhead.com/classic/item=4411) | 9,999g 99s | 1 | 0% |
@@ -267,33 +267,33 @@ Single items holding the most listed value.
 | --- | --- | --- | --- |
 | [Pendulum of Doom](https://www.wowhead.com/classic/item=9425) | 160k g | 8 | +14% |
 | [Encrypted Twilight Text](https://www.wowhead.com/classic/item=20404) | 90k g | 17,049 | +4% |
-| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 73k g | 3 | — |
+| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 53k g | 2 | 0% |
 | [Shadowfang](https://www.wowhead.com/classic/item=1482) | 33k g | 13 | \-13% |
 | [Assassin's Blade](https://www.wowhead.com/classic/item=1935) | 30k g | 12 | +9% |
-| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 28k g | 7,262 | +218% |
+| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 28k g | 7,262 | +194% |
 | [Wartorn Plate Scrap](https://www.wowhead.com/classic/item=22375) | 24k g | 772 | \-6% |
-| [Large Radiant Shard](https://www.wowhead.com/classic/item=11178) | 18k g | 1,616 | +19% |
 | [Titanic Leggings](https://www.wowhead.com/classic/item=22385) | 18k g | 9 | +29% |
+| [Large Radiant Shard](https://www.wowhead.com/classic/item=11178) | 17k g | 1,457 | +2% |
 | [Recipe: Major Rejuvenation Potion](https://www.wowhead.com/classic/item=18257) | 17k g | 3 | +200% |
+| [Pattern: Rich Purple Silk Shirt](https://www.wowhead.com/classic/item=4354) | 16k g | 8 | +100% |
 | [Pattern: Mooncloth Circlet](https://www.wowhead.com/classic/item=14509) | 15k g | 1 | \-50% |
-| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 15k g | 8 | +100% |
-| [Abyssal Crest](https://www.wowhead.com/classic/item=20513) | 14k g | 1,464 | +44% |
 | [Recipe: Flask of the Titans](https://www.wowhead.com/classic/item=13519) | 14k g | 3 | +50% |
-| [Pattern: Rich Purple Silk Shirt](https://www.wowhead.com/classic/item=4354) | 14k g | 7 | +133% |
+| [Abyssal Crest](https://www.wowhead.com/classic/item=20513) | 13k g | 1,420 | +45% |
+| [Recipe: Dirge's Kickin' Chimaerok Chops](https://www.wowhead.com/classic/item=21025) | 13k g | 2 | \-50% |
 
 ## Excluded as joke listings
 
-Priced above 84k g a unit — left out of the totals and lists above.
+Priced above 83k g a unit — left out of the totals and lists above.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
 | [Teebu's Blazing Longsword](https://www.wowhead.com/classic/item=1728) | 100,000g 55s | 1 | 0% |
 
-Items listed: 3,347 (distinct items seen)
+Items listed: 3,391 (distinct items seen)
 
-Listed value: 575k g (asking prices, not sales)
+Listed value: 574k g (asking prices, not sales)
 
-Quantity: 76,424 (units on the AH)
+Quantity: 77,208 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -303,7 +303,7 @@ Quantity listed × unit price, summed per market.
 
 WEAPONS
 
-160k g
+161k g
 
 ARMOR
 
@@ -315,7 +315,7 @@ RECIPES
 
 TRADE GOODS
 
-41k g
+40k g
 
 QUEST ITEMS
 
@@ -327,7 +327,7 @@ MISCELLANEOUS
 
 CONSUMABLES
 
-22k g
+21k g
 
 CLASS REAGENTS
 
@@ -351,11 +351,11 @@ OFF-HAND
 
 ENGINEERING SUPPLIES
 
-948 g
+965 g
 
 COSMETIC
 
-306 g
+308 g
 
 ## Most listed items
 
@@ -365,19 +365,19 @@ By quantity sitting on the auction house.
 | --- | --- | --- | --- |
 | [Encrypted Twilight Text](https://www.wowhead.com/classic/item=20404) | 2,924 | +9% | 7g 33s |
 | [Thorium Shells](https://www.wowhead.com/classic/item=15997) | 2,800 | \-46% | 1s 0c |
-| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 2,089 | +576% | 52s 3c |
-| [Stonescale Eel](https://www.wowhead.com/classic/item=13422) | 1,910 | \-33% | 1g 64s |
+| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 2,070 | +56% | 36s 25c |
+| [Hi-Impact Mithril Slugs](https://www.wowhead.com/classic/item=10512) | 2,000 | — | 38c |
+| [Stonescale Eel](https://www.wowhead.com/classic/item=13422) | 1,892 | \-35% | 1g 64s |
+| [Silk Cloth](https://www.wowhead.com/classic/item=4306) | 1,696 | +2% | 7s 99c |
 | [Dark Iron Scraps](https://www.wowhead.com/classic/item=22528) | 1,683 | — | 25s 38c |
-| [Thick Leather](https://www.wowhead.com/classic/item=4304) | 1,639 | \-35% | 29s 47c |
-| [Firefin Snapper](https://www.wowhead.com/classic/item=6359) | 1,585 | +766% | 32s 75c |
-| [Runecloth](https://www.wowhead.com/classic/item=14047) | 1,482 | \-41% | 31s 89c |
+| [Thick Leather](https://www.wowhead.com/classic/item=4304) | 1,610 | \-33% | 29s 93c |
+| [Firefin Snapper](https://www.wowhead.com/classic/item=6359) | 1,496 | +518% | 34s 63c |
 | [Mithril Gyro-Shot](https://www.wowhead.com/classic/item=10513) | 1,400 | +250% | 1s 8c |
-| [Thorium Bar](https://www.wowhead.com/classic/item=12359) | 1,371 | \-9% | 17s 90c |
-| [Silk Cloth](https://www.wowhead.com/classic/item=4306) | 1,305 | \-27% | 9s 57c |
-| [Light Leather](https://www.wowhead.com/classic/item=2318) | 1,301 | +240% | 1s 2c |
-| [Gromsblood](https://www.wowhead.com/classic/item=8846) | 1,253 | \-20% | 1g 5s |
+| [Runecloth](https://www.wowhead.com/classic/item=14047) | 1,387 | \-44% | 32s 10c |
+| [Thorium Bar](https://www.wowhead.com/classic/item=12359) | 1,341 | \-6% | 17s 9c |
+| [Mageweave Cloth](https://www.wowhead.com/classic/item=4338) | 1,333 | +101% | 9s 7c |
 | [Plaguebloom](https://www.wowhead.com/classic/item=13466) | 1,251 | +52% | 2g 66s |
-| [Mageweave Cloth](https://www.wowhead.com/classic/item=4338) | 1,227 | +61% | 8s 91c |
+| [Gromsblood](https://www.wowhead.com/classic/item=8846) | 1,249 | \-20% | 1g 5s |
 
 ## Most expensive items
 
@@ -559,7 +559,7 @@ Single items holding the most listed value.
 
 ## Excluded as joke listings
 
-Priced above 84k g a unit — left out of the totals and lists above.
+Priced above 83k g a unit — left out of the totals and lists above.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
@@ -701,7 +701,7 @@ Single items holding the most listed value.
 
 ## Excluded as joke listings
 
-Priced above 84k g a unit — left out of the totals and lists above.
+Priced above 83k g a unit — left out of the totals and lists above.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
@@ -841,207 +841,73 @@ Single items holding the most listed value.
 | [Arcanite Bar](https://www.wowhead.com/classic/item=12360) | 4k g | 24 | +9% |
 | [Blackguard](https://www.wowhead.com/classic/item=19168) | 4k g | 1 | 0% |
 
-Items listed: 1,823 (distinct items seen)
+Items listed: 1,802 (distinct items seen)
 
-Listed value: 118k g (asking prices, not sales)
+Listed value: 70k g (asking prices, not sales)
 
-Quantity: 40,545 (units on the AH)
-
-Scanned: 2026-10-02
-
-## Where the gold sits — listed value by market
-
-Quantity listed × unit price, summed per market.
-
-RECIPES
-
-40k g
-
-MISCELLANEOUS
-
-18k g
-
-TRADE GOODS
-
-17k g
-
-ARMOR
-
-15k g
-
-CONSUMABLES
-
-12k g
-
-WEAPONS
-
-7k g
-
-CLASS REAGENTS
-
-4k g
-
-QUEST ITEMS
-
-4k g
-
-BAGS
-
-925 g
-
-RELICS
-
-809 g
-
-ENGINEERING SUPPLIES
-
-376 g
-
-AMMO
-
-80 g
-
-OFF-HAND
-
-43 g
-
-QUIVERS
-
-11 g
-
-## Most listed items
-
-By quantity sitting on the auction house.
-
-| Item | Qty | Change | Unit |
-| --- | --- | --- | --- |
-| [Runecloth](https://www.wowhead.com/classic/item=14047) | 1,495 | +51% | 12s 25c |
-| [Light Leather](https://www.wowhead.com/classic/item=2318) | 1,173 | +245% | 89c |
-| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 1,106 | +3,714% | 74s 68c |
-| [Crafted Light Shot](https://www.wowhead.com/classic/item=8067) | 1,000 | 0% | 1c |
-| [Linen Cloth](https://www.wowhead.com/classic/item=2589) | 831 | \-11% | 46c |
-| [Silk Cloth](https://www.wowhead.com/classic/item=4306) | 804 | +9% | 3s 6c |
-| [Copper Bar](https://www.wowhead.com/classic/item=2840) | 762 | +109% | 1s 91c |
-| [Wintersbite](https://www.wowhead.com/classic/item=3819) | 673 | +3% | 36s 52c |
-| [Silverleaf](https://www.wowhead.com/classic/item=765) | 657 | +23% | 33c |
-| [Peacebloom](https://www.wowhead.com/classic/item=2447) | 636 | +20% | 27c |
-| [Oily Blackmouth](https://www.wowhead.com/classic/item=6358) | 612 | +91% | 5s 19c |
-| [Crafted Heavy Shot](https://www.wowhead.com/classic/item=8068) | 600 | \-25% | 1c |
-| [Raw Spotted Yellowtail](https://www.wowhead.com/classic/item=4603) | 561 | +95% | 1s 80c |
-| [Thorium Bar](https://www.wowhead.com/classic/item=12359) | 460 | \-18% | 23s 33c |
-| [Ruined Leather Scraps](https://www.wowhead.com/classic/item=2934) | 451 | +50% | 60c |
-
-## Most expensive items
-
-Highest unit asking price among items currently listed.
-
-| Item | Unit | Qty | Change |
-| --- | --- | --- | --- |
-| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 20,000g 0s | 1 | — |
-| [Recipe: Flask of Supreme Power](https://www.wowhead.com/classic/item=13521) | 5,000g 0s | 1 | — |
-| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 4,500g 0s | 2 | +100% |
-| [Recipe: Transmute Life to Earth](https://www.wowhead.com/classic/item=13488) | 3,000g 0s | 1 | — |
-| [Recipe: Transmute Earth to Life](https://www.wowhead.com/classic/item=13489) | 3,000g 0s | 1 | — |
-| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 1,259g 33s | 3 | — |
-| [Formula: Enchant Cloak - Greater Resistance](https://www.wowhead.com/classic/item=16216) | 1,000g 0s | 1 | — |
-| [Staff of Jordan](https://www.wowhead.com/classic/item=873) | 999g 99s | 2 | 0% |
-| [Hide of the Wild](https://www.wowhead.com/classic/item=18510) | 950g 0s | 1 | 0% |
-| [Warlords Deck](https://www.wowhead.com/classic/item=19257) | 900g 0s | 1 | — |
-| [Elementals Deck](https://www.wowhead.com/classic/item=19267) | 900g 0s | 1 | — |
-| [Ace of Beasts](https://www.wowhead.com/classic/item=19227) | 680g 0s | 1 | — |
-| [Formula: Enchant Weapon - Crusader](https://www.wowhead.com/classic/item=16252) | 499g 99s | 1 | 0% |
-| [Disgusting Oozeling](https://www.wowhead.com/classic/item=20769) | 480g 0s | 1 | — |
-| [Chromatic Cloak](https://www.wowhead.com/classic/item=18509) | 450g 0s | 1 | — |
-
-## Deepest markets
-
-Single items holding the most listed value.
-
-| Item | Listed value | Qty | Change |
-| --- | --- | --- | --- |
-| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 20k g | 1 | — |
-| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 9k g | 2 | +100% |
-| [Recipe: Flask of Supreme Power](https://www.wowhead.com/classic/item=13521) | 5k g | 1 | — |
-| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 4k g | 3 | — |
-| [Recipe: Transmute Life to Earth](https://www.wowhead.com/classic/item=13488) | 3k g | 1 | — |
-| [Recipe: Transmute Earth to Life](https://www.wowhead.com/classic/item=13489) | 3k g | 1 | — |
-| [Staff of Jordan](https://www.wowhead.com/classic/item=873) | 2k g | 2 | 0% |
-| [Large Radiant Shard](https://www.wowhead.com/classic/item=11178) | 2k g | 211 | — |
-| [Arcane Crystal](https://www.wowhead.com/classic/item=12363) | 1k g | 18 | — |
-| [Black Lotus](https://www.wowhead.com/classic/item=13468) | 1k g | 27 | — |
-| [Large Brilliant Shard](https://www.wowhead.com/classic/item=14344) | 1k g | 83 | +77% |
-| [Small Radiant Shard](https://www.wowhead.com/classic/item=11177) | 1k g | 168 | \-2% |
-| [Formula: Enchant Cloak - Greater Resistance](https://www.wowhead.com/classic/item=16216) | 1k g | 1 | — |
-| [Hide of the Wild](https://www.wowhead.com/classic/item=18510) | 950 g | 1 | 0% |
-| [Essence of Air](https://www.wowhead.com/classic/item=7082) | 934 g | 27 | — |
-
-Items listed: 1,368 (distinct items seen)
-
-Listed value: 95k g (asking prices, not sales)
-
-Quantity: 26,086 (units on the AH)
+Quantity: 34,394 (units on the AH)
 
 Scanned: 2026-10-02
 
 ## Where the gold sits — listed value by market
 
 Quantity listed × unit price, summed per market.
-
-RECIPES
-
-37k g
-
-MISCELLANEOUS
-
-15k g
 
 TRADE GOODS
 
 13k g
 
-CONSUMABLES
+ARMOR
+
+12k g
+
+RECIPES
 
 11k g
 
-ARMOR
+MISCELLANEOUS
 
 9k g
 
+CONSUMABLES
+
+8k g
+
 WEAPONS
+
+6k g
+
+QUEST ITEMS
 
 5k g
 
 CLASS REAGENTS
 
-2k g
-
-QUEST ITEMS
-
-1k g
-
-BAGS
-
-670 g
+4k g
 
 RELICS
 
-502 g
+644 g
+
+BAGS
+
+446 g
 
 ENGINEERING SUPPLIES
 
-347 g
-
-OFF-HAND
-
-34 g
-
-QUIVERS
-
-7 g
+213 g
 
 COSMETIC
 
-0 g
+25 g
+
+OFF-HAND
+
+24 g
+
+KEYS
+
+21 g
 
 ## Most listed items
 
@@ -1049,21 +915,21 @@ By quantity sitting on the auction house.
 
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
-| [Crafted Light Shot](https://www.wowhead.com/classic/item=8067) | 1,000 | 0% | 1c |
-| [Runecloth](https://www.wowhead.com/classic/item=14047) | 798 | +209% | 12s 90c |
-| [Silk Cloth](https://www.wowhead.com/classic/item=4306) | 694 | +43% | 2s 75c |
-| [Wintersbite](https://www.wowhead.com/classic/item=3819) | 672 | +5% | 36s 48c |
-| [Copper Bar](https://www.wowhead.com/classic/item=2840) | 663 | +283% | 1s 97c |
-| [Crafted Heavy Shot](https://www.wowhead.com/classic/item=8068) | 600 | \-25% | 1c |
-| [Linen Cloth](https://www.wowhead.com/classic/item=2589) | 504 | +13% | 50c |
-| [Raw Spotted Yellowtail](https://www.wowhead.com/classic/item=4603) | 490 | +162% | 1s 85c |
-| [Light Leather](https://www.wowhead.com/classic/item=2318) | 472 | +57% | 42c |
-| [Purple Lotus](https://www.wowhead.com/classic/item=8831) | 417 | +137% | 35s 3c |
-| [Dark Iron Scraps](https://www.wowhead.com/classic/item=22528) | 360 | \-87% | 14s 0c |
-| [Thorium Bar](https://www.wowhead.com/classic/item=12359) | 340 | \-6% | 17s 46c |
-| [Mountain Silversage](https://www.wowhead.com/classic/item=13465) | 334 | +439% | 1g 50s |
-| [Oily Blackmouth](https://www.wowhead.com/classic/item=6358) | 329 | +65% | 4s 50c |
-| [Mithril Ore](https://www.wowhead.com/classic/item=3858) | 319 | +565% | 17s 77c |
+| [Hi-Impact Mithril Slugs](https://www.wowhead.com/classic/item=10512) | 2,000 | — | 24c |
+| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 1,071 | \-3% | 47s 49c |
+| [Dark Iron Scraps](https://www.wowhead.com/classic/item=22528) | 1,014 | — | 14s 7c |
+| [Strange Dust](https://www.wowhead.com/classic/item=10940) | 913 | +357% | 1s 62c |
+| [Linen Cloth](https://www.wowhead.com/classic/item=2589) | 878 | +6% | 26c |
+| [Silk Cloth](https://www.wowhead.com/classic/item=4306) | 829 | +3% | 2s 78c |
+| [Crafted Light Shot](https://www.wowhead.com/classic/item=8067) | 800 | \-20% | 1c |
+| [Light Leather](https://www.wowhead.com/classic/item=2318) | 759 | \-35% | 44c |
+| [Runecloth](https://www.wowhead.com/classic/item=14047) | 683 | \-54% | 10s 70c |
+| [Copper Ore](https://www.wowhead.com/classic/item=2770) | 393 | +28% | 83c |
+| [Snowball](https://www.wowhead.com/classic/item=17202) | 380 | +90% | 15s 59c |
+| [Thick Leather](https://www.wowhead.com/classic/item=4304) | 375 | +90% | 5s 0c |
+| [Swiftthistle](https://www.wowhead.com/classic/item=2452) | 374 | \-5% | 38s 60c |
+| [Blackmouth Oil](https://www.wowhead.com/classic/item=6370) | 367 | +432% | 38s 29c |
+| [Mageweave Cloth](https://www.wowhead.com/classic/item=4338) | 338 | \-6% | 11s 37c |
 
 ## Most expensive items
 
@@ -1071,21 +937,21 @@ Highest unit asking price among items currently listed.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
-| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 20,000g 0s | 1 | — |
-| [Recipe: Flask of Supreme Power](https://www.wowhead.com/classic/item=13521) | 5,000g 0s | 1 | — |
-| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 4,500g 0s | 2 | +100% |
-| [Recipe: Transmute Life to Earth](https://www.wowhead.com/classic/item=13488) | 3,000g 0s | 1 | — |
-| [Recipe: Transmute Earth to Life](https://www.wowhead.com/classic/item=13489) | 3,000g 0s | 1 | — |
-| [Formula: Enchant Cloak - Greater Resistance](https://www.wowhead.com/classic/item=16216) | 1,000g 0s | 1 | — |
+| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 4,500g 0s | 1 | \-50% |
+| [Pattern: Rich Purple Silk Shirt](https://www.wowhead.com/classic/item=4354) | 1,999g 99s | 1 | 0% |
+| [Recipe: Flask of Distilled Wisdom](https://www.wowhead.com/classic/item=13520) | 1,699g 99s | 1 | 0% |
+| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 999g 99s | 2 | \-33% |
 | [Staff of Jordan](https://www.wowhead.com/classic/item=873) | 999g 99s | 1 | 0% |
 | [Hide of the Wild](https://www.wowhead.com/classic/item=18510) | 950g 0s | 1 | 0% |
-| [Warlords Deck](https://www.wowhead.com/classic/item=19257) | 900g 0s | 1 | — |
-| [Elementals Deck](https://www.wowhead.com/classic/item=19267) | 900g 0s | 1 | — |
-| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 888g 99s | 2 | \-50% |
-| [Ace of Beasts](https://www.wowhead.com/classic/item=19227) | 680g 0s | 1 | — |
-| [Disgusting Oozeling](https://www.wowhead.com/classic/item=20769) | 480g 0s | 1 | — |
-| [Chromatic Cloak](https://www.wowhead.com/classic/item=18509) | 450g 0s | 1 | — |
-| [Freezing Band](https://www.wowhead.com/classic/item=942) | 399g 99s | 1 | — |
+| [Disgusting Oozeling](https://www.wowhead.com/classic/item=20769) | 480g 0s | 1 | 0% |
+| [Formula: Enchant Weapon - Crusader](https://www.wowhead.com/classic/item=16252) | 459g 99s | 3 | — |
+| [Chromatic Cloak](https://www.wowhead.com/classic/item=18509) | 450g 0s | 1 | 0% |
+| [Freezing Band](https://www.wowhead.com/classic/item=942) | 399g 99s | 2 | 0% |
+| [Myrmidon's Signet](https://www.wowhead.com/classic/item=2246) | 399g 99s | 1 | \-50% |
+| [Idol of War](https://www.wowhead.com/classic/item=20882) | 399g 99s | 2 | 0% |
+| [Tiny Crimson Whelpling](https://www.wowhead.com/classic/item=8499) | 350g 0s | 1 | \-50% |
+| [Schematic: Arcanite Dragonling](https://www.wowhead.com/classic/item=16054) | 299g 99s | 2 | 0% |
+| [Idol of Death](https://www.wowhead.com/classic/item=20876) | 299g 99s | 2 | 0% |
 
 ## Deepest markets
 
@@ -1093,27 +959,161 @@ Single items holding the most listed value.
 
 | Item | Listed value | Qty | Change |
 | --- | --- | --- | --- |
-| [Plans: Lionheart Helm](https://www.wowhead.com/classic/item=12717) | 20k g | 1 | — |
-| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 9k g | 2 | +100% |
-| [Recipe: Flask of Supreme Power](https://www.wowhead.com/classic/item=13521) | 5k g | 1 | — |
-| [Recipe: Transmute Life to Earth](https://www.wowhead.com/classic/item=13488) | 3k g | 1 | — |
-| [Recipe: Transmute Earth to Life](https://www.wowhead.com/classic/item=13489) | 3k g | 1 | — |
-| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 2k g | 2 | \-50% |
-| [Large Radiant Shard](https://www.wowhead.com/classic/item=11178) | 2k g | 205 | +52% |
-| [Black Lotus](https://www.wowhead.com/classic/item=13468) | 1k g | 24 | — |
-| [Formula: Enchant Cloak - Greater Resistance](https://www.wowhead.com/classic/item=16216) | 1k g | 1 | — |
+| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 5k g | 1 | \-50% |
+| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 2k g | 2 | \-33% |
+| [Pattern: Rich Purple Silk Shirt](https://www.wowhead.com/classic/item=4354) | 2k g | 1 | 0% |
+| [Recipe: Flask of Distilled Wisdom](https://www.wowhead.com/classic/item=13520) | 2k g | 1 | 0% |
+| [Large Brilliant Shard](https://www.wowhead.com/classic/item=14344) | 1k g | 102 | +23% |
+| [Formula: Enchant Weapon - Crusader](https://www.wowhead.com/classic/item=16252) | 1k g | 3 | — |
+| [Arcane Crystal](https://www.wowhead.com/classic/item=12363) | 1k g | 13 | — |
 | [Staff of Jordan](https://www.wowhead.com/classic/item=873) | 999 g | 1 | 0% |
+| [Bloodvine](https://www.wowhead.com/classic/item=19726) | 989 g | 15 | +400% |
 | [Hide of the Wild](https://www.wowhead.com/classic/item=18510) | 950 g | 1 | 0% |
-| [Arcane Crystal](https://www.wowhead.com/classic/item=12363) | 945 g | 11 | +267% |
-| [Warlords Deck](https://www.wowhead.com/classic/item=19257) | 900 g | 1 | — |
-| [Elementals Deck](https://www.wowhead.com/classic/item=19267) | 900 g | 1 | — |
-| [Myrmidon's Signet](https://www.wowhead.com/classic/item=2246) | 799 g | 2 | +100% |
+| [Freezing Band](https://www.wowhead.com/classic/item=942) | 799 g | 2 | 0% |
+| [Idol of War](https://www.wowhead.com/classic/item=20882) | 799 g | 2 | 0% |
+| [Essence of Earth](https://www.wowhead.com/classic/item=7076) | 669 g | 25 | \-11% |
+| [Essence of Fire](https://www.wowhead.com/classic/item=7078) | 639 g | 42 | +68% |
+| [Orb of Deception](https://www.wowhead.com/classic/item=1973) | 629 g | 4 | — |
 
-Items listed: 940 (distinct items seen)
+Items listed: 1,178 (distinct items seen)
 
-Listed value: 23k g (asking prices, not sales)
+Listed value: 48k g (asking prices, not sales)
 
-Quantity: 14,459 (units on the AH)
+Quantity: 19,151 (units on the AH)
+
+Scanned: 2026-10-02
+
+## Where the gold sits — listed value by market
+
+Quantity listed × unit price, summed per market.
+
+TRADE GOODS
+
+9k g
+
+RECIPES
+
+8k g
+
+CONSUMABLES
+
+7k g
+
+MISCELLANEOUS
+
+7k g
+
+ARMOR
+
+7k g
+
+WEAPONS
+
+4k g
+
+QUEST ITEMS
+
+2k g
+
+CLASS REAGENTS
+
+2k g
+
+RELICS
+
+330 g
+
+ENGINEERING SUPPLIES
+
+167 g
+
+BAGS
+
+113 g
+
+COSMETIC
+
+23 g
+
+KEYS
+
+21 g
+
+OFF-HAND
+
+15 g
+
+## Most listed items
+
+By quantity sitting on the auction house.
+
+| Item | Qty | Change | Unit |
+| --- | --- | --- | --- |
+| [Dark Iron Scraps](https://www.wowhead.com/classic/item=22528) | 1,010 | +181% | 14s 0c |
+| [Crafted Light Shot](https://www.wowhead.com/classic/item=8067) | 800 | \-20% | 1c |
+| [Strange Dust](https://www.wowhead.com/classic/item=10940) | 593 | +229% | 1s 14c |
+| [Snowball](https://www.wowhead.com/classic/item=17202) | 380 | +90% | 15s 59c |
+| [Thick Leather](https://www.wowhead.com/classic/item=4304) | 371 | +126% | 5s 0c |
+| [Blackmouth Oil](https://www.wowhead.com/classic/item=6370) | 361 | +512% | 36s 99c |
+| [Swiftthistle](https://www.wowhead.com/classic/item=2452) | 347 | +66% | 27s 50c |
+| [Silk Cloth](https://www.wowhead.com/classic/item=4306) | 328 | \-53% | 2s 11c |
+| [Copper Bar](https://www.wowhead.com/classic/item=2840) | 263 | \-60% | 1s 25c |
+| [Copper Ore](https://www.wowhead.com/classic/item=2770) | 259 | \-3% | 95c |
+| [Dark Iron Residue](https://www.wowhead.com/classic/item=18945) | 205 | \-60% | 30s 23c |
+| [Nightfin Soup](https://www.wowhead.com/classic/item=13931) | 202 | +211% | 1g 49s |
+| [Hi-Impact Mithril Slugs](https://www.wowhead.com/classic/item=10512) | 200 | \-96% | 16c |
+| [Silithid Carapace Fragment](https://www.wowhead.com/classic/item=20384) | 200 | 0% | 15s 88c |
+| [Oily Blackmouth](https://www.wowhead.com/classic/item=6358) | 198 | \-40% | 7s 45c |
+
+## Most expensive items
+
+Highest unit asking price among items currently listed.
+
+| Item | Unit | Qty | Change |
+| --- | --- | --- | --- |
+| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 4,500g 0s | 1 | \-50% |
+| [Pattern: Rich Purple Silk Shirt](https://www.wowhead.com/classic/item=4354) | 1,999g 99s | 1 | 0% |
+| [Recipe: Flask of Distilled Wisdom](https://www.wowhead.com/classic/item=13520) | 1,699g 99s | 1 | 0% |
+| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 999g 99s | 1 | \-50% |
+| [Hide of the Wild](https://www.wowhead.com/classic/item=18510) | 950g 0s | 1 | 0% |
+| [Disgusting Oozeling](https://www.wowhead.com/classic/item=20769) | 480g 0s | 1 | 0% |
+| [Chromatic Cloak](https://www.wowhead.com/classic/item=18509) | 450g 0s | 1 | 0% |
+| [Formula: Enchant Weapon - Crusader](https://www.wowhead.com/classic/item=16252) | 439g 99s | 2 | — |
+| [Freezing Band](https://www.wowhead.com/classic/item=942) | 399g 99s | 1 | 0% |
+| [Myrmidon's Signet](https://www.wowhead.com/classic/item=2246) | 399g 99s | 1 | \-50% |
+| [Tiny Crimson Whelpling](https://www.wowhead.com/classic/item=8499) | 350g 0s | 1 | \-50% |
+| [Schematic: Arcanite Dragonling](https://www.wowhead.com/classic/item=16054) | 299g 99s | 1 | 0% |
+| [Lifestone](https://www.wowhead.com/classic/item=833) | 199g 99s | 1 | — |
+| [Five of Beasts](https://www.wowhead.com/classic/item=19233) | 195g 99s | 1 | — |
+| [First Mate Hat](https://www.wowhead.com/classic/item=2955) | 190g 0s | 1 | 0% |
+
+## Deepest markets
+
+Single items holding the most listed value.
+
+| Item | Listed value | Qty | Change |
+| --- | --- | --- | --- |
+| [Parrot Cage (Hyacinth Macaw)](https://www.wowhead.com/classic/item=8494) | 5k g | 1 | \-50% |
+| [Pattern: Rich Purple Silk Shirt](https://www.wowhead.com/classic/item=4354) | 2k g | 1 | 0% |
+| [Recipe: Flask of Distilled Wisdom](https://www.wowhead.com/classic/item=13520) | 2k g | 1 | 0% |
+| [Large Brilliant Shard](https://www.wowhead.com/classic/item=14344) | 1k g | 84 | +68% |
+| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 999 g | 1 | \-50% |
+| [Bloodvine](https://www.wowhead.com/classic/item=19726) | 989 g | 15 | +400% |
+| [Hide of the Wild](https://www.wowhead.com/classic/item=18510) | 950 g | 1 | 0% |
+| [Formula: Enchant Weapon - Crusader](https://www.wowhead.com/classic/item=16252) | 879 g | 2 | — |
+| [Essence of Fire](https://www.wowhead.com/classic/item=7078) | 614 g | 41 | +86% |
+| [Large Radiant Shard](https://www.wowhead.com/classic/item=11178) | 494 g | 46 | \-78% |
+| [Blood of the Mountain](https://www.wowhead.com/classic/item=11382) | 480 g | 4 | 0% |
+| [Disgusting Oozeling](https://www.wowhead.com/classic/item=20769) | 480 g | 1 | 0% |
+| [Arcane Crystal](https://www.wowhead.com/classic/item=12363) | 473 g | 6 | \-45% |
+| [Arcanite Bar](https://www.wowhead.com/classic/item=12360) | 460 g | 5 | 0% |
+| [Elixir of the Mongoose](https://www.wowhead.com/classic/item=13452) | 458 g | 51 | +2% |
+
+Items listed: 1,106 (distinct items seen)
+
+Listed value: 22k g (asking prices, not sales)
+
+Quantity: 15,243 (units on the AH)
 
 Scanned: 2026-10-02
 
@@ -1123,15 +1123,11 @@ Quantity listed × unit price, summed per market.
 
 ARMOR
 
-6k g
+5k g
 
 TRADE GOODS
 
 4k g
-
-MISCELLANEOUS
-
-3k g
 
 RECIPES
 
@@ -1141,41 +1137,45 @@ QUEST ITEMS
 
 3k g
 
-CLASS REAGENTS
+WEAPONS
 
 2k g
 
-WEAPONS
+MISCELLANEOUS
+
+2k g
+
+CLASS REAGENTS
 
 2k g
 
 CONSUMABLES
 
-817 g
-
-RELICS
-
-307 g
+664 g
 
 BAGS
 
-254 g
+332 g
 
-AMMO
+RELICS
 
-79 g
+314 g
 
 ENGINEERING SUPPLIES
 
-28 g
+45 g
 
 OFF-HAND
 
-8 g
+9 g
 
 QUIVERS
 
-4 g
+8 g
+
+AMMO
+
+5 g
 
 ## Most listed items
 
@@ -1183,21 +1183,21 @@ By quantity sitting on the auction house.
 
 | Item | Qty | Change | Unit |
 | --- | --- | --- | --- |
-| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 1,023 | +34,000% | 79s 99c |
-| [Light Leather](https://www.wowhead.com/classic/item=2318) | 701 | +1,652% | 1s 21c |
-| [Runecloth](https://www.wowhead.com/classic/item=14047) | 697 | \-5% | 11s 50c |
-| [Peacebloom](https://www.wowhead.com/classic/item=2447) | 525 | +81% | 25c |
-| [Silverleaf](https://www.wowhead.com/classic/item=765) | 466 | +64% | 27c |
-| [Exploding Shot](https://www.wowhead.com/classic/item=3465) | 400 | — | 19s 99c |
-| [Ruined Leather Scraps](https://www.wowhead.com/classic/item=2934) | 350 | +119% | 75c |
-| [Linen Cloth](https://www.wowhead.com/classic/item=2589) | 327 | \-33% | 40c |
+| [Hi-Impact Mithril Slugs](https://www.wowhead.com/classic/item=10512) | 1,800 | — | 25c |
+| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 1,004 | \-2% | 47s 99c |
+| [Linen Cloth](https://www.wowhead.com/classic/item=2589) | 757 | +131% | 25c |
+| [Runecloth](https://www.wowhead.com/classic/item=14047) | 602 | \-14% | 8s 77c |
+| [Light Leather](https://www.wowhead.com/classic/item=2318) | 599 | \-15% | 43c |
+| [Silk Cloth](https://www.wowhead.com/classic/item=4306) | 501 | +355% | 3s 22c |
 | [Savage Frond](https://www.wowhead.com/classic/item=22529) | 324 | +117% | 90s 10c |
-| [Sharp Arrow](https://www.wowhead.com/classic/item=2515) | 300 | — | 1c |
-| [Oily Blackmouth](https://www.wowhead.com/classic/item=6358) | 283 | +134% | 5s 99c |
-| [Firebloom](https://www.wowhead.com/classic/item=4625) | 223 | +210% | 47s 54c |
-| [Blood Shard](https://www.wowhead.com/classic/item=5075) | 214 | +723% | 1s 97c |
+| [Strange Dust](https://www.wowhead.com/classic/item=10940) | 320 | +1,500% | 2s 50c |
+| [Raw Redgill](https://www.wowhead.com/classic/item=13758) | 240 | +500% | 1s 99c |
+| [Wool Cloth](https://www.wowhead.com/classic/item=2592) | 232 | +54% | 4s 95c |
+| [Bone Fragments](https://www.wowhead.com/classic/item=22526) | 228 | +13% | 52s 63c |
 | [Earthroot](https://www.wowhead.com/classic/item=2449) | 203 | +915% | 1s 80c |
-| [Bone Fragments](https://www.wowhead.com/classic/item=22526) | 201 | — | 99s 50c |
+| [Exploding Shot](https://www.wowhead.com/classic/item=3465) | 200 | \-50% | 50c |
+| [Iron Bar](https://www.wowhead.com/classic/item=3575) | 196 | +1,860% | 17s 33c |
+| [Solid Stone](https://www.wowhead.com/classic/item=7912) | 193 | +13% | 12s 69c |
 
 ## Most expensive items
 
@@ -1205,21 +1205,21 @@ Highest unit asking price among items currently listed.
 
 | Item | Unit | Qty | Change |
 | --- | --- | --- | --- |
-| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 1,999g 99s | 1 | — |
 | [Staff of Jordan](https://www.wowhead.com/classic/item=873) | 999g 99s | 1 | 0% |
+| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 999g 99s | 1 | 0% |
 | [Formula: Enchant Weapon - Crusader](https://www.wowhead.com/classic/item=16252) | 499g 99s | 1 | 0% |
 | [Idol of War](https://www.wowhead.com/classic/item=20882) | 399g 99s | 2 | 0% |
-| [Freezing Band](https://www.wowhead.com/classic/item=942) | 399g 99s | 1 | — |
+| [Freezing Band](https://www.wowhead.com/classic/item=942) | 399g 99s | 1 | 0% |
 | [Idol of Death](https://www.wowhead.com/classic/item=20876) | 299g 99s | 2 | 0% |
+| [Warden Staff](https://www.wowhead.com/classic/item=943) | 299g 99s | 1 | — |
 | [Schematic: Arcanite Dragonling](https://www.wowhead.com/classic/item=16054) | 299g 99s | 1 | 0% |
 | [Field Plate Shield of Stamina](https://www.wowhead.com/classic/item=7496) | 250g 0s | 1 | — |
-| [The Eye of Shadow](https://www.wowhead.com/classic/item=18665) | 249g 99s | 1 | — |
-| [Underworld Band](https://www.wowhead.com/classic/item=1980) | 199g 99s | 2 | — |
+| [The Eye of Shadow](https://www.wowhead.com/classic/item=18665) | 249g 99s | 1 | 0% |
+| [Underworld Band](https://www.wowhead.com/classic/item=1980) | 199g 99s | 2 | 0% |
 | [Idol of the Sage](https://www.wowhead.com/classic/item=20877) | 199g 99s | 2 | 0% |
 | [Idol of Rebirth](https://www.wowhead.com/classic/item=20878) | 199g 99s | 2 | 0% |
 | [Idol of Strife](https://www.wowhead.com/classic/item=20881) | 199g 99s | 2 | 0% |
-| [Flurry Axe](https://www.wowhead.com/classic/item=871) | 199g 99s | 1 | — |
-| [Precisely Calibrated Boomstick](https://www.wowhead.com/classic/item=2100) | 199g 99s | 1 | — |
+| [Precisely Calibrated Boomstick](https://www.wowhead.com/classic/item=2100) | 199g 99s | 1 | 0% |
 
 ## Deepest markets
 
@@ -1227,21 +1227,21 @@ Single items holding the most listed value.
 
 | Item | Listed value | Qty | Change |
 | --- | --- | --- | --- |
-| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 2k g | 1 | — |
 | [Staff of Jordan](https://www.wowhead.com/classic/item=873) | 999 g | 1 | 0% |
-| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 818 g | 1,023 | +34,000% |
+| [Edgemaster's Handguards](https://www.wowhead.com/classic/item=14551) | 999 g | 1 | 0% |
 | [Idol of War](https://www.wowhead.com/classic/item=20882) | 799 g | 2 | 0% |
-| [Essence of Air](https://www.wowhead.com/classic/item=7082) | 769 g | 22 | +22% |
+| [Essence of Earth](https://www.wowhead.com/classic/item=7076) | 629 g | 21 | +5% |
 | [Idol of Death](https://www.wowhead.com/classic/item=20876) | 599 g | 2 | 0% |
-| [Essence of Earth](https://www.wowhead.com/classic/item=7076) | 599 g | 20 | \-17% |
 | [Arcane Crystal](https://www.wowhead.com/classic/item=12363) | 538 g | 7 | — |
 | [Formula: Enchant Weapon - Crusader](https://www.wowhead.com/classic/item=16252) | 499 g | 1 | 0% |
-| [Large Brilliant Shard](https://www.wowhead.com/classic/item=14344) | 494 g | 33 | +725% |
-| [Small Radiant Shard](https://www.wowhead.com/classic/item=11177) | 439 g | 44 | +91% |
-| [Freezing Band](https://www.wowhead.com/classic/item=942) | 399 g | 1 | — |
-| [Underworld Band](https://www.wowhead.com/classic/item=1980) | 399 g | 2 | — |
+| [Core of Elements](https://www.wowhead.com/classic/item=22527) | 481 g | 1,004 | \-2% |
+| [Essence of Air](https://www.wowhead.com/classic/item=7082) | 419 g | 12 | \-45% |
+| [Freezing Band](https://www.wowhead.com/classic/item=942) | 399 g | 1 | 0% |
+| [Underworld Band](https://www.wowhead.com/classic/item=1980) | 399 g | 2 | 0% |
 | [Idol of the Sage](https://www.wowhead.com/classic/item=20877) | 399 g | 2 | 0% |
 | [Idol of Rebirth](https://www.wowhead.com/classic/item=20878) | 399 g | 2 | 0% |
+| [Idol of Strife](https://www.wowhead.com/classic/item=20881) | 399 g | 2 | 0% |
+| [Orb of Deception](https://www.wowhead.com/classic/item=1973) | 399 g | 2 | — |
 
 Items listed: 0 (distinct items seen)
 
@@ -1273,4 +1273,4 @@ Scanned: —
 
 No auction scan uploaded for this faction yet. In game, run /ml scan at the auction house, /reload, then upload with `upload-realm.ps1 -Flavor classic-era`.
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

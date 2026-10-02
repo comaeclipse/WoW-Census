@@ -809,4 +809,4 @@ Single items holding the most listed value.
 | [Arcanite Rod](https://www.wowhead.com/classic/item=16206) | 3k g | 7 | — |
 | [Elemental Sharpening Stone](https://www.wowhead.com/classic/item=18262) | 3k g | 270 | +1,588% |
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

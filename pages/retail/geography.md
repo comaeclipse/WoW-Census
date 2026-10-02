@@ -5,163 +5,187 @@ url: "https://wowcensus.io/retail/geography"
 ---
 
 # WoW Retail Population by Zone – WoWCensus
-Characters: 5,129 (unique, last 30 days)
+Characters: 6,772 (unique, last 30 days)
 
-Locations: 267 (with recent sightings)
+Locations: 298 (with recent sightings)
 
 Top 5 share: 51% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 SILVERMOON CITY
 
-1,168
+1,682
 
 THE VENOMOUS ABYSS
 
-681
+774
 
 EVERSONG WOODS
 
-335
-
-ZUL'AMAN
-
-217
+413
 
 DELVES
 
-213
+317
+
+ZUL'AMAN
+
+261
 
 HARANDAR
 
-185
-
-STORMWIND CITY
-
-153
+230
 
 THE COILED ISLE
 
-131
+193
 
-VOIDSTORM
+STORMWIND CITY
 
-121
+171
 
 VAULTS OF ATAL'UTEK
 
-106
+156
+
+VOIDSTORM
+
+155
 
 MURDER ROW
 
-85
+139
 
 ALTAR OF FANGS
 
-82
-
-DEN OF NALORAKK
-
-69
+110
 
 KINGS' REST
 
-68
-
-DORNOGAL
-
-63
-
-↓ See more↑ See less
-
-ORGRIMMAR
-
-59
-
-RUBY LIFE POOLS
-
-59
-
-TEMPLE OF SETHRALISS
-
-55
-
-SLAYER'S RISE
-
-54
+95
 
 VOIDSCAR ARENA
 
-53
+91
 
-ISLE OF QUEL'DANAS
+DEN OF NALORAKK
 
-52
+88
+
+↓ See more↑ See less
+
+DORNOGAL
+
+85
 
 THE BLINDING VALE
 
-49
+84
+
+ORGRIMMAR
+
+80
+
+RUBY LIFE POOLS
+
+79
+
+TEMPLE OF SETHRALISS
+
+75
+
+SLAYER'S RISE
+
+65
+
+ISLE OF QUEL'DANAS
+
+64
 
 THE WAKING SHORES
 
-46
+58
 
 HOME INTERIOR
 
-43
+54
 
 OHN'AHRAN PLAINS
 
-33
+45
 
 DUN MOROGH
 
-31
-
-VALDRAKKEN
-
-26
+35
 
 FOUNDER'S POINT
 
-24
+35
 
 THE AZURE SPAN
 
-23
+30
+
+VALDRAKKEN
+
+29
 
 ARATHI HIGHLANDS
 
-22
+28
 
 THE TIDEBOUND GROTTO
 
-22
-
-MAISARA CAVERNS
-
-21
+28
 
 GARRISON
 
+27
+
+MAISARA CAVERNS
+
+23
+
+RAZORWIND SHORES
+
+22
+
+ARCANTINA
+
+21
+
+BLACKROCK DEPTHS
+
 20
+
+DALARAN
+
+20
+
+DUROTAR
+
+19
+
+ISLE OF DORN
+
+18
 
 WINDRUNNER SPIRE
 
 18
 
-DALARAN
+VAL
 
 16
 
-ISLE OF DORN
+ARDENWEALD
 
 15
 
-RAZORWIND SHORES
+THALDRASZUS
 
 15
 
@@ -169,11 +193,7 @@ ZULDAZAR
 
 15
 
-BLACKROCK DEPTHS
-
-14
-
-DUROTAR
+ELWYNN FOREST
 
 14
 
@@ -181,96 +201,373 @@ MAGISTERS' TERRACE
 
 14
 
-ARCANTINA
+ICECROWN CITADEL
 
-12
-
-ELWYNN FOREST
-
-12
-
-THALDRASZUS
-
-12
+13
 
 IRONFORGE
 
+13
+
+HALLOWFALL
+
+12
+
+BASTION
+
 11
-
-VAL
-
-11
-
-ARDENWEALD
-
-10
-
-ICECROWN CITADEL
-
-10
-
-RITUAL SITE
-
-9
-
-AZSUNA
-
-8
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Silvermoon City | 1,168 | 22.8% | Capital · avg 89 |
-| The Venomous Abyss | 681 | 13.3% | End game · avg 90 |
-| Eversong Woods | 335 | 6.5% | End game · avg 87 |
-| Zul'Aman | 217 | 4.2% | End game · avg 88 |
-| Delves | 213 | 4.2% | End game · avg 88 |
-| Harandar | 185 | 3.6% | End game · avg 89 |
-| Stormwind City | 153 | 3.0% | Capital · avg 70 |
-| The Coiled Isle | 131 | 2.6% | End game · avg 90 |
-| Voidstorm | 121 | 2.4% | End game · avg 88 |
-| Vaults of Atal'Utek | 106 | 2.1% | End game · avg 90 |
-| Murder Row | 85 | 1.7% | End game · avg 89 |
-| Altar of Fangs | 82 | 1.6% | End game · avg 89 |
-| Den of Nalorakk | 69 | 1.3% | End game · avg 89 |
-| Kings' Rest | 68 | 1.3% | End game · avg 90 |
-| Dornogal | 63 | 1.2% | Capital · avg 83 |
-| Orgrimmar | 59 | 1.2% | Capital · avg 72 |
-| Ruby Life Pools | 59 | 1.2% | End game · avg 86 |
-| Temple of Sethraliss | 55 | 1.1% | End game · avg 90 |
-| Slayer's Rise | 54 | 1.1% | End game · avg 90 |
-| Voidscar Arena | 53 | 1.0% | End game · avg 89 |
-| Isle of Quel'Danas | 52 | 1.0% | End game · avg 84 |
-| The Blinding Vale | 49 | 1.0% | End game · avg 89 |
-| The Waking Shores | 46 | 0.9% | Leveling · avg 49 |
-| Home Interior | 43 | 0.8% | End game · avg 81 |
-| Ohn'ahran Plains | 33 | 0.6% | Leveling · avg 51 |
-| Dun Morogh | 31 | 0.6% | Leveling · avg 78 |
-| Valdrakken | 26 | 0.5% | Leveling · avg 66 |
-| Founder's Point | 24 | 0.5% | End game · avg 84 |
-| The Azure Span | 23 | 0.4% | Leveling · avg 67 |
-| Arathi Highlands | 22 | 0.4% | Leveling · avg 78 |
-| The Tidebound Grotto | 22 | 0.4% | End game · avg 90 |
-| Maisara Caverns | 21 | 0.4% | End game · avg 85 |
-| Garrison | 20 | 0.4% | Leveling · avg 69 |
-| Windrunner Spire | 18 | 0.4% | End game · avg 86 |
-| Dalaran | 16 | 0.3% | End game · avg 81 |
-| Isle of Dorn | 15 | 0.3% | End game · avg 80 |
-| Razorwind Shores | 15 | 0.3% | End game · avg 87 |
-| Zuldazar | 15 | 0.3% | Leveling · avg 79 |
-| Blackrock Depths | 14 | 0.3% | Leveling · avg 79 |
-| Durotar | 14 | 0.3% | End game · avg 84 |
-| Magisters' Terrace | 14 | 0.3% | End game · avg 83 |
-| Arcantina | 12 | 0.2% | End game · avg 89 |
-| Elwynn Forest | 12 | 0.2% | Leveling · avg 72 |
-| Thaldraszus | 12 | 0.2% | Leveling · avg 64 |
-| Ironforge | 11 | 0.2% | Capital · avg 63 |
-| Val | 11 | 0.2% | End game · avg 90 |
-| Ardenweald | 10 | 0.2% | Leveling · avg 79 |
-| Icecrown Citadel | 10 | 0.2% | Leveling · avg 67 |
-| Ritual Site | 9 | 0.2% | End game · avg 90 |
-| Azsuna | 8 | 0.2% | Leveling · avg 58 |
+| Silvermoon City | 1,682 | 24.8% | Capital · avg 89 |
+| The Venomous Abyss | 774 | 11.4% | End game · avg 90 |
+| Eversong Woods | 413 | 6.1% | End game · avg 87 |
+| Delves | 317 | 4.7% | End game · avg 89 |
+| Zul'Aman | 261 | 3.9% | End game · avg 88 |
+| Harandar | 230 | 3.4% | End game · avg 89 |
+| The Coiled Isle | 193 | 2.8% | End game · avg 90 |
+| Stormwind City | 171 | 2.5% | Capital · avg 70 |
+| Vaults of Atal'Utek | 156 | 2.3% | End game · avg 90 |
+| Voidstorm | 155 | 2.3% | End game · avg 88 |
+| Murder Row | 139 | 2.1% | End game · avg 89 |
+| Altar of Fangs | 110 | 1.6% | End game · avg 89 |
+| Kings' Rest | 95 | 1.4% | End game · avg 90 |
+| Voidscar Arena | 91 | 1.3% | End game · avg 90 |
+| Den of Nalorakk | 88 | 1.3% | End game · avg 89 |
+| Dornogal | 85 | 1.3% | Capital · avg 83 |
+| The Blinding Vale | 84 | 1.2% | End game · avg 90 |
+| Orgrimmar | 80 | 1.2% | Capital · avg 72 |
+| Ruby Life Pools | 79 | 1.2% | End game · avg 88 |
+| Temple of Sethraliss | 75 | 1.1% | End game · avg 90 |
+| Slayer's Rise | 65 | 1.0% | End game · avg 89 |
+| Isle of Quel'Danas | 64 | 0.9% | End game · avg 84 |
+| The Waking Shores | 58 | 0.9% | Leveling · avg 52 |
+| Home Interior | 54 | 0.8% | End game · avg 84 |
+| Ohn'ahran Plains | 45 | 0.7% | Leveling · avg 56 |
+| Dun Morogh | 35 | 0.5% | Leveling · avg 79 |
+| Founder's Point | 35 | 0.5% | End game · avg 85 |
+| The Azure Span | 30 | 0.4% | Leveling · avg 64 |
+| Valdrakken | 29 | 0.4% | Leveling · avg 68 |
+| Arathi Highlands | 28 | 0.4% | Leveling · avg 78 |
+| The Tidebound Grotto | 28 | 0.4% | End game · avg 90 |
+| Garrison | 27 | 0.4% | Leveling · avg 71 |
+| Maisara Caverns | 23 | 0.3% | End game · avg 85 |
+| Razorwind Shores | 22 | 0.3% | End game · avg 88 |
+| Arcantina | 21 | 0.3% | End game · avg 90 |
+| Blackrock Depths | 20 | 0.3% | End game · avg 82 |
+| Dalaran | 20 | 0.3% | End game · avg 82 |
+| Durotar | 19 | 0.3% | End game · avg 84 |
+| Isle of Dorn | 18 | 0.3% | Leveling · avg 79 |
+| Windrunner Spire | 18 | 0.3% | End game · avg 86 |
+| Val | 16 | 0.2% | End game · avg 89 |
+| Ardenweald | 15 | 0.2% | End game · avg 81 |
+| Thaldraszus | 15 | 0.2% | Leveling · avg 64 |
+| Zuldazar | 15 | 0.2% | Leveling · avg 74 |
+| Elwynn Forest | 14 | 0.2% | Leveling · avg 69 |
+| Magisters' Terrace | 14 | 0.2% | End game · avg 86 |
+| Icecrown Citadel | 13 | 0.2% | Leveling · avg 72 |
+| Ironforge | 13 | 0.2% | Capital · avg 66 |
+| Hallowfall | 12 | 0.2% | Leveling · avg 79 |
+| Bastion | 11 | 0.2% | Leveling · avg 61 |
+
+## Play-style mix
+
+Recent characters grouped by the kind of location they were last seen in.
+
+END GAME
+
+59%
+
+LEVELING
+
+11%
+
+CAPITAL
+
+30%
+
+STARTING
+
+0%
+
+## How to read this
+
+**Strongest cluster**Silvermoon City contains 24.8% of characters in this selection.
+
+**Top-five concentration**51% indicates how much the footprint is concentrated in its five leading locations.
+
+**Capital footprint**30% were last recorded in recognized capitals.
+
+**Level context**Average level adds context for each location.
+
+Characters: 3,974 (unique, last 30 days)
+
+Locations: 225 (with recent sightings)
+
+Top 5 share: 51% (location concentration)
+
+Updated: 2026-10-02 (last population sample)
+
+## Where players are · last 30 days
+
+SILVERMOON CITY
+
+875
+
+THE VENOMOUS ABYSS
+
+549
+
+EVERSONG WOODS
+
+237
+
+HARANDAR
+
+186
+
+DELVES
+
+181
+
+STORMWIND CITY
+
+171
+
+ZUL'AMAN
+
+170
+
+VOIDSTORM
+
+100
+
+THE COILED ISLE
+
+95
+
+VAULTS OF ATAL'UTEK
+
+80
+
+MURDER ROW
+
+71
+
+ALTAR OF FANGS
+
+57
+
+DORNOGAL
+
+53
+
+DEN OF NALORAKK
+
+49
+
+VOIDSCAR ARENA
+
+45
+
+↓ See more↑ See less
+
+ISLE OF QUEL'DANAS
+
+41
+
+KINGS' REST
+
+41
+
+TEMPLE OF SETHRALISS
+
+36
+
+DUN MOROGH
+
+35
+
+RUBY LIFE POOLS
+
+35
+
+THE BLINDING VALE
+
+35
+
+THE WAKING SHORES
+
+34
+
+HOME INTERIOR
+
+32
+
+FOUNDER'S POINT
+
+30
+
+OHN'AHRAN PLAINS
+
+29
+
+SLAYER'S RISE
+
+29
+
+VALDRAKKEN
+
+26
+
+THE TIDEBOUND GROTTO
+
+20
+
+ARATHI HIGHLANDS
+
+18
+
+MAISARA CAVERNS
+
+18
+
+THE AZURE SPAN
+
+17
+
+WINDRUNNER SPIRE
+
+15
+
+DALARAN
+
+14
+
+ELWYNN FOREST
+
+14
+
+IRONFORGE
+
+13
+
+ISLE OF DORN
+
+12
+
+BLACKROCK DEPTHS
+
+11
+
+GARRISON
+
+10
+
+MAGISTERS' TERRACE
+
+10
+
+THALDRASZUS
+
+10
+
+ARCANTINA
+
+9
+
+AZSUNA
+
+9
+
+ICECROWN CITADEL
+
+9
+
+VAL
+
+9
+
+HALLOWFALL
+
+8
+
+BASTION
+
+7
+
+MALDRAXXUS
+
+7
+
+NETHERSTORM
+
+7
+
+THE ROOKERY
+
+7
+
+TIRAGARDE SOUND
+
+7
+
+## Location detail
+
+| Location | Characters | Share | Activity |
+| --- | --- | --- | --- |
+| Silvermoon City | 875 | 22.0% | Capital · avg 88 |
+| The Venomous Abyss | 549 | 13.8% | End game · avg 90 |
+| Eversong Woods | 237 | 6.0% | End game · avg 86 |
+| Harandar | 186 | 4.7% | End game · avg 89 |
+| Delves | 181 | 4.6% | End game · avg 88 |
+| Stormwind City | 171 | 4.3% | Capital · avg 70 |
+| Zul'Aman | 170 | 4.3% | End game · avg 88 |
+| Voidstorm | 100 | 2.5% | End game · avg 88 |
+| The Coiled Isle | 95 | 2.4% | End game · avg 90 |
+| Vaults of Atal'Utek | 80 | 2.0% | End game · avg 89 |
+| Murder Row | 71 | 1.8% | End game · avg 89 |
+| Altar of Fangs | 57 | 1.4% | End game · avg 89 |
+| Dornogal | 53 | 1.3% | Capital · avg 83 |
+| Den of Nalorakk | 49 | 1.2% | End game · avg 88 |
+| Voidscar Arena | 45 | 1.1% | End game · avg 90 |
+| Isle of Quel'Danas | 41 | 1.0% | End game · avg 84 |
+| Kings' Rest | 41 | 1.0% | End game · avg 90 |
+| Temple of Sethraliss | 36 | 0.9% | End game · avg 90 |
+| Dun Morogh | 35 | 0.9% | Leveling · avg 79 |
+| Ruby Life Pools | 35 | 0.9% | End game · avg 87 |
+| The Blinding Vale | 35 | 0.9% | End game · avg 89 |
+| The Waking Shores | 34 | 0.9% | Leveling · avg 52 |
+| Home Interior | 32 | 0.8% | End game · avg 83 |
+| Founder's Point | 30 | 0.8% | End game · avg 84 |
+| Ohn'ahran Plains | 29 | 0.7% | Leveling · avg 57 |
+| Slayer's Rise | 29 | 0.7% | End game · avg 89 |
+| Valdrakken | 26 | 0.7% | Leveling · avg 66 |
+| The Tidebound Grotto | 20 | 0.5% | End game · avg 90 |
+| Arathi Highlands | 18 | 0.5% | Leveling · avg 78 |
+| Maisara Caverns | 18 | 0.5% | End game · avg 84 |
+| The Azure Span | 17 | 0.4% | Leveling · avg 60 |
+| Windrunner Spire | 15 | 0.4% | End game · avg 86 |
+| Dalaran | 14 | 0.4% | End game · avg 80 |
+| Elwynn Forest | 14 | 0.4% | Leveling · avg 69 |
+| Ironforge | 13 | 0.3% | Capital · avg 66 |
+| Isle of Dorn | 12 | 0.3% | Leveling · avg 79 |
+| Blackrock Depths | 11 | 0.3% | Leveling · avg 78 |
+| Garrison | 10 | 0.3% | Leveling · avg 75 |
+| Magisters' Terrace | 10 | 0.3% | End game · avg 85 |
+| Thaldraszus | 10 | 0.3% | Leveling · avg 63 |
+| Arcantina | 9 | 0.2% | End game · avg 90 |
+| Azsuna | 9 | 0.2% | Leveling · avg 61 |
+| Icecrown Citadel | 9 | 0.2% | Leveling · avg 64 |
+| Val | 9 | 0.2% | End game · avg 89 |
+| Hallowfall | 8 | 0.2% | Leveling · avg 78 |
+| Bastion | 7 | 0.2% | Leveling · avg 57 |
+| Maldraxxus | 7 | 0.2% | Leveling · avg 73 |
+| Netherstorm | 7 | 0.2% | Leveling · avg 64 |
+| The Rookery | 7 | 0.2% | Leveling · avg 75 |
+| Tiragarde Sound | 7 | 0.2% | Leveling · avg 63 |
 
 ## Play-style mix
 
@@ -282,308 +579,11 @@ END GAME
 
 LEVELING
 
-11%
-
-CAPITAL
-
-29%
-
-STARTING
-
-0%
-
-## How to read this
-
-**Strongest cluster**Silvermoon City contains 22.8% of characters in this selection.
-
-**Top-five concentration**51% indicates how much the footprint is concentrated in its five leading locations.
-
-**Capital footprint**29% were last recorded in recognized capitals.
-
-**Level context**Average level adds context for each location.
-
-Characters: 3,239 (unique, last 30 days)
-
-Locations: 211 (with recent sightings)
-
-Top 5 share: 52% (location concentration)
-
-Updated: 2026-10-01 (last population sample)
-
-## Where players are · last 30 days
-
-SILVERMOON CITY
-
-639
-
-THE VENOMOUS ABYSS
-
-527
-
-EVERSONG WOODS
-
-203
-
-HARANDAR
-
-160
-
-STORMWIND CITY
-
-153
-
-ZUL'AMAN
-
-151
-
-DELVES
-
-126
-
-VOIDSTORM
-
-81
-
-THE COILED ISLE
-
-72
-
-VAULTS OF ATAL'UTEK
-
-60
-
-DORNOGAL
-
-49
-
-MURDER ROW
-
-49
-
-ALTAR OF FANGS
-
-46
-
-DEN OF NALORAKK
-
-42
-
-ISLE OF QUEL'DANAS
-
-38
-
-↓ See more↑ See less
-
-KINGS' REST
-
-33
-
-DUN MOROGH
-
-31
-
-VOIDSCAR ARENA
-
-29
-
-RUBY LIFE POOLS
-
-26
-
-TEMPLE OF SETHRALISS
-
-26
-
-THE WAKING SHORES
-
-26
-
-THE BLINDING VALE
-
-24
-
-HOME INTERIOR
-
-23
-
-VALDRAKKEN
-
-23
-
-FOUNDER'S POINT
-
-22
-
-SLAYER'S RISE
-
-22
-
-OHN'AHRAN PLAINS
-
-20
-
-MAISARA CAVERNS
-
-17
-
-THE TIDEBOUND GROTTO
-
-17
-
-ARATHI HIGHLANDS
-
-15
-
-WINDRUNNER SPIRE
-
-15
-
-DALARAN
-
-12
-
-ELWYNN FOREST
-
-12
-
-IRONFORGE
-
-11
-
-ISLE OF DORN
-
-11
-
-THE AZURE SPAN
-
-11
-
-BLACKROCK DEPTHS
-
-9
-
-GARRISON
-
-9
-
-ICECROWN CITADEL
-
-9
-
-MAGISTERS' TERRACE
-
-9
-
-THALDRASZUS
-
-9
-
-AZSUNA
-
-7
-
-VAL
-
-7
-
-BASTION
-
-6
-
-NETHERSTORM
-
-6
-
-STORMHEIM
-
-6
-
-THE ROOKERY
-
-6
-
-ARCANTINA
-
-5
-
-ARDENWEALD
-
-5
-
-EASTERN PLAGUELANDS
-
-5
-
-## Location detail
-
-| Location | Characters | Share | Activity |
-| --- | --- | --- | --- |
-| Silvermoon City | 639 | 19.7% | Capital · avg 88 |
-| The Venomous Abyss | 527 | 16.3% | End game · avg 90 |
-| Eversong Woods | 203 | 6.3% | End game · avg 86 |
-| Harandar | 160 | 4.9% | End game · avg 89 |
-| Stormwind City | 153 | 4.7% | Capital · avg 70 |
-| Zul'Aman | 151 | 4.7% | End game · avg 88 |
-| Delves | 126 | 3.9% | End game · avg 88 |
-| Voidstorm | 81 | 2.5% | End game · avg 88 |
-| The Coiled Isle | 72 | 2.2% | End game · avg 90 |
-| Vaults of Atal'Utek | 60 | 1.9% | End game · avg 89 |
-| Dornogal | 49 | 1.5% | Capital · avg 84 |
-| Murder Row | 49 | 1.5% | End game · avg 88 |
-| Altar of Fangs | 46 | 1.4% | End game · avg 89 |
-| Den of Nalorakk | 42 | 1.3% | End game · avg 88 |
-| Isle of Quel'Danas | 38 | 1.2% | End game · avg 84 |
-| Kings' Rest | 33 | 1.0% | End game · avg 90 |
-| Dun Morogh | 31 | 1.0% | Leveling · avg 78 |
-| Voidscar Arena | 29 | 0.9% | End game · avg 89 |
-| Ruby Life Pools | 26 | 0.8% | End game · avg 84 |
-| Temple of Sethraliss | 26 | 0.8% | End game · avg 90 |
-| The Waking Shores | 26 | 0.8% | Leveling · avg 45 |
-| The Blinding Vale | 24 | 0.7% | End game · avg 89 |
-| Home Interior | 23 | 0.7% | Leveling · avg 79 |
-| Valdrakken | 23 | 0.7% | Leveling · avg 65 |
-| Founder's Point | 22 | 0.7% | End game · avg 84 |
-| Slayer's Rise | 22 | 0.7% | End game · avg 89 |
-| Ohn'ahran Plains | 20 | 0.6% | Leveling · avg 54 |
-| Maisara Caverns | 17 | 0.5% | End game · avg 84 |
-| The Tidebound Grotto | 17 | 0.5% | End game · avg 90 |
-| Arathi Highlands | 15 | 0.5% | Leveling · avg 79 |
-| Windrunner Spire | 15 | 0.5% | End game · avg 86 |
-| Dalaran | 12 | 0.4% | End game · avg 80 |
-| Elwynn Forest | 12 | 0.4% | Leveling · avg 72 |
-| Ironforge | 11 | 0.3% | Capital · avg 63 |
-| Isle of Dorn | 11 | 0.3% | End game · avg 80 |
-| The Azure Span | 11 | 0.3% | Leveling · avg 61 |
-| Blackrock Depths | 9 | 0.3% | Leveling · avg 77 |
-| Garrison | 9 | 0.3% | Leveling · avg 73 |
-| Icecrown Citadel | 9 | 0.3% | Leveling · avg 64 |
-| Magisters' Terrace | 9 | 0.3% | End game · avg 86 |
-| Thaldraszus | 9 | 0.3% | Leveling · avg 61 |
-| Azsuna | 7 | 0.2% | Leveling · avg 55 |
-| Val | 7 | 0.2% | End game · avg 89 |
-| Bastion | 6 | 0.2% | Leveling · avg 60 |
-| Netherstorm | 6 | 0.2% | Leveling · avg 62 |
-| Stormheim | 6 | 0.2% | Leveling · avg 60 |
-| The Rookery | 6 | 0.2% | Leveling · avg 75 |
-| Arcantina | 5 | 0.2% | End game · avg 90 |
-| Ardenweald | 5 | 0.2% | End game · avg 83 |
-| Eastern Plaguelands | 5 | 0.2% | End game · avg 85 |
-
-## Play-style mix
-
-Recent characters grouped by the kind of location they were last seen in.
-
-END GAME
-
-62%
-
-LEVELING
-
 12%
 
 CAPITAL
 
-26%
+28%
 
 STARTING
 
@@ -591,137 +591,141 @@ STARTING
 
 ## How to read this
 
-**Strongest cluster**Silvermoon City contains 19.7% of characters in this selection.
+**Strongest cluster**Silvermoon City contains 22.0% of characters in this selection.
 
-**Top-five concentration**52% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**51% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**26% were last recorded in recognized capitals.
+**Capital footprint**28% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
-Characters: 1,890 (unique, last 30 days)
+Characters: 2,798 (unique, last 30 days)
 
-Locations: 171 (with recent sightings)
+Locations: 201 (with recent sightings)
 
-Top 5 share: 51% (location concentration)
+Top 5 share: 52% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 SILVERMOON CITY
 
-529
+807
 
 THE VENOMOUS ABYSS
 
-154
+225
 
 EVERSONG WOODS
 
-132
+176
 
 DELVES
 
-87
-
-ZUL'AMAN
-
-66
-
-ORGRIMMAR
-
-59
+136
 
 THE COILED ISLE
 
-59
+98
+
+ZUL'AMAN
+
+91
+
+ORGRIMMAR
+
+80
 
 VAULTS OF ATAL'UTEK
 
-46
-
-VOIDSTORM
-
-40
-
-ALTAR OF FANGS
-
-36
+76
 
 MURDER ROW
 
-36
+68
+
+VOIDSTORM
+
+55
 
 KINGS' REST
 
-35
+54
 
-RUBY LIFE POOLS
+ALTAR OF FANGS
 
-33
-
-SLAYER'S RISE
-
-32
-
-TEMPLE OF SETHRALISS
-
-29
-
-↓ See more↑ See less
-
-DEN OF NALORAKK
-
-27
-
-HARANDAR
-
-25
+53
 
 THE BLINDING VALE
 
-25
+49
 
 VOIDSCAR ARENA
 
-24
+46
 
-HOME INTERIOR
+HARANDAR
 
-20
+44
 
-THE WAKING SHORES
+↓ See more↑ See less
 
-20
+RUBY LIFE POOLS
+
+44
+
+DEN OF NALORAKK
+
+39
+
+TEMPLE OF SETHRALISS
+
+39
+
+SLAYER'S RISE
+
+36
 
 DORNOGAL
 
-14
+32
 
-DUROTAR
+THE WAKING SHORES
 
-14
+24
 
 ISLE OF QUEL'DANAS
 
-14
+23
 
-OHN'AHRAN PLAINS
+HOME INTERIOR
 
-13
+22
 
-RAZORWIND SHORES
+DUROTAR
 
-12
-
-THE AZURE SPAN
-
-12
+19
 
 GARRISON
 
-11
+17
+
+RAZORWIND SHORES
+
+17
+
+OHN'AHRAN PLAINS
+
+16
+
+THE AZURE SPAN
+
+13
+
+ARCANTINA
+
+12
 
 ZULDAZAR
 
@@ -729,9 +733,29 @@ ZULDAZAR
 
 ARATHI HIGHLANDS
 
+10
+
+ARDENWEALD
+
+9
+
+BLACKROCK DEPTHS
+
+9
+
+THE TIDEBOUND GROTTO
+
+8
+
+HIGHMOUNTAIN
+
 7
 
-ARCANTINA
+RITUAL SITE
+
+7
+
+VAL
 
 7
 
@@ -739,15 +763,23 @@ AZJ-KAHET
 
 6
 
-HIGHMOUNTAIN
+DALARAN
 
 6
 
-ARDENWEALD
+ISLE OF DORN
 
-5
+6
 
-BLACKROCK DEPTHS
+THE JADE FOREST
+
+6
+
+UNDERMINE
+
+6
+
+AMIRDRASSIL, THE DREAM'S HOPE
 
 5
 
@@ -755,116 +787,84 @@ BRACKENHIDE HOLLOW
 
 5
 
-MAGISTERS' TERRACE
+FOUNDER'S POINT
 
 5
-
-RITUAL SITE
-
-5
-
-THE JADE FOREST
-
-5
-
-THE TIDEBOUND GROTTO
-
-5
-
-BURNING STEPPES
-
-4
-
-DALARAN
-
-4
-
-ISLE OF DORN
-
-4
 
 MAISARA CAVERNS
 
-4
+5
 
 SILVERSHARD MINES
 
+5
+
+THALDRASZUS
+
+5
+
+VOL'DUN
+
+5
+
+BASTION
+
 4
-
-UNDERMINE
-
-4
-
-VAL
-
-4
-
-VENOMFALL DEEPS
-
-4
-
-AMIRDRASSIL, THE DREAM'S HOPE
-
-3
-
-ARATHI BASIN
-
-3
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Silvermoon City | 529 | 28.0% | Capital · avg 89 |
-| The Venomous Abyss | 154 | 8.1% | End game · avg 90 |
-| Eversong Woods | 132 | 7.0% | End game · avg 88 |
-| Delves | 87 | 4.6% | End game · avg 89 |
-| Zul'Aman | 66 | 3.5% | End game · avg 89 |
-| Orgrimmar | 59 | 3.1% | Capital · avg 72 |
-| The Coiled Isle | 59 | 3.1% | End game · avg 90 |
-| Vaults of Atal'Utek | 46 | 2.4% | End game · avg 90 |
-| Voidstorm | 40 | 2.1% | End game · avg 88 |
-| Altar of Fangs | 36 | 1.9% | End game · avg 89 |
-| Murder Row | 36 | 1.9% | End game · avg 90 |
-| Kings' Rest | 35 | 1.9% | End game · avg 90 |
-| Ruby Life Pools | 33 | 1.7% | End game · avg 88 |
-| Slayer's Rise | 32 | 1.7% | End game · avg 90 |
-| Temple of Sethraliss | 29 | 1.5% | End game · avg 90 |
-| Den of Nalorakk | 27 | 1.4% | End game · avg 90 |
-| Harandar | 25 | 1.3% | End game · avg 90 |
-| The Blinding Vale | 25 | 1.3% | End game · avg 89 |
-| Voidscar Arena | 24 | 1.3% | End game · avg 90 |
-| Home Interior | 20 | 1.1% | End game · avg 84 |
-| The Waking Shores | 20 | 1.1% | Leveling · avg 53 |
-| Dornogal | 14 | 0.7% | Capital · avg 82 |
-| Durotar | 14 | 0.7% | End game · avg 84 |
-| Isle of Quel'Danas | 14 | 0.7% | End game · avg 85 |
-| Ohn'ahran Plains | 13 | 0.7% | Leveling · avg 46 |
-| Razorwind Shores | 12 | 0.6% | End game · avg 87 |
-| The Azure Span | 12 | 0.6% | Leveling · avg 73 |
-| Garrison | 11 | 0.6% | Leveling · avg 65 |
-| Zuldazar | 11 | 0.6% | Leveling · avg 75 |
-| Arathi Highlands | 7 | 0.4% | Leveling · avg 76 |
-| Arcantina | 7 | 0.4% | End game · avg 89 |
-| Azj-Kahet | 6 | 0.3% | End game · avg 80 |
-| Highmountain | 6 | 0.3% | Leveling · avg 69 |
-| Ardenweald | 5 | 0.3% | Leveling · avg 74 |
-| Blackrock Depths | 5 | 0.3% | End game · avg 83 |
-| Brackenhide Hollow | 5 | 0.3% | Leveling · avg 35 |
-| Magisters' Terrace | 5 | 0.3% | Leveling · avg 76 |
-| Ritual Site | 5 | 0.3% | End game · avg 90 |
-| The Jade Forest | 5 | 0.3% | Leveling · avg 53 |
-| The Tidebound Grotto | 5 | 0.3% | End game · avg 90 |
-| Burning Steppes | 4 | 0.2% | Leveling · avg 75 |
-| Dalaran | 4 | 0.2% | End game · avg 86 |
-| Isle of Dorn | 4 | 0.2% | End game · avg 80 |
-| Maisara Caverns | 4 | 0.2% | End game · avg 87 |
-| Silvershard Mines | 4 | 0.2% | End game · avg 90 |
-| Undermine | 4 | 0.2% | End game · avg 90 |
-| Val | 4 | 0.2% | End game · avg 90 |
-| Venomfall Deeps | 4 | 0.2% | End game · avg 90 |
-| Amirdrassil, the Dream's Hope | 3 | 0.2% | End game · avg 90 |
-| Arathi Basin | 3 | 0.2% | End game · avg 90 |
+| Silvermoon City | 807 | 28.8% | Capital · avg 89 |
+| The Venomous Abyss | 225 | 8.0% | End game · avg 90 |
+| Eversong Woods | 176 | 6.3% | End game · avg 88 |
+| Delves | 136 | 4.9% | End game · avg 89 |
+| The Coiled Isle | 98 | 3.5% | End game · avg 90 |
+| Zul'Aman | 91 | 3.3% | End game · avg 89 |
+| Orgrimmar | 80 | 2.9% | Capital · avg 72 |
+| Vaults of Atal'Utek | 76 | 2.7% | End game · avg 90 |
+| Murder Row | 68 | 2.4% | End game · avg 90 |
+| Voidstorm | 55 | 2.0% | End game · avg 89 |
+| Kings' Rest | 54 | 1.9% | End game · avg 90 |
+| Altar of Fangs | 53 | 1.9% | End game · avg 89 |
+| The Blinding Vale | 49 | 1.8% | End game · avg 90 |
+| Voidscar Arena | 46 | 1.6% | End game · avg 90 |
+| Harandar | 44 | 1.6% | End game · avg 89 |
+| Ruby Life Pools | 44 | 1.6% | End game · avg 89 |
+| Den of Nalorakk | 39 | 1.4% | End game · avg 90 |
+| Temple of Sethraliss | 39 | 1.4% | End game · avg 90 |
+| Slayer's Rise | 36 | 1.3% | End game · avg 89 |
+| Dornogal | 32 | 1.1% | Capital · avg 84 |
+| The Waking Shores | 24 | 0.9% | Leveling · avg 51 |
+| Isle of Quel'Danas | 23 | 0.8% | End game · avg 85 |
+| Home Interior | 22 | 0.8% | End game · avg 85 |
+| Durotar | 19 | 0.7% | End game · avg 84 |
+| Garrison | 17 | 0.6% | Leveling · avg 68 |
+| Razorwind Shores | 17 | 0.6% | End game · avg 88 |
+| Ohn'ahran Plains | 16 | 0.6% | Leveling · avg 54 |
+| The Azure Span | 13 | 0.5% | Leveling · avg 70 |
+| Arcantina | 12 | 0.4% | End game · avg 89 |
+| Zuldazar | 11 | 0.4% | Leveling · avg 68 |
+| Arathi Highlands | 10 | 0.4% | Leveling · avg 77 |
+| Ardenweald | 9 | 0.3% | Leveling · avg 79 |
+| Blackrock Depths | 9 | 0.3% | End game · avg 87 |
+| The Tidebound Grotto | 8 | 0.3% | End game · avg 90 |
+| Highmountain | 7 | 0.3% | Leveling · avg 71 |
+| Ritual Site | 7 | 0.3% | End game · avg 90 |
+| Val | 7 | 0.3% | End game · avg 90 |
+| Azj-Kahet | 6 | 0.2% | End game · avg 82 |
+| Dalaran | 6 | 0.2% | End game · avg 86 |
+| Isle of Dorn | 6 | 0.2% | End game · avg 80 |
+| The Jade Forest | 6 | 0.2% | Leveling · avg 59 |
+| Undermine | 6 | 0.2% | End game · avg 90 |
+| Amirdrassil, the Dream's Hope | 5 | 0.2% | End game · avg 90 |
+| Brackenhide Hollow | 5 | 0.2% | Leveling · avg 35 |
+| Founder's Point | 5 | 0.2% | End game · avg 88 |
+| Maisara Caverns | 5 | 0.2% | End game · avg 87 |
+| Silvershard Mines | 5 | 0.2% | End game · avg 90 |
+| Thaldraszus | 5 | 0.2% | Leveling · avg 66 |
+| Vol'dun | 5 | 0.2% | End game · avg 90 |
+| Bastion | 4 | 0.1% | Leveling · avg 68 |
 
 ## Play-style mix
 
@@ -872,15 +872,15 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-58%
+59%
 
 LEVELING
 
-10%
+8%
 
 CAPITAL
 
-32%
+33%
 
 STARTING
 
@@ -888,137 +888,161 @@ STARTING
 
 ## How to read this
 
-**Strongest cluster**Silvermoon City contains 28.0% of characters in this selection.
+**Strongest cluster**Silvermoon City contains 28.8% of characters in this selection.
 
-**Top-five concentration**51% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**52% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**32% were last recorded in recognized capitals.
+**Capital footprint**33% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
-Characters: 1,101 (unique, last 30 days)
+Characters: 2,009 (unique, last 30 days)
 
-Locations: 122 (with recent sightings)
+Locations: 163 (with recent sightings)
 
-Top 5 share: 51% (location concentration)
+Top 5 share: 52% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 SILVERMOON CITY
 
-307
-
-EVERSONG WOODS
-
-92
+585
 
 THE VENOMOUS ABYSS
 
-88
+159
+
+EVERSONG WOODS
+
+136
 
 DELVES
 
-40
-
-ORGRIMMAR
-
-34
-
-ZUL'AMAN
-
-33
+89
 
 THE COILED ISLE
 
-32
+71
+
+ZUL'AMAN
+
+58
 
 VAULTS OF ATAL'UTEK
 
-27
+57
 
-SLAYER'S RISE
+ORGRIMMAR
 
-26
-
-RUBY LIFE POOLS
-
-25
-
-ALTAR OF FANGS
-
-24
+55
 
 MURDER ROW
 
-21
+53
 
-TEMPLE OF SETHRALISS
+ALTAR OF FANGS
 
-19
-
-VOIDSTORM
-
-19
-
-KINGS' REST
-
-18
-
-↓ See more↑ See less
+41
 
 THE BLINDING VALE
 
-16
+40
 
-DEN OF NALORAKK
+KINGS' REST
 
-15
-
-HARANDAR
-
-15
+37
 
 VOIDSCAR ARENA
 
-15
+37
 
-OHN'AHRAN PLAINS
+RUBY LIFE POOLS
 
-12
+36
+
+HARANDAR
+
+34
+
+↓ See more↑ See less
+
+VOIDSTORM
+
+34
+
+SLAYER'S RISE
+
+30
+
+TEMPLE OF SETHRALISS
+
+29
+
+DEN OF NALORAKK
+
+27
+
+DORNOGAL
+
+27
+
+ISLE OF QUEL'DANAS
+
+17
 
 THE WAKING SHORES
 
+16
+
+OHN'AHRAN PLAINS
+
+15
+
+GARRISON
+
 12
+
+RAZORWIND SHORES
+
+11
+
+ARCANTINA
+
+10
+
+THE AZURE SPAN
+
+10
 
 ZULDAZAR
 
 10
 
-DORNOGAL
+DUROTAR
 
 9
 
-THE AZURE SPAN
+ARATHI HIGHLANDS
 
-9
+7
 
-ISLE OF QUEL'DANAS
+BLACKROCK DEPTHS
 
-8
+7
 
-GARRISON
+HOME INTERIOR
+
+7
+
+ARDENWEALD
 
 6
 
-RAZORWIND SHORES
+VAL
 
 6
-
-ARCANTINA
-
-5
 
 AZJ-KAHET
 
@@ -1028,140 +1052,116 @@ BRACKENHIDE HOLLOW
 
 5
 
-HOME INTERIOR
+MAISARA CAVERNS
 
 5
 
-ARATHI HIGHLANDS
-
-4
-
-DUROTAR
-
-4
-
-MAISARA CAVERNS
-
-4
-
-BLACKROCK DEPTHS
-
-3
-
-BURNING STEPPES
-
-3
-
-DARKFLAME CLEFT
-
-3
-
-MAGISTERS' TERRACE
-
-3
-
-MOLTEN CORE
-
-3
-
-NEXUS-POINT XENAS
-
-3
-
 THALDRASZUS
 
-3
+5
 
 UNDERMINE
 
-3
-
-VAL
-
-3
+5
 
 AMIRDRASSIL, THE DREAM'S HOPE
 
-2
-
-ARDENWEALD
-
-2
-
-BOREAN TUNDRA
-
-2
-
-COURT OF STARS
-
-2
-
-CRYSTALSONG FOREST
-
-2
+4
 
 DALARAN
 
-2
+4
 
-FELWOOD
+FOUNDER'S POINT
 
-2
+4
+
+ICECROWN CITADEL
+
+4
+
+ISLE OF DORN
+
+4
+
+RITUAL SITE
+
+4
+
+THE TIDEBOUND GROTTO
+
+4
+
+TORGHAST, TOWER OF THE DAMNED
+
+4
+
+ULDAMAN
+
+4
+
+VOL'DUN
+
+4
+
+BASTION
+
+3
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Silvermoon City | 307 | 27.9% | Capital · avg 89 |
-| Eversong Woods | 92 | 8.4% | End game · avg 88 |
-| The Venomous Abyss | 88 | 8.0% | End game · avg 90 |
-| Delves | 40 | 3.6% | End game · avg 89 |
-| Orgrimmar | 34 | 3.1% | Capital · avg 71 |
-| Zul'Aman | 33 | 3.0% | End game · avg 89 |
-| The Coiled Isle | 32 | 2.9% | End game · avg 90 |
-| Vaults of Atal'Utek | 27 | 2.5% | End game · avg 90 |
-| Slayer's Rise | 26 | 2.4% | End game · avg 90 |
-| Ruby Life Pools | 25 | 2.3% | End game · avg 88 |
-| Altar of Fangs | 24 | 2.2% | End game · avg 89 |
-| Murder Row | 21 | 1.9% | End game · avg 90 |
-| Temple of Sethraliss | 19 | 1.7% | End game · avg 90 |
-| Voidstorm | 19 | 1.7% | End game · avg 88 |
-| Kings' Rest | 18 | 1.6% | End game · avg 90 |
-| The Blinding Vale | 16 | 1.5% | End game · avg 89 |
-| Den of Nalorakk | 15 | 1.4% | End game · avg 90 |
-| Harandar | 15 | 1.4% | End game · avg 90 |
-| Voidscar Arena | 15 | 1.4% | End game · avg 90 |
-| Ohn'ahran Plains | 12 | 1.1% | Leveling · avg 45 |
-| The Waking Shores | 12 | 1.1% | Leveling · avg 55 |
-| Zuldazar | 10 | 0.9% | Leveling · avg 75 |
-| Dornogal | 9 | 0.8% | Capital · avg 83 |
-| The Azure Span | 9 | 0.8% | Leveling · avg 73 |
-| Isle of Quel'Danas | 8 | 0.7% | End game · avg 87 |
-| Garrison | 6 | 0.5% | Leveling · avg 66 |
-| Razorwind Shores | 6 | 0.5% | End game · avg 87 |
-| Arcantina | 5 | 0.5% | End game · avg 90 |
-| Azj-Kahet | 5 | 0.5% | End game · avg 81 |
-| Brackenhide Hollow | 5 | 0.5% | Leveling · avg 35 |
-| Home Interior | 5 | 0.5% | End game · avg 84 |
-| Arathi Highlands | 4 | 0.4% | Leveling · avg 74 |
-| Durotar | 4 | 0.4% | Leveling · avg 78 |
-| Maisara Caverns | 4 | 0.4% | End game · avg 87 |
-| Blackrock Depths | 3 | 0.3% | End game · avg 82 |
-| Burning Steppes | 3 | 0.3% | Leveling · avg 71 |
-| Darkflame Cleft | 3 | 0.3% | Leveling · avg 76 |
-| Magisters' Terrace | 3 | 0.3% | Leveling · avg 71 |
-| Molten Core | 3 | 0.3% | Leveling · avg 70 |
-| Nexus-Point Xenas | 3 | 0.3% | End game · avg 86 |
-| Thaldraszus | 3 | 0.3% | Leveling · avg 74 |
-| Undermine | 3 | 0.3% | End game · avg 90 |
-| Val | 3 | 0.3% | End game · avg 90 |
-| Amirdrassil, the Dream's Hope | 2 | 0.2% | End game · avg 90 |
-| Ardenweald | 2 | 0.2% | End game · avg 86 |
-| Borean Tundra | 2 | 0.2% | Leveling · avg 22 |
-| Court of Stars | 2 | 0.2% | End game · avg 80 |
-| Crystalsong Forest | 2 | 0.2% | Leveling · avg 55 |
-| Dalaran | 2 | 0.2% | End game · avg 85 |
-| Felwood | 2 | 0.2% | Leveling · avg 50 |
+| Silvermoon City | 585 | 29.1% | Capital · avg 89 |
+| The Venomous Abyss | 159 | 7.9% | End game · avg 90 |
+| Eversong Woods | 136 | 6.8% | End game · avg 88 |
+| Delves | 89 | 4.4% | End game · avg 89 |
+| The Coiled Isle | 71 | 3.5% | End game · avg 90 |
+| Zul'Aman | 58 | 2.9% | End game · avg 89 |
+| Vaults of Atal'Utek | 57 | 2.8% | End game · avg 90 |
+| Orgrimmar | 55 | 2.7% | Capital · avg 72 |
+| Murder Row | 53 | 2.6% | End game · avg 90 |
+| Altar of Fangs | 41 | 2.0% | End game · avg 89 |
+| The Blinding Vale | 40 | 2.0% | End game · avg 90 |
+| Kings' Rest | 37 | 1.8% | End game · avg 90 |
+| Voidscar Arena | 37 | 1.8% | End game · avg 90 |
+| Ruby Life Pools | 36 | 1.8% | End game · avg 89 |
+| Harandar | 34 | 1.7% | End game · avg 89 |
+| Voidstorm | 34 | 1.7% | End game · avg 89 |
+| Slayer's Rise | 30 | 1.5% | End game · avg 89 |
+| Temple of Sethraliss | 29 | 1.4% | End game · avg 90 |
+| Den of Nalorakk | 27 | 1.3% | End game · avg 90 |
+| Dornogal | 27 | 1.3% | Capital · avg 85 |
+| Isle of Quel'Danas | 17 | 0.8% | End game · avg 86 |
+| The Waking Shores | 16 | 0.8% | Leveling · avg 52 |
+| Ohn'ahran Plains | 15 | 0.7% | Leveling · avg 54 |
+| Garrison | 12 | 0.6% | Leveling · avg 70 |
+| Razorwind Shores | 11 | 0.5% | End game · avg 88 |
+| Arcantina | 10 | 0.5% | End game · avg 90 |
+| The Azure Span | 10 | 0.5% | Leveling · avg 69 |
+| Zuldazar | 10 | 0.5% | Leveling · avg 68 |
+| Durotar | 9 | 0.4% | End game · avg 81 |
+| Arathi Highlands | 7 | 0.3% | Leveling · avg 76 |
+| Blackrock Depths | 7 | 0.3% | End game · avg 87 |
+| Home Interior | 7 | 0.3% | End game · avg 86 |
+| Ardenweald | 6 | 0.3% | End game · avg 85 |
+| Val | 6 | 0.3% | End game · avg 90 |
+| Azj-Kahet | 5 | 0.2% | End game · avg 83 |
+| Brackenhide Hollow | 5 | 0.2% | Leveling · avg 35 |
+| Maisara Caverns | 5 | 0.2% | End game · avg 87 |
+| Thaldraszus | 5 | 0.2% | Leveling · avg 66 |
+| Undermine | 5 | 0.2% | End game · avg 90 |
+| Amirdrassil, the Dream's Hope | 4 | 0.2% | End game · avg 90 |
+| Dalaran | 4 | 0.2% | End game · avg 85 |
+| Founder's Point | 4 | 0.2% | End game · avg 90 |
+| Icecrown Citadel | 4 | 0.2% | End game · avg 88 |
+| Isle of Dorn | 4 | 0.2% | End game · avg 82 |
+| Ritual Site | 4 | 0.2% | End game · avg 90 |
+| The Tidebound Grotto | 4 | 0.2% | End game · avg 90 |
+| Torghast, Tower of the Damned | 4 | 0.2% | End game · avg 83 |
+| Uldaman | 4 | 0.2% | Leveling · avg 68 |
+| Vol'dun | 4 | 0.2% | End game · avg 90 |
+| Bastion | 3 | 0.1% | Leveling · avg 60 |
 
 ## Play-style mix
 
@@ -1169,15 +1169,15 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-57%
+59%
 
 LEVELING
 
-11%
+8%
 
 CAPITAL
 
-32%
+33%
 
 STARTING
 
@@ -1185,11 +1185,11 @@ STARTING
 
 ## How to read this
 
-**Strongest cluster**Silvermoon City contains 27.9% of characters in this selection.
+**Strongest cluster**Silvermoon City contains 29.1% of characters in this selection.
 
-**Top-five concentration**51% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**52% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**32% were last recorded in recognized capitals.
+**Capital footprint**33% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
@@ -1199,133 +1199,157 @@ Locations: 0 (with recent sightings)
 
 Top 5 share: 0% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 No location data is available for this selection yet.
 
-Characters: 1,101 (unique, last 30 days)
+Characters: 2,009 (unique, last 30 days)
 
-Locations: 122 (with recent sightings)
+Locations: 163 (with recent sightings)
 
-Top 5 share: 51% (location concentration)
+Top 5 share: 52% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 SILVERMOON CITY
 
-307
-
-EVERSONG WOODS
-
-92
+585
 
 THE VENOMOUS ABYSS
 
-88
+159
+
+EVERSONG WOODS
+
+136
 
 DELVES
 
-40
-
-ORGRIMMAR
-
-34
-
-ZUL'AMAN
-
-33
+89
 
 THE COILED ISLE
 
-32
+71
+
+ZUL'AMAN
+
+58
 
 VAULTS OF ATAL'UTEK
 
-27
+57
 
-SLAYER'S RISE
+ORGRIMMAR
 
-26
-
-RUBY LIFE POOLS
-
-25
-
-ALTAR OF FANGS
-
-24
+55
 
 MURDER ROW
 
-21
+53
 
-TEMPLE OF SETHRALISS
+ALTAR OF FANGS
 
-19
-
-VOIDSTORM
-
-19
-
-KINGS' REST
-
-18
-
-↓ See more↑ See less
+41
 
 THE BLINDING VALE
 
-16
+40
 
-DEN OF NALORAKK
+KINGS' REST
 
-15
-
-HARANDAR
-
-15
+37
 
 VOIDSCAR ARENA
 
-15
+37
 
-OHN'AHRAN PLAINS
+RUBY LIFE POOLS
 
-12
+36
+
+HARANDAR
+
+34
+
+↓ See more↑ See less
+
+VOIDSTORM
+
+34
+
+SLAYER'S RISE
+
+30
+
+TEMPLE OF SETHRALISS
+
+29
+
+DEN OF NALORAKK
+
+27
+
+DORNOGAL
+
+27
+
+ISLE OF QUEL'DANAS
+
+17
 
 THE WAKING SHORES
 
+16
+
+OHN'AHRAN PLAINS
+
+15
+
+GARRISON
+
 12
+
+RAZORWIND SHORES
+
+11
+
+ARCANTINA
+
+10
+
+THE AZURE SPAN
+
+10
 
 ZULDAZAR
 
 10
 
-DORNOGAL
+DUROTAR
 
 9
 
-THE AZURE SPAN
+ARATHI HIGHLANDS
 
-9
+7
 
-ISLE OF QUEL'DANAS
+BLACKROCK DEPTHS
 
-8
+7
 
-GARRISON
+HOME INTERIOR
+
+7
+
+ARDENWEALD
 
 6
 
-RAZORWIND SHORES
+VAL
 
 6
-
-ARCANTINA
-
-5
 
 AZJ-KAHET
 
@@ -1335,140 +1359,116 @@ BRACKENHIDE HOLLOW
 
 5
 
-HOME INTERIOR
+MAISARA CAVERNS
 
 5
 
-ARATHI HIGHLANDS
-
-4
-
-DUROTAR
-
-4
-
-MAISARA CAVERNS
-
-4
-
-BLACKROCK DEPTHS
-
-3
-
-BURNING STEPPES
-
-3
-
-DARKFLAME CLEFT
-
-3
-
-MAGISTERS' TERRACE
-
-3
-
-MOLTEN CORE
-
-3
-
-NEXUS-POINT XENAS
-
-3
-
 THALDRASZUS
 
-3
+5
 
 UNDERMINE
 
-3
-
-VAL
-
-3
+5
 
 AMIRDRASSIL, THE DREAM'S HOPE
 
-2
-
-ARDENWEALD
-
-2
-
-BOREAN TUNDRA
-
-2
-
-COURT OF STARS
-
-2
-
-CRYSTALSONG FOREST
-
-2
+4
 
 DALARAN
 
-2
+4
 
-FELWOOD
+FOUNDER'S POINT
 
-2
+4
+
+ICECROWN CITADEL
+
+4
+
+ISLE OF DORN
+
+4
+
+RITUAL SITE
+
+4
+
+THE TIDEBOUND GROTTO
+
+4
+
+TORGHAST, TOWER OF THE DAMNED
+
+4
+
+ULDAMAN
+
+4
+
+VOL'DUN
+
+4
+
+BASTION
+
+3
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Silvermoon City | 307 | 27.9% | Capital · avg 89 |
-| Eversong Woods | 92 | 8.4% | End game · avg 88 |
-| The Venomous Abyss | 88 | 8.0% | End game · avg 90 |
-| Delves | 40 | 3.6% | End game · avg 89 |
-| Orgrimmar | 34 | 3.1% | Capital · avg 71 |
-| Zul'Aman | 33 | 3.0% | End game · avg 89 |
-| The Coiled Isle | 32 | 2.9% | End game · avg 90 |
-| Vaults of Atal'Utek | 27 | 2.5% | End game · avg 90 |
-| Slayer's Rise | 26 | 2.4% | End game · avg 90 |
-| Ruby Life Pools | 25 | 2.3% | End game · avg 88 |
-| Altar of Fangs | 24 | 2.2% | End game · avg 89 |
-| Murder Row | 21 | 1.9% | End game · avg 90 |
-| Temple of Sethraliss | 19 | 1.7% | End game · avg 90 |
-| Voidstorm | 19 | 1.7% | End game · avg 88 |
-| Kings' Rest | 18 | 1.6% | End game · avg 90 |
-| The Blinding Vale | 16 | 1.5% | End game · avg 89 |
-| Den of Nalorakk | 15 | 1.4% | End game · avg 90 |
-| Harandar | 15 | 1.4% | End game · avg 90 |
-| Voidscar Arena | 15 | 1.4% | End game · avg 90 |
-| Ohn'ahran Plains | 12 | 1.1% | Leveling · avg 45 |
-| The Waking Shores | 12 | 1.1% | Leveling · avg 55 |
-| Zuldazar | 10 | 0.9% | Leveling · avg 75 |
-| Dornogal | 9 | 0.8% | Capital · avg 83 |
-| The Azure Span | 9 | 0.8% | Leveling · avg 73 |
-| Isle of Quel'Danas | 8 | 0.7% | End game · avg 87 |
-| Garrison | 6 | 0.5% | Leveling · avg 66 |
-| Razorwind Shores | 6 | 0.5% | End game · avg 87 |
-| Arcantina | 5 | 0.5% | End game · avg 90 |
-| Azj-Kahet | 5 | 0.5% | End game · avg 81 |
-| Brackenhide Hollow | 5 | 0.5% | Leveling · avg 35 |
-| Home Interior | 5 | 0.5% | End game · avg 84 |
-| Arathi Highlands | 4 | 0.4% | Leveling · avg 74 |
-| Durotar | 4 | 0.4% | Leveling · avg 78 |
-| Maisara Caverns | 4 | 0.4% | End game · avg 87 |
-| Blackrock Depths | 3 | 0.3% | End game · avg 82 |
-| Burning Steppes | 3 | 0.3% | Leveling · avg 71 |
-| Darkflame Cleft | 3 | 0.3% | Leveling · avg 76 |
-| Magisters' Terrace | 3 | 0.3% | Leveling · avg 71 |
-| Molten Core | 3 | 0.3% | Leveling · avg 70 |
-| Nexus-Point Xenas | 3 | 0.3% | End game · avg 86 |
-| Thaldraszus | 3 | 0.3% | Leveling · avg 74 |
-| Undermine | 3 | 0.3% | End game · avg 90 |
-| Val | 3 | 0.3% | End game · avg 90 |
-| Amirdrassil, the Dream's Hope | 2 | 0.2% | End game · avg 90 |
-| Ardenweald | 2 | 0.2% | End game · avg 86 |
-| Borean Tundra | 2 | 0.2% | Leveling · avg 22 |
-| Court of Stars | 2 | 0.2% | End game · avg 80 |
-| Crystalsong Forest | 2 | 0.2% | Leveling · avg 55 |
-| Dalaran | 2 | 0.2% | End game · avg 85 |
-| Felwood | 2 | 0.2% | Leveling · avg 50 |
+| Silvermoon City | 585 | 29.1% | Capital · avg 89 |
+| The Venomous Abyss | 159 | 7.9% | End game · avg 90 |
+| Eversong Woods | 136 | 6.8% | End game · avg 88 |
+| Delves | 89 | 4.4% | End game · avg 89 |
+| The Coiled Isle | 71 | 3.5% | End game · avg 90 |
+| Zul'Aman | 58 | 2.9% | End game · avg 89 |
+| Vaults of Atal'Utek | 57 | 2.8% | End game · avg 90 |
+| Orgrimmar | 55 | 2.7% | Capital · avg 72 |
+| Murder Row | 53 | 2.6% | End game · avg 90 |
+| Altar of Fangs | 41 | 2.0% | End game · avg 89 |
+| The Blinding Vale | 40 | 2.0% | End game · avg 90 |
+| Kings' Rest | 37 | 1.8% | End game · avg 90 |
+| Voidscar Arena | 37 | 1.8% | End game · avg 90 |
+| Ruby Life Pools | 36 | 1.8% | End game · avg 89 |
+| Harandar | 34 | 1.7% | End game · avg 89 |
+| Voidstorm | 34 | 1.7% | End game · avg 89 |
+| Slayer's Rise | 30 | 1.5% | End game · avg 89 |
+| Temple of Sethraliss | 29 | 1.4% | End game · avg 90 |
+| Den of Nalorakk | 27 | 1.3% | End game · avg 90 |
+| Dornogal | 27 | 1.3% | Capital · avg 85 |
+| Isle of Quel'Danas | 17 | 0.8% | End game · avg 86 |
+| The Waking Shores | 16 | 0.8% | Leveling · avg 52 |
+| Ohn'ahran Plains | 15 | 0.7% | Leveling · avg 54 |
+| Garrison | 12 | 0.6% | Leveling · avg 70 |
+| Razorwind Shores | 11 | 0.5% | End game · avg 88 |
+| Arcantina | 10 | 0.5% | End game · avg 90 |
+| The Azure Span | 10 | 0.5% | Leveling · avg 69 |
+| Zuldazar | 10 | 0.5% | Leveling · avg 68 |
+| Durotar | 9 | 0.4% | End game · avg 81 |
+| Arathi Highlands | 7 | 0.3% | Leveling · avg 76 |
+| Blackrock Depths | 7 | 0.3% | End game · avg 87 |
+| Home Interior | 7 | 0.3% | End game · avg 86 |
+| Ardenweald | 6 | 0.3% | End game · avg 85 |
+| Val | 6 | 0.3% | End game · avg 90 |
+| Azj-Kahet | 5 | 0.2% | End game · avg 83 |
+| Brackenhide Hollow | 5 | 0.2% | Leveling · avg 35 |
+| Maisara Caverns | 5 | 0.2% | End game · avg 87 |
+| Thaldraszus | 5 | 0.2% | Leveling · avg 66 |
+| Undermine | 5 | 0.2% | End game · avg 90 |
+| Amirdrassil, the Dream's Hope | 4 | 0.2% | End game · avg 90 |
+| Dalaran | 4 | 0.2% | End game · avg 85 |
+| Founder's Point | 4 | 0.2% | End game · avg 90 |
+| Icecrown Citadel | 4 | 0.2% | End game · avg 88 |
+| Isle of Dorn | 4 | 0.2% | End game · avg 82 |
+| Ritual Site | 4 | 0.2% | End game · avg 90 |
+| The Tidebound Grotto | 4 | 0.2% | End game · avg 90 |
+| Torghast, Tower of the Damned | 4 | 0.2% | End game · avg 83 |
+| Uldaman | 4 | 0.2% | Leveling · avg 68 |
+| Vol'dun | 4 | 0.2% | End game · avg 90 |
+| Bastion | 3 | 0.1% | Leveling · avg 60 |
 
 ## Play-style mix
 
@@ -1476,15 +1476,15 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-57%
+59%
 
 LEVELING
 
-11%
+8%
 
 CAPITAL
 
-32%
+33%
 
 STARTING
 
@@ -1492,11 +1492,11 @@ STARTING
 
 ## How to read this
 
-**Strongest cluster**Silvermoon City contains 27.9% of characters in this selection.
+**Strongest cluster**Silvermoon City contains 29.1% of characters in this selection.
 
-**Top-five concentration**51% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**52% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**32% were last recorded in recognized capitals.
+**Capital footprint**33% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
@@ -1506,7 +1506,7 @@ Locations: 121 (with recent sightings)
 
 Top 5 share: 60% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -1803,7 +1803,7 @@ Locations: 78 (with recent sightings)
 
 Top 5 share: 63% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -2100,7 +2100,7 @@ Locations: 79 (with recent sightings)
 
 Top 5 share: 54% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -2391,135 +2391,143 @@ STARTING
 
 **Level context**Average level adds context for each location.
 
-Characters: 2,897 (unique, last 30 days)
+Characters: 3,632 (unique, last 30 days)
 
-Locations: 219 (with recent sightings)
+Locations: 232 (with recent sightings)
 
-Top 5 share: 49% (location concentration)
+Top 5 share: 48% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
 SILVERMOON CITY
 
-523
+759
 
 THE VENOMOUS ABYSS
 
-436
+458
 
 EVERSONG WOODS
 
-180
+214
 
 HARANDAR
 
-143
-
-ZUL'AMAN
-
-132
-
-STORMWIND CITY
-
-128
+169
 
 DELVES
 
-103
+158
+
+ZUL'AMAN
+
+151
+
+STORMWIND CITY
+
+146
 
 VOIDSTORM
 
-83
+102
 
 MURDER ROW
 
-57
+79
 
 VAULTS OF ATAL'UTEK
 
-57
-
-ALTAR OF FANGS
-
-51
+77
 
 THE COILED ISLE
 
-49
+72
 
-DORNOGAL
+ALTAR OF FANGS
 
-46
+62
 
 DEN OF NALORAKK
 
-45
+52
 
-ISLE OF QUEL'DANAS
+VOIDSCAR ARENA
 
-36
+52
+
+DORNOGAL
+
+50
 
 ↓ See more↑ See less
 
 KINGS' REST
 
-36
-
-VOIDSCAR ARENA
-
-36
+44
 
 RUBY LIFE POOLS
 
-31
+40
+
+ISLE OF QUEL'DANAS
+
+39
 
 TEMPLE OF SETHRALISS
 
-28
-
-HOME INTERIOR
-
-23
+38
 
 THE BLINDING VALE
 
-23
+34
 
-VALDRAKKEN
+HOME INTERIOR
 
-23
-
-DUN MOROGH
-
-22
-
-SLAYER'S RISE
-
-22
+32
 
 THE WAKING SHORES
 
-22
+30
+
+SLAYER'S RISE
+
+29
+
+DUN MOROGH
+
+26
+
+VALDRAKKEN
+
+26
 
 FOUNDER'S POINT
 
-17
-
-ARATHI HIGHLANDS
-
-15
-
-MAISARA CAVERNS
-
-15
+25
 
 OHN'AHRAN PLAINS
 
-15
+24
+
+ARATHI HIGHLANDS
+
+18
+
+MAISARA CAVERNS
+
+16
+
+THE AZURE SPAN
+
+16
 
 DALARAN
+
+15
+
+THE TIDEBOUND GROTTO
 
 13
 
@@ -2527,39 +2535,43 @@ WINDRUNNER SPIRE
 
 13
 
+BLACKROCK DEPTHS
+
+12
+
+GARRISON
+
+11
+
+MAGISTERS' TERRACE
+
+11
+
 ORGRIMMAR
 
 11
 
-BLACKROCK DEPTHS
-
-10
-
-GARRISON
-
-10
-
-MAGISTERS' TERRACE
-
-10
-
-THE AZURE SPAN
-
-10
-
-THE TIDEBOUND GROTTO
+ELWYNN FOREST
 
 10
 
 ISLE OF DORN
 
-9
+10
 
 THALDRASZUS
 
+10
+
+IRONFORGE
+
 9
 
-ELWYNN FOREST
+ARCANTINA
+
+8
+
+AZSUNA
 
 8
 
@@ -2567,96 +2579,84 @@ ICECROWN CITADEL
 
 8
 
-IRONFORGE
+MALDRAXXUS
 
-7
+8
 
 NETHERSTORM
 
-7
+8
 
 THE ROOKERY
 
-7
+8
 
-AZSUNA
-
-6
-
-STORMHEIM
-
-6
-
-VAL'SHARAH
+ABERRUS, THE SHADOWED CRUCIBLE
 
 6
 
 ARDENWEALD
 
-5
-
-DUROTAR
-
-5
+6
 
 EASTERN PLAGUELANDS
 
-5
+6
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Silvermoon City | 523 | 18.1% | Capital · avg 88 |
-| The Venomous Abyss | 436 | 15.1% | End game · avg 90 |
-| Eversong Woods | 180 | 6.2% | End game · avg 86 |
-| Harandar | 143 | 4.9% | End game · avg 89 |
-| Zul'Aman | 132 | 4.6% | End game · avg 88 |
-| Stormwind City | 128 | 4.4% | Capital · avg 70 |
-| Delves | 103 | 3.6% | End game · avg 87 |
-| Voidstorm | 83 | 2.9% | End game · avg 88 |
-| Murder Row | 57 | 2.0% | End game · avg 88 |
-| Vaults of Atal'Utek | 57 | 2.0% | End game · avg 89 |
-| Altar of Fangs | 51 | 1.8% | End game · avg 89 |
-| The Coiled Isle | 49 | 1.7% | End game · avg 90 |
-| Dornogal | 46 | 1.6% | Capital · avg 84 |
-| Den of Nalorakk | 45 | 1.6% | End game · avg 88 |
-| Isle of Quel'Danas | 36 | 1.2% | End game · avg 84 |
-| Kings' Rest | 36 | 1.2% | End game · avg 90 |
-| Voidscar Arena | 36 | 1.2% | End game · avg 89 |
-| Ruby Life Pools | 31 | 1.1% | End game · avg 85 |
-| Temple of Sethraliss | 28 | 1.0% | End game · avg 90 |
-| Home Interior | 23 | 0.8% | Leveling · avg 76 |
-| The Blinding Vale | 23 | 0.8% | End game · avg 88 |
-| Valdrakken | 23 | 0.8% | Leveling · avg 68 |
-| Dun Morogh | 22 | 0.8% | Leveling · avg 75 |
-| Slayer's Rise | 22 | 0.8% | End game · avg 89 |
-| The Waking Shores | 22 | 0.8% | Leveling · avg 37 |
-| Founder's Point | 17 | 0.6% | End game · avg 85 |
-| Arathi Highlands | 15 | 0.5% | End game · avg 81 |
-| Maisara Caverns | 15 | 0.5% | End game · avg 84 |
-| Ohn'ahran Plains | 15 | 0.5% | Leveling · avg 49 |
-| Dalaran | 13 | 0.4% | End game · avg 81 |
+| Silvermoon City | 759 | 20.9% | Capital · avg 88 |
+| The Venomous Abyss | 458 | 12.6% | End game · avg 90 |
+| Eversong Woods | 214 | 5.9% | End game · avg 86 |
+| Harandar | 169 | 4.7% | End game · avg 89 |
+| Delves | 158 | 4.4% | End game · avg 88 |
+| Zul'Aman | 151 | 4.2% | End game · avg 88 |
+| Stormwind City | 146 | 4.0% | Capital · avg 70 |
+| Voidstorm | 102 | 2.8% | End game · avg 88 |
+| Murder Row | 79 | 2.2% | End game · avg 89 |
+| Vaults of Atal'Utek | 77 | 2.1% | End game · avg 89 |
+| The Coiled Isle | 72 | 2.0% | End game · avg 90 |
+| Altar of Fangs | 62 | 1.7% | End game · avg 89 |
+| Den of Nalorakk | 52 | 1.4% | End game · avg 88 |
+| Voidscar Arena | 52 | 1.4% | End game · avg 90 |
+| Dornogal | 50 | 1.4% | Capital · avg 83 |
+| Kings' Rest | 44 | 1.2% | End game · avg 90 |
+| Ruby Life Pools | 40 | 1.1% | End game · avg 88 |
+| Isle of Quel'Danas | 39 | 1.1% | End game · avg 84 |
+| Temple of Sethraliss | 38 | 1.0% | End game · avg 90 |
+| The Blinding Vale | 34 | 0.9% | End game · avg 89 |
+| Home Interior | 32 | 0.9% | End game · avg 80 |
+| The Waking Shores | 30 | 0.8% | Leveling · avg 47 |
+| Slayer's Rise | 29 | 0.8% | End game · avg 89 |
+| Dun Morogh | 26 | 0.7% | Leveling · avg 77 |
+| Valdrakken | 26 | 0.7% | Leveling · avg 69 |
+| Founder's Point | 25 | 0.7% | End game · avg 85 |
+| Ohn'ahran Plains | 24 | 0.7% | Leveling · avg 54 |
+| Arathi Highlands | 18 | 0.5% | End game · avg 80 |
+| Maisara Caverns | 16 | 0.4% | End game · avg 84 |
+| The Azure Span | 16 | 0.4% | Leveling · avg 61 |
+| Dalaran | 15 | 0.4% | End game · avg 81 |
+| The Tidebound Grotto | 13 | 0.4% | End game · avg 90 |
 | Windrunner Spire | 13 | 0.4% | End game · avg 85 |
-| Orgrimmar | 11 | 0.4% | Capital · avg 70 |
-| Blackrock Depths | 10 | 0.3% | Leveling · avg 77 |
-| Garrison | 10 | 0.3% | Leveling · avg 65 |
-| Magisters' Terrace | 10 | 0.3% | End game · avg 86 |
-| The Azure Span | 10 | 0.3% | Leveling · avg 62 |
-| The Tidebound Grotto | 10 | 0.3% | End game · avg 90 |
-| Isle of Dorn | 9 | 0.3% | End game · avg 81 |
-| Thaldraszus | 9 | 0.3% | Leveling · avg 61 |
-| Elwynn Forest | 8 | 0.3% | Leveling · avg 69 |
-| Icecrown Citadel | 8 | 0.3% | Leveling · avg 61 |
-| Ironforge | 7 | 0.2% | Capital · avg 65 |
-| Netherstorm | 7 | 0.2% | Leveling · avg 66 |
-| The Rookery | 7 | 0.2% | Leveling · avg 76 |
-| Azsuna | 6 | 0.2% | Leveling · avg 51 |
-| Stormheim | 6 | 0.2% | Leveling · avg 60 |
-| Val'sharah | 6 | 0.2% | Leveling · avg 60 |
-| Ardenweald | 5 | 0.2% | End game · avg 80 |
-| Durotar | 5 | 0.2% | End game · avg 87 |
-| Eastern Plaguelands | 5 | 0.2% | End game · avg 85 |
+| Blackrock Depths | 12 | 0.3% | Leveling · avg 78 |
+| Garrison | 11 | 0.3% | Leveling · avg 68 |
+| Magisters' Terrace | 11 | 0.3% | End game · avg 85 |
+| Orgrimmar | 11 | 0.3% | Capital · avg 70 |
+| Elwynn Forest | 10 | 0.3% | Leveling · avg 65 |
+| Isle of Dorn | 10 | 0.3% | End game · avg 80 |
+| Thaldraszus | 10 | 0.3% | Leveling · avg 63 |
+| Ironforge | 9 | 0.2% | Capital · avg 69 |
+| Arcantina | 8 | 0.2% | End game · avg 90 |
+| Azsuna | 8 | 0.2% | Leveling · avg 59 |
+| Icecrown Citadel | 8 | 0.2% | Leveling · avg 61 |
+| Maldraxxus | 8 | 0.2% | Leveling · avg 71 |
+| Netherstorm | 8 | 0.2% | Leveling · avg 67 |
+| The Rookery | 8 | 0.2% | Leveling · avg 76 |
+| Aberrus, the Shadowed Crucible | 6 | 0.2% | End game · avg 88 |
+| Ardenweald | 6 | 0.2% | End game · avg 82 |
+| Eastern Plaguelands | 6 | 0.2% | Leveling · avg 77 |
 
 ## Play-style mix
 
@@ -2664,15 +2664,15 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-63%
+62%
 
 LEVELING
 
-12%
+11%
 
 CAPITAL
 
-25%
+27%
 
 STARTING
 
@@ -2680,139 +2680,147 @@ STARTING
 
 ## How to read this
 
-**Strongest cluster**Silvermoon City contains 18.1% of characters in this selection.
+**Strongest cluster**Silvermoon City contains 20.9% of characters in this selection.
 
-**Top-five concentration**49% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**48% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**25% were last recorded in recognized capitals.
+**Capital footprint**27% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
-Characters: 2,497 (unique, last 30 days)
+Characters: 3,232 (unique, last 30 days)
 
-Locations: 202 (with recent sightings)
+Locations: 217 (with recent sightings)
 
 Top 5 share: 49% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
-THE VENOMOUS ABYSS
-
-416
-
 SILVERMOON CITY
 
-394
+630
+
+THE VENOMOUS ABYSS
+
+438
 
 EVERSONG WOODS
 
-164
+198
 
 HARANDAR
 
-134
+160
 
 STORMWIND CITY
 
-128
-
-ZUL'AMAN
-
-117
+146
 
 DELVES
 
-84
+139
+
+ZUL'AMAN
+
+136
 
 VOIDSTORM
 
-71
-
-VAULTS OF ATAL'UTEK
-
-47
-
-DORNOGAL
-
-45
+90
 
 MURDER ROW
 
-45
+67
 
-ALTAR OF FANGS
+VAULTS OF ATAL'UTEK
 
-43
+67
 
 THE COILED ISLE
 
-40
+63
 
-DEN OF NALORAKK
+ALTAR OF FANGS
 
-36
+54
 
-ISLE OF QUEL'DANAS
+DORNOGAL
 
-34
-
-↓ See more↑ See less
+49
 
 VOIDSCAR ARENA
 
-28
+44
+
+DEN OF NALORAKK
+
+43
+
+↓ See more↑ See less
+
+ISLE OF QUEL'DANAS
+
+37
 
 KINGS' REST
 
-26
+34
 
 RUBY LIFE POOLS
 
-23
-
-DUN MOROGH
-
-22
-
-VALDRAKKEN
-
-21
+32
 
 TEMPLE OF SETHRALISS
 
-20
-
-SLAYER'S RISE
-
-19
+30
 
 THE BLINDING VALE
 
-18
+29
 
-THE WAKING SHORES
+DUN MOROGH
 
-18
+26
 
 HOME INTERIOR
 
-17
+26
+
+SLAYER'S RISE
+
+26
+
+THE WAKING SHORES
+
+26
 
 FOUNDER'S POINT
 
-16
-
-MAISARA CAVERNS
-
-15
+24
 
 OHN'AHRAN PLAINS
 
-15
+24
+
+VALDRAKKEN
+
+24
 
 ARATHI HIGHLANDS
+
+17
+
+MAISARA CAVERNS
+
+16
+
+THE AZURE SPAN
+
+15
+
+DALARAN
 
 14
 
@@ -2820,31 +2828,39 @@ WINDRUNNER SPIRE
 
 13
 
-DALARAN
+THE TIDEBOUND GROTTO
 
 12
 
 BLACKROCK DEPTHS
 
-9
+11
+
+ELWYNN FOREST
+
+10
 
 ISLE OF DORN
 
-9
+10
 
 THALDRASZUS
 
-9
+10
 
-THE AZURE SPAN
-
-9
-
-THE TIDEBOUND GROTTO
+IRONFORGE
 
 9
 
-ELWYNN FOREST
+MAGISTERS' TERRACE
+
+9
+
+ARCANTINA
+
+8
+
+GARRISON
 
 8
 
@@ -2852,19 +2868,31 @@ ICECROWN CITADEL
 
 8
 
-MAGISTERS' TERRACE
-
-8
-
-GARRISON
+AZSUNA
 
 7
 
-IRONFORGE
+MALDRAXXUS
 
 7
 
 NETHERSTORM
+
+7
+
+THE ROOKERY
+
+7
+
+ABERRUS, THE SHADOWED CRUCIBLE
+
+6
+
+EASTERN PLAGUELANDS
+
+6
+
+HALLOWFALL
 
 6
 
@@ -2872,88 +2900,60 @@ STORMHEIM
 
 6
 
-THE ROOKERY
-
-6
-
-AZSUNA
-
-5
-
-EASTERN PLAGUELANDS
-
-5
-
-VAL'SHARAH
-
-5
-
-WETLANDS
-
-5
-
-ABERRUS, THE SHADOWED CRUCIBLE
-
-4
-
-ARCANTINA
-
-4
-
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| The Venomous Abyss | 416 | 16.7% | End game · avg 90 |
-| Silvermoon City | 394 | 15.8% | Capital · avg 88 |
-| Eversong Woods | 164 | 6.6% | End game · avg 86 |
-| Harandar | 134 | 5.4% | End game · avg 89 |
-| Stormwind City | 128 | 5.1% | Capital · avg 70 |
-| Zul'Aman | 117 | 4.7% | End game · avg 88 |
-| Delves | 84 | 3.4% | End game · avg 87 |
-| Voidstorm | 71 | 2.8% | End game · avg 88 |
-| Vaults of Atal'Utek | 47 | 1.9% | End game · avg 89 |
-| Dornogal | 45 | 1.8% | Capital · avg 84 |
-| Murder Row | 45 | 1.8% | End game · avg 88 |
-| Altar of Fangs | 43 | 1.7% | End game · avg 89 |
-| The Coiled Isle | 40 | 1.6% | End game · avg 90 |
-| Den of Nalorakk | 36 | 1.4% | End game · avg 88 |
-| Isle of Quel'Danas | 34 | 1.4% | End game · avg 84 |
-| Voidscar Arena | 28 | 1.1% | End game · avg 89 |
-| Kings' Rest | 26 | 1.0% | End game · avg 90 |
-| Ruby Life Pools | 23 | 0.9% | End game · avg 83 |
-| Dun Morogh | 22 | 0.9% | Leveling · avg 75 |
-| Valdrakken | 21 | 0.8% | Leveling · avg 66 |
-| Temple of Sethraliss | 20 | 0.8% | End game · avg 90 |
-| Slayer's Rise | 19 | 0.8% | End game · avg 89 |
-| The Blinding Vale | 18 | 0.7% | End game · avg 88 |
-| The Waking Shores | 18 | 0.7% | Leveling · avg 39 |
-| Home Interior | 17 | 0.7% | Leveling · avg 75 |
-| Founder's Point | 16 | 0.6% | End game · avg 85 |
-| Maisara Caverns | 15 | 0.6% | End game · avg 84 |
-| Ohn'ahran Plains | 15 | 0.6% | Leveling · avg 49 |
-| Arathi Highlands | 14 | 0.6% | End game · avg 81 |
-| Windrunner Spire | 13 | 0.5% | End game · avg 85 |
-| Dalaran | 12 | 0.5% | End game · avg 80 |
-| Blackrock Depths | 9 | 0.4% | Leveling · avg 77 |
-| Isle of Dorn | 9 | 0.4% | End game · avg 81 |
-| Thaldraszus | 9 | 0.4% | Leveling · avg 61 |
-| The Azure Span | 9 | 0.4% | Leveling · avg 59 |
-| The Tidebound Grotto | 9 | 0.4% | End game · avg 90 |
-| Elwynn Forest | 8 | 0.3% | Leveling · avg 69 |
-| Icecrown Citadel | 8 | 0.3% | Leveling · avg 61 |
-| Magisters' Terrace | 8 | 0.3% | End game · avg 86 |
-| Garrison | 7 | 0.3% | Leveling · avg 69 |
-| Ironforge | 7 | 0.3% | Capital · avg 65 |
-| Netherstorm | 6 | 0.2% | Leveling · avg 62 |
+| Silvermoon City | 630 | 19.5% | Capital · avg 88 |
+| The Venomous Abyss | 438 | 13.6% | End game · avg 90 |
+| Eversong Woods | 198 | 6.1% | End game · avg 86 |
+| Harandar | 160 | 5.0% | End game · avg 89 |
+| Stormwind City | 146 | 4.5% | Capital · avg 70 |
+| Delves | 139 | 4.3% | End game · avg 88 |
+| Zul'Aman | 136 | 4.2% | End game · avg 88 |
+| Voidstorm | 90 | 2.8% | End game · avg 88 |
+| Murder Row | 67 | 2.1% | End game · avg 89 |
+| Vaults of Atal'Utek | 67 | 2.1% | End game · avg 89 |
+| The Coiled Isle | 63 | 1.9% | End game · avg 90 |
+| Altar of Fangs | 54 | 1.7% | End game · avg 89 |
+| Dornogal | 49 | 1.5% | Capital · avg 83 |
+| Voidscar Arena | 44 | 1.4% | End game · avg 90 |
+| Den of Nalorakk | 43 | 1.3% | End game · avg 88 |
+| Isle of Quel'Danas | 37 | 1.1% | End game · avg 84 |
+| Kings' Rest | 34 | 1.1% | End game · avg 90 |
+| Ruby Life Pools | 32 | 1.0% | End game · avg 87 |
+| Temple of Sethraliss | 30 | 0.9% | End game · avg 90 |
+| The Blinding Vale | 29 | 0.9% | End game · avg 89 |
+| Dun Morogh | 26 | 0.8% | Leveling · avg 77 |
+| Home Interior | 26 | 0.8% | End game · avg 81 |
+| Slayer's Rise | 26 | 0.8% | End game · avg 89 |
+| The Waking Shores | 26 | 0.8% | Leveling · avg 50 |
+| Founder's Point | 24 | 0.7% | End game · avg 85 |
+| Ohn'ahran Plains | 24 | 0.7% | Leveling · avg 54 |
+| Valdrakken | 24 | 0.7% | Leveling · avg 67 |
+| Arathi Highlands | 17 | 0.5% | End game · avg 80 |
+| Maisara Caverns | 16 | 0.5% | End game · avg 84 |
+| The Azure Span | 15 | 0.5% | Leveling · avg 59 |
+| Dalaran | 14 | 0.4% | End game · avg 80 |
+| Windrunner Spire | 13 | 0.4% | End game · avg 85 |
+| The Tidebound Grotto | 12 | 0.4% | End game · avg 90 |
+| Blackrock Depths | 11 | 0.3% | Leveling · avg 78 |
+| Elwynn Forest | 10 | 0.3% | Leveling · avg 65 |
+| Isle of Dorn | 10 | 0.3% | End game · avg 80 |
+| Thaldraszus | 10 | 0.3% | Leveling · avg 63 |
+| Ironforge | 9 | 0.3% | Capital · avg 69 |
+| Magisters' Terrace | 9 | 0.3% | End game · avg 85 |
+| Arcantina | 8 | 0.2% | End game · avg 90 |
+| Garrison | 8 | 0.2% | Leveling · avg 72 |
+| Icecrown Citadel | 8 | 0.2% | Leveling · avg 61 |
+| Azsuna | 7 | 0.2% | Leveling · avg 55 |
+| Maldraxxus | 7 | 0.2% | Leveling · avg 73 |
+| Netherstorm | 7 | 0.2% | Leveling · avg 64 |
+| The Rookery | 7 | 0.2% | Leveling · avg 75 |
+| Aberrus, the Shadowed Crucible | 6 | 0.2% | End game · avg 88 |
+| Eastern Plaguelands | 6 | 0.2% | Leveling · avg 77 |
+| Hallowfall | 6 | 0.2% | Leveling · avg 77 |
 | Stormheim | 6 | 0.2% | Leveling · avg 60 |
-| The Rookery | 6 | 0.2% | Leveling · avg 75 |
-| Azsuna | 5 | 0.2% | Leveling · avg 44 |
-| Eastern Plaguelands | 5 | 0.2% | End game · avg 85 |
-| Val'sharah | 5 | 0.2% | Leveling · avg 56 |
-| Wetlands | 5 | 0.2% | Leveling · avg 42 |
-| Aberrus, the Shadowed Crucible | 4 | 0.2% | End game · avg 88 |
-| Arcantina | 4 | 0.2% | End game · avg 90 |
 
 ## Play-style mix
 
@@ -2961,7 +2961,7 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-65%
+62%
 
 LEVELING
 
@@ -2969,7 +2969,7 @@ LEVELING
 
 CAPITAL
 
-23%
+26%
 
 STARTING
 
@@ -2977,11 +2977,11 @@ STARTING
 
 ## How to read this
 
-**Strongest cluster**The Venomous Abyss contains 16.7% of characters in this selection.
+**Strongest cluster**Silvermoon City contains 19.5% of characters in this selection.
 
 **Top-five concentration**49% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**23% were last recorded in recognized capitals.
+**Capital footprint**26% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
@@ -2991,7 +2991,7 @@ Locations: 73 (with recent sightings)
 
 Top 5 share: 50% (location concentration)
 
-Updated: 2026-10-01 (last population sample)
+Updated: 2026-10-02 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -3282,4 +3282,4 @@ STARTING
 
 **Level context**Average level adds context for each location.
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 17:42Z

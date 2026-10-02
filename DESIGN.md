@@ -112,10 +112,11 @@ identical across editions: adding a page or game means adding it everywhere.
   stale hash.
 - Pages are static: no runtime fetches. View toggles show/hide pre-rendered
   panes and mirror state in the URL query.
-- The default view is always in the HTML. Scripts may re-render on
-  interaction, never on load: content injected after first paint is a layout
-  shift. Share one pure render function between the build and the page script
-  (the talents page embeds `talentMarkup` via its source text).
+- Every view is in the HTML; scripts only show and hide panes, never build
+  content, and pages embed no data payloads. Long tables show 25 rows and fold
+  the rest into a `<details>` "Show all" expander, which needs no script. The
+  talents page renders an all-classes pane (each class's top 10 talents) plus
+  one full pane per class.
 
 ## Regression testing
 
@@ -131,7 +132,7 @@ current hashed stylesheet, font preloads), the anatomy from section 5 with one
 current game and one current page; every referenced `/fonts/` file exists; no
 external font hosts; every font face is `optional` (inline faces also woff2) and
 prose pages preload Friz Quadrata; no per-cell font-size overrides in talent
-tables; the talents page ships its filters and default view pre-rendered.
+tables; the talents page ships every class view as HTML with no data payload.
 
 Manual, before deploying a visual change: open one page of each type (census,
 combos, auction house, guilds, geography, talents) at desktop width and at
