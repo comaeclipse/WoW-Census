@@ -1,0 +1,12 @@
+# Cloudflare Pages project for wowcensus.io (the static bundle in ./pages).
+# `wrangler pages deploy` reads this from the repo root; the MarketLens Worker
+# and its D1 database have their own config in site/wrangler.toml.
+name = "wowcensus"
+pages_build_output_dir = "./pages"
+compatibility_date = "2026-09-21"
+
+# Pages rendered from fresh data by tools/publish-pages.js, served by
+# pages/_worker.js in place of the static copy when their layout matches.
+[[kv_namespaces]]
+binding = "PAGES_KV"
+id = "7bc77e4570af4e48953c183afeb7b45e"

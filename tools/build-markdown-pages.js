@@ -63,8 +63,8 @@ function talentSummary(data) {
   return lines.join('\n');
 }
 
-function buildOne(file, markdownFile) {
-  const source = fs.readFileSync(file, 'utf8');
+// The Markdown companion of one rendered content page.
+function htmlToMarkdown(source) {
   const { document } = parseHTML(source);
   const title = document.querySelector('title')?.textContent.trim() || 'WoWCensus';
   const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
@@ -93,24 +93,30 @@ function buildOne(file, markdownFile) {
   frontmatter.push('---', '', `# ${title}`, '');
   let markdown = frontmatter.join('\n') + content + '\n';
   if (talentData) markdown += '\n' + talentSummary(JSON.parse(talentData)) + '\n';
-  fs.writeFileSync(markdownFile, markdown);
+  return markdown;
 }
 
-for (const edition of editions) {
-  for (const name of names) {
-    const dir = path.join(root, edition);
-    const html = path.join(dir, `${name}.html`);
-    if (!fs.existsSync(html)) throw new Error(`Missing content page: ${html}`);
-    buildOne(html, path.join(dir, `${name}.md`));
-    const prefix = edition ? `/${edition}` : '';
-    routes.push(name === 'index' ? (prefix || '/') + (prefix ? '/' : '') : `${prefix}/${name}`);
+module.exports = { htmlToMarkdown };
+
+function main() {
+  for (const edition of editions) {
+    for (const name of names) {
+      const dir = path.join(root, edition);
+      const html = path.join(dir, `${name}.html`);
+      if (!fs.existsSync(html)) throw new Error(`Missing content page: ${html}`);
+      fs.writeFileSync(path.join(dir, `${name}.md`), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
+      const prefix = edition ? `/${edition}` : '';
+      routes.push(name === 'index' ? (prefix || '/') + (prefix ? '/' : '') : `${prefix}/${name}`);
+    }
   }
+
+  // Explicit routes keep CSS, JSON, fonts, and other assets on static Pages serving.
+  const includes = routes.flatMap((route) => route === '/' ? ['/', '/index.html'] :
+    route.endsWith('/') ? [route, route.slice(0, -1), `${route}index.html`] : [route, `${route}.html`]);
+  if (includes.length > 100) throw new Error('Pages _routes.json exceeds 100 rules');
+  fs.writeFileSync(path.join(root, '_routes.json'), JSON.stringify({ version: 1, include: includes, exclude: [] }, null, 2) + '\n');
+  fs.copyFileSync(path.join(__dirname, 'pages-markdown-worker.js'), path.join(root, '_worker.js'));
+  console.log(`Built ${routes.length} Markdown page variants`);
 }
 
-// Explicit routes keep CSS, JSON, fonts, and other assets on static Pages serving.
-const includes = routes.flatMap((route) => route === '/' ? ['/', '/index.html'] :
-  route.endsWith('/') ? [route, route.slice(0, -1), `${route}index.html`] : [route, `${route}.html`]);
-if (includes.length > 100) throw new Error('Pages _routes.json exceeds 100 rules');
-fs.writeFileSync(path.join(root, '_routes.json'), JSON.stringify({ version: 1, include: includes, exclude: [] }, null, 2) + '\n');
-fs.copyFileSync(path.join(__dirname, 'pages-markdown-worker.js'), path.join(root, '_worker.js'));
-console.log(`Built ${routes.length} Markdown page variants`);
+if (require.main === module) main();

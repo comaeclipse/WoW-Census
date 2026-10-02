@@ -297,9 +297,9 @@ node tools/build-forever-page.js            # build pages/ only
 node tools/build-forever-page.js --deploy   # build, then publish to Pages
 ```
 
-It reads the live data from `/api/forever`, `/api/games`, and `/api/items`, and
-renders it with the same modules the Worker uses (`site/src/census.mjs` and
-`site/src/market.mjs`, so the copies can't drift), writing:
+It reads the live data from `/api/census`, `/api/inspects`, `/api/games`, and
+`/api/items`, shapes and renders it with `site/src/edition.mjs` (on top of the
+Worker's own render modules, so the copies can't drift), writing:
 
 | File | Page |
 | --- | --- |
@@ -315,12 +315,31 @@ pages, `Accept: text/markdown` selects the Markdown variant; requests without
 that header continue to receive the same HTML. Only content-page routes invoke
 the Pages Function. Deploy the complete `pages/` directory after rebuilding.
 
-`--deploy` runs `wrangler pages deploy` against the `wowcensus` project; without
-it the folder can still be dragged onto **Cloudflare dashboard -> Workers &
-Pages -> Create -> Pages -> Upload assets**. The numbers are frozen at build
-time -- re-run after each upload to refresh them. `--url=` builds against a
-different origin (a local `wrangler dev`, say), `--out=` writes elsewhere, and
-`--project=` targets another Pages project.
+`--deploy` runs `wrangler pages deploy` against the `wowcensus` project (config
+and the `PAGES_KV` binding live in the root `wrangler.toml`), then republishes
+every edition to KV. `--url=` builds against a different origin (a local
+`wrangler dev`, say), `--out=` writes elsewhere, and `--project=` targets
+another Pages project.
+
+#### Fresh numbers without a redeploy
+
+Data and layout ship separately. A Pages deploy carries the layout (render code
+and CSS); the numbers come from KV:
+
+```bash
+node tools/publish-pages.js                              # every edition
+node tools/publish-pages.js --source=classic-progression # one edition
+```
+
+This renders each page (and its Markdown) from the live API and writes it to
+the `wowcensus-pages` KV namespace; `tools/upload-realm.ps1` runs it for the
+uploaded edition automatically (`-NoPublish` skips it). The Pages Function
+serves a KV page on its canonical path when the page was rendered with the
+deployed layout -- the hash in `pages/_layout.json`, from `tools/layout-id.js`
+-- and the deploy's static file otherwise, so a page rendered by other layout
+code is never served. Edge caches pick up a publish within about 5 minutes.
+Rendering happens at publish time, not per request: shaping the auction-house
+model alone takes tens of milliseconds of CPU.
 
 ## Status: v0.1 (MVP)
 

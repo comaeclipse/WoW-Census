@@ -26,7 +26,9 @@ param(
     # without swapping characters and reloading. e.g. Nesingwary-Alliance,
     # Dreamscythe-Horde. Without it the uploader takes whichever bucket was last
     # active and warns if the save holds others.
-    [string]$Realm
+    [string]$Realm,
+    # Skip re-rendering this edition's wowcensus.io pages after the upload.
+    [switch]$NoPublish
 )
 
 $ErrorActionPreference = "Stop"
@@ -326,5 +328,27 @@ if ($node -and (Test-Path $inspectFile) -and (Test-Path $inspectHelper)) {
         if (-not $ir.ok -or $ir.rejected -gt 0) { throw "Inspect import failed or rejected records: $($ir | ConvertTo-Json -Compress)" }
         Write-Host ("Inspects: {0} imported, {1} linked, {2} unmatched, {3} ambiguous, {4} talent nodes." -f $ir.imported, $ir.linked, $ir.unmatched, $ir.ambiguous, $ir.nodes) -ForegroundColor Green
         $offset = $end + 1
+    }
+}
+
+# Refresh this edition's wowcensus.io pages: render them from the data just
+# uploaded and publish to KV, so the site updates without a Pages redeploy.
+if (-not $NoPublish) {
+    $publishHelper = Join-Path $scriptDir "publish-pages.js"
+    $pageSource = switch ($Flavor) {
+        "tbc-anniversary" { "classic-progression" }
+        "classic-era" { "classic" }
+        default { $Flavor }
+    }
+    if ($node -and (Test-Path $publishHelper)) {
+        $ErrorActionPreference = "Continue"
+        & $node.Source $publishHelper "--source=$pageSource" "--url=$Url"
+        $publishExit = $LASTEXITCODE
+        $ErrorActionPreference = "Stop"
+        if ($publishExit -ne 0) {
+            Write-Host "wowcensus.io publish failed; rerun: node tools/publish-pages.js --source=$pageSource" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "Skipped wowcensus.io publish (needs node)." -ForegroundColor Yellow
     }
 }

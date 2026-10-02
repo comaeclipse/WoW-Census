@@ -44,41 +44,13 @@ const flag = (name) => args.includes("--" + name);
 
 const base = (arg("url", "https://marketlens.skarz.workers.dev") || "").replace(/\/+$/, "");
 const repo = path.resolve(__dirname, "..");
-const sourceGame = arg("source", "classic-beta");
-const editions = {
-  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever", title: "WoW Forever & Classic+ Population Census – WoWCensus", description: "WoWCensus - World of Warcraft: Forever and Classic+ population tracker. Realm population, faction balance, and race/class breakdowns from in-game /who scans.", comboBlurb: "Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta." },
-  "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc", comboBlurb: "TBC Anniversary’s smaller era roster makes race and class choices a direct view of the currently visible progression community." },
-  classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic", comboBlurb: "Classic Era keeps the original-era roster, so the mix reflects the characters currently active in its long-lived realms rather than modern class availability." },
-  sod: { dir: "pages/sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic", comboBlurb: "Season of Discovery class balance and player activity can shift sharply between phases, so treat the mix as a current activity signal rather than a durable meta ranking." },
-  "mop-classic": { dir: "pages/mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", flavor: "mop-classic", branch: "mop-classic", comboBlurb: "MoP Classic includes its era-specific roster and progression, so the mix captures who is visibly active during this phase rather than a prediction of endgame demand." },
-  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity", comboBlurb: "Retail’s broad modern roster and cross-faction play make this a view of the current population mix." },
-};
-const edition = editions[sourceGame];
-if (!edition) throw new Error("unsupported Pages source game: " + sourceGame);
-const outDir = path.resolve(repo, arg("out", edition.dir));
+const SOURCE_GAME = arg("source", "classic-beta");
 const project = arg("project", "wowcensus");
-const SOURCE_GAME = sourceGame;
-const GAME_LABEL = edition.label;
-const UPLOAD_FLAVOR = edition.flavor;
-const WH_BRANCH = edition.branch;
 const ITEM_NAME_CACHE = path.join(__dirname, "forever-item-names.json");
-const SITE_ORIGIN = "https://wowcensus.io";
 
-function editionPath(source) {
-  const dir = editions[source].dir.replace(/^pages\/?/, "");
-  return dir ? "/" + dir + "/" : "/";
-}
-
-function pagePath(source, page) {
-  const root = editionPath(source);
-  return page === "index" ? root : root + page;
-}
-
-function utcTimestamp(value) {
-  if (!value) return "unavailable";
-  const date = typeof value === "number" ? new Date(value * 1000) : new Date(value);
-  return Number.isNaN(date.getTime()) ? "unavailable" : date.toISOString().slice(0, 16).replace("T", " ") + "Z";
-}
+// Edition config, data shaping and page rendering live in site/src/edition.mjs,
+// shared with the edge renderer in pages/_worker.js. Loaded in main().
+let editions, editionPath, pagePath, SITE_ORIGIN;
 
 async function getJson(url) {
   const res = await fetch(url);
@@ -122,27 +94,20 @@ async function resolvePlaceholderNames(items) {
   return { resolved, unresolved: items.filter((it) => /^item:\d+$/.test(it.name)).length };
 }
 
-// The pages link to each other; the bundle has no Worker behind it, so the
-// header carries no crumb back to one.
-function nav(current) {
-  const currentPage = current.replace(/\.html$/, "");
-  const pageLabels = { index: "Census", combos: "Race + Class", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography", talents: "Talents" };
-  const item = (href, label, active = href === currentPage) =>
-    '<a class="game"' + (active ? ' aria-current="true"' : "") +
-    ' href="' + href + '">' + label + "</a>";
-  return {
-    games: '<nav class="games game-nav">' +
-      Object.entries(editions).map(([source, e]) => item(pagePath(source, "index"), e.nav, source === SOURCE_GAME)).join("") + "</nav>",
-    pages: '<nav class="games page-nav">' +
-    item(pagePath(SOURCE_GAME, "index"), "Census", currentPage === "index" || currentPage === "combos") +
-      item(pagePath(SOURCE_GAME, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
-      item(pagePath(SOURCE_GAME, "guilds"), "Guilds", currentPage === "guilds") +
-      item(pagePath(SOURCE_GAME, "geography"), "Geography", currentPage === "geography") +
-      item(pagePath(SOURCE_GAME, "talents"), "Talents", currentPage === "talents") + "</nav>",
-    breadcrumbs: '<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="' +
-      pagePath(SOURCE_GAME, "index") + '">' + edition.nav + '</a><span aria-hidden="true">/</span><span aria-current="page">' +
-      pageLabels[currentPage] + "</span></nav>",
-  };
+// Name the auction-house items still showing "item:<id>" placeholders.
+async function resolveModelNames(source, models) {
+  const views = models.auctionhouse.views;
+  const uniqueItems = [...new Map(views.flatMap((v) => v.snapshot.items).map((it) => [it.id, it])).values()];
+  const names = source === "classic-beta"
+    ? await resolvePlaceholderNames(uniqueItems)
+    : { resolved: 0, unresolved: uniqueItems.filter((it) => /^item:\d+$/.test(it.name)).length };
+  // Apply a name learned from either faction to every view containing that id.
+  const resolvedNames = new Map(uniqueItems.map((it) => [it.id, it.name]));
+  for (const v of views) for (const it of v.snapshot.items) {
+    if (/^item:\d+$/.test(it.name) && !/^item:\d+$/.test(resolvedNames.get(it.id) || ""))
+      it.name = resolvedNames.get(it.id);
+  }
+  return names;
 }
 
 function writeCrawlAndCacheFiles() {
@@ -258,213 +223,26 @@ function writeAgentDiscoveryFiles(pagesRoot) {
     '<body><h1>Not found</h1><p><a href="/">wowcensus home</a></p></body></html>\n');
 }
 
-// Chip labels for realms. Every beta realm is called "Classic Beta <type>",
-// and the client names one of them "Classic Beta PvP 2" -- the trailing number
-// is the realm's own name, not an index we added. Both are noise in a chip, so
-// drop the shared prefix and the trailing number, but only while the shortened
-// labels stay distinct: a beta with both "PvP 1" and "PvP 2" keeps its numbers
-// rather than showing two chips reading "PvP".
-let realmName; // census.mjs's display-name helper, loaded in main()
-function realmLabels(names) {
-  const short = (n) => n.replace(/^Classic Beta\s+/i, "").trim() || n;
-  const shorter = realmName;
-  const pick = new Set(names.map(shorter)).size === names.length ? shorter : short;
-  return new Map(names.map((n) => [n, pick(n)]));
-}
-
-// Roll realm/faction census units up into one group per faction -- the same
-// shape the census renderer charts, mirroring the Worker's own merge.
-function mergeCensusUnits(units) {
-  const byFaction = new Map();
-  for (const u of units) {
-    if (!byFaction.has(u.faction))
-      byFaction.set(u.faction, {
-        faction: u.faction, races: {}, classes: {}, combos: {}, characters: 0, samples: 0, observed: 0, games: [],
-      });
-    const g = byFaction.get(u.faction);
-    g.characters += u.characters;
-    g.samples += u.samples;
-    g.observed += u.observed;
-    if (g.games.indexOf(u.game) < 0) g.games.push(u.game);
-    for (const k in u.races) g.races[k] = (g.races[k] || 0) + u.races[k];
-    for (const k in u.classes) g.classes[k] = (g.classes[k] || 0) + u.classes[k];
-    for (const k in (u.combos || {})) g.combos[k] = (g.combos[k] || 0) + u.combos[k];
-  }
-  const order = ["Alliance", "Horde"];
-  return [...byFaction.values()].sort((a, b) =>
-    ((order.indexOf(a.faction) + 1) || 99) - ((order.indexOf(b.faction) + 1) || 99) || b.characters - a.characters);
-}
-
-// Merge every beta realm's item snapshot into one market view. Quantity and
-// listed value add up; the unit price is then value/quantity, which is the
-// quantity-weighted price across realms rather than an average of averages.
-function mergeItems(perRealm) {
-  const byId = new Map();
-  for (const { items, columns } of perRealm) {
-    const col = (name) => columns.indexOf(name);
-    const [iId, iName, iMv, iAsp, iQ, iPq, iCat] =
-      ["id", "name", "mv", "asp", "q", "pq", "cat"].map(col);
-    for (const row of items) {
-      const id = row[iId];
-      const cur = byId.get(id) || {
-        id, name: row[iName], cat: row[iCat], q: 0, pq: 0,
-        hasPreviousQty: true, mv: 0, asp: 0,
-      };
-      cur.q += row[iQ] || 0;
-      if (iPq < 0 || row[iPq] == null) cur.hasPreviousQty = false;
-      else cur.pq += row[iPq] || 0;
-      cur.mv += row[iMv] || 0;
-      // Prefer a resolved name over an "item:<id>" placeholder from another realm.
-      if (/^item:\d+$/.test(cur.name) && !/^item:\d+$/.test(row[iName])) cur.name = row[iName];
-      if (!cur.cat) cur.cat = row[iCat];
-      byId.set(id, cur);
-    }
-  }
-  for (const it of byId.values()) {
-    it.asp = it.q > 0 ? Math.round(it.mv / it.q) : 0;
-    if (!it.hasPreviousQty) it.pq = null;
-    delete it.hasPreviousQty;
-  }
-  return [...byId.values()];
-}
-
 async function main() {
-  const src = (f) => pathToFileURL(path.join(repo, "site/src", f)).href;
-  const censusMod = await import(src("census.mjs"));
-  const { renderCensusHtml, renderComboBreakdownHtml } = censusMod;
-  realmName = censusMod.realmName;
-  const { renderTalentsHtml, renderInspectCoverage } = await import(src("talents.mjs"));
-  const inspectData = await getJson(base + "/api/inspects?source=" + encodeURIComponent(SOURCE_GAME));
-  const { renderMarketHtml } = await import(src("market.mjs"));
-  const { renderGuildHtml } = await import(src("guilds.mjs"));
-  const { renderGeographyHtml } = await import(src("geography.mjs"));
+  const shared = await import(pathToFileURL(path.join(repo, "site/src/edition.mjs")).href);
+  ({ EDITIONS: editions, editionPath, pagePath, SITE_ORIGIN } = shared);
+  const edition = editions[SOURCE_GAME];
+  if (!edition) throw new Error("unsupported Pages source game: " + SOURCE_GAME);
+  const outDir = path.resolve(repo, arg("out", edition.dir));
 
   const built = new Date();
-  const generatedNote = "Page generated: " + utcTimestamp(built.toISOString());
-
-  process.stdout.write("Census   ... ");
-  const census = await getJson(base + "/api/census?source=" + encodeURIComponent(SOURCE_GAME));
+  const data = await shared.fetchEditionData(SOURCE_GAME, (p) => getJson(base + p));
+  const { census, games, snaps } = data;
   const chars = (census.groups || []).reduce((a, g) => a + g.characters, 0);
-  console.log(chars.toLocaleString() + " characters, " + (census.groups || []).length + " faction(s)");
+  console.log("Census   ... " + chars.toLocaleString() + " characters, " + (census.groups || []).length + " faction(s)");
+  const models = shared.buildEditionModels(SOURCE_GAME, data);
 
-  process.stdout.write("Auctions ... ");
-  const games = (await getJson(base + "/api/games")).games || [];
-  const marketGames = games.filter((g) => g.sourceGame === SOURCE_GAME && g.realm && g.hasItems);
-  const snaps = [];
-  for (const g of marketGames) {
-    const snap = await getJson(base + "/api/items?game=" + encodeURIComponent(g.game));
-    const realm = g.game.replace(/^realm:/, "");
-    snaps.push({
-      realm,
-      faction: (/-(Alliance|Horde)$/.exec(realm) || [, "Neutral"])[1],
-      items: snap.items || [], columns: snap.columns, updatedAt: snap.updatedAt,
-    });
-  }
-  // Both axes list "All" plus every value the beta has a realm dataset for --
-  // including a combination with no AH scan yet, whose view then says so rather
-  // than the toggle quietly hiding that side.
-  const betaRealms = games.filter((g) => g.sourceGame === SOURCE_GAME && g.realm)
-    .map((g) => g.game.replace(/^realm:/, ""));
-  const factions = [...new Set((census.units || []).map((u) => u.faction).filter((f) => f && f !== "Unknown"))].sort();
-  const realmNames = [...new Set(betaRealms.map((r) => r.replace(/-(Alliance|Horde)$/, "")))].sort();
-
-  const snapshotOf = (from, fallbackRealms) => {
-    // Retail's commodity auction house is regional and cross-realm. Multiple
-    // realm uploads are repeated captures of the same market, not independent
-    // inventories that can be added together. Use the newest capture for the
-    // aggregate view; the realm chips still expose each capture separately.
-    const selected = edition.factionlessMarket && from.length > 1
-      ? [from.reduce((latest, snap) =>
-          String(snap.updatedAt || "") > String(latest.updatedAt || "") ? snap : latest)]
-      : from;
-    return {
-    items: mergeItems(selected),
-    realms: selected.length ? selected.map((s2) => s2.realm) : fallbackRealms,
-    updatedAt: selected.map((s2) => s2.updatedAt).filter(Boolean).sort().pop() || null,
-    branch: WH_BRANCH, uploadFlavor: UPLOAD_FLAVOR,
-    aggregateOnly: edition.marketMetric === "quantity",
-    };
-  };
-  const marketRealmLabels = realmLabels(realmNames);
-  const dims = {
-    realm: [{ key: "all", label: edition.factionlessMarket ? "Latest regional scan" : "All realms" }]
-      .concat(realmNames.map((r) => ({ key: r, label: marketRealmLabels.get(r) }))),
-    faction: [{ key: "all", label: "Both" }].concat(factions.map((f) => ({ key: f, label: f }))),
-  };
-  // Retail auction houses are cross-faction. Population and guild census data
-  // remain faction-specific, but the market must not imply an Alliance/Horde
-  // split that Blizzard's Retail API does not provide.
-  const marketDims = edition.factionlessMarket
-    ? { realm: dims.realm, faction: [{ key: "all", label: "Cross-faction" }] }
-    : dims;
-  const views = [];
-  for (const r of marketDims.realm) {
-    for (const f of marketDims.faction) {
-      const from = snaps.filter((s2) =>
-        (r.key === "all" || s2.realm.replace(/-(Alliance|Horde)$/, "") === r.key) &&
-        (f.key === "all" || s2.faction === f.key));
-      const fallback = betaRealms.filter((name) =>
-        (r.key === "all" || name.replace(/-(Alliance|Horde)$/, "") === r.key) &&
-        (f.key === "all" || name.endsWith("-" + f.key)));
-      views.push({ realm: r.key, faction: f.key, snapshot: snapshotOf(from, fallback) });
-    }
-  }
-
-  const guildUnits = census.units || [];
-  const guildViews = [];
-  const geographyViews = [];
-  for (const r of dims.realm) {
-    for (const f of dims.faction) {
-      const from = guildUnits.filter((u) =>
-        (r.key === "all" || u.realm === r.key) &&
-        (f.key === "all" || u.faction === f.key));
-      const guilds = from.flatMap((u) => (u.guilds || []).map((g) => ({
-        name: g.name, members: g.members, realm: u.realm, faction: u.faction,
-      }))).sort((a, b) => b.members - a.members || a.name.localeCompare(b.name));
-      guildViews.push({
-        realm: r.key, faction: f.key,
-        snapshot: {
-          guilds,
-          guildedCharacters: guilds.reduce((sum, g) => sum + g.members, 0),
-          surveyedCharacters: from.reduce((sum, u) => sum + (u.characters || 0), 0),
-          realms: [...new Set(from.map((u) => u.realm))],
-          lastT: census.lastT || 0,
-        },
-      });
-      const byZone = new Map();
-      for (const u of from) for (const z of (u.zones || [])) {
-        const cur = byZone.get(z.name) || { name: z.name, characters: 0, levelSum: 0, maxLevel: 0 };
-        cur.characters += z.characters || 0;
-        cur.levelSum += (z.avgLevel || 0) * (z.characters || 0);
-        cur.maxLevel = Math.max(cur.maxLevel, z.maxLevel || 0);
-        byZone.set(z.name, cur);
-      }
-      const zones = [...byZone.values()].map((z) => ({
-        name: z.name, characters: z.characters,
-        avgLevel: z.characters ? Math.round(z.levelSum / z.characters) : 0,
-        maxLevel: z.maxLevel,
-      })).sort((a, b) => b.characters - a.characters || a.name.localeCompare(b.name));
-      geographyViews.push({ realm: r.key, faction: f.key, snapshot: {
-        zones,
-        characters: from.reduce((sum, u) => sum + (u.zoneCharacters || 0), 0),
-        realms: [...new Set(from.map((u) => u.realm))], lastT: census.lastT || 0,
-        windowDays: census.zoneWindowDays || 0,
-      }});
-    }
-  }
-
-  const uniqueItems = [...new Map(views.flatMap((v) => v.snapshot.items).map((it) => [it.id, it])).values()];
-  const names = SOURCE_GAME === "classic-beta"
-    ? await resolvePlaceholderNames(uniqueItems)
-    : { resolved: 0, unresolved: uniqueItems.filter((it) => /^item:\d+$/.test(it.name)).length };
-  // Apply a name learned from either faction to every view containing that id.
-  const resolvedNames = new Map(uniqueItems.map((it) => [it.id, it.name]));
-  for (const v of views) for (const it of v.snapshot.items) {
-    if (/^item:\d+$/.test(it.name) && !/^item:\d+$/.test(resolvedNames.get(it.id) || ""))
-      it.name = resolvedNames.get(it.id);
-  }
-  console.log(views[0].snapshot.items.length.toLocaleString() + " items across " +
-    marketGames.length + " realm dataset(s); realms: " + (realmNames.join(", ") || "none") +
+  const views = models.auctionhouse.views;
+  const names = await resolveModelNames(SOURCE_GAME, models);
+  const realmNames = models.guilds.dims.realm.slice(1).map((r) => r.key);
+  const factions = models.guilds.dims.faction.slice(1).map((f) => f.key);
+  console.log("Auctions ... " + views[0].snapshot.items.length.toLocaleString() + " items across " +
+    snaps.length + " realm dataset(s); realms: " + (realmNames.join(", ") || "none") +
     "; factions: " + (factions.join(", ") || "none") +
     "; names resolved " + names.resolved + ", unresolved " + names.unresolved);
 
@@ -474,58 +252,15 @@ async function main() {
   for (const name of fs.readdirSync(outDir)) {
     if (/^style(?:\.[a-f0-9]{12})?\.css$/.test(name)) fs.rmSync(path.join(outDir, name));
   }
-  // The census slices on realm only: each view still charts both factions.
-  const censusUnits = census.units || [];
-  const censusRealms = [...new Set(censusUnits.map((u) => u.realm))].sort();
-  const censusView = (key, label, units) => ({
-    key, label,
-    census: { groups: mergeCensusUnits(units), realms: [...new Set(units.map((u) => u.realm))].sort(), lastT: census.lastT },
-  });
-  const censusRealmLabels = realmLabels(censusRealms);
-  const censusViews = censusUnits.length
-    ? [censusView("all", "All realms", censusUnits)].concat(
-        censusRealms.map((r) =>
-          censusView(r, censusRealmLabels.get(r), censusUnits.filter((u) => u.realm === r))))
-    : [{ key: "all", label: "All realms", census }];
-  writeFile(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
-    stylesheet: cssName,
-    nav: nav("index.html"),
-    comboHref: pagePath(SOURCE_GAME, "combos"),
-    inspectCoverage: renderInspectCoverage(inspectData, pagePath(SOURCE_GAME, "talents")),
-    notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
-    gameLabel: GAME_LABEL, uploadFlavor: UPLOAD_FLAVOR,
-    canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "index"),
-    title: edition.title, description: edition.description,
-  }));
-  writeFile(path.join(outDir, "combos.html"), renderComboBreakdownHtml(censusViews[0].census, {
-    stylesheet: cssName, nav: nav("combos.html"),
-    notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
-    gameLabel: GAME_LABEL, flavorNote: edition.comboBlurb,
-    canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "combos"),
-  }));
-  writeFile(path.join(outDir, "auctionhouse.html"),
-    renderMarketHtml(views, marketDims, { stylesheet: cssName, nav: nav("auctionhouse.html"),
-      notes: ["Latest auction scan: " + utcTimestamp(views[0] && views[0].snapshot.updatedAt)], generatedNote,
-      gameLabel: GAME_LABEL,
-      canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "auctionhouse"),
-      tbcAnalysis: SOURCE_GAME === "classic-progression" }));
-  writeFile(path.join(outDir, "guilds.html"),
-    renderGuildHtml(guildViews, dims, { stylesheet: cssName, nav: nav("guilds.html"),
-      notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
-      gameLabel: GAME_LABEL,
-      canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "guilds") }));
-  writeFile(path.join(outDir, "geography.html"),
-    renderGeographyHtml(geographyViews, dims, { stylesheet: cssName, nav: nav("geography.html"),
-      notes: ["Latest location observation: " + utcTimestamp(census.lastT)], generatedNote,
-      gameLabel: GAME_LABEL,
-      canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "geography") }));
-  writeFile(path.join(outDir, "talents.html"), renderTalentsHtml(inspectData, {
-    stylesheet: cssName, nav: nav("talents.html"), gameLabel: GAME_LABEL, generatedNote,
-    canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "talents")
-  }));
-  writeFile(path.join(outDir, "inspects.json"), JSON.stringify(inspectData, null, 2) + "\n");
+  for (const page of shared.PAGES) {
+    writeFile(path.join(outDir, page + ".html"),
+      shared.renderEditionPage(SOURCE_GAME, page, models[page], { stylesheet: cssName, generatedAt: built.toISOString() }));
+  }
+  writeFile(path.join(outDir, "inspects.json"), JSON.stringify(data.inspects, null, 2) + "\n");
   // The bundle carries its own stylesheet so it renders with nothing else served.
   writeFile(path.join(outDir, cssName), css);
+  // The deployed layout identity, which gates pages published to KV.
+  require("./layout-id").writeLayout();
   // Font URLs are root-relative so every edition shares one immutable copy.
   const sourceFonts = path.join(repo, "site/public/fonts");
   const outputFonts = path.join(repo, "pages/fonts");
@@ -562,6 +297,15 @@ async function main() {
   const r = spawnSync("npx", ["--yes", "wrangler@latest", "pages", "deploy", deployDir,
     "--project-name", project, "--commit-dirty=true"], { stdio: "inherit", shell: true });
   if (r.status !== 0) throw new Error("wrangler pages deploy exited " + r.status);
+  // A deploy changes the layout KV pages must match; republish every edition
+  // so they serve fresh data again instead of falling back to this bundle.
+  console.log("\nPublishing every edition to KV ...");
+  const p = spawnSync(process.execPath, [path.join(__dirname, "publish-pages.js"), "--url=" + base],
+    { stdio: "inherit" });
+  if (p.status !== 0) throw new Error("publish-pages exited " + p.status);
 }
 
-main().catch((e) => { console.error(String((e && e.message) || e)); process.exit(1); });
+module.exports = { resolveModelNames };
+
+if (require.main === module)
+  main().catch((e) => { console.error(String((e && e.message) || e)); process.exit(1); });
