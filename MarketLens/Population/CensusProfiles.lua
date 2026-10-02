@@ -134,8 +134,9 @@ P.profiles = {
     ["retail"] = {
         label = "Retail",
         simpleRefresh = true,
-        -- Retail's population sits at the cap; low bands are near-empty.
-        bands = { {1,59}, {60,79}, {80,84}, {85,89}, {90,90} },
+        -- Retail's population sits at the cap; low bands are thin but not
+        -- empty (Stormrage-Alliance: 10-20 held 16 and 40-50 held 25).
+        bands = { {1,39}, {40,59}, {60,79}, {80,84}, {85,89}, {90,90} },
         classes = {
             Alliance = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "DEATHKNIGHT", "SHAMAN", "MAGE", "WARLOCK", "MONK", "DRUID", "DEMONHUNTER", "EVOKER" },
             Horde    = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "DEATHKNIGHT", "SHAMAN", "MAGE", "WARLOCK", "MONK", "DRUID", "DEMONHUNTER", "EVOKER" },
@@ -160,7 +161,8 @@ P.profiles = {
         -- The beta piles thousands into a few levels: a cell still over 50 with
         -- level, class and race pinned stays a lower bound instead of being dug
         -- into by zone (102 zone queries once found ~10 players each).
-        noZoneFallback = true,
+        -- Passive adaptive scans reach zones only after level, class, race and
+        -- high-yield name-letter refinements. Manual fixed refreshes never do.
         -- Decide the whole query list up front; never grow it mid-census.
         fixedPlan = true,
         -- Bands are generated from the live level cap (it moves during beta).

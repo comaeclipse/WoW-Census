@@ -6,7 +6,7 @@ local ML = MarketLens
 
 ML.ADDON = ADDON
 ML.VERSION = "0.1.1"
-ML.DB_VERSION = 3
+ML.DB_VERSION = 4
 
 -- Modules populate these tables as their files load (see .toc order).
 ML.Scanner    = ML.Scanner    or {}
@@ -51,10 +51,20 @@ function ML:Debug(fmt, ...)
     DEFAULT_CHAT_FRAME:AddMessage(PREFIX .. "|cff888888[dbg]|r " .. msg)
 end
 
+-- Population collection is intentionally headless. Detailed census progress
+-- belongs on the website; keep it out of chat unless addon debugging is on.
+function ML:CensusPrint(fmt, ...)
+    self:Debug(fmt, ...)
+end
+
 local DEFAULT_SETTINGS = {
     snapshotRetentionDays = 14,
     populationRetentionDays = 35, -- daily identity observations retained for 30-day metrics
     censusBudget          = 300, -- max /who queries one census may plan
+    censusPassive         = false, -- advance an active census from normal play input
+    censusAutoStart       = false, -- start/resume a census when this character logs in
+    specRetentionDays     = 35, -- successful inspect observations retained
+    specSampling          = true, -- opportunistically inspect exposed nearby/group unit tokens
     minimumSamples        = 3,   -- snapshots needed before demand is scored
     scanThrottle          = 0.5, -- seconds between paged AH queries
     sellerSampleSeconds   = 1200, -- hard budget for /ml scan paged seller sampling
@@ -118,7 +128,22 @@ function ML:InitDB()
     self.db = MarketLensDB
     self.db.settings = self.db.settings or {}
     migrate(self.db)
-    self.realm = self:Realm()
+    local realm, key = self:Realm()
+    self.realm = realm
+    -- Item history is stored packed (see Snapshots.lua); only this realm's
+    -- is unpacked into tables. Older saves hold every realm as tables, so
+    -- pack those now and let the collector drop them before play starts.
+    if self.Snapshots:PackInactive(key) > 0 then collectgarbage("collect") end
+    if realm.itemsPacked then
+        realm.items = self.Snapshots:Unpack(realm.itemsPacked, realm.items)
+        realm.itemsPacked = nil
+    end
+    realm.items = realm.items or {}
+    -- Old builds cached two large JSON copies alongside the authoritative Lua
+    -- tables. The uploader rebuilds both payloads directly, so discard them.
+    self.db.export = nil
+    self.db.popExport = nil
+    if self.Population.CompactStorage then self.Population:CompactStorage() end
 end
 
 -- Build a compact JSON string of this realm's per-item snapshot history for
@@ -176,13 +201,14 @@ function ML:BuildPopExport()
     if pop and pop.characters then
         for key, c in pairs(pop.characters) do
             characters[#characters + 1] = string.format(
-                '{"k":%s,"fn":%s,"n":%s,"r":%s,"g":%s,"l":%d,"race":%s,"class":%s,"cf":%s,"z":%s,"fs":%d,"ls":%d,"sc":%d}',
-                jstr(key), jstr(c.fullName), jstr(c.name), jstr(c.realm), jstr(c.guild),
+                '{"k":%s,"fn":%s,"n":%s,"first":%s,"last":%s,"r":%s,"g":%s,"l":%d,"race":%s,"class":%s,"cf":%s,"z":%s,"fs":%d,"ls":%d,"sc":%d}',
+                jstr(key), jstr(c.fullName), jstr(c.name), jstr(c.firstName), jstr(c.lastName), jstr(c.realm), jstr(c.guild),
                 c.level or 0, jstr(c.race), jstr(c.class), jstr(c.classFile),
                 jstr(c.zone), c.firstSeen or 0, c.lastSeen or 0, c.seenCount or 0)
             for day, d in pairs(c.days or {}) do
                 observations[#observations + 1] = string.format('[%s,%d,%d,%d,%d]',
-                    jstr(key), tonumber(day) or 0, d.count or 0, d.firstSeen or 0, d.lastSeen or 0)
+                jstr(key), tonumber(day) or 0, d.count or d[1] or 0,
+                d.firstSeen or d[2] or 0, d.lastSeen or d[3] or 0)
             end
         end
     end
@@ -203,8 +229,9 @@ function ML:BuildPopExport()
                 characterCount = characterCount + 1
                 locationObservations[#locationObservations + 1] = string.format(
                     '[%s,%s,%d,%d,%s,%d,%s,%s]', jstr(id), jstr(key),
-                    o.queryIndex or 0, o.observedAt or 0, jstr(o.zone), o.level or 0,
-                    jstr(o.classFile), jstr(o.race))
+                    o.queryIndex or o[1] or 0, o.observedAt or o[2] or 0,
+                    jstr(o.zone or o[3]), o.level or o[4] or 0,
+                    jstr(o.classFile or o[5]), jstr(o.race or o[6]))
             end
             sweeps[#sweeps + 1] = string.format(
                 '{"id":%s,"startedAt":%d,"completedAt":%d,"status":%s,"label":%s,"faction":%s,"queryCount":%d,"characterCount":%d,"cappedCount":%d}',
@@ -228,12 +255,13 @@ function ML:BuildPopExport()
         .. '],"locationObservations":[' .. table.concat(locationObservations, ",") .. "]}"
 end
 
--- Refresh both on-disk export strings so the companion uploader can read them.
+-- Legacy compatibility hook. Export payloads are now rebuilt by the companion
+-- uploader instead of being duplicated in SavedVariables during play.
 function ML:RefreshExports()
     if not self.db then return end
-    self.db.export = self:BuildExport()
     self.db.exportRealm = self:RealmKey()
-    self.db.popExport = self:BuildPopExport()
+    self.db.export = nil
+    self.db.popExport = nil
 end
 
 local boot = CreateFrame("Frame")
@@ -248,16 +276,22 @@ boot:SetScript("OnEvent", function(_, event, arg1)
         ML:Fire("LOGIN")
         if ML.Scanner.Init then ML.Scanner:Init() end
         if ML.Population.Init then ML.Population:Init() end
+        if ML.Population.Passive and ML.Population.Passive.Init then ML.Population.Passive:Init() end
         if ML.UI.Init then ML.UI:Init() end
-        -- Keep the on-disk exports fresh after each scan (flushed on logout/reload).
-        ML:On("SCAN_COMPLETE", function() ML:RefreshExports() end)
-        ML:On("POP_SCAN_COMPLETE", function() ML:RefreshExports() end)
-        ML:On("POP_SWEEP_CHANGED", function() ML:RefreshExports() end)
         ML:Print("v%s loaded. Type |cffffff00/ml|r to open, |cffffff00/ml scan|r at the AH.", ML.VERSION)
     elseif event == "PLAYER_LOGOUT" then
-        -- Stash fresh single-line JSON exports into SavedVariables so the
-        -- companion uploader (tools/upload-realm.ps1) can read them from disk.
+        -- Record the last active bucket; payloads are rebuilt by the uploader.
         ML:RefreshExports()
+        -- Write this realm's item history packed. On failure the tables are
+        -- left in place and saved as-is (the next load packs them).
+        local realm = ML.realm
+        if realm and realm.items then
+            local ok, packed = pcall(ML.Snapshots.Pack, ML.Snapshots, realm.items)
+            if ok then
+                realm.itemsPacked = packed
+                realm.items = nil
+            end
+        end
     end
 end)
 
@@ -292,21 +326,43 @@ SlashCmdList["MARKETLENS"] = function(msg)
         -- A typed query matching the census's next step runs as that step.
         local filter = raw:sub(4)
         if not ML.Population.Census:TryChatQuery(filter) then ML.Population:Scan(filter) end
+    elseif msg == "spec on" or msg == "spec off" then
+        local on = msg == "spec on"
+        ML.db.settings.specSampling = on
+        if ML.Population.Inspect then ML.Population.Inspect:Status() end
+    elseif msg == "spec" then
+        if ML.Population.Inspect then ML.Population.Inspect:Status() end
+    elseif msg == "spec status" then
+        if ML.Population.Inspect then ML.Population.Inspect:Status() end
+    elseif msg == "plan" or msg == "plan snapshot" or msg == "plan full" or msg == "plan auto" or msg == "plan new" then
+        -- The old plan commands are retained only so existing macros do not
+        -- break. Population collection now lives in the main addon window.
+        ML.UI:ShowCensus()
     elseif msg == "census" then
         local C = ML.Population.Census
         if C:IsActive() then C:RunNext() else C:Start() end
-        if ML.UI.ShowCensus then ML.UI:ShowCensus() end
     elseif msg == "census next" then
         -- Hardware event: a macro with /ml census next can step it by key.
         -- Never starts a new census, so a finished run is not silently restarted.
         ML.Population.Census:RunNext()
     elseif msg:match("^census start%s*%d*$") then
         ML.Population.Census:Start(tonumber(msg:match("(%d+)$")))
-        if ML.UI.ShowCensus then ML.UI:ShowCensus() end
     elseif msg == "census stop" then
         ML.Population.Census:Stop()
     elseif msg == "census status" then
         ML.Population.Census:Status()
+    elseif msg == "census passive on" or msg == "census passive off" then
+        local on = msg == "census passive on"
+        ML.db.settings.censusPassive = on
+        if on then ML.Population.Census:SetViaChat(false, true) end
+        ML:Print("Passive census: %s. %s", on and "|cff40c040on|r" or "off",
+            on and "Normal movement, turning and world clicks will advance an active census."
+                or "Use /ml census next, the Run Next button, or chat mode.")
+    elseif msg == "census auto on" or msg == "census auto off" then
+        local on = msg == "census auto on"
+        ML.db.settings.censusAutoStart = on
+        ML:Print("Census at login: %s.%s", on and "|cff40c040on|r" or "off",
+            on and " It will advance passively only when passive census is also on." or "")
     elseif msg == "census profile" then
         ML.Population.Census:PrintProfile()
     elseif msg == "census fixed on" or msg == "census fixed off" then

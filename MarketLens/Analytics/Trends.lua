@@ -41,8 +41,17 @@ end
 
 -- Default trend window used by the dashboard (24h, falling back to widest
 -- available if 24h has no earlier sample yet).
+-- While Scores:BuildAll runs, T.memo caches this per item: demand, saturation
+-- and the row itself each ask for it, and every call built fresh tables.
 function T:Primary(itemID)
-    return self:Window(itemID, 24 * 3600)
+    local memo = self.memo
+    if memo then
+        local hit = memo[itemID]
+        if hit ~= nil then return hit or nil end
+    end
+    local w = self:Window(itemID, 24 * 3600)
         or self:Window(itemID, 6 * 3600)
         or self:Window(itemID, 3600)
+    if memo then memo[itemID] = w or false end
+    return w
 end

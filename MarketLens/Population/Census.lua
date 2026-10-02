@@ -32,17 +32,22 @@ local TARGET = 35          -- aim each level split at about this many online pla
 local HISTORY_DAYS = 7     -- recent-sighting window used to weight splits and pick zones
 local LEARN_DAYS = 14      -- how long a learned "this cell caps" split is trusted
 local ZONE_SPLITS = 4      -- zones tried for a fully-pinned capped cell
+local NAME_SPLITS = 12     -- high-yield name letters tried before zones
 local MIN_ZONE_SUPPORT = 3 -- recent sightings a zone needs to be worth a query
 local FIXED_SPLIT_AT = 40  -- fixed list: split a cell up front once this many were seen recently
 local DEFAULT_BUDGET = 300 -- max queries a single census may plan
 local MERGE_TARGET = 40    -- merge learned level parts while their last counts sum under this
 local MAX_PRESPLIT_DEPTH = 8 -- level -> class -> level -> race chains, with room for nested level splits
+local ANSWER_TIMEOUT = 15
+local BACKOFF_MIN = 30
+local BACKOFF_MAX = 90
 
--- Node helpers. A node is { lo=, hi=, class=token?, race=?, zone=? }.
+-- Node helpers. A node is { lo=, hi=, class=token?, race=?, letter=?, zone=? }.
 
 local function nodeKey(n)
     if n.refreshFilter then return "refresh|" .. n.refreshFilter end
-    return string.format("%d-%d|%s|%s|%s", n.lo, n.hi, n.class or "", n.race or "", n.zone or "")
+    return string.format("%d-%d|%s|%s|%s|%s", n.lo, n.hi, n.class or "", n.race or "",
+        n.letter or "", n.zone or "")
 end
 
 -- Level, class and race splits partition their parent; a zone split does not.
@@ -56,6 +61,7 @@ function C:Filter(n)
     local parts = { n.lo == n.hi and tostring(n.lo) or (n.lo .. "-" .. n.hi) }
     if n.class then parts[#parts + 1] = 'c-"' .. P.ClassName(n.class) .. '"' end
     if n.race then parts[#parts + 1] = 'r-"' .. n.race .. '"' end
+    if n.letter then parts[#parts + 1] = 'n-"' .. n.letter .. '"' end
     if n.zone then parts[#parts + 1] = 'z-"' .. n.zone .. '"' end
     return table.concat(parts, " ")
 end
@@ -85,7 +91,7 @@ function C:History()
     if self.hist then return self.hist end
     local store = Pop:Store()
     local cutoff = time() - HISTORY_DAYS * 86400
-    local recent, racesByClass, classCount = {}, {}, {}
+    local recent, racesByClass, classCount, raceCount = {}, {}, {}, {}
     for _, c in pairs(store.characters or {}) do
         local L = tonumber(c.level) or 0
         if L > 0 and (c.lastSeen or 0) >= cutoff then recent[#recent + 1] = c end
@@ -93,17 +99,27 @@ function C:History()
             racesByClass[c.classFile] = racesByClass[c.classFile] or {}
             racesByClass[c.classFile][c.race] = true
             classCount[c.classFile] = (classCount[c.classFile] or 0) + 1
+            raceCount[c.race] = (raceCount[c.race] or 0) + 1
         end
     end
-    self.hist = { recent = recent, racesByClass = racesByClass, classCount = classCount }
+    self.hist = { recent = recent, racesByClass = racesByClass, classCount = classCount, raceCount = raceCount }
     return self.hist
+end
+
+-- /who matches c- and r- as substrings: c-"Hunter" also returns Demon
+-- Hunters, r-"Dwarf" Dark Iron Dwarves, r-"Draenei" Lightforged. Count the
+-- way the server does, so a cell's expected size includes its overlap.
+local function contains(have, want)
+    return have ~= nil and tostring(have):lower():find(tostring(want):lower(), 1, true) ~= nil
 end
 
 local function matchesNode(c, n)
     local L = tonumber(c.level) or 0
     return L >= n.lo and L <= n.hi
-        and (not n.class or c.classFile == n.class)
-        and (not n.race or c.race == n.race)
+        and (not n.class or c.classFile == n.class
+            or (c.classFile and contains(P.ClassName(c.classFile), P.ClassName(n.class))))
+        and (not n.race or contains(c.race, n.race))
+        and (not n.letter or tostring(c.name or c.fullName or ""):lower():find(n.letter, 1, true))
 end
 
 -- Recent sightings matching a node (ignoring zone).
@@ -157,7 +173,8 @@ function C:SplitLevels(n, st, known)
         acc = acc + weights[i]
         local mustCut = (width - i) == (k - part) -- one level left per remaining part
         if L == n.hi or (part < k and (acc >= total * part / k or mustCut)) then
-            kids[#kids + 1] = { lo = lo, hi = L, class = n.class, race = n.race }
+            kids[#kids + 1] = { lo = lo, hi = L, class = n.class, race = n.race,
+                letter = n.letter, zone = n.zone }
             lo, part = L + 1, part + 1
         end
     end
@@ -169,6 +186,7 @@ end
 -- playing that class here, once there is enough history to trust, plus any
 -- race the static list does not know yet (a new allied race).
 local MIN_CLASS_HISTORY = 20
+local MIN_RACE_HISTORY = 60
 local function raceList(prof, class, hist)
     local list, seen = {}, {}
     local function add(r)
@@ -191,6 +209,13 @@ local function raceList(prof, class, hist)
     table.sort(extra)
     for _, r in ipairs(extra) do add(r) end
     return list
+end
+
+-- Public wrapper used by the manual plan. Retail does not ship a complete
+-- race/class matrix here, so this returns the profile list until the realm has
+-- enough identity history, then prunes combinations never observed locally.
+function C:RaceList(class)
+    return raceList(self:Profile(), class, self:History())
 end
 
 local function zoneList(prof, n, hist)
@@ -235,6 +260,39 @@ local function zoneList(prof, n, hist)
     return out
 end
 
+-- n- matches anywhere in a name, so these children overlap and remain
+-- coverage-labeled. Greedily choose the letters expected to reveal the most
+-- not-yet-covered characters instead of spending 26 mostly duplicate queries.
+local function letterList(n, hist)
+    local names = {}
+    for _, c in ipairs(hist.recent or {}) do
+        if matchesNode(c, n) then
+            local name = tostring(c.name or c.fullName or ""):lower()
+            if name ~= "" then names[#names + 1] = name end
+        end
+    end
+    local candidates = {}
+    local order = "aeinorstludmchpgbyfkvwxqjz"
+    for i = 1, #order do candidates[#candidates + 1] = order:sub(i, i) end
+    local chosen, covered = {}, {}
+    while #chosen < NAME_SPLITS and #candidates > 0 do
+        local bestIndex, bestGain = 1, -1
+        for i, letter in ipairs(candidates) do
+            local gain = 0
+            for j, name in ipairs(names) do
+                if not covered[j] and name:find(letter, 1, true) then gain = gain + 1 end
+            end
+            if gain > bestGain then bestIndex, bestGain = i, gain end
+        end
+        local letter = table.remove(candidates, bestIndex)
+        chosen[#chosen + 1] = letter
+        for j, name in ipairs(names) do
+            if name:find(letter, 1, true) then covered[j] = true end
+        end
+    end
+    return chosen
+end
+
 function C:Learned(n)
     local _, store = self:State()
     local e = store.censusLearned[nodeKey(n)]
@@ -268,8 +326,54 @@ function C:SplitKind(n, st)
         end
         return "level"
     end
+    if not n.class and not n.race then
+        -- Pick the cheaper exhaustive first axis from recent realm sightings.
+        -- Cost includes the first set of queries plus a rough penalty for bins
+        -- expected to cap and therefore need the opposite axis as well.
+        local prof, hist = self:Profile(), self:History()
+        local function axisCost(axis, values)
+            local counts, support = {}, 0
+            for _, c in ipairs(hist.recent or {}) do
+                if matchesNode(c, n) then
+                    local value = axis == "class" and c.classFile or c.race
+                    if value and value ~= "" then
+                        counts[value] = (counts[value] or 0) + 1
+                        support = support + 1
+                    end
+                end
+            end
+            if support < 20 then return nil end
+            local cost = #values
+            for _, value in ipairs(values) do
+                if (counts[value] or 0) >= prof.capAt * 0.8 then
+                    if axis == "class" then
+                        cost = cost + math.max(#raceList(prof, value, hist) - 1, 1)
+                    else
+                        local possible = 0
+                        for _, token in ipairs(prof.classes) do
+                            local allowed = prof.racesByClass and prof.racesByClass[token]
+                            if not allowed then
+                                possible = possible + 1
+                            else
+                                for _, race in ipairs(allowed) do
+                                    if race == value then possible = possible + 1 break end
+                                end
+                            end
+                        end
+                        cost = cost + math.max(possible - 1, 1)
+                    end
+                end
+            end
+            return cost
+        end
+        local classCost = axisCost("class", prof.classes)
+        local raceCost = axisCost("race", prof.races)
+        if raceCost and (not classCost or raceCost < classCost) then return "race" end
+        return "class"
+    end
     if not n.class then return "class" end
     if not n.race then return "race" end
+    if not n.letter then return "letter" end
     if not n.zone then return "zone" end
     return nil
 end
@@ -284,7 +388,8 @@ function C:Children(n, st)
         local learned = self:Learned(n)
         if learned and learned.levels then
             for i = 1, #learned.levels, 2 do
-                kids[#kids + 1] = { lo = learned.levels[i], hi = learned.levels[i + 1], class = n.class, race = n.race }
+                kids[#kids + 1] = { lo = learned.levels[i], hi = learned.levels[i + 1],
+                    class = n.class, race = n.race, letter = n.letter, zone = n.zone }
             end
             kids = self:Compact(n, learned, kids)
         else
@@ -294,19 +399,43 @@ function C:Children(n, st)
         end
         return kids, true, kind
     elseif kind == "class" then
+        -- Rulesets without a race/class table (MoP, Retail, Forever): once a
+        -- race has MIN_RACE_HISTORY lifetime sightings here, skip classes it
+        -- was never seen playing (Human Evoker, Night Elf Paladin, ...), the
+        -- same trust rule raceList applies in the other direction.
+        local hist = n.race and not prof.racesByClass and self:History()
+        local trusted = hist and (hist.raceCount[n.race] or 0) >= MIN_RACE_HISTORY
         for _, token in ipairs(prof.classes) do
-            kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = token }
+            local include = true
+            if n.race and prof.racesByClass and prof.racesByClass[token] then
+                include = false
+                for _, race in ipairs(prof.racesByClass[token]) do
+                    if race == n.race then include = true break end
+                end
+            elseif trusted then
+                include = (hist.racesByClass[token] or {})[n.race] and true or false
+            end
+            if include then kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = token,
+                race = n.race, letter = n.letter, zone = n.zone } end
         end
         return kids, true, kind
     elseif kind == "race" then
         for _, race in ipairs(raceList(prof, n.class, self:History())) do
-            kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = n.class, race = race }
+            kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = n.class, race = race,
+                letter = n.letter, zone = n.zone }
         end
         return kids, true, kind
+    elseif kind == "letter" then
+        for _, letter in ipairs(letterList(n, self:History())) do
+            kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = n.class, race = n.race,
+                letter = letter, zone = n.zone }
+        end
+        return kids, false, kind
     elseif kind == "zone" then
         if not prof.zoneFallback then return kids, false, kind end -- stays a lower bound
         for _, zone in ipairs(zoneList(prof, n, self:History())) do
-            kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = n.class, race = n.race, zone = zone }
+            kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = n.class, race = n.race,
+                letter = n.letter, zone = zone }
         end
         return kids, false, kind
     end
@@ -352,7 +481,8 @@ function C:Compact(n, learned, kids)
         local c = count(k)
         local t = c and store.censusSeen[nodeKey(k)].t
         if cur and curN and c and curN + c <= MERGE_TARGET then
-            cur = { lo = cur.lo, hi = k.hi, class = n.class, race = n.race }
+            cur = { lo = cur.lo, hi = k.hi, class = n.class, race = n.race,
+                letter = n.letter, zone = n.zone }
             curN, curT = curN + c, math.min(curT, t)
         else
             flush()
@@ -393,6 +523,10 @@ function C:Fixed(st)
     if st and st.fixed ~= nil then return st.fixed end
     local set = ML.db.settings.censusFixed
     if set ~= nil then return set end
+    -- Passive collection has time to refine capped cells while the player is
+    -- already playing. Keep Forever's short fixed refresh only for deliberate
+    -- manual sessions; passive runs stay bounded by censusBudget instead.
+    if ML.db.settings.censusPassive then return false end
     return self:Profile().fixedPlan and true or false
 end
 
@@ -433,6 +567,13 @@ function C:Enqueue(nodes, st, front)
         for _, n in ipairs(planned) do st.queue[#st.queue + 1] = n end
     end
     return #planned
+end
+
+local function shuffle(list)
+    for i = #list, 2, -1 do
+        local j = math.random(i)
+        list[i], list[j] = list[j], list[i]
+    end
 end
 
 function C:PurgeLearned()
@@ -499,7 +640,8 @@ function C:Start(budget)
     if st.fixed then st.ratioObs, st.ratioHist = 1, 1 end
 
     local backbone = {}
-    if prof.simpleRefresh then
+    local adaptiveForever = prof.id == "forever" and ML.db.settings.censusPassive
+    if prof.simpleRefresh and not adaptiveForever then
         -- Forever and Retail are enormous, realmless populations. This is a
         -- deliberately small refresh sample, not an attempt to enumerate
         -- everyone online: levels 1-20, then every faction race and class.
@@ -524,6 +666,10 @@ function C:Start(budget)
         end
     end
     self:Enqueue(backbone, st, false)
+    -- Passive sessions may span a long play period. Shuffling avoids always
+    -- measuring low/high levels at the same point in that period. Deliberate
+    -- manual sessions retain the economically useful high-level-first order.
+    if ML.db.settings.censusPassive then shuffle(st.queue) end
     if st.fixed then st.ratioObs, st.ratioHist = 0, 0 end
     ML:Print("Census started: |cffffffff%s|r %s, %s%d queries%s.",
         prof.label, prof.faction, st.fixed and "fixed list of " or "", #st.queue,
@@ -537,15 +683,27 @@ end
 -- the last /who is still in flight (quiet=false prints why).
 function C:Settle(st, quiet)
     if st.inflight then
-        if Pop.pending and GetTime() - Pop.lastSend < Pop.COOLDOWN then
+        local sentAt = st.inflightSentAt or time()
+        if Pop.pending and time() - sentAt < ANSWER_TIMEOUT then
             if not quiet then ML:Print("Still waiting on the last /who...") end
             return nil
         end
-        -- No WHO_LIST_UPDATE came back (throttled or a /reload): retry it.
+        -- One silent miss can be an input the client declined. A second miss is
+        -- treated as server throttling and persisted as a real backoff, so a
+        -- passive census cannot hammer /who while the player keeps moving.
         table.insert(st.queue, 1, st.inflight)
         st.inflight = nil
+        st.inflightSentAt = nil
         st.retries = st.retries + 1
+        st.misses = (st.misses or 0) + 1
+        if st.misses >= 2 then
+            st.nextAttemptAt = time() + math.random(BACKOFF_MIN, BACKOFF_MAX)
+            st.misses = 0
+            if not quiet then ML:Print("/who appears throttled; retrying after a short backoff.") end
+        end
     end
+    if st.nextAttemptAt and time() < st.nextAttemptAt then return nil end
+    st.nextAttemptAt = nil
     -- Drop anything planned above the current level cap (e.g. a census started
     -- before the Forever beta cap was pinned).
     local prof = self:Profile()
@@ -570,11 +728,13 @@ function C:ViaChat()
     return ML.db.settings.censusViaChat
 end
 
-function C:SetViaChat(on)
+function C:SetViaChat(on, quiet)
     ML.db.settings.censusViaChat = on or nil
-    ML:Print("Census chat mode %s.", on
-        and "|cff40c040on|r -- press Enter on each /ml who the census types for you"
-        or "off -- Run Next sends queries directly")
+    if not quiet then
+        ML:Print("Census chat mode %s.", on
+            and "|cff40c040on|r -- press Enter on each /ml who the census types for you"
+            or "off -- Run Next sends queries directly")
+    end
     if on then self:PromptNext() end
     ML:Fire("CENSUS_CHANGED")
 end
@@ -626,14 +786,18 @@ end
 -- Mark the node in flight BEFORE sending: a refused SendWho raises
 -- ADDON_ACTION_BLOCKED during the call itself, and its handler must find the
 -- query to put it back.
-function C:Send(st, n, filter)
+function C:Send(st, n, filter, source)
     table.remove(st.queue, 1)
     st.inflight = n
+    st.inflightSentAt = time()
+    st.inflightSource = source
     if not Pop:Scan(filter, "census") and st.inflight == n then
         -- Not sent (client cooldown): leave it next in line, and in chat
         -- mode type it again once the cooldown clears.
         table.insert(st.queue, 1, n)
         st.inflight = nil
+        st.inflightSentAt = nil
+        st.inflightSource = nil
         self:PromptNext()
         return
     end
@@ -641,7 +805,7 @@ function C:Send(st, n, filter)
 end
 
 -- Must be reached from a hardware event (button click or slash command).
-function C:RunNext()
+function C:RunNext(quiet, source)
     local st = self:State()
     if not st then
         ML:Print("No census is running -- |cffffff00/ml census start|r.")
@@ -652,12 +816,14 @@ function C:RunNext()
         self:PromptNext()
         return
     end
-    local n = self:Settle(st)
+    local n = self:Settle(st, quiet)
     if not n then
-        if not st.inflight then self:Finish() end
+        -- A persisted throttle backoff has no in-flight query, but it is not
+        -- completion. A future hardware event will try again after the wait.
+        if not st.inflight and not (st.nextAttemptAt and time() < st.nextAttemptAt) then self:Finish() end
         return
     end
-    self:Send(st, n, self:Filter(n))
+    self:Send(st, n, self:Filter(n), source)
 end
 
 function C:OnScanComplete(sample, tag)
@@ -665,6 +831,10 @@ function C:OnScanComplete(sample, tag)
     if tag ~= "census" or not st or not st.inflight then return end
     local n = st.inflight
     st.inflight = nil
+    st.inflightSentAt = nil
+    st.inflightSource = nil
+    st.misses = 0
+    st.nextAttemptAt = nil
     st.done = st.done + 1
 
     local observed = sample.observed or 0
@@ -713,7 +883,7 @@ function C:OnScanComplete(sample, tag)
     end
     st.last = last
     -- One line per step: progress, query, result.
-    ML:Print("|cff808080%d/%d|r %s |cff808080=|r %s", st.done, st.done + #st.queue, sample.filter or "",
+    ML:CensusPrint("|cff808080%d/%d|r %s |cff808080=|r %s", st.done, st.done + #st.queue, sample.filter or "",
         last.capped and string.format("|cffff8040%d, split %d|r", observed, last.split) or tostring(observed))
 
     if #st.queue == 0 then
@@ -793,9 +963,11 @@ function C:Status()
         return
     end
     local unique, rows = self:Counts(st)
-    ML:Print("Census %s %s: %d/%d queries, next %s, %d unique, %d unresolved.",
+    local wait = st.nextAttemptAt and math.max(st.nextAttemptAt - time(), 0) or 0
+    ML:Print("Census %s %s: %d/%d queries, next %s%s, %d unique, %d unresolved.",
         st.label, st.faction, st.done, st.done + #st.queue,
-        st.queue[1] and self:Filter(st.queue[1]) or "--", unique, st.unresolved)
+        st.queue[1] and self:Filter(st.queue[1]) or "--",
+        wait > 0 and string.format(" (backoff %ds)", wait) or "", unique, st.unresolved)
 end
 
 -- Snapshot for the UI (nil when idle).
@@ -810,6 +982,8 @@ function C:Summary()
         next = st.queue[1] and self:Filter(st.queue[1]),
         last = st.last, generated = st.generated, preSplit = st.preSplit,
         unresolved = st.unresolved, overBudget = st.overBudget, retries = st.retries,
+        passive = ML.db.settings.censusPassive and true or false,
+        backoff = st.nextAttemptAt and math.max(st.nextAttemptAt - time(), 0) or 0,
         unique = unique, duplicates = math.max(rows - unique, 0),
     }, store.censusLast
 end
@@ -825,8 +999,25 @@ ML:On("POP_SCAN_COMPLETE", function(sample, tag) C:OnScanComplete(sample, tag) e
 ML:On("POP_SCAN_FAILED", function(_, tag)
     local st = C:State()
     if tag ~= "census" or not st or not st.inflight then return end
+    local source = st.inflightSource
     table.insert(st.queue, 1, st.inflight)
     st.inflight = nil
+    st.inflightSentAt = nil
+    st.inflightSource = nil
     ML:Fire("CENSUS_CHANGED")
-    if C:ViaChat() then C:PromptNext() else C:SetViaChat(true) end
+    if ML.db.settings.censusPassive and Pop.Passive then
+        Pop.Passive:OnSendFailure(source)
+    elseif C:ViaChat() then
+        C:PromptNext()
+    else
+        C:SetViaChat(true)
+    end
+end)
+
+ML:On("POP_SCAN_STALE", function(_, tag)
+    local st = C:State()
+    if tag ~= "census" or not st or not st.inflight then return end
+    table.insert(st.queue, 1, st.inflight)
+    st.inflight, st.inflightSentAt, st.inflightSource = nil, nil, nil
+    ML:Fire("CENSUS_CHANGED")
 end)

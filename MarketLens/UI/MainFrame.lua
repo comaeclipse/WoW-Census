@@ -15,7 +15,12 @@ local BOARD_H      = 392
 
 UI.view    = "markets"                     -- markets | items | trends | population
 UI.nav     = { level = 0 }                 -- drill state for the markets view
-UI.popMode = "class"                       -- population: class | race | demand | characters
+UI.popMode = "census"                      -- Population tab is a focused collection dashboard.
+
+local function isForever()
+    return ML.Population.Profiles and ML.Population.Profiles.DetectID
+        and ML.Population.Profiles.DetectID() == "forever"
+end
 
 function UI.ScoreText(v)
     if v == nil then return "|cff808080--|r" end
@@ -104,15 +109,18 @@ function UI:BuildBoard()
     scan:SetSize(120, 22)
     scan:SetPoint("BOTTOMRIGHT", -12, 10)
     scan:SetText("Scan Auction House")
-    -- The button press is the hardware event SendWho requires, so a Population
-    -- scan can be launched straight from OnClick.
     scan:SetScript("OnClick", function()
         if UI.view == "population" then
-            if ML.Population.Census:IsActive() then
-                ML.Population.Census:RunNext()
+            local C = ML.Population.Census
+            if C:IsActive() then
+                -- The Forever client can reject a SendWho originating from an
+                -- addon button. This must not be mistaken for a failed world
+                -- click, which is the passive collection path.
+                C:RunNext(false, "button")
             else
-                ML.Population:Scan()
+                C:Start()
             end
+            UI:Refresh()
         else
             ML.Scanner:StartScan()
         end
@@ -124,18 +132,41 @@ function UI:BuildBoard()
     refresh:SetPoint("RIGHT", scan, "LEFT", -6, 0)
     refresh:SetText("Refresh")
     refresh:SetScript("OnClick", function() UI:Refresh() end)
+    board.refreshButton = refresh
 
-    -- Population only: start/stop an adaptive census. Kept far from the scan
-    -- button (which becomes Run Next) so a stray click cannot end a census.
+    -- Population only: a clearly separate stop control, so collection never
+    -- stops due to a stray press of the primary collection button.
     local census = CreateFrame("Button", nil, board, "UIPanelButtonTemplate")
     census:SetSize(100, 22)
     census:SetPoint("BOTTOMLEFT", 12, 10)
     census:SetScript("OnClick", function()
         local C = ML.Population.Census
-        if C:IsActive() then C:Stop() else C:Start(); UI:ShowCensus() end
+        if C:IsActive() then C:Stop(); UI:Refresh() end
     end)
     census:Hide()
     board.censusButton = census
+
+    local passive = CreateFrame("Button", nil, board, "UIPanelButtonTemplate")
+    passive:SetSize(108, 22)
+    passive:SetPoint("LEFT", census, "RIGHT", 6, 0)
+    passive:SetScript("OnClick", function()
+        local on = not ML.db.settings.censusPassive
+        ML.db.settings.censusPassive = on
+        if on then ML.Population.Census:SetViaChat(false, true) end
+        UI:Refresh()
+    end)
+    passive:Hide()
+    board.passiveButton = passive
+
+    local auto = CreateFrame("Button", nil, board, "UIPanelButtonTemplate")
+    auto:SetSize(108, 22)
+    auto:SetPoint("LEFT", passive, "RIGHT", 6, 0)
+    auto:SetScript("OnClick", function()
+        ML.db.settings.censusAutoStart = not ML.db.settings.censusAutoStart
+        UI:Refresh()
+    end)
+    auto:Hide()
+    board.autoButton = auto
 
     local crumb = CreateFrame("Button", nil, board)
     crumb:SetSize(400, 16)
@@ -144,7 +175,7 @@ function UI:BuildBoard()
     ct:SetPoint("LEFT"); ct:SetJustifyH("LEFT")
     crumb.text = ct
     crumb:SetScript("OnClick", function()
-        if UI.view == "population" then UI:CyclePopMode() else UI:NavigateUp() end
+        if UI.view ~= "population" then UI:NavigateUp() end
     end)
     board.crumb = crumb
 
@@ -278,6 +309,7 @@ end
 function UI:SetView(view)
     self.view = view
     if view == "markets" then self.nav = { level = 0 } end
+    if view == "population" then self.popMode = "census" end
     self:StyleSubTabs()
     self:Refresh()
 end
@@ -289,13 +321,6 @@ function UI:NavigateUp()
     elseif self.nav.level == 1 then
         self.nav.level, self.nav.profession = 0, nil
     end
-    self:Refresh()
-end
-
--- Population tab cycles class -> race -> demand -> unique characters -> census.
-local POP_NEXT = { class = "race", race = "demand", demand = "characters", characters = "census", census = "class" }
-function UI:CyclePopMode()
-    self.popMode = POP_NEXT[self.popMode or "class"] or "class"
     self:Refresh()
 end
 
@@ -332,13 +357,13 @@ local function crumbLabel(nav)
     end
 end
 
-local POP_NAME = { class = "Class", race = "Race", demand = "Inferred profession demand", characters = "Unique characters", census = "Census" }
-local POP_HINT = { class = "Race", race = "Demand", demand = "Unique characters", characters = "Census", census = "Class" }
+local POP_NAME = { class = "Class", race = "Race", demand = "Inferred profession demand", characters = "Unique characters", census = "Population collection" }
+local POP_HINT = { class = "Race", race = "Demand", demand = "Unique characters", characters = "Census", census = "" }
 local function popCrumb(mode)
     if mode == "census" then
         local active = ML.Population.Census:IsActive()
-        return string.format("|cff33aaffCensus|r  |cff808080\194\183 %s \226\128\148 click for Class|r",
-            active and "one /who per Run Next press" or "adaptive /who sweep of your faction")
+        return string.format("|cff33aaffPopulation collection|r  |cff808080\194\183 %s|r",
+            active and "collecting while you play" or "ready when you are")
     end
     local agg = ML.Population and ML.Population:Aggregate()
     if not agg then
@@ -368,7 +393,12 @@ end
 
 function UI:Refresh()
     if not self.board then return end
-    self.model = ML.Scores:BuildAll()
+    -- Population collection is independent from auction scoring. Avoid doing
+    -- market analysis every time a passive /who result repaints this panel.
+    if self.view ~= "population" then
+        self.model = nil -- let the old model be collected while the new one builds
+        self.model = ML.Scores:BuildAll()
+    end
 
     local last = ML.realm.lastScan
     local when
@@ -384,8 +414,12 @@ function UI:Refresh()
     end
     local conf = self:Confidence()
     local confLine = string.format("\n|cff808080Confidence:|r %s", UI.ScoreText(conf))
-    self.board.subtitle:SetText(string.format("%s\n|cff808080Last scan:|r %s%s",
-        ML:RealmKey(), when, confLine))
+    if self.view == "population" then
+        self.board.subtitle:SetText(string.format("%s\n|cff808080Observed /who samples|r", ML:RealmKey()))
+    else
+        self.board.subtitle:SetText(string.format("%s\n|cff808080Last scan:|r %s%s",
+            ML:RealmKey(), when, confLine))
+    end
 
     local mod, cols, entries
     if self.view == "markets" then
@@ -399,11 +433,11 @@ function UI:Refresh()
         entries = ML.UI.ItemTable:FlatRows(self.model, "opportunity")
         self.board.crumb:Hide()
     elseif self.view == "population" then
-        local mode = self.popMode or "class"
-        cols = ML.UI.PopTable:Columns(mode)
-        entries = ML.UI.PopTable:Rows(mode)
+        self.popMode = "census"
+        cols = ML.UI.PopTable:Columns("census")
+        entries = ML.UI.PopTable:Rows("census")
         self.board.crumb:Show()
-        self.board.crumb.text:SetText(popCrumb(mode))
+        self.board.crumb.text:SetText(popCrumb("census"))
     else -- trends
         cols = ML.UI.ItemTable:TrendColumns()
         entries = ML.UI.ItemTable:FlatRows(self.model, "trend")
@@ -414,14 +448,41 @@ function UI:Refresh()
     if not (ML.Scanner.scanning or (ML.Population and ML.Population.pending)) then
         self.board.scanButton:SetText(self:ScanButtonLabel())
     end
-    local pop = self.view == "population"
-    self.board.hint:SetShown(not pop)
-    self.board.censusButton:SetShown(pop)
-    self.board.censusButton:SetText(ML.Population.Census:IsActive() and "Stop Census" or "Start Census")
+    self.board.hint:Show()
+    self:UpdatePopulationControls()
 
     self:ApplyColumns(cols)
     self.entries = entries
     self:Paint()
+end
+
+function UI:UpdatePopulationControls()
+    local board = self.board
+    if self.view ~= "population" then
+        board.refreshButton:Show()
+        board.censusButton:Hide()
+        board.passiveButton:Hide()
+        board.autoButton:Hide()
+        return
+    end
+
+    local active = ML.Population.Census:IsActive()
+    board.refreshButton:Hide()
+    board.censusButton:SetText("Stop collection")
+    if active then board.censusButton:Show() else board.censusButton:Hide() end
+    board.passiveButton:SetText("Passive: " .. (ML.db.settings.censusPassive and "On" or "Off"))
+    board.passiveButton:Enable()
+    board.autoButton:SetText("Start at login: " .. (ML.db.settings.censusAutoStart and "On" or "Off"))
+    board.passiveButton:Show()
+    board.autoButton:Show()
+    if isForever() and active then
+        board.scanButton:Disable()
+    elseif not (ML.Scanner.scanning or (ML.Population and ML.Population.pending)) then
+        board.scanButton:Enable()
+    end
+    board.hint:SetText(active
+        and "Passive collection advances from your normal world clicks while you play."
+        or "Choose Start Collection once, then play normally. Passive and login collection are controlled by the two toggles.")
 end
 
 function UI:Paint()
@@ -606,6 +667,11 @@ end
 
 function UI:Toggle()
     self:BuildBoard()
+    -- On the Forever beta this button is primarily a collection dashboard,
+    -- not an AH analysis launchpad. Other editions retain the market default.
+    if isForever() then
+        self.view, self.popMode = "population", "census"
+    end
     if AuctionFrame and AuctionFrame:IsShown() and self.ahTab and _G.AuctionFrameTab_OnClick then
         -- Behave like clicking our native tab.
         AuctionFrameTab_OnClick(self.ahTab)
@@ -642,7 +708,9 @@ end
 
 function UI:ScanButtonLabel()
     if self.view ~= "population" then return "Scan Auction House" end
-    return ML.Population.Census:IsActive() and "Run Next" or "Scan Population"
+    if not ML.Population.Census:IsActive() then return "Start Collection" end
+    if isForever() then return "Collection running" end
+    return "Collect Next Now"
 end
 
 -- Open the board on the Population tab's census view.

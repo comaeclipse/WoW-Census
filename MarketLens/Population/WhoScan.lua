@@ -29,6 +29,52 @@ local SCAN_CAP = 1000   -- retained samples per realm (also purged by retention)
 Pop.pending = false
 Pop.lastSend = 0
 Pop.COOLDOWN = COOLDOWN
+Pop.lastAnswer = nil
+
+local eventFrame
+local silencedWhoFrames = {}
+local whoSilenceGeneration = 0
+
+local function frameListening(frame)
+    if type(frame) ~= "table" or type(frame.IsEventRegistered) ~= "function" then return nil end
+    local ok, listening = pcall(frame.IsEventRegistered, frame, "WHO_LIST_UPDATE")
+    return ok and listening or nil
+end
+
+-- Blizzard's own WHO_LIST_UPDATE listeners open FriendsFrame on older clients
+-- and LFGParentFrame on Forever. Temporarily unregister only those listeners;
+-- our private event frame remains registered and still captures the roster.
+local function silenceWhoWindow()
+    whoSilenceGeneration = whoSilenceGeneration + 1
+    local found = {}
+    if type(GetFramesRegisteredForEvent) == "function" then
+        local frames = { GetFramesRegisteredForEvent("WHO_LIST_UPDATE") }
+        for _, frame in ipairs(frames) do found[#found + 1] = frame end
+    else
+        for _, name in ipairs({ "LFGWhoListFrame", "FriendsFrame", "WhoFrame" }) do
+            local frame = _G[name]
+            if frame and frameListening(frame) ~= false then found[#found + 1] = frame end
+        end
+    end
+    for _, frame in ipairs(found) do
+        if frame ~= eventFrame and type(frame.UnregisterEvent) == "function"
+            and frameListening(frame) ~= false then
+            local ok = pcall(frame.UnregisterEvent, frame, "WHO_LIST_UPDATE")
+            if ok and not silencedWhoFrames[frame] then silencedWhoFrames[frame] = true end
+        end
+    end
+    return whoSilenceGeneration
+end
+
+local function restoreWhoWindow(generation)
+    if generation and generation ~= whoSilenceGeneration then return end
+    for frame in pairs(silencedWhoFrames) do
+        if type(frame.RegisterEvent) == "function" and frameListening(frame) ~= true then
+            pcall(frame.RegisterEvent, frame, "WHO_LIST_UPDATE")
+        end
+        silencedWhoFrames[frame] = nil
+    end
+end
 
 -- API shims: C_FriendList (Classic/Retail) with legacy global fallbacks
 
@@ -69,20 +115,76 @@ local function whoInfo(i)
     end
 end
 
+local function answerFingerprint(roster, observed)
+    local keys = {}
+    for key in pairs(roster or {}) do keys[#keys + 1] = key end
+    table.sort(keys)
+    return tostring(observed or 0) .. "\n" .. table.concat(keys, "\n")
+end
+
+-- Reject only responses that are provably not for the request we issued. The
+-- client can replay its previous /who list after a new request; accepting that
+-- list would attach real characters to the wrong census cell. Small identical
+-- results are allowed because neighboring filters can legitimately coincide.
+local function staleReason(filter, roster, observed)
+    local lo, hi = tostring(filter or ""):match("(%d+)%s*%-%s*(%d+)")
+    if not lo then
+        local only = tostring(filter or ""):match("^%s*(%d+)%s*$")
+        lo, hi = only, only
+    end
+    if lo then
+        lo, hi = tonumber(lo), tonumber(hi)
+        for _, row in pairs(roster or {}) do
+            local level = tonumber(row.level)
+            if level and (level < lo or level > hi) then
+                return string.format("level %d is outside %d-%d", level, lo, hi)
+            end
+        end
+    end
+    local fp = answerFingerprint(roster, observed)
+    local last = Pop.lastAnswer
+    local disjoint = lo and last and last.lo
+        and (tonumber(hi) < last.lo or tonumber(lo) > last.hi)
+    if observed >= 10 and disjoint and last.filter ~= filter and last.fingerprint == fp then
+        return "the client replayed the previous /who list"
+    end
+    Pop.lastAnswer = { filter = filter, fingerprint = fp,
+        lo = tonumber(lo), hi = tonumber(hi) }
+    return nil
+end
+
 local function trim(s)
     return tostring(s or ""):gsub("^%s+", ""):gsub("%s+$", "")
 end
 
 local function identity(info)
+    local firstName = trim(info.firstName or info.mainName)
+    local lastName = trim(info.lastName or info.surname or info.secondaryName)
     local fullName = trim(info.fullName)
+    if fullName == "" and firstName ~= "" then
+        fullName = firstName .. (lastName ~= "" and (" " .. lastName) or "")
+    end
     if fullName == "" then return nil end
-    local name, realm = fullName:match("^([^-]+)%-(.+)$")
+    local directRealm = trim(info.realmName or info.realm or info.serverName)
+    local name, realm
+    -- Forever names can contain spaces and hyphens in the surname. Never
+    -- reinterpret such a hyphen as a realm delimiter without an explicit
+    -- realm field from the API.
+    local forever = Pop.Profiles and Pop.Profiles.DetectID and Pop.Profiles.DetectID() == "forever"
+    if directRealm ~= "" then
+        name, realm = fullName, directRealm
+    elseif not forever then
+        name, realm = fullName:match("^([^-]+)%-(.+)$")
+    end
     name = trim(name or fullName)
     realm = trim(realm or GetRealmName() or "UnknownRealm")
+    if firstName == "" then firstName, lastName = name:match("^(%S+)%s+(.+)$") end
+    firstName = trim(firstName ~= "" and firstName or name)
+    lastName = trim(lastName)
     if name == "" then return nil end
     local normalizedRealm = realm:lower():gsub("[%s']", "")
     local key = ML:GameFlavor() .. ":" .. normalizedRealm .. ":" .. name:lower()
-    return key, name .. "-" .. realm, name, realm
+    return key, name .. "-" .. realm, name, realm, firstName, lastName
 end
 
 -- Class-mix -> inferred crafting demand
@@ -192,11 +294,11 @@ function Pop:Scan(filter, tag)
     -- cooldown has elapsed with no WHO_LIST_UPDATE, treat it as dropped by the
     -- server (SendWho throttling) and let this press start a fresh one.
     if self.pending and now - self.lastSend < COOLDOWN then
-        ML:Print("Population scan already in progress...")
+        if tag ~= "census" then ML:Print("Population scan already in progress...") end
         return false
     end
     if now - self.lastSend < COOLDOWN then
-        ML:Print("Population scans are throttled \226\128\148 wait a few seconds and retry.")
+        if tag ~= "census" then ML:Print("Population scans are throttled \226\128\148 wait a few seconds and retry.") end
         return false
     end
 
@@ -206,11 +308,24 @@ function Pop:Scan(filter, tag)
     local store = self:Store()
     self.pendingSweepID = store.activeSweepID
     self.lastSend = now
+    local silenceGeneration = silenceWhoWindow()
     setWhoToUi(true)
     -- The census prints its own one-line step summary instead.
     if tag ~= "census" then ML:Print("Population scan: |cffffffff%s|r ...", filter) end
     ML:Fire("POP_SCAN_START", filter)
     sendWho(filter)
+    -- Forever can load its Group Finder who listener during SendWho itself.
+    -- Sweep once on the following frame to catch that late listener, then
+    -- always restore the UI listeners after the response timeout.
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, function()
+            if self.pending then silenceWhoWindow() end
+        end)
+        C_Timer.After(16, function() restoreWhoWindow() end)
+    else
+        -- Legacy clients without timers still get the normal response restore.
+        self.whoSilenceGeneration = silenceGeneration
+    end
     return true
 end
 
@@ -225,6 +340,11 @@ function Pop:Capture()
     if not self.pending then return end
     self.pending = false
     setWhoToUi(false) -- restore default so manual /who prints to chat again
+    if C_Timer and C_Timer.After then
+        C_Timer.After(0, function() restoreWhoWindow() end)
+    else
+        restoreWhoWindow(self.whoSilenceGeneration)
+    end
 
     local shown, total = numResults()
     shown = shown or 0
@@ -239,10 +359,11 @@ function Pop:Capture()
             classes[token] = (classes[token] or 0) + 1
             races[race]    = (races[race] or 0) + 1
             observed = observed + 1
-            local key, fullName, name, realm = identity(info)
+            local key, fullName, name, realm, firstName, lastName = identity(info)
             if key and not roster[key] then
                 roster[key] = {
                     key = key, fullName = fullName, name = name, realm = realm,
+                    firstName = firstName, lastName = lastName,
                     guild = info.fullGuildName or "", level = info.level or 0,
                     race = race, class = info.classStr or token,
                     classFile = token, zone = info.area or "",
@@ -260,6 +381,14 @@ function Pop:Capture()
         classes  = classes,
         races    = races,
     }
+    local stale = staleReason(self.pendingFilter, roster, observed)
+    if stale then
+        local tag = self.pendingTag
+        self.pendingSweepID, self.pendingTag = nil, nil
+        ML:Print("Ignored stale /who response for |cffffffff%s|r: %s.", sample.filter or "", stale)
+        ML:Fire("POP_SCAN_STALE", sample.filter, tag)
+        return
+    end
     local unique = self:Record(sample, roster)
     self:RecordSweepQuery(sample, roster, self.pendingSweepID)
     self.pendingSweepID = nil
@@ -281,7 +410,65 @@ function Pop:Store()
     realm.population.samples = realm.population.samples or {}
     realm.population.characters = realm.population.characters or {}
     realm.population.sweeps = realm.population.sweeps or {}
+    realm.population.specSamples = realm.population.specSamples or {}
     return realm.population
+end
+
+-- Migrate verbose population records in every realm bucket to compact array
+-- values. Map keys still carry character identity, so repeating those fields
+-- inside each observation only wastes SavedVariables and Lua heap space.
+function Pop:CompactStorage()
+    local retention = (ML.db.settings and ML.db.settings.populationRetentionDays) or 35
+    local cutoff = time() - retention * 86400
+    local cutoffDay = math.floor(cutoff / 86400)
+    for _, realm in pairs(ML.db.realms or {}) do
+        local store = realm.population
+        if store then
+            local kept = {}
+            for _, sample in ipairs(store.samples or {}) do
+                if (sample.t or 0) >= cutoff then kept[#kept + 1] = sample end
+            end
+            store.samples = kept
+            local specs = {}
+            local specCutoff = time() - ((ML.db.settings and ML.db.settings.specRetentionDays) or retention) * 86400
+            for _, sample in ipairs(store.specSamples or {}) do
+                if (sample.t or 0) >= specCutoff then specs[#specs + 1] = sample end
+            end
+            store.specSamples = specs
+            for _, c in pairs(store.characters or {}) do
+                for day, d in pairs(c.days or {}) do
+                    if (tonumber(day) or 0) < cutoffDay then
+                        c.days[day] = nil
+                    else
+                        c.days[day] = {
+                            d.count or d[1] or 0,
+                            d.firstSeen or d[2] or 0,
+                            d.lastSeen or d[3] or 0,
+                        }
+                    end
+                end
+            end
+            for id, sweep in pairs(store.sweeps or {}) do
+                local ended = sweep.completedAt or sweep.startedAt or 0
+                if sweep.status ~= "active" and ended < cutoff then
+                    store.sweeps[id] = nil
+                else
+                    for _, q in ipairs(sweep.queries or {}) do q.keys = nil end
+                    for key, o in pairs(sweep.observations or {}) do
+                        sweep.observations[key] = {
+                            o.queryIndex or o[1] or 0,
+                            o.observedAt or o[2] or 0,
+                            o.zone or o[3] or "",
+                            o.level or o[4] or 0,
+                            o.classFile or o[5] or "",
+                            o.race or o[6] or "",
+                        }
+                    end
+                end
+            end
+        end
+    end
+    ML.db.populationStorageVersion = 2
 end
 
 -- A sweep is an explicitly bounded collection session. It does not claim
@@ -292,7 +479,7 @@ function Pop:StartSweep(label, quiet)
     local store = self:Store()
     if store.activeSweepID then
         self:FinishSweep("partial")
-        ML:Print("Previous active sweep was closed as partial.")
+        ML:CensusPrint("Previous active sweep was closed as partial.")
     end
     store.nextSweepSeq = (store.nextSweepSeq or 0) + 1
     local started = time()
@@ -304,7 +491,7 @@ function Pop:StartSweep(label, quiet)
     }
     store.activeSweepID = id
     if not quiet then
-        ML:Print("Started population sweep |cffffffff%s|r. Run /ml who filters, then /ml sweep complete or /ml sweep partial.", id)
+        ML:CensusPrint("Started population sweep |cffffffff%s|r. Run /ml who filters, then /ml sweep complete or /ml sweep partial.", id)
     end
     ML:Fire("POP_SWEEP_CHANGED", store.sweeps[id])
     return id
@@ -324,7 +511,7 @@ function Pop:FinishSweep(status)
     store.activeSweepID = nil
     local chars = 0
     for _ in pairs(sweep.observations or {}) do chars = chars + 1 end
-    ML:Print("Closed sweep |cffffffff%s|r as %s: %d queries, %d unique characters.",
+    ML:CensusPrint("Closed sweep |cffffffff%s|r as %s: %d queries, %d unique characters.",
         id, status, #(sweep.queries or {}), chars)
     ML:Fire("POP_SWEEP_CHANGED", sweep)
     return sweep
@@ -340,7 +527,7 @@ function Pop:SweepStatus()
     local chars, capped = 0, 0
     for _ in pairs(sweep.observations or {}) do chars = chars + 1 end
     for _, q in ipairs(sweep.queries or {}) do if q.capped then capped = capped + 1 end end
-    ML:Print("Sweep %s: %d queries, %d unique characters, %d capped queries.",
+    ML:CensusPrint("Sweep %s: %d queries, %d unique characters, %d capped queries.",
         sweep.id, #(sweep.queries or {}), chars, capped)
     return sweep
 end
@@ -358,17 +545,10 @@ function Pop:RecordSweepQuery(sample, roster, sweepID)
         observed = sample.observed or 0, total = sample.total or sample.observed or 0,
         capped = (sample.total or 0) > (sample.observed or 0) or self:IsCapped(sample.observed),
     }
-    -- Every character this query returned (not just the latest sighting), so
-    -- overlap between queries can be measured: that is what capture-recapture
-    -- estimates, and the test of whether /who returns a random 50, rest on.
-    local keys = {}
-    for key in pairs(roster or {}) do keys[#keys + 1] = key end
-    sweep.queries[queryIndex].keys = keys
     for key, seen in pairs(roster or {}) do
         sweep.observations[key] = {
-            key = key, queryIndex = queryIndex, observedAt = sample.t,
-            zone = seen.zone or "", level = seen.level or 0,
-            classFile = seen.classFile or "", race = seen.race or "",
+            queryIndex, sample.t, seen.zone or "", seen.level or 0,
+            seen.classFile or "", seen.race or "",
         }
     end
     ML:Fire("POP_SWEEP_CHANGED", sweep)
@@ -388,16 +568,18 @@ function Pop:Record(sample, roster)
             store.characters[key] = c
         end
         c.fullName, c.name, c.realm = seen.fullName, seen.name, seen.realm
+        c.firstName, c.lastName = seen.firstName, seen.lastName
         c.guild, c.level, c.race = seen.guild, seen.level, seen.race
         c.class, c.classFile, c.zone = seen.class, seen.classFile, seen.zone
         c.firstSeen = math.min(c.firstSeen or sample.t, sample.t)
         c.lastSeen = math.max(c.lastSeen or 0, sample.t)
         c.seenCount = (c.seenCount or 0) + 1
         c.days = c.days or {}
-        local d = c.days[day] or { count = 0, firstSeen = sample.t, lastSeen = sample.t }
-        d.count = (d.count or 0) + 1
-        d.firstSeen = math.min(d.firstSeen or sample.t, sample.t)
-        d.lastSeen = math.max(d.lastSeen or 0, sample.t)
+        local d = c.days[day] or { 0, sample.t, sample.t }
+        d[1] = (d.count or d[1] or 0) + 1
+        d[2] = math.min(d.firstSeen or d[2] or sample.t, sample.t)
+        d[3] = math.max(d.lastSeen or d[3] or 0, sample.t)
+        d.count, d.firstSeen, d.lastSeen = nil, nil, nil
         c.days[day] = d
     end
     self:Purge()
@@ -417,6 +599,12 @@ function Pop:Purge()
         if s.t >= cutoff then kept[#kept + 1] = s else removed = removed + 1 end
     end
     store.samples = kept
+    local specCutoff = time() - ((ML.db.settings and ML.db.settings.specRetentionDays) or days) * 86400
+    local keptSpecs = {}
+    for _, sample in ipairs(store.specSamples or {}) do
+        if (sample.t or 0) >= specCutoff then keptSpecs[#keptSpecs + 1] = sample end
+    end
+    store.specSamples = keptSpecs
     for _, c in pairs(store.characters or {}) do
         for day in pairs(c.days or {}) do
             if (tonumber(day) or 0) < cutoffDay then c.days[day] = nil end
@@ -436,7 +624,7 @@ function Pop:DumpZones()
     local store = ML.realm and ML.realm.population
     local characters = store and store.characters
     if not characters or not next(characters) then
-        ML:Print("No population data yet -- run /ml who first.")
+        ML:CensusPrint("No population data yet -- run /ml who first.")
         return
     end
     local counts = {}
@@ -449,9 +637,9 @@ function Pop:DumpZones()
     local zones = {}
     for zone in pairs(counts) do zones[#zones + 1] = zone end
     table.sort(zones)
-    ML:Print("%d distinct zone(s) captured for %s:", #zones, ML:RealmKey())
+    ML:CensusPrint("%d distinct zone(s) captured for %s:", #zones, ML:RealmKey())
     for _, zone in ipairs(zones) do
-        ML:Print("  %s (%d)", zone, counts[zone])
+        ML:CensusPrint("  %s (%d)", zone, counts[zone])
     end
 end
 
@@ -527,6 +715,7 @@ function Pop:OnActionBlocked(event, addon, func)
     if self.pending then
         self.pending = false
         setWhoToUi(false)
+        restoreWhoWindow()
         local tag = self.pendingTag
         self.pendingTag, self.pendingSweepID = nil, nil
         -- A census recovers on its own (chat mode); only guide manual scans.
@@ -537,11 +726,11 @@ function Pop:OnActionBlocked(event, addon, func)
     end
 end
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("WHO_LIST_UPDATE")
-frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
-frame:RegisterEvent("ADDON_ACTION_BLOCKED")
-frame:SetScript("OnEvent", function(_, event, ...)
+eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("WHO_LIST_UPDATE")
+eventFrame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
+eventFrame:RegisterEvent("ADDON_ACTION_BLOCKED")
+eventFrame:SetScript("OnEvent", function(_, event, ...)
     if event == "WHO_LIST_UPDATE" then
         Pop:Capture()
     else

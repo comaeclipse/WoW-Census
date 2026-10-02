@@ -60,8 +60,14 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml scan replicate` | Retail only: request a throttled, high-detail replicate scan |
 | `/ml who` | Sample the observed population via `/who` (see below) |
 | `/ml who <filter>` | Sample with a raw `/who` filter, e.g. `/ml who z-"Shattrath City"` |
+| `/ml spec` / `/ml spec status` | Show automatic Spec Census status and client support |
+| `/ml spec on` / `off` | Enable/disable automatic, throttled sampling of inspectable nearby, mouseover, target, party, and raid unit tokens |
+| `/ml plan` | Window listing this client + faction's planned `/ml who` queries; click a line (or Next) to put it in chat, results fill in, capped lines split underneath. `/ml plan new` starts a fresh pass |
+| `/ml plan snapshot` / `full` / `auto` | Plan mode for this realm. **Snapshot**: coarse level bands plus cap-level class sampling; on Retail it uses levels 1-39, 40-59, 60-79, individual levels 80 through cap-1, then rotates two cap-level classes per day through race filters. Characters are deduplicated across the rolling window because Retail text filters can overlap. A capped line keeps its sample. **Auto** (default): snapshot, except a full count once an exact pass shows the realm fits in 40 queries. The window shows the realm's race/class lean over the last 14 days of census queries, the same window the site uses |
 | `/ml census` | Start an adaptive census for this client + faction, or run its next query if one is active |
 | `/ml census next` | Run the census's next `/who` (bind it to a key with a macro); never starts a new census |
+| `/ml census passive on` / `off` | Let normal movement, turning, zooming, and world clicks advance an active census whenever its next query is eligible |
+| `/ml census auto on` / `off` | Start a census at login; combine with passive mode for hands-off collection while playing |
 | `/ml census start [budget]` / `stop` / `status` | Start (optional max query count, default 300), stop as partial, or print progress |
 | `/ml census profile` | Show the detected scan profile, its level backbone, and learned splits |
 | `/ml census cap <n>` / `auto` | Forever beta: pin the census level cap (default: the level the population has piled up at) |
@@ -213,7 +219,9 @@ fabricated sweeps.
 ### Adaptive census
 
 **Start Census** on the Population tab, or `/ml census`, turns the scan button
-into **Run Next**. Each press sends exactly one `/who`. MarketLens decides which
+into **Run Next**. Each press sends exactly one `/who`. For passive collection,
+use `/ml census passive on`; normal play inputs then carry eligible queries.
+Use `/ml census auto on` as well to begin a census at each login. MarketLens decides which
 one from the result of the last:
 
 - It detects the scan profile from the client and your faction: Retail, WoW:
@@ -224,9 +232,11 @@ one from the result of the last:
 - A capped query is split into parts that cover it exactly. A level range splits
   into narrower ranges, weighted by recent sightings. A range too dense per level
   splits by class. A single level splits by class, then by race.
-- A cell still capped with level, class and race all pinned falls back to its
-  hottest zones. It then counts as **unresolved**, meaning the census is a lower
-  bound and its sweep closes as partial.
+- A cell still capped with level, class and race all pinned tries up to 12
+  high-yield name letters, selected from recent names to maximize new discovery,
+  then its hottest zones. Name and zone queries overlap, so these refinements
+  find otherwise-hidden characters but remain **unresolved** coverage: the
+  census is a lower bound and its sweep closes as partial.
 - Every split is remembered per realm bucket for 14 days. The next census skips
   straight to the parts instead of spending a press on a query it knows will cap.
   Each run also tightens those splits from real counts. Small neighbouring level
@@ -276,10 +286,10 @@ chart grouped by faction and a class chart per faction, counting **unique
 characters** rather than sightings so the faction that happened to get more
 `/who` scans doesn't gain share from the extra scans alone.
 
-### Static bundle (`pages/` -> wowcensus.pages.dev)
+### Static bundle (`pages/` -> wowcensus.io)
 
 The beta views also ship as a standalone bundle with no Worker and no database
-behind it, published at **https://wowcensus.pages.dev**:
+behind it, published at **https://wowcensus.io**:
 
 ```bash
 node tools/build-forever-page.js            # build pages/ only
@@ -325,3 +335,53 @@ price-depth ladders, multi-window trend badges (1h/6h/24h/7d), day-of-week seaso
   the fallback classifier handles everything else automatically.
 </content>
 </invoke>
+
+
+### Nearby inspected talent builds
+
+`NameplateInspect/` is the companion addon source. Install it beside MarketLens;
+MarketLens declares it as an optional dependency and consumes its cache without
+issuing competing inspect requests. The installed beta companion is also updated
+when developing against the local WoW installation. Reload WoW after addon edits.
+`/npi nearby` reports the current visible nameplates, unique player nameplates,
+players within inspect distance, and those WoW currently allows inspecting.
+`/npi diag` reports inspect requests and responses since the last reload.
+
+The companion's schema v2 keeps raw names, Forever surnames, player faction,
+verified same-realm context (otherwise unknown), observer context, locale and client
+build. Existing schema v1 cache records remain usable; missing realm/faction is not
+inferred from the observer. MarketLens copies contextual builds into its realm store.
+The uploader reads the companion SavedVariables file directly, preserving legacy
+records too. It does not import the old `specSamples` placeholder classifications.
+
+`tools/upload-realm.ps1 -Flavor classic-beta -Realm "Classic Beta PvE-Horde" -PopulationOnly`
+also imports the companion cache. This separate `ml-inspects-v1` upload never
+increments /who sightings. Reuploads are idempotent. Successful uploaded snapshots
+retain build history in D1; the addon itself stores the latest build per GUID.
+
+For a new database, apply `site/migrate-inspects.sql`, then
+`site/seed-forever-talents.sql` with Wrangler before deploying the Worker.
+`site/schema.sql` also includes the new tables. `/admin/import-inspects` uses the
+existing refresh token; `/api/inspects?source=classic-beta` exposes the latest build
+per GUID within 14 days of the newest collected inspection. Inspect timestamps,
+census timestamps and page generation times are separate.
+
+Forever spec IDs in the current cache identify classes, and the raw role field
+reports DAMAGER for every player. Neither field is used to classify builds or roles.
+The versioned catalog in `site/src/forever-talents.json` comes from Wowhead's Forever
+node dataset; nodes must match class, spell and maximum rank before branch assignment.
+Tree-based builds retain ranked points for each mapped branch. A second or third
+tree joins a named hybrid when it has at least 25% of allocated points and is
+within 10 points of the leader. Retail and MoP Classic use class-validated
+inspected specialization IDs instead. Insufficient or unmapped evidence is
+shown as Unknown build with a reason and excluded from build shares; raw
+inspection data remains available for later reclassification. Combat role
+remains unknown.
+
+The shared builder creates `talents.html` and `inspects.json` for every edition,
+updates navigation/sitemap/discovery, and adds inspect coverage to census pages.
+Talent popularity uses unique players with readable node data within each filtered
+class; string-only builds are explicitly excluded. These nearby samples are not
+population-wide spec shares. Run `node --test tools/test-inspects.mjs` for identity,
+classification, validation, replay/history and HTML escaping checks. Rebuild all six
+editions and deploy the complete `pages/` tree.

@@ -4,6 +4,7 @@
 ## Author: skarz
 ## Version: 0.1.1
 ## SavedVariables: MarketLensDB
+## OptionalDeps: NameplateInspect
 ## X-Category: Auction House & Vendors
 
 # Embedded libraries. LibAHTab-1-0 gives us a native tab on the modern
@@ -34,12 +35,15 @@ Analytics/Saturation.lua
 Analytics/Scores.lua
 
 Population/WhoScan.lua
+Population/SpecInspect.lua
 Population/CensusProfiles.lua
 Population/Census.lua
+Population/Passive.lua
 
+UI/Population.lua
 UI/MainFrame.lua
 UI/MarketTable.lua
 UI/ItemTable.lua
-UI/Population.lua
 UI/Minimap.lua
 UI/Tooltips.lua
+UI/CensusPlan.lua

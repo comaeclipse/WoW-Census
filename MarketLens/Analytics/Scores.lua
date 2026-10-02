@@ -135,6 +135,7 @@ end
 function Sc:BuildAll()
     local model = { items = {}, markets = {}, professions = {} }
 
+    T.memo = {}
     for itemID in pairs(ML.realm.items) do
         local row = self:Item(itemID)
         if row then
@@ -160,6 +161,7 @@ function Sc:BuildAll()
             mAgg.items[#mAgg.items + 1] = itemID
         end
     end
+    T.memo = nil
 
     for _, p in pairs(model.professions) do
         p.summary = finalizeAgg(p.agg)

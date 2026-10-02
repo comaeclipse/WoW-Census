@@ -96,12 +96,11 @@ local function censusIdleRows(last)
         out[#out + 1] = { cells = { "Profile", GRAY .. "--|r", why } }
     else
         out[#out + 1] = { cells = { "Profile", WHITE .. prof.label .. "|r " .. prof.faction, ML:RealmKey() } }
-        out[#out + 1] = { cells = { "Backbone", #prof.bands .. " level bands", "Split further only where /who caps" } }
-        local store = ML.Population:Store()
-        out[#out + 1] = { cells = { "Learned splits", tostring(U.CountKeys(store.censusLearned or {})),
-            "Cells pre-split from earlier runs" } }
-        out[#out + 1] = { cells = { "", "", "" } }
-        out[#out + 1] = { cells = { "", "|cffffd100Press Start Census|r", GRAY .. "then Run Next once per query|r" } }
+        out[#out + 1] = { cells = { "Collection", "|cffffd100Ready|r",
+            ML.db.settings.censusPassive and OK .. "Passive collection is on|r"
+                or GRAY .. "Start when you want a fresh sample|r" } }
+        out[#out + 1] = { cells = { "At login", ML.db.settings.censusAutoStart and OK .. "On|r" or GRAY .. "Off|r",
+            "Change it with the At login button below" } }
     end
     if last then
         out[#out + 1] = { cells = { "", "", "" } }
@@ -122,8 +121,10 @@ local function censusRows()
     local s, last = ML.Population.Census:Summary()
     if not s then return censusIdleRows(last) end
     local out = {}
-    out[#out + 1] = { cells = { "Profile", WHITE .. s.label .. "|r " .. s.faction, ML:RealmKey() } }
-    out[#out + 1] = { cells = { "Progress", string.format("%s%d|r / %d", WHITE, s.done, s.total),
+    local chat = ML.Population.Census:ViaChat()
+    out[#out + 1] = { cells = { "Collection", OK .. "Active|r",
+        chat and "Press Enter after the next query appears in chat" or (s.passive and "Passive collection is on" or "Use Collect Next Now") } }
+    out[#out + 1] = { cells = { "Progress", string.format("%s%d|r / %d queries", WHITE, s.done, s.total),
         bar(s.total > 0 and s.done / s.total or 0) } }
     local l = s.last
     if l then
@@ -135,22 +136,19 @@ local function censusRows()
         else
             result = string.format("%s%d \226\128\148 capped, cannot split further|r", WARN, l.observed)
         end
-        out[#out + 1] = { cells = { "Last", l.filter or "", result } }
+        out[#out + 1] = { cells = { "Last result", l.filter or "", result } }
     end
     if s.inflight then
-        out[#out + 1] = { cells = { "Waiting on", WHITE .. s.inflight .. "|r", GRAY .. "Run Next retries it if no reply|r" } }
+        out[#out + 1] = { cells = { "Waiting", WHITE .. s.inflight .. "|r",
+            s.passive and GRAY .. "A later world click will retry it|r" or GRAY .. "Collect Next Now retries it|r" } }
     end
-    out[#out + 1] = { cells = { "Next", s.next and (WHITE .. s.next .. "|r") or GRAY .. "--|r", "" } }
-    out[#out + 1] = { cells = { "", "", "" } }
-    out[#out + 1] = { cells = { "Overflow queries", tostring(s.generated), "Added when a query hit the cap" } }
-    out[#out + 1] = { cells = { "Pre-split", tostring(s.preSplit), "Capped last time, skipped straight to parts" } }
-    out[#out + 1] = { cells = { "Unique characters", tostring(s.unique), "Collected by this census" } }
-    out[#out + 1] = { cells = { "Duplicates removed", tostring(s.duplicates), "Same character seen twice" } }
-    out[#out + 1] = { cells = { "Unresolved cells", tostring(s.unresolved),
-        s.overBudget and WARN .. "Query budget reached|r" or "Capped after every split (lower bound)" } }
-    if (s.retries or 0) > 0 then
-        out[#out + 1] = { cells = { "Retried", tostring(s.retries), "Queries the server dropped" } }
+    if (s.backoff or 0) > 0 then
+        out[#out + 1] = { cells = { "Server backoff", tostring(s.backoff) .. "s", GRAY .. "Collection resumes from a later input|r" } }
     end
+    out[#out + 1] = { cells = { "Next", s.next and (WHITE .. s.next .. "|r") or GRAY .. "--|r",
+        chat and "Use Show Next Query, then press Enter" or (s.passive and "Keep playing or use Collect Next Now" or "Use Collect Next Now") } }
+    out[#out + 1] = { cells = { "Characters observed", tostring(s.unique),
+        string.format("%d capped cell(s): counts there are lower bounds", s.unresolved or 0) } }
     return out
 end
 
