@@ -49,8 +49,11 @@ Four faces, each with one job. Never swap their roles.
 
 - No new font families and no third-party font hosts. Fonts are self-hosted in
   `/fonts/` with their OFL licence next to them.
-- Pixel and terminal faces use `font-display:optional` and are preloaded on
-  every page, so the layout never shifts when they arrive (commit b680543).
+- Every face uses `font-display:optional`, ships as woff2, and is preloaded on
+  the pages that use it, so the layout never shifts when a font arrives
+  (commit b680543; Cinzel and Friz Quadrata followed on 2026-10-02). Pixel,
+  terminal and Cinzel are preloaded on every page; Friz Quadrata only on the
+  prose pages (combos, talents).
 - Don't shrink type inside one table to make it fit; widen the column or let it
   wrap. Talent tables regressed this way once (fixed in a136eb2).
 - Numbers in tables use `font-variant-numeric:tabular-nums` and align right;
@@ -107,6 +110,10 @@ identical across editions: adding a page or game means adding it everywhere.
   stale hash.
 - Pages are static: no runtime fetches. View toggles show/hide pre-rendered
   panes and mirror state in the URL query.
+- The default view is always in the HTML. Scripts may re-render on
+  interaction, never on load: content injected after first paint is a layout
+  shift. Share one pure render function between the build and the page script
+  (the talents page embeds `talentMarkup` via its source text).
 
 ## Regression testing
 
@@ -120,7 +127,9 @@ node --test tools/test-design.mjs tools/test-inspects.mjs
 edition has every page; each page has the shared head (doctype, lang, viewport,
 current hashed stylesheet, font preloads), the anatomy from section 5 with one
 current game and one current page; every referenced `/fonts/` file exists; no
-external font hosts; no per-cell font-size overrides in talent tables.
+external font hosts; every font face is `optional` (inline faces also woff2) and
+prose pages preload Friz Quadrata; no per-cell font-size overrides in talent
+tables; the talents page ships its filters and default view pre-rendered.
 
 Manual, before deploying a visual change: open one page of each type (census,
 combos, auction house, guilds, geography, talents) at desktop width and at
@@ -132,3 +141,40 @@ combos, auction house, guilds, geography, talents) at desktop width and at
 - [ ] Nothing shifts as fonts load (hard reload with cache disabled)
 - [ ] Chip toggles change the view and the URL, and Back restores the previous view
 - [ ] An edition with no data (currently SoD talents) still renders cleanly
+
+## Lessons learned
+
+**Layout shift (Cloudflare RUM CLS, 2026-10-02).**
+
+- `font-display:swap` is a layout shift whenever the font is late. Cinzel and
+  Friz Quadrata both used `swap`, and the Friz paragraph above the combos
+  tables reflowed when the font arrived (CLS 0.034 at 375px with slow fonts,
+  0 after switching to `optional`).
+- The talents page painted an empty `#talent-content` and filter row, then
+  filled both from 1.9 MB of inline JSON. On a streamed (slow 4G) load that
+  measured CLS 0.011-0.015; with the build writing the default view into the
+  HTML it is 0.
+- Pre-rendered form controls that drive content need `autocomplete="off"`.
+  Otherwise Back or reload restores a filter value over the unfiltered content
+  the build wrote (dropdown says Hunter, tables show everyone).
+- Reading the RUM table: a count of 1-2 is one or two visits, not a trend.
+  `html.translated-ltr` selectors are visitors using browser translation, which
+  rewrites text after load; that is not ours to fix. The large `html>body` /
+  `div.wrap` rows could not be reproduced locally (font delays at 13 widths,
+  realm chips via Back/Forward), so look up the URL in the RUM debug view
+  before guessing at a cause.
+
+**Verifying a visual change.** Pixel-diff the rebuilt bundle against HEAD
+built from identical data, or the diff is all data drift:
+
+- Build the baseline in a `git worktree` of HEAD. Point both builds at a local
+  caching proxy of the API with `--url=` and run Node with a fixed `Date`, so
+  numbers and "Page generated" stamps match.
+- Route the remote zamimg icons to one local image, force `loading=eager`, and
+  wait for `document.fonts.ready` after a warm reload (`optional` faces only
+  apply when cached). A baseline-vs-baseline run must come out identical
+  before an after-diff means anything.
+- Known noise: Chrome repeats the top of full-page screenshots taller than
+  16384px, and native `<select>` text can change subpixel antialiasing colour
+  with identical geometry when the control moves from script-built to parsed
+  HTML.

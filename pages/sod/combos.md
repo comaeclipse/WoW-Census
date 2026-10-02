@@ -61,4 +61,4 @@ Season of Discovery class balance and player activity can shift sharply between 
 | Troll Rogue | 2 | 1.1% |
 | Troll Warrior | 2 | 1.1% |
 
-Page generated: 2026-10-02 02:26Z
+Page generated: 2026-10-02 14:28Z

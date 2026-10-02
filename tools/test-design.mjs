@@ -23,8 +23,8 @@ test('design tokens match DESIGN.md', () => {
   assert.deepEqual(Object.keys(found).sort(), [...Object.keys(tokens), 'pixel', 'term'].sort(), 'new :root token without a DESIGN.md entry');
 });
 
-test('pixel and terminal faces never swap in layout', () => {
-  for (const family of ['Press Start 2P', 'VT323']) {
+test('no font face swaps in layout', () => {
+  for (const family of ['Press Start 2P', 'VT323', 'Cinzel']) {
     const face = css.match(new RegExp('@font-face\\{[^}]*' + family + '[^}]*\\}'))[0];
     assert.match(face, /font-display:optional/, family);
   }
@@ -61,6 +61,18 @@ for (const { dir, page, file } of files) {
     assert.ok(html.indexOf('class="breadcrumbs"') < html.indexOf('class="page-controls"'), 'breadcrumbs before page controls');
     for (const [, font] of html.matchAll(/url\("?(\/fonts\/[^")]+)"?\)/g)) assert.ok(exists('pages' + font), font);
     assert.doesNotMatch(html, /fonts\.googleapis|fonts\.gstatic|use\.typekit/);
-    if (page === 'talents') assert.doesNotMatch(html, /\.talent-combo-table[^{]*\{[^}]*font-size/, 'talent tables keep base type size');
+    for (const [face] of html.matchAll(/@font-face\{[^}]*\}/g)) {
+      assert.match(face, /font-display:optional/, 'inline face swaps in layout: ' + face);
+      assert.match(face, /format\("woff2"\)/, 'inline face is not woff2: ' + face);
+    }
+    if (/class="[^"]*\b(combo-analysis|talent-summary)\b/.test(html))
+      assert.ok(html.includes('rel="preload" href="/fonts/friz-quadrata-regular.woff2"'), 'prose page preloads Friz Quadrata');
+    if (page === 'talents') {
+      assert.doesNotMatch(html, /\.talent-combo-table[^{]*\{[^}]*font-size/, 'talent tables keep base type size');
+      // The default view ships in the HTML; script only re-renders on filter changes.
+      assert.match(html, /<div class="talent-filters" id="talent-filters"><label>/, 'filters pre-rendered');
+      assert.match(html, /<div id="talent-content" aria-live="polite"><(div class="combo-breakdown"|section class="panel")/, 'talent content pre-rendered');
+      assert.equal(count(html, /<select data-field="\w+" autocomplete="off">/g), 5, 'filters opt out of form restore');
+    }
   });
 }

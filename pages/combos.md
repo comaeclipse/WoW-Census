@@ -79,4 +79,4 @@ Forever Beta is still evolving, so this snapshot is most useful for reading the 
 | Troll Warrior | 203 | 1.4% |
 | Troll Rogue | 173 | 1.2% |
 
-Page generated: 2026-10-02 02:26Z
+Page generated: 2026-10-02 14:28Z

@@ -453,4 +453,4 @@ Highest minimum asking price in Retail's aggregate summary.
 | [Mithril Shaving Razor](https://www.wowhead.com/item=34825) | 9,999,999g 99s | 1 | — |
 | [Design: Stalwart Monarch Topaz](https://www.wowhead.com/item=41779) | 9,999,999g 99s | 1 | 0% |
 
-Page generated: 2026-10-02 02:27Z
+Page generated: 2026-10-02 14:28Z

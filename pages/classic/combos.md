@@ -63,4 +63,4 @@ Classic Era keeps the original-era roster, so the mix reflects the characters cu
 | Orc Rogue | 34 | 2.0% |
 | Troll Rogue | 13 | 0.8% |
 
-Page generated: 2026-10-02 02:26Z
+Page generated: 2026-10-02 14:28Z

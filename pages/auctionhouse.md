@@ -1211,4 +1211,4 @@ Single items holding the most listed value.
 | [Small Silk Pack](https://www.wowhead.com/forever/item=4245) | 163 g | 106 | +141% |
 | [Lesser Magic Essence](https://www.wowhead.com/forever/item=10938) | 163 g | 2,253 | +150% |
 
-Page generated: 2026-10-02 02:26Z
+Page generated: 2026-10-02 14:28Z

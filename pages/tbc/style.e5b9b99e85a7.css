@@ -17,7 +17,7 @@
   src:url("/fonts/cinzel-latin-800-normal.woff2") format("woff2");
   font-style:normal;
   font-weight:800;
-  font-display:swap;
+  font-display:optional;
 }
 :root{
   --bg:#0d0f17; --panel:#161a28; --panel2:#1e2334; --ink:#eae7d6;

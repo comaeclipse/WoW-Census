@@ -138,4 +138,4 @@ MoP Classic includes its era-specific roster and progression, so the mix capture
 | Tauren Priest | 6 | 0.3% |
 | Troll Death Knight | 1 | 0.0% |
 
-Page generated: 2026-10-02 02:27Z
+Page generated: 2026-10-02 14:28Z

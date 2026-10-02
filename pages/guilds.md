@@ -1040,4 +1040,4 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 99 | <The Church of Girth> | Horde | 3 |
 | 100 | <The Compound> | Horde | 3 |
 
-Page generated: 2026-10-02 02:26Z
+Page generated: 2026-10-02 14:28Z

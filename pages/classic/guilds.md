@@ -1030,4 +1030,4 @@ Updated: 2026-10-01 (no realm)
 
 No guilded characters were found for this selection yet.
 
-Page generated: 2026-10-02 02:26Z
+Page generated: 2026-10-02 14:28Z

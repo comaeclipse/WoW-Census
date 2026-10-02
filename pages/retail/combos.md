@@ -271,4 +271,4 @@ Retail’s broad modern roster and cross-faction play make this a view of the cu
 | Vulpera Mage | 1 | 0.1% |
 | Zandalari Troll Rogue | 1 | 0.1% |
 
-Page generated: 2026-10-02 02:27Z
+Page generated: 2026-10-02 14:28Z

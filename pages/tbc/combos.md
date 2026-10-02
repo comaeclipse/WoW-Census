@@ -75,4 +75,4 @@ TBC Anniversary’s smaller era roster makes race and class choices a direct vie
 | Tauren Hunter | 5 | 0.6% |
 | Troll Warrior | 2 | 0.2% |
 
-Page generated: 2026-10-02 02:26Z
+Page generated: 2026-10-02 14:28Z
