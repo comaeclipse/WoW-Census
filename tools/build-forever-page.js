@@ -155,7 +155,7 @@ function writeCrawlAndCacheFiles() {
     urls.map((url) => "  <url><loc>" + url + "</loc></url>").join("\n") +
     "\n</urlset>\n";
   writeFile(path.join(pagesRoot, "robots.txt"),
-    "User-agent: *\nAllow: /\n\nSitemap: " + SITE_ORIGIN + "/sitemap.xml\n");
+    "User-agent: *\nContent-Signal: ai-train=no, search=yes, ai-input=no\nAllow: /\n\nSitemap: " + SITE_ORIGIN + "/sitemap.xml\n");
   writeFile(path.join(pagesRoot, "sitemap.xml"), sitemap);
   writeAgentDiscoveryFiles(pagesRoot);
   const htmlHeaders = routes.map((route) => route +
