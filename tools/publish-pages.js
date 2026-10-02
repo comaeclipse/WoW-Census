@@ -62,7 +62,7 @@ async function main() {
     const started = Date.now();
     const data = await shared.fetchEditionData(source, (p) => getJson(api + p));
     const models = shared.buildEditionModels(source, data);
-    await resolveModelNames(source, models);
+    const names = await resolveModelNames(source, models);
     let bytes = 0;
     for (const page of shared.PAGES) {
       // Absolute stylesheet: the same HTML is served from more than one path.
@@ -75,7 +75,7 @@ async function main() {
       entries.push({ key: "md:" + source + ":" + page, value: htmlToMarkdown(html), metadata });
     }
     console.log(source.padEnd(20) + shared.PAGES.length + " pages, " + Math.round(bytes / 1024) + " KB, " +
-      (Date.now() - started) + " ms");
+      (Date.now() - started) + " ms; item names resolved " + names.resolved + ", still placeholders " + names.unresolved);
   }
 
   if (args.includes("--dry-run")) return;

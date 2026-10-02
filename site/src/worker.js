@@ -48,7 +48,7 @@ function sourceGameKey(flavor) {
 // Wowhead site branch per source flavor (empty = retail). Mirrors app.js's
 // WH_BRANCH map so region and realm-upload links agree on which Wowhead
 // branch resolves an item's icon/tooltip/rename data.
-const WH_BRANCH = { "classic-progression": "tbc", "classic": "classic", "retail": "", "classic-beta": "forever", "sod": "classic" };
+const WH_BRANCH = { "classic-progression": "tbc", "classic": "classic", "retail": "", "classic-beta": "forever", "sod": "classic", "mop-classic": "mop-classic" };
 function whBranchFor(sourceGame) { return WH_BRANCH[sourceGame] != null ? WH_BRANCH[sourceGame] : "tbc"; }
 
 // Column order for the packed /api/items rows. Emitted in the response as
@@ -368,6 +368,18 @@ async function bnetItemName(token, id, namespaces) {
   return null;
 }
 
+// Blizzard's static namespaces miss some ids the scans contain (Forever's
+// beta-only items, plus retail and Anniversary ids never exposed there).
+// Wowhead's tooltip endpoint for the flavor's branch knows them.
+async function wowheadItemName(id, branch) {
+  try {
+    const res = await fetch("https://nether.wowhead.com/" + (branch ? branch + "/" : "") + "tooltip/item/" + id);
+    if (!res.ok) return null;
+    const body = await res.json().catch(() => null);
+    return body && body.name && !/^Item \d+$/.test(body.name) ? body.name : null;
+  } catch (e) { return null; }
+}
+
 // Backfill item:<id> placeholders with Blizzard's own item names instead of
 // relying on the client-side Wowhead rename trick (data-wh-rename-link),
 // which only fires after an extra async round-trip in the browser -- causing
@@ -412,7 +424,8 @@ async function resolveItemNames(url, env) {
   const ids = [...idSet];
   for (let i = 0; i < ids.length; i += 20) {
     const chunk = ids.slice(i, i + 20);
-    const names = await Promise.all(chunk.map((id) => bnetItemName(token, id, namespaces)));
+    const names = await Promise.all(chunk.map(async (id) =>
+      (await bnetItemName(token, id, namespaces)) || wowheadItemName(id, whBranchFor(region))));
     chunk.forEach((id, j) => namesById.set(id, names[j]));
   }
 
