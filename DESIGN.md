@@ -63,7 +63,7 @@ Four faces, each with one job. Never swap their roles.
   4-5px tiles, 6px panels/tables), no blur, no radius.
 - Hover raises the border to gold. Focus is a visible 2px outline (blue or
   gold), never removed without a replacement.
-- The `.crt` overlay and `.wrap` container (max 1080px) wrap every page.
+- The `.crt` overlay and `.wrap` container (max 1130px) wrap every page.
 
 ## 5. Page anatomy (every static page, every game)
 

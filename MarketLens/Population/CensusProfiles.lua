@@ -167,6 +167,9 @@ P.profiles = {
         fixedPlan = true,
         -- Bands are generated from the live level cap (it moves during beta).
         dynamicBands = true,
+        -- The announced cap. Observed levels lag a raise by days (the old cap's
+        -- crowd is still where it stopped), so never plan below this.
+        levelCap = 30,
         classes = { Alliance = ALL_CLASSIC, Horde = ALL_CLASSIC },
         races = {
             Alliance = { "Human", "Dwarf", "Night Elf", "Gnome", "High Order Skyborne" },
@@ -208,13 +211,9 @@ end
 -- Which profile id this client should use. Separate from ML:GameFlavor(),
 -- which is part of stored character identity and must not change.
 function P.DetectID()
-    local toc = select(4, GetBuildInfo()) or 0
+    if ML:IsForeverBeta() then return "forever" end
     local id = WOW_PROJECT_ID
-    if id and WOW_PROJECT_MAINLINE and id == WOW_PROJECT_MAINLINE then
-        -- The Forever beta reports as mainline but runs a 1.x-series build.
-        if toc > 0 and toc < 20000 then return "forever" end
-        return "retail"
-    end
+    if id and WOW_PROJECT_MAINLINE and id == WOW_PROJECT_MAINLINE then return "retail" end
     if id and WOW_PROJECT_MISTS_CLASSIC and id == WOW_PROJECT_MISTS_CLASSIC then return "mop-classic" end
     if id and WOW_PROJECT_BURNING_CRUSADE_CLASSIC and id == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
         return "tbc-anniversary"
@@ -247,10 +246,11 @@ local function observedCap()
 end
 
 -- The beta's current level cap: /ml census cap <n> when set, else the level
--- the population has piled up at, else the API's (possibly ruleset) cap.
-function P.ForeverCap(apiMax)
+-- the population has piled up at, else the API's (possibly ruleset) cap --
+-- never below the profile's announced cap (floor).
+function P.ForeverCap(apiMax, floor)
     local set = ML.db and ML.db.settings.censusLevelCap
-    return set or math.min(observedCap() or apiMax, apiMax)
+    return set or math.max(math.min(observedCap() or apiMax, apiMax), floor or 0)
 end
 
 -- Decade bands up to the cap, then the cap on its own (everyone piles up there).
@@ -276,7 +276,7 @@ function P.Current()
     local id = P.DetectID()
     local def = P.profiles[id]
     local maxL = (GetMaxPlayerLevel and GetMaxPlayerLevel()) or 60
-    if def.dynamicBands then maxL = P.ForeverCap(maxL) end
+    if def.dynamicBands then maxL = P.ForeverCap(maxL, def.levelCap) end
     local bands = def.dynamicBands and foreverBands(maxL) or def.bands
     local hot = {}
     for _, z in ipairs(def.hotspots[faction] or {}) do hot[#hot + 1] = z end

@@ -89,8 +89,19 @@ function ML:RealmKey()
     return realm .. "-" .. (faction or "Neutral")
 end
 
+-- The WoW: Forever beta runs a 1.x build (interface 16xxx; Era and SoD are
+-- 115xx). Detect it by build, not WOW_PROJECT_ID: it reported as mainline
+-- until the 2026-10-01 patch gave it a project id no constant matches.
+function ML:IsForeverBeta()
+    local toc = select(4, GetBuildInfo()) or 0
+    return toc >= 16000 and toc < 20000
+end
+
 -- Stable user-facing client flavor used as part of /who character identity.
 function ML:GameFlavor()
+    -- The Forever beta's identities were keyed "retail" while it reported as
+    -- mainline; keep that so its characters stay the same records.
+    if self:IsForeverBeta() then return "retail" end
     if WOW_PROJECT_ID and WOW_PROJECT_MAINLINE and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
         return "retail"
     end
@@ -144,6 +155,7 @@ function ML:InitDB()
     self.db.export = nil
     self.db.popExport = nil
     if self.Population.CompactStorage then self.Population:CompactStorage() end
+    if self.Population.RepairForeverKeys then self.Population:RepairForeverKeys() end
 end
 
 -- Build a compact JSON string of this realm's per-item snapshot history for

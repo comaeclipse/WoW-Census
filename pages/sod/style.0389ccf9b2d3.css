@@ -33,7 +33,7 @@ body{
   -webkit-font-smoothing:none; image-rendering:pixelated;
 }
 a{color:var(--blue)}
-.wrap{max-width:1080px; margin:0 auto; padding:22px 18px 60px; position:relative; z-index:1;}
+.wrap{max-width:1130px; margin:0 auto; padding:22px 18px 60px; position:relative; z-index:1;}
 
 /* header / cabinet */
 .cab{display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px 20px; margin-bottom:20px;

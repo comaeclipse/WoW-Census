@@ -114,6 +114,8 @@ function Plan:Pass(prof)
         else
             p.mode = "full"
         end
+        -- Random line order, decided once with the list (Build re-reads it).
+        Pop.Census.Shuffle(nodes)
         p.nodes, p.splits, p.seedMeta = nodes, {}, seedMeta
     end
     p.mode = p.mode or "full"
@@ -268,6 +270,7 @@ function Plan:CapSplit(n, depth, pass, prof)
     -- Fixed-plan profiles (Forever) keep a fully pinned cell as its sample:
     -- name/zone digging there once took 102 queries.
     if not full and prof.fixedPlan then kids = {} end
+    C.Shuffle(kids)
     -- Remember the split so the next pass (and census) plans it up front.
     if full and #kids > 0 and not C:Learned(n) then C:Learn(n, kind, kids) end
     return { kids = kids, full = full }

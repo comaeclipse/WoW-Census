@@ -738,6 +738,78 @@ eventFrame:SetScript("OnEvent", function(_, event, ...)
     end
 end)
 
+-- The Forever beta's 2026-10-01 patch made GameFlavor() fall through to
+-- "tbc-anniversary" until detection moved to the build number, so a session
+-- of sightings was keyed "tbc-anniversary:..." beside the same players'
+-- "retail:..." records. Fold them back. Only runs on the Forever client.
+local BAD_PREFIX, GOOD_PREFIX = "tbc-anniversary:", "retail:"
+
+local function mergeCharacter(into, from)
+    if (from.lastSeen or 0) >= (into.lastSeen or 0) then
+        for _, f in ipairs({ "fullName", "name", "realm", "firstName", "lastName",
+                             "guild", "level", "race", "class", "classFile", "zone" }) do
+            if from[f] ~= nil then into[f] = from[f] end
+        end
+    end
+    into.firstSeen = math.min(into.firstSeen or from.firstSeen or 0, from.firstSeen or into.firstSeen or 0)
+    into.lastSeen = math.max(into.lastSeen or 0, from.lastSeen or 0)
+    into.seenCount = (into.seenCount or 0) + (from.seenCount or 0)
+    into.days = into.days or {}
+    for day, d in pairs(from.days or {}) do
+        local e = into.days[day]
+        if not e then
+            into.days[day] = d
+        else
+            e[1] = (e[1] or 0) + (d[1] or 0)
+            e[2] = math.min(e[2] or d[2] or 0, d[2] or e[2] or 0)
+            e[3] = math.max(e[3] or 0, d[3] or 0)
+        end
+    end
+end
+
+function Pop:RepairForeverKeys()
+    if not ML:IsForeverBeta() then return 0 end
+    local fixed = 0
+    for _, realm in pairs(ML.db.realms or {}) do
+        local store = realm.population
+        if store then
+            local chars, bad = store.characters or {}, {}
+            for key, c in pairs(chars) do
+                if key:sub(1, #BAD_PREFIX) == BAD_PREFIX then bad[key] = c end
+            end
+            for key, c in pairs(bad) do
+                local good = GOOD_PREFIX .. key:sub(#BAD_PREFIX + 1)
+                chars[key] = nil
+                c.key = good
+                if chars[good] then mergeCharacter(chars[good], c) else chars[good] = c end
+                fixed = fixed + 1
+            end
+            for _, sweep in pairs(store.sweeps or {}) do
+                if sweep.label == "census tbc-anniversary" then sweep.label = "census forever" end
+                local obs = sweep.observations or {}
+                local moved = {}
+                for key, o in pairs(obs) do
+                    if key:sub(1, #BAD_PREFIX) == BAD_PREFIX then moved[key] = o end
+                end
+                for key, o in pairs(moved) do
+                    obs[key] = nil
+                    local good = GOOD_PREFIX .. key:sub(#BAD_PREFIX + 1)
+                    -- Same sweep, same player: keep the later sighting.
+                    if not obs[good] or (o[2] or 0) > (obs[good][2] or 0) then obs[good] = o end
+                end
+            end
+            -- A census started while misdetected: carry on as the Forever one
+            -- (Settle drops its planned levels above the Forever cap).
+            local st = store.census
+            if st and st.profile == "tbc-anniversary" then
+                st.profile, st.label = "forever", Pop.Profiles.profiles.forever.label
+            end
+        end
+    end
+    if fixed > 0 then ML:Print("Repaired %d Forever character records keyed under the wrong client.", fixed) end
+    return fixed
+end
+
 function Pop:Init()
     -- Nothing to warm up; the WHO_LIST_UPDATE handler is live from file load.
 end

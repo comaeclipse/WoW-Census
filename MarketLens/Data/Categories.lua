@@ -6,8 +6,9 @@ local D = ML.Data
 
 -- Retail (Mainline) reshuffled some subclass numbering vs the TBC 2.5.x values
 -- used throughout this file; gate the divergent cases on this.
+-- (The Forever beta reported as mainline before its project id changed.)
 local IS_RETAIL = (WOW_PROJECT_ID ~= nil and WOW_PROJECT_MAINLINE ~= nil
-                   and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) or false
+                   and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) or ML:IsForeverBeta()
 
 local CLASS_CONSUMABLE = 0
 local CLASS_CONTAINER  = 1

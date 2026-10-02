@@ -550,11 +550,24 @@ function C:Expand(nodes, st, out, depth)
     end
 end
 
+local function shuffle(list)
+    for i = #list, 2, -1 do
+        local j = math.random(i)
+        list[i], list[j] = list[j], list[i]
+    end
+end
+
+C.Shuffle = shuffle
+
 -- Add nodes to the queue (front = right after the current query, keeping a
 -- split's children together). Respects the budget; returns how many were added.
+-- Order is random: a census spans a play period, so a fixed order would
+-- always measure the same brackets at the same point in it (and a budget
+-- trim would always drop the same tail).
 function C:Enqueue(nodes, st, front)
     local planned = {}
     self:Expand(nodes, st, planned, 0)
+    shuffle(planned)
     local room = math.max(st.budget - st.done - #st.queue, 0)
     if #planned > room then
         st.unresolved = st.unresolved + (#planned - room)
@@ -567,13 +580,6 @@ function C:Enqueue(nodes, st, front)
         for _, n in ipairs(planned) do st.queue[#st.queue + 1] = n end
     end
     return #planned
-end
-
-local function shuffle(list)
-    for i = #list, 2, -1 do
-        local j = math.random(i)
-        list[i], list[j] = list[j], list[i]
-    end
 end
 
 function C:PurgeLearned()
@@ -656,8 +662,6 @@ function C:Start(budget)
         end
         st.fixed = true
     else
-        -- Highest levels first: if the census is stopped early, the most
-        -- economically relevant part of the population is already covered.
         for i = #prof.bands, 1, -1 do
             local b = prof.bands[i]
             if b[1] <= prof.maxLevel then
@@ -665,11 +669,7 @@ function C:Start(budget)
             end
         end
     end
-    self:Enqueue(backbone, st, false)
-    -- Passive sessions may span a long play period. Shuffling avoids always
-    -- measuring low/high levels at the same point in that period. Deliberate
-    -- manual sessions retain the economically useful high-level-first order.
-    if ML.db.settings.censusPassive then shuffle(st.queue) end
+    self:Enqueue(backbone, st, false) -- shuffled
     if st.fixed then st.ratioObs, st.ratioHist = 0, 0 end
     ML:Print("Census started: |cffffffff%s|r %s, %s%d queries%s.",
         prof.label, prof.faction, st.fixed and "fixed list of " or "", #st.queue,
