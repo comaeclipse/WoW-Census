@@ -257,7 +257,11 @@ $node = Get-Command node -ErrorAction SilentlyContinue
 if ($node -and (Test-Path $helper)) {
     $sellerArgs = @($helper, $file.FullName, "--sellers")
     if ($Realm) { $sellerArgs += "--realm=$Realm" }
-    $rebuiltSellers = & $node.Source @sellerArgs
+    # Windows PowerShell turns the helper's stderr into a terminating error under
+    # "Stop", which would abort the inspect import below instead of skipping.
+    $ErrorActionPreference = "Continue"
+    $rebuiltSellers = & $node.Source @sellerArgs 2>$null
+    $ErrorActionPreference = "Stop"
     if ($LASTEXITCODE -eq 0 -and $rebuiltSellers) {
         try { $sellers = $rebuiltSellers | ConvertFrom-Json } catch { $sellers = $null }
         if ($sellers -and $sellers.type -eq "ml-sellers-v1" -and $sellers.sellers) {
