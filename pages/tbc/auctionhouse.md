@@ -5,13 +5,9 @@ url: "https://wowcensus.io/tbc/auctionhouse"
 ---
 
 # WoW TBC Anniversary Auction House Prices – WoWCensus
-Items listed: 7,956 (distinct items seen)
+## TBC combined market update
 
-Listed value: 4.0M g (asking prices, not sales)
-
-Quantity: 1,059,146 (units on the AH)
-
-Scanned: 2026-10-02
+Scanned 2026-10-02: The auction house held **1,059,146 units across 7,956 items** with **4.0M g** in listed asking value. Leading sectors: armor at 808k g, quest items at 689k g, gems at 478k g. Supply breakouts: Blackened Basilisk (+1,402%), Dreadfang Venom Sac (+1,100%). Mote of Life topped listed quantity at 39,957 units. These are changes in listed supply, not trading volume or confirmed sales.
 
 ## Where the gold sits — listed value by market
 
@@ -147,9 +143,9 @@ Priced above 63k g a unit — left out of the totals and lists above.
 | --- | --- | --- | --- |
 | [Spaulders of a Lost Age](https://www.wowhead.com/tbc/item=9430) | 102,365g 72s | 1 | 0% |
 
-## Alliance market update
+## TBC Alliance market update
 
-Dreamscythe, 2026-10-02: The auction house held **508,781 units across 7,032 items** with **1.9M g** in listed asking value. Leading sectors: armor at 404k g, gems at 267k g, quest items at 264k g. Listed supply rose in Adamantite Shells (+375%), Primal Mana (+832%), Adamantite Ore (+49%). Mote of Life topped listed quantity at 29,261 units. These are changes in listed supply, not trading volume or confirmed sales.
+Scanned 2026-10-02: The auction house held **508,781 units across 7,032 items** with **1.9M g** in listed asking value. Leading sectors: armor at 404k g, gems at 267k g, quest items at 264k g. Supply breakouts: Thorium Shells (+5,729%), Primal Mana (+832%). Mote of Life topped listed quantity at 29,261 units. These are changes in listed supply, not trading volume or confirmed sales.
 
 ## Where the gold sits — listed value by market
 
@@ -285,13 +281,9 @@ Priced above 63k g a unit — left out of the totals and lists above.
 | --- | --- | --- | --- |
 | [Spaulders of a Lost Age](https://www.wowhead.com/tbc/item=9430) | 102,365g 72s | 1 | 0% |
 
-Items listed: 6,832 (distinct items seen)
+## TBC Horde market update
 
-Listed value: 2.0M g (asking prices, not sales)
-
-Quantity: 550,365 (units on the AH)
-
-Scanned: 2026-10-02
+Scanned 2026-10-02: The auction house held **550,365 units across 6,832 items** with **2.0M g** in listed asking value. Leading sectors: quest items at 425k g, armor at 405k g, gems at 212k g. Supply breakouts: Blackened Basilisk (+8,924%), Dreadfang Venom Sac (+764%). Adamantite Shells topped listed quantity at 14,800 units. These are changes in listed supply, not trading volume or confirmed sales.
 
 ## Where the gold sits — listed value by market
 
@@ -419,13 +411,9 @@ Single items holding the most listed value.
 | [Encrypted Twilight Text](https://www.wowhead.com/tbc/item=20404) | 15k g | 5,097 | +21% |
 | [Brilliant Crimson Spinel](https://www.wowhead.com/tbc/item=32196) | 14k g | 12 | +100% |
 
-Items listed: 7,956 (distinct items seen)
+## Dreamscythe combined market update
 
-Listed value: 4.0M g (asking prices, not sales)
-
-Quantity: 1,059,146 (units on the AH)
-
-Scanned: 2026-10-02
+Scanned 2026-10-02: The auction house held **1,059,146 units across 7,956 items** with **4.0M g** in listed asking value. Leading sectors: armor at 808k g, quest items at 689k g, gems at 478k g. Supply breakouts: Blackened Basilisk (+1,402%), Dreadfang Venom Sac (+1,100%). Mote of Life topped listed quantity at 39,957 units. These are changes in listed supply, not trading volume or confirmed sales.
 
 ## Where the gold sits — listed value by market
 
@@ -561,9 +549,9 @@ Priced above 63k g a unit — left out of the totals and lists above.
 | --- | --- | --- | --- |
 | [Spaulders of a Lost Age](https://www.wowhead.com/tbc/item=9430) | 102,365g 72s | 1 | 0% |
 
-## Alliance market update
+## Dreamscythe Alliance market update
 
-Dreamscythe, 2026-10-02: The auction house held **508,781 units across 7,032 items** with **1.9M g** in listed asking value. Leading sectors: armor at 404k g, gems at 267k g, quest items at 264k g. Listed supply rose in Adamantite Shells (+375%), Primal Mana (+832%), Adamantite Ore (+49%). Mote of Life topped listed quantity at 29,261 units. These are changes in listed supply, not trading volume or confirmed sales.
+Scanned 2026-10-02: The auction house held **508,781 units across 7,032 items** with **1.9M g** in listed asking value. Leading sectors: armor at 404k g, gems at 267k g, quest items at 264k g. Supply breakouts: Thorium Shells (+5,729%), Primal Mana (+832%). Mote of Life topped listed quantity at 29,261 units. These are changes in listed supply, not trading volume or confirmed sales.
 
 ## Where the gold sits — listed value by market
 
@@ -699,13 +687,9 @@ Priced above 63k g a unit — left out of the totals and lists above.
 | --- | --- | --- | --- |
 | [Spaulders of a Lost Age](https://www.wowhead.com/tbc/item=9430) | 102,365g 72s | 1 | 0% |
 
-Items listed: 6,832 (distinct items seen)
+## Dreamscythe Horde market update
 
-Listed value: 2.0M g (asking prices, not sales)
-
-Quantity: 550,365 (units on the AH)
-
-Scanned: 2026-10-02
+Scanned 2026-10-02: The auction house held **550,365 units across 6,832 items** with **2.0M g** in listed asking value. Leading sectors: quest items at 425k g, armor at 405k g, gems at 212k g. Supply breakouts: Blackened Basilisk (+8,924%), Dreadfang Venom Sac (+764%). Adamantite Shells topped listed quantity at 14,800 units. These are changes in listed supply, not trading volume or confirmed sales.
 
 ## Where the gold sits — listed value by market
 
@@ -833,4 +817,4 @@ Single items holding the most listed value.
 | [Encrypted Twilight Text](https://www.wowhead.com/tbc/item=20404) | 15k g | 5,097 | +21% |
 | [Brilliant Crimson Spinel](https://www.wowhead.com/tbc/item=32196) | 14k g | 12 | +100% |
 
-Page generated: 2026-10-02 15:06Z
+Page generated: 2026-10-02 15:10Z

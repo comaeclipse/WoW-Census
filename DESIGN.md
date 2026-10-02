@@ -79,8 +79,8 @@ In this order:
 3. `.page-controls`: the **page nav** (Census, Auction House, Guilds,
    Geography, Talents; exactly one current) and, where the page slices data,
    the realm/faction chip rows (`.vchips`).
-4. Content: tiles or a concise market analysis, then panels/tables. The TBC
-   Alliance auction view leads with an analysis tied to its selected data.
+4. Content: tiles or a concise market analysis, then panels/tables. Every TBC
+   auction view has an analysis tied to its selected realm and faction.
 
 Every edition gets every page, even with no data. An empty page says so plainly
 in the normal layout; it never disappears or breaks the nav. Navigation is
