@@ -147,13 +147,9 @@ Priced above 63k g a unit — left out of the totals and lists above.
 | --- | --- | --- | --- |
 | [Spaulders of a Lost Age](https://www.wowhead.com/tbc/item=9430) | 102,365g 72s | 1 | 0% |
 
-Items listed: 7,032 (distinct items seen)
+## Alliance market update
 
-Listed value: 1.9M g (asking prices, not sales)
-
-Quantity: 508,781 (units on the AH)
-
-Scanned: 2026-10-02
+Dreamscythe, 2026-10-02: The auction house held **508,781 units across 7,032 items** with **1.9M g** in listed asking value. Leading sectors: armor at 404k g, gems at 267k g, quest items at 264k g. Listed supply rose in Adamantite Shells (+375%), Primal Mana (+832%), Adamantite Ore (+49%). Mote of Life topped listed quantity at 29,261 units. These are changes in listed supply, not trading volume or confirmed sales.
 
 ## Where the gold sits — listed value by market
 
@@ -565,13 +561,9 @@ Priced above 63k g a unit — left out of the totals and lists above.
 | --- | --- | --- | --- |
 | [Spaulders of a Lost Age](https://www.wowhead.com/tbc/item=9430) | 102,365g 72s | 1 | 0% |
 
-Items listed: 7,032 (distinct items seen)
+## Alliance market update
 
-Listed value: 1.9M g (asking prices, not sales)
-
-Quantity: 508,781 (units on the AH)
-
-Scanned: 2026-10-02
+Dreamscythe, 2026-10-02: The auction house held **508,781 units across 7,032 items** with **1.9M g** in listed asking value. Leading sectors: armor at 404k g, gems at 267k g, quest items at 264k g. Listed supply rose in Adamantite Shells (+375%), Primal Mana (+832%), Adamantite Ore (+49%). Mote of Life topped listed quantity at 29,261 units. These are changes in listed supply, not trading volume or confirmed sales.
 
 ## Where the gold sits — listed value by market
 
@@ -841,4 +833,4 @@ Single items holding the most listed value.
 | [Encrypted Twilight Text](https://www.wowhead.com/tbc/item=20404) | 15k g | 5,097 | +21% |
 | [Brilliant Crimson Spinel](https://www.wowhead.com/tbc/item=32196) | 14k g | 12 | +100% |
 
-Page generated: 2026-10-02 14:28Z
+Page generated: 2026-10-02 15:06Z

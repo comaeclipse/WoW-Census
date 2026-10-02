@@ -79,7 +79,8 @@ In this order:
 3. `.page-controls`: the **page nav** (Census, Auction House, Guilds,
    Geography, Talents; exactly one current) and, where the page slices data,
    the realm/faction chip rows (`.vchips`).
-4. Content: tiles, then panels/tables.
+4. Content: tiles or a concise market analysis, then panels/tables. The TBC
+   Alliance auction view leads with an analysis tied to its selected data.
 
 Every edition gets every page, even with no data. An empty page says so plainly
 in the normal layout; it never disappears or breaks the nav. Navigation is
@@ -91,7 +92,8 @@ identical across editions: adding a page or game means adding it everywhere.
   "X players online". Inspected talents are a nearby-player sample, never
   population-wide spec shares; the page says so.
 - Talent data is pooled **per game**, never split by realm.
-- Every data page states its freshness (`Scanned <date>` / `Latest inspection`).
+- Every data page states its freshness (`Scanned <date>` / `Latest inspection`),
+  including when a prose summary replaces the tiles.
 - No disclaimers or filler copy beyond what's needed to read the number correctly.
 
 ## 7. Layout and responsiveness

@@ -60,6 +60,9 @@ function topTable(title, hint, items, branch, cols) {
 }
 
 const MARKET_STYLE = `
+  .market-analysis{margin-bottom:22px}
+  .market-analysis p{font-family:"Friz Quadrata Web",Georgia,serif;font-size:17px;line-height:1.55;color:var(--ink);margin:12px 0 0}
+  .market-analysis strong{color:var(--gold);font-weight:400}
   .mkttable{width:100%; border-collapse:collapse; min-width:0; table-layout:fixed}
   .mkttable th{font-family:var(--pixel); font-size:7px; letter-spacing:1px; text-transform:uppercase;
     color:var(--gold); padding:6px 8px; border-bottom:2px solid var(--line); white-space:nowrap}
@@ -98,7 +101,7 @@ export function jokePriceThreshold(items) {
 // One view's worth of markup: the tiles and every panel under them.
 // snapshot: { items, realms, updatedAt, branch } -- items already merged across
 // that view's realms, each { id, name, q, pq, mv, asp, cat }.
-function renderMarketView(snapshot, threshold) {
+function renderMarketView(snapshot, threshold, analysis = false) {
   const all = (snapshot && snapshot.items) || [];
   const aggregateOnly = snapshot && snapshot.aggregateOnly;
   const joke = aggregateOnly ? [] : all.filter((it) => (it.asp || 0) > threshold)
@@ -148,6 +151,13 @@ function renderMarketView(snapshot, threshold) {
       (updatedAt ? esc(String(updatedAt).slice(0, 10)) : "&mdash;") +
       "</div></div>";
 
+  const supplyMove = (name) => {
+    const it = items.find((row) => row.name === name);
+    if (!it || !it.pq) return null;
+    const pct = Math.round(((it.q || 0) - it.pq) / it.pq * 100);
+    return name + ' (' + (pct > 0 ? '+' : '') + pct.toLocaleString() + '%)';
+  };
+
   const qtyTable = topTable("Most listed items", "By quantity sitting on the auction house.", byQty, branch, [
     { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
     { label: "Qty", cell: (it) => (it.q || 0).toLocaleString() },
@@ -185,7 +195,21 @@ function renderMarketView(snapshot, threshold) {
         ])
     : "";
 
-  return '<section class="tiles">' + tiles + "</section>" + body +
+  const allianceAnalysis = analysis && items.length
+    ? '<section class="panel market-analysis" aria-label="Alliance market update">' +
+      '<div class="ptitle">Alliance market update</div>' +
+      '<p>Dreamscythe, ' + esc(updatedAt ? String(updatedAt).slice(0, 10) : "scan date unavailable") +
+      ': The auction house held <strong>' + totalQty.toLocaleString() +
+      ' units across ' + items.length.toLocaleString() + ' items</strong> with <strong>' +
+      esc(bigGold(totalValue)) + '</strong> in listed asking value. Leading sectors: ' +
+      esc(catEntries.slice(0, 3).map(([name, value]) => name.toLowerCase() + ' at ' + bigGold(value)).join(', ')) +
+      '. Listed supply rose in ' + esc([supplyMove('Adamantite Shells'), supplyMove('Primal Mana'),
+        supplyMove('Adamantite Ore')].filter(Boolean).join(', ')) +
+      '. ' + esc(byQty[0]?.name || 'The leading item') + ' topped listed quantity at ' +
+      (byQty[0]?.q || 0).toLocaleString() + ' units. ' +
+      'These are changes in listed supply, not trading volume or confirmed sales.</p></section>'
+    : '';
+  return (allianceAnalysis || '<section class="tiles">' + tiles + "</section>") + body +
     (jokePanel ? '<div style="margin-top:22px">' + jokePanel + "</div>" : "");
 }
 
@@ -198,7 +222,8 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
   const realmOpts = dims.realm || [];
   const factionOpts = dims.faction || [];
   const activeRealm = realmOpts.length ? realmOpts[0].key : "all";
-  const activeFaction = factionOpts.length ? factionOpts[0].key : "all";
+  const activeFaction = opts.allianceAnalysis && factionOpts.some((f) => f.key === "Alliance")
+    ? "Alliance" : factionOpts.length ? factionOpts[0].key : "all";
   const chips = chipRow("realm", realmOpts, activeRealm) + chipRow("faction", factionOpts, activeFaction);
 
   // One threshold shared by every view -- computed from the widest item set, so
@@ -210,7 +235,8 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
   const sections = list.map((v) => {
     const on = v.realm === activeRealm && v.faction === activeFaction;
     return '<div class="vpane" data-realm="' + esc(v.realm) + '" data-faction="' + esc(v.faction) + '"' +
-      (on ? "" : " hidden") + ">" + renderMarketView(v.snapshot, threshold) + "</div>";
+      (on ? "" : " hidden") + ">" + renderMarketView(v.snapshot, threshold,
+        opts.allianceAnalysis && v.faction === "Alliance") + "</div>";
   }).join("");
   const script = chips ? TOGGLE_SCRIPT : "";
 
@@ -233,6 +259,7 @@ ${seoHead(topic + " – WoWCensus", seoGameLabel + " auction house snapshot with
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+${opts.allianceAnalysis ? '<link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>' : ''}
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">
 <style>${CENSUS_STYLE}
 ${MARKET_STYLE}

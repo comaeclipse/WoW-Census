@@ -507,7 +507,8 @@ async function main() {
     renderMarketHtml(views, marketDims, { stylesheet: cssName, nav: nav("auctionhouse.html"),
       notes: ["Latest auction scan: " + utcTimestamp(views[0] && views[0].snapshot.updatedAt)], generatedNote,
       gameLabel: GAME_LABEL,
-      canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "auctionhouse") }));
+      canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "auctionhouse"),
+      allianceAnalysis: SOURCE_GAME === "classic-progression" }));
   writeFile(path.join(outDir, "guilds.html"),
     renderGuildHtml(guildViews, dims, { stylesheet: cssName, nav: nav("guilds.html"),
       notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
