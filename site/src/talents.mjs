@@ -1,4 +1,4 @@
-import { esc, CENSUS_STYLE } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE } from "./census.mjs";
 
 function time(t) { return t ? new Date(t*1000).toISOString().slice(0,16).replace("T"," ")+"Z" : "Unavailable"; }
 export function renderInspectCoverage(data, href) {
@@ -12,11 +12,11 @@ export function renderInspectCoverage(data, href) {
 // All filtering and aggregation runs against this page's frozen snapshot.
 export function renderTalentsHtml(data, opts={}) {
   const nav=opts.nav||{};
+  const seoGameLabel=seoLabel(opts.gameLabel||"WoW Forever");
+  const topic=seoGameLabel+" Talent Builds & Popular Specs";
   const payload=JSON.stringify(data).replace(/</g,"\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>${esc(opts.gameLabel||"WoW")} talent builds</title>
-    <meta name="description" content="Observed nearby player talent builds, talent tree point totals and selected talent popularity.">
-    ${opts.canonical?`<link rel="canonical" href="${esc(opts.canonical)}">`:""}
+    ${seoHead(topic+" – WoWCensus", seoGameLabel+" talent builds seen on inspected players: most common builds, talent tree point totals and selected talent popularity.", opts.canonical)}
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96"><link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
     <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="${esc(opts.stylesheet||"/style.css")}">
@@ -36,7 +36,7 @@ export function renderTalentsHtml(data, opts={}) {
     @media(max-width:1050px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
     @media(max-width:600px){.talent-filters label{flex:1 1 40%}.talent-filters select{max-width:100%;width:100%}}
     </style></head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
-    <header class="ihead"><div class="page-heading"><h1 class="iname">WoWCensus</h1>${nav.games||""}</div>${nav.breadcrumbs||""}</header>
+    <header class="ihead"><div class="page-heading">${pageHeading("WoWCensus", nav, topic)}${nav.games||""}</div>${nav.breadcrumbs||""}</header>
     <div class="page-controls">${nav.pages||""}</div>
     <section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div>
     <p class="hint talent-summary" style="margin:0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>

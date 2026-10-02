@@ -2,7 +2,7 @@
 // the dataset's latest rolling window, each at its latest observed location.
 // Not movement history or proof of an activity.
 
-import { esc, realmName, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, realmName, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
 
 const CAPITALS = new Set([
   "Darnassus", "Dornogal", "Exodar", "Ironforge", "Orgrimmar", "Shattrath City",
@@ -128,13 +128,12 @@ export function renderGeographyHtml(views, dims = {}, opts = {}) {
   const generatedNote = opts.generatedNote
     ? '<div class="itag" style="margin-top:16px;line-height:1.6">' + esc(opts.generatedNote) + "</div>"
     : "";
-  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
+  const seoGameLabel = seoLabel(gameLabel);
+  const topic = seoGameLabel + " Population by Zone";
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
-<title>${esc(seoGameLabel)} player activity by zone</title>
-<meta name="description" content="${esc(seoGameLabel)} player activity by zone, realm, and faction from latest-known character locations collected through /who.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' player activity by zone">\n<meta property="og:description" content="' + esc(seoGameLabel) + ' player activity by zone, realm, and faction from latest-known character locations collected through /who.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+${seoHead(topic + " – WoWCensus", seoGameLabel + " player activity by zone, realm, and faction from latest-known character locations collected through /who.", opts.canonical)}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -142,7 +141,7 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}${GEO_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
-<header class="ihead"><div class="page-heading"><h1 class="iname">${esc(heading)}</h1>${navigation.games || ""}</div>
+<header class="ihead"><div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>
 ${navigation.breadcrumbs || notes}</header>
 <div class="page-controls">${navigation.pages || ""}${chips}</div>${panes}
 ${generatedNote}

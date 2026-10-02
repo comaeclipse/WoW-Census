@@ -13,6 +13,9 @@
 /geography
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/talents
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /tbc/
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -26,6 +29,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /tbc/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/tbc/talents
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /classic/
@@ -43,6 +49,9 @@
 /classic/geography
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/classic/talents
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /sod/
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -56,6 +65,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /sod/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/sod/talents
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /mop/
@@ -73,6 +85,9 @@
 /mop/geography
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/mop/talents
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /retail/
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -86,6 +101,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /retail/geography
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/retail/talents
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /*.css

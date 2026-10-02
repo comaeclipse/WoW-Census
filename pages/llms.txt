@@ -10,57 +10,63 @@ full census. Auction quantities are listings, not sales. Money is in copper
 
 ## WoW Forever
 
-- [Census](https://wowcensus.pages.dev/): sampled population, faction balance, race and class mix
-- [Race + class](https://wowcensus.pages.dev/combos): the complete observed race and class combination breakdown
-- [Auction house](https://wowcensus.pages.dev/auctionhouse): item supply, asking prices and listed value from recent scans
-- [Guilds](https://wowcensus.pages.dev/guilds): sampled guild activity by realm and faction
-- [Geography](https://wowcensus.pages.dev/geography): player activity by zone from latest-known character locations
-- [census.json](https://wowcensus.pages.dev/census.json): the census data behind the page, as JSON
+- [Census](https://wowcensus.io/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.io/combos): the complete observed race and class combination breakdown
+- [Auction house](https://wowcensus.io/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.io/guilds): sampled guild activity by realm and faction
+- [Geography](https://wowcensus.io/geography): player activity by zone from latest-known character locations
+- [Talents](https://wowcensus.io/talents): nearby inspected talent builds, inferred talent trees and selected talent popularity
+- [census.json](https://wowcensus.io/census.json): the census data behind the page, as JSON
 
 ## TBC Anniversary
 
-- [Census](https://wowcensus.pages.dev/tbc/): sampled population, faction balance, race and class mix
-- [Race + class](https://wowcensus.pages.dev/tbc/combos): the complete observed race and class combination breakdown
-- [Auction house](https://wowcensus.pages.dev/tbc/auctionhouse): item supply, asking prices and listed value from recent scans
-- [Guilds](https://wowcensus.pages.dev/tbc/guilds): sampled guild activity by realm and faction
-- [Geography](https://wowcensus.pages.dev/tbc/geography): player activity by zone from latest-known character locations
-- [census.json](https://wowcensus.pages.dev/tbc/census.json): the census data behind the page, as JSON
+- [Census](https://wowcensus.io/tbc/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.io/tbc/combos): the complete observed race and class combination breakdown
+- [Auction house](https://wowcensus.io/tbc/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.io/tbc/guilds): sampled guild activity by realm and faction
+- [Geography](https://wowcensus.io/tbc/geography): player activity by zone from latest-known character locations
+- [Talents](https://wowcensus.io/tbc/talents): nearby inspected talent builds, inferred talent trees and selected talent popularity
+- [census.json](https://wowcensus.io/tbc/census.json): the census data behind the page, as JSON
 
 ## Classic Era
 
-- [Census](https://wowcensus.pages.dev/classic/): sampled population, faction balance, race and class mix
-- [Race + class](https://wowcensus.pages.dev/classic/combos): the complete observed race and class combination breakdown
-- [Auction house](https://wowcensus.pages.dev/classic/auctionhouse): item supply, asking prices and listed value from recent scans
-- [Guilds](https://wowcensus.pages.dev/classic/guilds): sampled guild activity by realm and faction
-- [Geography](https://wowcensus.pages.dev/classic/geography): player activity by zone from latest-known character locations
-- [census.json](https://wowcensus.pages.dev/classic/census.json): the census data behind the page, as JSON
+- [Census](https://wowcensus.io/classic/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.io/classic/combos): the complete observed race and class combination breakdown
+- [Auction house](https://wowcensus.io/classic/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.io/classic/guilds): sampled guild activity by realm and faction
+- [Geography](https://wowcensus.io/classic/geography): player activity by zone from latest-known character locations
+- [Talents](https://wowcensus.io/classic/talents): nearby inspected talent builds, inferred talent trees and selected talent popularity
+- [census.json](https://wowcensus.io/classic/census.json): the census data behind the page, as JSON
 
 ## Season of Discovery
 
-- [Census](https://wowcensus.pages.dev/sod/): sampled population, faction balance, race and class mix
-- [Race + class](https://wowcensus.pages.dev/sod/combos): the complete observed race and class combination breakdown
-- [Auction house](https://wowcensus.pages.dev/sod/auctionhouse): item supply, asking prices and listed value from recent scans
-- [Guilds](https://wowcensus.pages.dev/sod/guilds): sampled guild activity by realm and faction
-- [Geography](https://wowcensus.pages.dev/sod/geography): player activity by zone from latest-known character locations
-- [census.json](https://wowcensus.pages.dev/sod/census.json): the census data behind the page, as JSON
+- [Census](https://wowcensus.io/sod/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.io/sod/combos): the complete observed race and class combination breakdown
+- [Auction house](https://wowcensus.io/sod/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.io/sod/guilds): sampled guild activity by realm and faction
+- [Geography](https://wowcensus.io/sod/geography): player activity by zone from latest-known character locations
+- [Talents](https://wowcensus.io/sod/talents): nearby inspected talent builds, inferred talent trees and selected talent popularity
+- [census.json](https://wowcensus.io/sod/census.json): the census data behind the page, as JSON
 
 ## Mists of Pandaria Classic
 
-- [Census](https://wowcensus.pages.dev/mop/): sampled population, faction balance, race and class mix
-- [Race + class](https://wowcensus.pages.dev/mop/combos): the complete observed race and class combination breakdown
-- [Auction house](https://wowcensus.pages.dev/mop/auctionhouse): item supply, asking prices and listed value from recent scans
-- [Guilds](https://wowcensus.pages.dev/mop/guilds): sampled guild activity by realm and faction
-- [Geography](https://wowcensus.pages.dev/mop/geography): player activity by zone from latest-known character locations
-- [census.json](https://wowcensus.pages.dev/mop/census.json): the census data behind the page, as JSON
+- [Census](https://wowcensus.io/mop/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.io/mop/combos): the complete observed race and class combination breakdown
+- [Auction house](https://wowcensus.io/mop/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.io/mop/guilds): sampled guild activity by realm and faction
+- [Geography](https://wowcensus.io/mop/geography): player activity by zone from latest-known character locations
+- [Talents](https://wowcensus.io/mop/talents): nearby inspected talent builds, inferred talent trees and selected talent popularity
+- [census.json](https://wowcensus.io/mop/census.json): the census data behind the page, as JSON
 
 ## Retail
 
-- [Census](https://wowcensus.pages.dev/retail/): sampled population, faction balance, race and class mix
-- [Race + class](https://wowcensus.pages.dev/retail/combos): the complete observed race and class combination breakdown
-- [Auction house](https://wowcensus.pages.dev/retail/auctionhouse): item supply, asking prices and listed value from recent scans
-- [Guilds](https://wowcensus.pages.dev/retail/guilds): sampled guild activity by realm and faction
-- [Geography](https://wowcensus.pages.dev/retail/geography): player activity by zone from latest-known character locations
-- [census.json](https://wowcensus.pages.dev/retail/census.json): the census data behind the page, as JSON
+- [Census](https://wowcensus.io/retail/): sampled population, faction balance, race and class mix
+- [Race + class](https://wowcensus.io/retail/combos): the complete observed race and class combination breakdown
+- [Auction house](https://wowcensus.io/retail/auctionhouse): item supply, asking prices and listed value from recent scans
+- [Guilds](https://wowcensus.io/retail/guilds): sampled guild activity by realm and faction
+- [Geography](https://wowcensus.io/retail/geography): player activity by zone from latest-known character locations
+- [Talents](https://wowcensus.io/retail/talents): nearby inspected talent builds, inferred talent trees and selected talent popularity
+- [census.json](https://wowcensus.io/retail/census.json): the census data behind the page, as JSON
 
 ## Live API
 

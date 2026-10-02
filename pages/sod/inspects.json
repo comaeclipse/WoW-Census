@@ -1,0 +1,17 @@
+{
+  "source": "sod",
+  "lastT": 0,
+  "windowDays": 14,
+  "truncated": false,
+  "records": [],
+  "coverage": {
+    "inspected": 0,
+    "withSelectedTalents": 0,
+    "linked": 0,
+    "unmatched": 0,
+    "ambiguous": 0,
+    "retainedCensusCharacters": 425,
+    "history": 0
+  },
+  "catalog": null
+}

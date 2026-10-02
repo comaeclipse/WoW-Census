@@ -14,6 +14,27 @@ export function esc(s) {
   return String(s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 }
 
+// Search-facing labels always lead with "WoW" ("TBC Anniversary" -> "WoW TBC Anniversary").
+export function seoLabel(gameLabel) {
+  return /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
+}
+
+// Title and description, plus the matching Open Graph tags when the page has a canonical URL.
+export function seoHead(title, description, canonical) {
+  return "<title>" + esc(title) + "</title>\n" +
+    '<meta name="description" content="' + esc(description) + '">' +
+    (canonical ? '\n<link rel="canonical" href="' + esc(canonical) + '">' +
+      '\n<meta property="og:type" content="website">\n<meta property="og:site_name" content="WoWCensus">' +
+      '\n<meta property="og:title" content="' + esc(title) + '">\n<meta property="og:description" content="' + esc(description) + '">' +
+      '\n<meta property="og:url" content="' + esc(canonical) + '">' : "");
+}
+
+// Static pages show the WoWCensus logo as their H1, so the page topic rides beneath it.
+export function pageHeading(heading, navigation, topic) {
+  return '<h1 class="iname">' + esc(heading) +
+    (navigation.games && topic ? '<span class="itopic">' + esc(topic) + "</span>" : "") + "</h1>";
+}
+
 // Blizzard's beta realms are internally "Classic Beta PvE" / "Classic Beta PvP 2";
 // players just call them PvE and PvP. Display-only -- the raw names stay the
 // data keys. Handles "-Faction" suffixes and "realm:" game keys.
@@ -141,6 +162,7 @@ export function sortedEntries(dist) {
 }
 
 export const CENSUS_STYLE = `
+  .iname .itopic{display:block; margin-top:6px; font-family:var(--pixel); font-size:9px; font-weight:400; letter-spacing:1px; line-height:1.6; text-transform:uppercase; color:var(--muted); text-shadow:none}
   .chartgrid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start}
   @media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
   .census .legend{display:flex; gap:18px; margin:0 0 14px}
@@ -166,9 +188,13 @@ export const CENSUS_STYLE = `
   .combofaction{font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--fac);margin-bottom:7px}
   .comboname{font-family:var(--pixel);font-size:11px;line-height:1.5;color:var(--ink);margin-bottom:5px}
   .combostat{color:var(--muted);font-size:17px}
-  .combo-panel{margin-bottom:22px}.combo-table{min-width:0}.combo-table th,.combo-table td{width:auto}.combo-table th:nth-child(1),.combo-table td:nth-child(1){width:64%}
-  .combo-name{display:flex;align-items:center;gap:7px}.combo-name img{width:24px;height:24px;border:1px solid var(--line);background:#111}
+  @font-face{font-family:"Friz Quadrata Web";src:url("/fonts/friz-quadrata-regular-os-5870333951e7c.woff") format("woff");font-style:normal;font-weight:400;font-display:swap}
+  .combo-analysis{font-family:"Friz Quadrata Web","Friz Quadrata","Friz Quadrata Std","Fritz Quadrata","Cinzel",Georgia,serif;font-size:17px;letter-spacing:.025em;line-height:1.55;color:var(--ink)}
+  .combo-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
+  .combo-panel{margin:0}.combo-table{min-width:0}.combo-table th,.combo-table td{width:auto}.combo-table th:nth-child(1),.combo-table td:nth-child(1){width:64%}
+  .combo-name{display:flex;align-items:center;gap:7px}.combo-name img{width:24px;height:24px;border:2px solid #b99b55;box-shadow:1px 1px 0 #000;background:#111}
   @media (max-width:760px){.combogrid{grid-template-columns:1fr}}
+  @media (max-width:760px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
   @media (max-width:420px){.combocard{padding:12px;gap:11px}.comboicons{min-width:82px}
     .comboicons img{width:48px;height:48px}.comboname{font-size:9px}}`;
 
@@ -315,7 +341,8 @@ export function renderComboBreakdownHtml(census, opts = {}) {
   const navigation = opts.nav && typeof opts.nav === "object" ? opts.nav : { games: opts.nav || "", pages: "" };
   const gameLabel = opts.gameLabel || "WoW Forever";
   const heading = navigation.games ? "WoWCensus" : gameLabel + " — Race + Class";
-  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
+  const seoGameLabel = seoLabel(gameLabel);
+  const topic = seoGameLabel + " Race & Class Breakdown";
   const notes = (opts.notes || []).map((note, i) =>
     '<div class="itag" style="' + (i ? "margin-top:4px;" : "margin-top:10px;") + 'line-height:1.6">' + esc(note) + "</div>").join("");
   const generatedNote = opts.generatedNote
@@ -324,9 +351,7 @@ export function renderComboBreakdownHtml(census, opts = {}) {
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
-<title>${esc(seoGameLabel)} race and class breakdown</title>
-<meta name="description" content="${esc(seoGameLabel)} observed race and class combinations from sampled in-game /who results.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">' : ""}
+${seoHead(topic + " – WoWCensus", seoGameLabel + " observed race and class combinations from sampled in-game /who results.", opts.canonical)}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -334,10 +359,10 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">' :
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
-<header class="ihead"><div class="page-heading"><h1 class="iname">${esc(heading)}</h1>${navigation.games || ""}</div>${navigation.breadcrumbs || notes}</header>
+<header class="ihead"><div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>${navigation.breadcrumbs || notes}</header>
 <div class="page-controls">${navigation.pages || ""}</div>
-<section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div><p class="hint" style="margin:0">${esc(comboAnalysis(groups, opts.flavorNote))}</p></section>
-${comboBreakdown(groups)}${generatedNote}
+<section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div><p class="hint combo-analysis" style="margin:0">${esc(comboAnalysis(groups, opts.flavorNote))}</p></section>
+<div class="combo-breakdown">${comboBreakdown(groups)}</div>${generatedNote}
 </div></body></html>`;
 }
 
@@ -363,13 +388,13 @@ export function renderCensusHtml(views, opts = {}) {
 
   const gameLabel = opts.gameLabel || "WoW Forever";
   const heading = navigation.games ? "WoWCensus" : (gameLabel === "WoW Forever" ? "WoW Forever Beta" : gameLabel + " — Census");
-  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
+  const seoGameLabel = seoLabel(gameLabel);
+  const topic = seoGameLabel + " Population Census";
+  const description = opts.description || seoGameLabel + " realm population, faction balance, race and class distribution from sampled in-game /who results.";
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
-<title>${esc(seoGameLabel)} census</title>
-<meta name="description" content="${esc(seoGameLabel)} realm population, faction balance, race and class distribution from sampled in-game /who results.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' census">\n<meta property="og:description" content="' + esc(seoGameLabel) + ' realm population, faction balance, race and class distribution from sampled in-game /who results.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+${seoHead(opts.title || topic + " – WoWCensus", description, opts.canonical)}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -382,11 +407,12 @@ ${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">
   <header class="ihead">
-    <div class="page-heading"><h1 class="iname">${esc(heading)}</h1>${navigation.games || ""}</div>
+    <div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>
     ${navigation.breadcrumbs || notes}
   </header>
   <div class="page-controls">${navigation.pages || ""}${chips}</div>
   ${panes}
+  ${opts.inspectCoverage || ""}
   ${generatedNote}
 </div>
 ${chips ? TOGGLE_SCRIPT : ""}

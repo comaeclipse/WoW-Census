@@ -132,7 +132,7 @@ if ($content -match '\["export"\]\s*=\s*"((?:\\.|[^"\\])*)"') {
     if ($parsed -and $parsed.type -eq "ml-realm-v1") { $obj = $parsed; $json = $rawJson }
 }
 if (-not $json) {
-    Write-Host "No usable compact export in SavedVariables -- rebuilding directly from the saved realm tables instead." -ForegroundColor Yellow
+    Write-Host "Building the upload payload from the authoritative saved realm tables."
 }
 
 # Rebuild from the authoritative realm tables rather than trusting the compact
@@ -289,5 +289,38 @@ if ($node -and (Test-Path $helper)) {
                 }
             }
         }
+    }
+}
+
+# Import the companion cache separately: nearby inspections never count as /who.
+$inspectFile = Join-Path $file.DirectoryName "NameplateInspect.lua"
+$inspectHelper = Join-Path $scriptDir "export-inspects-from-savedvariables.js"
+if ($node -and (Test-Path $inspectFile) -and (Test-Path $inspectHelper)) {
+    $inspectSource = switch ($Flavor) {
+        "tbc-anniversary" { "classic-progression" }
+        "classic-era" { "classic" }
+        default { $Flavor }
+    }
+    $inspectArgs = @($inspectHelper, $inspectFile, "--source=$inspectSource")
+    if ($Realm) { $inspectArgs += "--observer-realm=$Realm" }
+    $inspectJson = & $node.Source @inspectArgs
+    if ($LASTEXITCODE -ne 0) { throw "NameplateInspect export failed." }
+    $inspect = $inspectJson | ConvertFrom-Json
+    # Bound each request; reuploads are idempotent even after partial failures.
+    for ($offset = 0; $offset -lt $inspect.records.Count;) {
+        $end = $offset - 1
+        $nodeCount = 0
+        while (($end + 1) -lt $inspect.records.Count -and ($end - $offset + 1) -lt 500) {
+            $nextCount = @($inspect.records[$end + 1].list).Count
+            if ($end -ge $offset -and ($nodeCount + $nextCount) -gt 3500) { break }
+            $nodeCount += $nextCount
+            $end++
+        }
+        $chunk = @{ type = $inspect.type; source = $inspect.source; collector = $inspect.collector;
+            observerBucket = $inspect.observerBucket; records = @($inspect.records[$offset..$end]) } | ConvertTo-Json -Depth 30 -Compress
+        $ir = Invoke-RestMethod -Uri "$Url/admin/import-inspects?token=$([uri]::EscapeDataString($Token))" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($chunk)) -ContentType "application/json; charset=utf-8"
+        if (-not $ir.ok -or $ir.rejected -gt 0) { throw "Inspect import failed or rejected records: $($ir | ConvertTo-Json -Compress)" }
+        Write-Host ("Inspects: {0} imported, {1} linked, {2} unmatched, {3} ambiguous, {4} talent nodes." -f $ir.imported, $ir.linked, $ir.unmatched, $ir.ambiguous, $ir.nodes) -ForegroundColor Green
+        $offset = $end + 1
     }
 }

@@ -8,93 +8,8 @@ const fs = require("node:fs");
 
 const input = process.argv[2];
 if (!input) throw new Error("usage: node export-realm-from-savedvariables.js <MarketLens.lua>");
-const source = fs.readFileSync(input, "utf8");
-let p = source.indexOf("{");
-if (p < 0) throw new Error("MarketLensDB table not found");
-
-function ws() {
-  while (p < source.length) {
-    if (/\s/.test(source[p])) { p++; continue; }
-    if (source.startsWith("--", p)) {
-      p = source.indexOf("\n", p + 2);
-      if (p < 0) p = source.length;
-      continue;
-    }
-    break;
-  }
-}
-
-function string() {
-  if (source[p++] !== '"') throw new Error(`expected string at ${p - 1}`);
-  let out = "";
-  while (p < source.length) {
-    const c = source[p++];
-    if (c === '"') return out;
-    if (c !== "\\") { out += c; continue; }
-    const e = source[p++];
-    const escapes = { a: "\x07", b: "\b", f: "\f", n: "\n", r: "\r", t: "\t", v: "\v" };
-    if (escapes[e] !== undefined) out += escapes[e];
-    else if (/\d/.test(e)) {
-      let digits = e;
-      while (digits.length < 3 && /\d/.test(source[p] || "")) digits += source[p++];
-      out += String.fromCharCode(Number(digits));
-    } else out += e;
-  }
-  throw new Error("unterminated string");
-}
-
-function atom() {
-  const start = p;
-  while (p < source.length && /[A-Za-z0-9_.+\-]/.test(source[p])) p++;
-  const raw = source.slice(start, p);
-  if (raw === "true") return true;
-  if (raw === "false") return false;
-  if (raw === "nil") return null;
-  const n = Number(raw);
-  if (raw && Number.isFinite(n)) return n;
-  if (raw) return raw;
-  throw new Error(`unexpected token at ${p}: ${source.slice(p, p + 20)}`);
-}
-
-function value() {
-  ws();
-  if (source[p] === "{") return table();
-  if (source[p] === '"') return string();
-  return atom();
-}
-
-function table() {
-  if (source[p++] !== "{") throw new Error(`expected table at ${p - 1}`);
-  const out = {};
-  let next = 1;
-  while (true) {
-    ws();
-    if (source[p] === "}") { p++; return out; }
-    let key;
-    if (source[p] === "[") {
-      p++; key = value(); ws();
-      if (source[p++] !== "]") throw new Error(`expected ] at ${p - 1}`);
-      ws();
-      if (source[p++] !== "=") throw new Error(`expected = at ${p - 1}`);
-      out[String(key)] = value();
-    } else if (source[p] === "{" || source[p] === '"') {
-      out[String(next++)] = value();
-    } else {
-      const mark = p;
-      const candidate = atom();
-      ws();
-      if (source[p] === "=") {
-        p++; out[String(candidate)] = value();
-      } else {
-        p = mark; out[String(next++)] = value();
-      }
-    }
-    ws();
-    if (source[p] === "," || source[p] === ";") p++;
-  }
-}
-
-const db = value();
+const { readSavedVariables } = require("./savedvariables.js");
+const db = readSavedVariables(input);
 const realms = db.realms || {};
 if (process.argv.includes("--list-realms")) {
   process.stdout.write(JSON.stringify(Object.keys(realms)));
@@ -130,8 +45,30 @@ function normalizeFlavor(flavor) {
 let sourceMap = {};
 try { sourceMap = require("./item-sources.json"); } catch (e) { /* not generated yet */ }
 
+// The addon stores each realm's item history as one packed string
+// (Analytics/Snapshots.lua, Snap:Pack): "ML1\n" then per item
+// id \t name \t link \t market \t source \t crafter \t t,q,a,s,l,m,w,tc[,...].
+// Expand it to the table shape older saves used; table entries win.
+function unpackItems(packed, into) {
+  if (typeof packed !== "string" || !packed.startsWith("ML1\n")) return into;
+  const keys = ["t", "q", "a", "s", "l", "m", "w", "tc"];
+  for (const line of packed.slice(4).split("\n")) {
+    const f = line.split("\t");
+    if (f.length < 7 || into[f[0]]) continue;
+    const nums = f[6].split(",").map((v) => Number(v) || 0);
+    const snaps = {};
+    for (let i = 0; i + keys.length <= nums.length; i += keys.length) {
+      const s = {};
+      keys.forEach((k, j) => { s[k] = nums[i + j]; });
+      snaps[String(i / keys.length + 1)] = s;
+    }
+    into[f[0]] = { name: f[1], link: f[2], class: { market: f[3], source: f[4], crafter: f[5] }, snaps };
+  }
+  return into;
+}
+
 const items = {};
-for (const [id, rec] of Object.entries(realm.items || {})) {
+for (const [id, rec] of Object.entries(unpackItems(realm.itemsPacked, { ...(realm.items || {}) }))) {
   const rawSnaps = Object.keys(rec.snaps || {}).sort((a, b) => Number(a) - Number(b)).map((k) => {
     const s = rec.snaps[k];
     return [s.t || 0, s.q || 0, s.a || 0, s.s || 0, s.l || 0, s.m || 0, s.w || 0, s.tc || 0];
@@ -235,13 +172,17 @@ if (process.argv.includes("--sellers")) {
   const observations = [];
   for (const [key, c] of Object.entries((realm.population && realm.population.characters) || {})) {
     characters.push({
-      k: key, fn: c.fullName || c.name || key, n: c.name || "", r: c.realm || "",
+      k: key, fn: c.fullName || c.name || key, n: c.name || "",
+      first: c.firstName || "", last: c.lastName || "", r: c.realm || "",
       g: c.guild || "", l: c.level || 0, race: c.race || "", class: c.class || "",
       cf: c.classFile || "", z: c.zone || "", fs: c.firstSeen || 0,
       ls: c.lastSeen || 0, sc: c.seenCount || 0,
     });
     for (const [day, d] of Object.entries(c.days || {})) {
-      observations.push([key, Number(day), d.count || 0, d.firstSeen || 0, d.lastSeen || 0]);
+      observations.push([
+        key, Number(day), d.count || d[1] || 0,
+        d.firstSeen || d[2] || 0, d.lastSeen || d[3] || 0,
+      ]);
     }
   }
   const sweeps = [];
@@ -262,8 +203,9 @@ if (process.argv.includes("--sellers")) {
     const observed = Object.entries(sweep.observations || {});
     for (const [key, o] of observed) {
       locationObservations.push([
-        id, key, o.queryIndex || 0, o.observedAt || 0, o.zone || "",
-        o.level || 0, o.classFile || "", o.race || "",
+        id, key, o.queryIndex || o[1] || 0, o.observedAt || o[2] || 0,
+        o.zone || o[3] || "", o.level || o[4] || 0,
+        o.classFile || o[5] || "", o.race || o[6] || "",
       ]);
     }
     sweeps.push({

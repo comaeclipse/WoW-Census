@@ -6,7 +6,7 @@
 // Only what a scan actually observes is shown. Listings are not sales, so
 // "popular" here means listed in quantity, never sold.
 
-import { esc, realmName, barChart, sortedEntries, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, realmName, barChart, sortedEntries, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
 
 // Copper -> the site's usual g/s/c shorthand.
 function money(cop) {
@@ -146,7 +146,7 @@ function renderMarketView(snapshot, threshold) {
       '</div><div class="s">units on the AH</div></div>' +
     '<div class="tile"><div class="k">Scanned</div><div class="v">' +
       (updatedAt ? esc(String(updatedAt).slice(0, 10)) : "&mdash;") +
-      '</div><div class="s">' + esc(realms.map(realmName).join(" · ") || "no realm") + "</div></div>";
+      "</div></div>";
 
   const qtyTable = topTable("Most listed items", "By quantity sitting on the auction house.", byQty, branch, [
     { label: "Item", left: true, cell: (it, b) => itemLink(it, b) },
@@ -222,13 +222,12 @@ export function renderMarketHtml(views, dims = {}, opts = {}) {
   const generatedNote = opts.generatedNote
     ? '<div class="itag" style="margin-top:16px;line-height:1.6">' + esc(opts.generatedNote) + "</div>"
     : "";
-  const seoGameLabel = /^WoW\b/i.test(gameLabel) ? gameLabel : "WoW " + gameLabel;
+  const seoGameLabel = seoLabel(gameLabel);
+  const topic = seoGameLabel + " Auction House Prices";
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
-<title>${esc(seoGameLabel)} auction house</title>
-<meta name="description" content="${esc(seoGameLabel)} auction house snapshot with item supply, asking prices, listed value, and market changes from recent scans.">
-${opts.canonical ? '<link rel="canonical" href="' + esc(opts.canonical) + '">\n<meta property="og:type" content="website">\n<meta property="og:title" content="' + esc(seoGameLabel) + ' auction house">\n<meta property="og:description" content="' + esc(seoGameLabel) + ' auction house snapshot with item supply, asking prices, listed value, and market changes from recent scans.">\n<meta property="og:url" content="' + esc(opts.canonical) + '">' : ""}
+${seoHead(topic + " – WoWCensus", seoGameLabel + " auction house snapshot with item supply, asking prices, listed value, and market changes from recent scans.", opts.canonical)}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -242,7 +241,7 @@ ${MARKET_STYLE}
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">
   <header class="ihead">
-    <div class="page-heading"><h1 class="iname">${esc(heading)}</h1>${navigation.games || ""}</div>
+    <div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>
     ${navigation.breadcrumbs || notes}
   </header>
   <div class="page-controls">${navigation.pages || ""}${chips}</div>

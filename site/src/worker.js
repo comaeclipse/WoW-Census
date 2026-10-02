@@ -1,5 +1,7 @@
 import { Hono } from "hono";
-import { CLASS_META, esc, realmName, renderCensusHtml } from "./census.mjs";
+import { renderTalentsHtml, renderInspectCoverage } from "./talents.mjs";
+import { importInspects, apiInspects, loadInspects } from "./inspects.mjs";
+import { CENSUS_WINDOW_DAYS, CLASS_META, esc, realmName, renderCensusHtml } from "./census.mjs";
 
 // MarketLens — Cloudflare Worker
 // Routes:
@@ -1475,12 +1477,42 @@ async function popPage(url, env) {
 const ZONE_WINDOW_DAYS = 30;
 
 async function loadCensus(env, sourceGame = "classic-beta") {
-  const rows = (await env.DB.prepare(
+  // Race/class shares: a rolling CENSUS_WINDOW_DAYS window of characters that
+  // census sweeps found with level/class/race queries -- each character once,
+  // at their latest sighting. Zone queries are left out (they favor whoever
+  // idles in cities), and so is anything older than the window, so a realm's
+  // lean follows the realm instead of pinning every character ever seen. The
+  // window ends at that dataset's newest census sighting, so a realm not
+  // scanned lately keeps its last picture instead of going blank.
+  const censusWindow = CENSUS_WINDOW_DAYS * 86400;
+  const censusRows = (await env.DB.prepare(
+    `WITH obs AS (
+       SELECT o.game game, o.race race, o.class_file cf, o.observed_at t,
+         ROW_NUMBER() OVER (PARTITION BY o.game, o.character_key ORDER BY o.observed_at DESC) rn
+       FROM character_location_observations o
+       JOIN population_sweeps s
+         ON s.game = o.game AND s.source_game = o.source_game AND s.sweep_id = o.sweep_id
+       JOIN population_sweep_queries q
+         ON q.game = o.game AND q.source_game = o.source_game AND q.sweep_id = o.sweep_id
+        AND q.query_index = o.query_index
+       JOIN datasets d ON d.game = o.game
+       WHERE d.source_game = ? AND s.label LIKE 'census %' AND COALESCE(q.filter, '') NOT LIKE '%z-%'
+     ), latest AS (SELECT game, MAX(t) t FROM obs GROUP BY game)
+     SELECT obs.game game, obs.race race, obs.cf cf, COUNT(*) n
+     FROM obs JOIN latest l ON l.game = obs.game
+     WHERE obs.rn = 1 AND obs.t >= l.t - ?
+     GROUP BY obs.game, obs.race, obs.cf`
+  ).bind(sourceGame, censusWindow).all()).results;
+  // Realms with no census passes yet: their latest window of plain sightings.
+  const censused = new Set(censusRows.map((r) => r.game));
+  const sightingRows = (await env.DB.prepare(
     `SELECT c.game game, c.race race, c.class_file cf, COUNT(*) n
      FROM characters c JOIN datasets d ON d.game = c.game
-     WHERE d.source_game = ?
+     JOIN (SELECT game, MAX(last_seen) latest FROM characters GROUP BY game) m ON m.game = c.game
+     WHERE d.source_game = ? AND c.last_seen >= m.latest - ?
      GROUP BY c.game, c.race, c.class_file`
-  ).bind(sourceGame).all()).results;
+  ).bind(sourceGame, censusWindow).all()).results.filter((r) => !censused.has(r.game));
+  const rows = censusRows.concat(sightingRows);
   const scans = (await env.DB.prepare(
     `SELECT p.game game, COUNT(*) samples, SUM(p.observed) observed, MAX(p.t) lastT
      FROM pop_samples p JOIN datasets d ON d.game = p.game
@@ -1519,7 +1551,7 @@ async function loadCensus(env, sourceGame = "classic-beta") {
       realms.add(name);
       units.set(game, {
         game, realm: name, faction: fac || "Unknown",
-        races: {}, classes: {}, guilds: [], zones: [], zoneCharacters: 0,
+        races: {}, classes: {}, combos: {}, guilds: [], zones: [], zoneCharacters: 0,
         characters: 0, samples: 0, observed: 0,
       });
     }
@@ -1527,9 +1559,14 @@ async function loadCensus(env, sourceGame = "classic-beta") {
   }
   for (const r of rows) {
     const u = unit(r.game);
+    u.basis = censused.has(r.game) ? "census" : "sightings";
     u.characters += r.n;
     if (r.race) u.races[r.race] = (u.races[r.race] || 0) + r.n;
     if (r.cf) u.classes[r.cf] = (u.classes[r.cf] || 0) + r.n;
+    if (r.race && r.cf) {
+      const key = r.race + "\t" + r.cf;
+      u.combos[key] = (u.combos[key] || 0) + r.n;
+    }
   }
   for (const sc of scans) {
     const u = unit(sc.game);
@@ -1568,7 +1605,7 @@ function mergeCensusUnits(units) {
   for (const u of units) {
     if (!byFaction.has(u.faction))
       byFaction.set(u.faction, {
-        faction: u.faction, races: {}, classes: {}, characters: 0, samples: 0, observed: 0, games: [],
+        faction: u.faction, races: {}, classes: {}, combos: {}, characters: 0, samples: 0, observed: 0, games: [],
       });
     const g = byFaction.get(u.faction);
     g.characters += u.characters;
@@ -1577,6 +1614,7 @@ function mergeCensusUnits(units) {
     if (g.games.indexOf(u.game) < 0) g.games.push(u.game);
     for (const k in u.races) g.races[k] = (g.races[k] || 0) + u.races[k];
     for (const k in u.classes) g.classes[k] = (g.classes[k] || 0) + u.classes[k];
+    for (const k in u.combos) g.combos[k] = (g.combos[k] || 0) + u.combos[k];
   }
   const order = ["Alliance", "Horde"];
   return [...byFaction.values()].sort((a, b) =>
@@ -1584,10 +1622,12 @@ function mergeCensusUnits(units) {
 }
 
 async function foreverPage(env) {
+  const inspectData = await loadInspects(env, "classic-beta");
   const census = await loadCensus(env, "classic-beta");
   return new Response(renderCensusHtml([{ key: "all", label: "All", census }], {
     stylesheet: "/style.css",
     back: { href: "/pop", label: "POPULATION" },
+    inspectCoverage: renderInspectCoverage(inspectData, "/talents?source=classic-beta"),
     realmHref: (game) => "/pop?game=" + encodeURIComponent(game),
   }), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } });
 }
@@ -1605,12 +1645,24 @@ async function apiCensus(url, env) {
   return json(await loadCensus(env, sourceGame), 300);
 }
 
+async function talentsPage(url, env) {
+  const source = url.searchParams.get("source") || "classic-beta";
+  if (!GAMES[source]) return new Response("unknown source game", {status:400});
+  const data = await loadInspects(env, source);
+  return new Response(renderTalentsHtml(data, {
+    gameLabel: GAMES[source].label, stylesheet: "/style.css",
+    nav: {games: '<a class="game" href="/wowforever">Census</a>'},
+  }), {headers:{"content-type":"text/html; charset=utf-8","cache-control":"public, max-age=60"}});
+}
+
 const app = new Hono();
 
 app.all("/api/items", (c) => apiItems(new URL(c.req.url), c.env, c.executionCtx));
 app.all("/api/history", (c) => apiHistory(new URL(c.req.url), c.env));
 app.all("/api/games", (c) => apiGames(c.env));
 app.all("/api/population", (c) => apiPopulation(new URL(c.req.url), c.env));
+app.all("/api/inspects", (c) => apiInspects(new URL(c.req.url), c.env));
+app.post("/admin/import-inspects", (c) => importInspects(new URL(c.req.url), c.env, c.req.raw));
 app.all("/api/census", (c) => apiCensus(new URL(c.req.url), c.env));
 
 app.post("/admin/import-realm", (c) => importRealm(new URL(c.req.url), c.env, c.req.raw));
@@ -1621,6 +1673,7 @@ app.all("/admin/bnet-realm-auctions", (c) => bnetRealmAuctions(new URL(c.req.url
 app.all("/admin/resolve-names", (c) => resolveItemNames(new URL(c.req.url), c.env));
 
 app.all("/pop", (c) => popPage(new URL(c.req.url), c.env));
+app.all("/talents", (c) => talentsPage(new URL(c.req.url), c.env));
 app.all("/wowforever", (c) => foreverPage(c.env));
 app.all("/api/forever", (c) => apiForever(c.env));
 app.all("/seller/*", (c) => sellerPage(new URL(c.req.url), c.env));

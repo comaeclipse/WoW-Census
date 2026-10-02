@@ -19,6 +19,22 @@ const crypto = require("crypto");
 const { pathToFileURL } = require("url");
 const { spawnSync } = require("child_process");
 
+// Editors and antivirus scanners can briefly hold generated files on Windows.
+// Write beside the destination, then replace atomically with bounded retries.
+function writeFile(file, data) {
+  const temporary = file + "." + crypto.randomBytes(6).toString("hex") + ".tmp";
+  try {
+    fs.writeFileSync(temporary, data);
+    for (let attempt = 0; ; attempt++) {
+      try { fs.renameSync(temporary, file); return; }
+      catch (e) {
+        if (attempt >= 19 || !["UNKNOWN", "EPERM", "EBUSY", "EACCES"].includes(e.code)) throw e;
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
+      }
+    }
+  } finally { if (fs.existsSync(temporary)) fs.rmSync(temporary); }
+}
+
 const args = process.argv.slice(2);
 function arg(name, fallback) {
   const hit = args.find((a) => a.startsWith("--" + name + "="));
@@ -30,7 +46,7 @@ const base = (arg("url", "https://marketlens.skarz.workers.dev") || "").replace(
 const repo = path.resolve(__dirname, "..");
 const sourceGame = arg("source", "classic-beta");
 const editions = {
-  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever", comboBlurb: "Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta." },
+  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever", title: "WoW Forever & Classic+ Population Census – WoWCensus", description: "WoWCensus - World of Warcraft: Forever and Classic+ population tracker. Realm population, faction balance, and race/class breakdowns from in-game /who scans.", comboBlurb: "Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta." },
   "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc", comboBlurb: "TBC Anniversary’s smaller era roster makes race and class choices a direct view of the currently visible progression community." },
   classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic", comboBlurb: "Classic Era keeps the original-era roster, so the mix reflects the characters currently active in its long-lived realms rather than modern class availability." },
   sod: { dir: "pages/sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic", comboBlurb: "Season of Discovery class balance and player activity can shift sharply between phases, so treat the mix as a current activity signal rather than a durable meta ranking." },
@@ -46,7 +62,7 @@ const GAME_LABEL = edition.label;
 const UPLOAD_FLAVOR = edition.flavor;
 const WH_BRANCH = edition.branch;
 const ITEM_NAME_CACHE = path.join(__dirname, "forever-item-names.json");
-const SITE_ORIGIN = "https://wowcensus.pages.dev";
+const SITE_ORIGIN = "https://wowcensus.io";
 
 function editionPath(source) {
   const dir = editions[source].dir.replace(/^pages\/?/, "");
@@ -98,7 +114,7 @@ async function resolvePlaceholderNames(items) {
   }
   if (resolved) {
     const ordered = Object.fromEntries(Object.entries(cache).sort((a, b) => Number(a[0]) - Number(b[0])));
-    fs.writeFileSync(ITEM_NAME_CACHE, JSON.stringify(ordered, null, 2) + "\n");
+    writeFile(ITEM_NAME_CACHE, JSON.stringify(ordered, null, 2) + "\n");
   }
   for (const it of items) {
     if (/^item:\d+$/.test(it.name) && cache[it.id]) it.name = cache[it.id];
@@ -110,7 +126,7 @@ async function resolvePlaceholderNames(items) {
 // header carries no crumb back to one.
 function nav(current) {
   const currentPage = current.replace(/\.html$/, "");
-  const pageLabels = { index: "Census", combos: "Race + Class", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography" };
+  const pageLabels = { index: "Census", combos: "Race + Class", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography", talents: "Talents" };
   const item = (href, label, active = href === currentPage) =>
     '<a class="game"' + (active ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
@@ -121,7 +137,8 @@ function nav(current) {
     item(pagePath(SOURCE_GAME, "index"), "Census", currentPage === "index" || currentPage === "combos") +
       item(pagePath(SOURCE_GAME, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
       item(pagePath(SOURCE_GAME, "guilds"), "Guilds", currentPage === "guilds") +
-      item(pagePath(SOURCE_GAME, "geography"), "Geography", currentPage === "geography") + "</nav>",
+      item(pagePath(SOURCE_GAME, "geography"), "Geography", currentPage === "geography") +
+      item(pagePath(SOURCE_GAME, "talents"), "Talents", currentPage === "talents") + "</nav>",
     breadcrumbs: '<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="' +
       pagePath(SOURCE_GAME, "index") + '">' + edition.nav + '</a><span aria-hidden="true">/</span><span aria-current="page">' +
       pageLabels[currentPage] + "</span></nav>",
@@ -131,19 +148,19 @@ function nav(current) {
 function writeCrawlAndCacheFiles() {
   const pagesRoot = path.join(repo, "pages");
   const routes = Object.keys(editions).flatMap((source) =>
-    ["index", "combos", "auctionhouse", "guilds", "geography"].map((page) => pagePath(source, page)));
+    ["index", "combos", "auctionhouse", "guilds", "geography", "talents"].map((page) => pagePath(source, page)));
   const urls = routes.map((route) => SITE_ORIGIN + route);
   const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     urls.map((url) => "  <url><loc>" + url + "</loc></url>").join("\n") +
     "\n</urlset>\n";
-  fs.writeFileSync(path.join(pagesRoot, "robots.txt"),
+  writeFile(path.join(pagesRoot, "robots.txt"),
     "User-agent: *\nAllow: /\n\nSitemap: " + SITE_ORIGIN + "/sitemap.xml\n");
-  fs.writeFileSync(path.join(pagesRoot, "sitemap.xml"), sitemap);
+  writeFile(path.join(pagesRoot, "sitemap.xml"), sitemap);
   writeAgentDiscoveryFiles(pagesRoot);
   const htmlHeaders = routes.map((route) => route +
     "\n  Cache-Control: public, max-age=300, stale-while-revalidate=86400").join("\n\n");
-  fs.writeFileSync(path.join(pagesRoot, "_headers"), htmlHeaders + `
+  writeFile(path.join(pagesRoot, "_headers"), htmlHeaders + `
 
 /*.css
   Cache-Control: public, max-age=31536000, immutable
@@ -178,6 +195,7 @@ function writeAgentDiscoveryFiles(pagesRoot) {
     ["auctionhouse", "Auction house", "item supply, asking prices and listed value from recent scans"],
     ["guilds", "Guilds", "sampled guild activity by realm and faction"],
     ["geography", "Geography", "player activity by zone from latest-known character locations"],
+    ["talents", "Talents", "nearby inspected talent builds, inferred talent trees and selected talent popularity"],
   ];
   const withCensus = Object.keys(editions).filter((source) =>
     fs.existsSync(path.join(repo, editions[source].dir, "census.json")));
@@ -207,21 +225,21 @@ function writeAgentDiscoveryFiles(pagesRoot) {
     "- [MarketLens llms.txt](https://marketlens.skarz.workers.dev/llms.txt): the live JSON API these pages are built from",
     "",
   ].join("\n");
-  fs.writeFileSync(path.join(pagesRoot, "llms.txt"), llms);
+  writeFile(path.join(pagesRoot, "llms.txt"), llms);
 
   const catalog = {
     specVersion: "1.0",
     host: { displayName: "wowcensus", documentationUrl: SITE_ORIGIN + "/llms.txt" },
     entries: [
       {
-        identifier: "urn:air:wowcensus.pages.dev:docs:llms-txt",
+        identifier: "urn:air:wowcensus.io:docs:llms-txt",
         displayName: "wowcensus site guide",
         type: "text/markdown",
         url: SITE_ORIGIN + "/llms.txt",
         description: "Index of every census, race-and-class, auction-house, guild and geography page on this site.",
       },
       ...withCensus.map((source) => ({
-        identifier: "urn:air:wowcensus.pages.dev:census:" + (editions[source].dir.replace(/^pages\/?/, "") || "forever"),
+        identifier: "urn:air:wowcensus.io:census:" + (editions[source].dir.replace(/^pages\/?/, "") || "forever"),
         displayName: editions[source].label + " census data",
         type: "application/json",
         url: SITE_ORIGIN + editionPath(source) + "census.json",
@@ -231,9 +249,9 @@ function writeAgentDiscoveryFiles(pagesRoot) {
     ],
   };
   fs.mkdirSync(path.join(pagesRoot, ".well-known"), { recursive: true });
-  fs.writeFileSync(path.join(pagesRoot, ".well-known", "ai-catalog.json"), JSON.stringify(catalog, null, 2) + "\n");
+  writeFile(path.join(pagesRoot, ".well-known", "ai-catalog.json"), JSON.stringify(catalog, null, 2) + "\n");
 
-  fs.writeFileSync(path.join(pagesRoot, "404.html"),
+  writeFile(path.join(pagesRoot, "404.html"),
     '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>Not found</title><meta name="robots" content="noindex"></head>' +
@@ -315,6 +333,8 @@ async function main() {
   const censusMod = await import(src("census.mjs"));
   const { renderCensusHtml, renderComboBreakdownHtml } = censusMod;
   realmName = censusMod.realmName;
+  const { renderTalentsHtml, renderInspectCoverage } = await import(src("talents.mjs"));
+  const inspectData = await getJson(base + "/api/inspects?source=" + encodeURIComponent(SOURCE_GAME));
   const { renderMarketHtml } = await import(src("market.mjs"));
   const { renderGuildHtml } = await import(src("guilds.mjs"));
   const { renderGeographyHtml } = await import(src("geography.mjs"));
@@ -467,37 +487,44 @@ async function main() {
         censusRealms.map((r) =>
           censusView(r, censusRealmLabels.get(r), censusUnits.filter((u) => u.realm === r))))
     : [{ key: "all", label: "All realms", census }];
-  fs.writeFileSync(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
+  writeFile(path.join(outDir, "index.html"), renderCensusHtml(censusViews, {
     stylesheet: cssName,
     nav: nav("index.html"),
     comboHref: pagePath(SOURCE_GAME, "combos"),
+    inspectCoverage: renderInspectCoverage(inspectData, pagePath(SOURCE_GAME, "talents")),
     notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
     gameLabel: GAME_LABEL, uploadFlavor: UPLOAD_FLAVOR,
     canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "index"),
+    title: edition.title, description: edition.description,
   }));
-  fs.writeFileSync(path.join(outDir, "combos.html"), renderComboBreakdownHtml(censusViews[0].census, {
+  writeFile(path.join(outDir, "combos.html"), renderComboBreakdownHtml(censusViews[0].census, {
     stylesheet: cssName, nav: nav("combos.html"),
     notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
     gameLabel: GAME_LABEL, flavorNote: edition.comboBlurb,
     canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "combos"),
   }));
-  fs.writeFileSync(path.join(outDir, "auctionhouse.html"),
+  writeFile(path.join(outDir, "auctionhouse.html"),
     renderMarketHtml(views, marketDims, { stylesheet: cssName, nav: nav("auctionhouse.html"),
       notes: ["Latest auction scan: " + utcTimestamp(views[0] && views[0].snapshot.updatedAt)], generatedNote,
       gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "auctionhouse") }));
-  fs.writeFileSync(path.join(outDir, "guilds.html"),
+  writeFile(path.join(outDir, "guilds.html"),
     renderGuildHtml(guildViews, dims, { stylesheet: cssName, nav: nav("guilds.html"),
       notes: ["Latest census observation: " + utcTimestamp(census.lastT)], generatedNote,
       gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "guilds") }));
-  fs.writeFileSync(path.join(outDir, "geography.html"),
+  writeFile(path.join(outDir, "geography.html"),
     renderGeographyHtml(geographyViews, dims, { stylesheet: cssName, nav: nav("geography.html"),
       notes: ["Latest location observation: " + utcTimestamp(census.lastT)], generatedNote,
       gameLabel: GAME_LABEL,
       canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "geography") }));
+  writeFile(path.join(outDir, "talents.html"), renderTalentsHtml(inspectData, {
+    stylesheet: cssName, nav: nav("talents.html"), gameLabel: GAME_LABEL, generatedNote,
+    canonical: SITE_ORIGIN + pagePath(SOURCE_GAME, "talents")
+  }));
+  writeFile(path.join(outDir, "inspects.json"), JSON.stringify(inspectData, null, 2) + "\n");
   // The bundle carries its own stylesheet so it renders with nothing else served.
-  fs.writeFileSync(path.join(outDir, cssName), css);
+  writeFile(path.join(outDir, cssName), css);
   // Font URLs are root-relative so every edition shares one immutable copy.
   const sourceFonts = path.join(repo, "site/public/fonts");
   const outputFonts = path.join(repo, "pages/fonts");
@@ -514,11 +541,11 @@ async function main() {
     ...census,
     units: (census.units || []).map(({ guilds, zones, ...unit }) => unit),
   };
-  fs.writeFileSync(path.join(outDir, "census.json"), JSON.stringify(censusJson, null, 2));
+  writeFile(path.join(outDir, "census.json"), JSON.stringify(censusJson, null, 2));
   writeCrawlAndCacheFiles();
 
   const rel = path.relative(repo, outDir).replace(/\\/g, "/");
-  console.log("Wrote " + rel + "/{index.html,combos.html,auctionhouse.html,guilds.html,geography.html," + cssName + ",census.json}");
+  console.log("Wrote " + rel + "/{index.html,combos.html,auctionhouse.html,guilds.html,geography.html,talents.html," + cssName + ",census.json,inspects.json}");
 
   if (!flag("deploy")) {
     console.log("Publish it with:  node tools/build-forever-page.js --deploy");
