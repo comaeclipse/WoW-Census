@@ -5,13 +5,13 @@ url: "https://wowcensus.io/"
 ---
 
 # WoW Forever & Classic+ Population Census – WoWCensus
-Characters: 28,894 (unique, all time)
+Characters: 37,315 (unique, all time)
 
 Realms: 2
 
-Scans: 1,816 (73,951 sightings)
+Scans: 2,196 (85,087 sightings)
 
-Updated: 2026-10-02 (last sample)
+Updated: 2026-10-03 (last sample)
 
 ## Most popular race + class
 
@@ -19,13 +19,13 @@ Alliance
 
 Dwarf Shaman
 
-954 characters · 7.1% of Alliance
+1,769 characters · 9.6% of Alliance
 
 Horde
 
-Undead Priest
+Undead Paladin
 
-1,306 characters · 8.4% of Horde
+1,653 characters · 8.7% of Horde
 
 ## Population by race
 
@@ -35,131 +35,131 @@ AllianceHorde
 
 HUMAN
 
-4,025
+5,257
 
-HIGH ORDER SKYBORNE
+SKYBORNE
 
-2,720
-
-NIGHT ELF
-
-2,430
-
-GNOME
-
-2,133
+3,732
 
 DWARF
 
-2,104
+3,542
+
+NIGHT ELF
+
+3,106
+
+GNOME
+
+2,705
 
 UNDEAD
 
-4,305
+5,569
 
 ORC
 
-2,925
-
-WINDSHAPER SKYBORNE
-
-2,854
+3,508
 
 TROLL
 
-2,752
+3,330
+
+SKYBORNE
+
+3,325
 
 TAUREN
 
-2,646
+3,241
 
 ## Class distribution — Alliance
 
-13,412 characters shown
+18,342 characters shown
 
 WARRIOR
 
-2,352
+3,074
 
 HUNTER
 
-2,072
+2,978
 
 DRUID
 
-1,593
+2,017
 
 MAGE
 
-1,555
-
-WARLOCK
-
-1,426
+1,946
 
 PALADIN
 
-1,193
-
-ROGUE
-
-1,155
-
-PRIEST
-
-1,112
+1,791
 
 SHAMAN
 
-954
+1,769
+
+ROGUE
+
+1,715
+
+WARLOCK
+
+1,701
+
+PRIEST
+
+1,351
 
 ## Class distribution — Horde
 
-15,482 characters shown
+18,973 characters shown
 
 SHAMAN
 
-3,027
+3,447
 
 WARRIOR
 
-2,332
+2,994
 
 HUNTER
 
-2,113
+2,668
 
 PRIEST
 
-1,987
-
-ROGUE
-
-1,308
+2,427
 
 PALADIN
 
-1,304
+1,653
 
 MAGE
 
-1,286
+1,572
+
+ROGUE
+
+1,505
 
 DRUID
 
-1,201
+1,406
 
 WARLOCK
 
-924
+1,301
 
-Characters: 23,519 (unique, all time)
+Characters: 31,940 (unique, all time)
 
 Realms: 1
 
-Scans: 1,584 (63,266 sightings)
+Scans: 1,964 (74,402 sightings)
 
-Updated: 2026-10-02 (last sample)
+Updated: 2026-10-03 (last sample)
 
 ## Most popular race + class
 
@@ -167,13 +167,13 @@ Alliance
 
 Dwarf Shaman
 
-767 characters · 7.4% of Alliance
+1,582 characters · 10.3% of Alliance
 
 Horde
 
 Undead Priest
 
-1,219 characters · 9.3% of Horde
+1,564 characters · 9.4% of Horde
 
 ## Population by race
 
@@ -183,123 +183,123 @@ AllianceHorde
 
 HUMAN
 
-3,028
-
-HIGH ORDER SKYBORNE
-
-2,129
-
-NIGHT ELF
-
-1,800
+4,260
 
 DWARF
 
-1,744
+3,182
+
+SKYBORNE
+
+3,141
+
+NIGHT ELF
+
+2,476
 
 GNOME
 
-1,665
+2,237
 
 UNDEAD
 
-3,740
+5,004
 
-WINDSHAPER SKYBORNE
+SKYBORNE
 
-2,546
+3,017
 
 ORC
 
-2,370
+2,953
 
 TROLL
 
-2,278
+2,856
 
 TAUREN
 
-2,219
+2,814
 
 ## Class distribution — Alliance
 
-10,366 characters shown
+15,296 characters shown
 
 WARRIOR
 
-2,033
+2,755
 
 HUNTER
 
-1,462
+2,368
 
 DRUID
 
-1,219
-
-WARLOCK
-
-1,212
-
-MAGE
-
-1,165
-
-PRIEST
-
-848
-
-ROGUE
-
-834
-
-PALADIN
-
-826
+1,643
 
 SHAMAN
 
-767
+1,582
+
+MAGE
+
+1,556
+
+WARLOCK
+
+1,487
+
+PALADIN
+
+1,424
+
+ROGUE
+
+1,394
+
+PRIEST
+
+1,087
 
 ## Class distribution — Horde
 
-13,153 characters shown
+16,644 characters shown
 
 SHAMAN
 
-2,718
-
-PRIEST
-
-1,819
+3,138
 
 HUNTER
 
-1,756
+2,311
 
 WARRIOR
 
-1,636
+2,298
+
+PRIEST
+
+2,259
 
 PALADIN
 
-1,169
+1,518
 
 MAGE
 
-1,098
+1,384
 
 DRUID
 
-1,083
+1,288
 
 ROGUE
 
-1,057
+1,254
 
 WARLOCK
 
-817
+1,194
 
 Characters: 5,375 (unique, all time)
 
@@ -307,7 +307,7 @@ Realms: 1
 
 Scans: 232 (10,685 sightings)
 
-Updated: 2026-10-02 (last sample)
+Updated: 2026-10-03 (last sample)
 
 ## Most popular race + class
 
@@ -337,7 +337,7 @@ NIGHT ELF
 
 630
 
-HIGH ORDER SKYBORNE
+SKYBORNE
 
 591
 
@@ -365,7 +365,7 @@ TAUREN
 
 427
 
-WINDSHAPER SKYBORNE
+SKYBORNE
 
 308
 
@@ -451,12 +451,12 @@ WARLOCK
 
 ## Inspected talent builds
 
-2,027 nearby players inspected · 1,763 with selected talents · 534 linked to retained census characters
+3,469 nearby players inspected · 3,068 with selected talents · 981 linked to retained census characters
 
-1,493 unlinked inspections. Nearby inspect samples have their own coverage and do not measure population-wide specialization shares.
+2,488 unlinked inspections. Nearby inspect samples have their own coverage and do not measure population-wide specialization shares.
 
-Latest inspection: 2026-10-02 16:56Z
+Latest inspection: 2026-10-03 02:26Z
 
 [Explore talents](/talents)
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:36Z

@@ -453,4 +453,4 @@ Highest minimum asking price in Retail's aggregate summary.
 | [Pattern: Festival Suit](https://www.wowhead.com/item=21723) | 9,999,999g 99s | 1 | 0% |
 | [Bloodwood Wand](https://www.wowhead.com/item=25285) | 9,999,999g 99s | 1 | \-50% |
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:35Z

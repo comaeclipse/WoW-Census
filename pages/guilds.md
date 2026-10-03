@@ -5,13 +5,13 @@ url: "https://wowcensus.io/guilds"
 ---
 
 # WoW Forever Guilds by Realm – WoWCensus
-Guilds found: 3,668 (distinct realm guilds)
+Guilds found: 4,572 (distinct realm guilds)
 
-Guilded characters: 11,163 (latest known guild)
+Guilded characters: 14,908 (latest known guild)
 
-Surveyed: 28,894 (unique characters)
+Surveyed: 37,315 (unique characters)
 
-Updated: 2026-10-02 (PvE · PvP)
+Updated: 2026-10-03 (PvE · PvP)
 
 ## Most popular guilds
 
@@ -19,114 +19,114 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 
 | # | Guild | Realm · faction | Characters |
 | --- | --- | --- | --- |
-| 1 | <Church of Beef> | PvE · Horde | 123 |
+| 1 | <Church of Beef> | PvE · Horde | 132 |
 | 2 | <The Forever Open lII> | PvP · Horde | 113 |
-| 3 | <OLYMPUS LII> | PvP · Alliance | 97 |
-| 4 | <Mistfits> | PvE · Horde | 93 |
-| 5 | <Great Tomb of Nazarick> | PvE · Horde | 87 |
-| 6 | <FrostBane> | PvE · Alliance | 78 |
-| 7 | <Ominous Latin Name> | PvE · Alliance | 68 |
-| 8 | <OLYMPUS XXL> | PvP · Alliance | 67 |
-| 9 | <OLYMPUS I> | PvP · Alliance | 63 |
-| 10 | <Redux Crew> | PvE · Horde | 61 |
-| 11 | <Desperado Club> | PvE · Horde | 60 |
-| 12 | <Olympus PVE II> | PvE · Alliance | 60 |
-| 13 | <OLYMPUS USA> | PvP · Alliance | 56 |
-| 14 | <Final TIer Forever> | PvE · Alliance | 50 |
-| 15 | <Zero Threat> | PvE · Horde | 50 |
-| 16 | <BRAZUG> | PvP · Horde | 46 |
-| 17 | <OLYMPUS XXI> | PvP · Alliance | 45 |
-| 18 | <Order of the Fallen> | PvE · Horde | 40 |
-| 19 | <DGG> | PvE · Alliance | 39 |
-| 20 | <無限> | PvP · Horde | 39 |
-| 21 | <Coitados Forever> | PvP · Alliance | 37 |
-| 22 | <The Forever Open> | PvP · Horde | 37 |
-| 23 | <Nameless> | PvE · Alliance | 35 |
-| 24 | <Return of the Warchief> | PvE · Alliance | 33 |
-| 25 | <RUIN> | PvP · Alliance | 33 |
-| 26 | <Ill Skulls> | PvP · Horde | 32 |
-| 27 | <Parse Partout> | PvE · Horde | 32 |
-| 28 | <OLYMPUS DCLXVI> | PvP · Alliance | 31 |
-| 29 | <TRIBUNAL BETA> | PvP · Horde | 31 |
-| 30 | <WoW Forever PvP> | PvP · Alliance | 31 |
-| 31 | <乘月问晚星> | PvP · Alliance | 31 |
-| 32 | <Inception> | PvE · Alliance | 30 |
-| 33 | <No Flying> | PvE · Horde | 30 |
-| 34 | <Ony Fans> | PvE · Horde | 29 |
-| 35 | <TTK> | PvE · Horde | 29 |
-| 36 | <AMPLIFY> | PvE · Horde | 28 |
-| 37 | <Filthy Casuals> | PvE · Alliance | 28 |
-| 38 | <HOELYMPUS> | PvP · Alliance | 28 |
-| 39 | <Legacy Reborn> | PvE · Horde | 28 |
-| 40 | <OLYMPUS IIl> | PvE · Alliance | 27 |
-| 41 | <OLYMPUS XXII> | PvP · Alliance | 27 |
-| 42 | <P I R A T E S> | PvP · Horde | 27 |
-| 43 | <Strictly Business> | PvE · Horde | 27 |
-| 44 | <The Forlorn Hope> | PvE · Alliance | 27 |
-| 45 | <Better Than Nothing> | PvE · Alliance | 26 |
-| 46 | <Choo Choo Forever> | PvE · Alliance | 26 |
-| 47 | <Keyboard Turners> | PvE · Horde | 26 |
-| 48 | <Beta Buddies> | PvE · Alliance | 25 |
-| 49 | <Hidden Leaf Village> | PvE · Alliance | 25 |
-| 50 | <Sunnyvale> | PvP · Horde | 24 |
-| 51 | <The Knights of Lordaeron> | PvE · Alliance | 24 |
-| 52 | <Elwynn Golf Club> | PvE · Alliance | 23 |
-| 53 | <The Parse is Right> | PvE · Horde | 23 |
-| 54 | <The Scarlet Crusade> | PvE · Alliance | 23 |
-| 55 | <Kratos> | PvP · Horde | 22 |
-| 56 | <Mildly Dangerous> | PvE · Horde | 22 |
-| 57 | <OLYMPUS BALD> | PvE · Alliance | 22 |
-| 58 | <Phoenix Rising> | PvE · Alliance | 22 |
-| 59 | <Agony> | PvE · Horde | 21 |
-| 60 | <EMPIRE> | PvP · Alliance | 21 |
-| 61 | <FORWARD> | PvE · Alliance | 21 |
-| 62 | <Jah Ith Ber> | PvE · Horde | 21 |
-| 63 | <The Little Giants> | PvE · Alliance | 21 |
-| 64 | <Lifers> | PvE · Alliance | 20 |
-| 65 | <The Gnome Depot> | PvE · Alliance | 20 |
-| 66 | <THE HONOR HALL> | PvE · Horde | 20 |
-| 67 | <Together> | PvE · Horde | 20 |
-| 68 | <Way She Goes> | PvE · Alliance | 20 |
-| 69 | <Band of Misfitz> | PvE · Horde | 19 |
-| 70 | <Casual Garbage> | PvE · Alliance | 19 |
-| 71 | <Court of Azathoth> | PvE · Horde | 19 |
-| 72 | <Gooner Lords> | PvP · Horde | 19 |
-| 73 | <Latam Forever> | PvP · Alliance | 19 |
-| 74 | <Slash N Burn> | PvE · Alliance | 19 |
-| 75 | <the gays> | PvE · Alliance | 19 |
-| 76 | <The Lost Beta> | PvE · Alliance | 19 |
-| 77 | <critters> | PvE · Horde | 18 |
-| 78 | <Remnant> | PvE · Alliance | 18 |
-| 79 | <CHILL> | PvE · Horde | 17 |
-| 80 | <Chosen> | PvE · Alliance | 17 |
-| 81 | <Clan Sangue e Trovão> | PvP · Horde | 17 |
-| 82 | <OnlyCrits> | PvE · Alliance | 17 |
-| 83 | <The Dissidents> | PvE · Alliance | 17 |
-| 84 | <WARSTOMP Forever> | PvE · Horde | 17 |
-| 85 | <Way Beyond Toasted> | PvE · Horde | 17 |
-| 86 | <F A F O> | PvE · Horde | 16 |
-| 87 | <Fresh Meat> | PvE · Horde | 16 |
-| 88 | <It Burns When I Plea> | PvP · Horde | 16 |
-| 89 | <MidIife Crisis> | PvP · Horde | 16 |
-| 90 | <Nightfeather> | PvE · Horde | 16 |
-| 91 | <Pernoctated> | PvE · Alliance | 16 |
-| 92 | <Raid V Retirement> | PvE · Alliance | 16 |
-| 93 | <Toxic> | PvE · Alliance | 16 |
-| 94 | <Azeroth Coffee Company> | PvE · Horde | 15 |
-| 95 | <Frost Shock Therapy> | PvE · Horde | 15 |
-| 96 | <Frostwolf Clan Unbroken> | PvE · Horde | 15 |
-| 97 | <Girth Wind And Fire> | PvE · Horde | 15 |
-| 98 | <Power Trip> | PvE · Horde | 15 |
-| 99 | <Retrospective> | PvE · Horde | 15 |
-| 100 | <stratagem> | PvE · Horde | 15 |
+| 3 | <Mistfits> | PvE · Horde | 98 |
+| 4 | <OLYMPUS LII> | PvP · Alliance | 97 |
+| 5 | <FrostBane> | PvE · Alliance | 93 |
+| 6 | <Great Tomb of Nazarick> | PvE · Horde | 89 |
+| 7 | <Redux Crew> | PvE · Horde | 86 |
+| 8 | <Ominous Latin Name> | PvE · Alliance | 79 |
+| 9 | <Nameless> | PvE · Alliance | 71 |
+| 10 | <Zero Threat> | PvE · Horde | 70 |
+| 11 | <Olympus PVE II> | PvE · Alliance | 68 |
+| 12 | <OLYMPUS XXL> | PvP · Alliance | 67 |
+| 13 | <Desperado Club> | PvE · Horde | 65 |
+| 14 | <OLYMPUS I> | PvP · Alliance | 63 |
+| 15 | <OLYMPUS USA> | PvP · Alliance | 56 |
+| 16 | <Final TIer Forever> | PvE · Alliance | 55 |
+| 17 | <OLYMPUS IIl> | PvE · Alliance | 52 |
+| 18 | <DGG> | PvE · Alliance | 47 |
+| 19 | <Order of the Fallen> | PvE · Horde | 47 |
+| 20 | <BRAZUG> | PvP · Horde | 46 |
+| 21 | <Inception> | PvE · Alliance | 46 |
+| 22 | <OLYMPUS XXI> | PvP · Alliance | 45 |
+| 23 | <Filthy Casuals> | PvE · Alliance | 43 |
+| 24 | <No Flying> | PvE · Horde | 42 |
+| 25 | <The Gnome Depot> | PvE · Alliance | 39 |
+| 26 | <無限> | PvP · Horde | 39 |
+| 27 | <Coitados Forever> | PvP · Alliance | 37 |
+| 28 | <Return of the Warchief> | PvE · Alliance | 37 |
+| 29 | <The Forever Open> | PvP · Horde | 37 |
+| 30 | <Ony Fans> | PvE · Horde | 36 |
+| 31 | <THE HONOR HALL> | PvE · Horde | 35 |
+| 32 | <Better Than Nothing> | PvE · Alliance | 34 |
+| 33 | <Parse Partout> | PvE · Horde | 33 |
+| 34 | <RUIN> | PvP · Alliance | 33 |
+| 35 | <TTK> | PvE · Horde | 33 |
+| 36 | <Ill Skulls> | PvP · Horde | 32 |
+| 37 | <OLYMPUS BALD> | PvE · Alliance | 32 |
+| 38 | <FORWARD> | PvE · Alliance | 31 |
+| 39 | <Hidden Leaf Village> | PvE · Alliance | 31 |
+| 40 | <OLYMPUS DCLXVI> | PvP · Alliance | 31 |
+| 41 | <The Grey Company> | PvE · Alliance | 31 |
+| 42 | <TRIBUNAL BETA> | PvP · Horde | 31 |
+| 43 | <WoW Forever PvP> | PvP · Alliance | 31 |
+| 44 | <乘月问晚星> | PvP · Alliance | 31 |
+| 45 | <Nobility> | PvE · Alliance | 30 |
+| 46 | <The Forlorn Hope> | PvE · Alliance | 30 |
+| 47 | <The Knights of Lordaeron> | PvE · Alliance | 30 |
+| 48 | <The Scarlet Crusade> | PvE · Alliance | 30 |
+| 49 | <Together> | PvE · Horde | 30 |
+| 50 | <Keyboard Turners> | PvE · Horde | 29 |
+| 51 | <Legacy Reborn> | PvE · Horde | 29 |
+| 52 | <Strictly Business> | PvE · Horde | 29 |
+| 53 | <AMPLIFY> | PvE · Horde | 28 |
+| 54 | <Casual Garbage> | PvE · Alliance | 28 |
+| 55 | <HOELYMPUS> | PvP · Alliance | 28 |
+| 56 | <Choo Choo Forever> | PvE · Alliance | 27 |
+| 57 | <OLYMPUS XXII> | PvP · Alliance | 27 |
+| 58 | <P I R A T E S> | PvP · Horde | 27 |
+| 59 | <The Little Giants> | PvE · Alliance | 27 |
+| 60 | <Pernoctated> | PvE · Alliance | 26 |
+| 61 | <Redux Crew II> | PvE · Horde | 26 |
+| 62 | <OnlyCrits> | PvE · Alliance | 25 |
+| 63 | <Phoenix Rising> | PvE · Alliance | 25 |
+| 64 | <the gays> | PvE · Alliance | 25 |
+| 65 | <Beta Buddies> | PvE · Alliance | 24 |
+| 66 | <Chosen> | PvE · Alliance | 24 |
+| 67 | <Court of Azathoth> | PvE · Horde | 24 |
+| 68 | <Elwynn Golf Club> | PvE · Alliance | 24 |
+| 69 | <Mortis> | PvE · Alliance | 24 |
+| 70 | <Slash N Burn> | PvE · Alliance | 24 |
+| 71 | <Sunnyvale> | PvP · Horde | 24 |
+| 72 | <唐人街> | PvE · Alliance | 24 |
+| 73 | <Lifers> | PvE · Alliance | 23 |
+| 74 | <Mildly Dangerous> | PvE · Horde | 23 |
+| 75 | <Sylvanistas> | PvE · Horde | 23 |
+| 76 | <The Parse is Right> | PvE · Horde | 23 |
+| 77 | <UC Gate Keepers> | PvE · Horde | 23 |
+| 78 | <永恆第一名> | PvE · Horde | 23 |
+| 79 | <Frostwolf Clan Unbroken> | PvE · Horde | 22 |
+| 80 | <Kratos> | PvP · Horde | 22 |
+| 81 | <Night Shift> | PvE · Alliance | 22 |
+| 82 | <The Social Club> | PvE · Alliance | 22 |
+| 83 | <Agony> | PvE · Horde | 21 |
+| 84 | <CHILL> | PvE · Horde | 21 |
+| 85 | <EMPIRE> | PvP · Alliance | 21 |
+| 86 | <Jah Ith Ber> | PvE · Horde | 21 |
+| 87 | <Toxic> | PvE · Alliance | 21 |
+| 88 | <자비> | PvE · Alliance | 21 |
+| 89 | <Band of Misfitz> | PvE · Horde | 20 |
+| 90 | <Flat Azeroth Society> | PvE · Alliance | 20 |
+| 91 | <Imperia> | PvE · Alliance | 20 |
+| 92 | <Místborn> | PvE · Alliance | 20 |
+| 93 | <Raid V Retirement> | PvE · Alliance | 20 |
+| 94 | <The Dissidents> | PvE · Alliance | 20 |
+| 95 | <The Lost Beta> | PvE · Alliance | 20 |
+| 96 | <Way She Goes> | PvE · Alliance | 20 |
+| 97 | <Gooner Lords> | PvP · Horde | 19 |
+| 98 | <Latam Forever> | PvP · Alliance | 19 |
+| 99 | <Mid Life Aggro> | PvE · Alliance | 19 |
+| 100 | <OLYMPUS PVE> | PvE · Alliance | 19 |
 
-Guilds found: 1,429 (distinct realm guilds)
+Guilds found: 1,946 (distinct realm guilds)
 
-Guilded characters: 4,796 (latest known guild)
+Guilded characters: 6,972 (latest known guild)
 
-Surveyed: 13,412 (unique characters)
+Surveyed: 18,342 (unique characters)
 
-Updated: 2026-10-02 (PvE · PvP)
+Updated: 2026-10-03 (PvE · PvP)
 
 ## Most popular guilds
 
@@ -135,113 +135,113 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | # | Guild | Realm · faction | Characters |
 | --- | --- | --- | --- |
 | 1 | <OLYMPUS LII> | PvP · Alliance | 97 |
-| 2 | <FrostBane> | PvE · Alliance | 78 |
-| 3 | <Ominous Latin Name> | PvE · Alliance | 68 |
-| 4 | <OLYMPUS XXL> | PvP · Alliance | 67 |
-| 5 | <OLYMPUS I> | PvP · Alliance | 63 |
-| 6 | <Olympus PVE II> | PvE · Alliance | 60 |
-| 7 | <OLYMPUS USA> | PvP · Alliance | 56 |
-| 8 | <Final TIer Forever> | PvE · Alliance | 50 |
-| 9 | <OLYMPUS XXI> | PvP · Alliance | 45 |
-| 10 | <DGG> | PvE · Alliance | 39 |
-| 11 | <Coitados Forever> | PvP · Alliance | 37 |
-| 12 | <Nameless> | PvE · Alliance | 35 |
-| 13 | <Return of the Warchief> | PvE · Alliance | 33 |
-| 14 | <RUIN> | PvP · Alliance | 33 |
-| 15 | <OLYMPUS DCLXVI> | PvP · Alliance | 31 |
-| 16 | <WoW Forever PvP> | PvP · Alliance | 31 |
-| 17 | <乘月问晚星> | PvP · Alliance | 31 |
-| 18 | <Inception> | PvE · Alliance | 30 |
-| 19 | <Filthy Casuals> | PvE · Alliance | 28 |
-| 20 | <HOELYMPUS> | PvP · Alliance | 28 |
-| 21 | <OLYMPUS IIl> | PvE · Alliance | 27 |
-| 22 | <OLYMPUS XXII> | PvP · Alliance | 27 |
-| 23 | <The Forlorn Hope> | PvE · Alliance | 27 |
-| 24 | <Better Than Nothing> | PvE · Alliance | 26 |
-| 25 | <Choo Choo Forever> | PvE · Alliance | 26 |
-| 26 | <Beta Buddies> | PvE · Alliance | 25 |
-| 27 | <Hidden Leaf Village> | PvE · Alliance | 25 |
-| 28 | <The Knights of Lordaeron> | PvE · Alliance | 24 |
-| 29 | <Elwynn Golf Club> | PvE · Alliance | 23 |
-| 30 | <The Scarlet Crusade> | PvE · Alliance | 23 |
-| 31 | <OLYMPUS BALD> | PvE · Alliance | 22 |
-| 32 | <Phoenix Rising> | PvE · Alliance | 22 |
-| 33 | <EMPIRE> | PvP · Alliance | 21 |
-| 34 | <FORWARD> | PvE · Alliance | 21 |
-| 35 | <The Little Giants> | PvE · Alliance | 21 |
-| 36 | <Lifers> | PvE · Alliance | 20 |
-| 37 | <The Gnome Depot> | PvE · Alliance | 20 |
-| 38 | <Way She Goes> | PvE · Alliance | 20 |
-| 39 | <Casual Garbage> | PvE · Alliance | 19 |
-| 40 | <Latam Forever> | PvP · Alliance | 19 |
-| 41 | <Slash N Burn> | PvE · Alliance | 19 |
-| 42 | <the gays> | PvE · Alliance | 19 |
-| 43 | <The Lost Beta> | PvE · Alliance | 19 |
-| 44 | <Remnant> | PvE · Alliance | 18 |
-| 45 | <Chosen> | PvE · Alliance | 17 |
-| 46 | <OnlyCrits> | PvE · Alliance | 17 |
-| 47 | <The Dissidents> | PvE · Alliance | 17 |
-| 48 | <Pernoctated> | PvE · Alliance | 16 |
-| 49 | <Raid V Retirement> | PvE · Alliance | 16 |
-| 50 | <Toxic> | PvE · Alliance | 16 |
-| 51 | <The Social Club> | PvE · Alliance | 15 |
-| 52 | <There and back againn> | PvE · Alliance | 15 |
-| 53 | <中国人会飞> | PvP · Alliance | 15 |
-| 54 | <夏天里的蜗牛> | PvP · Alliance | 15 |
-| 55 | <Beta Dawn> | PvE · Alliance | 14 |
-| 56 | <Safety Third> | PvP · Alliance | 14 |
-| 57 | <Zeit ist Relativ> | PvE · Alliance | 14 |
-| 58 | <b r e e z e> | PvE · Alliance | 13 |
-| 59 | <Midnight EmpIre> | PvE · Alliance | 13 |
-| 60 | <Místborn> | PvE · Alliance | 13 |
-| 61 | <Our Legacy> | PvE · Alliance | 13 |
-| 62 | <Reckoning> | PvE · Alliance | 13 |
-| 63 | <Blackwater Coalition> | PvE · Alliance | 12 |
-| 64 | <Mid Life Aggro> | PvE · Alliance | 12 |
-| 65 | <Mortis> | PvE · Alliance | 12 |
-| 66 | <Never Said Die> | PvE · Alliance | 12 |
-| 67 | <OLYMPUS PVE> | PvE · Alliance | 12 |
-| 68 | <OLYMPUS XII> | PvP · Alliance | 12 |
-| 69 | <The Beta Guild> | PvE · Alliance | 12 |
-| 70 | <Valor Forever> | PvE · Alliance | 12 |
-| 71 | <ægis> | PvP · Alliance | 11 |
-| 72 | <EIfcore> | PvP · Alliance | 11 |
-| 73 | <Flat Azeroth Society> | PvE · Alliance | 11 |
-| 74 | <Lookthreesmall> | PvP · Alliance | 11 |
-| 75 | <Night Shift> | PvE · Alliance | 11 |
-| 76 | <OLYMPUS HUSSIES> | PvP · Alliance | 11 |
-| 77 | <OLYMPUS XIV> | PvP · Alliance | 11 |
-| 78 | <Phoenix RP> | PvE · Alliance | 11 |
-| 79 | <Stormwind Book Club> | PvP · Alliance | 11 |
-| 80 | <Генезис> | PvP · Alliance | 11 |
-| 81 | <Рейдерская закваска> | PvP · Alliance | 11 |
-| 82 | <Bananas in pajamas> | PvP · Alliance | 10 |
-| 83 | <BONK> | PvE · Alliance | 10 |
-| 84 | <Chromie Homies> | PvP · Alliance | 10 |
-| 85 | <Echoes of Home A> | PvE · Alliance | 10 |
-| 86 | <HAMMERSTRIKE> | PvP · Alliance | 10 |
-| 87 | <Made in Brazil> | PvP · Alliance | 10 |
-| 88 | <Nobility> | PvE · Alliance | 10 |
-| 89 | <OLYMPUS CDXX> | PvP · Alliance | 10 |
-| 90 | <OLYMPUS VI> | PvP · Alliance | 10 |
-| 91 | <Slash N Burn II> | PvE · Alliance | 10 |
-| 92 | <Blanket Fort> | PvE · Alliance | 9 |
-| 93 | <Blood Envoy> | PvE · Alliance | 9 |
-| 94 | <Buncle> | PvE · Alliance | 9 |
-| 95 | <Eidolon> | PvE · Alliance | 9 |
-| 96 | <FOREVER FRENCH> | PvP · Alliance | 9 |
-| 97 | <Frog Squad> | PvE · Alliance | 9 |
-| 98 | <Heat From Fire> | PvE · Alliance | 9 |
-| 99 | <KOR Forever> | PvP · Alliance | 9 |
-| 100 | <La Churreria De Manolo> | PvP · Alliance | 9 |
+| 2 | <FrostBane> | PvE · Alliance | 93 |
+| 3 | <Ominous Latin Name> | PvE · Alliance | 79 |
+| 4 | <Nameless> | PvE · Alliance | 71 |
+| 5 | <Olympus PVE II> | PvE · Alliance | 68 |
+| 6 | <OLYMPUS XXL> | PvP · Alliance | 67 |
+| 7 | <OLYMPUS I> | PvP · Alliance | 63 |
+| 8 | <OLYMPUS USA> | PvP · Alliance | 56 |
+| 9 | <Final TIer Forever> | PvE · Alliance | 55 |
+| 10 | <OLYMPUS IIl> | PvE · Alliance | 52 |
+| 11 | <DGG> | PvE · Alliance | 47 |
+| 12 | <Inception> | PvE · Alliance | 46 |
+| 13 | <OLYMPUS XXI> | PvP · Alliance | 45 |
+| 14 | <Filthy Casuals> | PvE · Alliance | 43 |
+| 15 | <The Gnome Depot> | PvE · Alliance | 39 |
+| 16 | <Coitados Forever> | PvP · Alliance | 37 |
+| 17 | <Return of the Warchief> | PvE · Alliance | 37 |
+| 18 | <Better Than Nothing> | PvE · Alliance | 34 |
+| 19 | <RUIN> | PvP · Alliance | 33 |
+| 20 | <OLYMPUS BALD> | PvE · Alliance | 32 |
+| 21 | <FORWARD> | PvE · Alliance | 31 |
+| 22 | <Hidden Leaf Village> | PvE · Alliance | 31 |
+| 23 | <OLYMPUS DCLXVI> | PvP · Alliance | 31 |
+| 24 | <The Grey Company> | PvE · Alliance | 31 |
+| 25 | <WoW Forever PvP> | PvP · Alliance | 31 |
+| 26 | <乘月问晚星> | PvP · Alliance | 31 |
+| 27 | <Nobility> | PvE · Alliance | 30 |
+| 28 | <The Forlorn Hope> | PvE · Alliance | 30 |
+| 29 | <The Knights of Lordaeron> | PvE · Alliance | 30 |
+| 30 | <The Scarlet Crusade> | PvE · Alliance | 30 |
+| 31 | <Casual Garbage> | PvE · Alliance | 28 |
+| 32 | <HOELYMPUS> | PvP · Alliance | 28 |
+| 33 | <Choo Choo Forever> | PvE · Alliance | 27 |
+| 34 | <OLYMPUS XXII> | PvP · Alliance | 27 |
+| 35 | <The Little Giants> | PvE · Alliance | 27 |
+| 36 | <Pernoctated> | PvE · Alliance | 26 |
+| 37 | <OnlyCrits> | PvE · Alliance | 25 |
+| 38 | <Phoenix Rising> | PvE · Alliance | 25 |
+| 39 | <the gays> | PvE · Alliance | 25 |
+| 40 | <Beta Buddies> | PvE · Alliance | 24 |
+| 41 | <Chosen> | PvE · Alliance | 24 |
+| 42 | <Elwynn Golf Club> | PvE · Alliance | 24 |
+| 43 | <Mortis> | PvE · Alliance | 24 |
+| 44 | <Slash N Burn> | PvE · Alliance | 24 |
+| 45 | <唐人街> | PvE · Alliance | 24 |
+| 46 | <Lifers> | PvE · Alliance | 23 |
+| 47 | <Night Shift> | PvE · Alliance | 22 |
+| 48 | <The Social Club> | PvE · Alliance | 22 |
+| 49 | <EMPIRE> | PvP · Alliance | 21 |
+| 50 | <Toxic> | PvE · Alliance | 21 |
+| 51 | <자비> | PvE · Alliance | 21 |
+| 52 | <Flat Azeroth Society> | PvE · Alliance | 20 |
+| 53 | <Imperia> | PvE · Alliance | 20 |
+| 54 | <Místborn> | PvE · Alliance | 20 |
+| 55 | <Raid V Retirement> | PvE · Alliance | 20 |
+| 56 | <The Dissidents> | PvE · Alliance | 20 |
+| 57 | <The Lost Beta> | PvE · Alliance | 20 |
+| 58 | <Way She Goes> | PvE · Alliance | 20 |
+| 59 | <Latam Forever> | PvP · Alliance | 19 |
+| 60 | <Mid Life Aggro> | PvE · Alliance | 19 |
+| 61 | <OLYMPUS PVE> | PvE · Alliance | 19 |
+| 62 | <Remnant> | PvE · Alliance | 19 |
+| 63 | <Blackwater Coalition> | PvE · Alliance | 18 |
+| 64 | <Lost Kingz> | PvE · Alliance | 18 |
+| 65 | <b r e e z e> | PvE · Alliance | 17 |
+| 66 | <Valor Forever> | PvE · Alliance | 17 |
+| 67 | <无限探索> | PvE · Alliance | 17 |
+| 68 | <Deeprun Rail Authority> | PvE · Alliance | 16 |
+| 69 | <Phoenix RP> | PvE · Alliance | 16 |
+| 70 | <Rise> | PvE · Alliance | 16 |
+| 71 | <There and back againn> | PvE · Alliance | 16 |
+| 72 | <Reckoning> | PvE · Alliance | 15 |
+| 73 | <Zeit ist Relativ> | PvE · Alliance | 15 |
+| 74 | <中国人会飞> | PvP · Alliance | 15 |
+| 75 | <夏天里的蜗牛> | PvP · Alliance | 15 |
+| 76 | <Beta Dawn> | PvE · Alliance | 14 |
+| 77 | <gay men> | PvE · Alliance | 14 |
+| 78 | <Midnight EmpIre> | PvE · Alliance | 14 |
+| 79 | <Our Legacy> | PvE · Alliance | 14 |
+| 80 | <Safety Third> | PvP · Alliance | 14 |
+| 81 | <True Freedom> | PvE · Alliance | 14 |
+| 82 | <BONK> | PvE · Alliance | 13 |
+| 83 | <Eidolon> | PvE · Alliance | 13 |
+| 84 | <Forever Mains> | PvE · Alliance | 13 |
+| 85 | <Never Said Die> | PvE · Alliance | 13 |
+| 86 | <OLYMPUS TYCOONS> | PvE · Alliance | 13 |
+| 87 | <Operasjon Firkløver> | PvE · Alliance | 13 |
+| 88 | <Owl Buddies> | PvE · Alliance | 13 |
+| 89 | <The Beta Guild> | PvE · Alliance | 13 |
+| 90 | <Unbroken Titans> | PvE · Alliance | 13 |
+| 91 | <Blanket Fort> | PvE · Alliance | 12 |
+| 92 | <Buncle> | PvE · Alliance | 12 |
+| 93 | <Echoes of Home A> | PvE · Alliance | 12 |
+| 94 | <Iconic> | PvE · Alliance | 12 |
+| 95 | <OLYMPUS XII> | PvP · Alliance | 12 |
+| 96 | <Salvation> | PvE · Alliance | 12 |
+| 97 | <Zoulbound> | PvE · Alliance | 12 |
+| 98 | <ægis> | PvP · Alliance | 11 |
+| 99 | <BattleRite> | PvE · Alliance | 11 |
+| 100 | <Brave Newbies> | PvE · Alliance | 11 |
 
-Guilds found: 2,239 (distinct realm guilds)
+Guilds found: 2,626 (distinct realm guilds)
 
-Guilded characters: 6,367 (latest known guild)
+Guilded characters: 7,936 (latest known guild)
 
-Surveyed: 15,482 (unique characters)
+Surveyed: 18,973 (unique characters)
 
-Updated: 2026-10-02 (PvE · PvP)
+Updated: 2026-10-03 (PvE · PvP)
 
 ## Most popular guilds
 
@@ -249,229 +249,114 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 
 | # | Guild | Realm · faction | Characters |
 | --- | --- | --- | --- |
-| 1 | <Church of Beef> | PvE · Horde | 123 |
+| 1 | <Church of Beef> | PvE · Horde | 132 |
 | 2 | <The Forever Open lII> | PvP · Horde | 113 |
-| 3 | <Mistfits> | PvE · Horde | 93 |
-| 4 | <Great Tomb of Nazarick> | PvE · Horde | 87 |
-| 5 | <Redux Crew> | PvE · Horde | 61 |
-| 6 | <Desperado Club> | PvE · Horde | 60 |
-| 7 | <Zero Threat> | PvE · Horde | 50 |
-| 8 | <BRAZUG> | PvP · Horde | 46 |
-| 9 | <Order of the Fallen> | PvE · Horde | 40 |
-| 10 | <無限> | PvP · Horde | 39 |
-| 11 | <The Forever Open> | PvP · Horde | 37 |
-| 12 | <Ill Skulls> | PvP · Horde | 32 |
-| 13 | <Parse Partout> | PvE · Horde | 32 |
-| 14 | <TRIBUNAL BETA> | PvP · Horde | 31 |
-| 15 | <No Flying> | PvE · Horde | 30 |
-| 16 | <Ony Fans> | PvE · Horde | 29 |
-| 17 | <TTK> | PvE · Horde | 29 |
-| 18 | <AMPLIFY> | PvE · Horde | 28 |
-| 19 | <Legacy Reborn> | PvE · Horde | 28 |
-| 20 | <P I R A T E S> | PvP · Horde | 27 |
-| 21 | <Strictly Business> | PvE · Horde | 27 |
-| 22 | <Keyboard Turners> | PvE · Horde | 26 |
-| 23 | <Sunnyvale> | PvP · Horde | 24 |
-| 24 | <The Parse is Right> | PvE · Horde | 23 |
-| 25 | <Kratos> | PvP · Horde | 22 |
-| 26 | <Mildly Dangerous> | PvE · Horde | 22 |
-| 27 | <Agony> | PvE · Horde | 21 |
-| 28 | <Jah Ith Ber> | PvE · Horde | 21 |
-| 29 | <THE HONOR HALL> | PvE · Horde | 20 |
-| 30 | <Together> | PvE · Horde | 20 |
-| 31 | <Band of Misfitz> | PvE · Horde | 19 |
-| 32 | <Court of Azathoth> | PvE · Horde | 19 |
-| 33 | <Gooner Lords> | PvP · Horde | 19 |
-| 34 | <critters> | PvE · Horde | 18 |
-| 35 | <CHILL> | PvE · Horde | 17 |
-| 36 | <Clan Sangue e Trovão> | PvP · Horde | 17 |
-| 37 | <WARSTOMP Forever> | PvE · Horde | 17 |
-| 38 | <Way Beyond Toasted> | PvE · Horde | 17 |
-| 39 | <F A F O> | PvE · Horde | 16 |
-| 40 | <Fresh Meat> | PvE · Horde | 16 |
-| 41 | <It Burns When I Plea> | PvP · Horde | 16 |
-| 42 | <MidIife Crisis> | PvP · Horde | 16 |
-| 43 | <Nightfeather> | PvE · Horde | 16 |
-| 44 | <Azeroth Coffee Company> | PvE · Horde | 15 |
-| 45 | <Frost Shock Therapy> | PvE · Horde | 15 |
-| 46 | <Frostwolf Clan Unbroken> | PvE · Horde | 15 |
-| 47 | <Girth Wind And Fire> | PvE · Horde | 15 |
-| 48 | <Power Trip> | PvE · Horde | 15 |
-| 49 | <Retrospective> | PvE · Horde | 15 |
-| 50 | <stratagem> | PvE · Horde | 15 |
-| 51 | <Sylvanistas> | PvE · Horde | 15 |
-| 52 | <UC Gate Keepers> | PvE · Horde | 15 |
-| 53 | <Big Box Brigade> | PvP · Horde | 14 |
-| 54 | <Tree of Life> | PvE · Horde | 14 |
-| 55 | <True Honor> | PvE · Horde | 14 |
-| 56 | <BloodSeekers> | PvE · Horde | 13 |
-| 57 | <Disciples of Honor> | PvE · Horde | 13 |
-| 58 | <Hordecore> | PvE · Horde | 13 |
-| 59 | <Legacy of Arthas> | PvE · Horde | 13 |
-| 60 | <Unshackled> | PvE · Horde | 13 |
-| 61 | <永恆第一名> | PvE · Horde | 13 |
-| 62 | <Blackwater> | PvE · Horde | 12 |
-| 63 | <èz> | PvE · Horde | 12 |
-| 64 | <Resurrection> | PvP · Horde | 12 |
-| 65 | <Secret Discord> | PvE · Horde | 12 |
-| 66 | <Skill Issues> | PvE · Horde | 12 |
-| 67 | <The Reunion> | PvE · Horde | 12 |
-| 68 | <Based> | PvE · Horde | 11 |
-| 69 | <Big Back Mafia> | PvE · Horde | 11 |
-| 70 | <Countdown> | PvE · Horde | 11 |
-| 71 | <Death to Alliance> | PvP · Horde | 11 |
-| 72 | <Die Laughing> | PvE · Horde | 11 |
-| 73 | <F A T A L I T Y> | PvE · Horde | 11 |
-| 74 | <Harlequins> | PvE · Horde | 11 |
-| 75 | <Hello Kitty SpecOps Team> | PvP · Horde | 11 |
-| 76 | <Ignorance is BiS> | PvE · Horde | 11 |
-| 77 | <Inept> | PvE · Horde | 11 |
-| 78 | <MUDHUTTERS> | PvE · Horde | 11 |
-| 79 | <Never Say Die> | PvE · Horde | 11 |
-| 80 | <Redux Crew II> | PvE · Horde | 11 |
-| 81 | <Retry> | PvE · Horde | 11 |
-| 82 | <Six Seven> | PvE · Horde | 11 |
-| 83 | <The Forever Open II> | PvP · Horde | 11 |
-| 84 | <The other other Guys> | PvE · Horde | 11 |
-| 85 | <Under the Desk Supprt> | PvE · Horde | 11 |
-| 86 | <WoWForeverUS> | PvP · Horde | 11 |
-| 87 | <BETA GUILD> | PvE · Horde | 10 |
-| 88 | <Blood and Thunder> | PvE · Horde | 10 |
-| 89 | <French Connection> | PvE · Horde | 10 |
-| 90 | <Horde Bloodline> | PvE · Horde | 10 |
-| 91 | <My Healer Hits Me> | PvE · Horde | 10 |
-| 92 | <Night Owl Society> | PvE · Horde | 10 |
-| 93 | <Not Optimal> | PvE · Horde | 10 |
-| 94 | <Shinra> | PvE · Horde | 10 |
-| 95 | <Tired Forever> | PvP · Horde | 10 |
-| 96 | <BAD JUJU MON> | PvE · Horde | 9 |
-| 97 | <BETA Obviously> | PvE · Horde | 9 |
-| 98 | <Dungeons and Dads> | PvP · Horde | 9 |
-| 99 | <Groot Lemlins> | PvE · Horde | 9 |
-| 100 | <Hells Gate> | PvP · Horde | 9 |
+| 3 | <Mistfits> | PvE · Horde | 98 |
+| 4 | <Great Tomb of Nazarick> | PvE · Horde | 89 |
+| 5 | <Redux Crew> | PvE · Horde | 86 |
+| 6 | <Zero Threat> | PvE · Horde | 70 |
+| 7 | <Desperado Club> | PvE · Horde | 65 |
+| 8 | <Order of the Fallen> | PvE · Horde | 47 |
+| 9 | <BRAZUG> | PvP · Horde | 46 |
+| 10 | <No Flying> | PvE · Horde | 42 |
+| 11 | <無限> | PvP · Horde | 39 |
+| 12 | <The Forever Open> | PvP · Horde | 37 |
+| 13 | <Ony Fans> | PvE · Horde | 36 |
+| 14 | <THE HONOR HALL> | PvE · Horde | 35 |
+| 15 | <Parse Partout> | PvE · Horde | 33 |
+| 16 | <TTK> | PvE · Horde | 33 |
+| 17 | <Ill Skulls> | PvP · Horde | 32 |
+| 18 | <TRIBUNAL BETA> | PvP · Horde | 31 |
+| 19 | <Together> | PvE · Horde | 30 |
+| 20 | <Keyboard Turners> | PvE · Horde | 29 |
+| 21 | <Legacy Reborn> | PvE · Horde | 29 |
+| 22 | <Strictly Business> | PvE · Horde | 29 |
+| 23 | <AMPLIFY> | PvE · Horde | 28 |
+| 24 | <P I R A T E S> | PvP · Horde | 27 |
+| 25 | <Redux Crew II> | PvE · Horde | 26 |
+| 26 | <Court of Azathoth> | PvE · Horde | 24 |
+| 27 | <Sunnyvale> | PvP · Horde | 24 |
+| 28 | <Mildly Dangerous> | PvE · Horde | 23 |
+| 29 | <Sylvanistas> | PvE · Horde | 23 |
+| 30 | <The Parse is Right> | PvE · Horde | 23 |
+| 31 | <UC Gate Keepers> | PvE · Horde | 23 |
+| 32 | <永恆第一名> | PvE · Horde | 23 |
+| 33 | <Frostwolf Clan Unbroken> | PvE · Horde | 22 |
+| 34 | <Kratos> | PvP · Horde | 22 |
+| 35 | <Agony> | PvE · Horde | 21 |
+| 36 | <CHILL> | PvE · Horde | 21 |
+| 37 | <Jah Ith Ber> | PvE · Horde | 21 |
+| 38 | <Band of Misfitz> | PvE · Horde | 20 |
+| 39 | <Gooner Lords> | PvP · Horde | 19 |
+| 40 | <Way Beyond Toasted> | PvE · Horde | 19 |
+| 41 | <critters> | PvE · Horde | 18 |
+| 42 | <F A F O> | PvE · Horde | 18 |
+| 43 | <HighlyRegarded> | PvE · Horde | 18 |
+| 44 | <Nightfeather> | PvE · Horde | 18 |
+| 45 | <WARSTOMP Forever> | PvE · Horde | 18 |
+| 46 | <BloodSeekers> | PvE · Horde | 17 |
+| 47 | <Clan Sangue e Trovão> | PvP · Horde | 17 |
+| 48 | <Die Laughing> | PvE · Horde | 17 |
+| 49 | <Fresh Meat> | PvE · Horde | 16 |
+| 50 | <Frost Shock Therapy> | PvE · Horde | 16 |
+| 51 | <Girth Wind And Fire> | PvE · Horde | 16 |
+| 52 | <Hordecore> | PvE · Horde | 16 |
+| 53 | <Inept> | PvE · Horde | 16 |
+| 54 | <It Burns When I Plea> | PvP · Horde | 16 |
+| 55 | <MidIife Crisis> | PvP · Horde | 16 |
+| 56 | <Power Trip> | PvE · Horde | 16 |
+| 57 | <Redux Crew IIl> | PvE · Horde | 16 |
+| 58 | <Retrospective> | PvE · Horde | 16 |
+| 59 | <True Honor> | PvE · Horde | 16 |
+| 60 | <亡者之手骑士团> | PvE · Horde | 16 |
+| 61 | <Azeroth Coffee Company> | PvE · Horde | 15 |
+| 62 | <Skill Issues> | PvE · Horde | 15 |
+| 63 | <stratagem> | PvE · Horde | 15 |
+| 64 | <The Reunion> | PvE · Horde | 15 |
+| 65 | <Big Box Brigade> | PvP · Horde | 14 |
+| 66 | <Disciples of Honor> | PvE · Horde | 14 |
+| 67 | <Legacy of Arthas> | PvE · Horde | 14 |
+| 68 | <MUDHUTTERS> | PvE · Horde | 14 |
+| 69 | <Six Seven> | PvE · Horde | 14 |
+| 70 | <Tree of Life> | PvE · Horde | 14 |
+| 71 | <Unshackled> | PvE · Horde | 14 |
+| 72 | <BETA GUILD> | PvE · Horde | 13 |
+| 73 | <Blackwater> | PvE · Horde | 13 |
+| 74 | <Countdown> | PvE · Horde | 13 |
+| 75 | <èz> | PvE · Horde | 13 |
+| 76 | <Ignorance is BiS> | PvE · Horde | 13 |
+| 77 | <Reborn Forever> | PvE · Horde | 13 |
+| 78 | <Beta Slayers> | PvE · Horde | 12 |
+| 79 | <Big Back Mafia> | PvE · Horde | 12 |
+| 80 | <F A T A L I T Y> | PvE · Horde | 12 |
+| 81 | <My Healer Hits Me> | PvE · Horde | 12 |
+| 82 | <Resurrection> | PvP · Horde | 12 |
+| 83 | <Retry> | PvE · Horde | 12 |
+| 84 | <Secret Discord> | PvE · Horde | 12 |
+| 85 | <Surreal> | PvE · Horde | 12 |
+| 86 | <The Takeshi Empire> | PvE · Horde | 12 |
+| 87 | <BAD JUJU MON> | PvE · Horde | 11 |
+| 88 | <Based> | PvE · Horde | 11 |
+| 89 | <Blood and Thunder> | PvE · Horde | 11 |
+| 90 | <Death to Alliance> | PvP · Horde | 11 |
+| 91 | <Harlequins> | PvE · Horde | 11 |
+| 92 | <Hello Kitty SpecOps Team> | PvP · Horde | 11 |
+| 93 | <Horde Bloodline> | PvE · Horde | 11 |
+| 94 | <Loot The Hound> | PvE · Horde | 11 |
+| 95 | <Never Say Die> | PvE · Horde | 11 |
+| 96 | <Not Optimal> | PvE · Horde | 11 |
+| 97 | <Operasjon Fírkløver> | PvE · Horde | 11 |
+| 98 | <Reign of Error> | PvE · Horde | 11 |
+| 99 | <SpellBound> | PvE · Horde | 11 |
+| 100 | <The Forever Open II> | PvP · Horde | 11 |
 
-Guilds found: 2,607 (distinct realm guilds)
+Guilds found: 3,511 (distinct realm guilds)
 
-Guilded characters: 8,042 (latest known guild)
+Guilded characters: 11,787 (latest known guild)
 
-Surveyed: 23,519 (unique characters)
+Surveyed: 31,940 (unique characters)
 
-Updated: 2026-10-02 (PvE)
-
-## Most popular guilds
-
-Ranked by unique surveyed characters whose latest recorded guild matches this name.
-
-| # | Guild | Realm · faction | Characters |
-| --- | --- | --- | --- |
-| 1 | <Church of Beef> | Horde | 123 |
-| 2 | <Mistfits> | Horde | 93 |
-| 3 | <Great Tomb of Nazarick> | Horde | 87 |
-| 4 | <FrostBane> | Alliance | 78 |
-| 5 | <Ominous Latin Name> | Alliance | 68 |
-| 6 | <Redux Crew> | Horde | 61 |
-| 7 | <Desperado Club> | Horde | 60 |
-| 8 | <Olympus PVE II> | Alliance | 60 |
-| 9 | <Final TIer Forever> | Alliance | 50 |
-| 10 | <Zero Threat> | Horde | 50 |
-| 11 | <Order of the Fallen> | Horde | 40 |
-| 12 | <DGG> | Alliance | 39 |
-| 13 | <Nameless> | Alliance | 35 |
-| 14 | <Return of the Warchief> | Alliance | 33 |
-| 15 | <Parse Partout> | Horde | 32 |
-| 16 | <Inception> | Alliance | 30 |
-| 17 | <No Flying> | Horde | 30 |
-| 18 | <Ony Fans> | Horde | 29 |
-| 19 | <TTK> | Horde | 29 |
-| 20 | <AMPLIFY> | Horde | 28 |
-| 21 | <Filthy Casuals> | Alliance | 28 |
-| 22 | <Legacy Reborn> | Horde | 28 |
-| 23 | <OLYMPUS IIl> | Alliance | 27 |
-| 24 | <Strictly Business> | Horde | 27 |
-| 25 | <The Forlorn Hope> | Alliance | 27 |
-| 26 | <Better Than Nothing> | Alliance | 26 |
-| 27 | <Choo Choo Forever> | Alliance | 26 |
-| 28 | <Keyboard Turners> | Horde | 26 |
-| 29 | <Beta Buddies> | Alliance | 25 |
-| 30 | <Hidden Leaf Village> | Alliance | 25 |
-| 31 | <The Knights of Lordaeron> | Alliance | 24 |
-| 32 | <Elwynn Golf Club> | Alliance | 23 |
-| 33 | <The Parse is Right> | Horde | 23 |
-| 34 | <The Scarlet Crusade> | Alliance | 23 |
-| 35 | <Mildly Dangerous> | Horde | 22 |
-| 36 | <OLYMPUS BALD> | Alliance | 22 |
-| 37 | <Phoenix Rising> | Alliance | 22 |
-| 38 | <Agony> | Horde | 21 |
-| 39 | <FORWARD> | Alliance | 21 |
-| 40 | <Jah Ith Ber> | Horde | 21 |
-| 41 | <The Little Giants> | Alliance | 21 |
-| 42 | <Lifers> | Alliance | 20 |
-| 43 | <The Gnome Depot> | Alliance | 20 |
-| 44 | <THE HONOR HALL> | Horde | 20 |
-| 45 | <Together> | Horde | 20 |
-| 46 | <Way She Goes> | Alliance | 20 |
-| 47 | <Band of Misfitz> | Horde | 19 |
-| 48 | <Casual Garbage> | Alliance | 19 |
-| 49 | <Court of Azathoth> | Horde | 19 |
-| 50 | <Slash N Burn> | Alliance | 19 |
-| 51 | <the gays> | Alliance | 19 |
-| 52 | <The Lost Beta> | Alliance | 19 |
-| 53 | <critters> | Horde | 18 |
-| 54 | <Remnant> | Alliance | 18 |
-| 55 | <CHILL> | Horde | 17 |
-| 56 | <Chosen> | Alliance | 17 |
-| 57 | <OnlyCrits> | Alliance | 17 |
-| 58 | <The Dissidents> | Alliance | 17 |
-| 59 | <WARSTOMP Forever> | Horde | 17 |
-| 60 | <Way Beyond Toasted> | Horde | 17 |
-| 61 | <F A F O> | Horde | 16 |
-| 62 | <Fresh Meat> | Horde | 16 |
-| 63 | <Nightfeather> | Horde | 16 |
-| 64 | <Pernoctated> | Alliance | 16 |
-| 65 | <Raid V Retirement> | Alliance | 16 |
-| 66 | <Toxic> | Alliance | 16 |
-| 67 | <Azeroth Coffee Company> | Horde | 15 |
-| 68 | <Frost Shock Therapy> | Horde | 15 |
-| 69 | <Frostwolf Clan Unbroken> | Horde | 15 |
-| 70 | <Girth Wind And Fire> | Horde | 15 |
-| 71 | <Power Trip> | Horde | 15 |
-| 72 | <Retrospective> | Horde | 15 |
-| 73 | <stratagem> | Horde | 15 |
-| 74 | <Sylvanistas> | Horde | 15 |
-| 75 | <The Social Club> | Alliance | 15 |
-| 76 | <There and back againn> | Alliance | 15 |
-| 77 | <UC Gate Keepers> | Horde | 15 |
-| 78 | <Beta Dawn> | Alliance | 14 |
-| 79 | <Tree of Life> | Horde | 14 |
-| 80 | <True Honor> | Horde | 14 |
-| 81 | <Zeit ist Relativ> | Alliance | 14 |
-| 82 | <b r e e z e> | Alliance | 13 |
-| 83 | <BloodSeekers> | Horde | 13 |
-| 84 | <Disciples of Honor> | Horde | 13 |
-| 85 | <Hordecore> | Horde | 13 |
-| 86 | <Legacy of Arthas> | Horde | 13 |
-| 87 | <Midnight EmpIre> | Alliance | 13 |
-| 88 | <Místborn> | Alliance | 13 |
-| 89 | <Our Legacy> | Alliance | 13 |
-| 90 | <Reckoning> | Alliance | 13 |
-| 91 | <Unshackled> | Horde | 13 |
-| 92 | <永恆第一名> | Horde | 13 |
-| 93 | <Blackwater> | Horde | 12 |
-| 94 | <Blackwater Coalition> | Alliance | 12 |
-| 95 | <èz> | Horde | 12 |
-| 96 | <Mid Life Aggro> | Alliance | 12 |
-| 97 | <Mortis> | Alliance | 12 |
-| 98 | <Never Said Die> | Alliance | 12 |
-| 99 | <OLYMPUS PVE> | Alliance | 12 |
-| 100 | <Secret Discord> | Horde | 12 |
-
-Guilds found: 1,174 (distinct realm guilds)
-
-Guilded characters: 3,506 (latest known guild)
-
-Surveyed: 10,366 (unique characters)
-
-Updated: 2026-10-02 (PvE)
+Updated: 2026-10-03 (PvE)
 
 ## Most popular guilds
 
@@ -479,114 +364,114 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 
 | # | Guild | Realm · faction | Characters |
 | --- | --- | --- | --- |
-| 1 | <FrostBane> | Alliance | 78 |
-| 2 | <Ominous Latin Name> | Alliance | 68 |
-| 3 | <Olympus PVE II> | Alliance | 60 |
-| 4 | <Final TIer Forever> | Alliance | 50 |
-| 5 | <DGG> | Alliance | 39 |
-| 6 | <Nameless> | Alliance | 35 |
-| 7 | <Return of the Warchief> | Alliance | 33 |
-| 8 | <Inception> | Alliance | 30 |
-| 9 | <Filthy Casuals> | Alliance | 28 |
-| 10 | <OLYMPUS IIl> | Alliance | 27 |
-| 11 | <The Forlorn Hope> | Alliance | 27 |
-| 12 | <Better Than Nothing> | Alliance | 26 |
-| 13 | <Choo Choo Forever> | Alliance | 26 |
-| 14 | <Beta Buddies> | Alliance | 25 |
-| 15 | <Hidden Leaf Village> | Alliance | 25 |
-| 16 | <The Knights of Lordaeron> | Alliance | 24 |
-| 17 | <Elwynn Golf Club> | Alliance | 23 |
-| 18 | <The Scarlet Crusade> | Alliance | 23 |
-| 19 | <OLYMPUS BALD> | Alliance | 22 |
-| 20 | <Phoenix Rising> | Alliance | 22 |
-| 21 | <FORWARD> | Alliance | 21 |
-| 22 | <The Little Giants> | Alliance | 21 |
-| 23 | <Lifers> | Alliance | 20 |
-| 24 | <The Gnome Depot> | Alliance | 20 |
-| 25 | <Way She Goes> | Alliance | 20 |
-| 26 | <Casual Garbage> | Alliance | 19 |
-| 27 | <Slash N Burn> | Alliance | 19 |
-| 28 | <the gays> | Alliance | 19 |
-| 29 | <The Lost Beta> | Alliance | 19 |
-| 30 | <Remnant> | Alliance | 18 |
-| 31 | <Chosen> | Alliance | 17 |
-| 32 | <OnlyCrits> | Alliance | 17 |
-| 33 | <The Dissidents> | Alliance | 17 |
-| 34 | <Pernoctated> | Alliance | 16 |
-| 35 | <Raid V Retirement> | Alliance | 16 |
-| 36 | <Toxic> | Alliance | 16 |
-| 37 | <The Social Club> | Alliance | 15 |
-| 38 | <There and back againn> | Alliance | 15 |
-| 39 | <Beta Dawn> | Alliance | 14 |
-| 40 | <Zeit ist Relativ> | Alliance | 14 |
-| 41 | <b r e e z e> | Alliance | 13 |
-| 42 | <Midnight EmpIre> | Alliance | 13 |
-| 43 | <Místborn> | Alliance | 13 |
-| 44 | <Our Legacy> | Alliance | 13 |
-| 45 | <Reckoning> | Alliance | 13 |
-| 46 | <Blackwater Coalition> | Alliance | 12 |
-| 47 | <Mid Life Aggro> | Alliance | 12 |
-| 48 | <Mortis> | Alliance | 12 |
-| 49 | <Never Said Die> | Alliance | 12 |
-| 50 | <OLYMPUS PVE> | Alliance | 12 |
-| 51 | <The Beta Guild> | Alliance | 12 |
-| 52 | <Valor Forever> | Alliance | 12 |
-| 53 | <Flat Azeroth Society> | Alliance | 11 |
-| 54 | <Night Shift> | Alliance | 11 |
-| 55 | <Phoenix RP> | Alliance | 11 |
-| 56 | <BONK> | Alliance | 10 |
-| 57 | <Echoes of Home A> | Alliance | 10 |
-| 58 | <Nobility> | Alliance | 10 |
-| 59 | <Slash N Burn II> | Alliance | 10 |
-| 60 | <Blanket Fort> | Alliance | 9 |
-| 61 | <Blood Envoy> | Alliance | 9 |
-| 62 | <Buncle> | Alliance | 9 |
-| 63 | <Eidolon> | Alliance | 9 |
-| 64 | <Frog Squad> | Alliance | 9 |
-| 65 | <Heat From Fire> | Alliance | 9 |
-| 66 | <Lost Kingz> | Alliance | 9 |
-| 67 | <LvL Up> | Alliance | 9 |
-| 68 | <phase compaction> | Alliance | 9 |
-| 69 | <Rainbow Revenge> | Alliance | 9 |
-| 70 | <Salvation> | Alliance | 9 |
-| 71 | <Львиная гвардия> | Alliance | 9 |
-| 72 | <Citadel> | Alliance | 8 |
-| 73 | <Deeprun Rail Authority> | Alliance | 8 |
-| 74 | <Dragons Heart> | Alliance | 8 |
-| 75 | <Forever Mains> | Alliance | 8 |
-| 76 | <gay men> | Alliance | 8 |
-| 77 | <Imperia> | Alliance | 8 |
-| 78 | <Iron Soul> | Alliance | 8 |
-| 79 | <Owl Buddies> | Alliance | 8 |
-| 80 | <Praxis> | Alliance | 8 |
-| 81 | <Purgatorial> | Alliance | 8 |
-| 82 | <Rise> | Alliance | 8 |
-| 83 | <The Creek> | Alliance | 8 |
-| 84 | <Unbroken Titans> | Alliance | 8 |
-| 85 | <Zoulbound> | Alliance | 8 |
-| 86 | <CLI> | Alliance | 7 |
-| 87 | <Friends Forever> | Alliance | 7 |
-| 88 | <Gnome Sayin> | Alliance | 7 |
-| 89 | <Pact> | Alliance | 7 |
-| 90 | <Placeholder> | Alliance | 7 |
-| 91 | <Ram Ranch Cowboys> | Alliance | 7 |
-| 92 | <Random Encounter> | Alliance | 7 |
-| 93 | <Starfall> | Alliance | 7 |
-| 94 | <Steamys Taints> | Alliance | 7 |
-| 95 | <Valheim Swamp Squad> | Alliance | 7 |
-| 96 | <Zug N Tug> | Alliance | 7 |
-| 97 | <AZEROTH> | Alliance | 6 |
-| 98 | <Baguette Forever> | Alliance | 6 |
-| 99 | <Brave Newbies> | Alliance | 6 |
-| 100 | <FOREVER BETA> | Alliance | 6 |
+| 1 | <Church of Beef> | Horde | 132 |
+| 2 | <Mistfits> | Horde | 98 |
+| 3 | <FrostBane> | Alliance | 93 |
+| 4 | <Great Tomb of Nazarick> | Horde | 89 |
+| 5 | <Redux Crew> | Horde | 86 |
+| 6 | <Ominous Latin Name> | Alliance | 79 |
+| 7 | <Nameless> | Alliance | 71 |
+| 8 | <Zero Threat> | Horde | 70 |
+| 9 | <Olympus PVE II> | Alliance | 68 |
+| 10 | <Desperado Club> | Horde | 65 |
+| 11 | <Final TIer Forever> | Alliance | 55 |
+| 12 | <OLYMPUS IIl> | Alliance | 52 |
+| 13 | <DGG> | Alliance | 47 |
+| 14 | <Order of the Fallen> | Horde | 47 |
+| 15 | <Inception> | Alliance | 46 |
+| 16 | <Filthy Casuals> | Alliance | 43 |
+| 17 | <No Flying> | Horde | 42 |
+| 18 | <The Gnome Depot> | Alliance | 39 |
+| 19 | <Return of the Warchief> | Alliance | 37 |
+| 20 | <Ony Fans> | Horde | 36 |
+| 21 | <THE HONOR HALL> | Horde | 35 |
+| 22 | <Better Than Nothing> | Alliance | 34 |
+| 23 | <Parse Partout> | Horde | 33 |
+| 24 | <TTK> | Horde | 33 |
+| 25 | <OLYMPUS BALD> | Alliance | 32 |
+| 26 | <FORWARD> | Alliance | 31 |
+| 27 | <Hidden Leaf Village> | Alliance | 31 |
+| 28 | <The Grey Company> | Alliance | 31 |
+| 29 | <Nobility> | Alliance | 30 |
+| 30 | <The Forlorn Hope> | Alliance | 30 |
+| 31 | <The Knights of Lordaeron> | Alliance | 30 |
+| 32 | <The Scarlet Crusade> | Alliance | 30 |
+| 33 | <Together> | Horde | 30 |
+| 34 | <Keyboard Turners> | Horde | 29 |
+| 35 | <Legacy Reborn> | Horde | 29 |
+| 36 | <Strictly Business> | Horde | 29 |
+| 37 | <AMPLIFY> | Horde | 28 |
+| 38 | <Casual Garbage> | Alliance | 28 |
+| 39 | <Choo Choo Forever> | Alliance | 27 |
+| 40 | <The Little Giants> | Alliance | 27 |
+| 41 | <Pernoctated> | Alliance | 26 |
+| 42 | <Redux Crew II> | Horde | 26 |
+| 43 | <OnlyCrits> | Alliance | 25 |
+| 44 | <Phoenix Rising> | Alliance | 25 |
+| 45 | <the gays> | Alliance | 25 |
+| 46 | <Beta Buddies> | Alliance | 24 |
+| 47 | <Chosen> | Alliance | 24 |
+| 48 | <Court of Azathoth> | Horde | 24 |
+| 49 | <Elwynn Golf Club> | Alliance | 24 |
+| 50 | <Mortis> | Alliance | 24 |
+| 51 | <Slash N Burn> | Alliance | 24 |
+| 52 | <唐人街> | Alliance | 24 |
+| 53 | <Lifers> | Alliance | 23 |
+| 54 | <Mildly Dangerous> | Horde | 23 |
+| 55 | <Sylvanistas> | Horde | 23 |
+| 56 | <The Parse is Right> | Horde | 23 |
+| 57 | <UC Gate Keepers> | Horde | 23 |
+| 58 | <永恆第一名> | Horde | 23 |
+| 59 | <Frostwolf Clan Unbroken> | Horde | 22 |
+| 60 | <Night Shift> | Alliance | 22 |
+| 61 | <The Social Club> | Alliance | 22 |
+| 62 | <Agony> | Horde | 21 |
+| 63 | <CHILL> | Horde | 21 |
+| 64 | <Jah Ith Ber> | Horde | 21 |
+| 65 | <Toxic> | Alliance | 21 |
+| 66 | <자비> | Alliance | 21 |
+| 67 | <Band of Misfitz> | Horde | 20 |
+| 68 | <Flat Azeroth Society> | Alliance | 20 |
+| 69 | <Imperia> | Alliance | 20 |
+| 70 | <Místborn> | Alliance | 20 |
+| 71 | <Raid V Retirement> | Alliance | 20 |
+| 72 | <The Dissidents> | Alliance | 20 |
+| 73 | <The Lost Beta> | Alliance | 20 |
+| 74 | <Way She Goes> | Alliance | 20 |
+| 75 | <Mid Life Aggro> | Alliance | 19 |
+| 76 | <OLYMPUS PVE> | Alliance | 19 |
+| 77 | <Remnant> | Alliance | 19 |
+| 78 | <Way Beyond Toasted> | Horde | 19 |
+| 79 | <Blackwater Coalition> | Alliance | 18 |
+| 80 | <critters> | Horde | 18 |
+| 81 | <F A F O> | Horde | 18 |
+| 82 | <HighlyRegarded> | Horde | 18 |
+| 83 | <Lost Kingz> | Alliance | 18 |
+| 84 | <Nightfeather> | Horde | 18 |
+| 85 | <WARSTOMP Forever> | Horde | 18 |
+| 86 | <b r e e z e> | Alliance | 17 |
+| 87 | <BloodSeekers> | Horde | 17 |
+| 88 | <Die Laughing> | Horde | 17 |
+| 89 | <Valor Forever> | Alliance | 17 |
+| 90 | <无限探索> | Alliance | 17 |
+| 91 | <Deeprun Rail Authority> | Alliance | 16 |
+| 92 | <Fresh Meat> | Horde | 16 |
+| 93 | <Frost Shock Therapy> | Horde | 16 |
+| 94 | <Girth Wind And Fire> | Horde | 16 |
+| 95 | <Hordecore> | Horde | 16 |
+| 96 | <Inept> | Horde | 16 |
+| 97 | <Phoenix RP> | Alliance | 16 |
+| 98 | <Power Trip> | Horde | 16 |
+| 99 | <Redux Crew IIl> | Horde | 16 |
+| 100 | <Retrospective> | Horde | 16 |
 
-Guilds found: 1,433 (distinct realm guilds)
+Guilds found: 1,691 (distinct realm guilds)
 
-Guilded characters: 4,536 (latest known guild)
+Guilded characters: 5,682 (latest known guild)
 
-Surveyed: 13,153 (unique characters)
+Surveyed: 15,296 (unique characters)
 
-Updated: 2026-10-02 (PvE)
+Updated: 2026-10-03 (PvE)
 
 ## Most popular guilds
 
@@ -594,106 +479,221 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 
 | # | Guild | Realm · faction | Characters |
 | --- | --- | --- | --- |
-| 1 | <Church of Beef> | Horde | 123 |
-| 2 | <Mistfits> | Horde | 93 |
-| 3 | <Great Tomb of Nazarick> | Horde | 87 |
-| 4 | <Redux Crew> | Horde | 61 |
-| 5 | <Desperado Club> | Horde | 60 |
-| 6 | <Zero Threat> | Horde | 50 |
-| 7 | <Order of the Fallen> | Horde | 40 |
-| 8 | <Parse Partout> | Horde | 32 |
-| 9 | <No Flying> | Horde | 30 |
-| 10 | <Ony Fans> | Horde | 29 |
-| 11 | <TTK> | Horde | 29 |
-| 12 | <AMPLIFY> | Horde | 28 |
-| 13 | <Legacy Reborn> | Horde | 28 |
-| 14 | <Strictly Business> | Horde | 27 |
-| 15 | <Keyboard Turners> | Horde | 26 |
-| 16 | <The Parse is Right> | Horde | 23 |
-| 17 | <Mildly Dangerous> | Horde | 22 |
-| 18 | <Agony> | Horde | 21 |
-| 19 | <Jah Ith Ber> | Horde | 21 |
-| 20 | <THE HONOR HALL> | Horde | 20 |
-| 21 | <Together> | Horde | 20 |
-| 22 | <Band of Misfitz> | Horde | 19 |
-| 23 | <Court of Azathoth> | Horde | 19 |
-| 24 | <critters> | Horde | 18 |
-| 25 | <CHILL> | Horde | 17 |
-| 26 | <WARSTOMP Forever> | Horde | 17 |
-| 27 | <Way Beyond Toasted> | Horde | 17 |
-| 28 | <F A F O> | Horde | 16 |
-| 29 | <Fresh Meat> | Horde | 16 |
-| 30 | <Nightfeather> | Horde | 16 |
-| 31 | <Azeroth Coffee Company> | Horde | 15 |
-| 32 | <Frost Shock Therapy> | Horde | 15 |
-| 33 | <Frostwolf Clan Unbroken> | Horde | 15 |
-| 34 | <Girth Wind And Fire> | Horde | 15 |
-| 35 | <Power Trip> | Horde | 15 |
-| 36 | <Retrospective> | Horde | 15 |
-| 37 | <stratagem> | Horde | 15 |
-| 38 | <Sylvanistas> | Horde | 15 |
-| 39 | <UC Gate Keepers> | Horde | 15 |
-| 40 | <Tree of Life> | Horde | 14 |
-| 41 | <True Honor> | Horde | 14 |
-| 42 | <BloodSeekers> | Horde | 13 |
-| 43 | <Disciples of Honor> | Horde | 13 |
-| 44 | <Hordecore> | Horde | 13 |
-| 45 | <Legacy of Arthas> | Horde | 13 |
-| 46 | <Unshackled> | Horde | 13 |
-| 47 | <永恆第一名> | Horde | 13 |
-| 48 | <Blackwater> | Horde | 12 |
-| 49 | <èz> | Horde | 12 |
-| 50 | <Secret Discord> | Horde | 12 |
-| 51 | <Skill Issues> | Horde | 12 |
-| 52 | <The Reunion> | Horde | 12 |
-| 53 | <Based> | Horde | 11 |
-| 54 | <Big Back Mafia> | Horde | 11 |
-| 55 | <Countdown> | Horde | 11 |
-| 56 | <Die Laughing> | Horde | 11 |
-| 57 | <F A T A L I T Y> | Horde | 11 |
-| 58 | <Harlequins> | Horde | 11 |
-| 59 | <Ignorance is BiS> | Horde | 11 |
-| 60 | <Inept> | Horde | 11 |
-| 61 | <MUDHUTTERS> | Horde | 11 |
-| 62 | <Never Say Die> | Horde | 11 |
-| 63 | <Redux Crew II> | Horde | 11 |
-| 64 | <Retry> | Horde | 11 |
-| 65 | <Six Seven> | Horde | 11 |
-| 66 | <The other other Guys> | Horde | 11 |
-| 67 | <Under the Desk Supprt> | Horde | 11 |
-| 68 | <BETA GUILD> | Horde | 10 |
-| 69 | <Blood and Thunder> | Horde | 10 |
-| 70 | <French Connection> | Horde | 10 |
-| 71 | <Horde Bloodline> | Horde | 10 |
-| 72 | <My Healer Hits Me> | Horde | 10 |
-| 73 | <Night Owl Society> | Horde | 10 |
-| 74 | <Not Optimal> | Horde | 10 |
-| 75 | <Shinra> | Horde | 10 |
-| 76 | <BAD JUJU MON> | Horde | 9 |
-| 77 | <BETA Obviously> | Horde | 9 |
-| 78 | <Groot Lemlins> | Horde | 9 |
-| 79 | <Surreal> | Horde | 9 |
-| 80 | <Technically Classic> | Horde | 9 |
-| 81 | <Work in Progres> | Horde | 9 |
-| 82 | <Afterthought> | Horde | 8 |
-| 83 | <Antiquity> | Horde | 8 |
-| 84 | <Beta Slayers> | Horde | 8 |
-| 85 | <Controlled Chaos> | Horde | 8 |
-| 86 | <Cool Kids Club> | Horde | 8 |
-| 87 | <Crossroads Cartel> | Horde | 8 |
-| 88 | <HC Waiting Room> | Horde | 8 |
-| 89 | <HighlyRegarded> | Horde | 8 |
-| 90 | <Holdts Heroes> | Horde | 8 |
-| 91 | <House Of Camacho> | Horde | 8 |
-| 92 | <Me Not That Kind Of Orc> | Horde | 8 |
-| 93 | <Mercs> | Horde | 8 |
-| 94 | <Noodle Company> | Horde | 8 |
-| 95 | <Normies Forever> | Horde | 8 |
-| 96 | <Phank> | Horde | 8 |
-| 97 | <Power Bottoms> | Horde | 8 |
-| 98 | <regarded> | Horde | 8 |
-| 99 | <Reign of Error> | Horde | 8 |
-| 100 | <Sons of Lochag> | Horde | 8 |
+| 1 | <FrostBane> | Alliance | 93 |
+| 2 | <Ominous Latin Name> | Alliance | 79 |
+| 3 | <Nameless> | Alliance | 71 |
+| 4 | <Olympus PVE II> | Alliance | 68 |
+| 5 | <Final TIer Forever> | Alliance | 55 |
+| 6 | <OLYMPUS IIl> | Alliance | 52 |
+| 7 | <DGG> | Alliance | 47 |
+| 8 | <Inception> | Alliance | 46 |
+| 9 | <Filthy Casuals> | Alliance | 43 |
+| 10 | <The Gnome Depot> | Alliance | 39 |
+| 11 | <Return of the Warchief> | Alliance | 37 |
+| 12 | <Better Than Nothing> | Alliance | 34 |
+| 13 | <OLYMPUS BALD> | Alliance | 32 |
+| 14 | <FORWARD> | Alliance | 31 |
+| 15 | <Hidden Leaf Village> | Alliance | 31 |
+| 16 | <The Grey Company> | Alliance | 31 |
+| 17 | <Nobility> | Alliance | 30 |
+| 18 | <The Forlorn Hope> | Alliance | 30 |
+| 19 | <The Knights of Lordaeron> | Alliance | 30 |
+| 20 | <The Scarlet Crusade> | Alliance | 30 |
+| 21 | <Casual Garbage> | Alliance | 28 |
+| 22 | <Choo Choo Forever> | Alliance | 27 |
+| 23 | <The Little Giants> | Alliance | 27 |
+| 24 | <Pernoctated> | Alliance | 26 |
+| 25 | <OnlyCrits> | Alliance | 25 |
+| 26 | <Phoenix Rising> | Alliance | 25 |
+| 27 | <the gays> | Alliance | 25 |
+| 28 | <Beta Buddies> | Alliance | 24 |
+| 29 | <Chosen> | Alliance | 24 |
+| 30 | <Elwynn Golf Club> | Alliance | 24 |
+| 31 | <Mortis> | Alliance | 24 |
+| 32 | <Slash N Burn> | Alliance | 24 |
+| 33 | <唐人街> | Alliance | 24 |
+| 34 | <Lifers> | Alliance | 23 |
+| 35 | <Night Shift> | Alliance | 22 |
+| 36 | <The Social Club> | Alliance | 22 |
+| 37 | <Toxic> | Alliance | 21 |
+| 38 | <자비> | Alliance | 21 |
+| 39 | <Flat Azeroth Society> | Alliance | 20 |
+| 40 | <Imperia> | Alliance | 20 |
+| 41 | <Místborn> | Alliance | 20 |
+| 42 | <Raid V Retirement> | Alliance | 20 |
+| 43 | <The Dissidents> | Alliance | 20 |
+| 44 | <The Lost Beta> | Alliance | 20 |
+| 45 | <Way She Goes> | Alliance | 20 |
+| 46 | <Mid Life Aggro> | Alliance | 19 |
+| 47 | <OLYMPUS PVE> | Alliance | 19 |
+| 48 | <Remnant> | Alliance | 19 |
+| 49 | <Blackwater Coalition> | Alliance | 18 |
+| 50 | <Lost Kingz> | Alliance | 18 |
+| 51 | <b r e e z e> | Alliance | 17 |
+| 52 | <Valor Forever> | Alliance | 17 |
+| 53 | <无限探索> | Alliance | 17 |
+| 54 | <Deeprun Rail Authority> | Alliance | 16 |
+| 55 | <Phoenix RP> | Alliance | 16 |
+| 56 | <Rise> | Alliance | 16 |
+| 57 | <There and back againn> | Alliance | 16 |
+| 58 | <Reckoning> | Alliance | 15 |
+| 59 | <Zeit ist Relativ> | Alliance | 15 |
+| 60 | <Beta Dawn> | Alliance | 14 |
+| 61 | <gay men> | Alliance | 14 |
+| 62 | <Midnight EmpIre> | Alliance | 14 |
+| 63 | <Our Legacy> | Alliance | 14 |
+| 64 | <True Freedom> | Alliance | 14 |
+| 65 | <BONK> | Alliance | 13 |
+| 66 | <Eidolon> | Alliance | 13 |
+| 67 | <Forever Mains> | Alliance | 13 |
+| 68 | <Never Said Die> | Alliance | 13 |
+| 69 | <OLYMPUS TYCOONS> | Alliance | 13 |
+| 70 | <Operasjon Firkløver> | Alliance | 13 |
+| 71 | <Owl Buddies> | Alliance | 13 |
+| 72 | <The Beta Guild> | Alliance | 13 |
+| 73 | <Unbroken Titans> | Alliance | 13 |
+| 74 | <Blanket Fort> | Alliance | 12 |
+| 75 | <Buncle> | Alliance | 12 |
+| 76 | <Echoes of Home A> | Alliance | 12 |
+| 77 | <Iconic> | Alliance | 12 |
+| 78 | <Salvation> | Alliance | 12 |
+| 79 | <Zoulbound> | Alliance | 12 |
+| 80 | <BattleRite> | Alliance | 11 |
+| 81 | <Brave Newbies> | Alliance | 11 |
+| 82 | <Citadel> | Alliance | 11 |
+| 83 | <CLI> | Alliance | 11 |
+| 84 | <Drop Bears United> | Alliance | 11 |
+| 85 | <Heat From Fire> | Alliance | 11 |
+| 86 | <LvL Up> | Alliance | 11 |
+| 87 | <Peak> | Alliance | 11 |
+| 88 | <Praxis> | Alliance | 11 |
+| 89 | <Purgatorial> | Alliance | 11 |
+| 90 | <Sétima Legião> | Alliance | 11 |
+| 91 | <Baguette Forever> | Alliance | 10 |
+| 92 | <Dragons Heart> | Alliance | 10 |
+| 93 | <Friends Forever> | Alliance | 10 |
+| 94 | <Frog Squad> | Alliance | 10 |
+| 95 | <Fruity Pebbles> | Alliance | 10 |
+| 96 | <Knightmare> | Alliance | 10 |
+| 97 | <Legacy> | Alliance | 10 |
+| 98 | <Ragnarök Alliance> | Alliance | 10 |
+| 99 | <Rainbow Revenge> | Alliance | 10 |
+| 100 | <Ram Ranch Cowboys> | Alliance | 10 |
+
+Guilds found: 1,820 (distinct realm guilds)
+
+Guilded characters: 6,105 (latest known guild)
+
+Surveyed: 16,644 (unique characters)
+
+Updated: 2026-10-03 (PvE)
+
+## Most popular guilds
+
+Ranked by unique surveyed characters whose latest recorded guild matches this name.
+
+| # | Guild | Realm · faction | Characters |
+| --- | --- | --- | --- |
+| 1 | <Church of Beef> | Horde | 132 |
+| 2 | <Mistfits> | Horde | 98 |
+| 3 | <Great Tomb of Nazarick> | Horde | 89 |
+| 4 | <Redux Crew> | Horde | 86 |
+| 5 | <Zero Threat> | Horde | 70 |
+| 6 | <Desperado Club> | Horde | 65 |
+| 7 | <Order of the Fallen> | Horde | 47 |
+| 8 | <No Flying> | Horde | 42 |
+| 9 | <Ony Fans> | Horde | 36 |
+| 10 | <THE HONOR HALL> | Horde | 35 |
+| 11 | <Parse Partout> | Horde | 33 |
+| 12 | <TTK> | Horde | 33 |
+| 13 | <Together> | Horde | 30 |
+| 14 | <Keyboard Turners> | Horde | 29 |
+| 15 | <Legacy Reborn> | Horde | 29 |
+| 16 | <Strictly Business> | Horde | 29 |
+| 17 | <AMPLIFY> | Horde | 28 |
+| 18 | <Redux Crew II> | Horde | 26 |
+| 19 | <Court of Azathoth> | Horde | 24 |
+| 20 | <Mildly Dangerous> | Horde | 23 |
+| 21 | <Sylvanistas> | Horde | 23 |
+| 22 | <The Parse is Right> | Horde | 23 |
+| 23 | <UC Gate Keepers> | Horde | 23 |
+| 24 | <永恆第一名> | Horde | 23 |
+| 25 | <Frostwolf Clan Unbroken> | Horde | 22 |
+| 26 | <Agony> | Horde | 21 |
+| 27 | <CHILL> | Horde | 21 |
+| 28 | <Jah Ith Ber> | Horde | 21 |
+| 29 | <Band of Misfitz> | Horde | 20 |
+| 30 | <Way Beyond Toasted> | Horde | 19 |
+| 31 | <critters> | Horde | 18 |
+| 32 | <F A F O> | Horde | 18 |
+| 33 | <HighlyRegarded> | Horde | 18 |
+| 34 | <Nightfeather> | Horde | 18 |
+| 35 | <WARSTOMP Forever> | Horde | 18 |
+| 36 | <BloodSeekers> | Horde | 17 |
+| 37 | <Die Laughing> | Horde | 17 |
+| 38 | <Fresh Meat> | Horde | 16 |
+| 39 | <Frost Shock Therapy> | Horde | 16 |
+| 40 | <Girth Wind And Fire> | Horde | 16 |
+| 41 | <Hordecore> | Horde | 16 |
+| 42 | <Inept> | Horde | 16 |
+| 43 | <Power Trip> | Horde | 16 |
+| 44 | <Redux Crew IIl> | Horde | 16 |
+| 45 | <Retrospective> | Horde | 16 |
+| 46 | <True Honor> | Horde | 16 |
+| 47 | <亡者之手骑士团> | Horde | 16 |
+| 48 | <Azeroth Coffee Company> | Horde | 15 |
+| 49 | <Skill Issues> | Horde | 15 |
+| 50 | <stratagem> | Horde | 15 |
+| 51 | <The Reunion> | Horde | 15 |
+| 52 | <Disciples of Honor> | Horde | 14 |
+| 53 | <Legacy of Arthas> | Horde | 14 |
+| 54 | <MUDHUTTERS> | Horde | 14 |
+| 55 | <Six Seven> | Horde | 14 |
+| 56 | <Tree of Life> | Horde | 14 |
+| 57 | <Unshackled> | Horde | 14 |
+| 58 | <BETA GUILD> | Horde | 13 |
+| 59 | <Blackwater> | Horde | 13 |
+| 60 | <Countdown> | Horde | 13 |
+| 61 | <èz> | Horde | 13 |
+| 62 | <Ignorance is BiS> | Horde | 13 |
+| 63 | <Reborn Forever> | Horde | 13 |
+| 64 | <Beta Slayers> | Horde | 12 |
+| 65 | <Big Back Mafia> | Horde | 12 |
+| 66 | <F A T A L I T Y> | Horde | 12 |
+| 67 | <My Healer Hits Me> | Horde | 12 |
+| 68 | <Retry> | Horde | 12 |
+| 69 | <Secret Discord> | Horde | 12 |
+| 70 | <Surreal> | Horde | 12 |
+| 71 | <The Takeshi Empire> | Horde | 12 |
+| 72 | <BAD JUJU MON> | Horde | 11 |
+| 73 | <Based> | Horde | 11 |
+| 74 | <Blood and Thunder> | Horde | 11 |
+| 75 | <Harlequins> | Horde | 11 |
+| 76 | <Horde Bloodline> | Horde | 11 |
+| 77 | <Loot The Hound> | Horde | 11 |
+| 78 | <Never Say Die> | Horde | 11 |
+| 79 | <Not Optimal> | Horde | 11 |
+| 80 | <Operasjon Fírkløver> | Horde | 11 |
+| 81 | <Reign of Error> | Horde | 11 |
+| 82 | <SpellBound> | Horde | 11 |
+| 83 | <The other other Guys> | Horde | 11 |
+| 84 | <Too Many Kats> | Horde | 11 |
+| 85 | <Under the Desk Supprt> | Horde | 11 |
+| 86 | <venado> | Horde | 11 |
+| 87 | <二十四桥明月夜> | Horde | 11 |
+| 88 | <Aligned> | Horde | 10 |
+| 89 | <Chronicle> | Horde | 10 |
+| 90 | <Crossroads Cartel> | Horde | 10 |
+| 91 | <Enjoy EU> | Horde | 10 |
+| 92 | <Eternal Dawn> | Horde | 10 |
+| 93 | <French Connection> | Horde | 10 |
+| 94 | <Groot Lemlins> | Horde | 10 |
+| 95 | <Hammer Squad> | Horde | 10 |
+| 96 | <HC Waiting Room> | Horde | 10 |
+| 97 | <HorsemenoftheApocalypse> | Horde | 10 |
+| 98 | <Night Owl Society> | Horde | 10 |
+| 99 | <OLYMPUS DUSTMONKEYS> | Horde | 10 |
+| 100 | <OUTCAST> | Horde | 10 |
 
 Guilds found: 1,061 (distinct realm guilds)
 
@@ -701,7 +701,7 @@ Guilded characters: 3,121 (latest known guild)
 
 Surveyed: 5,375 (unique characters)
 
-Updated: 2026-10-02 (PvP)
+Updated: 2026-10-03 (PvP)
 
 ## Most popular guilds
 
@@ -816,7 +816,7 @@ Guilded characters: 1,290 (latest known guild)
 
 Surveyed: 3,046 (unique characters)
 
-Updated: 2026-10-02 (PvP)
+Updated: 2026-10-03 (PvP)
 
 ## Most popular guilds
 
@@ -931,7 +931,7 @@ Guilded characters: 1,831 (latest known guild)
 
 Surveyed: 2,329 (unique characters)
 
-Updated: 2026-10-02 (PvP)
+Updated: 2026-10-03 (PvP)
 
 ## Most popular guilds
 
@@ -1040,4 +1040,4 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 99 | <Crossroads Crafting Crew> | Horde | 3 |
 | 100 | <Demon Hour> | Horde | 3 |
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:36Z

@@ -12,9 +12,10 @@ import { renderMarketHtml } from "./market.mjs";
 import { renderGuildHtml } from "./guilds.mjs";
 import { renderGeographyHtml } from "./geography.mjs";
 import { renderTalentsHtml, renderInspectCoverage } from "./talents.mjs";
+import { renderGearHtml } from "./gear.mjs";
 
 export const SITE_ORIGIN = "https://wowcensus.io";
-export const PAGES = ["index", "combos", "auctionhouse", "guilds", "geography", "talents"];
+export const PAGES = ["index", "combos", "auctionhouse", "guilds", "geography", "talents", "gear"];
 
 export const EDITIONS = {
   "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever", title: "WoW Forever & Classic+ Population Census – WoWCensus", description: "WoWCensus - World of Warcraft: Forever and Classic+ population tracker. Realm population, faction balance, and race/class breakdowns from in-game /who scans.", comboBlurb: "Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta." },
@@ -51,19 +52,29 @@ export function utcTimestamp(value) {
 export function nav(source, current) {
   const edition = EDITIONS[source];
   const currentPage = current.replace(/\.html$/, "");
-  const pageLabels = { index: "Census", combos: "Race + Class", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography", talents: "Talents" };
+  const pageLabels = { index: "Census", combos: "Race + Class", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography", talents: "Talents", gear: "Gear" };
   const item = (href, label, active = href === currentPage) =>
     '<a class="game"' + (active ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
+  const mobileLink = (href, label, active) =>
+    '<a' + (active ? ' aria-current="page"' : '') + ' href="' + href + '">' + label + '</a>';
+  const mobileMenu = '<details class="mobile-menu"><summary aria-label="Open site menu"><span aria-hidden="true">☰</span> Menu</summary>' +
+    '<div class="mobile-menu-panel"><div class="mobile-menu-label">Edition</div>' +
+    Object.entries(EDITIONS).map(([s, e]) => mobileLink(pagePath(s, "index"), e.nav, s === source)).join("") +
+    '<div class="mobile-menu-label">Explore ' + edition.nav + '</div>' +
+    Object.entries({ index: "Census", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography", talents: "Talents", gear: "Gear" })
+      .map(([page, label]) => mobileLink(pagePath(source, page), label, page === currentPage || (page === "index" && currentPage === "combos"))).join("") +
+    '</div></details><div class="mobile-edition">' + edition.nav + ' <span>›</span> ' + pageLabels[currentPage] + '</div>';
   return {
     games: '<nav class="games game-nav">' +
-      Object.entries(EDITIONS).map(([s, e]) => item(pagePath(s, "index"), e.nav, s === source)).join("") + "</nav>",
+      Object.entries(EDITIONS).map(([s, e]) => item(pagePath(s, "index"), e.nav, s === source)).join("") + "</nav>" + mobileMenu,
     pages: '<nav class="games page-nav">' +
     item(pagePath(source, "index"), "Census", currentPage === "index" || currentPage === "combos") +
       item(pagePath(source, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
       item(pagePath(source, "guilds"), "Guilds", currentPage === "guilds") +
       item(pagePath(source, "geography"), "Geography", currentPage === "geography") +
-      item(pagePath(source, "talents"), "Talents", currentPage === "talents") + "</nav>",
+      item(pagePath(source, "talents"), "Talents", currentPage === "talents") +
+      item(pagePath(source, "gear"), "Gear", currentPage === "gear") + "</nav>",
     breadcrumbs: '<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="' +
       pagePath(source, "index") + '">' + edition.nav + '</a><span aria-hidden="true">/</span><span aria-current="page">' +
       pageLabels[currentPage] + "</span></nav>",
@@ -278,6 +289,7 @@ export function buildEditionModels(source, { inspects, census, games, snaps }) {
     guilds: { views: guildViews, dims, lastT: census.lastT },
     geography: { views: geographyViews, dims, lastT: census.lastT },
     talents: { inspects },
+    gear: { inspects },
   };
 }
 
@@ -292,6 +304,7 @@ export function renderEditionPage(source, page, model, { stylesheet, generatedAt
     case "index":
       return renderCensusHtml(model.censusViews, {
         ...common,
+        mobileHome: true,
         comboHref: pagePath(source, "combos"),
         inspectCoverage: renderInspectCoverage(model.inspect, pagePath(source, "talents")),
         notes: ["Latest census observation: " + utcTimestamp(model.lastT)],
@@ -315,6 +328,8 @@ export function renderEditionPage(source, page, model, { stylesheet, generatedAt
       return renderGeographyHtml(model.views, model.dims, { ...common, notes: ["Latest location observation: " + utcTimestamp(model.lastT)] });
     case "talents":
       return renderTalentsHtml(model.inspects, common);
+    case "gear":
+      return renderGearHtml(model.inspects, { ...common, branch: edition.branch });
   }
   throw new Error("unknown page: " + page);
 }

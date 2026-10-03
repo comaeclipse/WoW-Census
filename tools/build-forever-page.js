@@ -118,7 +118,7 @@ async function resolveModelNames(source, models) {
 function writeCrawlAndCacheFiles() {
   const pagesRoot = path.join(repo, "pages");
   const routes = Object.keys(editions).flatMap((source) =>
-    ["index", "combos", "auctionhouse", "guilds", "geography", "talents"].map((page) => pagePath(source, page)));
+    ["index", "combos", "auctionhouse", "guilds", "geography", "talents", "gear"].map((page) => pagePath(source, page)));
   const urls = routes.map((route) => SITE_ORIGIN + route);
   const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
@@ -166,6 +166,7 @@ function writeAgentDiscoveryFiles(pagesRoot) {
     ["guilds", "Guilds", "sampled guild activity by realm and faction"],
     ["geography", "Geography", "player activity by zone from latest-known character locations"],
     ["talents", "Talents", "nearby inspected talent builds, inferred talent trees and selected talent popularity"],
+    ["gear", "Gear", "most equipped items per slot on nearby inspected players, with enchant rates"],
   ];
   const withCensus = Object.keys(editions).filter((source) =>
     fs.existsSync(path.join(repo, editions[source].dir, "census.json")));
@@ -288,7 +289,7 @@ async function main() {
   if (markdown.status !== 0) throw new Error("Markdown page build failed");
 
   const rel = path.relative(repo, outDir).replace(/\\/g, "/");
-  console.log("Wrote " + rel + "/{index.html,combos.html,auctionhouse.html,guilds.html,geography.html,talents.html," + cssName + ",census.json,inspects.json}");
+  console.log("Wrote " + rel + "/{index.html,combos.html,auctionhouse.html,guilds.html,geography.html,talents.html,gear.html," + cssName + ",census.json,inspects.json}");
 
   if (!flag("deploy")) {
     console.log("Publish it with:  node tools/build-forever-page.js --deploy");

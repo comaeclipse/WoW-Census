@@ -817,4 +817,4 @@ Single items holding the most listed value.
 | [Encrypted Twilight Text](https://www.wowhead.com/tbc/item=20404) | 15k g | 5,097 | +21% |
 | [Brilliant Crimson Spinel](https://www.wowhead.com/tbc/item=32196) | 14k g | 12 | +100% |
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:35Z

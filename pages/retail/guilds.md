@@ -1280,4 +1280,4 @@ Ranked by unique surveyed characters whose latest recorded guild matches this na
 | 99 | <Hammer To Fall> | Horde | 1 |
 | 100 | <HardcoreCasuals-Shandris> | Horde | 1 |
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:35Z

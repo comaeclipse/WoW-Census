@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS character_inspects (
  raw_spec_id INTEGER, raw_role TEXT, import_string TEXT,
  schema_version INTEGER NOT NULL, client_build TEXT, locale TEXT,
  game TEXT, character_key TEXT, match_status TEXT NOT NULL,
- collector TEXT NOT NULL, nodes_json TEXT NOT NULL, raw_json TEXT NOT NULL,
+ collector TEXT NOT NULL, nodes_json TEXT NOT NULL, raw_json TEXT NOT NULL, gear_json TEXT,
  PRIMARY KEY(source_game,guid,captured_at)
 );
 CREATE INDEX IF NOT EXISTS idx_inspects_latest ON character_inspects(source_game,guid,captured_at DESC);

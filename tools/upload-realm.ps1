@@ -326,7 +326,7 @@ if ($node -and (Test-Path $inspectFile) -and (Test-Path $inspectHelper)) {
             observerBucket = $inspect.observerBucket; records = @($inspect.records[$offset..$end]) } | ConvertTo-Json -Depth 30 -Compress
         $ir = Invoke-RestMethod -Uri "$Url/admin/import-inspects?token=$([uri]::EscapeDataString($Token))" -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($chunk)) -ContentType "application/json; charset=utf-8"
         if (-not $ir.ok -or $ir.rejected -gt 0) { throw "Inspect import failed or rejected records: $($ir | ConvertTo-Json -Compress)" }
-        Write-Host ("Inspects: {0} imported, {1} linked, {2} unmatched, {3} ambiguous, {4} talent nodes." -f $ir.imported, $ir.linked, $ir.unmatched, $ir.ambiguous, $ir.nodes) -ForegroundColor Green
+        Write-Host ("Inspects: {0} imported, {1} linked, {2} unmatched, {3} ambiguous, {4} talent nodes, {5} with gear." -f $ir.imported, $ir.linked, $ir.unmatched, $ir.ambiguous, $ir.nodes, [int]$ir.withGear) -ForegroundColor Green
         $offset = $end + 1
     }
 }

@@ -14,7 +14,7 @@ const path = require("path");
 const crypto = require("crypto");
 
 const repo = path.resolve(__dirname, "..");
-const RENDER_MODULES = ["edition.mjs", "census.mjs", "market.mjs", "guilds.mjs", "geography.mjs", "talents.mjs"];
+const RENDER_MODULES = ["edition.mjs", "census.mjs", "market.mjs", "guilds.mjs", "geography.mjs", "talents.mjs", "gear.mjs"];
 
 // Normalize line endings so checkouts with different autocrlf agree: a CRLF
 // working copy must not stamp published pages with a layout (or stylesheet

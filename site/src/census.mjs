@@ -292,7 +292,8 @@ function renderCensusView(census, opts = {}) {
     const raceMax = groups.reduce((m, g) =>
       Object.values(g.races).reduce((mm, n) => Math.max(mm, n), m), 0);
     const raceRows = groups.map((g) =>
-      barChart(sortedEntries(g.races), raceMax, () => factionColor(g.faction), (k) => k.toUpperCase())).join("");
+      barChart(sortedEntries(g.races), raceMax, () => factionColor(g.faction),
+        (k) => (/^(High Order|Windshaper) Skyborne$/i.test(k) ? "Skyborne" : k).toUpperCase())).join("");
     const legend = groups.map((g) =>
       '<span class="key"><i style="background:' + factionColor(g.faction) + '"></i>' + esc(g.faction) + "</span>").join("");
     const racePanel = '<div class="panel census" style="margin-bottom:22px"><div class="ptitle">Population by race</div>' +
@@ -404,7 +405,7 @@ ${seoHead(opts.title || topic + " – WoWCensus", description, opts.canonical)}
 <link rel="stylesheet" href="${esc(opts.stylesheet || "/style.css")}">
 <style>${CENSUS_STYLE}
 </style>
-</head><body>
+</head><body${opts.mobileHome ? ' class="census-home"' : ''}>
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">
   <header class="ihead">

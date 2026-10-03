@@ -10,7 +10,7 @@ const read = (p) => fs.readFileSync(new URL(p, root), 'utf8');
 const exists = (p) => fs.existsSync(new URL(p, root));
 const { css, name: cssName } = createRequire(import.meta.url)('./layout-id.js').stylesheet();
 const editions = { '': 'Forever', tbc: 'TBC Anniversary', classic: 'Classic Era', sod: 'SoD', mop: 'MoP Classic', retail: 'Retail' };
-const pages = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents'];
+const pages = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents', 'gear'];
 const files = Object.keys(editions).flatMap((dir) => pages.map((page) => ({ dir, page, file: 'pages/' + (dir ? dir + '/' : '') + page + '.html' })));
 const count = (html, re) => (html.match(re) || []).length;
 
@@ -55,7 +55,7 @@ for (const { dir, page, file } of files) {
     assert.equal(count(crumbs[1], /aria-current="page"/g), 1);
     const nav = html.match(/<div class="page-controls">\s*<nav class="games page-nav">(.*?)<\/nav>/s);
     assert.ok(nav, 'page nav inside .page-controls');
-    assert.equal(count(nav[1], /class="game"/g), 5);
+    assert.equal(count(nav[1], /class="game"/g), 6);
     assert.equal(count(nav[1], /aria-current="true"/g), 1, 'one current page');
     assert.ok(html.indexOf('class="breadcrumbs"') < html.indexOf('class="page-controls"'), 'breadcrumbs before page controls');
     for (const [, font] of html.matchAll(/url\("?(\/fonts\/[^")]+)"?\)/g)) assert.ok(exists('pages' + font), font);
@@ -68,11 +68,10 @@ for (const { dir, page, file } of files) {
       assert.ok(html.includes('rel="preload" href="/fonts/friz-quadrata-regular.woff2"'), 'prose page preloads Friz Quadrata');
     if (page === 'talents') {
       assert.doesNotMatch(html, /\.talent-combo-table[^{]*\{[^}]*font-size/, 'talent tables keep base type size');
-      // Every class view ships as HTML; the chips only show and hide panes.
-      assert.match(html, /<div id="talent-content"><div class="vpane" data-class="all">/, 'all-classes view pre-rendered first');
-      assert.doesNotMatch(html, /id="talent-data"|application\/json/, 'no embedded data payload');
-      const panes = count(html, /<div class="vpane" data-class="/g);
-      if (panes > 1) assert.equal(count(html, /<button class="chip" type="button" data-key="/g), panes, 'one class chip per pane');
+      // The default view ships in the HTML; script only re-renders on filter changes.
+      assert.match(html, /<div class="talent-filters" id="talent-filters"><label>/, 'filters pre-rendered');
+      assert.match(html, /<div id="talent-content" aria-live="polite"><(div class="combo-breakdown"|section class="panel")/, 'talent content pre-rendered');
+      assert.equal(count(html, /<select data-field="\w+" autocomplete="off">/g), 5, 'filters opt out of form restore');
     }
   });
 }

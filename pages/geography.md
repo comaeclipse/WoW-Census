@@ -5,272 +5,272 @@ url: "https://wowcensus.io/geography"
 ---
 
 # WoW Forever Population by Zone – WoWCensus
-Characters: 37,944 (unique, last 30 days)
+Characters: 46,153 (unique, last 30 days)
 
-Locations: 568 (with recent sightings)
+Locations: 591 (with recent sightings)
 
-Top 5 share: 21% (location concentration)
+Top 5 share: 19% (location concentration)
 
-Updated: 2026-10-02 (last population sample)
+Updated: 2026-10-03 (last population sample)
 
 ## Where players are · last 30 days
 
 STORMWIND CITY
 
-2,085
+2,642
 
 ORGRIMMAR
 
-1,935
+2,064
 
 WAILING CAVERNS
 
-1,379
+1,569
 
 UNDERCITY
 
-1,235
+1,372
 
 IRONFORGE
 
-1,167
+1,300
 
 THE BARRENS
 
-1,105
+1,248
 
 DEATHKNELL
 
-830
-
-THE CROSSROADS
-
-682
-
-THUNDER BLUFF
-
-680
+853
 
 THE DEADMINES
 
-677
+805
+
+THUNDER BLUFF
+
+771
+
+THE CROSSROADS
+
+753
 
 TIRISFAL GLADES
 
-636
-
-VALLEY OF TRIALS
-
-618
-
-NORTHSHIRE VALLEY
-
-587
-
-VALANAAR
-
-586
+667
 
 COLDRIDGE VALLEY
 
-569
+663
+
+NORTHSHIRE VALLEY
+
+662
+
+VALLEY OF TRIALS
+
+637
+
+VALANAAR
+
+623
 
 ↓ See more↑ See less
 
-ELWYNN FOREST
-
-483
-
-DUROTAR
-
-465
-
-THENDAL VILLAGE
-
-442
-
-GOLDSHIRE
-
-419
-
-SHADOWGLEN
-
-419
-
-GUSTBERRY LOWLANDS
-
-407
-
-SENTINEL HILL
-
-397
-
-THENDAL GROVE
-
-396
-
 SHADOWFANG KEEP
 
-387
+595
 
-DARNASSUS
+ELWYNN FOREST
 
-370
-
-THE HALL OF THANES
-
-368
-
-RUINS OF LORDAERON
-
-319
-
-WESTFALL
-
-295
-
-RATCHET
-
-290
-
-SHEN'DAR HIGHLANDS
-
-289
-
-DUN MOROGH
-
-283
-
-SILVERPINE FOREST
-
-278
-
-SHEN'DAR VILLAGE
-
-271
-
-AUBERDINE
-
-260
-
-MULGORE
-
-250
-
-TELDRASSIL
-
-242
-
-RAGEFIRE CHASM
-
-229
-
-THORN HILL
-
-206
-
-BRILL
-
-203
+543
 
 BLACKFATHOM DEEPS
 
-200
+524
 
-THE SEPULCHER
+DUROTAR
 
-199
+505
 
-WINDFIELD ORCHARD
+SENTINEL HILL
 
-191
+460
 
-RED CLOUD MESA
+GOLDSHIRE
 
-175
+448
 
-MOONBROOK
+THENDAL VILLAGE
 
-168
+446
+
+GUSTBERRY LOWLANDS
+
+428
+
+SHADOWGLEN
+
+420
+
+THENDAL GROVE
+
+404
+
+DARNASSUS
+
+401
+
+THE HALL OF THANES
+
+373
+
+RATCHET
+
+343
+
+RUINS OF LORDAERON
+
+338
+
+SILVERPINE FOREST
+
+334
+
+WESTFALL
+
+317
+
+DUN MOROGH
+
+311
+
+LAKESHIRE
+
+302
+
+AUBERDINE
+
+301
+
+SHEN'DAR HIGHLANDS
+
+293
+
+SHEN'DAR VILLAGE
+
+285
 
 HILLSBRAD FOOTHILLS
 
-165
+283
 
-LOCH MODAN
+REDRIDGE MOUNTAINS
 
-162
+278
 
-MIST'S EDGE
+MULGORE
 
-162
+272
 
-DALARAN
+WETLANDS
 
-161
+265
 
-SHADOWGALE FOREST
+TELDRASSIL
 
-161
+245
 
-RAZOR HILL
+RAGEFIRE CHASM
 
-158
+232
+
+THE SEPULCHER
+
+232
+
+THORN HILL
+
+221
+
+TARREN MILL
+
+218
+
+BRILL
+
+211
+
+WINDFIELD ORCHARD
+
+203
+
+HILLSBRAD FIELDS
+
+200
+
+SOUTHERN BARRENS
+
+199
+
+MOONBROOK
+
+188
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Stormwind City | 2,085 | 5.5% | Capital · avg 15 |
-| Orgrimmar | 1,935 | 5.1% | Capital · avg 17 |
-| Wailing Caverns | 1,379 | 3.6% | Leveling · avg 20 |
-| Undercity | 1,235 | 3.3% | Capital · avg 16 |
-| Ironforge | 1,167 | 3.1% | Capital · avg 13 |
-| The Barrens | 1,105 | 2.9% | Leveling · avg 17 |
-| Deathknell | 830 | 2.2% | Starting · avg 3 |
-| The Crossroads | 682 | 1.8% | Leveling · avg 18 |
-| Thunder Bluff | 680 | 1.8% | Capital · avg 16 |
-| The Deadmines | 677 | 1.8% | Leveling · avg 19 |
-| Tirisfal Glades | 636 | 1.7% | Leveling · avg 11 |
-| Valley of Trials | 618 | 1.6% | Starting · avg 3 |
-| Northshire Valley | 587 | 1.5% | Starting · avg 2 |
-| Valanaar | 586 | 1.5% | Leveling · avg 11 |
-| Coldridge Valley | 569 | 1.5% | Starting · avg 3 |
-| Elwynn Forest | 483 | 1.3% | Leveling · avg 12 |
-| Durotar | 465 | 1.2% | Leveling · avg 13 |
-| Thendal Village | 442 | 1.2% | Starting · avg 2 |
-| Goldshire | 419 | 1.1% | Starting · avg 10 |
-| Shadowglen | 419 | 1.1% | Starting · avg 2 |
-| Gustberry Lowlands | 407 | 1.1% | Starting · avg 10 |
-| Sentinel Hill | 397 | 1.0% | Leveling · avg 16 |
-| Thendal Grove | 396 | 1.0% | Starting · avg 2 |
-| Shadowfang Keep | 387 | 1.0% | Leveling · avg 20 |
-| Darnassus | 370 | 1.0% | Capital · avg 10 |
-| The Hall of Thanes | 368 | 1.0% | Leveling · avg 16 |
-| Ruins of Lordaeron | 319 | 0.8% | Leveling · avg 18 |
-| Westfall | 295 | 0.8% | Leveling · avg 15 |
-| Ratchet | 290 | 0.8% | Leveling · avg 18 |
-| Shen'dar Highlands | 289 | 0.8% | Starting · avg 9 |
-| Dun Morogh | 283 | 0.7% | Leveling · avg 11 |
-| Silverpine Forest | 278 | 0.7% | Leveling · avg 17 |
-| Shen'dar Village | 271 | 0.7% | Starting · avg 7 |
-| Auberdine | 260 | 0.7% | Leveling · avg 14 |
-| Mulgore | 250 | 0.7% | Leveling · avg 11 |
-| Teldrassil | 242 | 0.6% | Starting · avg 10 |
-| Ragefire Chasm | 229 | 0.6% | Leveling · avg 16 |
-| Thorn Hill | 206 | 0.5% | Leveling · avg 16 |
-| Brill | 203 | 0.5% | Starting · avg 8 |
-| Blackfathom Deeps | 200 | 0.5% | Leveling · avg 22 |
-| The Sepulcher | 199 | 0.5% | Leveling · avg 18 |
-| Windfield Orchard | 191 | 0.5% | Starting · avg 10 |
-| Red Cloud Mesa | 175 | 0.5% | Starting · avg 3 |
-| Moonbrook | 168 | 0.4% | Leveling · avg 18 |
-| Hillsbrad Foothills | 165 | 0.4% | Leveling · avg 21 |
-| Loch Modan | 162 | 0.4% | Leveling · avg 14 |
-| Mist's Edge | 162 | 0.4% | Leveling · avg 11 |
-| Dalaran | 161 | 0.4% | Leveling · avg 15 |
-| Shadowgale Forest | 161 | 0.4% | Leveling · avg 12 |
-| Razor Hill | 158 | 0.4% | Starting · avg 9 |
+| Stormwind City | 2,642 | 5.7% | Capital · avg 17 |
+| Orgrimmar | 2,064 | 4.5% | Capital · avg 17 |
+| Wailing Caverns | 1,569 | 3.4% | Leveling · avg 20 |
+| Undercity | 1,372 | 3.0% | Capital · avg 17 |
+| Ironforge | 1,300 | 2.8% | Capital · avg 14 |
+| The Barrens | 1,248 | 2.7% | Leveling · avg 18 |
+| Deathknell | 853 | 1.8% | Starting · avg 3 |
+| The Deadmines | 805 | 1.7% | Leveling · avg 20 |
+| Thunder Bluff | 771 | 1.7% | Capital · avg 17 |
+| The Crossroads | 753 | 1.6% | Leveling · avg 18 |
+| Tirisfal Glades | 667 | 1.4% | Leveling · avg 12 |
+| Coldridge Valley | 663 | 1.4% | Starting · avg 2 |
+| Northshire Valley | 662 | 1.4% | Starting · avg 3 |
+| Valley of Trials | 637 | 1.4% | Starting · avg 3 |
+| Valanaar | 623 | 1.3% | Leveling · avg 11 |
+| Shadowfang Keep | 595 | 1.3% | Leveling · avg 21 |
+| Elwynn Forest | 543 | 1.2% | Leveling · avg 13 |
+| Blackfathom Deeps | 524 | 1.1% | Leveling · avg 24 |
+| Durotar | 505 | 1.1% | Leveling · avg 13 |
+| Sentinel Hill | 460 | 1.0% | Leveling · avg 17 |
+| Goldshire | 448 | 1.0% | Leveling · avg 11 |
+| Thendal Village | 446 | 1.0% | Starting · avg 2 |
+| Gustberry Lowlands | 428 | 0.9% | Starting · avg 10 |
+| Shadowglen | 420 | 0.9% | Starting · avg 2 |
+| Thendal Grove | 404 | 0.9% | Starting · avg 3 |
+| Darnassus | 401 | 0.9% | Capital · avg 11 |
+| The Hall of Thanes | 373 | 0.8% | Leveling · avg 16 |
+| Ratchet | 343 | 0.7% | Leveling · avg 19 |
+| Ruins of Lordaeron | 338 | 0.7% | Leveling · avg 18 |
+| Silverpine Forest | 334 | 0.7% | Leveling · avg 18 |
+| Westfall | 317 | 0.7% | Leveling · avg 16 |
+| Dun Morogh | 311 | 0.7% | Leveling · avg 12 |
+| Lakeshire | 302 | 0.7% | Leveling · avg 21 |
+| Auberdine | 301 | 0.7% | Leveling · avg 15 |
+| Shen'dar Highlands | 293 | 0.6% | Starting · avg 9 |
+| Shen'dar Village | 285 | 0.6% | Starting · avg 7 |
+| Hillsbrad Foothills | 283 | 0.6% | Leveling · avg 22 |
+| Redridge Mountains | 278 | 0.6% | Leveling · avg 20 |
+| Mulgore | 272 | 0.6% | Leveling · avg 11 |
+| Wetlands | 265 | 0.6% | Leveling · avg 21 |
+| Teldrassil | 245 | 0.5% | Starting · avg 10 |
+| Ragefire Chasm | 232 | 0.5% | Leveling · avg 16 |
+| The Sepulcher | 232 | 0.5% | Leveling · avg 19 |
+| Thorn Hill | 221 | 0.5% | Leveling · avg 16 |
+| Tarren Mill | 218 | 0.5% | Leveling · avg 22 |
+| Brill | 211 | 0.5% | Starting · avg 9 |
+| Windfield Orchard | 203 | 0.4% | Starting · avg 10 |
+| Hillsbrad Fields | 200 | 0.4% | Leveling · avg 24 |
+| Southern Barrens | 199 | 0.4% | Leveling · avg 20 |
+| Moonbrook | 188 | 0.4% | Leveling · avg 18 |
 
 ## Play-style mix
 
@@ -278,296 +278,296 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-0%
+1%
 
 LEVELING
 
-55%
+60%
 
 CAPITAL
 
-20%
+19%
 
 STARTING
 
-25%
+21%
 
 ## How to read this
 
-**Strongest cluster**Stormwind City contains 5.5% of characters in this selection.
+**Strongest cluster**Stormwind City contains 5.7% of characters in this selection.
 
-**Top-five concentration**21% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**19% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**20% were last recorded in recognized capitals.
+**Capital footprint**19% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
-Characters: 18,017 (unique, last 30 days)
+Characters: 22,768 (unique, last 30 days)
 
-Locations: 359 (with recent sightings)
+Locations: 397 (with recent sightings)
 
-Top 5 share: 27% (location concentration)
+Top 5 share: 26% (location concentration)
 
-Updated: 2026-10-02 (last population sample)
+Updated: 2026-10-03 (last population sample)
 
 ## Where players are · last 30 days
 
 STORMWIND CITY
 
-2,085
+2,642
 
 IRONFORGE
 
-1,166
-
-NORTHSHIRE VALLEY
-
-587
+1,299
 
 COLDRIDGE VALLEY
 
-569
+663
+
+NORTHSHIRE VALLEY
+
+662
 
 THE DEADMINES
 
-491
+619
 
 ELWYNN FOREST
 
-479
-
-GOLDSHIRE
-
-419
-
-SHADOWGLEN
-
-419
+539
 
 SENTINEL HILL
 
-389
+452
+
+GOLDSHIRE
+
+448
+
+SHADOWGLEN
+
+420
 
 VALANAAR
 
-377
+404
 
 DARNASSUS
 
-370
+401
 
 THE HALL OF THANES
 
-337
-
-WESTFALL
-
-282
+345
 
 DUN MOROGH
 
-281
+309
 
-GUSTBERRY LOWLANDS
+WESTFALL
 
-279
+303
+
+LAKESHIRE
+
+302
 
 ↓ See more↑ See less
 
+AUBERDINE
+
+301
+
+GUSTBERRY LOWLANDS
+
+294
+
 THENDAL VILLAGE
 
-278
+280
 
-AUBERDINE
+REDRIDGE MOUNTAINS
+
+273
+
+WAILING CAVERNS
 
 260
 
 TELDRASSIL
 
-242
+245
 
 THENDAL GROVE
 
+227
+
+WETLANDS
+
 224
 
-WAILING CAVERNS
+BLACKFATHOM DEEPS
 
-215
+210
 
 MIST'S EDGE
 
-160
+176
 
 LOCH MODAN
 
-156
+172
 
-DOLANAAR
+LAKE EVERSTILL
 
-154
+171
 
-REDRIDGE MOUNTAINS
+DARKSHIRE
 
-153
+164
 
 WINDFIELD ORCHARD
 
-153
+164
+
+LAKERIDGE HIGHWAY
+
+161
+
+THE STOCKADE
+
+160
+
+DOLANAAR
+
+155
+
+DUSKWOOD
+
+152
+
+MENETHIL HARBOR
+
+150
 
 DALARAN
 
-149
-
-KHARANOS
-
-144
+148
 
 SALDEAN'S FARM
 
-141
+147
 
-LAKESHIRE
+KHARANOS
 
-140
+146
+
+MOONBROOK
+
+144
 
 DARKSHORE
 
-130
+143
 
 EASTVALE LOGGING CAMP
 
-130
-
-STONE CAIRN LAKE
-
-130
+140
 
 LONGSHORE
 
-128
+133
+
+STONE CAIRN LAKE
+
+131
+
+THREE CORNERS
+
+125
 
 SHEN'DAR HIGHLANDS
 
 124
 
-MOONBROOK
+SHADOWFANG KEEP
 
 123
 
-RUINS OF LORDAERON
+FOREST'S EDGE
 
-117
+118
 
 JASPERLODE MINE
 
+116
+
+RUINS OF LORDAERON
+
 115
-
-FOREST'S EDGE
-
-112
-
-CRYSTAL LAKE
-
-99
-
-ALDRASSIL
-
-98
-
-LAKERIDGE HIGHWAY
-
-96
 
 SHADOWGALE FOREST
 
-96
+109
 
-WETLANDS
+CRYSTAL LAKE
 
-95
-
-LAKE EVERSTILL
-
-92
-
-THE GRIZZLED DEN
-
-89
-
-SHEN'DAR VILLAGE
-
-88
-
-FURLBROW'S PUMPKIN FARM
-
-87
-
-THE MOLSEN FARM
-
-87
-
-THE LONG WASH
-
-84
-
-GOL'BOLAR QUARRY
-
-83
+108
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Stormwind City | 2,085 | 11.6% | Capital · avg 15 |
-| Ironforge | 1,166 | 6.5% | Capital · avg 13 |
-| Northshire Valley | 587 | 3.3% | Starting · avg 2 |
-| Coldridge Valley | 569 | 3.2% | Starting · avg 3 |
-| The Deadmines | 491 | 2.7% | Leveling · avg 19 |
-| Elwynn Forest | 479 | 2.7% | Leveling · avg 12 |
-| Goldshire | 419 | 2.3% | Starting · avg 10 |
-| Shadowglen | 419 | 2.3% | Starting · avg 2 |
-| Sentinel Hill | 389 | 2.2% | Leveling · avg 16 |
-| Valanaar | 377 | 2.1% | Leveling · avg 11 |
-| Darnassus | 370 | 2.1% | Capital · avg 10 |
-| The Hall of Thanes | 337 | 1.9% | Leveling · avg 16 |
-| Westfall | 282 | 1.6% | Leveling · avg 15 |
-| Dun Morogh | 281 | 1.6% | Leveling · avg 11 |
-| Gustberry Lowlands | 279 | 1.5% | Starting · avg 10 |
-| Thendal Village | 278 | 1.5% | Starting · avg 2 |
-| Auberdine | 260 | 1.4% | Leveling · avg 14 |
-| Teldrassil | 242 | 1.3% | Starting · avg 10 |
-| Thendal Grove | 224 | 1.2% | Starting · avg 2 |
-| Wailing Caverns | 215 | 1.2% | Leveling · avg 20 |
-| Mist's Edge | 160 | 0.9% | Leveling · avg 11 |
-| Loch Modan | 156 | 0.9% | Leveling · avg 14 |
-| Dolanaar | 154 | 0.9% | Starting · avg 10 |
-| Redridge Mountains | 153 | 0.8% | Leveling · avg 18 |
-| Windfield Orchard | 153 | 0.8% | Starting · avg 10 |
-| Dalaran | 149 | 0.8% | Leveling · avg 15 |
-| Kharanos | 144 | 0.8% | Starting · avg 10 |
-| Saldean's Farm | 141 | 0.8% | Leveling · avg 14 |
-| Lakeshire | 140 | 0.8% | Leveling · avg 19 |
-| Darkshore | 130 | 0.7% | Leveling · avg 16 |
-| Eastvale Logging Camp | 130 | 0.7% | Leveling · avg 11 |
-| Stone Cairn Lake | 130 | 0.7% | Leveling · avg 11 |
-| Longshore | 128 | 0.7% | Leveling · avg 16 |
-| Shen'dar Highlands | 124 | 0.7% | Starting · avg 10 |
-| Moonbrook | 123 | 0.7% | Leveling · avg 18 |
-| Ruins of Lordaeron | 117 | 0.6% | Leveling · avg 19 |
-| Jasperlode Mine | 115 | 0.6% | Starting · avg 10 |
-| Forest's Edge | 112 | 0.6% | Leveling · avg 12 |
-| Crystal Lake | 99 | 0.5% | Leveling · avg 11 |
-| Aldrassil | 98 | 0.5% | Starting · avg 3 |
-| Lakeridge Highway | 96 | 0.5% | Leveling · avg 19 |
-| Shadowgale Forest | 96 | 0.5% | Leveling · avg 12 |
-| Wetlands | 95 | 0.5% | Leveling · avg 15 |
-| Lake Everstill | 92 | 0.5% | Leveling · avg 19 |
-| The Grizzled Den | 89 | 0.5% | Starting · avg 10 |
-| Shen'dar Village | 88 | 0.5% | Starting · avg 8 |
-| Furlbrow's Pumpkin Farm | 87 | 0.5% | Leveling · avg 14 |
-| The Molsen Farm | 87 | 0.5% | Leveling · avg 14 |
-| The Long Wash | 84 | 0.5% | Leveling · avg 13 |
-| Gol'Bolar Quarry | 83 | 0.5% | Leveling · avg 11 |
+| Stormwind City | 2,642 | 11.6% | Capital · avg 17 |
+| Ironforge | 1,299 | 5.7% | Capital · avg 14 |
+| Coldridge Valley | 663 | 2.9% | Starting · avg 2 |
+| Northshire Valley | 662 | 2.9% | Starting · avg 3 |
+| The Deadmines | 619 | 2.7% | Leveling · avg 20 |
+| Elwynn Forest | 539 | 2.4% | Leveling · avg 13 |
+| Sentinel Hill | 452 | 2.0% | Leveling · avg 17 |
+| Goldshire | 448 | 2.0% | Leveling · avg 11 |
+| Shadowglen | 420 | 1.8% | Starting · avg 2 |
+| Valanaar | 404 | 1.8% | Leveling · avg 11 |
+| Darnassus | 401 | 1.8% | Capital · avg 11 |
+| The Hall of Thanes | 345 | 1.5% | Leveling · avg 16 |
+| Dun Morogh | 309 | 1.4% | Leveling · avg 12 |
+| Westfall | 303 | 1.3% | Leveling · avg 16 |
+| Lakeshire | 302 | 1.3% | Leveling · avg 21 |
+| Auberdine | 301 | 1.3% | Leveling · avg 15 |
+| Gustberry Lowlands | 294 | 1.3% | Starting · avg 10 |
+| Thendal Village | 280 | 1.2% | Starting · avg 2 |
+| Redridge Mountains | 273 | 1.2% | Leveling · avg 20 |
+| Wailing Caverns | 260 | 1.1% | Leveling · avg 20 |
+| Teldrassil | 245 | 1.1% | Starting · avg 10 |
+| Thendal Grove | 227 | 1.0% | Starting · avg 2 |
+| Wetlands | 224 | 1.0% | Leveling · avg 21 |
+| Blackfathom Deeps | 210 | 0.9% | Leveling · avg 24 |
+| Mist's Edge | 176 | 0.8% | Leveling · avg 11 |
+| Loch Modan | 172 | 0.8% | Leveling · avg 15 |
+| Lake Everstill | 171 | 0.8% | Leveling · avg 20 |
+| Darkshire | 164 | 0.7% | Leveling · avg 23 |
+| Windfield Orchard | 164 | 0.7% | Starting · avg 10 |
+| Lakeridge Highway | 161 | 0.7% | Leveling · avg 20 |
+| The Stockade | 160 | 0.7% | Leveling · avg 25 |
+| Dolanaar | 155 | 0.7% | Starting · avg 10 |
+| Duskwood | 152 | 0.7% | Leveling · avg 23 |
+| Menethil Harbor | 150 | 0.7% | Leveling · avg 23 |
+| Dalaran | 148 | 0.7% | Leveling · avg 15 |
+| Saldean's Farm | 147 | 0.6% | Leveling · avg 14 |
+| Kharanos | 146 | 0.6% | Starting · avg 10 |
+| Moonbrook | 144 | 0.6% | Leveling · avg 18 |
+| Darkshore | 143 | 0.6% | Leveling · avg 16 |
+| Eastvale Logging Camp | 140 | 0.6% | Leveling · avg 11 |
+| Longshore | 133 | 0.6% | Leveling · avg 16 |
+| Stone Cairn Lake | 131 | 0.6% | Leveling · avg 11 |
+| Three Corners | 125 | 0.5% | Leveling · avg 19 |
+| Shen'dar Highlands | 124 | 0.5% | Starting · avg 10 |
+| Shadowfang Keep | 123 | 0.5% | Leveling · avg 22 |
+| Forest's Edge | 118 | 0.5% | Leveling · avg 13 |
+| Jasperlode Mine | 116 | 0.5% | Starting · avg 10 |
+| Ruins of Lordaeron | 115 | 0.5% | Leveling · avg 19 |
+| Shadowgale Forest | 109 | 0.5% | Leveling · avg 12 |
+| Crystal Lake | 108 | 0.5% | Leveling · avg 11 |
 
 ## Play-style mix
 
@@ -575,296 +575,890 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-0%
+1%
 
 LEVELING
 
-51%
+59%
 
 CAPITAL
 
-20%
+19%
 
 STARTING
 
-29%
+21%
 
 ## How to read this
 
 **Strongest cluster**Stormwind City contains 11.6% of characters in this selection.
 
-**Top-five concentration**27% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**26% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**20% were last recorded in recognized capitals.
+**Capital footprint**19% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
-Characters: 19,927 (unique, last 30 days)
+Characters: 23,385 (unique, last 30 days)
 
-Locations: 422 (with recent sightings)
+Locations: 440 (with recent sightings)
 
-Top 5 share: 31% (location concentration)
+Top 5 share: 29% (location concentration)
 
-Updated: 2026-10-02 (last population sample)
+Updated: 2026-10-03 (last population sample)
 
 ## Where players are · last 30 days
 
 ORGRIMMAR
 
-1,935
+2,064
 
 UNDERCITY
 
-1,233
+1,370
 
 WAILING CAVERNS
 
-1,164
+1,309
 
 THE BARRENS
 
-1,072
+1,206
 
 DEATHKNELL
 
-829
-
-THE CROSSROADS
-
-682
+852
 
 THUNDER BLUFF
 
-680
+771
+
+THE CROSSROADS
+
+752
 
 VALLEY OF TRIALS
 
-618
+637
 
 TIRISFAL GLADES
 
-597
+628
 
 DUROTAR
 
-461
+500
 
 SHADOWFANG KEEP
 
-330
+472
 
 SILVERPINE FOREST
 
-267
+317
+
+BLACKFATHOM DEEPS
+
+314
 
 RATCHET
 
-261
+298
 
 MULGORE
 
-246
-
-RAGEFIRE CHASM
-
-229
+267
 
 ↓ See more↑ See less
 
-VALANAAR
+HILLSBRAD FOOTHILLS
 
-209
-
-THORN HILL
-
-203
-
-BRILL
-
-202
-
-RUINS OF LORDAERON
-
-202
+258
 
 THE SEPULCHER
 
-199
+232
+
+RAGEFIRE CHASM
+
+231
+
+RUINS OF LORDAERON
+
+223
+
+VALANAAR
+
+219
+
+TARREN MILL
+
+218
+
+THORN HILL
+
+215
+
+BRILL
+
+210
+
+HILLSBRAD FIELDS
+
+195
+
+SHEN'DAR VILLAGE
+
+194
+
+SOUTHERN BARRENS
+
+194
 
 THE DEADMINES
 
 186
 
-SHEN'DAR VILLAGE
-
-183
-
 RED CLOUD MESA
 
-175
+182
 
 THENDAL GROVE
 
-172
-
-SHEN'DAR HIGHLANDS
-
-165
-
-THENDAL VILLAGE
-
-164
-
-RAZOR HILL
-
-158
-
-HILLSBRAD FOOTHILLS
-
-152
-
-BLACKFATHOM DEEPS
-
-142
-
-TARREN MILL
-
-138
-
-THE MERCHANT COAST
-
-138
-
-SOUTHERN BARRENS
-
-137
-
-CAMP NARACHE
-
-128
-
-GUSTBERRY LOWLANDS
-
-128
+177
 
 AGAMA'GOR
 
-123
+176
 
-ECHO ISLES
+RAZOR HILL
 
-120
+169
+
+SHEN'DAR HIGHLANDS
+
+169
+
+THE MERCHANT COAST
+
+169
 
 CAMP TAURAJO
 
-119
+166
 
-THE DRY HILLS
+THENDAL VILLAGE
 
-118
+166
 
 LUSHWATER OASIS
 
-115
+136
+
+THE DRY HILLS
+
+135
+
+GUSTBERRY LOWLANDS
+
+134
+
+ECHO ISLES
+
+130
+
+CAMP NARACHE
+
+127
 
 GALLOWS' END TAVERN
 
-114
+121
 
 KING'S ALLEY
 
-110
-
-BLOODHOOF VILLAGE
-
-108
-
-LORDAMERE OVERLOOK
-
-93
-
-GOLD ROAD
-
-90
-
-NORTHWATCH HOLD
-
-90
-
-BURNING BLADE COVEN
-
-78
-
-SOUTHERN GOLD ROAD
-
-78
+120
 
 NIGHTSONG WOODS
 
-75
+120
 
-THE GOLDEN PLAINS
+BLOODHOOF VILLAGE
 
-74
+112
 
-MARKET STREET
+GOLD ROAD
 
-72
+107
+
+SUN ROCK RETREAT
+
+107
+
+WEBWINDER PATH
+
+106
+
+LORDAMERE OVERLOOK
+
+103
+
+SOUTHERN GOLD ROAD
+
+101
+
+THE CHARRED VALE
+
+97
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Orgrimmar | 1,935 | 9.7% | Capital · avg 17 |
-| Undercity | 1,233 | 6.2% | Capital · avg 16 |
-| Wailing Caverns | 1,164 | 5.8% | Leveling · avg 20 |
-| The Barrens | 1,072 | 5.4% | Leveling · avg 17 |
-| Deathknell | 829 | 4.2% | Starting · avg 3 |
-| The Crossroads | 682 | 3.4% | Leveling · avg 18 |
-| Thunder Bluff | 680 | 3.4% | Capital · avg 16 |
-| Valley of Trials | 618 | 3.1% | Starting · avg 3 |
-| Tirisfal Glades | 597 | 3.0% | Leveling · avg 11 |
-| Durotar | 461 | 2.3% | Leveling · avg 12 |
-| Shadowfang Keep | 330 | 1.7% | Leveling · avg 20 |
-| Silverpine Forest | 267 | 1.3% | Leveling · avg 17 |
-| Ratchet | 261 | 1.3% | Leveling · avg 17 |
-| Mulgore | 246 | 1.2% | Leveling · avg 11 |
-| Ragefire Chasm | 229 | 1.1% | Leveling · avg 16 |
-| Valanaar | 209 | 1.0% | Leveling · avg 12 |
-| Thorn Hill | 203 | 1.0% | Leveling · avg 16 |
-| Brill | 202 | 1.0% | Starting · avg 8 |
-| Ruins of Lordaeron | 202 | 1.0% | Leveling · avg 18 |
-| The Sepulcher | 199 | 1.0% | Leveling · avg 18 |
-| The Deadmines | 186 | 0.9% | Leveling · avg 20 |
-| Shen'dar Village | 183 | 0.9% | Starting · avg 7 |
-| Red Cloud Mesa | 175 | 0.9% | Starting · avg 3 |
-| Thendal Grove | 172 | 0.9% | Starting · avg 3 |
-| Shen'dar Highlands | 165 | 0.8% | Starting · avg 8 |
-| Thendal Village | 164 | 0.8% | Starting · avg 2 |
-| Razor Hill | 158 | 0.8% | Starting · avg 9 |
-| Hillsbrad Foothills | 152 | 0.8% | Leveling · avg 21 |
-| Blackfathom Deeps | 142 | 0.7% | Leveling · avg 22 |
-| Tarren Mill | 138 | 0.7% | Leveling · avg 21 |
-| The Merchant Coast | 138 | 0.7% | Leveling · avg 17 |
-| Southern Barrens | 137 | 0.7% | Leveling · avg 18 |
-| Camp Narache | 128 | 0.6% | Starting · avg 2 |
-| Gustberry Lowlands | 128 | 0.6% | Leveling · avg 11 |
-| Agama'gor | 123 | 0.6% | Leveling · avg 19 |
-| Echo Isles | 120 | 0.6% | Starting · avg 8 |
-| Camp Taurajo | 119 | 0.6% | Leveling · avg 19 |
-| The Dry Hills | 118 | 0.6% | Leveling · avg 17 |
-| Lushwater Oasis | 115 | 0.6% | Leveling · avg 19 |
-| Gallows' End Tavern | 114 | 0.6% | Starting · avg 10 |
-| King's Alley | 110 | 0.6% | Leveling · avg 19 |
-| Bloodhoof Village | 108 | 0.5% | Starting · avg 8 |
-| Lordamere Overlook | 93 | 0.5% | Leveling · avg 19 |
-| Gold Road | 90 | 0.5% | Leveling · avg 16 |
-| Northwatch Hold | 90 | 0.5% | Leveling · avg 19 |
-| Burning Blade Coven | 78 | 0.4% | Starting · avg 5 |
-| Southern Gold Road | 78 | 0.4% | Leveling · avg 17 |
-| Nightsong Woods | 75 | 0.4% | Leveling · avg 19 |
-| The Golden Plains | 74 | 0.4% | Leveling · avg 15 |
-| Market Street | 72 | 0.4% | Leveling · avg 19 |
+| Orgrimmar | 2,064 | 8.8% | Capital · avg 17 |
+| Undercity | 1,370 | 5.9% | Capital · avg 17 |
+| Wailing Caverns | 1,309 | 5.6% | Leveling · avg 20 |
+| The Barrens | 1,206 | 5.2% | Leveling · avg 18 |
+| Deathknell | 852 | 3.6% | Starting · avg 3 |
+| Thunder Bluff | 771 | 3.3% | Capital · avg 17 |
+| The Crossroads | 752 | 3.2% | Leveling · avg 18 |
+| Valley of Trials | 637 | 2.7% | Starting · avg 3 |
+| Tirisfal Glades | 628 | 2.7% | Leveling · avg 11 |
+| Durotar | 500 | 2.1% | Leveling · avg 12 |
+| Shadowfang Keep | 472 | 2.0% | Leveling · avg 21 |
+| Silverpine Forest | 317 | 1.4% | Leveling · avg 18 |
+| Blackfathom Deeps | 314 | 1.3% | Leveling · avg 24 |
+| Ratchet | 298 | 1.3% | Leveling · avg 18 |
+| Mulgore | 267 | 1.1% | Leveling · avg 11 |
+| Hillsbrad Foothills | 258 | 1.1% | Leveling · avg 22 |
+| The Sepulcher | 232 | 1.0% | Leveling · avg 19 |
+| Ragefire Chasm | 231 | 1.0% | Leveling · avg 16 |
+| Ruins of Lordaeron | 223 | 1.0% | Leveling · avg 18 |
+| Valanaar | 219 | 0.9% | Leveling · avg 12 |
+| Tarren Mill | 218 | 0.9% | Leveling · avg 22 |
+| Thorn Hill | 215 | 0.9% | Leveling · avg 16 |
+| Brill | 210 | 0.9% | Starting · avg 9 |
+| Hillsbrad Fields | 195 | 0.8% | Leveling · avg 24 |
+| Shen'dar Village | 194 | 0.8% | Starting · avg 7 |
+| Southern Barrens | 194 | 0.8% | Leveling · avg 20 |
+| The Deadmines | 186 | 0.8% | Leveling · avg 20 |
+| Red Cloud Mesa | 182 | 0.8% | Starting · avg 3 |
+| Thendal Grove | 177 | 0.8% | Starting · avg 3 |
+| Agama'gor | 176 | 0.8% | Leveling · avg 20 |
+| Razor Hill | 169 | 0.7% | Starting · avg 9 |
+| Shen'dar Highlands | 169 | 0.7% | Starting · avg 8 |
+| The Merchant Coast | 169 | 0.7% | Leveling · avg 18 |
+| Camp Taurajo | 166 | 0.7% | Leveling · avg 20 |
+| Thendal Village | 166 | 0.7% | Starting · avg 2 |
+| Lushwater Oasis | 136 | 0.6% | Leveling · avg 19 |
+| The Dry Hills | 135 | 0.6% | Leveling · avg 18 |
+| Gustberry Lowlands | 134 | 0.6% | Leveling · avg 11 |
+| Echo Isles | 130 | 0.6% | Starting · avg 8 |
+| Camp Narache | 127 | 0.5% | Starting · avg 2 |
+| Gallows' End Tavern | 121 | 0.5% | Starting · avg 10 |
+| King's Alley | 120 | 0.5% | Leveling · avg 19 |
+| Nightsong Woods | 120 | 0.5% | Leveling · avg 21 |
+| Bloodhoof Village | 112 | 0.5% | Starting · avg 8 |
+| Gold Road | 107 | 0.5% | Leveling · avg 17 |
+| Sun Rock Retreat | 107 | 0.5% | Leveling · avg 22 |
+| Webwinder Path | 106 | 0.5% | Leveling · avg 22 |
+| Lordamere Overlook | 103 | 0.4% | Leveling · avg 19 |
+| Southern Gold Road | 101 | 0.4% | Leveling · avg 19 |
+| The Charred Vale | 97 | 0.4% | Leveling · avg 24 |
+
+## Play-style mix
+
+Recent characters grouped by the kind of location they were last seen in.
+
+END GAME
+
+1%
+
+LEVELING
+
+62%
+
+CAPITAL
+
+18%
+
+STARTING
+
+19%
+
+## How to read this
+
+**Strongest cluster**Orgrimmar contains 8.8% of characters in this selection.
+
+**Top-five concentration**29% indicates how much the footprint is concentrated in its five leading locations.
+
+**Capital footprint**18% were last recorded in recognized capitals.
+
+**Level context**Average level adds context for each location.
+
+Characters: 38,812 (unique, last 30 days)
+
+Locations: 577 (with recent sightings)
+
+Top 5 share: 20% (location concentration)
+
+Updated: 2026-10-03 (last population sample)
+
+## Where players are · last 30 days
+
+STORMWIND CITY
+
+2,384
+
+ORGRIMMAR
+
+1,680
+
+WAILING CAVERNS
+
+1,266
+
+IRONFORGE
+
+1,164
+
+UNDERCITY
+
+1,097
+
+THE BARRENS
+
+999
+
+DEATHKNELL
+
+740
+
+THE DEADMINES
+
+672
+
+THUNDER BLUFF
+
+622
+
+COLDRIDGE VALLEY
+
+608
+
+THE CROSSROADS
+
+606
+
+NORTHSHIRE VALLEY
+
+587
+
+VALANAAR
+
+550
+
+VALLEY OF TRIALS
+
+549
+
+TIRISFAL GLADES
+
+514
+
+↓ See more↑ See less
+
+SHADOWFANG KEEP
+
+498
+
+BLACKFATHOM DEEPS
+
+480
+
+ELWYNN FOREST
+
+479
+
+DUROTAR
+
+398
+
+GUSTBERRY LOWLANDS
+
+391
+
+GOLDSHIRE
+
+385
+
+THENDAL VILLAGE
+
+378
+
+SENTINEL HILL
+
+371
+
+SHADOWGLEN
+
+365
+
+THENDAL GROVE
+
+355
+
+DARNASSUS
+
+314
+
+RATCHET
+
+295
+
+LAKESHIRE
+
+281
+
+THE HALL OF THANES
+
+275
+
+DUN MOROGH
+
+274
+
+AUBERDINE
+
+271
+
+RUINS OF LORDAERON
+
+266
+
+SILVERPINE FOREST
+
+259
+
+MULGORE
+
+243
+
+REDRIDGE MOUNTAINS
+
+243
+
+SHEN'DAR HIGHLANDS
+
+240
+
+WESTFALL
+
+240
+
+HILLSBRAD FOOTHILLS
+
+227
+
+WETLANDS
+
+224
+
+SHEN'DAR VILLAGE
+
+219
+
+TELDRASSIL
+
+200
+
+RAGEFIRE CHASM
+
+190
+
+WINDFIELD ORCHARD
+
+190
+
+THE SEPULCHER
+
+187
+
+THORN HILL
+
+184
+
+BRILL
+
+181
+
+HILLSBRAD FIELDS
+
+180
+
+SOUTHERN BARRENS
+
+173
+
+TARREN MILL
+
+167
+
+RED CLOUD MESA
+
+162
+
+## Location detail
+
+| Location | Characters | Share | Activity |
+| --- | --- | --- | --- |
+| Stormwind City | 2,384 | 6.1% | Capital · avg 17 |
+| Orgrimmar | 1,680 | 4.3% | Capital · avg 17 |
+| Wailing Caverns | 1,266 | 3.3% | Leveling · avg 20 |
+| Ironforge | 1,164 | 3.0% | Capital · avg 14 |
+| Undercity | 1,097 | 2.8% | Capital · avg 17 |
+| The Barrens | 999 | 2.6% | Leveling · avg 18 |
+| Deathknell | 740 | 1.9% | Starting · avg 3 |
+| The Deadmines | 672 | 1.7% | Leveling · avg 20 |
+| Thunder Bluff | 622 | 1.6% | Capital · avg 16 |
+| Coldridge Valley | 608 | 1.6% | Starting · avg 2 |
+| The Crossroads | 606 | 1.6% | Leveling · avg 18 |
+| Northshire Valley | 587 | 1.5% | Starting · avg 3 |
+| Valanaar | 550 | 1.4% | Leveling · avg 11 |
+| Valley of Trials | 549 | 1.4% | Starting · avg 3 |
+| Tirisfal Glades | 514 | 1.3% | Leveling · avg 11 |
+| Shadowfang Keep | 498 | 1.3% | Leveling · avg 21 |
+| Blackfathom Deeps | 480 | 1.2% | Leveling · avg 24 |
+| Elwynn Forest | 479 | 1.2% | Leveling · avg 13 |
+| Durotar | 398 | 1.0% | Leveling · avg 12 |
+| Gustberry Lowlands | 391 | 1.0% | Starting · avg 10 |
+| Goldshire | 385 | 1.0% | Leveling · avg 11 |
+| Thendal Village | 378 | 1.0% | Starting · avg 2 |
+| Sentinel Hill | 371 | 1.0% | Leveling · avg 17 |
+| Shadowglen | 365 | 0.9% | Starting · avg 2 |
+| Thendal Grove | 355 | 0.9% | Starting · avg 2 |
+| Darnassus | 314 | 0.8% | Capital · avg 10 |
+| Ratchet | 295 | 0.8% | Leveling · avg 18 |
+| Lakeshire | 281 | 0.7% | Leveling · avg 21 |
+| The Hall of Thanes | 275 | 0.7% | Leveling · avg 16 |
+| Dun Morogh | 274 | 0.7% | Leveling · avg 12 |
+| Auberdine | 271 | 0.7% | Leveling · avg 15 |
+| Ruins of Lordaeron | 266 | 0.7% | Leveling · avg 18 |
+| Silverpine Forest | 259 | 0.7% | Leveling · avg 18 |
+| Mulgore | 243 | 0.6% | Leveling · avg 11 |
+| Redridge Mountains | 243 | 0.6% | Leveling · avg 20 |
+| Shen'dar Highlands | 240 | 0.6% | Starting · avg 9 |
+| Westfall | 240 | 0.6% | Leveling · avg 16 |
+| Hillsbrad Foothills | 227 | 0.6% | Leveling · avg 22 |
+| Wetlands | 224 | 0.6% | Leveling · avg 21 |
+| Shen'dar Village | 219 | 0.6% | Starting · avg 7 |
+| Teldrassil | 200 | 0.5% | Starting · avg 10 |
+| Ragefire Chasm | 190 | 0.5% | Leveling · avg 16 |
+| Windfield Orchard | 190 | 0.5% | Starting · avg 10 |
+| The Sepulcher | 187 | 0.5% | Leveling · avg 19 |
+| Thorn Hill | 184 | 0.5% | Leveling · avg 16 |
+| Brill | 181 | 0.5% | Starting · avg 9 |
+| Hillsbrad Fields | 180 | 0.5% | Leveling · avg 24 |
+| Southern Barrens | 173 | 0.4% | Leveling · avg 20 |
+| Tarren Mill | 167 | 0.4% | Leveling · avg 22 |
+| Red Cloud Mesa | 162 | 0.4% | Starting · avg 3 |
+
+## Play-style mix
+
+Recent characters grouped by the kind of location they were last seen in.
+
+END GAME
+
+1%
+
+LEVELING
+
+59%
+
+CAPITAL
+
+19%
+
+STARTING
+
+21%
+
+## How to read this
+
+**Strongest cluster**Stormwind City contains 6.1% of characters in this selection.
+
+**Top-five concentration**20% indicates how much the footprint is concentrated in its five leading locations.
+
+**Capital footprint**19% were last recorded in recognized capitals.
+
+**Level context**Average level adds context for each location.
+
+Characters: 19,722 (unique, last 30 days)
+
+Locations: 384 (with recent sightings)
+
+Top 5 share: 27% (location concentration)
+
+Updated: 2026-10-03 (last population sample)
+
+## Where players are · last 30 days
+
+STORMWIND CITY
+
+2,384
+
+IRONFORGE
+
+1,163
+
+COLDRIDGE VALLEY
+
+608
+
+NORTHSHIRE VALLEY
+
+587
+
+THE DEADMINES
+
+531
+
+ELWYNN FOREST
+
+475
+
+GOLDSHIRE
+
+385
+
+SENTINEL HILL
+
+370
+
+SHADOWGLEN
+
+365
+
+VALANAAR
+
+360
+
+DARNASSUS
+
+314
+
+LAKESHIRE
+
+281
+
+DUN MOROGH
+
+273
+
+AUBERDINE
+
+271
+
+GUSTBERRY LOWLANDS
+
+268
+
+↓ See more↑ See less
+
+THE HALL OF THANES
+
+255
+
+THENDAL VILLAGE
+
+242
+
+REDRIDGE MOUNTAINS
+
+241
+
+WAILING CAVERNS
+
+238
+
+WESTFALL
+
+235
+
+BLACKFATHOM DEEPS
+
+208
+
+THENDAL GROVE
+
+202
+
+TELDRASSIL
+
+200
+
+WETLANDS
+
+196
+
+DARKSHIRE
+
+159
+
+THE STOCKADE
+
+158
+
+LAKE EVERSTILL
+
+157
+
+MIST'S EDGE
+
+157
+
+WINDFIELD ORCHARD
+
+155
+
+DUSKWOOD
+
+146
+
+LAKERIDGE HIGHWAY
+
+144
+
+MENETHIL HARBOR
+
+137
+
+LOCH MODAN
+
+136
+
+DOLANAAR
+
+131
+
+KHARANOS
+
+130
+
+EASTVALE LOGGING CAMP
+
+120
+
+SHADOWFANG KEEP
+
+120
+
+DALARAN
+
+113
+
+THREE CORNERS
+
+112
+
+DARKSHORE
+
+107
+
+STONE CAIRN LAKE
+
+104
+
+LONGSHORE
+
+102
+
+FOREST'S EDGE
+
+101
+
+MOONBROOK
+
+101
+
+SALDEAN'S FARM
+
+101
+
+SHEN'DAR HIGHLANDS
+
+94
+
+BARADIN BAY
+
+92
+
+JASPERLODE MINE
+
+92
+
+SHADOWGALE FOREST
+
+89
+
+RUINS OF LORDAERON
+
+88
+
+## Location detail
+
+| Location | Characters | Share | Activity |
+| --- | --- | --- | --- |
+| Stormwind City | 2,384 | 12.1% | Capital · avg 17 |
+| Ironforge | 1,163 | 5.9% | Capital · avg 14 |
+| Coldridge Valley | 608 | 3.1% | Starting · avg 2 |
+| Northshire Valley | 587 | 3.0% | Starting · avg 3 |
+| The Deadmines | 531 | 2.7% | Leveling · avg 20 |
+| Elwynn Forest | 475 | 2.4% | Leveling · avg 13 |
+| Goldshire | 385 | 2.0% | Leveling · avg 11 |
+| Sentinel Hill | 370 | 1.9% | Leveling · avg 17 |
+| Shadowglen | 365 | 1.9% | Starting · avg 2 |
+| Valanaar | 360 | 1.8% | Leveling · avg 11 |
+| Darnassus | 314 | 1.6% | Capital · avg 10 |
+| Lakeshire | 281 | 1.4% | Leveling · avg 21 |
+| Dun Morogh | 273 | 1.4% | Leveling · avg 12 |
+| Auberdine | 271 | 1.4% | Leveling · avg 15 |
+| Gustberry Lowlands | 268 | 1.4% | Starting · avg 10 |
+| The Hall of Thanes | 255 | 1.3% | Leveling · avg 16 |
+| Thendal Village | 242 | 1.2% | Starting · avg 2 |
+| Redridge Mountains | 241 | 1.2% | Leveling · avg 20 |
+| Wailing Caverns | 238 | 1.2% | Leveling · avg 20 |
+| Westfall | 235 | 1.2% | Leveling · avg 16 |
+| Blackfathom Deeps | 208 | 1.1% | Leveling · avg 24 |
+| Thendal Grove | 202 | 1.0% | Starting · avg 2 |
+| Teldrassil | 200 | 1.0% | Starting · avg 10 |
+| Wetlands | 196 | 1.0% | Leveling · avg 21 |
+| Darkshire | 159 | 0.8% | Leveling · avg 23 |
+| The Stockade | 158 | 0.8% | Leveling · avg 25 |
+| Lake Everstill | 157 | 0.8% | Leveling · avg 20 |
+| Mist's Edge | 157 | 0.8% | Leveling · avg 11 |
+| Windfield Orchard | 155 | 0.8% | Starting · avg 10 |
+| Duskwood | 146 | 0.7% | Leveling · avg 23 |
+| Lakeridge Highway | 144 | 0.7% | Leveling · avg 20 |
+| Menethil Harbor | 137 | 0.7% | Leveling · avg 23 |
+| Loch Modan | 136 | 0.7% | Leveling · avg 15 |
+| Dolanaar | 131 | 0.7% | Starting · avg 10 |
+| Kharanos | 130 | 0.7% | Starting · avg 10 |
+| Eastvale Logging Camp | 120 | 0.6% | Leveling · avg 11 |
+| Shadowfang Keep | 120 | 0.6% | Leveling · avg 22 |
+| Dalaran | 113 | 0.6% | Leveling · avg 15 |
+| Three Corners | 112 | 0.6% | Leveling · avg 19 |
+| Darkshore | 107 | 0.5% | Leveling · avg 16 |
+| Stone Cairn Lake | 104 | 0.5% | Leveling · avg 11 |
+| Longshore | 102 | 0.5% | Leveling · avg 16 |
+| Forest's Edge | 101 | 0.5% | Leveling · avg 13 |
+| Moonbrook | 101 | 0.5% | Leveling · avg 18 |
+| Saldean's Farm | 101 | 0.5% | Leveling · avg 14 |
+| Shen'dar Highlands | 94 | 0.5% | Starting · avg 10 |
+| Baradin Bay | 92 | 0.5% | Leveling · avg 19 |
+| Jasperlode Mine | 92 | 0.5% | Starting · avg 10 |
+| Shadowgale Forest | 89 | 0.5% | Leveling · avg 12 |
+| Ruins of Lordaeron | 88 | 0.4% | Leveling · avg 19 |
 
 ## Play-style mix
 
@@ -880,882 +1474,288 @@ LEVELING
 
 CAPITAL
 
-19%
-
-STARTING
-
-22%
-
-## How to read this
-
-**Strongest cluster**Orgrimmar contains 9.7% of characters in this selection.
-
-**Top-five concentration**31% indicates how much the footprint is concentrated in its five leading locations.
-
-**Capital footprint**19% were last recorded in recognized capitals.
-
-**Level context**Average level adds context for each location.
-
-Characters: 30,603 (unique, last 30 days)
-
-Locations: 546 (with recent sightings)
-
-Top 5 share: 21% (location concentration)
-
-Updated: 2026-10-02 (last population sample)
-
-## Where players are · last 30 days
-
-STORMWIND CITY
-
-1,827
-
-ORGRIMMAR
-
-1,551
-
-WAILING CAVERNS
-
-1,076
-
-IRONFORGE
-
-1,031
-
-UNDERCITY
-
-960
-
-THE BARRENS
-
-856
-
-DEATHKNELL
-
-717
-
-THE DEADMINES
-
-544
-
-THE CROSSROADS
-
-535
-
-THUNDER BLUFF
-
-531
-
-VALLEY OF TRIALS
-
-530
-
-COLDRIDGE VALLEY
-
-514
-
-VALANAAR
-
-513
-
-NORTHSHIRE VALLEY
-
-512
-
-TIRISFAL GLADES
-
-483
-
-↓ See more↑ See less
-
-ELWYNN FOREST
-
-419
-
-THENDAL VILLAGE
-
-374
-
-GUSTBERRY LOWLANDS
-
-370
-
-SHADOWGLEN
-
-364
-
-DUROTAR
-
-358
-
-GOLDSHIRE
-
-356
-
-THENDAL GROVE
-
-347
-
-SENTINEL HILL
-
-308
-
-SHADOWFANG KEEP
-
-290
-
-DARNASSUS
-
-283
-
-THE HALL OF THANES
-
-270
-
-RUINS OF LORDAERON
-
-247
-
-DUN MOROGH
-
-246
-
-RATCHET
-
-242
-
-SHEN'DAR HIGHLANDS
-
-236
-
-AUBERDINE
-
-230
-
-MULGORE
-
-221
-
-WESTFALL
-
-218
-
-SHEN'DAR VILLAGE
-
-205
-
-SILVERPINE FOREST
-
-203
-
-TELDRASSIL
-
-197
-
-RAGEFIRE CHASM
-
-187
-
-WINDFIELD ORCHARD
-
-178
-
-BRILL
-
-173
-
-THORN HILL
-
-169
-
-BLACKFATHOM DEEPS
-
-156
-
-RED CLOUD MESA
-
-155
-
-THE SEPULCHER
-
-154
-
-MIST'S EDGE
-
-143
-
-RAZOR HILL
-
-136
-
-SHADOWGALE FOREST
-
-132
-
-DOLANAAR
-
-130
-
-KHARANOS
-
-130
-
-DALARAN
-
-126
-
-LOCH MODAN
-
-126
-
-## Location detail
-
-| Location | Characters | Share | Activity |
-| --- | --- | --- | --- |
-| Stormwind City | 1,827 | 6.0% | Capital · avg 15 |
-| Orgrimmar | 1,551 | 5.1% | Capital · avg 16 |
-| Wailing Caverns | 1,076 | 3.5% | Leveling · avg 20 |
-| Ironforge | 1,031 | 3.4% | Capital · avg 13 |
-| Undercity | 960 | 3.1% | Capital · avg 16 |
-| The Barrens | 856 | 2.8% | Leveling · avg 17 |
-| Deathknell | 717 | 2.3% | Starting · avg 3 |
-| The Deadmines | 544 | 1.8% | Leveling · avg 19 |
-| The Crossroads | 535 | 1.7% | Leveling · avg 18 |
-| Thunder Bluff | 531 | 1.7% | Capital · avg 15 |
-| Valley of Trials | 530 | 1.7% | Starting · avg 3 |
-| Coldridge Valley | 514 | 1.7% | Starting · avg 3 |
-| Valanaar | 513 | 1.7% | Leveling · avg 11 |
-| Northshire Valley | 512 | 1.7% | Starting · avg 2 |
-| Tirisfal Glades | 483 | 1.6% | Starting · avg 10 |
-| Elwynn Forest | 419 | 1.4% | Leveling · avg 12 |
-| Thendal Village | 374 | 1.2% | Starting · avg 2 |
-| Gustberry Lowlands | 370 | 1.2% | Starting · avg 10 |
-| Shadowglen | 364 | 1.2% | Starting · avg 2 |
-| Durotar | 358 | 1.2% | Leveling · avg 12 |
-| Goldshire | 356 | 1.2% | Starting · avg 10 |
-| Thendal Grove | 347 | 1.1% | Starting · avg 2 |
-| Sentinel Hill | 308 | 1.0% | Leveling · avg 16 |
-| Shadowfang Keep | 290 | 0.9% | Leveling · avg 20 |
-| Darnassus | 283 | 0.9% | Capital · avg 9 |
-| The Hall of Thanes | 270 | 0.9% | Leveling · avg 16 |
-| Ruins of Lordaeron | 247 | 0.8% | Leveling · avg 18 |
-| Dun Morogh | 246 | 0.8% | Leveling · avg 11 |
-| Ratchet | 242 | 0.8% | Leveling · avg 17 |
-| Shen'dar Highlands | 236 | 0.8% | Starting · avg 9 |
-| Auberdine | 230 | 0.8% | Leveling · avg 14 |
-| Mulgore | 221 | 0.7% | Leveling · avg 11 |
-| Westfall | 218 | 0.7% | Leveling · avg 15 |
-| Shen'dar Village | 205 | 0.7% | Starting · avg 7 |
-| Silverpine Forest | 203 | 0.7% | Leveling · avg 17 |
-| Teldrassil | 197 | 0.6% | Starting · avg 10 |
-| Ragefire Chasm | 187 | 0.6% | Leveling · avg 16 |
-| Windfield Orchard | 178 | 0.6% | Starting · avg 10 |
-| Brill | 173 | 0.6% | Starting · avg 8 |
-| Thorn Hill | 169 | 0.6% | Leveling · avg 16 |
-| Blackfathom Deeps | 156 | 0.5% | Leveling · avg 21 |
-| Red Cloud Mesa | 155 | 0.5% | Starting · avg 3 |
-| The Sepulcher | 154 | 0.5% | Leveling · avg 18 |
-| Mist's Edge | 143 | 0.5% | Starting · avg 10 |
-| Razor Hill | 136 | 0.4% | Starting · avg 9 |
-| Shadowgale Forest | 132 | 0.4% | Leveling · avg 12 |
-| Dolanaar | 130 | 0.4% | Starting · avg 10 |
-| Kharanos | 130 | 0.4% | Starting · avg 10 |
-| Dalaran | 126 | 0.4% | Leveling · avg 15 |
-| Loch Modan | 126 | 0.4% | Leveling · avg 14 |
-
-## Play-style mix
-
-Recent characters grouped by the kind of location they were last seen in.
-
-END GAME
-
-0%
-
-LEVELING
-
-51%
-
-CAPITAL
-
 20%
 
 STARTING
 
-29%
+21%
 
 ## How to read this
 
-**Strongest cluster**Stormwind City contains 6.0% of characters in this selection.
+**Strongest cluster**Stormwind City contains 12.1% of characters in this selection.
 
-**Top-five concentration**21% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**27% indicates how much the footprint is concentrated in its five leading locations.
 
 **Capital footprint**20% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
-Characters: 14,971 (unique, last 30 days)
+Characters: 19,090 (unique, last 30 days)
 
-Locations: 342 (with recent sightings)
+Locations: 413 (with recent sightings)
 
 Top 5 share: 29% (location concentration)
 
-Updated: 2026-10-02 (last population sample)
-
-## Where players are · last 30 days
-
-STORMWIND CITY
-
-1,827
-
-IRONFORGE
-
-1,030
-
-COLDRIDGE VALLEY
-
-514
-
-NORTHSHIRE VALLEY
-
-512
-
-ELWYNN FOREST
-
-415
-
-THE DEADMINES
-
-403
-
-SHADOWGLEN
-
-364
-
-GOLDSHIRE
-
-356
-
-VALANAAR
-
-333
-
-SENTINEL HILL
-
-307
-
-DARNASSUS
-
-283
-
-GUSTBERRY LOWLANDS
-
-253
-
-THE HALL OF THANES
-
-247
-
-DUN MOROGH
-
-245
-
-THENDAL VILLAGE
-
-240
-
-↓ See more↑ See less
-
-AUBERDINE
-
-230
-
-WESTFALL
-
-214
-
-THENDAL GROVE
-
-199
-
-TELDRASSIL
-
-197
-
-WAILING CAVERNS
-
-193
-
-WINDFIELD ORCHARD
-
-144
-
-MIST'S EDGE
-
-141
-
-DOLANAAR
-
-130
-
-KHARANOS
-
-128
-
-REDRIDGE MOUNTAINS
-
-121
-
-LOCH MODAN
-
-120
-
-LAKESHIRE
-
-119
-
-DALARAN
-
-114
-
-EASTVALE LOGGING CAMP
-
-110
-
-STONE CAIRN LAKE
-
-103
-
-LONGSHORE
-
-97
-
-FOREST'S EDGE
-
-95
-
-SALDEAN'S FARM
-
-95
-
-DARKSHORE
-
-94
-
-SHEN'DAR HIGHLANDS
-
-94
-
-JASPERLODE MINE
-
-91
-
-RUINS OF LORDAERON
-
-90
-
-MOONBROOK
-
-80
-
-LAKERIDGE HIGHWAY
-
-79
-
-LAKE EVERSTILL
-
-78
-
-CRYSTAL LAKE
-
-77
-
-SHADOWGALE FOREST
-
-76
-
-THUNDERBREW DISTILLERY
-
-75
-
-GOL'BOLAR QUARRY
-
-74
-
-THE GRIZZLED DEN
-
-74
-
-THE LONG WASH
-
-74
-
-ALDRASSIL
-
-70
-
-THE ORACLE GLADE
-
-67
-
-WETLANDS
-
-67
-
-SHEN'DAR VILLAGE
-
-66
-
-## Location detail
-
-| Location | Characters | Share | Activity |
-| --- | --- | --- | --- |
-| Stormwind City | 1,827 | 12.2% | Capital · avg 15 |
-| Ironforge | 1,030 | 6.9% | Capital · avg 13 |
-| Coldridge Valley | 514 | 3.4% | Starting · avg 3 |
-| Northshire Valley | 512 | 3.4% | Starting · avg 2 |
-| Elwynn Forest | 415 | 2.8% | Leveling · avg 12 |
-| The Deadmines | 403 | 2.7% | Leveling · avg 19 |
-| Shadowglen | 364 | 2.4% | Starting · avg 2 |
-| Goldshire | 356 | 2.4% | Starting · avg 10 |
-| Valanaar | 333 | 2.2% | Leveling · avg 11 |
-| Sentinel Hill | 307 | 2.1% | Leveling · avg 16 |
-| Darnassus | 283 | 1.9% | Capital · avg 9 |
-| Gustberry Lowlands | 253 | 1.7% | Starting · avg 10 |
-| The Hall of Thanes | 247 | 1.6% | Leveling · avg 16 |
-| Dun Morogh | 245 | 1.6% | Leveling · avg 11 |
-| Thendal Village | 240 | 1.6% | Starting · avg 2 |
-| Auberdine | 230 | 1.5% | Leveling · avg 14 |
-| Westfall | 214 | 1.4% | Leveling · avg 15 |
-| Thendal Grove | 199 | 1.3% | Starting · avg 2 |
-| Teldrassil | 197 | 1.3% | Starting · avg 10 |
-| Wailing Caverns | 193 | 1.3% | Leveling · avg 20 |
-| Windfield Orchard | 144 | 1.0% | Starting · avg 10 |
-| Mist's Edge | 141 | 0.9% | Starting · avg 10 |
-| Dolanaar | 130 | 0.9% | Starting · avg 10 |
-| Kharanos | 128 | 0.9% | Starting · avg 10 |
-| Redridge Mountains | 121 | 0.8% | Leveling · avg 18 |
-| Loch Modan | 120 | 0.8% | Leveling · avg 14 |
-| Lakeshire | 119 | 0.8% | Leveling · avg 19 |
-| Dalaran | 114 | 0.8% | Leveling · avg 15 |
-| Eastvale Logging Camp | 110 | 0.7% | Leveling · avg 11 |
-| Stone Cairn Lake | 103 | 0.7% | Leveling · avg 11 |
-| Longshore | 97 | 0.6% | Leveling · avg 16 |
-| Forest's Edge | 95 | 0.6% | Leveling · avg 12 |
-| Saldean's Farm | 95 | 0.6% | Leveling · avg 14 |
-| Darkshore | 94 | 0.6% | Leveling · avg 16 |
-| Shen'dar Highlands | 94 | 0.6% | Starting · avg 10 |
-| Jasperlode Mine | 91 | 0.6% | Starting · avg 10 |
-| Ruins of Lordaeron | 90 | 0.6% | Leveling · avg 19 |
-| Moonbrook | 80 | 0.5% | Leveling · avg 18 |
-| Lakeridge Highway | 79 | 0.5% | Leveling · avg 19 |
-| Lake Everstill | 78 | 0.5% | Leveling · avg 19 |
-| Crystal Lake | 77 | 0.5% | Leveling · avg 11 |
-| Shadowgale Forest | 76 | 0.5% | Leveling · avg 12 |
-| Thunderbrew Distillery | 75 | 0.5% | Starting · avg 10 |
-| Gol'Bolar Quarry | 74 | 0.5% | Leveling · avg 11 |
-| The Grizzled Den | 74 | 0.5% | Starting · avg 10 |
-| The Long Wash | 74 | 0.5% | Leveling · avg 13 |
-| Aldrassil | 70 | 0.5% | Starting · avg 3 |
-| The Oracle Glade | 67 | 0.4% | Starting · avg 10 |
-| Wetlands | 67 | 0.4% | Leveling · avg 14 |
-| Shen'dar Village | 66 | 0.4% | Starting · avg 8 |
-
-## Play-style mix
-
-Recent characters grouped by the kind of location they were last seen in.
-
-END GAME
-
-0%
-
-LEVELING
-
-48%
-
-CAPITAL
-
-21%
-
-STARTING
-
-31%
-
-## How to read this
-
-**Strongest cluster**Stormwind City contains 12.2% of characters in this selection.
-
-**Top-five concentration**29% indicates how much the footprint is concentrated in its five leading locations.
-
-**Capital footprint**21% were last recorded in recognized capitals.
-
-**Level context**Average level adds context for each location.
-
-Characters: 15,632 (unique, last 30 days)
-
-Locations: 390 (with recent sightings)
-
-Top 5 share: 32% (location concentration)
-
-Updated: 2026-10-02 (last population sample)
+Updated: 2026-10-03 (last population sample)
 
 ## Where players are · last 30 days
 
 ORGRIMMAR
 
-1,551
+1,680
 
 UNDERCITY
 
-958
+1,095
 
 WAILING CAVERNS
 
-883
+1,028
 
 THE BARRENS
 
-827
+961
 
 DEATHKNELL
 
-716
-
-THE CROSSROADS
-
-535
+739
 
 THUNDER BLUFF
 
-531
+622
+
+THE CROSSROADS
+
+605
 
 VALLEY OF TRIALS
 
-530
+549
 
 TIRISFAL GLADES
 
-464
+495
 
 DUROTAR
 
-354
+393
 
 SHADOWFANG KEEP
 
-236
+378
 
-MULGORE
+BLACKFATHOM DEEPS
 
-217
+272
 
 RATCHET
 
-215
+252
 
 SILVERPINE FOREST
 
-197
+247
 
-RAGEFIRE CHASM
+MULGORE
 
-187
+238
 
 ↓ See more↑ See less
 
+HILLSBRAD FOOTHILLS
+
+205
+
 VALANAAR
 
-180
+190
 
-BRILL
+RAGEFIRE CHASM
 
-173
-
-THORN HILL
-
-167
-
-RUINS OF LORDAERON
-
-157
-
-RED CLOUD MESA
-
-155
+189
 
 THE SEPULCHER
 
-154
+187
+
+BRILL
+
+181
+
+THORN HILL
+
+179
+
+RUINS OF LORDAERON
+
+178
+
+HILLSBRAD FIELDS
+
+177
+
+SOUTHERN BARRENS
+
+168
+
+TARREN MILL
+
+167
+
+RED CLOUD MESA
+
+162
 
 THENDAL GROVE
 
-148
+153
+
+SHEN'DAR VILLAGE
+
+150
+
+RAZOR HILL
+
+147
+
+THE MERCHANT COAST
+
+147
 
 SHEN'DAR HIGHLANDS
 
-142
+146
 
 THE DEADMINES
 
 141
 
-SHEN'DAR VILLAGE
+CAMP TAURAJO
 
 139
 
-RAZOR HILL
+THENDAL VILLAGE
 
 136
 
-THENDAL VILLAGE
+AGAMA'GOR
 
-134
+135
 
 GUSTBERRY LOWLANDS
 
-117
+123
 
-THE MERCHANT COAST
-
-116
-
-SOUTHERN BARRENS
+THE DRY HILLS
 
 111
 
 CAMP NARACHE
 
-110
-
-BLACKFATHOM DEEPS
-
-100
-
-GALLOWS' END TAVERN
-
-100
-
-HILLSBRAD FOOTHILLS
-
-99
+109
 
 ECHO ISLES
 
-98
+108
 
-THE DRY HILLS
+GALLOWS' END TAVERN
 
-94
-
-CAMP TAURAJO
-
-92
-
-BLOODHOOF VILLAGE
-
-91
-
-TARREN MILL
-
-87
-
-LUSHWATER OASIS
-
-85
-
-KING'S ALLEY
-
-83
-
-AGAMA'GOR
-
-82
-
-GOLD ROAD
-
-81
-
-LORDAMERE OVERLOOK
-
-79
-
-NORTHWATCH HOLD
-
-73
+107
 
 NIGHTSONG WOODS
 
-62
+107
 
-THE GOLDEN PLAINS
+LUSHWATER OASIS
 
-60
+106
 
-BURNING BLADE COVEN
+GOLD ROAD
 
-59
+98
 
-NIGHT WEB'S HOLLOW
+BLOODHOOF VILLAGE
 
-59
+95
+
+KING'S ALLEY
+
+93
+
+WEBWINDER PATH
+
+93
+
+LORDAMERE OVERLOOK
+
+89
+
+THE CHARRED VALE
+
+86
+
+SUN ROCK RETREAT
+
+84
 
 SOUTHERN GOLD ROAD
 
-58
+81
 
 ## Location detail
 
 | Location | Characters | Share | Activity |
 | --- | --- | --- | --- |
-| Orgrimmar | 1,551 | 9.9% | Capital · avg 16 |
-| Undercity | 958 | 6.1% | Capital · avg 16 |
-| Wailing Caverns | 883 | 5.6% | Leveling · avg 20 |
-| The Barrens | 827 | 5.3% | Leveling · avg 17 |
-| Deathknell | 716 | 4.6% | Starting · avg 3 |
-| The Crossroads | 535 | 3.4% | Leveling · avg 18 |
-| Thunder Bluff | 531 | 3.4% | Capital · avg 15 |
-| Valley of Trials | 530 | 3.4% | Starting · avg 3 |
-| Tirisfal Glades | 464 | 3.0% | Starting · avg 10 |
-| Durotar | 354 | 2.3% | Leveling · avg 12 |
-| Shadowfang Keep | 236 | 1.5% | Leveling · avg 20 |
-| Mulgore | 217 | 1.4% | Leveling · avg 11 |
-| Ratchet | 215 | 1.4% | Leveling · avg 17 |
-| Silverpine Forest | 197 | 1.3% | Leveling · avg 17 |
-| Ragefire Chasm | 187 | 1.2% | Leveling · avg 16 |
-| Valanaar | 180 | 1.2% | Leveling · avg 12 |
-| Brill | 173 | 1.1% | Starting · avg 8 |
-| Thorn Hill | 167 | 1.1% | Leveling · avg 16 |
-| Ruins of Lordaeron | 157 | 1.0% | Leveling · avg 18 |
-| Red Cloud Mesa | 155 | 1.0% | Starting · avg 3 |
-| The Sepulcher | 154 | 1.0% | Leveling · avg 18 |
-| Thendal Grove | 148 | 0.9% | Starting · avg 3 |
-| Shen'dar Highlands | 142 | 0.9% | Starting · avg 8 |
-| The Deadmines | 141 | 0.9% | Leveling · avg 20 |
-| Shen'dar Village | 139 | 0.9% | Starting · avg 7 |
-| Razor Hill | 136 | 0.9% | Starting · avg 9 |
-| Thendal Village | 134 | 0.9% | Starting · avg 2 |
-| Gustberry Lowlands | 117 | 0.7% | Leveling · avg 11 |
-| The Merchant Coast | 116 | 0.7% | Leveling · avg 17 |
-| Southern Barrens | 111 | 0.7% | Leveling · avg 18 |
-| Camp Narache | 110 | 0.7% | Starting · avg 2 |
-| Blackfathom Deeps | 100 | 0.6% | Leveling · avg 22 |
-| Gallows' End Tavern | 100 | 0.6% | Starting · avg 10 |
-| Hillsbrad Foothills | 99 | 0.6% | Leveling · avg 20 |
-| Echo Isles | 98 | 0.6% | Starting · avg 8 |
-| The Dry Hills | 94 | 0.6% | Leveling · avg 17 |
-| Camp Taurajo | 92 | 0.6% | Leveling · avg 19 |
-| Bloodhoof Village | 91 | 0.6% | Starting · avg 8 |
-| Tarren Mill | 87 | 0.6% | Leveling · avg 21 |
-| Lushwater Oasis | 85 | 0.5% | Leveling · avg 19 |
-| King's Alley | 83 | 0.5% | Leveling · avg 19 |
-| Agama'gor | 82 | 0.5% | Leveling · avg 19 |
-| Gold Road | 81 | 0.5% | Leveling · avg 16 |
-| Lordamere Overlook | 79 | 0.5% | Leveling · avg 19 |
-| Northwatch Hold | 73 | 0.5% | Leveling · avg 19 |
-| Nightsong Woods | 62 | 0.4% | Leveling · avg 19 |
-| The Golden Plains | 60 | 0.4% | Leveling · avg 14 |
-| Burning Blade Coven | 59 | 0.4% | Starting · avg 5 |
-| Night Web's Hollow | 59 | 0.4% | Starting · avg 4 |
-| Southern Gold Road | 58 | 0.4% | Leveling · avg 15 |
+| Orgrimmar | 1,680 | 8.8% | Capital · avg 17 |
+| Undercity | 1,095 | 5.7% | Capital · avg 17 |
+| Wailing Caverns | 1,028 | 5.4% | Leveling · avg 20 |
+| The Barrens | 961 | 5.0% | Leveling · avg 18 |
+| Deathknell | 739 | 3.9% | Starting · avg 3 |
+| Thunder Bluff | 622 | 3.3% | Capital · avg 16 |
+| The Crossroads | 605 | 3.2% | Leveling · avg 18 |
+| Valley of Trials | 549 | 2.9% | Starting · avg 3 |
+| Tirisfal Glades | 495 | 2.6% | Leveling · avg 11 |
+| Durotar | 393 | 2.1% | Leveling · avg 12 |
+| Shadowfang Keep | 378 | 2.0% | Leveling · avg 21 |
+| Blackfathom Deeps | 272 | 1.4% | Leveling · avg 24 |
+| Ratchet | 252 | 1.3% | Leveling · avg 18 |
+| Silverpine Forest | 247 | 1.3% | Leveling · avg 18 |
+| Mulgore | 238 | 1.2% | Leveling · avg 11 |
+| Hillsbrad Foothills | 205 | 1.1% | Leveling · avg 22 |
+| Valanaar | 190 | 1.0% | Leveling · avg 12 |
+| Ragefire Chasm | 189 | 1.0% | Leveling · avg 16 |
+| The Sepulcher | 187 | 1.0% | Leveling · avg 19 |
+| Brill | 181 | 0.9% | Starting · avg 9 |
+| Thorn Hill | 179 | 0.9% | Leveling · avg 16 |
+| Ruins of Lordaeron | 178 | 0.9% | Leveling · avg 18 |
+| Hillsbrad Fields | 177 | 0.9% | Leveling · avg 24 |
+| Southern Barrens | 168 | 0.9% | Leveling · avg 20 |
+| Tarren Mill | 167 | 0.9% | Leveling · avg 22 |
+| Red Cloud Mesa | 162 | 0.8% | Starting · avg 3 |
+| Thendal Grove | 153 | 0.8% | Starting · avg 3 |
+| Shen'dar Village | 150 | 0.8% | Starting · avg 7 |
+| Razor Hill | 147 | 0.8% | Starting · avg 9 |
+| The Merchant Coast | 147 | 0.8% | Leveling · avg 18 |
+| Shen'dar Highlands | 146 | 0.8% | Starting · avg 8 |
+| The Deadmines | 141 | 0.7% | Leveling · avg 20 |
+| Camp Taurajo | 139 | 0.7% | Leveling · avg 20 |
+| Thendal Village | 136 | 0.7% | Starting · avg 2 |
+| Agama'gor | 135 | 0.7% | Leveling · avg 20 |
+| Gustberry Lowlands | 123 | 0.6% | Leveling · avg 11 |
+| The Dry Hills | 111 | 0.6% | Leveling · avg 18 |
+| Camp Narache | 109 | 0.6% | Starting · avg 2 |
+| Echo Isles | 108 | 0.6% | Starting · avg 8 |
+| Gallows' End Tavern | 107 | 0.6% | Starting · avg 10 |
+| Nightsong Woods | 107 | 0.6% | Leveling · avg 21 |
+| Lushwater Oasis | 106 | 0.6% | Leveling · avg 19 |
+| Gold Road | 98 | 0.5% | Leveling · avg 17 |
+| Bloodhoof Village | 95 | 0.5% | Starting · avg 8 |
+| King's Alley | 93 | 0.5% | Leveling · avg 19 |
+| Webwinder Path | 93 | 0.5% | Leveling · avg 22 |
+| Lordamere Overlook | 89 | 0.5% | Leveling · avg 19 |
+| The Charred Vale | 86 | 0.5% | Leveling · avg 24 |
+| Sun Rock Retreat | 84 | 0.4% | Leveling · avg 22 |
+| Southern Gold Road | 81 | 0.4% | Leveling · avg 18 |
 
 ## Play-style mix
 
@@ -1763,27 +1763,27 @@ Recent characters grouped by the kind of location they were last seen in.
 
 END GAME
 
-0%
+1%
 
 LEVELING
 
-54%
+61%
 
 CAPITAL
 
-19%
+18%
 
 STARTING
 
-26%
+20%
 
 ## How to read this
 
-**Strongest cluster**Orgrimmar contains 9.9% of characters in this selection.
+**Strongest cluster**Orgrimmar contains 8.8% of characters in this selection.
 
-**Top-five concentration**32% indicates how much the footprint is concentrated in its five leading locations.
+**Top-five concentration**29% indicates how much the footprint is concentrated in its five leading locations.
 
-**Capital footprint**19% were last recorded in recognized capitals.
+**Capital footprint**18% were last recorded in recognized capitals.
 
 **Level context**Average level adds context for each location.
 
@@ -1793,7 +1793,7 @@ Locations: 453 (with recent sightings)
 
 Top 5 share: 20% (location concentration)
 
-Updated: 2026-10-02 (last population sample)
+Updated: 2026-10-03 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -2090,7 +2090,7 @@ Locations: 238 (with recent sightings)
 
 Top 5 share: 22% (location concentration)
 
-Updated: 2026-10-02 (last population sample)
+Updated: 2026-10-03 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -2387,7 +2387,7 @@ Locations: 300 (with recent sightings)
 
 Top 5 share: 31% (location concentration)
 
-Updated: 2026-10-02 (last population sample)
+Updated: 2026-10-03 (last population sample)
 
 ## Where players are · last 30 days
 
@@ -2678,4 +2678,4 @@ STARTING
 
 **Level context**Average level adds context for each location.
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:36Z

@@ -282,4 +282,4 @@ Retail’s broad modern roster and cross-faction play make this a view of the cu
 | Troll Rogue | 1 | 0.0% |
 | Undead Monk | 1 | 0.0% |
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:35Z

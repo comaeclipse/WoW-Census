@@ -1273,4 +1273,4 @@ Scanned: —
 
 No auction scan uploaded for this faction yet. In game, run /ml scan at the auction house, /reload, then upload with `upload-realm.ps1 -Flavor classic-era`.
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:35Z

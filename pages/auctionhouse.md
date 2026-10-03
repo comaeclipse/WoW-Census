@@ -11,7 +11,7 @@ Listed value: 95k g (asking prices, not sales)
 
 Quantity: 2,493,651 (units on the AH)
 
-Scanned: 2026-10-02
+Scanned: 2026-10-03
 
 ## Where the gold sits — listed value by market
 
@@ -279,7 +279,7 @@ Listed value: 60k g (asking prices, not sales)
 
 Quantity: 1,284,472 (units on the AH)
 
-Scanned: 2026-10-02
+Scanned: 2026-10-03
 
 ## Where the gold sits — listed value by market
 
@@ -413,7 +413,7 @@ Listed value: 39k g (asking prices, not sales)
 
 Quantity: 1,137,175 (units on the AH)
 
-Scanned: 2026-10-02
+Scanned: 2026-10-03
 
 ## Where the gold sits — listed value by market
 
@@ -681,7 +681,7 @@ Listed value: 22k g (asking prices, not sales)
 
 Quantity: 462,361 (units on the AH)
 
-Scanned: 2026-10-02
+Scanned: 2026-10-03
 
 ## Where the gold sits — listed value by market
 
@@ -1211,4 +1211,4 @@ Single items holding the most listed value.
 | [Greater Astral Essence](https://www.wowhead.com/forever/item=11082) | 239 g | 894 | +1% |
 | [Mageweave Cloth](https://www.wowhead.com/forever/item=4338) | 221 g | 316 | +37% |
 
-Page generated: 2026-10-02 17:42Z
+Page generated: 2026-10-03 02:36Z

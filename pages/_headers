@@ -16,6 +16,9 @@
 /talents
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/gear
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /tbc/
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -32,6 +35,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /tbc/talents
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/tbc/gear
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /classic/
@@ -52,6 +58,9 @@
 /classic/talents
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/classic/gear
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /sod/
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -68,6 +77,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /sod/talents
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/sod/gear
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /mop/
@@ -88,6 +100,9 @@
 /mop/talents
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
+/mop/gear
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
 /retail/
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
@@ -104,6 +119,9 @@
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /retail/talents
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+
+/retail/gear
   Cache-Control: public, max-age=300, stale-while-revalidate=86400
 
 /*.css

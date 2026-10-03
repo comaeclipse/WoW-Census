@@ -4,6 +4,11 @@ export const INSPECT_WINDOW_DAYS = 14;
 const classes = new Set(["WARRIOR","PALADIN","HUNTER","ROGUE","PRIEST","SHAMAN","MAGE","WARLOCK","DRUID","MONK","DEATHKNIGHT","DEMONHUNTER","EVOKER"]);
 const sources = new Set(["classic-beta","classic-progression","classic","retail","mop-classic","sod"]);
 const nodeCatalog = new Map(catalog.nodes.map(n => [n.node, n]));
+// The Forever catalog contains internal or shortened labels for these tabs.
+// Keep its raw provenance, but classify builds with the player-facing names.
+const foreverTreeNames = {
+  DRUID:{281:"Feral Combat"}, WARLOCK:{302:"Affliction",303:"Demonology"}
+};
 // The inspected specialization is authoritative on spec-based clients. Keep
 // this class-scoped so a placeholder or a stale ID cannot label another class.
 const specNames = {
@@ -19,6 +24,33 @@ export const catalogInfo = {version: catalog.version, source: catalog.source, re
 const text = (value, max = 200) => typeof value === "string" ? value.slice(0, max) : "";
 const norm = value => String(value || "").normalize("NFC").toLocaleLowerCase().replace(/\s+/g, " ").trim();
 const integer = value => Number.isSafeInteger(value);
+
+// Equipped gear, harvested by NameplateInspect inside the same INSPECT_READY
+// as the talents (Forever first). Slots follow the inventory slot IDs. The item
+// ID, enchant and name are read from the stored link, which is authoritative:
+// GetInventoryItemID() returns nil on the Forever client. A malformed slot is
+// dropped on its own rather than rejecting the whole inspection.
+export const GEAR_SLOTS = ["Head","Neck","Shoulder","Shirt","Chest","Waist","Legs","Feet","Wrist","Hands",
+  "Finger1","Finger2","Trinket1","Trinket2","Back","MainHand","OffHand","Ranged","Tabard"];
+// Classic-style links color by hex; Forever writes |cnIQ<quality>: instead.
+const QUALITY_HEX = {"9d9d9d":0,"ffffff":1,"1eff00":2,"0070dd":3,"a335ee":4,"ff8000":5,"e6cc80":6,"00ccff":7};
+export function parseItemLink(link) {
+  const m = /\|Hitem:(\d+):([^|]*)\|h\[([^\]]*)\]\|h/.exec(typeof link === "string" ? link : "");
+  if (!m || !Number(m[1])) return null;
+  const iq = /\|cnIQ(\d):/.exec(link), hex = /\|cff([0-9a-f]{6})/i.exec(link);
+  const quality = iq ? Number(iq[1]) : hex ? QUALITY_HEX[hex[1].toLowerCase()] ?? null : null;
+  return {id:Number(m[1]),name:m[3].slice(0,120),quality,enchant:Number(m[2].split(":")[0])||null};
+}
+export function normalizeGear(gear) {
+  const out = [], seen = new Set();
+  for (const g of Array.isArray(gear) ? gear : Object.values(gear && typeof gear === "object" ? gear : {})) {
+    const slot = g && g.slot, item = g && parseItemLink(g.itemLink);
+    if (!integer(slot) || slot < 1 || slot > 19 || seen.has(slot) || !item) continue;
+    seen.add(slot);
+    out.push({slot,...item,link:text(g.itemLink,600)});
+  }
+  return out.sort((a,b)=>a.slot-b.slot);
+}
 
 export function normalizeInspect(record, source, now = Math.floor(Date.now()/1000)) {
   if (!record || !/^Player-[0-9]+-[A-Fa-f0-9]+$/.test(record.guid || "") || !integer(record.time)
@@ -47,7 +79,8 @@ export function normalizeInspect(record, source, now = Math.floor(Date.now()/100
     observerRealm:contextual?text(record.observerRealm):"",observerFaction:contextual?text(record.observerFaction):"",
     observerZone:contextual?text(record.observerZone):"",class:record.class,race:text(record.race),level:record.level,guild:text(record.guild),
     spec:integer(record.spec)?record.spec:null,role:text(record.role,30),talents,list,schemaVersion:contextual?record.schemaVersion:1,
-    clientBuild:contextual?text(record.clientBuild,40):"",locale:contextual?text(record.locale,10):"",source};
+    clientBuild:contextual?text(record.clientBuild,40):"",locale:contextual?text(record.locale,10):"",
+    gear:normalizeGear(record.gear),source};
 }
 
 export function matchInspect(e, characters) {
@@ -67,7 +100,9 @@ export function describeBuild(e, source) {
     // assigning a beta branch. Old catalogs must not silently mislabel changes.
     const mapped = candidate && candidate.classFile === e.class && candidate.max === t.max
       && (!t.spell || candidate.spell === t.spell) ? candidate : null;
-    const branch = mapped?.branch || (source !== "classic-beta" && t.branch ? t.branch : null);
+    const branch = mapped
+      ? (foreverTreeNames[mapped.classFile]?.[mapped.tab] || mapped.branch)
+      : (source !== "classic-beta" && t.branch ? t.branch : null);
     if (branch) points[branch] = (points[branch] || 0) + t.rank;
     else unresolved.push(t.node);
     talents.push({...t,branch:branch || (specBased&&t.tree?`Tree ${t.tree}`:"Unmapped talent"),icon:mapped?.icon || null});
@@ -106,7 +141,7 @@ export async function importInspects(url, env, req) {
   if (body?.type!=="ml-inspects-v1" || !sources.has(body.source) || body.collector!=="NameplateInspect"
       || !Array.isArray(body.records) || body.records.length>1000) return response({error:"invalid inspect payload (maximum 1000 records)"},400);
   const characters=(await env.DB.prepare("SELECT game,character_key,name,realm,race,class_file FROM characters WHERE source_game=?").bind(body.source).all()).results;
-  let imported=0,rejected=0,linked=0,unmatched=0,ambiguous=0,nodes=0;
+  let imported=0,rejected=0,linked=0,unmatched=0,ambiguous=0,nodes=0,withGear=0;
   const now=Math.floor(Date.now()/1000);
   const inspectRows=[], talentRows=[];
   for (const record of body.records) {
@@ -117,22 +152,24 @@ export async function importInspects(url, env, req) {
     const values=[body.source,e.guid,e.time,e.rawName,e.name,e.realm||null,e.faction||null,
       e.observerRealm||suffix?.[1]||null,e.observerFaction||suffix?.[2]||null,e.observerZone||null,
       e.class,e.race,e.level,e.guild,e.spec,e.role,e.talents,e.schemaVersion,e.clientBuild,e.locale,
-      match.game,match.key,match.status,body.collector,JSON.stringify(e.list),JSON.stringify(record)];
+      match.game,match.key,match.status,body.collector,JSON.stringify(e.list),JSON.stringify(record),
+      e.gear.length?JSON.stringify(e.gear):null];
     inspectRows.push(values);
     for (const t of e.list) talentRows.push([body.source,e.guid,e.time,t.node,t.tree,t.spell,t.name,t.rank,t.max,t.x,t.y,t.entry,t.definition,JSON.stringify(t.groups)]);
-    imported++;nodes+=e.list.length;
+    imported++;nodes+=e.list.length;if(e.gear.length)withGear++;
   }
   // D1 permits 100 bound parameters per statement. Multi-row inserts keep
   // large caches comfortably below the per-request D1 query limit.
   if(talentRows.length>4000)return response({error:"too many talent nodes; send smaller chunks"},400);
   const statements=[];
-  const columns="source_game,guid,captured_at,raw_name,name,realm,faction,observer_realm,observer_faction,observer_zone,class_file,race,level,guild,raw_spec_id,raw_role,import_string,schema_version,client_build,locale,game,character_key,match_status,collector,nodes_json,raw_json";
+  const columns="source_game,guid,captured_at,raw_name,name,realm,faction,observer_realm,observer_faction,observer_zone,class_file,race,level,guild,raw_spec_id,raw_role,import_string,schema_version,client_build,locale,game,character_key,match_status,collector,nodes_json,raw_json,gear_json";
   for(let i=0;i<inspectRows.length;i+=3){
     const chunk=inspectRows.slice(i,i+3);
     statements.push(env.DB.prepare(`INSERT INTO character_inspects (${columns}) VALUES ${chunk.map(r=>"("+r.map(()=>"?").join(",")+")").join(",")}
       ON CONFLICT(source_game,guid,captured_at) DO UPDATE SET
       name=excluded.name,raw_name=excluded.raw_name,
-      game=excluded.game,character_key=excluded.character_key,match_status=excluded.match_status
+      game=excluded.game,character_key=excluded.character_key,match_status=excluded.match_status,
+      gear_json=COALESCE(excluded.gear_json,character_inspects.gear_json)
       WHERE excluded.schema_version>=character_inspects.schema_version`).bind(...chunk.flat()));
   }
   for(let i=0;i<talentRows.length;i+=7){
@@ -142,7 +179,7 @@ export async function importInspects(url, env, req) {
       VALUES ${chunk.map(r=>"("+r.map(()=>"?").join(",")+")").join(",")} ON CONFLICT(source_game,guid,captured_at,node_id) DO NOTHING`).bind(...chunk.flat()));
   }
   for(let i=0;i<statements.length;i+=40)await env.DB.batch(statements.slice(i,i+40));
-  return response({ok:true,imported,rejected,linked,unmatched,ambiguous,nodes});
+  return response({ok:true,imported,rejected,linked,unmatched,ambiguous,nodes,withGear});
 }
 
 export async function loadInspects(env, source) {
@@ -162,13 +199,17 @@ export async function loadInspects(env, source) {
       realm:r.realm||r.game?.replace(/^realm:/,"").replace(/-(Alliance|Horde)$/,"")||null,
       faction:r.faction||(/-(Alliance|Horde)$/.exec(r.game||"")||[])[1]||null,
       matchStatus:r.match_status,game:r.game,characterKey:r.character_key,
-      importString:r.import_string,rawSpecID:r.raw_spec_id,rawRole:r.raw_role,...build};
+      importString:r.import_string,rawSpecID:r.raw_spec_id,rawRole:r.raw_role,
+      // Public gear omits the raw link; the page needs only the parsed fields.
+      gear:r.gear_json?JSON.parse(r.gear_json).map(({slot,id,name,quality,enchant})=>({slot,id,name,quality,enchant})):[],
+      ...build};
   });
   const retained=(await env.DB.prepare("SELECT COUNT(*) n FROM characters WHERE source_game=?").bind(source).first())?.n||0;
   const linked=new Set(records.filter(r=>r.game).map(r=>r.game+":"+r.characterKey)).size;
   const history=(await env.DB.prepare("SELECT COUNT(*) n FROM character_inspects WHERE source_game=?").bind(source).first())?.n||0;
   return {source,lastT:end,windowDays:INSPECT_WINDOW_DAYS,truncated,records,
-    coverage:{inspected:records.length,withSelectedTalents:records.filter(r=>r.talents.length).length,linked,unmatched:records.filter(r=>!r.game).length,
+    coverage:{inspected:records.length,withSelectedTalents:records.filter(r=>r.talents.length).length,
+      withGear:records.filter(r=>r.gear.length).length,linked,unmatched:records.filter(r=>!r.game).length,
       ambiguous:records.filter(r=>r.matchStatus==="ambiguous").length,retainedCensusCharacters:retained,history},
     catalog:source==="classic-beta"?catalogInfo:null};
 }

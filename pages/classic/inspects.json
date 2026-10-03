@@ -19,6 +19,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Fire": 1,
         "Frost": 50
@@ -331,6 +332,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Balance": 13,
         "Restoration": 38
@@ -628,6 +630,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Arms": 3,
         "Fury": 26,
@@ -945,6 +948,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Marksmanship": 23
       },
@@ -1087,6 +1091,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Frost": 7
       },
@@ -1169,6 +1174,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Beast Mastery": 19
       },
@@ -1296,6 +1302,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Retribution": 2
       },
@@ -1348,6 +1355,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Holy": 6,
         "Retribution": 1
@@ -1435,6 +1443,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Assassination": 10,
         "Combat": 33,
@@ -1707,6 +1716,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Arcane": 17,
         "Fire": 31,
@@ -2024,6 +2034,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Discipline": 32,
         "Holy": 19
@@ -2336,6 +2347,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Balance": 8,
         "Feral Combat": 30,
@@ -2638,6 +2650,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Arcane": 5,
         "Frost": 43
@@ -2935,6 +2948,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Holy": 3,
         "Retribution": 6
@@ -3022,6 +3036,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Holy": 17,
         "Protection": 11,
@@ -3339,6 +3354,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Beast Mastery": 30,
         "Marksmanship": 16
@@ -3621,6 +3637,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Affliction": 10,
         "Demonology": 23
@@ -3828,6 +3845,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Arcane": 9,
         "Fire": 7
@@ -3945,6 +3963,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Feral Combat": 24
       },
@@ -4102,6 +4121,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Elemental": 7,
         "Enhancement": 30
@@ -4294,6 +4314,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Marksmanship": 19
       },
@@ -4421,6 +4442,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Marksmanship": 42
       },
@@ -4638,6 +4660,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Restoration": 4
       },
@@ -4690,6 +4713,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Arms": 7
       },
@@ -4772,6 +4796,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Arcane": 2,
         "Fire": 33,
@@ -5119,6 +5144,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Elemental": 31,
         "Restoration": 10
@@ -5356,6 +5382,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Fury": 19
       },
@@ -5468,6 +5495,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Assassination": 24,
         "Subtlety": 27
@@ -5780,6 +5808,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Restoration": 12
       },
@@ -5862,6 +5891,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Elemental": 6,
         "Enhancement": 45
@@ -6144,6 +6174,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Arms": 16,
         "Fury": 32
@@ -6396,6 +6427,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Balance": 11,
         "Feral Combat": 33,
@@ -6698,6 +6730,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Marksmanship": 1
       },
@@ -6750,6 +6783,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Discipline": 9,
         "Holy": 33
@@ -6987,6 +7021,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Beast Mastery": 12,
         "Marksmanship": 7
@@ -7119,6 +7154,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Fury": 6,
         "Protection": 3
@@ -7206,6 +7242,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Fire": 13,
         "Frost": 5
@@ -7338,6 +7375,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Beast Mastery": 20,
         "Marksmanship": 31
@@ -7590,6 +7628,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Affliction": 10,
         "Destruction": 21
@@ -7782,6 +7821,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Balance": 5,
         "Restoration": 46
@@ -8049,6 +8089,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Beast Mastery": 1
       },
@@ -8101,6 +8142,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Beast Mastery": 13
       },
@@ -8213,6 +8255,7 @@
       "importString": "",
       "rawSpecID": null,
       "rawRole": "",
+      "gear": [],
       "points": {
         "Discipline": 1
       },
@@ -8254,6 +8297,7 @@
   "coverage": {
     "inspected": 43,
     "withSelectedTalents": 43,
+    "withGear": 0,
     "linked": 34,
     "unmatched": 9,
     "ambiguous": 0,
