@@ -1526,6 +1526,35 @@ async function loadCensus(env, sourceGame = "classic-beta") {
      GROUP BY c.game, c.race, c.class_file`
   ).bind(sourceGame, censusWindow).all()).results.filter((r) => !censused.has(r.game));
   const rows = censusRows.concat(sightingRows);
+  // Distinct characters by race for the chart's three selectable windows.
+  // Anchor each window to its dataset's latest observation, as above.
+  const raceCensusRows = (await env.DB.prepare(
+    `WITH obs AS (
+       SELECT o.game, o.race, o.observed_at t,
+         ROW_NUMBER() OVER (PARTITION BY o.game, o.character_key ORDER BY o.observed_at DESC) rn
+       FROM character_location_observations o
+       JOIN population_sweeps s ON s.game=o.game AND s.source_game=o.source_game AND s.sweep_id=o.sweep_id
+       JOIN population_sweep_queries q ON q.game=o.game AND q.source_game=o.source_game AND q.sweep_id=o.sweep_id AND q.query_index=o.query_index
+       JOIN datasets d ON d.game=o.game
+       WHERE d.source_game=? AND s.label LIKE 'census %' AND COALESCE(q.filter,'') NOT LIKE '%z-%'
+     ), latest AS (SELECT game, MAX(t) t FROM obs GROUP BY game)
+     SELECT o.game, o.race, COUNT(*) all_count,
+       SUM(CASE WHEN o.t>=l.t-604800 THEN 1 ELSE 0 END) week_count,
+       SUM(CASE WHEN o.t>=l.t-86400 THEN 1 ELSE 0 END) day_count
+     FROM obs o JOIN latest l ON l.game=o.game
+     WHERE o.rn=1 AND o.race IS NOT NULL
+     GROUP BY o.game,o.race`
+  ).bind(sourceGame).all()).results;
+  const raceSightingRows = (await env.DB.prepare(
+    `SELECT c.game, c.race, COUNT(*) all_count,
+       SUM(CASE WHEN c.last_seen>=m.latest-604800 THEN 1 ELSE 0 END) week_count,
+       SUM(CASE WHEN c.last_seen>=m.latest-86400 THEN 1 ELSE 0 END) day_count
+     FROM characters c JOIN datasets d ON d.game=c.game
+     JOIN (SELECT game,MAX(last_seen) latest FROM characters GROUP BY game) m ON m.game=c.game
+     WHERE d.source_game=? AND c.race IS NOT NULL
+     GROUP BY c.game,c.race`
+  ).bind(sourceGame).all()).results.filter((r) => !censused.has(r.game));
+  const raceWindowRows = raceCensusRows.concat(raceSightingRows);
   const scans = (await env.DB.prepare(
     `SELECT p.game game, COUNT(*) samples, SUM(p.observed) observed, MAX(p.t) lastT
      FROM pop_samples p JOIN datasets d ON d.game = p.game
@@ -1564,7 +1593,7 @@ async function loadCensus(env, sourceGame = "classic-beta") {
       realms.add(name);
       units.set(game, {
         game, realm: name, faction: fac || "Unknown",
-        races: {}, classes: {}, combos: {}, guilds: [], zones: [], zoneCharacters: 0,
+        races: {}, raceWindows: { all: {}, week: {}, day: {} }, classes: {}, combos: {}, guilds: [], zones: [], zoneCharacters: 0,
         characters: 0, samples: 0, observed: 0,
       });
     }
@@ -1580,6 +1609,12 @@ async function loadCensus(env, sourceGame = "classic-beta") {
       const key = r.race + "\t" + r.cf;
       u.combos[key] = (u.combos[key] || 0) + r.n;
     }
+  }
+  for (const r of raceWindowRows) {
+    const windows = unit(r.game).raceWindows;
+    windows.all[r.race] = r.all_count || 0;
+    windows.week[r.race] = r.week_count || 0;
+    windows.day[r.race] = r.day_count || 0;
   }
   for (const sc of scans) {
     const u = unit(sc.game);
@@ -1618,7 +1653,7 @@ function mergeCensusUnits(units) {
   for (const u of units) {
     if (!byFaction.has(u.faction))
       byFaction.set(u.faction, {
-        faction: u.faction, races: {}, classes: {}, combos: {}, characters: 0, samples: 0, observed: 0, games: [],
+        faction: u.faction, races: {}, raceWindows: { all: {}, week: {}, day: {} }, classes: {}, combos: {}, characters: 0, samples: 0, observed: 0, games: [],
       });
     const g = byFaction.get(u.faction);
     g.characters += u.characters;
@@ -1626,6 +1661,9 @@ function mergeCensusUnits(units) {
     g.observed += u.observed;
     if (g.games.indexOf(u.game) < 0) g.games.push(u.game);
     for (const k in u.races) g.races[k] = (g.races[k] || 0) + u.races[k];
+    for (const window of ["all", "week", "day"])
+      for (const k in (u.raceWindows?.[window] || {}))
+        g.raceWindows[window][k] = (g.raceWindows[window][k] || 0) + u.raceWindows[window][k];
     for (const k in u.classes) g.classes[k] = (g.classes[k] || 0) + u.classes[k];
     for (const k in u.combos) g.combos[k] = (g.combos[k] || 0) + u.combos[k];
   }

@@ -100,7 +100,7 @@ export function mergeCensusUnits(units) {
   for (const u of units) {
     if (!byFaction.has(u.faction))
       byFaction.set(u.faction, {
-        faction: u.faction, races: {}, classes: {}, combos: {}, characters: 0, samples: 0, observed: 0, games: [],
+        faction: u.faction, races: {}, raceWindows: { all: {}, week: {}, day: {} }, classes: {}, combos: {}, characters: 0, samples: 0, observed: 0, games: [],
       });
     const g = byFaction.get(u.faction);
     g.characters += u.characters;
@@ -108,6 +108,9 @@ export function mergeCensusUnits(units) {
     g.observed += u.observed;
     if (g.games.indexOf(u.game) < 0) g.games.push(u.game);
     for (const k in u.races) g.races[k] = (g.races[k] || 0) + u.races[k];
+    for (const window of ["all", "week", "day"])
+      for (const k in (u.raceWindows?.[window] || {}))
+        g.raceWindows[window][k] = (g.raceWindows[window][k] || 0) + u.raceWindows[window][k];
     for (const k in u.classes) g.classes[k] = (g.classes[k] || 0) + u.classes[k];
     for (const k in (u.combos || {})) g.combos[k] = (g.combos[k] || 0) + u.combos[k];
   }

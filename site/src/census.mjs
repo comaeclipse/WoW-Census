@@ -168,6 +168,15 @@ export const CENSUS_STYLE = `
   .census .legend{display:flex; gap:18px; margin:0 0 14px}
   .census .key{display:inline-flex; align-items:center; gap:7px; font-size:17px; color:var(--muted)}
   .census .key i{width:13px; height:13px; display:inline-block}
+  .race-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+  .race-head .ptitle{margin-bottom:10px}
+  .race-toggle{display:inline-flex;border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);flex-wrap:wrap}
+  .race-toggle button{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel2);border:0;border-right:2px solid var(--line);padding:9px 11px;cursor:pointer}
+  .race-toggle button:last-child{border-right:0}
+  .race-toggle button:hover{color:var(--gold)}
+  .race-toggle button[aria-pressed="true"]{background:var(--gold);color:#161018}
+  .race-toggle button[aria-pressed="true"]:hover{color:#161018}
+  .race-toggle button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .bar{display:grid; grid-template-columns:172px 1fr 62px; align-items:center; gap:10px; margin-bottom:6px}
   .bar .bl{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-align:right;
     color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
@@ -289,17 +298,23 @@ function renderCensusView(census, opts = {}) {
   } else {
     // Race chart: every faction's races in one chart, grouped by faction and
     // scaled against the single largest race so the faction blocks compare.
-    const raceMax = groups.reduce((m, g) =>
-      Object.values(g.races).reduce((mm, n) => Math.max(mm, n), m), 0);
-    const raceRows = groups.map((g) =>
-      barChart(sortedEntries(g.races), raceMax, () => factionColor(g.faction),
-        (k) => (/^(High Order|Windshaper) Skyborne$/i.test(k) ? "Skyborne" : k).toUpperCase())).join("");
+    const raceMarkup = (window) => {
+      const dist = (g) => g.raceWindows?.[window] || g.races;
+      const max = groups.reduce((m, g) =>
+        Object.values(dist(g)).reduce((mm, n) => Math.max(mm, n), m), 0);
+      return groups.map((g) =>
+        barChart(sortedEntries(dist(g)).filter(([, n]) => n > 0), max, () => factionColor(g.faction),
+          (k) => (/^(High Order|Windshaper) Skyborne$/i.test(k) ? "Skyborne" : k).toUpperCase())).join("") ||
+        '<p class="hint">No race observations in this window.</p>';
+    };
+    const hasRaceWindows = groups.some((g) => g.raceWindows);
     const legend = groups.map((g) =>
       '<span class="key"><i style="background:' + factionColor(g.faction) + '"></i>' + esc(g.faction) + "</span>").join("");
-    const racePanel = '<div class="panel census" style="margin-bottom:22px"><div class="ptitle">Population by race</div>' +
-      '<p class="hint" style="margin-top:0">Grouped by faction, most populous first.</p>' +
+    const racePanel = '<div class="panel census race-panel" style="margin-bottom:22px"><div class="race-head"><div><div class="ptitle">Population by race</div>' +
+      '<p class="hint" style="margin-top:0">Grouped by faction, most populous first. Windows end at each realm\'s latest scan.</p></div>' +
+      (hasRaceWindows ? '<div class="race-toggle" role="group" aria-label="Population by race time range"><button type="button" data-window="all" aria-pressed="true">All</button><button type="button" data-window="week" aria-pressed="false">7 days</button><button type="button" data-window="day" aria-pressed="false">24 hours</button></div>' : '') + '</div>' +
       '<div class="legend">' + legend + "</div>" +
-      (raceRows || '<p class="hint">No race data yet.</p>') + "</div>";
+      (hasRaceWindows ? ['all', 'week', 'day'].map((window) => '<div class="race-bars" data-window="' + window + '"' + (window === 'all' ? '' : ' hidden') + '>' + raceMarkup(window) + '</div>').join('') : raceMarkup('all')) + "</div>";
 
     // One class chart per faction, each scaled to its own leader.
     const classPanels = groups.map((g) => {
@@ -418,5 +433,12 @@ ${seoHead(opts.title || topic + " – WoWCensus", description, opts.canonical)}
   ${generatedNote}
 </div>
 ${chips ? TOGGLE_SCRIPT : ""}
+<script>(function(){
+  var toggles=[].slice.call(document.querySelectorAll('.race-toggle'));
+  function apply(window){toggles.forEach(function(toggle){var panel=toggle.closest('.race-panel');toggle.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.window===window))});panel.querySelectorAll('.race-bars').forEach(function(bars){bars.hidden=bars.dataset.window!==window})})}
+  function selected(){var value=new URLSearchParams(location.search).get('race');return value==='week'||value==='day'?value:'all'}
+  toggles.forEach(function(toggle){toggle.addEventListener('click',function(event){var button=event.target.closest('button[data-window]');if(!button)return;apply(button.dataset.window);var url=new URL(location.href);if(button.dataset.window==='all')url.searchParams.delete('race');else url.searchParams.set('race',button.dataset.window);history.pushState(null,'',url.pathname+url.search+url.hash)})});
+  window.addEventListener('popstate',function(){apply(selected())});apply(selected());
+})();</script>
 </body></html>`;
 }
