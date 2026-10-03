@@ -313,6 +313,80 @@ end
 -- END MISTS OF PANDARIA CLASSIC INSPECTION
 ------------------------------------------------------------------------
 
+------------------------------------------------------------------------
+-- EQUIPPED GEAR CAPTURE
+-- WoW: Forever Beta
+-- Gear data is harvested during the matching INSPECT_READY event.
+-- GetInventoryItemLink() was verified to return inspected-player equipment.
+-- Do not rely on GetInventoryItemID() for this client; derive itemID from itemLink.
+------------------------------------------------------------------------
+-- Gear is another collector on the same successful inspect as the talent
+-- readers above; it never issues its own NotifyInspect. It must run inside
+-- INSPECT_READY: the same slot read again later frequently returns nil even
+-- though the inspect succeeded. GetInventoryItemID() returned nil on Forever
+-- while the link was correct, so the ID comes from the link, and the full
+-- link is kept for its suffix/enchant/gem/bonus data.
+--
+-- Enabled per client so each can be verified on its own; "/npi gear" turns
+-- it on for the current client for this session to test an unverified one.
+local GEAR_CAPTURE = {
+  ["classic-beta"]    = true,   -- WoW: Forever Beta (verified)
+  ["retail"]          = false,
+  ["classic-era"]     = false,
+  ["sod"]             = false,
+  ["tbc-anniversary"] = false,
+  ["mop-classic"]     = false,
+}
+local gearOverride = false
+
+local SLOT_NAMES = {
+  [1]  = "Head",
+  [2]  = "Neck",
+  [3]  = "Shoulder",
+  [4]  = "Shirt",
+  [5]  = "Chest",
+  [6]  = "Waist",
+  [7]  = "Legs",
+  [8]  = "Feet",
+  [9]  = "Wrist",
+  [10] = "Hands",
+  [11] = "Finger1",
+  [12] = "Finger2",
+  [13] = "Trinket1",
+  [14] = "Trinket2",
+  [15] = "Back",
+  [16] = "MainHand",
+  [17] = "OffHand",
+  [18] = "Ranged",
+  [19] = "Tabard",
+}
+
+local function gearEnabled()
+  return (GEAR_CAPTURE[flavor] or gearOverride) and type(GetInventoryItemLink) == "function"
+end
+
+-- Empty slots are omitted. Returns nil when nothing was equipped/readable.
+local function captureGear(unit)
+  if not gearEnabled() then return nil end
+  local gear, count = {}, 0
+  for slot = 1, 19 do
+    local ok, itemLink = pcall(GetInventoryItemLink, unit, slot)
+    if ok and not isSecret(itemLink) and type(itemLink) == "string" then
+      gear[slot] = {
+        slot = slot,
+        slotName = SLOT_NAMES[slot],
+        itemID = tonumber(itemLink:match("item:(%d+)")),
+        itemLink = itemLink,
+      }
+      count = count + 1
+    end
+  end
+  return count > 0 and gear or nil
+end
+------------------------------------------------------------------------
+-- END EQUIPPED GEAR CAPTURE
+------------------------------------------------------------------------
+
 local function store(guid, unit)
   local talents, list, trees, pointSplit, primaryTree
   -- One reader per client family. The MoP branch must never fall through to
@@ -329,6 +403,9 @@ local function store(guid, unit)
     local ok, result = pcall(readTalents)
     if ok then list = result end
   end
+  -- Same INSPECT_READY, same verified unit: harvest gear now, not later.
+  local gearOK, gear = pcall(captureGear, unit)
+  if not gearOK then gear = nil end
   local spec = getInspectSpec(unit)
   if isSecret(spec) then return false end
   -- On MoP Classic a valid spec ID (> 0) alone is worth storing, e.g. players
@@ -392,6 +469,7 @@ local function store(guid, unit)
     spec    = spec,
     talents = talents,
     list    = list,
+    gear    = gear,    -- [slot] = { slot, slotName, itemID, itemLink }; nil if not captured
     time    = time(),
   }
   -- SavedVariables cannot safely persist Retail's restricted values.
@@ -528,7 +606,9 @@ f:SetScript("OnEvent", function(_, event, arg)
   --     -> verify the GUID matches   unitFor(guid) must still point at them
   --     -> read specialization       store() -> getInspectSpec()
   --     -> read talents              store() -> per-client reader (MoP: selected tier talents)
+  --     -> read equipped gear        store() -> captureGear() (Forever; must be now, not later)
   --     -> store result              NameplateInspectDB[guid]
+  --     -> ClearInspectPlayer()      then tick() sends the next queued request
   elseif event == "INSPECT_READY" then
     stats.ready = stats.ready + 1
     if not collecting then return end
@@ -622,6 +702,12 @@ local function show(e)
     print(("   %s %d/%d  (x=%s y=%s)"):format(t.name or "?", t.rank, t.max or t.rank, tostring(t.x), tostring(t.y)))
   end
   print(("   %d points"):format(total))
+  if e.gear then
+    for slot = 1, 19 do
+      local g = e.gear[slot]
+      if g then print(("   %-8s %s"):format(g.slotName or tostring(slot), g.itemLink or "?")) end
+    end
+  end
   if not e.talents or e.talents == "" then return end
   StaticPopup_Show("NAMEPLATEINSPECT_COPY", e.name .. " — " .. specName(e.spec), nil, e.talents)
 end
@@ -692,9 +778,18 @@ SlashCmdList.NAMEPLATEINSPECT = function(msg)
   elseif lower == "nearby" then
     showNearby()
 
+  elseif lower == "gear" then
+    if GEAR_CAPTURE[flavor] then
+      print("NPI: gear capture is always on for " .. flavor .. ".")
+    else
+      gearOverride = not gearOverride
+      print(("NPI: gear capture %s for %s this session (unverified client)."):format(
+        gearOverride and "ON" or "off", flavor))
+    end
+
   elseif lower == "diag" then
     local _, build, _, interface = GetBuildInfo()
-    print(("NPI: diagnostics v3.0.3, %s, client=%s build=%s interface=%s"):format(flavor,
+    print(("NPI: diagnostics v3.1.0, %s, client=%s build=%s interface=%s"):format(flavor,
       clientVersion, tostring(build), tostring(interface)))
     print(("NPI: plates=%d requests=%d ready=%d saved=%d timeouts=%d queued=%d pending=%s"):format(
       stats.plates, stats.requests, stats.ready, stats.saved, stats.timeouts, #queue,
