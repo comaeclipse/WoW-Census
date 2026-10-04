@@ -98,6 +98,27 @@ function htmlToMarkdown(source) {
     const detail = el.querySelector('.s')?.textContent.trim();
     if (label && value) el.textContent = `${label}: ${value}${detail ? ` (${detail})` : ''}`;
   }
+  for (const grid of [...document.querySelectorAll('.gear-top-grid')]) {
+    const table = document.createElement('table');
+    table.innerHTML = '<thead><tr><th>Slot</th><th>Most equipped item</th><th>Players</th></tr></thead><tbody></tbody>';
+    const body = table.querySelector('tbody');
+    for (const item of grid.querySelectorAll('.gear-top-item')) {
+      const row = document.createElement('tr');
+      for (const value of [item.querySelector('.gear-top-slot')?.textContent,
+        item.querySelector('.gear-top-name')?.textContent,
+        item.querySelector('.gear-top-count')?.textContent]) {
+        const cell = document.createElement('td');
+        cell.textContent = value || '';
+        row.appendChild(cell);
+      }
+      const link = document.createElement('a');
+      link.href = item.getAttribute('href');
+      link.textContent = row.children[1].textContent;
+      row.children[1].replaceChildren(link);
+      body.appendChild(row);
+    }
+    grid.replaceWith(table);
+  }
   const turndown = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-', codeBlockStyle: 'fenced' });
   turndown.use(gfm);
   const body = document.querySelector('.wrap') || document.body;

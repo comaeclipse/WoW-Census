@@ -5,269 +5,304 @@ url: "https://wowcensus.io/gear"
 ---
 
 # WoW Forever Gear: Most Equipped Items – WoWCensus
-## What this sample shows
+## Most equipped by slot
 
-119 of 3,469 nearby players inspected in the latest 14 days had readable equipment. Shares count players, within the filtered set, wearing an item in that slot; rings and trinkets count each player once per item. This is a sample of visible players, not the whole population. Latest inspection: 2026-10-03 02:26Z.
+385 of 3,714 nearby players inspected in the latest 14 days had readable equipment. Shares count players, within the filtered set, wearing an item in that slot; rings and trinkets count each player once per item. This is a sample of visible players, not the whole population. Latest inspection: 2026-10-03 17:08Z.
+
+| Slot | Most equipped item | Players |
+| --- | --- | --- |
+| Head | [Brawler's Leather Hood](https://www.wowhead.com/forever/item=252504) | 26 players |
+| Neck | [Tarnished Locket](https://www.wowhead.com/forever/item=279870) | 34 players |
+| Shoulder | [Rough Bronze Shoulders](https://www.wowhead.com/forever/item=3480) | 32 players |
+| Back | [Catacomb Cloak](https://www.wowhead.com/forever/item=279899) | 42 players |
+| Chest | [Tunic of Westfall](https://www.wowhead.com/forever/item=2041) | 27 players |
+| Wrist | [Bravo's Armbands](https://www.wowhead.com/forever/item=270015) | 27 players |
+| Hands | [Embossed Leather Gloves](https://www.wowhead.com/forever/item=4239) | 25 players |
+| Waist | [Novice Arcanist's Sash](https://www.wowhead.com/forever/item=253885) | 30 players |
+| Legs | [Leggings of the Fang](https://www.wowhead.com/forever/item=10410) | 18 players |
+| Feet | [Gemmed Copper Boots](https://www.wowhead.com/forever/item=250620) | 16 players |
+| Rings | [Avala's Binding](https://www.wowhead.com/forever/item=286737) | 43 players |
+| Trinkets | [Lookie's Spyglass](https://www.wowhead.com/forever/item=273298) | 21 players |
+| Main hand | [Staff of Westfall](https://www.wowhead.com/forever/item=2042) | 17 players |
+| Off hand | [Arctic Buckler](https://www.wowhead.com/forever/item=7002) | 7 players |
+| Ranged | [Sizzle Stick](https://www.wowhead.com/forever/item=8071) | 27 players |
+| Shirt | [Red Linen Shirt](https://www.wowhead.com/forever/item=2575) | 39 players |
+| Tabard | [Guild Tabard](https://www.wowhead.com/forever/item=5976) | 10 players |
 
 ## Head
 
-21 of 119 players with this slot filled · 0% enchanted · 9 distinct items
+96 of 385 players with this slot filled · 0% enchanted · 19 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Taurajo Headband](https://www.wowhead.com/forever/item=279391) | 8 | 38.1% |
-| [Brawler's Leather Hood](https://www.wowhead.com/forever/item=252504) | 3 | 14.3% |
-| [Veteran's Silvered Chain Helm](https://www.wowhead.com/forever/item=250528) | 3 | 14.3% |
-| [Hooded Cowl](https://www.wowhead.com/forever/item=3732) | 2 | 9.5% |
-| [Blindwatcher's Sight](https://www.wowhead.com/forever/item=273645) | 1 | 4.8% |
-| [Crusader's Silvered Chain Helm](https://www.wowhead.com/forever/item=250532) | 1 | 4.8% |
-| [Defender's Leather Hood](https://www.wowhead.com/forever/item=252447) | 1 | 4.8% |
-| [Green Tinted Goggles](https://www.wowhead.com/forever/item=4385) | 1 | 4.8% |
-| [Shadow Circlet](https://www.wowhead.com/forever/item=253955) | 1 | 4.8% |
+| [Brawler's Leather Hood](https://www.wowhead.com/forever/item=252504) | 26 | 27.1% |
+| [Veteran's Silvered Chain Helm](https://www.wowhead.com/forever/item=250528) | 17 | 17.7% |
+| [Crusader's Silvered Chain Helm](https://www.wowhead.com/forever/item=250532) | 9 | 9.4% |
+| [Taurajo Headband](https://www.wowhead.com/forever/item=279391) | 8 | 8.3% |
+| [Red Defias Mask](https://www.wowhead.com/forever/item=7997) | 7 | 7.3% |
+| [Flying Tiger Goggles](https://www.wowhead.com/forever/item=4368) | 4 | 4.2% |
+| [Defender's Leather Hood](https://www.wowhead.com/forever/item=252447) | 3 | 3.1% |
+| [Protector's Silvered Chain Helm](https://www.wowhead.com/forever/item=250530) | 3 | 3.1% |
+| [Shadow Circlet](https://www.wowhead.com/forever/item=253955) | 3 | 3.1% |
+| [Totemic Leather Hood](https://www.wowhead.com/forever/item=252448) | 3 | 3.1% |
 
 ## Neck
 
-35 of 119 players with this slot filled · 0% enchanted · 6 distinct items
+117 of 385 players with this slot filled · 0% enchanted · 15 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Snake Eye Kaleidoscope](https://www.wowhead.com/forever/item=273088) | 15 | 42.9% |
-| [Roadwatcher's Confidence](https://www.wowhead.com/forever/item=281265) | 12 | 34.3% |
-| [Erudite's Amulet](https://www.wowhead.com/forever/item=277204) | 3 | 8.6% |
-| [Sorcerer Collar](https://www.wowhead.com/forever/item=273457) | 3 | 8.6% |
-| [Mark of the Pack Leader](https://www.wowhead.com/forever/item=285331) | 1 | 2.9% |
-| [Scholarly Pendant](https://www.wowhead.com/forever/item=277203) | 1 | 2.9% |
+| [Tarnished Locket](https://www.wowhead.com/forever/item=279870) | 34 | 29.1% |
+| [Snake Eye Kaleidoscope](https://www.wowhead.com/forever/item=273088) | 25 | 21.4% |
+| [Erudite's Amulet](https://www.wowhead.com/forever/item=277204) | 17 | 14.5% |
+| [Ephemeral Choker](https://www.wowhead.com/forever/item=270227) | 14 | 12.0% |
+| [Roadwatcher's Confidence](https://www.wowhead.com/forever/item=281265) | 12 | 10.3% |
+| [Scholarly Pendant](https://www.wowhead.com/forever/item=277203) | 3 | 2.6% |
+| [Sorcerer Collar](https://www.wowhead.com/forever/item=273457) | 3 | 2.6% |
+| [Ghostshard Talisman](https://www.wowhead.com/forever/item=7731) | 2 | 1.7% |
+| [Basalt Necklace of the Physician](https://www.wowhead.com/forever/item=12028) | 1 | 0.9% |
+| [Crystal Starfire Medallion](https://www.wowhead.com/forever/item=5003) | 1 | 0.9% |
 
 ## Shoulder
 
-61 of 119 players with this slot filled · 0% enchanted · 10 distinct items
+191 of 385 players with this slot filled · 0% enchanted · 36 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Talbar Mantle](https://www.wowhead.com/forever/item=10657) | 16 | 26.2% |
-| [Rough Bronze Shoulders](https://www.wowhead.com/forever/item=3480) | 11 | 18.0% |
-| [Serpent's Shoulders](https://www.wowhead.com/forever/item=5404) | 10 | 16.4% |
-| [Ghostly Mantle](https://www.wowhead.com/forever/item=3324) | 7 | 11.5% |
-| [Tanned Shoulderpads](https://www.wowhead.com/forever/item=270023) | 7 | 11.5% |
-| [Bronzed Shoulderguards](https://www.wowhead.com/forever/item=270024) | 3 | 4.9% |
-| [Reinforced Woolen Shoulders](https://www.wowhead.com/forever/item=4315) | 3 | 4.9% |
-| [Feline Mantle](https://www.wowhead.com/forever/item=3748) | 2 | 3.3% |
-| [Canvas Shoulderpads](https://www.wowhead.com/forever/item=1769) | 1 | 1.6% |
-| [Double-Stitched Woolen Shoulders](https://www.wowhead.com/forever/item=4314) | 1 | 1.6% |
+| [Rough Bronze Shoulders](https://www.wowhead.com/forever/item=3480) | 32 | 16.8% |
+| [Talbar Mantle](https://www.wowhead.com/forever/item=10657) | 27 | 14.1% |
+| [Serpent's Shoulders](https://www.wowhead.com/forever/item=5404) | 21 | 11.0% |
+| [Double-Stitched Woolen Shoulders](https://www.wowhead.com/forever/item=4314) | 13 | 6.8% |
+| [Reinforced Woolen Shoulders](https://www.wowhead.com/forever/item=4315) | 12 | 6.3% |
+| [Hillman's Shoulders](https://www.wowhead.com/forever/item=4251) | 11 | 5.8% |
+| [Ghostly Mantle](https://www.wowhead.com/forever/item=3324) | 7 | 3.7% |
+| [Patched Leather Shoulderpads](https://www.wowhead.com/forever/item=1793) | 7 | 3.7% |
+| [Tanned Shoulderpads](https://www.wowhead.com/forever/item=270023) | 7 | 3.7% |
+| [Reliquary Mantle](https://www.wowhead.com/forever/item=273028) | 5 | 2.6% |
 
 ## Back
 
-73 of 119 players with this slot filled · 18% enchanted · 27 distinct items
+331 of 385 players with this slot filled · 14% enchanted · 89 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Glowing Lizardscale Cloak](https://www.wowhead.com/forever/item=6449) | 8 | 11.0% |
-| [Grave Shroud](https://www.wowhead.com/forever/item=279865) | 8 | 11.0% |
-| [Pearl-clasped Cloak](https://www.wowhead.com/forever/item=5542) | 6 | 8.2% |
-| [Barkeeper's Cloak](https://www.wowhead.com/forever/item=5343) | 5 | 6.8% |
-| [Embossed Leather Cloak](https://www.wowhead.com/forever/item=2310) | 4 | 5.5% |
-| [Reinforced Linen Cape](https://www.wowhead.com/forever/item=2580) | 4 | 5.5% |
-| [Subterranean Cape](https://www.wowhead.com/forever/item=14149) | 4 | 5.5% |
-| [Wolfmaster Cape](https://www.wowhead.com/forever/item=6314) | 4 | 5.5% |
-| [Feyscale Cloak](https://www.wowhead.com/forever/item=6632) | 3 | 4.1% |
-| [Satyrskin Cloak](https://www.wowhead.com/forever/item=273005) | 3 | 4.1% |
+| [Catacomb Cloak](https://www.wowhead.com/forever/item=279899) | 42 | 12.7% |
+| [Grave Shroud](https://www.wowhead.com/forever/item=279865) | 16 | 4.8% |
+| [Reinforced Linen Cape](https://www.wowhead.com/forever/item=2580) | 15 | 4.5% |
+| [Cape of the Brotherhood](https://www.wowhead.com/forever/item=5193) | 14 | 4.2% |
+| [Glowing Lizardscale Cloak](https://www.wowhead.com/forever/item=6449) | 14 | 4.2% |
+| [Pearl-clasped Cloak](https://www.wowhead.com/forever/item=5542) | 13 | 3.9% |
+| [Embossed Leather Cloak](https://www.wowhead.com/forever/item=2310) | 10 | 3.0% |
+| [Spiritwraith Drape](https://www.wowhead.com/forever/item=271097) | 9 | 2.7% |
+| [Fenrus' Hide](https://www.wowhead.com/forever/item=6340) | 8 | 2.4% |
+| [Goat Fur Cloak](https://www.wowhead.com/forever/item=2905) | 8 | 2.4% |
 
 ## Chest
 
-76 of 119 players with this slot filled · 49% enchanted · 30 distinct items
+334 of 385 players with this slot filled · 49% enchanted · 103 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Armor of the Fang](https://www.wowhead.com/forever/item=6473) | 7 | 9.2% |
-| [Mutant Scale Breastplate](https://www.wowhead.com/forever/item=6627) | 7 | 9.2% |
-| [Bloodied Chestwraps](https://www.wowhead.com/forever/item=271212) | 6 | 7.9% |
-| [Blackened Defias Armor](https://www.wowhead.com/forever/item=10399) | 5 | 6.6% |
-| [Robe of Evocation](https://www.wowhead.com/forever/item=14150) | 5 | 6.6% |
-| [Abomination Bones](https://www.wowhead.com/forever/item=271205) | 4 | 5.3% |
-| [Fine Leather Tunic](https://www.wowhead.com/forever/item=4243) | 4 | 5.3% |
-| [Barbaric Linen Vest](https://www.wowhead.com/forever/item=2578) | 3 | 3.9% |
-| [Dreamer's Chestguard](https://www.wowhead.com/forever/item=270043) | 3 | 3.9% |
-| [Handstitched Leather Vest](https://www.wowhead.com/forever/item=5957) | 3 | 3.9% |
+| [Tunic of Westfall](https://www.wowhead.com/forever/item=2041) | 27 | 8.1% |
+| [Blackened Defias Armor](https://www.wowhead.com/forever/item=10399) | 18 | 5.4% |
+| [Armor of the Fang](https://www.wowhead.com/forever/item=6473) | 12 | 3.6% |
+| [Fine Leather Tunic](https://www.wowhead.com/forever/item=4243) | 12 | 3.6% |
+| [Handstitched Leather Vest](https://www.wowhead.com/forever/item=5957) | 11 | 3.3% |
+| [Mutant Scale Breastplate](https://www.wowhead.com/forever/item=6627) | 10 | 3.0% |
+| [Abomination Bones](https://www.wowhead.com/forever/item=271205) | 9 | 2.7% |
+| [Robes of the Disgraced Thane](https://www.wowhead.com/forever/item=270261) | 9 | 2.7% |
+| [Rough Copper Vest](https://www.wowhead.com/forever/item=10421) | 9 | 2.7% |
+| [Bloodied Chestwraps](https://www.wowhead.com/forever/item=271212) | 8 | 2.4% |
 
 ## Wrist
 
-84 of 119 players with this slot filled · 21% enchanted · 18 distinct items
+335 of 385 players with this slot filled · 22% enchanted · 73 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Tabitha's Cuffs](https://www.wowhead.com/forever/item=251486) | 18 | 21.4% |
-| [Spare Part Bindings](https://www.wowhead.com/forever/item=279875) | 11 | 13.1% |
-| [Featherbead Bracers](https://www.wowhead.com/forever/item=15452) | 9 | 10.7% |
-| [Savannah Bracers](https://www.wowhead.com/forever/item=15453) | 7 | 8.3% |
-| [Cultist's Armguards](https://www.wowhead.com/forever/item=270032) | 5 | 6.0% |
-| [Light Leather Bracers](https://www.wowhead.com/forever/item=7281) | 5 | 6.0% |
-| [Witherbite Bracers](https://www.wowhead.com/forever/item=271202) | 5 | 6.0% |
-| [Green Linen Bracers](https://www.wowhead.com/forever/item=4308) | 4 | 4.8% |
-| [Sandrunner Wristguards](https://www.wowhead.com/forever/item=4928) | 4 | 4.8% |
-| [Garrison Cuffs](https://www.wowhead.com/forever/item=270003) | 3 | 3.6% |
+| [Bravo's Armbands](https://www.wowhead.com/forever/item=270015) | 27 | 8.1% |
+| [Light Leather Bracers](https://www.wowhead.com/forever/item=7281) | 24 | 7.2% |
+| [Aetherwisp Bracers](https://www.wowhead.com/forever/item=271096) | 21 | 6.3% |
+| [Tabitha's Cuffs](https://www.wowhead.com/forever/item=251486) | 18 | 5.4% |
+| [Cryptwalker Bracers](https://www.wowhead.com/forever/item=280095) | 16 | 4.8% |
+| [Cultist's Armguards](https://www.wowhead.com/forever/item=270032) | 16 | 4.8% |
+| [Bandsaw Wristbands](https://www.wowhead.com/forever/item=273293) | 12 | 3.6% |
+| [Green Linen Bracers](https://www.wowhead.com/forever/item=4308) | 11 | 3.3% |
+| [Spare Part Bindings](https://www.wowhead.com/forever/item=279875) | 11 | 3.3% |
+| [Witherbite Bracers](https://www.wowhead.com/forever/item=271202) | 11 | 3.3% |
 
 ## Hands
 
-82 of 119 players with this slot filled · 23% enchanted · 23 distinct items
+337 of 385 players with this slot filled · 34% enchanted · 93 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Blight Gloves](https://www.wowhead.com/forever/item=279877) | 12 | 14.6% |
-| [Gloves of the Fang](https://www.wowhead.com/forever/item=10413) | 12 | 14.6% |
-| [Tattered Mittens](https://www.wowhead.com/forever/item=270030) | 11 | 13.4% |
-| [Grip of Fear](https://www.wowhead.com/forever/item=271208) | 7 | 8.5% |
-| [Dagmire Gauntlets](https://www.wowhead.com/forever/item=6481) | 5 | 6.1% |
-| [Embossed Leather Gloves](https://www.wowhead.com/forever/item=4239) | 4 | 4.9% |
-| [Veiled Grips](https://www.wowhead.com/forever/item=4940) | 4 | 4.9% |
-| [Lupine Handwraps of the Monkey](https://www.wowhead.com/forever/item=15016) | 3 | 3.7% |
-| [Naga Battle Gloves](https://www.wowhead.com/forever/item=888) | 3 | 3.7% |
-| [Nimble Leather Gloves](https://www.wowhead.com/forever/item=7285) | 3 | 3.7% |
+| [Embossed Leather Gloves](https://www.wowhead.com/forever/item=4239) | 25 | 7.4% |
+| [Gloves of the Fang](https://www.wowhead.com/forever/item=10413) | 24 | 7.1% |
+| [Heavy Linen Gloves](https://www.wowhead.com/forever/item=4307) | 18 | 5.3% |
+| [Tomb Robber's Gloves](https://www.wowhead.com/forever/item=280096) | 18 | 5.3% |
+| [Runed Copper Gauntlets](https://www.wowhead.com/forever/item=3472) | 15 | 4.5% |
+| [Blight Gloves](https://www.wowhead.com/forever/item=279877) | 12 | 3.6% |
+| [Grip of Fear](https://www.wowhead.com/forever/item=271208) | 11 | 3.3% |
+| [Tattered Mittens](https://www.wowhead.com/forever/item=270030) | 11 | 3.3% |
+| [Nimble Leather Gloves](https://www.wowhead.com/forever/item=7285) | 10 | 3.0% |
+| [Wolf Handler Gloves](https://www.wowhead.com/forever/item=6171) | 10 | 3.0% |
 
 ## Waist
 
-79 of 119 players with this slot filled · 0% enchanted · 24 distinct items
+332 of 385 players with this slot filled · 0% enchanted · 85 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Novice Arcanist's Sash](https://www.wowhead.com/forever/item=253885) | 10 | 12.7% |
-| [Belt of the Fang](https://www.wowhead.com/forever/item=10412) | 9 | 11.4% |
-| [Tuskwrap Belt](https://www.wowhead.com/forever/item=271210) | 8 | 10.1% |
-| [Binding Girdle](https://www.wowhead.com/forever/item=5275) | 7 | 8.9% |
-| [Belt of Blades](https://www.wowhead.com/forever/item=263405) | 6 | 7.6% |
-| [Runed Copper Belt](https://www.wowhead.com/forever/item=2857) | 6 | 7.6% |
-| [Atrophic Girdle](https://www.wowhead.com/forever/item=271201) | 5 | 6.3% |
-| [Handstitched Leather Belt](https://www.wowhead.com/forever/item=4237) | 5 | 6.3% |
-| [Cobrahn's Grasp](https://www.wowhead.com/forever/item=6460) | 3 | 3.8% |
-| [Fine Leather Belt](https://www.wowhead.com/forever/item=4246) | 3 | 3.8% |
+| [Novice Arcanist's Sash](https://www.wowhead.com/forever/item=253885) | 30 | 9.0% |
+| [Runed Copper Belt](https://www.wowhead.com/forever/item=2857) | 23 | 6.9% |
+| [Dusty Belt](https://www.wowhead.com/forever/item=279897) | 21 | 6.3% |
+| [Belt of the Fang](https://www.wowhead.com/forever/item=10412) | 15 | 4.5% |
+| [Handstitched Leather Belt](https://www.wowhead.com/forever/item=4237) | 14 | 4.2% |
+| [Blackened Defias Belt](https://www.wowhead.com/forever/item=10403) | 13 | 3.9% |
+| [Fine Leather Belt](https://www.wowhead.com/forever/item=4246) | 12 | 3.6% |
+| [Tuskwrap Belt](https://www.wowhead.com/forever/item=271210) | 11 | 3.3% |
+| [Dark Leather Belt](https://www.wowhead.com/forever/item=4249) | 10 | 3.0% |
+| [Atrophic Girdle](https://www.wowhead.com/forever/item=271201) | 9 | 2.7% |
 
 ## Legs
 
-80 of 119 players with this slot filled · 23% enchanted · 22 distinct items
+339 of 385 players with this slot filled · 33% enchanted · 97 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Ghastly Trousers](https://www.wowhead.com/forever/item=15449) | 13 | 16.3% |
-| [Gargoyle Leggings](https://www.wowhead.com/forever/item=15451) | 9 | 11.3% |
-| [Slick Deviate Leggings](https://www.wowhead.com/forever/item=6480) | 8 | 10.0% |
-| [Leggings of the Fang](https://www.wowhead.com/forever/item=10410) | 7 | 8.8% |
-| [Rotmender's Leggings](https://www.wowhead.com/forever/item=271207) | 7 | 8.8% |
-| [Handstitched Linen Britches](https://www.wowhead.com/forever/item=4309) | 6 | 7.5% |
-| [Dredgemire Leggings](https://www.wowhead.com/forever/item=15450) | 5 | 6.3% |
-| [Handstitched Leather Pants](https://www.wowhead.com/forever/item=2303) | 5 | 6.3% |
-| [Bonerust Leggings](https://www.wowhead.com/forever/item=271209) | 4 | 5.0% |
-| [Runed Copper Pants](https://www.wowhead.com/forever/item=3473) | 2 | 2.5% |
+| [Leggings of the Fang](https://www.wowhead.com/forever/item=10410) | 18 | 5.3% |
+| [Chausses of Westfall](https://www.wowhead.com/forever/item=6087) | 17 | 5.0% |
+| [Handstitched Leather Pants](https://www.wowhead.com/forever/item=2303) | 14 | 4.1% |
+| [Ghastly Trousers](https://www.wowhead.com/forever/item=15449) | 13 | 3.8% |
+| [Handstitched Linen Britches](https://www.wowhead.com/forever/item=4309) | 13 | 3.8% |
+| [Ogre Loincloth](https://www.wowhead.com/forever/item=273289) | 13 | 3.8% |
+| [Duty Bound Leggings](https://www.wowhead.com/forever/item=279868) | 11 | 3.2% |
+| [Dwarven Leather Pants](https://www.wowhead.com/forever/item=61) | 11 | 3.2% |
+| [Slick Deviate Leggings](https://www.wowhead.com/forever/item=6480) | 11 | 3.2% |
+| [Gargoyle Leggings](https://www.wowhead.com/forever/item=15451) | 9 | 2.7% |
 
 ## Feet
 
-72 of 119 players with this slot filled · 29% enchanted · 36 distinct items
+328 of 385 players with this slot filled · 36% enchanted · 101 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Footpads of the Fang](https://www.wowhead.com/forever/item=10411) | 5 | 6.9% |
-| [Gemmed Copper Boots](https://www.wowhead.com/forever/item=250620) | 5 | 6.9% |
-| [Rotmender's Treads](https://www.wowhead.com/forever/item=271214) | 5 | 6.9% |
-| [Vilewalkers](https://www.wowhead.com/forever/item=271211) | 5 | 6.9% |
-| [Chasm Walkers](https://www.wowhead.com/forever/item=273007) | 4 | 5.6% |
-| [Soft-soled Linen Boots](https://www.wowhead.com/forever/item=4312) | 4 | 5.6% |
-| [Barbaric Cloth Boots](https://www.wowhead.com/forever/item=3307) | 3 | 4.2% |
-| [Grizzled Boots](https://www.wowhead.com/forever/item=6335) | 3 | 4.2% |
-| [Willow Boots of the Owl](https://www.wowhead.com/forever/item=6537) | 3 | 4.2% |
-| [Bard's Boots of the Eagle](https://www.wowhead.com/forever/item=6557) | 2 | 2.8% |
+| [Gemmed Copper Boots](https://www.wowhead.com/forever/item=250620) | 16 | 4.9% |
+| [Dark Leather Boots](https://www.wowhead.com/forever/item=252425) | 13 | 4.0% |
+| [Footpads of the Fang](https://www.wowhead.com/forever/item=10411) | 12 | 3.7% |
+| [Vilewalkers](https://www.wowhead.com/forever/item=271211) | 12 | 3.7% |
+| [Blackened Defias Boots](https://www.wowhead.com/forever/item=10402) | 11 | 3.4% |
+| [Frosthowl's Footwarmers](https://www.wowhead.com/forever/item=281322) | 10 | 3.0% |
+| [Spidersilk Boots](https://www.wowhead.com/forever/item=4320) | 10 | 3.0% |
+| [Willow Boots of the Owl](https://www.wowhead.com/forever/item=6537) | 10 | 3.0% |
+| [Ambassador's Boots](https://www.wowhead.com/forever/item=2033) | 9 | 2.7% |
+| [Dark Leather Boots](https://www.wowhead.com/forever/item=2315) | 8 | 2.4% |
 
 ## Rings
 
-102 of 119 players with this slot filled · 0% enchanted · 20 distinct items
+280 of 385 players with this slot filled · 0% enchanted · 48 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Seal of Sylvanas](https://www.wowhead.com/forever/item=6414) | 28 | 27.5% |
-| [Depleted Ritual Band](https://www.wowhead.com/forever/item=281268) | 26 | 25.5% |
-| [Slain Baron's Signet](https://www.wowhead.com/forever/item=279867) | 23 | 22.5% |
-| [Ancient Heirloom](https://www.wowhead.com/forever/item=264908) | 14 | 13.7% |
-| [Bounty Hunter's Ring](https://www.wowhead.com/forever/item=5351) | 11 | 10.8% |
-| [Loop of Sacrifice](https://www.wowhead.com/forever/item=281673) | 10 | 9.8% |
-| [Deep Fathom Ring](https://www.wowhead.com/forever/item=6463) | 8 | 7.8% |
-| [Band of the Fist](https://www.wowhead.com/forever/item=17694) | 5 | 4.9% |
-| [First Mate Band](https://www.wowhead.com/forever/item=284715) | 5 | 4.9% |
-| [Lavishly Jeweled Ring](https://www.wowhead.com/forever/item=1156) | 3 | 2.9% |
+| [Avala's Binding](https://www.wowhead.com/forever/item=286737) | 43 | 15.4% |
+| [Ancient Heirloom](https://www.wowhead.com/forever/item=264908) | 37 | 13.2% |
+| [Malignant Root](https://www.wowhead.com/forever/item=282283) | 35 | 12.5% |
+| [Slain Baron's Signet](https://www.wowhead.com/forever/item=279867) | 35 | 12.5% |
+| [Minor Channeling Ring](https://www.wowhead.com/forever/item=1449) | 30 | 10.7% |
+| [Seal of Sylvanas](https://www.wowhead.com/forever/item=6414) | 28 | 10.0% |
+| [Depleted Ritual Band](https://www.wowhead.com/forever/item=281268) | 26 | 9.3% |
+| [First Mate Band](https://www.wowhead.com/forever/item=284715) | 21 | 7.5% |
+| [Lavishly Jeweled Ring](https://www.wowhead.com/forever/item=1156) | 17 | 6.1% |
+| [Ring of Iron Will](https://www.wowhead.com/forever/item=1319) | 12 | 4.3% |
 
 ## Trinkets
 
-6 of 119 players with this slot filled · 0% enchanted · 4 distinct items
+49 of 385 players with this slot filled · 0% enchanted · 6 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Cursed Murloc Eye](https://www.wowhead.com/forever/item=273840) | 2 | 33.3% |
-| [Worgenbane Talisman](https://www.wowhead.com/forever/item=273643) | 2 | 33.3% |
-| [Lookie's Spyglass](https://www.wowhead.com/forever/item=273298) | 1 | 16.7% |
-| [Satchel of Potions](https://www.wowhead.com/forever/item=280766) | 1 | 16.7% |
+| [Lookie's Spyglass](https://www.wowhead.com/forever/item=273298) | 21 | 42.9% |
+| [Satchel of Potions](https://www.wowhead.com/forever/item=280766) | 20 | 40.8% |
+| [Worgenbane Talisman](https://www.wowhead.com/forever/item=273643) | 9 | 18.4% |
+| [Cursed Murloc Eye](https://www.wowhead.com/forever/item=273840) | 7 | 14.3% |
+| [Minor Recombobulator](https://www.wowhead.com/forever/item=4381) | 1 | 2.0% |
+| [Roogug's Severed Head](https://www.wowhead.com/forever/item=274152) | 1 | 2.0% |
 
 ## Main hand
 
-80 of 119 players with this slot filled · 13% enchanted · 32 distinct items
+338 of 385 players with this slot filled · 12% enchanted · 151 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Gnarled Necromancer's Staff](https://www.wowhead.com/forever/item=251534) | 12 | 15.0% |
-| [Wingblade](https://www.wowhead.com/forever/item=6504) | 8 | 10.0% |
-| [Crescent Staff](https://www.wowhead.com/forever/item=6505) | 7 | 8.8% |
-| [Hammerbone](https://www.wowhead.com/forever/item=270018) | 7 | 8.8% |
-| [Forsaken Greataxe](https://www.wowhead.com/forever/item=251533) | 6 | 7.5% |
-| [Kris of Orgrimmar](https://www.wowhead.com/forever/item=15443) | 4 | 5.0% |
-| [Hammer of Orgrimmar](https://www.wowhead.com/forever/item=15445) | 3 | 3.8% |
-| [Staff of Orgrimmar](https://www.wowhead.com/forever/item=15444) | 3 | 3.8% |
-| [Butcher's Cleaver](https://www.wowhead.com/forever/item=1292) | 2 | 2.5% |
-| [Coldspire Staff](https://www.wowhead.com/forever/item=271215) | 2 | 2.5% |
+| [Staff of Westfall](https://www.wowhead.com/forever/item=2042) | 17 | 5.0% |
+| [Gnarled Necromancer's Staff](https://www.wowhead.com/forever/item=251534) | 12 | 3.6% |
+| [Impaling Harpoon](https://www.wowhead.com/forever/item=5200) | 10 | 3.0% |
+| [Cruel Barb](https://www.wowhead.com/forever/item=5191) | 9 | 2.7% |
+| [Emberstone Staff](https://www.wowhead.com/forever/item=5201) | 9 | 2.7% |
+| [Heavy Copper Maul](https://www.wowhead.com/forever/item=6214) | 8 | 2.4% |
+| [Wingblade](https://www.wowhead.com/forever/item=6504) | 8 | 2.4% |
+| [Buzz Saw](https://www.wowhead.com/forever/item=1937) | 7 | 2.1% |
+| [Crescent Staff](https://www.wowhead.com/forever/item=6505) | 7 | 2.1% |
+| [Hammerbone](https://www.wowhead.com/forever/item=270018) | 7 | 2.1% |
 
 ## Off hand
 
-22 of 119 players with this slot filled · 9% enchanted · 14 distinct items
+115 of 385 players with this slot filled · 11% enchanted · 59 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Butcher's Cleaver](https://www.wowhead.com/forever/item=1292) | 4 | 18.2% |
-| [Plaguefang](https://www.wowhead.com/forever/item=279876) | 4 | 18.2% |
-| [Kresh's Back](https://www.wowhead.com/forever/item=13245) | 2 | 9.1% |
-| [Mirror of Rath'mael](https://www.wowhead.com/forever/item=271213) | 2 | 9.1% |
-| [Blade of Cunning](https://www.wowhead.com/forever/item=7298) | 1 | 4.5% |
-| [Carving Knife of the Monkey](https://www.wowhead.com/forever/item=2140) | 1 | 4.5% |
-| [Commander's Crest](https://www.wowhead.com/forever/item=6320) | 1 | 4.5% |
-| [Curved Dagger of the Gorilla](https://www.wowhead.com/forever/item=2632) | 1 | 4.5% |
-| [Edward's Knife](https://www.wowhead.com/forever/item=251485) | 1 | 4.5% |
-| [Eerie Stable Lantern](https://www.wowhead.com/forever/item=6341) | 1 | 4.5% |
+| [Arctic Buckler](https://www.wowhead.com/forever/item=7002) | 7 | 6.1% |
+| [Ironplate Buckler](https://www.wowhead.com/forever/item=3160) | 7 | 6.1% |
+| [Stone Buckler](https://www.wowhead.com/forever/item=2900) | 7 | 6.1% |
+| [Butcher's Cleaver](https://www.wowhead.com/forever/item=1292) | 6 | 5.2% |
+| [Dwarven Tome](https://www.wowhead.com/forever/item=279898) | 6 | 5.2% |
+| [Thief's Blade](https://www.wowhead.com/forever/item=5192) | 6 | 5.2% |
+| [Commander's Crest](https://www.wowhead.com/forever/item=6320) | 4 | 3.5% |
+| [Plaguefang](https://www.wowhead.com/forever/item=279876) | 4 | 3.5% |
+| [Dwarven Kite Shield](https://www.wowhead.com/forever/item=6176) | 3 | 2.6% |
+| [Kresh's Back](https://www.wowhead.com/forever/item=13245) | 3 | 2.6% |
 
 ## Ranged
 
-62 of 119 players with this slot filled · 2% enchanted · 15 distinct items
+224 of 385 players with this slot filled · 6% enchanted · 50 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Sizzle Stick](https://www.wowhead.com/forever/item=8071) | 15 | 24.2% |
-| [Totem of Charged Flames](https://www.wowhead.com/forever/item=263412) | 12 | 19.4% |
-| [Idol of Shifting Tides](https://www.wowhead.com/forever/item=263411) | 11 | 17.7% |
-| [Dull Sawblade](https://www.wowhead.com/forever/item=285292) | 4 | 6.5% |
-| [Lesser Magic Wand](https://www.wowhead.com/forever/item=11287) | 4 | 6.5% |
-| [Greater Magic Wand](https://www.wowhead.com/forever/item=11288) | 3 | 4.8% |
-| [Venomstrike](https://www.wowhead.com/forever/item=6469) | 3 | 4.8% |
-| [Compact Shotgun](https://www.wowhead.com/forever/item=4577) | 2 | 3.2% |
-| [Keen Throwing Knife](https://www.wowhead.com/forever/item=3107) | 2 | 3.2% |
-| [Balanced Throwing Dagger](https://www.wowhead.com/forever/item=2946) | 1 | 1.6% |
+| [Sizzle Stick](https://www.wowhead.com/forever/item=8071) | 27 | 12.1% |
+| [Dull Sawblade](https://www.wowhead.com/forever/item=285292) | 19 | 8.5% |
+| [Totem of Charged Flames](https://www.wowhead.com/forever/item=263412) | 17 | 7.6% |
+| [Greater Magic Wand](https://www.wowhead.com/forever/item=11288) | 16 | 7.1% |
+| [Deepblaze](https://www.wowhead.com/forever/item=279896) | 13 | 5.8% |
+| [Lesser Magic Wand](https://www.wowhead.com/forever/item=11287) | 13 | 5.8% |
+| [Calibrated Blunderbuss](https://www.wowhead.com/forever/item=279894) | 11 | 4.9% |
+| [Idol of Shifting Tides](https://www.wowhead.com/forever/item=263411) | 11 | 4.9% |
+| [Harvester's Pestslayer](https://www.wowhead.com/forever/item=276695) | 9 | 4.0% |
+| [Venomstrike](https://www.wowhead.com/forever/item=6469) | 9 | 4.0% |
 
 ## Shirt
 
-80 of 119 players with this slot filled · 0% enchanted · 17 distinct items
+299 of 385 players with this slot filled · 0% enchanted · 34 distinct items
 
 | Item | Players | % |
 | --- | --- | --- |
-| [Brawler's Harness](https://www.wowhead.com/forever/item=6125) | 17 | 21.3% |
-| [Deckhand's Shirt](https://www.wowhead.com/forever/item=5107) | 8 | 10.0% |
-| [Thendal Survivalist's Shirt](https://www.wowhead.com/forever/item=271668) | 8 | 10.0% |
-| [Neophyte's Shirt](https://www.wowhead.com/forever/item=53) | 7 | 8.8% |
-| [Primitive Mantle](https://www.wowhead.com/forever/item=154) | 7 | 8.8% |
-| [Thendal Novice's Shirt](https://www.wowhead.com/forever/item=271663) | 7 | 8.8% |
-| [Trapper's Shirt](https://www.wowhead.com/forever/item=127) | 6 | 7.5% |
-| [Airy Windseeker's Shirt](https://www.wowhead.com/forever/item=273815) | 3 | 3.8% |
-| [Apprentice's Shirt](https://www.wowhead.com/forever/item=6096) | 3 | 3.8% |
-| [Grove Scoundrel's Shirt](https://www.wowhead.com/forever/item=271675) | 3 | 3.8% |
+| [Red Linen Shirt](https://www.wowhead.com/forever/item=2575) | 39 | 13.0% |
+| [Primitive Mantle](https://www.wowhead.com/forever/item=154) | 26 | 8.7% |
+| [Rugged Trapper's Shirt](https://www.wowhead.com/forever/item=148) | 23 | 7.7% |
+| [Thendal Survivalist's Shirt](https://www.wowhead.com/forever/item=271668) | 22 | 7.4% |
+| [Apprentice's Shirt](https://www.wowhead.com/forever/item=6096) | 17 | 5.7% |
+| [Brawler's Harness](https://www.wowhead.com/forever/item=6125) | 17 | 5.7% |
+| [Neophyte's Shirt](https://www.wowhead.com/forever/item=53) | 17 | 5.7% |
+| [Squire's Shirt](https://www.wowhead.com/forever/item=45) | 16 | 5.4% |
+| [Footpad's Shirt](https://www.wowhead.com/forever/item=49) | 10 | 3.3% |
+| [Acolyte's Shirt](https://www.wowhead.com/forever/item=6097) | 9 | 3.0% |
 
-Page generated: 2026-10-03 02:36Z
+## Tabard
+
+10 of 385 players with this slot filled · 0% enchanted · 1 distinct item
+
+| Item | Players | % |
+| --- | --- | --- |
+| [Guild Tabard](https://www.wowhead.com/forever/item=5976) | 10 | 100.0% |
+
+Page generated: 2026-10-04 00:20Z
