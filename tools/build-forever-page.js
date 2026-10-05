@@ -4,9 +4,11 @@
 // publishes it to Cloudflare Pages.
 //
 //   node tools/build-forever-page.js                 build pages/ only
-//   node tools/build-forever-page.js --deploy        build, then publish
+//   node tools/build-forever-page.js --deploy --project=NAME   build, then publish
 //   node tools/build-forever-page.js --url=http://127.0.0.1:8799
-//   node tools/build-forever-page.js --out=pages --project=wowcensus
+//
+// wowcensus.io now serves the pure static static/ build from the "wowcensus"
+// project, so --deploy needs an explicit --project and refuses that one.
 //
 // Data comes from the live Worker API (/api/forever, /api/games, /api/items)
 // and is rendered with the same modules the Worker uses (site/src/census.mjs,
@@ -45,7 +47,14 @@ const flag = (name) => args.includes("--" + name);
 const base = (arg("url", "https://marketlens.skarz.workers.dev") || "").replace(/\/+$/, "");
 const repo = path.resolve(__dirname, "..");
 const SOURCE_GAME = arg("source", "classic-beta");
-const project = arg("project", "wowcensus");
+const project = arg("project", "");
+// This bundle must never replace the static site served by the wowcensus project.
+const PRODUCTION_PROJECT = "wowcensus";
+if (flag("deploy") && (!project || project.toLowerCase() === PRODUCTION_PROJECT)) {
+  console.error("Refusing to deploy pages/: --project=" + PRODUCTION_PROJECT + " serves wowcensus.io from " +
+    "static/ (tools/LOCAL_STATIC.md). Pass --project=<another Pages project>.");
+  process.exit(1);
+}
 
 // Edition config, data shaping and page rendering live in site/src/edition.mjs,
 // shared with the edge renderer in pages/_worker.js. Loaded in main().
@@ -292,7 +301,7 @@ async function main() {
   console.log("Wrote " + rel + "/{index.html,combos.html,auctionhouse.html,guilds.html,geography.html,talents.html,gear.html," + cssName + ",census.json,inspects.json}");
 
   if (!flag("deploy")) {
-    console.log("Publish it with:  node tools/build-forever-page.js --deploy");
+    console.log("Publish it with:  node tools/build-forever-page.js --deploy --project=<non-production project>");
     return;
   }
   console.log("\nDeploying to Cloudflare Pages project \"" + project + "\" ...");

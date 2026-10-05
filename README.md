@@ -31,7 +31,8 @@ MarketLens/   the in-game addon — drop this folder into Interface/AddOns
   Libs/       embedded LibStub + LibAHTab (native AH tab on modern clients)
 site/         Cloudflare Worker, D1 schema, and static frontend
 tools/        out-of-game scripts (realm/population upload, data builders)
-pages/        generated static census bundle (drag-and-drop to Cloudflare Pages)
+static/       generated pure static site served at wowcensus.io (gitignored)
+pages/        legacy Worker-backed census bundle (no longer deployed to wowcensus.io)
 archive/      early prototypes
 ```
 
@@ -287,10 +288,26 @@ chart grouped by faction and a class chart per faction, counting **unique
 characters** rather than sightings so the faction that happened to get more
 `/who` scans doesn't gain share from the extra scans alone.
 
-### Static bundle (`pages/` -> wowcensus.io)
+### Static site (`static/` -> wowcensus.io)
 
-The beta views also ship as a standalone bundle with no Worker and no database
-behind it, published at **https://wowcensus.io**:
+**https://wowcensus.io** serves `static/`, a pure static build with no Pages
+Function, KV, or database behind it. `tools/refresh-local-static.py` builds it
+from a local SQLite snapshot via `tools/build-static-site.mjs`; see
+`tools/LOCAL_STATIC.md` for the capture, build, and deploy steps. The root
+`wrangler.toml` points the `wowcensus` Pages project at `./static`.
+
+The build writes `static/_headers`: each HTML page gets its own
+`Cache-Control: public, max-age=300` rule (Pages serves pages at extensionless
+URLs that a `/*.html` rule would not match), fingerprinted CSS and fonts are
+immutable, and JSON is cached for five minutes.
+
+### Legacy bundle (`pages/`)
+
+> wowcensus.io no longer serves this bundle. `--deploy` below still targets the
+> `wowcensus` project and would replace the static site, so pass `--project=`
+> for anything else or don't deploy it.
+
+The beta views also ship as a Worker-backed bundle:
 
 ```bash
 npm ci --prefix site                     # install build dependencies
@@ -316,8 +333,8 @@ pages, `Accept: text/markdown` selects the Markdown variant; requests without
 that header continue to receive the same HTML. Only content-page routes invoke
 the Pages Function. Deploy the complete `pages/` directory after rebuilding.
 
-`--deploy` runs `wrangler pages deploy` against the `wowcensus` project (config
-and the `PAGES_KV` binding live in the root `wrangler.toml`), then republishes
+`--deploy` runs `wrangler pages deploy pages` against the `wowcensus` project
+(the root `wrangler.toml` no longer carries its `PAGES_KV` binding), then republishes
 every edition to KV. `--url=` builds against a different origin (a local
 `wrangler dev`, say), `--out=` writes elsewhere, and `--project=` targets
 another Pages project.
