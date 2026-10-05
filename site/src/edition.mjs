@@ -1,11 +1,5 @@
-// wowcensus.io edition pages: edition config, the data shaping that turns the
-// Worker API's census/items/inspects into per-page models, and the renderers
-// that turn a page model into HTML. Shared by tools/build-forever-page.js (static
-// bundle) and pages/_worker.js (edge rendering from published snapshots), so
-// both produce byte-identical pages from the same data.
-//
-// Page models are plain JSON so they can be published to KV and rendered later
-// by whatever layout code is deployed at that time.
+// wowcensus.io edition pages: edition config, data shaping, and HTML renderers
+// used by the local static site builder.
 
 import { renderCensusHtml, renderComboBreakdownHtml, realmName } from "./census.mjs";
 import { renderMarketHtml } from "./market.mjs";
@@ -18,17 +12,17 @@ export const SITE_ORIGIN = "https://wowcensus.io";
 export const PAGES = ["index", "combos", "auctionhouse", "guilds", "geography", "talents", "gear"];
 
 export const EDITIONS = {
-  "classic-beta": { dir: "pages", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever", title: "WoW Forever & Classic+ Population Census – WoWCensus", description: "WoWCensus - World of Warcraft: Forever and Classic+ population tracker. Realm population, faction balance, and race/class breakdowns from in-game /who scans.", comboBlurb: "Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta." },
-  "classic-progression": { dir: "pages/tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc", comboBlurb: "TBC Anniversary’s smaller era roster makes race and class choices a direct view of the currently visible progression community." },
-  classic: { dir: "pages/classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic", comboBlurb: "Classic Era keeps the original-era roster, so the mix reflects the characters currently active in its long-lived realms rather than modern class availability." },
-  sod: { dir: "pages/sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic", comboBlurb: "Season of Discovery class balance and player activity can shift sharply between phases, so treat the mix as a current activity signal rather than a durable meta ranking." },
-  "mop-classic": { dir: "pages/mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", flavor: "mop-classic", branch: "mop-classic", comboBlurb: "MoP Classic includes its era-specific roster and progression, so the mix captures who is visibly active during this phase rather than a prediction of endgame demand." },
-  retail: { dir: "pages/retail", label: "Retail", nav: "Retail", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity", comboBlurb: "Retail’s broad modern roster and cross-faction play make this a view of the current population mix." },
+  "classic-beta": { dir: "", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever", title: "WoW Forever & Classic+ Population Census – WoWCensus", description: "WoWCensus - World of Warcraft: Forever and Classic+ population tracker. Realm population, faction balance, and race/class breakdowns from in-game /who scans.", comboBlurb: "Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta." },
+  "classic-progression": { dir: "tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc", comboBlurb: "TBC Anniversary’s smaller era roster makes race and class choices a direct view of the currently visible progression community." },
+  classic: { dir: "classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic", comboBlurb: "Classic Era keeps the original-era roster, so the mix reflects the characters currently active in its long-lived realms rather than modern class availability." },
+  sod: { dir: "sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic", comboBlurb: "Season of Discovery class balance and player activity can shift sharply between phases, so treat the mix as a current activity signal rather than a durable meta ranking." },
+  "mop-classic": { dir: "mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", flavor: "mop-classic", branch: "mop-classic", comboBlurb: "MoP Classic includes its era-specific roster and progression, so the mix captures who is visibly active during this phase rather than a prediction of endgame demand." },
+  retail: { dir: "retail", label: "Retail", nav: "Retail", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity", comboBlurb: "Retail’s broad modern roster and cross-faction play make this a view of the current population mix." },
 };
 
 // URL directory of an edition ("/" for Forever, "/tbc/" ...), and the reverse.
 export function editionPath(source) {
-  const dir = EDITIONS[source].dir.replace(/^pages\/?/, "");
+  const dir = EDITIONS[source].dir;
   return dir ? "/" + dir + "/" : "/";
 }
 

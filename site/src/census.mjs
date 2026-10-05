@@ -1,13 +1,7 @@
-// Shared rendering for the Forever (Beta) cross-faction census.
-//
-// Two things draw this page: the Worker (/wowforever, live from D1) and
-// tools/build-forever-page.js, which bakes the same markup into a static
-// pages/ bundle for drag-and-drop hosting. Both call renderCensusHtml with the
-// same census object so the two never drift apart -- only the links and the
-// stylesheet path differ.
+// Shared rendering for the Forever (Beta) cross-faction census in the static build.
 
 // Race/class shares cover characters seen in this many days of census /who
-// queries (see loadCensus in worker.js).
+// queries (see loadCensus in tools/local-site-data.mjs).
 export const CENSUS_WINDOW_DAYS = 14;
 
 export function esc(s) {
@@ -428,9 +422,8 @@ function renderCensusView(census, opts = {}) {
 
   let body;
   if (!total && !samples) {
-    body = '<div class="panel"><p class="hint">No ' + esc(opts.gameLabel || "WoW Forever") + ' population data uploaded yet. ' +
-      "In game, open the Population tab and press Scan Population (or /ml who), then run " +
-      "<code>upload-realm.ps1 -Flavor " + esc(opts.uploadFlavor || "classic-beta") + "</code>.</p></div>";
+    body = '<div class="panel"><p class="hint">No ' + esc(opts.gameLabel || "WoW Forever") + ' population data is in the current snapshot yet. ' +
+      "In game, open the Population tab and press Scan Population (or /ml who), then /reload and rebuild the local site snapshot.</p></div>";
   } else {
     // Race chart: every faction's races in one chart, grouped by faction and
     // scaled against the single largest race so the faction blocks compare.

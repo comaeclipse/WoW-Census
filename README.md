@@ -10,9 +10,9 @@ halves:
   **Opportunity** — a "Bloomberg terminal" style view of the economy. It also
   samples the online population via `/who` (class, race, an inferred profession
   demand ranking, and unique/returning-character metrics).
-- **The companion website** (`site/`) — a Cloudflare Worker backed by a D1
-  database. It ingests realm snapshots and population samples uploaded from the
-  addon and renders per-item price/sale-rate history and realm population views.
+- **The companion website** (`static/`) — pre-rendered pages built from local
+  SQLite snapshots and published to Cloudflare Pages. Collection comes from
+  the addon's SavedVariables files.
 
 Everything is collected from the game's own APIs. WoW-Census is rigorous about
 never claiming data it cannot observe — see *What it measures* below.
@@ -29,10 +29,11 @@ MarketLens/   the in-game addon — drop this folder into Interface/AddOns
   UI/         MainFrame (drill-down engine), tables, Population, Tooltips, Minimap
   Utils/      Tables (stats), Money (copper formatting)
   Libs/       embedded LibStub + LibAHTab (native AH tab on modern clients)
-site/         Cloudflare Worker, D1 schema, and static frontend
-tools/        out-of-game scripts (realm/population upload, data builders)
-static/       generated pure static site served at wowcensus.io (gitignored)
-pages/        legacy Worker-backed census bundle (no longer deployed to wowcensus.io)
+site/src/     shared page renderers and inspect/census model code
+site/public/  stylesheet, fonts, and favicons for the static build
+tools/        local snapshot import, site builders, and verification
+static/       generated static site served at wowcensus.io (gitignored)
+assets/       mirrored site images used by the static builder
 archive/      early prototypes
 ```
 
@@ -141,16 +142,7 @@ or for the Auction House to close; it does not invent a client-side timeout.
 ### Retail data workflow
 
 `/reload`, open the Retail Auction House, run `/ml scan`, and wait for the
-summary scan to complete. Run `/reload` again to flush the export to disk. To
-send that realm snapshot to the companion site:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\upload-realm.ps1 -Flavor retail
-```
-
-Use `-Flavor tbc-anniversary` for TBC Anniversary, `-Flavor classic-era` for
-Classic Era, or `-Flavor retail` for Retail. `-Flavor classic` is retained as a
-legacy alias for TBC Anniversary uploads.
+summary scan to complete. Run `/reload` again to flush the export to disk. To update the companion site, follow `upload.md`: capture the SavedVariables into a local SQLite snapshot, rebuild `static/`, verify it, then deploy the static directory.
 
 The first scan immediately supplies market, minimum buyout, quantity, and
 saturation. Demand, local supply, and price trends become meaningful after
@@ -274,19 +266,13 @@ demand ranking, and that's expected, not a bug.
 Snapshots are stored compactly (`t,q,a,s,l,m,w,tc`) per item, capped by retention,
 to keep `SavedVariables` small.
 
-## Companion website (`site/`)
+## Companion website
 
-The `site/` folder is a Cloudflare Worker plus a D1 schema (`site/schema.sql`) and
-a static frontend. It receives realm snapshots and `/who` population samples
-uploaded by `tools/upload-realm.ps1`, stores latest-value and day-bucketed
-history rows per item, and serves per-item price/sale-rate history and realm
-population/census views. Item links and icons follow the correct Wowhead branch
-(Retail vs Classic Era/TBC Anniversary) based on each dataset's recorded flavor.
-
-`/wowforever` is a cross-faction census for the Forever (Beta) realms: one race
-chart grouped by faction and a class chart per faction, counting **unique
-characters** rather than sightings so the faction that happened to get more
-`/who` scans doesn't gain share from the extra scans alone.
+The website is generated locally from a verified SQLite snapshot. New data is
+collected in WoW and saved to `MarketLens.lua` and `NameplateInspect.lua`.
+`tools/refresh-local-static.py` merges those files with the historical D1
+snapshot, then renders all six editions. `tools/local-site-data.mjs` runs
+read-only SQLite queries during the build; no site Worker or live API is used.
 
 ### Static site (`static/` -> wowcensus.io)
 
@@ -301,119 +287,23 @@ The build writes `static/_headers`: each HTML page gets its own
 URLs that a `/*.html` rule would not match), fingerprinted CSS and fonts are
 immutable, and JSON is cached for five minutes.
 
-### Legacy bundle (`pages/`)
+### Retired paths
 
-> wowcensus.io no longer serves this bundle. `--deploy` below still targets the
-> `wowcensus` project and would replace the static site, so pass `--project=`
-> for anything else or don't deploy it.
+The retired `pages/` output is removed from the checkout. The previous D1
+import API, KV publisher, and Pages Function have been removed from the build.
+The `www` hostname still needs a Cloudflare Redirect Rule before its existing
+redirect Worker can be retired in Cloudflare.
 
-The beta views also ship as a Worker-backed bundle:
-
-```bash
-npm ci --prefix site                     # install build dependencies
-node tools/build-forever-page.js            # build pages/ only
-node tools/build-forever-page.js --deploy   # build, then publish to Pages
-```
-
-It reads the live data from `/api/census`, `/api/inspects`, `/api/games`, and
-`/api/items`, shapes and renders it with `site/src/edition.mjs` (on top of the
-Worker's own render modules, so the copies can't drift), writing:
-
-| File | Page |
-| --- | --- |
-| `pages/index.html` | the cross-faction census |
-| `pages/auctionhouse.html` | `/auctionhouse` — biggest markets, most listed items, most expensive listings |
-| `pages/style.<hash>.css`, `pages/census.json` | immutable fingerprinted stylesheet and raw census numbers |
-| `pages/robots.txt`, `pages/sitemap.xml` | crawler policy and clean canonical route discovery |
-| `pages/_headers` | Pages caching rules for HTML, JSON, and fingerprinted assets |
-| `pages/*.md`, `pages/<edition>/*.md` | content-only Markdown variants for agents |
-
-The build also writes `pages/_worker.js` and `pages/_routes.json`. On content
-pages, `Accept: text/markdown` selects the Markdown variant; requests without
-that header continue to receive the same HTML. Only content-page routes invoke
-the Pages Function. Deploy the complete `pages/` directory after rebuilding.
-
-`--deploy` runs `wrangler pages deploy pages` against the `wowcensus` project
-(the root `wrangler.toml` no longer carries its `PAGES_KV` binding), then republishes
-every edition to KV. `--url=` builds against a different origin (a local
-`wrangler dev`, say), `--out=` writes elsewhere, and `--project=` targets
-another Pages project.
-
-#### Fresh numbers without a redeploy
-
-Data and layout ship separately. A Pages deploy carries the layout (render code
-and CSS); the numbers come from KV:
-
-```bash
-node tools/publish-pages.js                              # every edition
-node tools/publish-pages.js --source=classic-progression # one edition
-```
-
-This renders each page (and its Markdown) from the live API and writes it to
-the `wowcensus-pages` KV namespace; `tools/upload-realm.ps1` runs it for the
-uploaded edition automatically (`-NoPublish` skips it). The Pages Function
-serves a KV page on its canonical path when the page was rendered with the
-deployed layout -- the hash in `pages/_layout.json`, from `tools/layout-id.js`
--- and the deploy's static file otherwise, so a page rendered by other layout
-code is never served. Each publish stores its pages under a new revision key
-that never changes, then flips a small `rev:<source>` pointer; the Pages
-Function re-reads only the pointer (about once a minute) and keeps page bodies
-in the edge cache indefinitely (`X-Page-Source: edge`, or `kv` on a cache
-miss). A publish is live within about a minute; old revisions expire after 30
-days.
-Rendering happens at publish time, not per request: shaping the auction-house
-model alone takes tens of milliseconds of CPU.
-
-## Status: v0.1 (MVP)
-
-Implemented: full scan, aggregation, snapshots, demand/saturation/opportunity,
-drill-down dashboard and tooltip integration, observed-population (`/who`)
-sampling with inferred profession demand, and the companion upload/site pipeline.
-
-**Not yet (v0.2):** crafting profitability (recipe cost vs. AH value), persisted
-price-depth ladders, multi-window trend badges (1h/6h/24h/7d), day-of-week seasonality.
-
-## Notes / tuning
-
-- `## Interface: 20506` targets TBC 2.5.6. If the client refuses to load the addon,
-  update this to your exact build (the client shows it under AddOns → "out of date").
-- The class/subclass fallback in `MarketLens/Data/Categories.lua` uses TBC 2.5.x
-  subclass numbering. If an item looks misfiled, add a curated override in
-  `MarketLens/Data/Items.lua` or adjust the mapping there.
-- Curated item IDs in `MarketLens/Data/Items.lua` cover the highest-value markets;
-  the fallback classifier handles everything else automatically.
-</content>
-</invoke>
-
-
-### Nearby inspected talent builds
-
-`NameplateInspect/` is the companion addon source. Install it beside MarketLens;
-MarketLens declares it as an optional dependency and consumes its cache without
-issuing competing inspect requests. The installed beta companion is also updated
-when developing against the local WoW installation. Reload WoW after addon edits.
-`/npi nearby` reports the current visible nameplates, unique player nameplates,
-players within inspect distance, and those WoW currently allows inspecting.
-`/npi diag` reports inspect requests and responses since the last reload.
-
-The companion's schema v2 keeps raw names, Forever surnames, player faction,
-verified same-realm context (otherwise unknown), observer context, locale and client
-build. Existing schema v1 cache records remain usable; missing realm/faction is not
+Inspection records retain verified same-realm context (otherwise unknown), observer
+context, locale and client build. Existing schema v1 cache records remain usable; missing realm/faction is not
 inferred from the observer. MarketLens copies contextual builds into its realm store.
-The uploader reads the companion SavedVariables file directly, preserving legacy
-records too. It does not import the old `specSamples` placeholder classifications.
+The local snapshot importer reads the companion SavedVariables file directly,
+preserving legacy records too. It does not import the old `specSamples`
+placeholder classifications.
 
-`tools/upload-realm.ps1 -Flavor classic-beta -Realm "Classic Beta PvE-Horde" -PopulationOnly`
-also imports the companion cache. This separate `ml-inspects-v1` upload never
-increments /who sightings. Reuploads are idempotent. Successful uploaded snapshots
-retain build history in D1; the addon itself stores the latest build per GUID.
-
-For a new database, apply `site/migrate-inspects.sql`, then
-`site/seed-forever-talents.sql` with Wrangler before deploying the Worker.
-`site/schema.sql` also includes the new tables. `/admin/import-inspects` uses the
-existing refresh token; `/api/inspects?source=classic-beta` exposes the latest build
-per GUID within 14 days of the newest collected inspection. Inspect timestamps,
-census timestamps and page generation times are separate.
+The local build imports inspection caches without incrementing /who sightings.
+`site/src/forever-talents.json` and the shared renderer classify talent builds
+from the imported inspect records.
 
 Forever spec IDs in the current cache identify classes, and the raw role field
 reports DAMAGER for every player. Neither field is used to classify builds or roles.
@@ -433,4 +323,4 @@ Talent popularity uses unique players with readable node data within each filter
 class; string-only builds are explicitly excluded. These nearby samples are not
 population-wide spec shares. Run `node --test tools/test-inspects.mjs` for identity,
 classification, validation, replay/history and HTML escaping checks. Rebuild all six
-editions and deploy the complete `pages/` tree.
+editions and deploy the verified `static/` directory.

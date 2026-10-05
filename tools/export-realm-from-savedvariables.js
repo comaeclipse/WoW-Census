@@ -9,6 +9,7 @@ const fs = require("node:fs");
 const input = process.argv[2];
 if (!input) throw new Error("usage: node export-realm-from-savedvariables.js <MarketLens.lua>");
 const { readSavedVariables } = require("./savedvariables.js");
+const { unpackCharacters } = require("./population-packed.js");
 const db = readSavedVariables(input);
 const realms = db.realms || {};
 if (process.argv.includes("--list-realms")) {
@@ -170,7 +171,10 @@ if (process.argv.includes("--sellers")) {
     });
   const characters = [];
   const observations = [];
-  for (const [key, c] of Object.entries((realm.population && realm.population.characters) || {})) {
+  const populationCharacters = realm.population?.charactersPacked
+    ? unpackCharacters(realm.population.charactersPacked)
+    : (realm.population?.characters || {});
+  for (const [key, c] of Object.entries(populationCharacters)) {
     characters.push({
       k: key, fn: c.fullName || c.name || key, n: c.name || "",
       first: c.firstName || "", last: c.lastName || "", r: c.realm || "",

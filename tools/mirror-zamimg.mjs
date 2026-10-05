@@ -1,5 +1,5 @@
 // Crawls every page on wowcensus.io and saves the zamimg.com assets it uses to
-// pages/assets/, mirroring the remote path (assets/wow.zamimg.com/images/...).
+// assets/, mirroring the remote path (assets/wow.zamimg.com/images/...).
 // Covers URLs written into the HTML and icons the page scripts build at runtime
 // from embedded data (gear item icons in both sizes, talent class icons).
 // Usage: node tools/mirror-zamimg.mjs [origin]
@@ -8,7 +8,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ORIGIN = (process.argv[2] || "https://wowcensus.io").replace(/\/$/, "");
-const OUT = join(dirname(fileURLToPath(import.meta.url)), "..", "pages", "assets");
+const OUT = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 const ICONS = "https://wow.zamimg.com/images/wow/icons/";
 
 async function text(url) {

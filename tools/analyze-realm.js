@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
-// Summarize what upload-realm.ps1 is about to send for one realm bucket, so a
-// scan can be sanity-checked before it goes to the site. Read-only: it shells
-// out to export-realm-from-savedvariables.js for the same payloads the uploader
-// builds and prints stats plus a "Flags" list of anything worth a second look.
+// Summarize one SavedVariables realm bucket before building a local snapshot.
+// Read-only: it shells out to export-realm-from-savedvariables.js and prints
+// stats plus a "Flags" list of anything worth a second look.
 //
 //   node tools/analyze-realm.js <MarketLens.lua> [--realm=Realm-Faction] [--flavor=tbc-anniversary]
 
@@ -22,7 +21,7 @@ const realmArg = opt("realm");
 const flavor = opt("flavor") || "tbc-anniversary";
 const helper = path.join(__dirname, "export-realm-from-savedvariables.js");
 
-// Mirrors of site/src/worker.js -- keep in sync if those change.
+// Historical import limits used when checking old saved scans.
 const TBC_MAX_ITEM_ID = 41000;
 const CURRENT_MAX_AGE_SECONDS = 48 * 60 * 60;
 

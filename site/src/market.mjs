@@ -178,9 +178,9 @@ function renderMarketView(snapshot, threshold, analysisLabel = "") {
 
   const body = items.length
     ? catPanel + '<div class="mktgrid">' + qtyTable + priceTable + "</div>" + (aggregateOnly ? "" : valueTable)
-    : '<div class="panel"><p class="hint">No auction scan uploaded for ' +
-      esc(realms.map(realmName).join(" · ") || "this faction") + ' yet. In game, run /ml scan at the auction house, ' +
-      '/reload, then upload with <code>upload-realm.ps1 -Flavor ' + esc(snapshot.uploadFlavor || "classic-beta") + '</code>.</p></div>';
+    : '<div class="panel"><p class="hint">No auction scan is in the current snapshot for ' +
+      esc(realms.map(realmName).join(" · ") || "this faction") +
+      ' yet. Run /ml scan at the auction house, /reload, then rebuild the local site snapshot.</p></div>';
 
   const jokePanel = joke.length
     ? topTable("Excluded as joke listings",

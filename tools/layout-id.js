@@ -1,13 +1,7 @@
 #!/usr/bin/env node
-// The layout identity of the wowcensus pages: a hash of the render modules and
-// the stylesheet. The static build writes it to pages/_layout.json (bundled into
-// pages/_worker.js), and tools/publish-pages.js stamps it on every page it
-// publishes to KV. The Pages worker serves a published page only when the two
-// match, so a page rendered by other layout code -- or pointing at a stylesheet
-// this deploy no longer carries -- is never served.
+// Content hash of the static site's render modules and stylesheet.
 //
 //   node tools/layout-id.js            print the current layout
-//   node tools/layout-id.js --write    write pages/_layout.json
 
 const fs = require("fs");
 const path = require("path");
@@ -35,14 +29,8 @@ function layout() {
   return { id: hash.digest("hex").slice(0, 12), css: cssName };
 }
 
-function writeLayout() {
-  const current = layout();
-  fs.writeFileSync(path.join(repo, "pages/_layout.json"), JSON.stringify(current) + "\n");
-  return current;
-}
-
-module.exports = { stylesheet, layout, writeLayout };
+module.exports = { stylesheet, layout };
 
 if (require.main === module) {
-  console.log(JSON.stringify(process.argv.includes("--write") ? writeLayout() : layout()));
+  console.log(JSON.stringify(layout()));
 }

@@ -1,4 +1,4 @@
-// Mechanical checks for DESIGN.md against the built static bundle in pages/.
+// Mechanical checks for DESIGN.md against the built static bundle in static/.
 // Run: node --test tools/test-design.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -11,7 +11,7 @@ const exists = (p) => fs.existsSync(new URL(p, root));
 const { css, name: cssName } = createRequire(import.meta.url)('./layout-id.js').stylesheet();
 const editions = { '': 'Forever', tbc: 'TBC Anniversary', classic: 'Classic Era', sod: 'SoD', mop: 'MoP Classic', retail: 'Retail' };
 const pages = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents', 'gear'];
-const files = Object.keys(editions).flatMap((dir) => pages.map((page) => ({ dir, page, file: 'pages/' + (dir ? dir + '/' : '') + page + '.html' })));
+const files = Object.keys(editions).flatMap((dir) => pages.map((page) => ({ dir, page, file: 'static/' + (dir ? dir + '/' : '') + page + '.html' })));
 const count = (html, re) => (html.match(re) || []).length;
 
 test('design tokens match DESIGN.md', () => {
@@ -31,7 +31,7 @@ test('no font face swaps in layout', () => {
 
 test('every edition ships every page', () => {
   for (const { file } of files) assert.ok(exists(file), file);
-  assert.ok(exists('pages/' + cssName), 'bundle is missing the current stylesheet ' + cssName);
+  assert.ok(exists('static/' + cssName), 'bundle is missing the current stylesheet ' + cssName);
 });
 
 for (const { dir, page, file } of files) {
@@ -39,7 +39,7 @@ for (const { dir, page, file } of files) {
     const html = read(file);
     assert.match(html, /^<!doctype html><html lang="en">/i);
     assert.match(html, /<meta name="viewport" content="width=device-width,initial-scale=1">/);
-    assert.ok(html.includes('href="' + cssName + '"'), 'stale or missing stylesheet (rebuild every edition after CSS changes)');
+    assert.ok(html.includes('href="' + cssName + '"') || (page === 'index' && html.includes('<style>' + css)), 'stale or missing stylesheet (rebuild every edition after CSS changes)');
     for (const font of ['press-start-2p-latin.woff2', 'vt323-latin.woff2', 'cinzel-latin-800-normal.woff2'])
       assert.ok(html.includes('rel="preload" href="/fonts/' + font + '"'), 'preload ' + font);
     assert.match(html, /<div class="crt" aria-hidden="true"><\/div>\s*<div class="wrap">/);
@@ -58,7 +58,7 @@ for (const { dir, page, file } of files) {
     assert.equal(count(nav[1], /class="game"/g), 6);
     assert.equal(count(nav[1], /aria-current="true"/g), 1, 'one current page');
     assert.ok(html.indexOf('class="breadcrumbs"') < html.indexOf('class="page-controls"'), 'breadcrumbs before page controls');
-    for (const [, font] of html.matchAll(/url\("?(\/fonts\/[^")]+)"?\)/g)) assert.ok(exists('pages' + font), font);
+    for (const [, font] of html.matchAll(/url\("?(\/fonts\/[^")]+)"?\)/g)) assert.ok(exists('static' + font), font);
     assert.doesNotMatch(html, /fonts\.googleapis|fonts\.gstatic|use\.typekit/);
     for (const [face] of html.matchAll(/@font-face\{[^}]*\}/g)) {
       assert.match(face, /font-display:optional/, 'inline face swaps in layout: ' + face);

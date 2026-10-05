@@ -8,8 +8,10 @@ const TurndownService = require('../site/node_modules/turndown');
 const { gfm } = require('../site/node_modules/turndown-plugin-gfm');
 const { unpackTalentRecords } = require('../site/src/talents.mjs');
 
-const root = path.resolve(__dirname, '..', 'pages');
-const editions = ['', 'tbc', 'classic', 'sod', 'mop', 'retail'];
+const outputArg = process.argv.find((arg) => arg.startsWith('--out='));
+const root = path.resolve(__dirname, '..', outputArg ? outputArg.slice(6) : 'static');
+const editionArg = process.argv.find((arg) => arg.startsWith('--edition='));
+const editions = editionArg ? editionArg.slice(10).split(',') : ['', 'tbc', 'classic', 'sod', 'mop', 'retail'];
 const names = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents', 'gear'];
 const routes = [];
 function writeFile(file, content) {
@@ -146,13 +148,7 @@ function main() {
     }
   }
 
-  // Explicit routes keep CSS, JSON, fonts, and other assets on static Pages serving.
-  const includes = routes.flatMap((route) => route === '/' ? ['/', '/index.html'] :
-    route.endsWith('/') ? [route, route.slice(0, -1), `${route}index.html`] : [route, `${route}.html`]);
-  if (includes.length > 100) throw new Error('Pages _routes.json exceeds 100 rules');
-  fs.writeFileSync(path.join(root, '_routes.json'), JSON.stringify({ version: 1, include: includes, exclude: [] }, null, 2) + '\n');
-  fs.copyFileSync(path.join(__dirname, 'pages-markdown-worker.js'), path.join(root, '_worker.js'));
-  console.log(`Built ${routes.length} Markdown page variants`);
+  console.log(`Built ${routes.length} Markdown page variants in ${root}`);
 }
 
 if (require.main === module) main();
