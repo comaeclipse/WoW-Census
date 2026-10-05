@@ -1,7 +1,10 @@
 -- Adaptive /who census: one button press = one query, MarketLens decides which.
 --
--- A census starts from the profile's disjoint level backbone (see
--- Population/CensusProfiles.lua) and refines any query that hits the /who cap:
+-- A census starts from its profile's plan (see Population/CensusProfiles.lua)
+-- and refines capped /who queries. Forever shuffles a balanced set of
+-- level/race and level/class cells after an ordered 10-30 level pass, then
+-- refines capped cells by name letters.
+-- Other profiles use an adaptive level backbone with class/race splits:
 --
 --   level range  -> narrower level ranges   (weighted by recent sightings)
 --   single level -> one query per class     (exhaustive)
@@ -10,11 +13,10 @@
 --                   exhaustive: the cell is counted as "unresolved", so the
 --                   census is reported as a lower bound / partial sweep)
 --
--- Because the exhaustive splits are disjoint, a resolved census sees each online
--- player once; duplicates only come from zone fallbacks or players who level
--- between queries. Cells that capped on a previous census are remembered per
--- realm bucket and pre-split on the next run, so we do not spend a press on a
--- query we already know will cap.
+-- Class/race splits are exhaustive where supported. Forever's race and class
+-- cells deliberately overlap; stored characters are deduplicated. Name-letter
+-- splits are not exhaustive, so capped cells remain lower bounds. Learned
+-- capped cells are remembered per realm bucket.
 --
 -- SendWho needs a hardware event and is server-throttled, so the census never
 -- fires on its own: RunNext is only called from the button or /ml census next
@@ -32,12 +34,11 @@ local TARGET = 35          -- aim each level split at about this many online pla
 local HISTORY_DAYS = 7     -- recent-sighting window used to weight splits and pick zones
 local LEARN_DAYS = 14      -- how long a learned "this cell caps" split is trusted
 local ZONE_SPLITS = 4      -- zones tried for a fully-pinned capped cell
-local NAME_SPLITS = 16     -- most name letters tried for a capped level+class+race cell
+local NAME_SPLITS = 16     -- most name letters tried for a capped cell
 local LETTER_MAX_SHARE = 0.4 -- a letter in more names than this would cap again on a 2x-cap cell
 local LETTER_COVERAGE = 0.98 -- stop adding letters once they reach this share of known names
 local MIN_ZONE_SUPPORT = 3 -- recent sightings a zone needs to be worth a query
 local FIXED_SPLIT_AT = 40  -- fixed list: split a cell up front once this many were seen recently
-local FOCUS_ONLINE_GUESS = 4000 -- online at the focus levels before a census has measured it
 local MERGE_TARGET = 40    -- merge learned level parts while their last counts sum under this
 local MAX_PRESPLIT_DEPTH = 8 -- level -> class -> level -> race chains, with room for nested level splits
 local ANSWER_TIMEOUT = 15
@@ -329,6 +330,11 @@ end
 -- Returns the kind plus, when known, the node's true online count (the sum of
 -- its children's last results), which SplitLevels uses instead of an estimate.
 function C:SplitKind(n, st)
+    if self:Profile().id == "forever" then
+        if n.hi > n.lo then return "level" end
+        if not n.letter then return "letter" end
+        return nil
+    end
     local learned = self:Learned(n)
     local width = n.hi - n.lo + 1
     if learned and learned.kind == "class" and width > 1 then
@@ -340,7 +346,7 @@ function C:SplitKind(n, st)
         if total and total / width <= self:Profile().capAt * 0.8 then return "level", total end
         return "class"
     end
-    if learned and learned.kind then return learned.kind end
+    if learned and learned.kind and not (learned.kind == "level" and width == 1) then return learned.kind end
     if width > 1 then
         if not n.class then
             local est = self:Estimate(n, st)
@@ -415,7 +421,9 @@ function C:Children(n, st)
                     class = n.class, race = n.race, letter = n.letter, zone = n.zone }
             end
             kids = self:Compact(n, learned, kids)
-        else
+        end
+        -- A saved split that collapsed to one part (older Compact) is no split.
+        if not learned or not learned.levels or #kids < 2 then
             kids = self:SplitLevels(n, st, total)
             -- Switched from a learned class split: persist the new plan.
             if learned then self:Learn(n, kind, kids) end
@@ -503,7 +511,10 @@ function C:Compact(n, learned, kids)
     for _, k in ipairs(kids) do
         local c = count(k)
         local t = c and store.censusSeen[nodeKey(k)].t
-        if cur and curN and c and curN + c <= MERGE_TARGET then
+        -- Never merge back into the whole node: it just capped, so a one-part
+        -- "split" would requeue the same query forever (10-12 did, 2026-10-05).
+        if cur and curN and c and curN + c <= MERGE_TARGET
+            and not (cur.lo == n.lo and k.hi == n.hi) then
             cur = { lo = cur.lo, hi = k.hi, class = n.class, race = n.race,
                 letter = n.letter, zone = n.zone }
             curN, curT = curN + c, math.min(curT, t)
@@ -538,10 +549,9 @@ function C:Learn(n, kind, kids)
 end
 
 -- Fixed-list mode: the whole query list is decided when the census starts and
--- never grows; a query that still hits the cap is recorded as a lower bound
--- (and learned, so the next census's list splits it up front). On by default
--- where adaptive splitting would snowball (the Forever beta); /ml census fixed
--- on|off overrides it per client.
+-- never grows; a query that still hits the cap is recorded as a lower bound.
+-- /ml census fixed on|off overrides the profile default, except the Forever
+-- plan always refines its capped race cells by name.
 function C:Fixed(st)
     if st and st.fixed ~= nil then return st.fixed end
     local set = ML.db.settings.censusFixed
@@ -563,7 +573,13 @@ end
 -- Replace any node we already know caps with its children, recursively.
 function C:Expand(nodes, st, out, depth)
     for _, n in ipairs(nodes) do
-        if depth < MAX_PRESPLIT_DEPTH and splitsExhaustively(n) and self:ShouldPreSplit(n, st) then
+        local exhaustive
+        if self:Profile().id == "forever" then
+            exhaustive = not n.refreshFilter and not n.tail and n.hi > n.lo
+        else
+            exhaustive = splitsExhaustively(n)
+        end
+        if depth < MAX_PRESPLIT_DEPTH and exhaustive and self:ShouldPreSplit(n, st) then
             st.preSplit = st.preSplit + 1
             self:Expand((self:Children(n, st)), st, out, depth + 1)
         else
@@ -632,64 +648,36 @@ function C:SeedSeen()
     end
 end
 
--- The focus census (profiles with focusFrom, i.e. the Forever beta). Levels
--- focusFrom..cap are enumerated as level x class x race, every pair this realm
--- has been seen playing. A pair whose share of the realm puts it under TARGET
--- across the whole range starts as one range query (split by level if it caps).
--- A level+class+race cell that still caps is covered by name letters. Levels
--- below focusFrom get one query per level, quiet adjacent levels merged; a cap
--- there is recorded as 50+ and never dug into.
-function C:FocusPlan(prof, store)
-    local hist = self:History()
-    local top = prof.maxLevel
-    local from = math.min(prof.focusFrom, top)
-    local nodes = {}
-
-    local perLevel = {}
-    for _, c in ipairs(hist.recent) do
-        local L = tonumber(c.level)
-        perLevel[L] = (perLevel[L] or 0) + 1
-    end
-    local lo, acc = 1, 0
-    for L = 1, from - 1 do
-        local w = perLevel[L] or 0
-        if L > lo and acc + w > MERGE_TARGET then
-            nodes[#nodes + 1] = { lo = lo, hi = L - 1, tail = true }
-            lo, acc = L, 0
-        end
-        acc = acc + w
-    end
-    if from > 1 then nodes[#nodes + 1] = { lo = lo, hi = from - 1, tail = true } end
-
-    local pairTotal = 0
-    for _, class in ipairs(prof.classes) do
-        for _, race in ipairs(raceList(prof, class, hist)) do
-            pairTotal = pairTotal + (hist.pairCount[class .. "|" .. race] or 0)
-        end
-    end
-    local last = store.censusLast
-    local online = last and last.profile == prof.id and last.focusFrom == from
-        and last.focusOnline or FOCUS_ONLINE_GUESS
-    for _, class in ipairs(prof.classes) do
-        for _, race in ipairs(raceList(prof, class, hist)) do
-            local share = pairTotal >= 200 and (hist.pairCount[class .. "|" .. race] or 0) / pairTotal
-            if top > from and share and online * share <= TARGET then
-                nodes[#nodes + 1] = { lo = from, hi = top, class = class, race = race }
-            else
-                for L = from, top do
-                    nodes[#nodes + 1] = { lo = L, hi = L, class = class, race = race }
-                end
-            end
-        end
-    end
-    return nodes
-end
-
--- A census planned before the focus census existed: replace it.
+-- Replace an old Forever plan before it issues another query.
 function C:Outdated()
     local st = self:State()
     local prof = self:Profile()
-    return st and prof and prof.focusFrom and st.plan ~= "focus" or false
+    return st and prof and prof.id == "forever" and st.plan ~= "forever-mixed-v2" or false
+end
+
+-- Every level gets all five race filters and five distinct class filters.
+-- Pick the least-used classes at each level, randomizing ties, so class
+-- frequency differs by at most one across the full plan. Then shuffle every
+-- query together; no level, race, or class owns an early block of the run.
+function C:ForeverMixedPlan(prof)
+    local nodes, classCount = {}, {}
+    for _, class in ipairs(prof.classes) do classCount[class] = 0 end
+    for level = 1, prof.maxLevel do
+        for _, race in ipairs(prof.races) do
+            nodes[#nodes + 1] = { lo = level, hi = level, race = race, base = true }
+        end
+        local candidates = {}
+        for _, class in ipairs(prof.classes) do candidates[#candidates + 1] = class end
+        shuffle(candidates)
+        table.sort(candidates, function(a, b) return classCount[a] < classCount[b] end)
+        for i = 1, math.min(#prof.races, #candidates) do
+            local class = candidates[i]
+            nodes[#nodes + 1] = { lo = level, hi = level, class = class, base = true }
+            classCount[class] = classCount[class] + 1
+        end
+    end
+    shuffle(nodes)
+    return nodes
 end
 
 function C:Start()
@@ -697,6 +685,11 @@ function C:Start()
     if not prof then ML:Print(why); return end
     self.profile, self.hist = prof, nil
     local st, store = self:State()
+    if st and self:Outdated() then
+        ML:Print("Replacing the running Forever census with the shuffled level/race/class plan.")
+        self:Finish(true)
+        st = nil
+    end
     if st then
         ML:Print("A census is already running -- |cffffff00/ml census next|r to continue or |cffffff00/ml census stop|r.")
         return
@@ -717,17 +710,20 @@ function C:Start()
     if st.fixed then st.ratioObs, st.ratioHist = 1, 1 end
 
     local backbone = {}
-    -- Passive collection has the whole play session to refine capped cells,
-    -- so it walks the adaptive backbone (level -> class/race -> name letter)
-    -- even on the realmless profiles. Retail needs it most: nearly everyone
-    -- sits at 80+, so the fixed refresh below saw only ~50 of them per query.
+    -- Passive collection has the whole play session to refine capped cells.
+    -- Retail needs an adaptive backbone: nearly everyone sits at 80+.
     local adaptivePassive = ML.db.settings.censusPassive
-    if prof.focusFrom then
-        backbone = self:FocusPlan(prof, store)
-        st.plan, st.focusFrom, st.fixed = "focus", math.min(prof.focusFrom, prof.maxLevel), false
+    if prof.id == "forever" then
+        -- Race cells cover every level; an equal number of class cells provide
+        -- a second, independently sampled view. Hold name-letter refinements
+        -- until the whole randomized base pass has run.
+        st.plan, st.fixed = "forever-mixed-v2", false
         st.ratioObs, st.ratioHist = 0, 0
+        backbone = self:ForeverMixedPlan(prof)
+        st.baseRemaining = #backbone
+        st.refinements = {}
     elseif prof.simpleRefresh and not adaptivePassive then
-        -- Forever and Retail are enormous, realmless populations. This is a
+        -- Retail has an enormous population. This is a
         -- deliberately small refresh sample, not an attempt to enumerate
         -- everyone online: levels 1-20, then every faction race and class.
         for level = 1, math.min(prof.maxLevel, 20) do
@@ -748,12 +744,18 @@ function C:Start()
             end
         end
     end
-    self:Enqueue(backbone, st)
+    if st.plan == "forever-mixed-v2" then
+        for _, n in ipairs(backbone) do st.queue[#st.queue + 1] = n end
+        for level = math.min(30, prof.maxLevel), 10, -1 do
+            table.insert(st.queue, 1, { refreshFilter = tostring(level) })
+        end
+    else
+        self:Enqueue(backbone, st)
+    end
     if st.fixed then st.ratioObs, st.ratioHist = 0, 0 end
-    if st.plan == "focus" then
-        ML:Print("Census started: |cffffffff%s|r %s, %d queries in random order -- levels %d-%d by class and race, "
-            .. "below %d by level. A capped cell adds name-letter queries.",
-            prof.label, prof.faction, #st.queue, st.focusFrom, prof.maxLevel, st.focusFrom)
+    if st.plan == "forever-mixed-v2" then
+        ML:Print("Census started: |cffffffff%s|r %s, levels 10-%d in order, then %d shuffled level/race and level/class queries across levels 1-%d. Name refinements follow the base sweep.",
+            prof.label, prof.faction, math.min(30, prof.maxLevel), #backbone, prof.maxLevel)
     else
         ML:Print("Census started: |cffffffff%s|r %s, %s%d queries%s.",
             prof.label, prof.faction, st.fixed and "fixed list of " or "", #st.queue,
@@ -789,10 +791,17 @@ function C:Settle(st, quiet)
     end
     if st.nextAttemptAt and time() < st.nextAttemptAt then return nil end
     st.nextAttemptAt = nil
-    -- Drop anything planned above the current level cap (e.g. a census started
-    -- before the Forever beta cap was pinned).
+    -- Drop all queued queries above the current level cap, including entries
+    -- later in an already-running randomized Forever sweep.
     local prof = self:Profile()
-    while st.queue[1] and st.queue[1].lo and st.queue[1].lo > prof.maxLevel do table.remove(st.queue, 1) end
+    for i = #st.queue, 1, -1 do
+        local n = st.queue[i]
+        if n.lo and n.lo > prof.maxLevel then
+            table.remove(st.queue, i)
+        elseif n.hi and n.hi > prof.maxLevel then
+            n.hi = prof.maxLevel
+        end
+    end
     -- Profiles without zone fallback drop zone queries planned before that
     -- changed (they sit at the back of the queue).
     if not prof.zoneFallback then
@@ -828,6 +837,7 @@ end
 function C:PromptNext()
     local st = self:State()
     if not st or not self:ViaChat() then return end
+    if self:Outdated() then self:Start(); return end
     local n = self:Settle(st, true)
     if not n then return end
     local filter = self:Filter(n)
@@ -861,6 +871,7 @@ end
 function C:TryChatQuery(filter)
     local st = self:State()
     if not st then return false end
+    if self:Outdated() then self:Start(); return false end
     filter = trim(filter)
     local n = self:Settle(st, true)
     if not n or self:Filter(n) ~= filter then return false end
@@ -897,7 +908,7 @@ function C:RunNext(quiet, source)
         return
     end
     if self:Outdated() then
-        ML:Print("Replacing the running census with the new single census plan.")
+        ML:Print("Replacing the running Forever census with the shuffled level/race/class plan.")
         self:Finish(true)
         self:Start()
         return
@@ -938,7 +949,8 @@ function C:OnScanComplete(sample, tag)
         if not n.refreshFilter then kids, exhaustive, kind = self:Children(n, st) end
         if exhaustive then
             self:Learn(n, kind, kids)
-        elseif not n.zone and not n.letter then
+        elseif not (n.refreshFilter and st.plan == "forever-mixed-v2")
+            and not n.zone and not n.letter then
             st.unresolved = st.unresolved + 1 -- letters/zones cannot prove they covered this cell
         end
         if self:Fixed(st) then
@@ -947,13 +959,20 @@ function C:OnScanComplete(sample, tag)
             if exhaustive then st.unresolved = st.unresolved + 1 end
             kids = {}
         end
-        last.split = self:Enqueue(kids, st)
+        if st.plan == "forever-mixed-v2" and (n.base or (st.baseRemaining or 0) > 0) then
+            for _, kid in ipairs(kids) do st.refinements[#st.refinements + 1] = kid end
+            last.split = #kids
+        else
+            last.split = self:Enqueue(kids, st)
+        end
         st.generated = st.generated + last.split
         -- Tell the sweep export this cap is covered by its children, so the
         -- site's capped_count reflects real coverage gaps only.
         local sweep = store.sweeps[st.sweepID]
         local q = sweep and sweep.queries and sweep.queries[#sweep.queries]
-        if exhaustive and #kids > 0 and last.split == #kids and q and q.filter == sample.filter then
+        if q and q.filter == sample.filter and
+            ((exhaustive and #kids > 0 and last.split == #kids)
+                or (n.refreshFilter and st.plan == "forever-mixed-v2")) then
             q.split = true
         end
     else
@@ -966,6 +985,14 @@ function C:OnScanComplete(sample, tag)
                 st.ratioObs = st.ratioObs + observed
                 st.ratioHist = st.ratioHist + raw
             end
+        end
+    end
+    if n.base then
+        st.baseRemaining = math.max((st.baseRemaining or 1) - 1, 0)
+        if st.baseRemaining == 0 and st.refinements then
+            shuffle(st.refinements)
+            for _, kid in ipairs(st.refinements) do st.queue[#st.queue + 1] = kid end
+            st.refinements = nil
         end
     end
     st.last = last

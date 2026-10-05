@@ -408,10 +408,91 @@ function Pop:Store()
     local realm = ML.realm
     realm.population = realm.population or { samples = {}, characters = {} }
     realm.population.samples = realm.population.samples or {}
+    self:UnpackCharacters(realm.population)
     realm.population.characters = realm.population.characters or {}
     realm.population.sweeps = realm.population.sweeps or {}
     realm.population.specSamples = realm.population.specSamples or {}
     return realm.population
+end
+
+-- Keep lifetime identities in small strings when WoW serializes SavedVariables.
+-- A huge Lua table constructor can exceed the Classic client's constant limit
+-- even though the file itself is valid data. In memory, callers still see the
+-- same character tables. Length prefixes preserve UTF-8 names and punctuation.
+local CHARACTER_FIELDS = {
+    "fullName", "name", "firstName", "lastName", "realm", "guild",
+    "level", "race", "class", "classFile", "zone", "firstSeen",
+    "lastSeen", "seenCount",
+}
+local function packedField(value)
+    local s = value == nil and "" or tostring(value)
+    return #s .. ":" .. s
+end
+
+function Pop:PackCharacters(store)
+    if not store or not store.characters then return end
+    local chunks, records, count = { "MLC1" }, {}, 0
+    for key, c in pairs(store.characters) do
+        local fields = { packedField(key) }
+        for _, name in ipairs(CHARACTER_FIELDS) do fields[#fields + 1] = packedField(c[name]) end
+        local days = {}
+        for day, d in pairs(c.days or {}) do
+            days[#days + 1] = table.concat({ day, d.count or d[1] or 0,
+                d.firstSeen or d[2] or 0, d.lastSeen or d[3] or 0 }, ",")
+        end
+        fields[#fields + 1] = packedField(table.concat(days, ";"))
+        records[#records + 1] = table.concat(fields)
+        count = count + 1
+        if count == 256 then
+            chunks[#chunks + 1] = table.concat(records)
+            records, count = {}, 0
+        end
+    end
+    if count > 0 then chunks[#chunks + 1] = table.concat(records) end
+    store.charactersPacked = chunks
+    store.characters = nil
+end
+
+function Pop:UnpackCharacters(store)
+    if not store or not store.charactersPacked then return end
+    local chunks = store.charactersPacked
+    assert(chunks[1] == "MLC1", "Unknown packed population format")
+    local characters = store.characters or {}
+    for part = 2, #chunks do
+        local chunk, cursor = chunks[part], 1
+        local function field()
+            local colon = chunk:find(":", cursor, true)
+            assert(colon, "Truncated packed population field")
+            local size = tonumber(chunk:sub(cursor, colon - 1))
+            assert(size and size >= 0 and colon + size <= #chunk, "Invalid packed population field")
+            local value = chunk:sub(colon + 1, colon + size)
+            cursor = colon + size + 1
+            return value
+        end
+        while cursor <= #chunk do
+            local key = field()
+            local c = { key = key, days = {} }
+            for _, name in ipairs(CHARACTER_FIELDS) do c[name] = field() end
+            for _, name in ipairs({ "level", "firstSeen", "lastSeen", "seenCount" }) do
+                c[name] = tonumber(c[name]) or 0
+            end
+            local days = field()
+            for token in days:gmatch("[^;]+") do
+                local day, count, first, last = token:match("^(%d+),(%d+),(%d+),(%d+)$")
+                assert(day, "Invalid packed population day")
+                c.days[tonumber(day)] = { tonumber(count), tonumber(first), tonumber(last) }
+            end
+            characters[key] = c
+        end
+    end
+    store.characters = characters
+    store.charactersPacked = nil
+end
+
+function Pop:PackStorage()
+    for _, realm in pairs(ML.db.realms or {}) do
+        if realm.population then self:PackCharacters(realm.population) end
+    end
 end
 
 -- Migrate verbose population records in every realm bucket to compact array
@@ -424,6 +505,7 @@ function Pop:CompactStorage()
     for _, realm in pairs(ML.db.realms or {}) do
         local store = realm.population
         if store then
+            self:UnpackCharacters(store)
             local kept = {}
             for _, sample in ipairs(store.samples or {}) do
                 if (sample.t or 0) >= cutoff then kept[#kept + 1] = sample end

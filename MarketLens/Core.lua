@@ -303,6 +303,9 @@ boot:SetScript("OnEvent", function(_, event, arg1)
                 realm.items = nil
             end
         end
+        -- Serialize lifetime population identities as bounded strings. Large
+        -- table constructors can exceed the beta client's Lua constant limit.
+        if ML.Population.PackStorage then ML.Population:PackStorage() end
     end
 end)
 
@@ -384,11 +387,14 @@ SlashCmdList["MARKETLENS"] = function(msg)
     elseif msg == "census chat on" or msg == "census chat off" then
         ML.Population.Census:SetViaChat(msg == "census chat on")
     elseif msg:match("^census cap%s") then
-        -- Forever beta: pin the census to the current level cap (or "auto").
-        local n = tonumber(msg:match("^census cap%s+(%d+)$"))
-        ML.db.settings.censusLevelCap = n
-        ML.Population.Census.profile = nil
-        ML:Print("Census level cap: %s.", n and tostring(n) or "auto (from observed levels)")
+        if ML:IsForeverBeta() then
+            ML:Print("Forever beta census is capped at level 30.")
+        else
+            local n = tonumber(msg:match("^census cap%s+(%d+)$"))
+            ML.db.settings.censusLevelCap = n
+            ML.Population.Census.profile = nil
+            ML:Print("Census level cap: %s.", n and tostring(n) or "auto (from observed levels)")
+        end
     elseif msg == "census forget" then
         ML.Population.Census:Forget()
     elseif msg == "zones" then

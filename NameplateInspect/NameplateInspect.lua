@@ -327,17 +327,18 @@ end
 -- while the link was correct, so the ID comes from the link, and the full
 -- link is kept for its suffix/enchant/gem/bonus data.
 --
--- Enabled per client so each can be verified on its own; "/npi gear" turns
--- it on for the current client for this session to test an unverified one.
+-- On for every client: one that cannot read inspected gear just saves records
+-- without it. Kept per client so one can be switched off if it misbehaves;
+-- "/npi gear" switches it off (and back on) for the current session.
 local GEAR_CAPTURE = {
   ["classic-beta"]    = true,   -- WoW: Forever Beta (verified)
-  ["retail"]          = false,
-  ["classic-era"]     = false,
-  ["sod"]             = false,
-  ["tbc-anniversary"] = false,
-  ["mop-classic"]     = false,
+  ["mop-classic"]     = true,   -- verified: links arrive ~0.5s after READY (see unlinkedSlots)
+  ["retail"]          = true,
+  ["classic-era"]     = true,
+  ["sod"]             = true,
+  ["tbc-anniversary"] = true,
 }
-local gearOverride = false
+local gearOff = false
 
 local SLOT_NAMES = {
   [1]  = "Head",
@@ -362,7 +363,7 @@ local SLOT_NAMES = {
 }
 
 local function gearEnabled()
-  return (GEAR_CAPTURE[flavor] or gearOverride) and type(GetInventoryItemLink) == "function"
+  return GEAR_CAPTURE[flavor] and not gearOff and type(GetInventoryItemLink) == "function"
 end
 
 -- Empty slots are omitted. Returns nil when nothing was equipped/readable.
@@ -382,6 +383,52 @@ local function captureGear(unit)
     end
   end
   return count > 0 and gear or nil
+end
+
+-- MoP Classic: at INSPECT_READY, GetInventoryItemID() reports an equipped item
+-- while GetInventoryItemLink() is still nil for it, because this client has not
+-- loaded that item yet (a level-90 came back with only a trinket). Those slots
+-- are returned here as [slot] = itemID. Forever's GetInventoryItemID() is nil
+-- for inspected players, so this finds nothing there and Forever's capture is
+-- unchanged.
+local function unlinkedSlots(unit, gear)
+  if not gearEnabled() or type(GetInventoryItemID) ~= "function" then return nil end
+  local missing
+  for slot = 1, 19 do
+    if not (gear and gear[slot]) then
+      local ok, id = pcall(GetInventoryItemID, unit, slot)
+      if ok and not isSecret(id) and type(id) == "number" and id > 0 then
+        missing = missing or {}
+        missing[slot] = id
+      end
+    end
+  end
+  return missing
+end
+
+local function requestItemData(missing)
+  for _, id in pairs(missing) do
+    if C_Item and C_Item.RequestLoadItemDataByID then pcall(C_Item.RequestLoadItemDataByID, id)
+    elseif GetItemInfo then pcall(GetItemInfo, id) end
+  end
+end
+
+-- Links that arrived since the last read, added to the saved record. Returns
+-- how many slots are still unlinked.
+local function fillUnlinked(record, unit, missing)
+  local left = 0
+  for slot in pairs(missing) do
+    local ok, itemLink = pcall(GetInventoryItemLink, unit, slot)
+    if ok and not isSecret(itemLink) and type(itemLink) == "string" then
+      record.gear = record.gear or {}
+      record.gear[slot] = { slot = slot, slotName = SLOT_NAMES[slot],
+        itemID = tonumber(itemLink:match("item:(%d+)")), itemLink = itemLink }
+      missing[slot] = nil
+    else
+      left = left + 1
+    end
+  end
+  return left
 end
 ------------------------------------------------------------------------
 -- END EQUIPPED GEAR CAPTURE
@@ -406,6 +453,8 @@ local function store(guid, unit)
   -- Same INSPECT_READY, same verified unit: harvest gear now, not later.
   local gearOK, gear = pcall(captureGear, unit)
   if not gearOK then gear = nil end
+  local unlinkedOK, unlinked = pcall(unlinkedSlots, unit, gear)
+  if not unlinkedOK then unlinked = nil end
   local spec = getInspectSpec(unit)
   if isSecret(spec) then return false end
   -- On MoP Classic a valid spec ID (> 0) alone is worth storing, e.g. players
@@ -470,6 +519,9 @@ local function store(guid, unit)
     talents = talents,
     list    = list,
     gear    = gear,    -- [slot] = { slot, slotName, itemID, itemLink }; nil if not captured
+    -- [slot] = itemID equipped but still without a link; the INSPECT_READY
+    -- handler fills these in and leaves only the ones that never arrived.
+    gearUnlinked = unlinked,
     time    = time(),
   }
   -- SavedVariables cannot safely persist Retail's restricted values.
@@ -641,15 +693,42 @@ f:SetScript("OnEvent", function(_, event, arg)
       print(("NPI: cached %s (%s %s, %d talents)"):format(e.name, e.race or "?", e.class or "?", #(e.list or {})))
     end
     if mine then
-      pending = nil
-      if saved then
-        tries[guid] = nil
-        failures = 0
-      else
-        backoff(GetTime())
-        enqueue(guid)
+      local request = pending
+      local function finish()
+        if pending ~= request then return end  -- another inspect took the slot
+        pending = nil
+        if saved then
+          tries[guid] = nil
+          failures = 0
+        else
+          backoff(GetTime())
+          enqueue(guid)
+        end
+        if not inspectWindowOpen() then ClearInspectPlayer() end
       end
-      if not inspectWindowOpen() then ClearInspectPlayer() end
+      local record = saved and NameplateInspectDB[guid]
+      local missing = record and record.gearUnlinked
+      if not (missing and next(missing) and C_Timer and C_Timer.After) then return finish() end
+      -- Still the same inspect: no new NotifyInspect, and tick() waits on
+      -- `pending`. Only the slots that lacked a link are read again.
+      requestItemData(missing)
+      request.t = GetTime()
+      local wanted, delays, step = 0, { 0.5, 1, 2, 4 }, 0
+      for _ in pairs(missing) do wanted = wanted + 1 end
+      local function retry()
+        if pending ~= request then return end
+        step = step + 1
+        local u = unitFor(guid)
+        local left = u and fillUnlinked(record, u, missing) or wanted
+        if left > 0 and u and step < #delays then
+          C_Timer.After(delays[step + 1] - delays[step], retry)
+          return
+        end
+        if left == 0 then record.gearUnlinked = nil end
+        trace(("gear: %d/%d unlinked slot(s) filled after %.1fs"):format(wanted - left, wanted, delays[step]))
+        finish()
+      end
+      C_Timer.After(delays[1], retry)
     end
   end
 end)
@@ -707,6 +786,12 @@ local function show(e)
       local g = e.gear[slot]
       if g then print(("   %-8s %s"):format(g.slotName or tostring(slot), g.itemLink or "?")) end
     end
+  end
+  if e.gearUnlinked and next(e.gearUnlinked) then
+    local slots = {}
+    for slot, id in pairs(e.gearUnlinked) do slots[#slots + 1] = (SLOT_NAMES[slot] or slot) .. "=" .. id end
+    table.sort(slots)
+    print("   equipped but never linked: " .. table.concat(slots, ", "))
   end
   if not e.talents or e.talents == "" then return end
   StaticPopup_Show("NAMEPLATEINSPECT_COPY", e.name .. " — " .. specName(e.spec), nil, e.talents)
@@ -779,17 +864,16 @@ SlashCmdList.NAMEPLATEINSPECT = function(msg)
     showNearby()
 
   elseif lower == "gear" then
-    if GEAR_CAPTURE[flavor] then
-      print("NPI: gear capture is always on for " .. flavor .. ".")
+    if not GEAR_CAPTURE[flavor] then
+      print("NPI: gear capture is disabled for " .. flavor .. ".")
     else
-      gearOverride = not gearOverride
-      print(("NPI: gear capture %s for %s this session (unverified client)."):format(
-        gearOverride and "ON" or "off", flavor))
+      gearOff = not gearOff
+      print(("NPI: gear capture %s for %s this session."):format(gearOff and "off" or "ON", flavor))
     end
 
   elseif lower == "diag" then
     local _, build, _, interface = GetBuildInfo()
-    print(("NPI: diagnostics v3.1.0, %s, client=%s build=%s interface=%s"):format(flavor,
+    print(("NPI: diagnostics v3.1.2, %s, client=%s build=%s interface=%s"):format(flavor,
       clientVersion, tostring(build), tostring(interface)))
     print(("NPI: plates=%d requests=%d ready=%d saved=%d timeouts=%d queued=%d pending=%s"):format(
       stats.plates, stats.requests, stats.ready, stats.saved, stats.timeouts, #queue,

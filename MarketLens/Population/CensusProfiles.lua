@@ -2,12 +2,11 @@
 --
 -- A profile is picked automatically from the running client (WOW_PROJECT_ID,
 -- the TOC build, and the Classic season/ruleset APIs) and the player's faction.
--- It only supplies the STARTING plan and the split vocabulary; Population/
--- Census.lua refines it adaptively from actual results (a capped query is split
--- level -> class -> race -> hotspot zone) and remembers learned splits per realm.
+-- It supplies the starting plan and split vocabulary; Population/Census.lua
+-- refines capped queries and remembers learned splits per faction bucket.
 --
--- Bands are deliberately coarse and disjoint: every online player matches
--- exactly one backbone query, so a fully-resolved census counts nobody twice.
+-- Most profiles start with coarse, disjoint bands. Forever instead shuffles
+-- level/race and level/class searches across the whole beta level range.
 -- Zone lists are NOT a separate pass (a zone sweep on top of a level sweep only
 -- re-sees the same players); they are the last-resort split for a cell that is
 -- still capped after level, class and race are all pinned.
@@ -157,17 +156,12 @@ P.profiles = {
     },
     ["forever"] = {
         label = "WoW: Forever (beta)",
-        -- One census: every level from focusFrom to the cap is enumerated as
-        -- level x class x race (rare pairs as one range query), and a cell that
-        -- still caps is covered by name letters. Below focusFrom is a light
-        -- per-level pass. Never dug into by zone: 108 zone queries found ~10
-        -- players each.
-        focusFrom = 20,
+        -- Begin with levels 10-30 in order, then fully shuffle every level x
+        -- race cell alongside the same number of level x class cells. Capped
+        -- cells are refined by name, never zone.
         noZoneFallback = true,
-        -- Bands are generated from the live level cap (it moves during beta).
+        -- Forever beta is currently capped at level 30.
         dynamicBands = true,
-        -- The announced cap. Observed levels lag a raise by days (the old cap's
-        -- crowd is still where it stopped), so never plan below this.
         levelCap = 30,
         classes = { Alliance = ALL_CLASSIC, Horde = ALL_CLASSIC },
         races = {
@@ -227,29 +221,10 @@ function P.DetectID()
     return P.profiles[flavor] and flavor or "tbc-anniversary"
 end
 
--- The live beta cap: the highest level at least 3 characters on this realm
--- bucket reached in the last week (3 so one odd sighting cannot move it).
--- GetMaxPlayerLevel() may report the ruleset's cap rather than the beta's.
-local function observedCap()
-    local store = ML.realm and ML.realm.population
-    local cutoff = time() - 7 * 86400
-    local perLevel, best = {}, nil
-    for _, c in pairs(store and store.characters or {}) do
-        local L = tonumber(c.level) or 0
-        if L > 0 and (c.lastSeen or 0) >= cutoff then
-            perLevel[L] = (perLevel[L] or 0) + 1
-            if perLevel[L] >= 3 and (not best or L > best) then best = L end
-        end
-    end
-    return best
-end
-
--- The beta's current level cap: /ml census cap <n> when set, else the level
--- the population has piled up at, else the API's (possibly ruleset) cap --
--- never below the profile's announced cap (floor).
-function P.ForeverCap(apiMax, floor)
-    local set = ML.db and ML.db.settings.censusLevelCap
-    return set or math.max(math.min(observedCap() or apiMax, apiMax), floor or 0)
+-- The client API and stored sightings can describe a higher ruleset level.
+-- Use the beta cap explicitly until Forever announces a different one.
+function P.ForeverCap(_, betaCap)
+    return betaCap
 end
 
 -- Decade bands up to the cap, then the cap on its own (everyone piles up there).
@@ -286,6 +261,6 @@ function P.Current()
         racesByClass = def.racesByClass, hotspots = hot,
         capAt = def.capAt or 49, maxLevel = maxL,
         zoneFallback = not def.noZoneFallback, fixedPlan = def.fixedPlan,
-        simpleRefresh = def.simpleRefresh, focusFrom = def.focusFrom,
+        simpleRefresh = def.simpleRefresh,
     }
 end
