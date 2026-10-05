@@ -212,12 +212,138 @@ export const CENSUS_STYLE = `
 // axis gets a chip row; every combination is rendered up front as a .vpane
 // carrying one data-<dim> per axis, and the script just shows the pane whose
 // attributes match every active chip. Static file, no fetching.
+// The realm axis renders as an "All realms" chip beside a select holding the
+// individual realms, so the row stays one line however many realms there are.
 export function chipRow(dim, options, active) {
   if (!options || options.length < 2) return "";
-  return '<div class="chips vchips" data-dim="' + esc(dim) + '">' + options.map((o) =>
-    '<button class="chip" type="button" data-key="' + esc(o.key) + '" aria-pressed="' +
-    (o.key === active ? "true" : "false") + '">' + esc(o.label) + "</button>").join("") + "</div>";
+  const chip = (o) => '<button class="chip" type="button" data-key="' + esc(o.key) + '" aria-pressed="' +
+    (o.key === active ? "true" : "false") + '">' + esc(o.label) + "</button>";
+  const all = options.find((o) => o.key === "all");
+  if (dim !== "realm" || !all) {
+    return '<div class="chips vchips" data-dim="' + esc(dim) + '">' + options.map(chip).join("") + "</div>";
+  }
+  const rest = options.filter((o) => o !== all);
+  const picked = rest.find((o) => o.key === active);
+  const id = "vsel-" + esc(dim);
+  const check = '<svg class="vsel-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  return '<div class="chips vchips vsel-row" data-dim="' + esc(dim) + '">' + chip(all) +
+    '<div class="vsel"><button class="vsel-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="' +
+    id + '" aria-pressed="' + (picked ? "true" : "false") + '"' + (picked ? "" : " data-placeholder") + '>' +
+    '<span class="vsel-value">' + esc(picked ? picked.label : "Select a realm") + "</span>" +
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>' +
+    '<div class="vsel-pop" id="' + id + '" role="listbox" tabindex="-1" aria-label="Realm" hidden>' +
+    '<div class="vsel-label" role="presentation">Realms</div>' +
+    rest.map((o) => '<div class="vsel-item" role="option" data-key="' + esc(o.key) + '" aria-selected="' +
+      (o.key === active ? "true" : "false") + '"><span>' + esc(o.label) + "</span>" + check + "</div>").join("") +
+    "</div></div></div>";
 }
+
+// The neobrutalist select: a listbox popup that opens over its trigger with
+// the chosen option lined up on it. Wires every server-rendered .vsel (the
+// realm row) and builds one in front of each <select class="vsel-native">,
+// which stays the source of truth: choosing sets its value and fires "change".
+export const SELECT_SCRIPT = `<script>
+(function(){
+  var check='<svg class="vsel-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  function el(tag,cls,html){var e=document.createElement(tag);e.className=cls;if(html)e.innerHTML=html;return e;}
+  [].slice.call(document.querySelectorAll("select.vsel-native")).forEach(function(sel,n){
+    var box=el("div","vsel");
+    var t=el("button","vsel-trigger",'<span class="vsel-value"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>');
+    var pop=el("div","vsel-pop");
+    t.type="button"; t.setAttribute("aria-haspopup","listbox"); t.setAttribute("aria-expanded","false");
+    pop.id="vsel-native-"+n; pop.setAttribute("role","listbox"); pop.tabIndex=-1; pop.hidden=true;
+    t.setAttribute("aria-controls",pop.id);
+    var label=sel.closest("label"); if(label){pop.setAttribute("aria-label",label.firstChild.textContent.trim());}
+    [].slice.call(sel.options).forEach(function(o){
+      var it=el("div","vsel-item",'<span></span>'+check);
+      it.setAttribute("role","option"); it.dataset.key=o.value; it.firstChild.textContent=o.text;
+      pop.appendChild(it);
+    });
+    function sync(){
+      var on=sel.options[sel.selectedIndex];
+      [].slice.call(pop.children).forEach(function(it){it.setAttribute("aria-selected",it.dataset.key===sel.value?"true":"false");});
+      t.querySelector(".vsel-value").textContent=on?on.text:"";
+      t.setAttribute("aria-pressed",sel.value?"true":"false");
+    }
+    pop.addEventListener("click",function(e){
+      var it=e.target.closest(".vsel-item"); if(!it||sel.value===it.dataset.key) return;
+      sel.value=it.dataset.key; sync(); sel.dispatchEvent(new Event("change",{bubbles:true}));
+    });
+    sel.addEventListener("change",sync);
+    box.appendChild(t); box.appendChild(pop);
+    sel.hidden=true; sel.tabIndex=-1; sel.parentNode.insertBefore(box,sel);
+    if(label){label.addEventListener("click",function(e){if(e.target===label||e.target===label.firstChild){e.preventDefault();t.focus();}});}
+    sync();
+  });
+  [].slice.call(document.querySelectorAll(".vsel")).forEach(function(box){
+    var t=box.querySelector(".vsel-trigger"), pop=box.querySelector(".vsel-pop");
+    var items=[].slice.call(pop.querySelectorAll(".vsel-item")), hi=-1, typed="", typedAt=0;
+    function highlight(i){
+      items.forEach(function(o,n){o.toggleAttribute("data-highlighted", n===i);});
+      hi=i; if(i<0) return;
+      var o=items[i];
+      if(o.offsetTop<pop.scrollTop) pop.scrollTop=o.offsetTop;
+      else if(o.offsetTop+o.offsetHeight>pop.scrollTop+pop.clientHeight) pop.scrollTop=o.offsetTop+o.offsetHeight-pop.clientHeight;
+    }
+    function place(){
+      pop.style.top=""; pop.style.bottom=""; pop.scrollTop=0;
+      var sel=pop.querySelector('[aria-selected="true"]');
+      if(!sel){
+        pop.style.top=(t.offsetHeight+4)+"px";
+        if(box.getBoundingClientRect().top+t.offsetHeight+4+pop.offsetHeight>innerHeight-8){pop.style.top="";pop.style.bottom=(t.offsetHeight+4)+"px";}
+        return;
+      }
+      // Line the chosen option up on the trigger; when that would push the
+      // popup off the top, scroll the list instead.
+      var off=sel.offsetTop-(t.offsetHeight-sel.offsetHeight)/2;
+      var room=Math.max(0,t.getBoundingClientRect().top-8);
+      var scroll=Math.min(Math.max(0,off-room),pop.scrollHeight-pop.clientHeight);
+      pop.scrollTop=scroll; pop.style.top=-(off-scroll)+"px";
+      // Layout sizes, not getBoundingClientRect: the open animation scales the popup.
+      var popTop=box.getBoundingClientRect().top-(off-scroll);
+      var up=Math.min(popTop+pop.offsetHeight-(innerHeight-8), popTop-8);
+      if(up>0) pop.style.top=-(off-scroll+up)+"px";
+    }
+    function open(){
+      if(!pop.hidden) return;
+      pop.hidden=false; t.setAttribute("aria-expanded","true"); place();
+      var s=items.findIndex(function(o){return o.getAttribute("aria-selected")==="true";});
+      highlight(s<0?0:s); pop.focus({preventScroll:true});
+    }
+    function close(refocus){
+      if(pop.hidden) return;
+      pop.hidden=true; t.setAttribute("aria-expanded","false"); highlight(-1);
+      if(refocus) t.focus({preventScroll:true});
+    }
+    function choose(i){ if(i>=0) items[i].click(); close(true); }
+    t.addEventListener("click", function(){ pop.hidden?open():close(false); });
+    t.addEventListener("keydown", function(e){
+      if(e.key==="ArrowDown"||e.key==="ArrowUp"||e.key==="Enter"||e.key===" "){e.preventDefault();open();}
+    });
+    pop.addEventListener("keydown", function(e){
+      var n=items.length;
+      if(e.key==="ArrowDown"){e.preventDefault();highlight(Math.min(n-1,hi+1));}
+      else if(e.key==="ArrowUp"){e.preventDefault();highlight(Math.max(0,hi-1));}
+      else if(e.key==="Home"){e.preventDefault();highlight(0);}
+      else if(e.key==="End"){e.preventDefault();highlight(n-1);}
+      else if(e.key==="Enter"||e.key===" "){e.preventDefault();choose(hi);}
+      else if(e.key==="Escape"){e.preventDefault();close(true);}
+      else if(e.key==="Tab"){close(false);}
+      else if(e.key.length===1){
+        var now=Date.now(); typed=(now-typedAt>600?"":typed)+e.key.toLowerCase(); typedAt=now;
+        var m=items.findIndex(function(o){return o.textContent.toLowerCase().indexOf(typed)===0;});
+        if(m>=0) highlight(m);
+      }
+    });
+    pop.addEventListener("mousemove", function(e){
+      var o=e.target.closest(".vsel-item"); if(o&&items.indexOf(o)!==hi) highlight(items.indexOf(o));
+    });
+    pop.addEventListener("click", function(e){ if(e.target.closest(".vsel-item")) close(true); });
+    document.addEventListener("pointerdown", function(e){ if(!box.contains(e.target)) close(false); });
+    window.addEventListener("resize", function(){ close(false); });
+  });
+})();
+</script>`;
 
 export const TOGGLE_SCRIPT = `<script>
 (function(){
@@ -228,7 +354,7 @@ export const TOGGLE_SCRIPT = `<script>
   var defaults={};
   function slug(v){return String(v||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
   rows.forEach(function(r){
-    var on=r.querySelector('.chip[aria-pressed="true"]')||r.querySelector(".chip");
+    var on=r.querySelector('.chip[aria-pressed="true"],.vsel-item[aria-selected="true"]')||r.querySelector("[data-key]");
     state[r.dataset.dim]=on?on.dataset.key:"";
     defaults[r.dataset.dim]=state[r.dataset.dim];
   });
@@ -236,7 +362,7 @@ export const TOGGLE_SCRIPT = `<script>
     var q=new URLSearchParams(location.search);
     rows.forEach(function(r){
       var wanted=q.get(r.dataset.dim); state[r.dataset.dim]=defaults[r.dataset.dim]; if(!wanted) return;
-      var match=[].slice.call(r.querySelectorAll(".chip")).find(function(c){return slug(c.dataset.key)===slug(wanted);});
+      var match=[].slice.call(r.querySelectorAll("[data-key]")).find(function(c){return slug(c.dataset.key)===slug(wanted);});
       if(match) state[r.dataset.dim]=match.dataset.key;
     });
   }
@@ -251,9 +377,19 @@ export const TOGGLE_SCRIPT = `<script>
   }
   function apply(){
     rows.forEach(function(r){
+      var key=state[r.dataset.dim], picked=null;
       [].slice.call(r.querySelectorAll(".chip")).forEach(function(c){
-        c.setAttribute("aria-pressed", c.dataset.key===state[r.dataset.dim]?"true":"false");
+        c.setAttribute("aria-pressed", c.dataset.key===key?"true":"false");
       });
+      [].slice.call(r.querySelectorAll(".vsel-item")).forEach(function(o){
+        var on=o.dataset.key===key; o.setAttribute("aria-selected", on?"true":"false"); if(on) picked=o;
+      });
+      var t=r.querySelector(".vsel-trigger");
+      if(t){
+        t.setAttribute("aria-pressed", picked?"true":"false");
+        t.toggleAttribute("data-placeholder", !picked);
+        t.querySelector(".vsel-value").textContent=picked?picked.textContent:"Select a realm";
+      }
     });
     panes.forEach(function(p){
       var show=true;
@@ -266,14 +402,14 @@ export const TOGGLE_SCRIPT = `<script>
   }
   rows.forEach(function(r){
     r.addEventListener("click", function(e){
-      var c=e.target.closest(".chip"); if(!c||!r.contains(c)) return;
+      var c=e.target.closest(".chip,.vsel-item"); if(!c||!r.contains(c)) return;
       state[r.dataset.dim]=c.dataset.key; apply(); writeUrl();
     });
   });
   window.addEventListener("popstate",function(){readUrl();apply();});
   readUrl(); apply();
 })();
-</script>`;
+</script>${SELECT_SCRIPT}`;
 
 // census: { groups, realms, lastT } from loadForeverCensus (or /api/forever).
 // opts.stylesheet  path to style.css ("/style.css" on the Worker, "style.css"

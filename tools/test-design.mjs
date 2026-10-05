@@ -71,7 +71,7 @@ for (const { dir, page, file } of files) {
       // The default view ships in the HTML; script only re-renders on filter changes.
       assert.match(html, /<div class="talent-filters" id="talent-filters"><label>/, 'filters pre-rendered');
       assert.match(html, /<div id="talent-content" aria-live="polite"><(div class="combo-breakdown"|section class="panel")/, 'talent content pre-rendered');
-      assert.equal(count(html, /<select data-field="\w+" autocomplete="off">/g), 5, 'filters opt out of form restore');
+      assert.equal(count(html, /<select class="vsel-native" data-field="\w+" autocomplete="off">/g), 5, 'filters opt out of form restore');
     }
   });
 }

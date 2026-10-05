@@ -1,4 +1,4 @@
-import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE, SELECT_SCRIPT } from "./census.mjs";
 
 function time(t) { return t ? new Date(t*1000).toISOString().slice(0,16).replace("T"," ")+"Z" : "Unavailable"; }
 export function renderInspectCoverage(data, href) {
@@ -69,7 +69,7 @@ export function renderTalentsHtml(data, opts={}) {
     .talent-combo-table .combo-name img{vertical-align:middle;margin-right:7px;flex:none}
     .talent-popularity-table{table-layout:auto}.talent-popularity-table td:nth-child(2){white-space:normal;text-overflow:clip}
     @media(max-width:1050px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
-    @media(max-width:600px){.talent-filters label{flex:1 1 40%}.talent-filters select{max-width:100%;width:100%}
+    @media(max-width:600px){.talent-filters label{flex:1 1 40%}.talent-filters select{max-width:100%;width:100%}.talent-filters .vsel-trigger{width:100%}
       .talent-combo-table th:first-child,.talent-combo-table td:first-child{width:50%}
       .talent-combo-table th:nth-child(2),.talent-combo-table td:nth-child(2){width:26%}
       .talent-combo-table th:nth-child(3),.talent-combo-table td:nth-child(3){width:24%}}
@@ -82,7 +82,7 @@ export function renderTalentsHtml(data, opts={}) {
     <div id="talent-content" aria-live="polite">${talentMarkup("content", data.records)}</div>
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>
     <script type="application/json" id="talent-data">${payload}</script>
-    <script>${TALENT_SCRIPT}</script></body></html>`;
+    <script>${TALENT_SCRIPT}</script>${SELECT_SCRIPT}</body></html>`;
 }
 // Builds the filter row or the results for a set of inspection records. It runs
 // at build time for the unfiltered view, so the page paints complete with no
@@ -97,7 +97,7 @@ function talentMarkup(part, records) {
  if(part==='filters'){
   const fields=[['classFile','Class'],['race','Race'],['realm','Realm'],['faction','Faction'],['level','Level']];
   return fields.map(([key,label])=>{const values=[...new Set(records.map(r=>r[key]).filter(v=>v!=null&&v!==''))].sort((a,b)=>key==='level'?a-b:String(a).localeCompare(String(b)));
-   return '<label>'+escape(label)+'<select data-field="'+key+'" autocomplete="off"><option value="">All</option>'+values.map(v=>'<option value="'+escape(v)+'">'+escape(key==='classFile'?cls(v):v)+'</option>').join('')+'</select></label>';
+   return '<label>'+escape(label)+'<select class="vsel-native" data-field="'+key+'" autocomplete="off"><option value="">All</option>'+values.map(v=>'<option value="'+escape(v)+'">'+escape(key==='classFile'?cls(v):v)+'</option>').join('')+'</select></label>';
   }).join('');
  }
  const rows=records, withNodes=rows.filter(r=>r.talents.length), classified=rows.filter(r=>r.classification&&r.classification!=='Unknown build'), talents=new Map(), denominators={};

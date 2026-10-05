@@ -1,4 +1,4 @@
-import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE, SELECT_SCRIPT } from "./census.mjs";
 
 function time(t) { return t ? new Date(t*1000).toISOString().slice(0,16).replace("T"," ")+"Z" : "Unavailable"; }
 
@@ -75,7 +75,7 @@ export function renderGearHtml(data, opts={}) {
     .iq0{color:#9d9d9d}.iq1{color:#fff}.iq2{color:#1eff00}.iq3{color:#0070dd}.iq4{color:#a335ee}.iq5{color:#ff8000}.iq6,.iq7{color:#e6cc80}
     @media(max-width:1050px){.gear-grid{grid-template-columns:1fr}}
     @media(max-width:900px){.gear-top-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
-    @media(max-width:600px){.gear-filters label{flex:1 1 40%}.gear-filters select{max-width:100%;width:100%}
+    @media(max-width:600px){.gear-filters label{flex:1 1 40%}.gear-filters select{max-width:100%;width:100%}.gear-filters .vsel-trigger{width:100%}
       .gear-top-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gear-top-item{min-height:132px}
       .gear-table th:first-child,.gear-table td:first-child{width:46%}.gear-table th:nth-child(2),.gear-table td:nth-child(2){width:31%}.gear-table th:nth-child(3),.gear-table td:nth-child(3){width:23%}}
     </style></head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
@@ -85,7 +85,7 @@ export function renderGearHtml(data, opts={}) {
     ${withGear?`<div id="gear-content" aria-live="polite">${gearMarkup("content", records, packed.wowhead)}</div>`:""}
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>
     ${withGear?`<script type="application/json" id="gear-data">${payload}</script>
-    <script>${GEAR_SCRIPT}</script>
+    <script>${GEAR_SCRIPT}</script>${SELECT_SCRIPT}
     <script>const whTooltips={colorLinks:false,iconizeLinks:false,renameLinks:false};</script><script src="https://wow.zamimg.com/js/tooltips.js" async></script>`:""}</body></html>`;
 }
 
@@ -99,7 +99,7 @@ function gearMarkup(part, records, wowhead) {
  if(part==='filters'){
   const fields=[['classFile','Class'],['race','Race'],['realm','Realm'],['faction','Faction'],['level','Level']];
   return fields.map(([key,label])=>{const values=[...new Set(records.map(r=>r[key]).filter(v=>v!=null&&v!==''))].sort((a,b)=>key==='level'?a-b:String(a).localeCompare(String(b)));
-   return '<label>'+escape(label)+'<select data-field="'+key+'" autocomplete="off"><option value="">All</option>'+values.map(v=>'<option value="'+escape(v)+'">'+escape(key==='classFile'?cls(v):v)+'</option>').join('')+'</select></label>';
+   return '<label>'+escape(label)+'<select class="vsel-native" data-field="'+key+'" autocomplete="off"><option value="">All</option>'+values.map(v=>'<option value="'+escape(v)+'">'+escape(key==='classFile'?cls(v):v)+'</option>').join('')+'</select></label>';
   }).join('');
  }
  if(!records.length)return part==='top'?'<p class="hint">No inspected gear for these filters.</p>':'<section class="panel"><p class="hint" style="margin:0">No inspected gear for these filters.</p></section>';
