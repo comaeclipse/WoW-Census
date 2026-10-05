@@ -93,7 +93,7 @@ function comboCards(groups, opts = {}) {
       '</article>';
   }).filter(Boolean).join("");
   const more = opts.comboHref
-    ? '<a class="combo-more" href="' + esc(opts.comboHref) + '">See more</a>'
+    ? '<a class="combo-more" href="' + esc(opts.comboHref) + '">Explore race and class combinations</a>'
     : "";
   return cards ? '<section class="combos"><div class="ptitle combo-title">Most popular race + class' + more + '</div><div class="combogrid">' + cards + '</div></section>' : "";
 }
@@ -556,10 +556,12 @@ ${seoHead(opts.title || topic + " – WoWCensus", description, opts.canonical)}
     <div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>
     ${navigation.breadcrumbs || notes}
   </header>
+  <main>
   <div class="page-controls">${navigation.pages || ""}${chips}</div>
   ${panes}
   ${opts.inspectCoverage || ""}
   ${generatedNote}
+  </main>
 </div>
 ${chips ? TOGGLE_SCRIPT : ""}
 <script>(function(){

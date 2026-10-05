@@ -42,8 +42,8 @@ export function renderGearHtml(data, opts={}) {
   const records=unpackGearRecords(packed);
   const withGear=records.length;
   const summary=withGear
-    ? `${withGear.toLocaleString()} of ${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days had readable equipment. Shares count players, within the filtered set, wearing an item in that slot; rings and trinkets count each player once per item. This is a sample of visible players, not the whole population. Latest inspection: ${esc(time(data.lastT))}.`
-    : `No inspected gear for ${esc(opts.gameLabel||"this edition")} yet. Gear is read during the same inspection as talents by the NameplateInspect addon; it is verified on WoW Forever and can be switched on for testing elsewhere with <code>/npi gear</code>.`;
+    ? `Latest inspection: ${esc(time(data.lastT))}`
+    : `No inspected gear for ${esc(opts.gameLabel||"this edition")} yet. Gear is collected during the same inspection as talents and will appear in a future snapshot when available.`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     ${seoHead(topic+" – WoWCensus", seoGameLabel+" equipment seen on inspected players: the most equipped items in every slot and how often they are enchanted.", opts.canonical)}
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96"><link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
@@ -81,7 +81,7 @@ export function renderGearHtml(data, opts={}) {
     </style></head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
     <header class="ihead"><div class="page-heading">${pageHeading("WoWCensus", nav, topic)}${nav.games||""}</div>${nav.breadcrumbs||""}</header>
     <div class="page-controls">${nav.pages||""}</div>
-    ${withGear?`<section class="panel gear-top-panel"><div class="ptitle">Most equipped by slot</div><p class="hint gear-summary" style="margin:0 0 15px">${summary}</p><div id="gear-top">${gearMarkup("top", records, packed.wowhead)}</div><div class="gear-filters" id="gear-filters">${gearMarkup("filters", records, packed.wowhead)}</div></section>`:`<section class="panel" style="margin-bottom:22px"><p class="hint gear-summary" style="margin:0">${summary}</p></section>`}
+    ${withGear?`<section class="panel gear-top-panel"><div class="ptitle">Most equipped by slot</div><div id="gear-top">${gearMarkup("top", records, packed.wowhead)}</div><div class="gear-filters" id="gear-filters">${gearMarkup("filters", records, packed.wowhead)}</div><p class="hint" style="margin:14px 0 0">${summary}</p></section>`:`<section class="panel" style="margin-bottom:22px"><p class="hint gear-summary" style="margin:0">${summary}</p></section>`}
     ${withGear?`<div id="gear-content" aria-live="polite">${gearMarkup("content", records, packed.wowhead)}</div>`:""}
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>
     ${withGear?`<script type="application/json" id="gear-data">${payload}</script>

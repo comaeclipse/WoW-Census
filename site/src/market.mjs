@@ -177,7 +177,7 @@ function renderMarketView(snapshot, threshold, analysisLabel = "") {
   ]);
 
   const body = items.length
-    ? catPanel + '<div class="mktgrid">' + qtyTable + priceTable + "</div>" + (aggregateOnly ? "" : valueTable)
+    ? '<div class="mktgrid">' + qtyTable + priceTable + "</div>" + catPanel + (aggregateOnly ? "" : valueTable)
     : '<div class="panel"><p class="hint">No auction scan is in the current snapshot for ' +
       esc(realms.map(realmName).join(" · ") || "this faction") +
       ' yet. Run /ml scan at the auction house, /reload, then rebuild the local site snapshot.</p></div>';

@@ -1,7 +1,7 @@
 # WoWCensus design principles
 
-The governing rules for the website (`site/` Worker pages and the static
-`pages/` bundle on wowcensus). Change a rule here first, then the code.
+The governing rules for the static website generated into `static/` for
+wowcensus.io. Change a rule here first, then the code.
 `node --test tools/test-design.mjs` enforces the mechanical parts against the
 built bundle; the checklist at the end covers what a test cannot see.
 
@@ -104,12 +104,13 @@ identical across editions: adding a page or game means adding it everywhere.
 
 ## 8. Build rules
 
-- `site/src/*.mjs` renderers are shared by the Worker and the static build, so
-  the two can't drift. Style changes go into `site/public/style.css` or the
-  renderer's shared `CENSUS_STYLE`, never by hand-editing `pages/`.
+- `site/src/*.mjs` renderers are shared across all six editions. Style changes
+  go into `site/public/style.css` or the renderer's shared `CENSUS_STYLE`,
+  never by hand-editing generated `static/` files.
 - The static stylesheet is content-hashed (`style.<sha256:12>.css`) and served
-  immutable. Rebuild every edition after a CSS change so no page references a
-  stale hash.
+  immutable on interior pages. Static landing pages inline it to remove the
+  render-blocking stylesheet request on a cold visit. Rebuild every edition
+  after a CSS change so no page references a stale hash.
 - Pages are static: no runtime fetches. View toggles show/hide pre-rendered
   panes and mirror state in the URL query.
 - The default view is always in the HTML. Scripts may re-render on
@@ -125,7 +126,7 @@ Automated (run after any renderer, CSS, or rebuild change):
 node --test tools/test-design.mjs tools/test-inspects.mjs
 ```
 
-`test-design.mjs` checks the built `pages/` bundle: tokens unchanged; every
+`test-design.mjs` checks the built `static/` bundle: tokens unchanged; every
 edition has every page; each page has the shared head (doctype, lang, viewport,
 current hashed stylesheet, font preloads), the anatomy from section 5 with one
 current game and one current page; every referenced `/fonts/` file exists; no
