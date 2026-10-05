@@ -141,12 +141,21 @@ export async function importInspects(url, env, req) {
   if (body?.type!=="ml-inspects-v1" || !sources.has(body.source) || body.collector!=="NameplateInspect"
       || !Array.isArray(body.records) || body.records.length>1000) return response({error:"invalid inspect payload (maximum 1000 records)"},400);
   const characters=(await env.DB.prepare("SELECT game,character_key,name,realm,race,class_file FROM characters WHERE source_game=?").bind(body.source).all()).results;
+  // Index once per request instead of scanning every character for every inspect.
+  const charactersByNameClass = new Map();
+  for (const character of characters) {
+    const key = `${norm(character.name)}\0${character.class_file}`;
+    const candidates = charactersByNameClass.get(key) || [];
+    candidates.push(character);
+    charactersByNameClass.set(key, candidates);
+  }
   let imported=0,rejected=0,linked=0,unmatched=0,ambiguous=0,nodes=0,withGear=0;
   const now=Math.floor(Date.now()/1000);
   const inspectRows=[], talentRows=[];
   for (const record of body.records) {
     const e=normalizeInspect(record,body.source,now); if(!e){rejected++;continue;}
-    const match=matchInspect(e,characters); if(match.game)linked++;else if(match.status==="ambiguous")ambiguous++;else unmatched++;
+    const candidates = charactersByNameClass.get(`${norm(e.name)}\0${e.class}`) || [];
+    const match=matchInspect(e,candidates); if(match.game)linked++;else if(match.status==="ambiguous")ambiguous++;else unmatched++;
     // Observer context never assigns the inspected character to a faction.
     const bucket=text(body.observerBucket), suffix=/^(.*)-(Alliance|Horde)$/.exec(bucket);
     const values=[body.source,e.guid,e.time,e.rawName,e.name,e.realm||null,e.faction||null,
