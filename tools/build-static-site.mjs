@@ -136,25 +136,12 @@ function writeSiteMetadata() {
     '<meta name="viewport" content="width=device-width,initial-scale=1"><title>Not found</title>' +
     '<meta name="robots" content="noindex"><h1>Not found</h1><p><a href="/">WoWCensus home</a></p></html>\n');
 }
-// Pages serves HTML at extensionless URLs (/tbc/combos, /tbc/), which no /*.html
-// rule matches, and repeating a header across matching rules comma-joins it, so
-// each page gets its own rule. Runs after every HTML file has been written.
+// Cloudflare skips _headers for responses from the Markdown negotiation
+// Function, which handles every request outside its excluded folders and sets
+// page caching itself (tools/build-markdown-negotiation.mjs mirrors these rules).
+// These rules cover the excluded folders (fonts, icons, favicons).
 function writeHeaders() {
-  const pages = [];
-  const visit = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const file = path.join(dir, entry.name);
-      if (entry.isDirectory()) visit(file);
-      else if (entry.name.endsWith(".html") && file !== path.join(out, "404.html"))
-        pages.push("/" + path.relative(out, file).split(path.sep).join("/")
-          .replace(/(^|\/)index\.html$/, "$1").replace(/\.html$/, ""));
-    }
-  };
-  visit(out);
-  const htmlRules = pages.sort().map((url) => `${url}\n  Cache-Control: public, max-age=300\n\n`);
-  // Cloudflare Pages ignores _headers rules past the 100th.
-  if (htmlRules.length + 5 > 100) throw new Error(`Too many _headers rules: ${htmlRules.length + 5}`);
-  write(path.join(out, "_headers"), htmlRules.join("") +
+  write(path.join(out, "_headers"),
     `/*.css\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
     `/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
     `/*.json\n  Cache-Control: public, max-age=300\n\n` +

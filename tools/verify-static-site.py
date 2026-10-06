@@ -49,10 +49,14 @@ def main():
         routes = json.loads(route_file.read_text(encoding="utf-8"))
         sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
         expected = [urlsplit(value).path for value in re.findall(r"<loc>([^<]+)</loc>", sitemap)]
-        if routes != {"version": 1, "include": expected, "exclude": []}:
-            errors.append("Function routes differ from sitemap content routes")
-        if len(expected) > 100:
+        if routes.get("include") != ["/*"] or "/assets/*" not in routes.get("exclude", []):
+            errors.append("Function routes should include /* and exclude the static folders")
+        if len(routes.get("include", [])) + len(routes.get("exclude", [])) > 100:
             errors.append("Too many Pages Function routes")
+        worker = worker_file.read_text(encoding="utf-8")
+        for route in expected:
+            if f'"{route}":' not in worker:
+                errors.append(f"Function has no Markdown route for {route}")
         for route in expected:
             markdown = route + ("index.md" if route.endswith("/") else ".md")
             if not (root / markdown.lstrip("/")).is_file():
