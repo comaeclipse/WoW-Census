@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8791", "--bind", "127.0.0.1"],
       "port": 8791
+    },
+    {
+      "name": "pages-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["wrangler", "pages", "dev", "static", "--port", "8788"],
+      "port": 8788
     }
   ]
 }
