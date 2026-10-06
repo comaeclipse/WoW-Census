@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Render every WoWCensus edition from the local SQLite database. No network,
-// Cloudflare binding, KV publication, or Pages Function is used.
+// Render every WoWCensus edition from the local SQLite database. The only
+// Pages Function selects prebuilt Markdown for content negotiation.
 // Usage: node tools/build-static-site.mjs --db=C:/path/marketlens-unified.sqlite
 //        node tools/build-static-site.mjs --db=... --out=static
 //        node tools/build-static-site.mjs --db=... --source=classic-beta[,retail]
@@ -234,9 +234,10 @@ async function main() {
   if (markdown.status !== 0) throw new Error("Markdown build failed");
   localizeMirroredAssets();
   writeHeaders();
+  const negotiation = spawnSync(process.execPath, [path.join(repo, "tools/build-markdown-negotiation.mjs"), `--out=${out}`],
+    { cwd: repo, stdio: "inherit" });
+  if (negotiation.status !== 0) throw new Error("Markdown negotiation build failed");
   write(path.join(out, "build-report.json"), JSON.stringify(report, null, 2) + "\n");
-  for (const forbidden of ["_worker.js", "_routes.json"])
-    if (fs.existsSync(path.join(out, forbidden))) throw new Error(`Function artifact in static output: ${forbidden}`);
   const verify = spawnSync("python", ["-B", path.join(repo, "tools/verify-static-site.py"), out],
     { cwd: repo, stdio: "inherit" });
   if (verify.status !== 0) throw new Error("Static output verification failed");
