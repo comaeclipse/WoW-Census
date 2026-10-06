@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Render every WoWCensus edition from the local SQLite database. The only
-// Pages Function selects prebuilt Markdown for content negotiation.
+// Render every WoWCensus edition from the local SQLite database. No network,
+// Cloudflare binding, KV publication, or Pages Function is used.
 // Usage: node tools/build-static-site.mjs --db=C:/path/marketlens-unified.sqlite
 //        node tools/build-static-site.mjs --db=... --out=static
 //        node tools/build-static-site.mjs --db=... --source=classic-beta[,retail]
@@ -136,10 +136,9 @@ function writeSiteMetadata() {
     '<meta name="viewport" content="width=device-width,initial-scale=1"><title>Not found</title>' +
     '<meta name="robots" content="noindex"><h1>Not found</h1><p><a href="/">WoWCensus home</a></p></html>\n');
 }
-// Cloudflare skips _headers for responses from the Markdown negotiation
-// Function, which handles every request outside its excluded folders and sets
-// page caching itself (tools/build-markdown-negotiation.mjs mirrors these rules).
-// These rules cover the excluded folders (fonts, icons, favicons).
+// General rules only, so the file never grows with the page count (Cloudflare
+// reads at most 100). HTML pages keep the Pages default, revalidating on each
+// visit by ETag, which suits pages that only change when a build is deployed.
 function writeHeaders() {
   write(path.join(out, "_headers"),
     `/*.css\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
@@ -218,10 +217,9 @@ async function main() {
   if (markdown.status !== 0) throw new Error("Markdown build failed");
   localizeMirroredAssets();
   writeHeaders();
-  const negotiation = spawnSync(process.execPath, [path.join(repo, "tools/build-markdown-negotiation.mjs"), `--out=${out}`],
-    { cwd: repo, stdio: "inherit" });
-  if (negotiation.status !== 0) throw new Error("Markdown negotiation build failed");
   write(path.join(out, "build-report.json"), JSON.stringify(report, null, 2) + "\n");
+  for (const forbidden of ["_worker.js", "_routes.json"])
+    if (fs.existsSync(path.join(out, forbidden))) throw new Error(`Function artifact in static output: ${forbidden}`);
   const verify = spawnSync("python", ["-B", path.join(repo, "tools/verify-static-site.py"), out],
     { cwd: repo, stdio: "inherit" });
   if (verify.status !== 0) throw new Error("Static output verification failed");

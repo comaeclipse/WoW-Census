@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the locally built Pages tree and its narrow Markdown Function routes."""
+"""Check that the locally built Pages tree needs no runtime Function."""
 import json
 import re
 import sys
@@ -41,26 +41,9 @@ def resolve_asset(root, pathname):
 def main():
     root = Path(sys.argv[1] if len(sys.argv) > 1 else "static").resolve()
     errors = []
-    route_file = root / "_routes.json"
-    worker_file = root / "_worker.js"
-    if not route_file.is_file() or not worker_file.is_file():
-        errors.append("Missing Markdown negotiation Function")
-    else:
-        routes = json.loads(route_file.read_text(encoding="utf-8"))
-        sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
-        expected = [urlsplit(value).path for value in re.findall(r"<loc>([^<]+)</loc>", sitemap)]
-        if routes.get("include") != ["/*"] or "/assets/*" not in routes.get("exclude", []):
-            errors.append("Function routes should include /* and exclude the static folders")
-        if len(routes.get("include", [])) + len(routes.get("exclude", [])) > 100:
-            errors.append("Too many Pages Function routes")
-        worker = worker_file.read_text(encoding="utf-8")
-        for route in expected:
-            if f'"{route}":' not in worker:
-                errors.append(f"Function has no Markdown route for {route}")
-        for route in expected:
-            markdown = route + ("index.md" if route.endswith("/") else ".md")
-            if not (root / markdown.lstrip("/")).is_file():
-                errors.append(f"Missing negotiated Markdown: {route}")
+    for name in ("_worker.js", "_routes.json"):
+        if (root / name).exists():
+            errors.append(f"Function artifact: {name}")
     for edition in EDITIONS:
         directory = root / edition
         for page in PAGES:
