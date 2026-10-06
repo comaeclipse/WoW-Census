@@ -93,21 +93,26 @@ def main():
                 errors.append(f"Missing data: {edition}/{name}")
             else:
                 json.loads(file.read_text(encoding="utf-8"))
-    # Race profiles, then class profiles (CLASS_PROFILES in site/src/class-profile.mjs).
-    for race in ("human", "dwarf", "gnome", "skyborne", "night-elf", "orc", "undead", "tauren", "horde-skyborne", "troll", "paladin", "warrior", "druid", "hunter", "shaman", "priest", "rogue", "mage", "warlock"):
+    # Race and class profiles are the sitemap's two-segment routes (/forever/troll/, /tbc/paladin/).
+    sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
+    profiles = re.findall(r"<loc>https://[^/<]+(/[^/<]+/[^/<]+/)</loc>", sitemap)
+    if not profiles:
+        errors.append("No race or class profiles in sitemap")
+    for route in profiles:
+        directory = root / route.strip("/")
         for name in ("index.html", "index.md"):
-            if not (root / "forever" / race / name).is_file():
-                errors.append(f"Missing race profile: forever/{race}/{name}")
-        race_html = root / "forever" / race / "index.html"
-        if race_html.is_file():
+            if not (directory / name).is_file():
+                errors.append(f"Missing profile page: {route}{name}")
+        profile_html = directory / "index.html"
+        if profile_html.is_file():
             parser = Links()
-            parser.feed(race_html.read_text(encoding="utf-8"))
+            parser.feed(profile_html.read_text(encoding="utf-8"))
             for ref in parser.urls:
-                url = urlsplit(urljoin(f"https://wowcensus.io/forever/{race}/", ref))
+                url = urlsplit(urljoin(f"https://wowcensus.io{route}", ref))
                 if url.netloc == "wowcensus.io" and not resolve_asset(root, url.path):
-                    errors.append(f"Missing {race} profile asset: {ref}")
-            if "https://wow.zamimg.com/" in race_html.read_text(encoding="utf-8"):
-                errors.append(f"Remote {race} profile icon URL")
+                    errors.append(f"Missing {route} profile asset: {ref}")
+            if "https://wow.zamimg.com/" in profile_html.read_text(encoding="utf-8"):
+                errors.append(f"Remote {route} profile icon URL")
     for file in root.rglob("*"):
         if not file.is_file() or file.suffix not in (".html", ".js", ".css") or "assets" in file.parts:
             continue

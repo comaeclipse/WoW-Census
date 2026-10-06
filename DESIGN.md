@@ -85,8 +85,9 @@ In this order:
 Every edition gets every page, even with no data. An empty page says so plainly
 in the normal layout; it never disappears or breaks the nav. Navigation is
 identical across editions: adding a page or game means adding it everywhere.
-Edition-specific race profiles may have their own nested routes when supported
-by inspected data; they link from that edition's Talents page.
+Games with enough inspected data get race and class profiles under their own
+prefix (`/forever/troll/`, `/tbc/paladin/`), configured in
+`site/src/profile-games.mjs` and linked from that edition's Talents page.
 
 ## 6. Data honesty is part of the design
 
@@ -94,6 +95,9 @@ by inspected data; they link from that edition's Talents page.
   "X players online". Inspected talents are a nearby-player sample, never
   population-wide spec shares; the page says so.
 - Talent data is pooled **per game**, never split by realm.
+- Talent rankings need a minimum sample (`MIN_SAMPLE`, 20 players). A smaller
+  spec column or class card shows its count and says there is not enough data
+  yet, rather than ranking picks that read as 0% or 100%.
 - Every data page states its freshness (`Scanned <date>` / `Latest inspection`),
   including when a prose summary replaces the tiles.
 - No disclaimers or filler copy beyond what's needed to read the number correctly.

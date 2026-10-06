@@ -136,6 +136,11 @@ function htmlToMarkdown(source) {
 
 module.exports = { htmlToMarkdown };
 
+function profileRoutes(root) {
+  const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
+  return [...sitemap.matchAll(/<loc>https:\/\/[^/<]+(\/[^/<]+\/[^/<]+\/)<\/loc>/g)].map((m) => m[1]);
+}
+
 function main() {
   for (const edition of editions) {
     for (const name of names) {
@@ -148,21 +153,13 @@ function main() {
     }
   }
 
-  if (!editionArg || editions.includes('')) {
-    // Keep in step with RACE_PROFILES in site/src/race-profile.mjs.
-    for (const race of ['human', 'dwarf', 'gnome', 'skyborne', 'night-elf', 'orc', 'undead', 'tauren', 'horde-skyborne', 'troll']) {
-      const html = path.join(root, 'forever', race, 'index.html');
-      if (!fs.existsSync(html)) throw new Error(`Missing race profile: ${html}`);
-      writeFile(path.join(root, 'forever', race, 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
-      routes.push(`/forever/${race}/`);
-    }
-    // Keep in step with CLASS_PROFILES in site/src/class-profile.mjs.
-    for (const cls of ['paladin', 'warrior', 'druid', 'hunter', 'shaman', 'priest', 'rogue', 'mage', 'warlock']) {
-      const html = path.join(root, 'forever', cls, 'index.html');
-      if (!fs.existsSync(html)) throw new Error(`Missing class profile: ${html}`);
-      writeFile(path.join(root, 'forever', cls, 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
-      routes.push(`/forever/${cls}/`);
-    }
+  // Race and class profiles (/forever/troll/, /tbc/paladin/) are the sitemap's
+  // two-segment routes; the static build writes the sitemap first.
+  for (const route of profileRoutes(root)) {
+    const html = path.join(root, route, 'index.html');
+    if (!fs.existsSync(html)) throw new Error(`Missing profile page: ${html}`);
+    writeFile(path.join(root, route, 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
+    routes.push(route);
   }
 
   console.log(`Built ${routes.length} Markdown page variants in ${root}`);

@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{{RACE}} Specs &amp; Talents – WoW Forever – WoWCensus</title>
+<title>{{RACE}} Specs &amp; Talents – {{GAME}} – WoWCensus</title>
 <link rel="preload" href="../static/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../static/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../static/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -140,6 +140,7 @@ a{color:var(--blue)}
 .pick .mini i{display:block;height:100%;background:var(--gold)}
 .card-f{padding:10px 14px;border-top:2px solid var(--line);background:var(--panel2);font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);line-height:1.8}
 .card[hidden]{display:none}
+.colnote{margin:0;padding:12px 0 4px;font-size:17px;color:var(--muted)}
 
 @media (max-width:760px){
   .page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}
@@ -161,7 +162,7 @@ a{color:var(--blue)}
 
 <header class="ihead">
   <div class="page-heading">
-    <h1 class="iname">WoWCensus<span class="itopic">WoW Forever {{RACE}} Specs &amp; Talents</span></h1>
+    <h1 class="iname">WoWCensus<span class="itopic">{{GAME}} {{RACE}} Specs &amp; Talents</span></h1>
     <nav class="games game-nav">
       <a class="game" aria-current="true" href="#">Forever</a>
       <a class="game" href="#">TBC Anniversary</a>
@@ -263,6 +264,8 @@ const SPECICON = {"Enhancement":"spell_nature_lightningshield","Restoration:SHAM
   "Balance":"spell_nature_starfall","Feral Combat":"ability_racial_bearform","Restoration:DRUID":"spell_nature_healingtouch"};
 // "Spec:CLASS" -> color; race-profile.mjs fills this from class-profile.mjs SPEC_COLORS.
 const SPECCOLOR = {};
+// Below this many players a card shows its count instead of ranking talents; race-profile.mjs fills it in.
+const MIN_SAMPLE = 0;
 const specColor = (s, cf) => SPECCOLOR[s + ":" + cf] || CLASS[cf][1];
 const D = {"n":425,"classes":{"WARRIOR":{"n":37,"spec":{"Arms":9,"Protection":18,"Arms/Fury":2,"Fury":5,"Unknown build":2,"Fury/Arms":1},"tal":[{"name":"Shield Specialization","pct":49,"avgRank":4.3,"max":5,"icon":"inv_shield_06","tree":"Protection"},{"name":"Improved Rend","pct":27,"avgRank":2.5,"max":3,"icon":"ability_gouge","tree":"Arms"},{"name":"Cruelty","pct":27,"avgRank":3.9,"max":5,"icon":"ability_rogue_eviscerate","tree":"Fury"},{"name":"Improved Bloodrage","pct":27,"avgRank":1.7,"max":2,"icon":"ability_racial_bloodrage","tree":"Protection"},{"name":"Improved Thunder Clap","pct":24,"avgRank":2.8,"max":3,"icon":"ability_thunderclap","tree":"Protection"},{"name":"Improved Heroic Strike","pct":16,"avgRank":2.8,"max":3,"icon":"ability_rogue_ambush","tree":"Arms"}],"trees":{"Protection":4.1,"Arms":2.5,"Fury":1.6},"medLv":18},"SHAMAN":{"n":202,"spec":{"Enhancement":152,"Restoration":27,"Elemental":14,"Enhancement/Restoration":4,"Restoration/Enhancement":3,"Restoration/Elemental/Enhancement":1,"Elemental/Enhancement":1},"tal":[{"name":"Thundering Strikes","pct":71,"avgRank":4.5,"max":5,"icon":"ability_thunderbolt","tree":"Enhancement"},{"name":"Mental Dexterity","pct":65,"avgRank":2.8,"max":3,"icon":"spell_nature_mentalquickness","tree":"Enhancement"},{"name":"Improved Ghost Wolf","pct":52,"avgRank":1.9,"max":2,"icon":"spell_nature_spiritwolf","tree":"Enhancement"},{"name":"Shamanistic Focus","pct":46,"avgRank":1,"max":1,"icon":"spell_nature_elementalabsorption","tree":"Enhancement"},{"name":"Elemental Weapons","pct":38,"avgRank":2.5,"max":3,"icon":"spell_fire_flametounge","tree":"Enhancement"},{"name":"Ancestral Knowledge","pct":35,"avgRank":2.6,"max":5,"icon":"spell_shadow_grimward","tree":"Enhancement"}],"trees":{"Enhancement":9.3,"Restoration":1.8,"Elemental":0.5},"medLv":21},"HUNTER":{"n":61,"spec":{"Beast Mastery/Marksmanship":6,"Marksmanship":18,"Beast Mastery":32,"Marksmanship/Beast Mastery":2,"Beast Mastery/Survival":1,"Survival/Marksmanship":1,"Beast Mastery/Marksmanship/Survival":1},"tal":[{"name":"Deadly Aspects","pct":56,"avgRank":3.4,"max":5,"icon":"spell_nature_ravenform","tree":"Beast Mastery"},{"name":"Endurance Training","pct":49,"avgRank":2.9,"max":5,"icon":"spell_nature_reincarnation","tree":"Beast Mastery"},{"name":"Lethal Attacks","pct":38,"avgRank":4.3,"max":5,"icon":"ability_searingarrow","tree":"Marksmanship"},{"name":"Focused Fire","pct":31,"avgRank":1.8,"max":2,"icon":"inv_weapon_crossbow_10","tree":"Beast Mastery"},{"name":"Careful Aim","pct":26,"avgRank":4.1,"max":5,"icon":"ability_hunter_zenarchery","tree":"Marksmanship"},{"name":"Hawk Eye","pct":18,"avgRank":2.5,"max":3,"icon":"ability_townwatch","tree":"Marksmanship"}],"trees":{"Beast Mastery":5.7,"Marksmanship":3.9,"Survival":0.2},"medLv":19},"PRIEST":{"n":21,"spec":{"Discipline":8,"Shadow":3,"Discipline/Shadow":2,"Discipline/Holy":1,"Shadow/Holy":1,"Holy":4,"Holy/Shadow":2},"tal":[{"name":"Wand Specialization","pct":76,"avgRank":1.9,"max":2,"icon":"inv_wand_01","tree":"Discipline"},{"name":"Twin Disciplines","pct":43,"avgRank":3.8,"max":5,"icon":"spell_holy_sealofvengeance","tree":"Discipline"},{"name":"Spirit Tap","pct":38,"avgRank":4.8,"max":5,"icon":"spell_shadow_requiem","tree":"Shadow"},{"name":"Improved Power Word: Shield","pct":33,"avgRank":2.7,"max":3,"icon":"spell_holy_powerwordshield","tree":"Discipline"},{"name":"Meditation","pct":29,"avgRank":3,"max":3,"icon":"spell_nature_sleep","tree":"Discipline"},{"name":"Improved Renew","pct":29,"avgRank":2.5,"max":3,"icon":"spell_holy_renew","tree":"Holy"}],"trees":{"Discipline":6.7,"Shadow":2.8,"Holy":2.5},"medLv":20},"ROGUE":{"n":11,"spec":{"Combat/Subtlety":1,"Combat":5,"Assassination":1,"Assassination/Combat":1,"Combat/Assassination":2,"Subtlety":1},"tal":[{"name":"Improved Sinister Strike","pct":82,"avgRank":1.9,"max":2,"icon":"spell_shadow_ritualofsacrifice","tree":"Combat"},{"name":"Improved Eviscerate","pct":73,"avgRank":2.6,"max":3,"icon":"ability_rogue_eviscerate","tree":"Combat"},{"name":"Precision","pct":45,"avgRank":2.6,"max":3,"icon":"ability_marksmanship","tree":"Combat"},{"name":"Deflection","pct":36,"avgRank":3,"max":3,"icon":"ability_parry","tree":"Combat"},{"name":"Malice","pct":36,"avgRank":4.5,"max":5,"icon":"ability_racial_bloodrage","tree":"Assassination"},{"name":"Riposte","pct":27,"avgRank":1,"max":1,"icon":"ability_warrior_challange","tree":"Combat"}],"trees":{"Combat":6.5,"Assassination":3.9,"Subtlety":1},"medLv":22},"PALADIN":{"n":93,"spec":{"Protection":42,"Retribution":35,"Protection/Retribution":1,"Retribution/Holy":3,"Holy":9,"Holy/Retribution":1,"Protection/Holy/Retribution":1,"Protection/Holy":1},"tal":[{"name":"Redoubt","pct":47,"avgRank":4.5,"max":5,"icon":"ability_defend","tree":"Protection"},{"name":"Benediction","pct":39,"avgRank":4,"max":5,"icon":"spell_frost_windwalkon","tree":"Retribution"},{"name":"Precision","pct":34,"avgRank":2.9,"max":3,"icon":"ability_rogue_ambush","tree":"Protection"},{"name":"Improved Judgement","pct":31,"avgRank":1.9,"max":2,"icon":"spell_holy_righteousfury","tree":"Retribution"},{"name":"Anticipation","pct":30,"avgRank":2.3,"max":5,"icon":"spell_magic_lesserinvisibilty","tree":"Protection"},{"name":"Shield Specialization","pct":29,"avgRank":2.2,"max":3,"icon":"inv_shield_06","tree":"Protection"}],"trees":{"Protection":5.7,"Retribution":4.5,"Holy":1.1},"medLv":21}}};
 
@@ -280,7 +283,7 @@ for (const cf of order) {
   if (h) hybrids.push({cf, s: "Hybrid / unknown", n: h});
 }
 specs.sort((a, b) => b.n - a.n);
-const topN = specs[0].n;
+const topN = specs[0]?.n || 1;
 const row = (r, i, max, hy) => {
   const cn = CLASS[r.cf][0], col = hy ? CLASS[r.cf][1] : specColor(r.s, r.cf);
   const icon = hy ? "classicon_" + r.cf.toLowerCase() : (SPECICON[r.s + ":" + r.cf] || SPECICON[r.s]);
@@ -322,9 +325,9 @@ document.getElementById("cards").innerHTML = order.map(cf => {
     <div class="card-b">
       <p class="lbl">Spec split</p><div class="specbar">${seg}</div><div class="speckey">${key}</div>
       <p class="lbl">Avg points per tree</p><div class="trees">${tr}</div>
-      <p class="lbl">Most-picked talents</p><ul class="tal">${tal}</ul>
+      <p class="lbl">Most-picked talents</p>${c.n < MIN_SAMPLE ? `<p class="colnote">Not enough data yet to rank talents.</p>` : `<ul class="tal">${tal}</ul>`}
     </div>
-    <div class="card-f">Median level ${c.medLv}${c.n < 30 ? " · small sample, read loosely" : ""}</div>
+    <div class="card-f">Median level ${c.medLv}</div>
   </article>`;
 }).join("");
 

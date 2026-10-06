@@ -1,13 +1,11 @@
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { CLASS_META } from "./census.mjs";
+import { PROFILE_GAMES, GAME_NAV, pageNav, talentsPath, MIN_SAMPLE, rootPrefix } from "./profile-games.mjs";
 
-// Class talent pages, one column per talent tree. Keyed by edition source so
-// another game only needs an entry here; `dir` is the route prefix, which for
-// Forever matches the race profiles (/forever/<race>/).
-export const CLASS_PROFILES = {
-  "classic-beta": { dir: "forever", nav: "Forever", gameLabel: "WoW Forever", classes: ["PALADIN", "WARRIOR", "DRUID", "HUNTER", "SHAMAN", "PRIEST", "ROGUE", "MAGE", "WARLOCK"] },
-};
+// Class talent pages, one column per talent tree, for every game in PROFILE_GAMES.
+const CLASSES = ["PALADIN", "WARRIOR", "DRUID", "HUNTER", "SHAMAN", "PRIEST", "ROGUE", "MAGE", "WARLOCK"];
+export const CLASS_PROFILES = Object.fromEntries(Object.entries(PROFILE_GAMES).map(([source, game]) => [source, { ...game, classes: CLASSES }]));
 // Trees in the game's own order, with the icon and spec color each tree uses.
 const CLASS_TREES = {
   PALADIN: [["Holy", "spell_holy_holybolt", "#eeb138"], ["Protection", "spell_holy_devotionaura", "#4c9ddb"], ["Retribution", "spell_holy_auraoflight", "#a96be0"]],
@@ -22,8 +20,6 @@ const CLASS_TREES = {
 };
 // "Spec:CLASS" -> color, shared with the race profiles.
 export const SPEC_COLORS = Object.fromEntries(Object.entries(CLASS_TREES).flatMap(([cf, trees]) => trees.map(([t, , c]) => [t + ":" + cf, c])));
-const GAME_NAV = [["Forever", "/"], ["TBC Anniversary", "/tbc/"], ["Classic Era", "/classic/"], ["SoD", "/sod/"], ["MoP Classic", "/mop/"], ["Retail", "/retail/"]];
-const PAGE_NAV = [["Census", "/"], ["Auction House", "/auctionhouse"], ["Guilds", "/guilds"], ["Geography", "/geography"], ["Talents", "/talents"], ["Gear", "/gear"]];
 
 export const classSlug = (cf) => (CLASS_META[cf]?.[0] || cf).toLowerCase().replace(/\s+/g, "-");
 export const classRoute = (source, cf) => `/${CLASS_PROFILES[source].dir}/${classSlug(cf)}/`;
@@ -85,7 +81,6 @@ const CLASS_STYLE = `
 .ranks .tt b{display:block;font-weight:400;font-size:19px;line-height:1.05}
 .ranks .meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:16px;color:var(--muted)}
 .ranks li.none{opacity:.5}
-.colnote{margin:0;padding:12px 0 4px;font-size:17px;color:var(--muted)}
 .speccol .card-h .cn{white-space:nowrap}
 .specbar{height:22px}
 /* The columns are not clickable, so no hover. */
@@ -95,7 +90,7 @@ const CLASS_STYLE = `
 
 export function renderClassProfile(inspects, source, classFile, opts) {
   const P = CLASS_PROFILES[source], D = classProfile(inspects, classFile);
-  const route = classRoute(source, classFile), prefix = "../".repeat(route.split("/").filter(Boolean).length);
+  const route = classRoute(source, classFile), prefix = rootPrefix(route);
   const icon = (n) => prefix + "assets/images/wow/icons/large/" + n + ".jpg";
   const treeColor = (i) => CLASS_TREES[classFile]?.[i]?.[2] || ["var(--gold)", "var(--blue)", "var(--green)"][i] || "var(--gold)";
   const className = CLASS_META[classFile]?.[0] || classFile;
@@ -118,7 +113,8 @@ export function renderClassProfile(inspects, source, classFile, opts) {
         `<span class="tt"><b>${esc(x.name)}</b><span class="meta"><span class="pips" title="Average rank ${x.avgRank} of ${x.max}">${pips}</span></span></span>` +
         `<span class="pick"><b>${x.pct}%</b><div class="mini"><i style="width:${x.pct}%"></i></div></span></li>`;
     }).join("");
-    const body = !t.n ? `<p class="colnote">No ${esc(t.tree)} ${esc(plural)} in this sample.</p>` : `<ol class="ranks">${rows}</ol>`;
+    const body = !t.n ? `<p class="colnote">No ${esc(t.tree)} ${esc(plural)} in this sample.</p>`
+      : t.n < MIN_SAMPLE ? `<p class="colnote">Not enough data yet to rank talents.</p>` : `<ol class="ranks">${rows}</ol>`;
     return `<article class="card speccol" data-tree="${esc(t.tree)}" style="--c:${treeColor(i)}">` +
       `<div class="card-h"><img src="${esc(icon(CLASS_TREES[classFile]?.[i]?.[1] || "classicon_" + classFile.toLowerCase()))}" alt="" width="40" height="40"><h4>${esc(t.tree)}</h4>` +
       `<div class="cn" title="${t.n} players"><b>${t.n}</b>${pct(t.n, D.n)}%</div></div>` +
@@ -140,10 +136,10 @@ ${fonts.map((f) => `<link rel="preload" href="${prefix}fonts/${f}.woff2" as="fon
     <h1 class="iname">WoWCensus<span class="itopic">${esc(P.gameLabel)} ${esc(className)} Talents</span></h1>
     <nav class="games game-nav">${GAME_NAV.map(([label, href]) => `<a class="game"${label === P.nav ? ' aria-current="true"' : ""} href="${href}">${label}</a>`).join("")}</nav>
   </div>
-  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="/">${esc(P.nav)}</a><span aria-hidden="true">/</span><a href="/talents">Talents</a><span aria-hidden="true">/</span><span aria-current="page">${esc(className)}</span></nav>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="${P.home}">${esc(P.nav)}</a><span aria-hidden="true">/</span><a href="${talentsPath(source)}">Talents</a><span aria-hidden="true">/</span><span aria-current="page">${esc(className)}</span></nav>
 </header>
 <div class="page-controls">
-  <nav class="games page-nav">${PAGE_NAV.map(([label, href]) => `<a class="game"${label === "Talents" ? ' aria-current="true"' : ""} href="${href}">${label}</a>`).join("")}</nav>${classChips}
+  <nav class="games page-nav">${pageNav(source).map(([label, href]) => `<a class="game"${label === "Talents" ? ' aria-current="true"' : ""} href="${href}">${label}</a>`).join("")}</nav>${classChips}
 </div>
 <section class="hero slab">
   <img class="portrait" src="${esc(icon("classicon_" + classFile.toLowerCase()))}" alt="" width="96" height="96">

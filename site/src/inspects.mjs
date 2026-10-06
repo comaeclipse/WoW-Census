@@ -1,9 +1,12 @@
 import catalog from "./forever-talents.json" with { type: "json" };
+import tbcCatalog from "./tbc-talents.json" with { type: "json" };
 
 export const INSPECT_WINDOW_DAYS = 14;
 const classes = new Set(["WARRIOR","PALADIN","HUNTER","ROGUE","PRIEST","SHAMAN","MAGE","WARLOCK","DRUID","MONK","DEATHKNIGHT","DEMONHUNTER","EVOKER"]);
 const sources = new Set(["classic-beta","classic-progression","classic","retail","mop-classic","sod"]);
 const nodeCatalog = new Map(catalog.nodes.map(n => [n.node, n]));
+// TBC Anniversary reports its own tree names; its catalog only supplies icons.
+const tbcNodes = new Map(tbcCatalog.nodes.map(n => [n.node, n]));
 // The Forever catalog contains internal or shortened labels for these tabs.
 // Keep its raw provenance, but classify builds with the player-facing names.
 const foreverTreeNames = {
@@ -105,7 +108,9 @@ export function describeBuild(e, source) {
       : (source !== "classic-beta" && t.branch ? t.branch : null);
     if (branch) points[branch] = (points[branch] || 0) + t.rank;
     else unresolved.push(t.node);
-    talents.push({...t,branch:branch || (specBased&&t.tree?`Tree ${t.tree}`:"Unmapped talent"),icon:mapped?.icon || null});
+    const tbc = source === "classic-progression" ? tbcNodes.get(t.node) : null;
+    const icon = mapped?.icon || (tbc && tbc.classFile === e.class && tbc.max === t.max ? tbc.icon : null);
+    talents.push({...t,branch:branch || (specBased&&t.tree?`Tree ${t.tree}`:"Unmapped talent"),icon});
   }
   const orderedPoints = Object.entries(points).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))
     .map(([tree,points])=>({tree,points}));

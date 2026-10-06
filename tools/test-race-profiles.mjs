@@ -29,19 +29,25 @@ test("Skyborne profiles keep Alliance and Horde records separate", () => {
   assert.equal(raceProfile({ records }, "Windshaper Skyborne").n, 1);
 });
 
-for (const race of ["human", "dwarf", "gnome", "skyborne", "night-elf", "orc", "undead", "tauren", "horde-skyborne", "troll"]) test(`built ${race} route has real pre-rendered content and sitemap entry`, () => {
-  const pageUrl = new URL(`../static/forever/${race}/index.html`, import.meta.url);
+const GAMES = [
+  { dir: "forever", nav: "Forever", talents: "/talents", horde: ["orc", "undead", "tauren", "horde-skyborne", "troll"],
+    races: ["human", "dwarf", "gnome", "skyborne", "night-elf", "orc", "undead", "tauren", "horde-skyborne", "troll"] },
+  { dir: "tbc", nav: "TBC Anniversary", talents: "/tbc/talents", horde: ["orc", "undead", "tauren", "troll", "blood-elf"],
+    races: ["human", "dwarf", "gnome", "night-elf", "draenei", "orc", "undead", "tauren", "troll", "blood-elf"] },
+];
+for (const game of GAMES) for (const race of game.races) test(`built ${game.dir}/${race} route has real pre-rendered content and sitemap entry`, () => {
+  const pageUrl = new URL(`../static/${game.dir}/${race}/index.html`, import.meta.url);
   const html = fs.readFileSync(pageUrl, "utf8");
   const sitemap = fs.readFileSync(new URL("../static/sitemap.xml", import.meta.url), "utf8");
   assert.match(html, /<ol class="board" id="board"><li /);
   assert.match(html, /<div class="cards" id="cards"><article /);
-  assert.ok(html.includes(`<link rel="canonical" href="https://wowcensus.io/forever/${race}/">`));
+  assert.ok(html.includes(`<link rel="canonical" href="https://wowcensus.io/${game.dir}/${race}/">`));
   assert.doesNotMatch(html, /class="crt"|MOCKUP|illustrative|\{\{RACE/);
   assert.doesNotMatch(html, /class="src"|Pick rate =|Pips show the average rank|Page generated:/);
   assert.doesNotMatch(html, /A\/B<\/span>|is the most inspected/);
   assert.match(html, /<p>Among [^<]+ we've inspected, <strong>[^<]+<\/strong> is the most common class, with <strong>[^<]+<\/strong> leading among identified builds\.<\/p>/);
   assert.match(html, /<div class="k">Median level<\/div><div class="v">[^<]+<\/div><\/div>/);
-  assert.ok(sitemap.includes(`<loc>https://wowcensus.io/forever/${race}/</loc>`));
+  assert.ok(sitemap.includes(`<loc>https://wowcensus.io/${game.dir}/${race}/</loc>`));
   assert.doesNotMatch(html, /(?:src|href)="\/(?:assets|fonts|style\.)/);
   for (const [, ref] of html.matchAll(/(?:src|href)="(\.\.\/\.\.\/(?:assets|fonts|style\.|favicon)[^"]*)"/g))
     assert.ok(fs.existsSync(new URL(ref, pageUrl)), `Local asset missing from ${race}: ${ref}`);
@@ -53,12 +59,12 @@ for (const race of ["human", "dwarf", "gnome", "skyborne", "night-elf", "orc", "
     faction: tag.match(/data-faction="([^"]+)"/)?.[1],
     hidden: /<a\b[^>]*\bhidden\b/.test(tag),
   }));
-  assert.deepEqual(chips.map((chip) => chip.href), [
-    "/forever/human/", "/forever/dwarf/", "/forever/gnome/",
-    "/forever/skyborne/", "/forever/night-elf/", "/forever/orc/", "/forever/undead/", "/forever/tauren/", "/forever/horde-skyborne/", "/forever/troll/",
-  ]);
-  assert.deepEqual(chips.filter((chip) => chip.current).map((chip) => chip.href), [`/forever/${race}/`]);
-  const selectedFaction = ["orc", "undead", "tauren", "horde-skyborne", "troll"].includes(race) ? "Horde" : "Alliance";
+  assert.deepEqual(chips.map((chip) => chip.href), game.races.map((r) => `/${game.dir}/${r}/`));
+  assert.deepEqual(chips.filter((chip) => chip.current).map((chip) => chip.href), [`/${game.dir}/${race}/`]);
+  assert.match(html, new RegExp(`<a aria-current="true" href="[^"]*" class="game">${game.nav}</a>`));
+  assert.match(html, new RegExp(`<a aria-current="true" href="${game.talents}" class="game">Talents</a>`));
+  assert.equal(html.match(/<!doctype html>/gi).length, 1);
+  const selectedFaction = game.horde.includes(race) ? "Horde" : "Alliance";
   assert.match(html, new RegExp(`<option selected value="${selectedFaction}">`));
   assert.deepEqual(chips.filter((chip) => !chip.hidden).map((chip) => chip.faction), Array(5).fill(selectedFaction));
   assert.deepEqual(chips.filter((chip) => chip.hidden).map((chip) => chip.faction), Array(5).fill(selectedFaction === "Horde" ? "Alliance" : "Horde"));
