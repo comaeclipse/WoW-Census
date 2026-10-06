@@ -1,0 +1,218 @@
+﻿<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WoW Forever Paladin Talents – WoWCensus</title>
+<meta name="description" content="Paladin talent picks observed in WoW Forever nearby-player inspections, ranked by popularity within each spec."><link rel="canonical" href="https://wowcensus.io/forever/paladin/"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="WoW Forever Paladin Talents – WoWCensus"><meta property="og:url" content="https://wowcensus.io/forever/paladin/"><link rel="icon" href="https://wowcensus.io/favicon.ico">
+<link rel="preload" href="https://wowcensus.io/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://wowcensus.io/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://wowcensus.io/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://wowcensus.io/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://wowcensus.io/style.45f98f4b2a22.css">
+<style>
+@font-face{font-family:"Press Start 2P";src:url("https://wowcensus.io/fonts/press-start-2p-latin.woff2") format("woff2");font-display:optional}
+@font-face{font-family:"VT323";src:url("https://wowcensus.io/fonts/vt323-latin.woff2") format("woff2");font-display:optional}
+@font-face{font-family:"Cinzel";src:url("https://wowcensus.io/fonts/cinzel-latin-800-normal.woff2") format("woff2");font-weight:800;font-display:optional}
+@font-face{font-family:"Friz Quadrata Web";src:url("https://wowcensus.io/fonts/friz-quadrata-regular.woff2") format("woff2");font-display:optional}
+:root{
+  --bg:#0d0f17; --panel:#161a28; --panel2:#1e2334; --ink:#eae7d6;
+  --muted:#8b90a0; --gold:#ffce43; --green:#66d16b; --red:#e8595f;
+  --blue:#5fb0f0; --line:#2b3145; --shadow:#000;
+  --pixel:"Press Start 2P", ui-monospace, monospace;
+  --term:"VT323", ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--term);font-size:20px;line-height:1.15;-webkit-font-smoothing:none}
+a{color:var(--blue)}
+.wrap{max-width:1130px;margin:0 auto;padding:22px 18px 60px}
+
+/* ---- shared anatomy (as on the live site) ---- */
+.ihead{border-bottom:3px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+.page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.iname{font-family:"Cinzel",Georgia,serif;font-size:32px;font-weight:800;letter-spacing:1px;color:var(--gold);margin:0 0 10px;line-height:1.2;text-shadow:2px 2px 0 var(--shadow)}
+.iname .itopic{display:block;margin-top:6px;font-family:var(--pixel);font-size:9px;font-weight:400;letter-spacing:1px;line-height:1.6;text-transform:uppercase;color:var(--muted);text-shadow:none}
+.games{display:flex;gap:8px;flex-wrap:wrap}
+.game-nav{justify-content:flex-end;margin:0 0 10px auto}
+.game,.chip{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);padding:8px 10px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.game:hover,.chip:hover{border-color:var(--gold)}
+.game[aria-current="true"],.chip[aria-pressed="true"],.page-controls .chip[aria-current="page"]{background:var(--gold);color:#161018;border-color:var(--gold)}
+.game:focus-visible,.chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.breadcrumbs a{color:var(--blue);text-decoration:none}.breadcrumbs [aria-current="page"]{color:var(--ink)}
+.page-controls{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+.race-filter{display:flex;align-items:flex-start;flex-wrap:wrap;gap:8px;min-width:0}
+.race-filter .chips{flex:1 1 100px;min-width:0}
+.faction-picker{display:inline-flex;align-items:center;position:relative;flex:none;height:34px;border:2px solid var(--gold);box-shadow:3px 3px 0 var(--shadow);background:var(--panel)}
+.faction-picker select{appearance:none;border:0;border-radius:0;background:transparent;color:var(--ink);font:8px var(--pixel);letter-spacing:1px;text-transform:uppercase;padding:0 26px 0 10px;height:100%;cursor:pointer}
+.faction-picker select:hover{color:var(--gold)}
+.faction-picker select:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.faction-picker option{background:var(--panel);color:var(--ink)}
+.faction-picker::after{content:"";position:absolute;right:9px;top:10px;width:6px;height:6px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);pointer-events:none}
+.race-filter .chips .chip[hidden]{display:none}
+.ptitle{font-family:var(--pixel);font-size:9px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin:0 0 14px}
+.panel{background:var(--panel);border:2px solid var(--line);box-shadow:6px 6px 0 var(--shadow);padding:16px}
+
+/* ---- neobrutalist layer: thicker frames, bigger hard shadows, gold slabs ---- */
+.slab{border:3px solid var(--ink);box-shadow:8px 8px 0 var(--shadow)}
+.tag{display:inline-block;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;background:var(--gold);color:#161018;padding:6px 8px;border:2px solid var(--shadow)}
+.tag.ghost{background:var(--panel2);color:var(--muted);border-color:var(--line)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;background:var(--panel);padding:20px 22px;margin-bottom:26px}
+.portrait{width:96px;height:96px;border:4px solid #b99b55;box-shadow:5px 5px 0 var(--shadow);background:#111;display:block}
+.hero h2{font-family:var(--pixel);font-size:26px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);margin:0 0 12px;text-shadow:4px 4px 0 var(--shadow)}
+.hero h2 span{color:var(--gold)}
+.hero p{font-family:"Friz Quadrata Web","Friz Quadrata",Georgia,serif;font-size:16px;line-height:1.6;color:#ccc;margin:0;max-width:62ch}
+.hero p strong{color:var(--ink)}
+.hero .fresh{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.bignum{text-align:right}
+.bignum b{display:block;font-family:var(--pixel);font-size:40px;color:var(--gold);text-shadow:4px 4px 0 var(--shadow);line-height:1}
+.bignum small{display:block;margin-top:10px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.tile{background:var(--panel);border:2px solid var(--line);box-shadow:5px 5px 0 var(--shadow);padding:12px 13px 13px;border-top:6px solid var(--c,var(--gold))}
+.tile .k{font-family:var(--pixel);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.tile .v{font-family:var(--pixel);font-size:15px;color:var(--gold);margin-top:12px;line-height:1.35}
+.tile .s{font-size:18px;color:var(--muted);margin-top:6px}
+
+/* class mix strip */
+.strip{display:flex;height:46px;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--shadow);margin-bottom:12px}
+.strip i{display:block;height:100%;border-right:3px solid var(--shadow)}
+.strip i:last-child{border-right:0}
+.strip-key{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:18px;color:var(--muted)}
+.strip-key span::before{content:"";display:inline-block;width:12px;height:12px;margin-right:6px;background:var(--c);border:2px solid var(--shadow);vertical-align:-1px}
+.strip-key b{color:var(--ink);font-weight:400}
+
+/* spec leaderboard */
+.board{list-style:none;margin:0;padding:0}
+.board li{display:grid;grid-template-columns:44px 34px minmax(100px,150px) 1fr 64px;align-items:center;gap:12px;padding:8px 0;border-bottom:2px dashed var(--line)}
+.board li:last-child{border-bottom:0}
+.rank{font-family:var(--pixel);font-size:13px;text-align:center;background:var(--panel2);border:2px solid var(--line);padding:8px 0;color:var(--muted)}
+.board li:nth-child(-n+3) .rank{background:var(--gold);color:#161018;border-color:var(--shadow);box-shadow:3px 3px 0 var(--shadow)}
+.board img,.tal img{width:34px;height:34px;border:2px solid #b99b55;box-shadow:2px 2px 0 var(--shadow);background:#111;display:block}
+.sname{font-family:var(--pixel);font-size:9px;line-height:1.6;text-transform:uppercase;letter-spacing:1px}
+.sname small{display:block;font-size:7px;color:var(--c)}
+.track{height:24px;background:var(--panel2);border:2px solid var(--line)}
+.track i{display:block;height:100%;background:var(--c);border-right:3px solid var(--shadow)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.num b{font-family:var(--pixel);font-size:11px;color:var(--gold);font-weight:400}
+.num span{display:block;color:var(--muted);font-size:17px;margin-top:2px}
+
+.split2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;align-items:start;margin-bottom:30px}
+
+/* class filter */
+.secthead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:6px 0 18px;padding-bottom:12px;border-bottom:3px solid var(--line)}
+.secthead h3{margin:0;font-family:var(--pixel);font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);text-shadow:3px 3px 0 var(--shadow)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+
+/* class cards */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.card{background:var(--panel);border:3px solid var(--line);box-shadow:8px 8px 0 var(--shadow)}
+.card:hover{border-color:var(--gold)}
+.card-h{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--c);color:#161018;border-bottom:3px solid var(--shadow)}
+.card-h img{width:40px;height:40px;border:3px solid var(--shadow);display:block}
+.card-h h4{margin:0;font-family:var(--pixel);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.card-h .cn{margin-left:auto;text-align:right;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;line-height:1.7}
+.card-h .cn b{display:block;font-size:15px;font-weight:400}
+.card-b{padding:14px}
+.lbl{font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.specbar{display:flex;height:30px;border:3px solid var(--shadow);margin-bottom:8px;background:var(--panel2)}
+.specbar i{display:block;height:100%;border-right:3px solid var(--shadow)}
+.specbar i:last-child{border-right:0}
+.specbar i:not(.th){background:var(--k)}
+.th{background:repeating-linear-gradient(45deg,var(--muted) 0 4px,var(--panel2) 4px 8px)}
+.speckey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:17px;color:var(--muted);margin-bottom:16px}
+.speckey span::before{content:"";display:inline-block;width:11px;height:11px;margin-right:5px;border:2px solid var(--shadow);vertical-align:-1px}
+.speckey span:not(.kh)::before{background:var(--k)}
+.speckey .kh::before{background:repeating-linear-gradient(45deg,var(--muted) 0 3px,var(--panel2) 3px 6px)}
+.speckey b{color:var(--ink);font-weight:400}
+.trees{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.tree{background:var(--panel2);border:2px solid var(--line);padding:8px}
+.tree .tn{font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tree .tv{font-family:var(--pixel);font-size:13px;margin-top:8px}
+.tal{list-style:none;margin:0;padding:0}
+.tal li{display:grid;grid-template-columns:34px minmax(0,1fr) 70px;gap:10px;align-items:center;padding:7px 0;border-top:2px solid #20263a}
+.tal .tt{min-width:0}
+.tal .tt b{display:block;font-weight:400;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tal .meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:16px;color:var(--muted)}
+.pips{display:inline-flex;gap:2px}
+.pips i{width:7px;height:11px;background:#31374d;display:inline-block}
+.pips i.on{background:var(--gold)}
+.pick{text-align:right}
+.pick b{font-family:var(--pixel);font-size:11px;color:var(--ink);font-weight:400}
+.pick .mini{height:8px;background:var(--panel2);border:1px solid var(--line);margin-top:6px}
+.pick .mini i{display:block;height:100%;background:var(--gold)}
+.card-f{padding:10px 14px;border-top:2px solid var(--line);background:var(--panel2);font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);line-height:1.8}
+.card[hidden]{display:none}
+
+@media (max-width:760px){
+  .page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}
+  .page-controls{display:block}.page-controls .race-filter{margin-top:12px}.race-filter .chips{display:contents}
+  .hero{grid-template-columns:auto 1fr;padding:16px;align-items:start}
+  .hero .bignum{grid-column:1/-1;text-align:left;display:flex;align-items:baseline;gap:12px}
+  .hero .bignum small{margin:0}
+  .portrait{width:64px;height:64px}
+  .hero h2{font-size:17px}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .split2,.cards{grid-template-columns:minmax(0,1fr)}
+  .board li{grid-template-columns:40px 30px minmax(0,1fr) 72px;gap:9px}
+  .board li .track{grid-column:3/5;grid-row:2;height:14px}
+  .board img{width:30px;height:30px}
+}
+@media (max-width:420px){.wrap{padding:17px 15px 48px}.iname{font-size:26px}.trees{grid-template-columns:1fr 1fr 1fr;gap:5px}.tree .tv{font-size:11px}}
+
+.split{margin-bottom:26px}
+.speccols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start}
+.speckey span[style]::before{background:var(--c)}
+.speccol .card-h h4{font-size:11px}
+.speccol .card-b{padding:6px 12px 10px}
+.ranks{list-style:none;margin:0;padding:0}
+.ranks li{display:grid;grid-template-columns:30px 30px minmax(0,1fr) 54px;gap:9px;align-items:center;padding:7px 0;border-top:2px solid #20263a}
+.ranks li:first-child{border-top:0}
+.ranks .rank{font-size:9px;padding:6px 0}
+.ranks li:nth-child(-n+3) .rank{background:var(--gold);color:#161018;border-color:var(--shadow);box-shadow:2px 2px 0 var(--shadow)}
+.ranks img{width:30px;height:30px;border:2px solid #b99b55;box-shadow:2px 2px 0 var(--shadow);background:#111;display:block}
+.ranks .tt b{display:block;font-weight:400;font-size:19px;line-height:1.05}
+.ranks .meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:16px;color:var(--muted)}
+.ranks li.none{opacity:.5}
+.colnote{margin:0;padding:12px 0 4px;font-size:17px;color:var(--muted)}
+.speccol .card-h .cn{white-space:nowrap}
+/* Three columns need ~300px each; below that one column reads better than squeezed headers. */
+@media (max-width:960px){.speccols{grid-template-columns:minmax(0,1fr)}}</style><style id="mockup-overrides">
+/* 1. thinner spec bar */
+.specbar{height:22px}
+/* 2. header: spec color becomes a 5px bottom border instead of the fill */
+.card-h{background:var(--panel2);color:var(--ink);border-bottom:5px solid var(--c)}
+/* 2b. no hover on the columns */
+.card:hover{border-color:var(--line)}
+/* 3. hero border matches cards/panels */
+.slab{border-color:var(--line)}
+</style></head>
+<body><div class="wrap">
+<header class="ihead">
+  <div class="page-heading">
+    <h1 class="iname">WoWCensus<span class="itopic">WoW Forever Paladin Talents</span></h1>
+    <nav class="games game-nav"><a class="game" aria-current="true" href="/">Forever</a><a class="game" href="/tbc/">TBC Anniversary</a><a class="game" href="/classic/">Classic Era</a><a class="game" href="/sod/">SoD</a><a class="game" href="/mop/">MoP Classic</a><a class="game" href="/retail/">Retail</a></nav>
+  </div>
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="/">Forever</a><span aria-hidden="true">/</span><a href="/talents">Talents</a><span aria-hidden="true">/</span><span aria-current="page">Paladin</span></nav>
+</header>
+<div class="page-controls">
+  <nav class="games page-nav"><a class="game" href="/">Census</a><a class="game" href="/auctionhouse">Auction House</a><a class="game" href="/guilds">Guilds</a><a class="game" href="/geography">Geography</a><a class="game" aria-current="true" href="/talents">Talents</a><a class="game" href="/gear">Gear</a></nav><div class="chips" aria-label="Class"><a class="chip" href="/forever/paladin/" aria-current="page">Paladin</a><a class="chip" href="/forever/warrior/">Warrior</a><a class="chip" href="/forever/druid/">Druid</a><a class="chip" href="/forever/hunter/">Hunter</a><a class="chip" href="/forever/shaman/">Shaman</a><a class="chip" href="/forever/priest/">Priest</a><a class="chip" href="/forever/rogue/">Rogue</a><a class="chip" href="/forever/mage/">Mage</a><a class="chip" href="/forever/warlock/">Warlock</a></div>
+</div>
+<section class="hero slab">
+  <img class="portrait" src="https://wowcensus.io/assets/images/wow/icons/large/classicon_paladin.jpg" alt="" width="96" height="96">
+  <div>
+    <h2>Paladin <span>talents</span></h2>
+    <p>Among Paladins we've inspected, <strong>Retribution</strong> (44%) is the most common build, followed by <strong>Protection</strong> (35%) and <strong>Holy</strong> (13%).</p>
+    <div class="fresh"><span class="tag">Latest inspection 2026-10-06 02:28Z</span><span class="tag ghost">Last 14 days · all realms</span></div>
+  </div>
+  <div class="bignum"><b>944</b><small>Paladins with talents</small></div>
+</section>
+<section class="panel split">
+  <div class="ptitle">Spec split</div>
+  <div class="specbar"><i style="background:#eeb138;width:12.61%" title="Holy 119"></i><i style="background:#4c9ddb;width:34.64%" title="Protection 327"></i><i style="background:#a96be0;width:44.49%" title="Retribution 420"></i><i class="th" style="width:8.26%" title="Hybrid 78"></i></div><div class="speckey"><span style="--c:#eeb138"><b>Holy</b> 119 · 13%</span><span style="--c:#4c9ddb"><b>Protection</b> 327 · 35%</span><span style="--c:#a96be0"><b>Retribution</b> 420 · 44%</span><span class="kh"><b>Hybrid</b> 78 · 8%</span></div>
+</section>
+<div class="speccols"><article class="card speccol" data-tree="Holy" style="--c:#eeb138"><div class="card-h"><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_holybolt.jpg" alt="" width="40" height="40"><h4>Holy</h4><div class="cn" title="119 players"><b>119</b>13%</div></div><div class="card-b"><ol class="ranks"><li><span class="rank">1</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_nature_sleep.jpg" alt="" width="30" height="30"><span class="tt"><b>Divine Intellect</b><span class="meta"><span class="pips" title="Average rank 4.5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>80%</b><div class="mini"><i style="width:80%"></i></div></span></li><li><span class="rank">2</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_holybolt.jpg" alt="" width="30" height="30"><span class="tt"><b>Healing Light</b><span class="meta"><span class="pips" title="Average rank 2.8 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>63%</b><div class="mini"><i style="width:63%"></i></div></span></li><li><span class="rank">3</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_divineillumination.jpg" alt="" width="30" height="30"><span class="tt"><b>Reverence</b><span class="meta"><span class="pips" title="Average rank 2.3 of 3"><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>59%</b><div class="mini"><i style="width:59%"></i></div></span></li><li><span class="rank">4</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_arcane_blink.jpg" alt="" width="30" height="30"><span class="tt"><b>Spiritual Focus</b><span class="meta"><span class="pips" title="Average rank 1.9 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>57%</b><div class="mini"><i style="width:57%"></i></div></span></li><li><span class="rank">5</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_thunderbolt.jpg" alt="" width="30" height="30"><span class="tt"><b>Improved Seals</b><span class="meta"><span class="pips" title="Average rank 2.3 of 3"><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>40%</b><div class="mini"><i style="width:40%"></i></div></span></li><li><span class="rank">6</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_golemthunderclap.jpg" alt="" width="30" height="30"><span class="tt"><b>Divine Strength</b><span class="meta"><span class="pips" title="Average rank 4.1 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>29%</b><div class="mini"><i style="width:29%"></i></div></span></li><li><span class="rank">7</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_greaterheal.jpg" alt="" width="30" height="30"><span class="tt"><b>Illumination</b><span class="meta"><span class="pips" title="Average rank 3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></span></span><span class="pick"><b>21%</b><div class="mini"><i style="width:21%"></i></div></span></li><li><span class="rank">8</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_purifyingpower.jpg" alt="" width="30" height="30"><span class="tt"><b>Purifying Power</b><span class="meta"><span class="pips" title="Average rank 1.6 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>19%</b><div class="mini"><i style="width:19%"></i></div></span></li><li><span class="rank">9</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_heal.jpg" alt="" width="30" height="30"><span class="tt"><b>Divine Favor</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>14%</b><div class="mini"><i style="width:14%"></i></div></span></li><li><span class="rank">10</span><img src="https://wowcensus.io/assets/images/wow/icons/large/inv_misc_horn_03.jpg" alt="" width="30" height="30"><span class="tt"><b>Voice of Truth</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>13%</b><div class="mini"><i style="width:13%"></i></div></span></li><li><span class="rank">11</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_searinglight.jpg" alt="" width="30" height="30"><span class="tt"><b>Holy Shock</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>13%</b><div class="mini"><i style="width:13%"></i></div></span></li><li><span class="rank">12</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_paladin_infusionoflight.jpg" alt="" width="30" height="30"><span class="tt"><b>Infusion of Light</b><span class="meta"><span class="pips" title="Average rank 1.5 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>5%</b><div class="mini"><i style="width:5%"></i></div></span></li><li><span class="rank">13</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_unyieldingfaith.jpg" alt="" width="30" height="30"><span class="tt"><b>Unyielding Faith</b><span class="meta"><span class="pips" title="Average rank 1.5 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>5%</b><div class="mini"><i style="width:5%"></i></div></span></li></ol></div><div class="card-f">Median level 20</div></article><article class="card speccol" data-tree="Protection" style="--c:#4c9ddb"><div class="card-h"><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_devotionaura.jpg" alt="" width="40" height="40"><h4>Protection</h4><div class="cn" title="327 players"><b>327</b>35%</div></div><div class="card-b"><ol class="ranks"><li><span class="rank">1</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_defend.jpg" alt="" width="30" height="30"><span class="tt"><b>Redoubt</b><span class="meta"><span class="pips" title="Average rank 4.8 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>98%</b><div class="mini"><i style="width:98%"></i></div></span></li><li><span class="rank">2</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_rogue_ambush.jpg" alt="" width="30" height="30"><span class="tt"><b>Precision</b><span class="meta"><span class="pips" title="Average rank 2.8 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>75%</b><div class="mini"><i style="width:75%"></i></div></span></li><li><span class="rank">3</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_magic_lesserinvisibilty.jpg" alt="" width="30" height="30"><span class="tt"><b>Anticipation</b><span class="meta"><span class="pips" title="Average rank 2.7 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></span></span><span class="pick"><b>73%</b><div class="mini"><i style="width:73%"></i></div></span></li><li><span class="rank">4</span><img src="https://wowcensus.io/assets/images/wow/icons/large/inv_shield_06.jpg" alt="" width="30" height="30"><span class="tt"><b>Shield Specialization</b><span class="meta"><span class="pips" title="Average rank 2.3 of 3"><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>64%</b><div class="mini"><i style="width:64%"></i></div></span></li><li><span class="rank">5</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_righteousnessaura.jpg" alt="" width="30" height="30"><span class="tt"><b>Improved Seal of Fury</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>52%</b><div class="mini"><i style="width:52%"></i></div></span></li><li><span class="rank">6</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_sealoffury.jpg" alt="" width="30" height="30"><span class="tt"><b>Improved Righteous Fury</b><span class="meta"><span class="pips" title="Average rank 2 of 3"><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>32%</b><div class="mini"><i style="width:32%"></i></div></span></li><li><span class="rank">7</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_devotion.jpg" alt="" width="30" height="30"><span class="tt"><b>Toughness</b><span class="meta"><span class="pips" title="Average rank 3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></span></span><span class="pick"><b>19%</b><div class="mini"><i style="width:19%"></i></div></span></li><li><span class="rank">8</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_paladin_judgementred.jpg" alt="" width="30" height="30"><span class="tt"><b>Swift Judgement</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>18%</b><div class="mini"><i style="width:18%"></i></div></span></li><li><span class="rank">9</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_divineintervention.jpg" alt="" width="30" height="30"><span class="tt"><b>Sacred Duty</b><span class="meta"><span class="pips" title="Average rank 1.7 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>14%</b><div class="mini"><i style="width:14%"></i></div></span></li><li><span class="rank">10</span><img src="https://wowcensus.io/assets/images/wow/icons/large/inv_sword_20.jpg" alt="" width="30" height="30"><span class="tt"><b>One-Handed Weapon Specialization</b><span class="meta"><span class="pips" title="Average rank 2.3 of 3"><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>13%</b><div class="mini"><i style="width:13%"></i></div></span></li><li><span class="rank">11</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_paladin_shieldofthetemplar.jpg" alt="" width="30" height="30"><span class="tt"><b>Templar&#39;s Bulwark</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>9%</b><div class="mini"><i style="width:9%"></i></div></span></li><li><span class="rank">12</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_sealofprotection.jpg" alt="" width="30" height="30"><span class="tt"><b>Guardian&#39;s Favor</b><span class="meta"><span class="pips" title="Average rank 1.9 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>4%</b><div class="mini"><i style="width:4%"></i></div></span></li><li><span class="rank">13</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_blessingofstrength.jpg" alt="" width="30" height="30"><span class="tt"><b>Reckoning</b><span class="meta"><span class="pips" title="Average rank 1.8 of 5"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></span></span><span class="pick"><b>3%</b><div class="mini"><i style="width:3%"></i></div></span></li></ol></div><div class="card-f">Median level 22</div></article><article class="card speccol" data-tree="Retribution" style="--c:#a96be0"><div class="card-h"><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_auraoflight.jpg" alt="" width="40" height="40"><h4>Retribution</h4><div class="cn" title="420 players"><b>420</b>44%</div></div><div class="card-b"><ol class="ranks"><li><span class="rank">1</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_frost_windwalkon.jpg" alt="" width="30" height="30"><span class="tt"><b>Benediction</b><span class="meta"><span class="pips" title="Average rank 4.7 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>81%</b><div class="mini"><i style="width:81%"></i></div></span></li><li><span class="rank">2</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_retributionaura.jpg" alt="" width="30" height="30"><span class="tt"><b>Conviction</b><span class="meta"><span class="pips" title="Average rank 3.5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>76%</b><div class="mini"><i style="width:76%"></i></div></span></li><li><span class="rank">3</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_righteousfury.jpg" alt="" width="30" height="30"><span class="tt"><b>Improved Judgement</b><span class="meta"><span class="pips" title="Average rank 1.9 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>67%</b><div class="mini"><i style="width:67%"></i></div></span></li><li><span class="rank">4</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_warrior_innerrage.jpg" alt="" width="30" height="30"><span class="tt"><b>Seal of Command</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>62%</b><div class="mini"><i style="width:62%"></i></div></span></li><li><span class="rank">5</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_persuitofjustice.jpg" alt="" width="30" height="30"><span class="tt"><b>Pursuit of Justice</b><span class="meta"><span class="pips" title="Average rank 1.8 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>45%</b><div class="mini"><i style="width:45%"></i></div></span></li><li><span class="rank">6</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_devineaegis.jpg" alt="" width="30" height="30"><span class="tt"><b>Holy Conduit</b><span class="meta"><span class="pips" title="Average rank 1.9 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>33%</b><div class="mini"><i style="width:33%"></i></div></span></li><li><span class="rank">7</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_parry.jpg" alt="" width="30" height="30"><span class="tt"><b>Deflection</b><span class="meta"><span class="pips" title="Average rank 3.5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>32%</b><div class="mini"><i style="width:32%"></i></div></span></li><li><span class="rank">8</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_paladin_judgementblue.jpg" alt="" width="30" height="30"><span class="tt"><b>Sanctified Judgement</b><span class="meta"><span class="pips" title="Average rank 2.3 of 3"><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>32%</b><div class="mini"><i style="width:32%"></i></div></span></li><li><span class="rank">9</span><img src="https://wowcensus.io/assets/images/wow/icons/large/inv_sword_08.jpg" alt="" width="30" height="30"><span class="tt"><b>Sacred Arbiter</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>28%</b><div class="mini"><i style="width:28%"></i></div></span></li><li><span class="rank">10</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_vindication.jpg" alt="" width="30" height="30"><span class="tt"><b>Vindication</b><span class="meta"><span class="pips" title="Average rank 2 of 3"><i class="on"></i><i class="on"></i><i></i></span></span></span><span class="pick"><b>16%</b><div class="mini"><i style="width:16%"></i></div></span></li><li><span class="rank">11</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_racial_avatar.jpg" alt="" width="30" height="30"><span class="tt"><b>Vengeance</b><span class="meta"><span class="pips" title="Average rank 1.1 of 3"><i class="on"></i><i></i><i></i></span></span></span><span class="pick"><b>4%</b><div class="mini"><i style="width:4%"></i></div></span></li><li><span class="rank">12</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_eyeforaneye.jpg" alt="" width="30" height="30"><span class="tt"><b>Eye for an Eye</b><span class="meta"><span class="pips" title="Average rank 1.5 of 2"><i class="on"></i><i class="on"></i></span></span></span><span class="pick"><b>3%</b><div class="mini"><i style="width:3%"></i></div></span></li><li><span class="rank">13</span><img src="https://wowcensus.io/assets/images/wow/icons/large/spell_holy_prayerofhealing.jpg" alt="" width="30" height="30"><span class="tt"><b>Repentance</b><span class="meta"><span class="pips" title="Average rank 1 of 1"><i class="on"></i></span></span></span><span class="pick"><b>3%</b><div class="mini"><i style="width:3%"></i></div></span></li><li><span class="rank">14</span><img src="https://wowcensus.io/assets/images/wow/icons/large/inv_hammer_04.jpg" alt="" width="30" height="30"><span class="tt"><b>Two-Handed Weapon Specialization</b><span class="meta"><span class="pips" title="Average rank 1 of 3"><i class="on"></i><i></i><i></i></span></span></span><span class="pick"><b>1%</b><div class="mini"><i style="width:1%"></i></div></span></li><li><span class="rank">15</span><img src="https://wowcensus.io/assets/images/wow/icons/large/ability_paladin_enlightenedjudgements.jpg" alt="" width="30" height="30"><span class="tt"><b>Champion of the Light</b><span class="meta"><span class="pips" title="Average rank 1 of 3"><i class="on"></i><i></i><i></i></span></span></span><span class="pick"><b>0%</b><div class="mini"><i style="width:0%"></i></div></span></li></ol></div><div class="card-f">Median level 21</div></article></div>
+</div><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"29f5731b936e4bcf9113730ec7691450","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body></html>
+
+
+

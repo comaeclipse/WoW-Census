@@ -87,6 +87,10 @@ const CLASS_STYLE = `
 .ranks li.none{opacity:.5}
 .colnote{margin:0;padding:12px 0 4px;font-size:17px;color:var(--muted)}
 .speccol .card-h .cn{white-space:nowrap}
+.specbar{height:22px}
+/* Spec color as an underline rather than a fill; the columns are not clickable, so no hover. */
+.speccol .card-h{background:var(--panel2);color:var(--ink);border-bottom:5px solid var(--c)}
+.speccol:hover{border-color:var(--line)}
 /* Three columns need ~300px each; below that one column reads better than squeezed headers. */
 @media (max-width:960px){.speccols{grid-template-columns:minmax(0,1fr)}}`;
 
