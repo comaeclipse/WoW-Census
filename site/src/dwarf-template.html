@@ -1,0 +1,324 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dwarf Specs &amp; Talents – WoW Forever – WoWCensus</title>
+<link rel="preload" href="../static/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../static/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../static/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../static/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Press Start 2P";src:url("../static/fonts/press-start-2p-latin.woff2") format("woff2");font-display:optional}
+@font-face{font-family:"VT323";src:url("../static/fonts/vt323-latin.woff2") format("woff2");font-display:optional}
+@font-face{font-family:"Cinzel";src:url("../static/fonts/cinzel-latin-800-normal.woff2") format("woff2");font-weight:800;font-display:optional}
+@font-face{font-family:"Friz Quadrata Web";src:url("../static/fonts/friz-quadrata-regular.woff2") format("woff2");font-display:optional}
+:root{
+  --bg:#0d0f17; --panel:#161a28; --panel2:#1e2334; --ink:#eae7d6;
+  --muted:#8b90a0; --gold:#ffce43; --green:#66d16b; --red:#e8595f;
+  --blue:#5fb0f0; --line:#2b3145; --shadow:#000;
+  --pixel:"Press Start 2P", ui-monospace, monospace;
+  --term:"VT323", ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--term);font-size:20px;line-height:1.15;-webkit-font-smoothing:none}
+a{color:var(--blue)}
+.wrap{max-width:1130px;margin:0 auto;padding:22px 18px 60px}
+
+/* ---- shared anatomy (as on the live site) ---- */
+.ihead{border-bottom:3px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+.page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.iname{font-family:"Cinzel",Georgia,serif;font-size:32px;font-weight:800;letter-spacing:1px;color:var(--gold);margin:0 0 10px;line-height:1.2;text-shadow:2px 2px 0 var(--shadow)}
+.iname .itopic{display:block;margin-top:6px;font-family:var(--pixel);font-size:9px;font-weight:400;letter-spacing:1px;line-height:1.6;text-transform:uppercase;color:var(--muted);text-shadow:none}
+.games{display:flex;gap:8px;flex-wrap:wrap}
+.game-nav{justify-content:flex-end;margin:0 0 10px auto}
+.game,.chip{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);padding:8px 10px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.game:hover,.chip:hover{border-color:var(--gold)}
+.game[aria-current="true"],.chip[aria-pressed="true"]{background:var(--gold);color:#161018;border-color:var(--gold)}
+.game:focus-visible,.chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.breadcrumbs a{color:var(--blue);text-decoration:none}.breadcrumbs [aria-current="page"]{color:var(--ink)}
+.page-controls{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+.ptitle{font-family:var(--pixel);font-size:9px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin:0 0 14px}
+.panel{background:var(--panel);border:2px solid var(--line);box-shadow:6px 6px 0 var(--shadow);padding:16px}
+
+/* ---- neobrutalist layer: thicker frames, bigger hard shadows, gold slabs ---- */
+.slab{border:3px solid var(--ink);box-shadow:8px 8px 0 var(--shadow)}
+.tag{display:inline-block;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;background:var(--gold);color:#161018;padding:6px 8px;border:2px solid var(--shadow)}
+.tag.ghost{background:var(--panel2);color:var(--muted);border-color:var(--line)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;background:var(--panel);padding:20px 22px;margin-bottom:26px}
+.portrait{width:96px;height:96px;border:4px solid #b99b55;box-shadow:5px 5px 0 var(--shadow);background:#111;display:block}
+.hero h2{font-family:var(--pixel);font-size:26px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);margin:0 0 12px;text-shadow:4px 4px 0 var(--shadow)}
+.hero h2 span{color:var(--gold)}
+.hero p{font-family:"Friz Quadrata Web","Friz Quadrata",Georgia,serif;font-size:16px;line-height:1.6;color:#ccc;margin:0;max-width:62ch}
+.hero .fresh{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.bignum{text-align:right}
+.bignum b{display:block;font-family:var(--pixel);font-size:40px;color:var(--gold);text-shadow:4px 4px 0 var(--shadow);line-height:1}
+.bignum small{display:block;margin-top:10px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.tile{background:var(--panel);border:2px solid var(--line);box-shadow:5px 5px 0 var(--shadow);padding:12px 13px 13px;border-top:6px solid var(--c,var(--gold))}
+.tile .k{font-family:var(--pixel);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.tile .v{font-family:var(--pixel);font-size:15px;color:var(--gold);margin-top:12px;line-height:1.35}
+.tile .s{font-size:18px;color:var(--muted);margin-top:6px}
+
+/* class mix strip */
+.strip{display:flex;height:46px;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--shadow);margin-bottom:12px}
+.strip i{display:block;height:100%;border-right:3px solid var(--shadow)}
+.strip i:last-child{border-right:0}
+.strip-key{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:18px;color:var(--muted)}
+.strip-key span::before{content:"";display:inline-block;width:12px;height:12px;margin-right:6px;background:var(--c);border:2px solid var(--shadow);vertical-align:-1px}
+.strip-key b{color:var(--ink);font-weight:400}
+
+/* spec leaderboard */
+.board{list-style:none;margin:0;padding:0}
+.board li{display:grid;grid-template-columns:44px 34px minmax(100px,150px) 1fr 64px;align-items:center;gap:12px;padding:8px 0;border-bottom:2px dashed var(--line)}
+.board li:last-child{border-bottom:0}
+.rank{font-family:var(--pixel);font-size:13px;text-align:center;background:var(--panel2);border:2px solid var(--line);padding:8px 0;color:var(--muted)}
+.board li:nth-child(-n+3) .rank{background:var(--gold);color:#161018;border-color:var(--shadow);box-shadow:3px 3px 0 var(--shadow)}
+.board img,.tal img{width:34px;height:34px;border:2px solid #b99b55;box-shadow:2px 2px 0 var(--shadow);background:#111;display:block}
+.sname{font-family:var(--pixel);font-size:9px;line-height:1.6;text-transform:uppercase;letter-spacing:1px}
+.sname small{display:block;font-size:7px;color:var(--c)}
+.track{height:24px;background:var(--panel2);border:2px solid var(--line)}
+.track i{display:block;height:100%;background:var(--c);border-right:3px solid var(--shadow)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.num b{font-family:var(--pixel);font-size:11px;color:var(--gold);font-weight:400}
+.num span{display:block;color:var(--muted);font-size:17px;margin-top:2px}
+
+.split2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;align-items:start;margin-bottom:30px}
+
+/* class filter */
+.secthead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:6px 0 18px;padding-bottom:12px;border-bottom:3px solid var(--line)}
+.secthead h3{margin:0;font-family:var(--pixel);font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);text-shadow:3px 3px 0 var(--shadow)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+
+/* class cards */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.card{background:var(--panel);border:3px solid var(--line);box-shadow:8px 8px 0 var(--shadow)}
+.card:hover{border-color:var(--gold)}
+.card-h{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--c);color:#161018;border-bottom:3px solid var(--shadow)}
+.card-h img{width:40px;height:40px;border:3px solid var(--shadow);display:block}
+.card-h h4{margin:0;font-family:var(--pixel);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.card-h .cn{margin-left:auto;text-align:right;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;line-height:1.7}
+.card-h .cn b{display:block;font-size:15px;font-weight:400}
+.card-b{padding:14px}
+.lbl{font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.specbar{display:flex;height:30px;border:3px solid var(--shadow);margin-bottom:8px;background:var(--panel2)}
+.specbar i{display:block;height:100%;border-right:3px solid var(--shadow)}
+.specbar i:last-child{border-right:0}
+.t0{background:var(--gold)}.t1{background:var(--blue)}.t2{background:var(--green)}
+.th{background:repeating-linear-gradient(45deg,var(--muted) 0 4px,var(--panel2) 4px 8px)}
+.speckey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:17px;color:var(--muted);margin-bottom:16px}
+.speckey span::before{content:"";display:inline-block;width:11px;height:11px;margin-right:5px;border:2px solid var(--shadow);vertical-align:-1px}
+.speckey .k0::before{background:var(--gold)}.speckey .k1::before{background:var(--blue)}.speckey .k2::before{background:var(--green)}
+.speckey .kh::before{background:repeating-linear-gradient(45deg,var(--muted) 0 3px,var(--panel2) 3px 6px)}
+.speckey b{color:var(--ink);font-weight:400}
+.trees{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.tree{background:var(--panel2);border:2px solid var(--line);padding:8px}
+.tree .tn{font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tree .tv{font-family:var(--pixel);font-size:13px;margin-top:8px}
+.tal{list-style:none;margin:0;padding:0}
+.tal li{display:grid;grid-template-columns:34px minmax(0,1fr) 70px;gap:10px;align-items:center;padding:7px 0;border-top:2px solid #20263a}
+.tal .tt{min-width:0}
+.tal .tt b{display:block;font-weight:400;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tal .meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:16px;color:var(--muted)}
+.pips{display:inline-flex;gap:2px}
+.pips i{width:7px;height:11px;background:#31374d;display:inline-block}
+.pips i.on{background:var(--gold)}
+.pick{text-align:right}
+.pick b{font-family:var(--pixel);font-size:11px;color:var(--ink);font-weight:400}
+.pick .mini{height:8px;background:var(--panel2);border:1px solid var(--line);margin-top:6px}
+.pick .mini i{display:block;height:100%;background:var(--gold)}
+.card-f{padding:10px 14px;border-top:2px solid var(--line);background:var(--panel2);font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);line-height:1.8}
+.card[hidden]{display:none}
+
+.src{margin-top:30px;font-size:16px;color:var(--muted);text-align:center;line-height:1.5}
+
+@media (max-width:760px){
+  .page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}
+  .page-controls{display:block}.page-controls .chips{margin-top:12px}
+  .hero{grid-template-columns:auto 1fr;padding:16px;align-items:start}
+  .hero .bignum{grid-column:1/-1;text-align:left;display:flex;align-items:baseline;gap:12px}
+  .hero .bignum small{margin:0}
+  .portrait{width:64px;height:64px}
+  .hero h2{font-size:17px}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .split2,.cards{grid-template-columns:minmax(0,1fr)}
+  .board li{grid-template-columns:40px 30px minmax(0,1fr) 72px;gap:9px}
+  .board li .track{grid-column:3/5;grid-row:2;height:14px}
+  .board img{width:30px;height:30px}
+}
+@media (max-width:420px){.wrap{padding:17px 15px 48px}.iname{font-size:26px}.trees{grid-template-columns:1fr 1fr 1fr;gap:5px}.tree .tv{font-size:11px}}
+</style></head>
+<body><div class="wrap">
+
+<header class="ihead">
+  <div class="page-heading">
+    <h1 class="iname">WoWCensus<span class="itopic">WoW Forever Dwarf Specs &amp; Talents</span></h1>
+    <nav class="games game-nav">
+      <a class="game" aria-current="true" href="#">Forever</a>
+      <a class="game" href="#">TBC Anniversary</a>
+      <a class="game" href="#">Classic Era</a>
+      <a class="game" href="#">SoD</a>
+      <a class="game" href="#">MoP Classic</a>
+      <a class="game" href="#">Retail</a>
+    </nav>
+  </div>
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="#">WoWCensus</a><span aria-hidden="true">/</span>
+    <a href="#">Forever</a><span aria-hidden="true">/</span>
+    <a href="#">Talents</a><span aria-hidden="true">/</span>
+    <span aria-current="page">Dwarf</span>
+  </nav>
+</header>
+
+<div class="page-controls">
+  <nav class="games page-nav">
+    <a class="game" href="#">Census</a>
+    <a class="game" href="#">Auction House</a>
+    <a class="game" href="#">Guilds</a>
+    <a class="game" href="#">Geography</a>
+    <a class="game" aria-current="true" href="#">Talents</a>
+    <a class="game" href="#">Gear</a>
+  </nav>
+  <div class="chips" aria-label="Race">
+    <a class="chip" href="#">Human</a>
+    <a class="chip" aria-pressed="true" href="#">Dwarf</a>
+    <a class="chip" href="#">Gnome</a>
+    <a class="chip" href="#">Night Elf</a>
+  </div>
+</div>
+
+<section class="hero slab">
+  <img class="portrait" src="../static/assets/images/wow/icons/large/achievement_character_dwarf_male.jpg" alt="" width="96" height="96">
+  <div>
+    <h2>Dwarf <span>builds</span></h2>
+    <p>Dwarves seen nearby on Forever are mostly Shamans, and three in four of those run Enhancement. Paladins split between Protection and Retribution, and Hunters lean Beast Mastery. This is an inspected sample, not every Dwarf on the realm.</p>
+    <div class="fresh"><span class="tag">Latest inspection 2026-10-05 23:33Z</span><span class="tag ghost">Last 14 days · all realms</span></div>
+  </div>
+  <div class="bignum"><b>425</b><small>Dwarves inspected</small></div>
+</section>
+
+<div class="tiles">
+  <div class="tile" style="--c:#0070DE"><div class="k">Top class</div><div class="v">Shaman</div><div class="s">202 of 425 · 48%</div></div>
+  <div class="tile" style="--c:#0070DE"><div class="k">Top spec</div><div class="v">Enhancement</div><div class="s">152 players · 36%</div></div>
+  <div class="tile" style="--c:#F58CBA"><div class="k">Top tank spec</div><div class="v">Prot Paladin</div><div class="s">42 · ahead of Prot Warrior (18)</div></div>
+  <div class="tile"><div class="k">Median level</div><div class="v">20</div><div class="s">No level 60s seen yet</div></div>
+</div>
+
+<div class="split2">
+  <section class="panel">
+    <div class="ptitle">Most popular specs</div>
+    <ol class="board" id="board"></ol>
+  </section>
+  <div style="display:flex;flex-direction:column;gap:22px;min-width:0">
+    <section class="panel">
+      <div class="ptitle">Class mix of the sample</div>
+      <div class="strip" id="strip"></div>
+      <div class="strip-key" id="stripkey"></div>
+    </section>
+    <section class="panel">
+      <div class="ptitle">Hybrids &amp; unknowns</div>
+      <p style="margin:0 0 10px;font-size:18px;color:var(--muted)">Builds with points split across trees. Counted per class, never folded into a spec above.</p>
+      <ol class="board" id="hybrids"></ol>
+    </section>
+  </div>
+</div>
+
+<div class="secthead">
+  <h3>Talents by class</h3>
+  <div class="chips" id="classchips" role="group" aria-label="Class"></div>
+</div>
+<div class="cards" id="cards"></div>
+
+<p class="src">Inspected nearby players with readable talent selections, pooled across every Forever realm. Pick rate = share of that class's inspected Dwarves with at least one point in the talent. Pips show the average rank taken.</p>
+</div>
+
+<script>
+const ICON = n => "https://wow.zamimg.com/images/wow/icons/large/" + n + ".jpg";
+const CLASS = {SHAMAN:["Shaman","#0070DE"],PALADIN:["Paladin","#F58CBA"],HUNTER:["Hunter","#ABD473"],WARRIOR:["Warrior","#C79C6E"],PRIEST:["Priest","#FFFFFF"],ROGUE:["Rogue","#FFF569"]};
+const SPECICON = {"Enhancement":"spell_nature_lightningshield","Restoration:SHAMAN":"spell_nature_magicimmunity","Elemental":"spell_nature_lightning",
+  "Protection:PALADIN":"spell_holy_devotionaura","Retribution":"spell_holy_auraoflight","Holy:PALADIN":"spell_holy_holybolt",
+  "Beast Mastery":"ability_hunter_beasttaming","Marksmanship":"ability_marksmanship","Survival":"ability_hunter_swiftstrike",
+  "Protection:WARRIOR":"inv_shield_06","Arms":"ability_warrior_savageblow","Fury":"ability_warrior_innerrage",
+  "Discipline":"spell_holy_wordfortitude","Holy:PRIEST":"spell_holy_guardianspirit","Shadow":"spell_shadow_shadowwordpain",
+  "Combat":"ability_backstab","Assassination":"ability_rogue_eviscerate","Subtlety":"ability_stealth"};
+const D = {"n":425,"classes":{"WARRIOR":{"n":37,"spec":{"Arms":9,"Protection":18,"Arms/Fury":2,"Fury":5,"Unknown build":2,"Fury/Arms":1},"tal":[{"name":"Shield Specialization","pct":49,"avgRank":4.3,"max":5,"icon":"inv_shield_06","tree":"Protection"},{"name":"Improved Rend","pct":27,"avgRank":2.5,"max":3,"icon":"ability_gouge","tree":"Arms"},{"name":"Cruelty","pct":27,"avgRank":3.9,"max":5,"icon":"ability_rogue_eviscerate","tree":"Fury"},{"name":"Improved Bloodrage","pct":27,"avgRank":1.7,"max":2,"icon":"ability_racial_bloodrage","tree":"Protection"},{"name":"Improved Thunder Clap","pct":24,"avgRank":2.8,"max":3,"icon":"ability_thunderclap","tree":"Protection"},{"name":"Improved Heroic Strike","pct":16,"avgRank":2.8,"max":3,"icon":"ability_rogue_ambush","tree":"Arms"}],"trees":{"Protection":4.1,"Arms":2.5,"Fury":1.6},"medLv":18},"SHAMAN":{"n":202,"spec":{"Enhancement":152,"Restoration":27,"Elemental":14,"Enhancement/Restoration":4,"Restoration/Enhancement":3,"Restoration/Elemental/Enhancement":1,"Elemental/Enhancement":1},"tal":[{"name":"Thundering Strikes","pct":71,"avgRank":4.5,"max":5,"icon":"ability_thunderbolt","tree":"Enhancement"},{"name":"Mental Dexterity","pct":65,"avgRank":2.8,"max":3,"icon":"spell_nature_mentalquickness","tree":"Enhancement"},{"name":"Improved Ghost Wolf","pct":52,"avgRank":1.9,"max":2,"icon":"spell_nature_spiritwolf","tree":"Enhancement"},{"name":"Shamanistic Focus","pct":46,"avgRank":1,"max":1,"icon":"spell_nature_elementalabsorption","tree":"Enhancement"},{"name":"Elemental Weapons","pct":38,"avgRank":2.5,"max":3,"icon":"spell_fire_flametounge","tree":"Enhancement"},{"name":"Ancestral Knowledge","pct":35,"avgRank":2.6,"max":5,"icon":"spell_shadow_grimward","tree":"Enhancement"}],"trees":{"Enhancement":9.3,"Restoration":1.8,"Elemental":0.5},"medLv":21},"HUNTER":{"n":61,"spec":{"Beast Mastery/Marksmanship":6,"Marksmanship":18,"Beast Mastery":32,"Marksmanship/Beast Mastery":2,"Beast Mastery/Survival":1,"Survival/Marksmanship":1,"Beast Mastery/Marksmanship/Survival":1},"tal":[{"name":"Deadly Aspects","pct":56,"avgRank":3.4,"max":5,"icon":"spell_nature_ravenform","tree":"Beast Mastery"},{"name":"Endurance Training","pct":49,"avgRank":2.9,"max":5,"icon":"spell_nature_reincarnation","tree":"Beast Mastery"},{"name":"Lethal Attacks","pct":38,"avgRank":4.3,"max":5,"icon":"ability_searingarrow","tree":"Marksmanship"},{"name":"Focused Fire","pct":31,"avgRank":1.8,"max":2,"icon":"inv_weapon_crossbow_10","tree":"Beast Mastery"},{"name":"Careful Aim","pct":26,"avgRank":4.1,"max":5,"icon":"ability_hunter_zenarchery","tree":"Marksmanship"},{"name":"Hawk Eye","pct":18,"avgRank":2.5,"max":3,"icon":"ability_townwatch","tree":"Marksmanship"}],"trees":{"Beast Mastery":5.7,"Marksmanship":3.9,"Survival":0.2},"medLv":19},"PRIEST":{"n":21,"spec":{"Discipline":8,"Shadow":3,"Discipline/Shadow":2,"Discipline/Holy":1,"Shadow/Holy":1,"Holy":4,"Holy/Shadow":2},"tal":[{"name":"Wand Specialization","pct":76,"avgRank":1.9,"max":2,"icon":"inv_wand_01","tree":"Discipline"},{"name":"Twin Disciplines","pct":43,"avgRank":3.8,"max":5,"icon":"spell_holy_sealofvengeance","tree":"Discipline"},{"name":"Spirit Tap","pct":38,"avgRank":4.8,"max":5,"icon":"spell_shadow_requiem","tree":"Shadow"},{"name":"Improved Power Word: Shield","pct":33,"avgRank":2.7,"max":3,"icon":"spell_holy_powerwordshield","tree":"Discipline"},{"name":"Meditation","pct":29,"avgRank":3,"max":3,"icon":"spell_nature_sleep","tree":"Discipline"},{"name":"Improved Renew","pct":29,"avgRank":2.5,"max":3,"icon":"spell_holy_renew","tree":"Holy"}],"trees":{"Discipline":6.7,"Shadow":2.8,"Holy":2.5},"medLv":20},"ROGUE":{"n":11,"spec":{"Combat/Subtlety":1,"Combat":5,"Assassination":1,"Assassination/Combat":1,"Combat/Assassination":2,"Subtlety":1},"tal":[{"name":"Improved Sinister Strike","pct":82,"avgRank":1.9,"max":2,"icon":"spell_shadow_ritualofsacrifice","tree":"Combat"},{"name":"Improved Eviscerate","pct":73,"avgRank":2.6,"max":3,"icon":"ability_rogue_eviscerate","tree":"Combat"},{"name":"Precision","pct":45,"avgRank":2.6,"max":3,"icon":"ability_marksmanship","tree":"Combat"},{"name":"Deflection","pct":36,"avgRank":3,"max":3,"icon":"ability_parry","tree":"Combat"},{"name":"Malice","pct":36,"avgRank":4.5,"max":5,"icon":"ability_racial_bloodrage","tree":"Assassination"},{"name":"Riposte","pct":27,"avgRank":1,"max":1,"icon":"ability_warrior_challange","tree":"Combat"}],"trees":{"Combat":6.5,"Assassination":3.9,"Subtlety":1},"medLv":22},"PALADIN":{"n":93,"spec":{"Protection":42,"Retribution":35,"Protection/Retribution":1,"Retribution/Holy":3,"Holy":9,"Holy/Retribution":1,"Protection/Holy/Retribution":1,"Protection/Holy":1},"tal":[{"name":"Redoubt","pct":47,"avgRank":4.5,"max":5,"icon":"ability_defend","tree":"Protection"},{"name":"Benediction","pct":39,"avgRank":4,"max":5,"icon":"spell_frost_windwalkon","tree":"Retribution"},{"name":"Precision","pct":34,"avgRank":2.9,"max":3,"icon":"ability_rogue_ambush","tree":"Protection"},{"name":"Improved Judgement","pct":31,"avgRank":1.9,"max":2,"icon":"spell_holy_righteousfury","tree":"Retribution"},{"name":"Anticipation","pct":30,"avgRank":2.3,"max":5,"icon":"spell_magic_lesserinvisibilty","tree":"Protection"},{"name":"Shield Specialization","pct":29,"avgRank":2.2,"max":3,"icon":"inv_shield_06","tree":"Protection"}],"trees":{"Protection":5.7,"Retribution":4.5,"Holy":1.1},"medLv":21}}};
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pct = (a, b) => Math.round(100 * a / b);
+const order = Object.keys(D.classes).sort((a, b) => D.classes[b].n - D.classes[a].n);
+const isPure = s => !s.includes("/") && s !== "Unknown build";
+
+// pure specs across classes
+const specs = [];
+const hybrids = [];
+for (const cf of order) {
+  const c = D.classes[cf]; let h = 0;
+  for (const [s, n] of Object.entries(c.spec)) isPure(s) ? specs.push({cf, s, n}) : h += n;
+  if (h) hybrids.push({cf, s: "Hybrid / unknown", n: h});
+}
+specs.sort((a, b) => b.n - a.n);
+const topN = specs[0].n;
+const row = (r, i, max, hy) => {
+  const [cn, col] = CLASS[r.cf];
+  const icon = hy ? "classicon_" + r.cf.toLowerCase() : (SPECICON[r.s + ":" + r.cf] || SPECICON[r.s]);
+  return `<li style="--c:${col}"><span class="rank">${hy ? "~" : i + 1}</span><img src="${ICON(icon)}" alt="" width="34" height="34">
+    <span class="sname">${esc(hy ? cn : r.s)}<small>${esc(hy ? r.s : cn)}</small></span>
+    <span class="track"><i style="width:${(100 * r.n / max).toFixed(1)}%"></i></span>
+    <span class="num"><b>${r.n}</b><span>${pct(r.n, D.n)}%</span></span></li>`;
+};
+document.getElementById("board").innerHTML = specs.slice(0, 12).map((r, i) => row(r, i, topN)).join("");
+document.getElementById("hybrids").innerHTML = hybrids.sort((a, b) => b.n - a.n).map((r, i) => row(r, i, topN, true)).join("");
+
+// class strip
+document.getElementById("strip").innerHTML = order.map(cf => `<i style="width:${100 * D.classes[cf].n / D.n}%;background:${CLASS[cf][1]}" title="${CLASS[cf][0]}"></i>`).join("");
+document.getElementById("stripkey").innerHTML = order.map(cf => `<span style="--c:${CLASS[cf][1]}"><b>${CLASS[cf][0]}</b> ${pct(D.classes[cf].n, D.n)}%</span>`).join("");
+
+// class cards
+document.getElementById("cards").innerHTML = order.map(cf => {
+  const c = D.classes[cf], [cn, col] = CLASS[cf];
+  const trees = Object.entries(c.trees);
+  const ti = Object.fromEntries(trees.map(([t], i) => [t, i]));
+  let hy = 0; const pure = [];
+  for (const [s, n] of Object.entries(c.spec)) isPure(s) ? pure.push([s, n]) : hy += n;
+  pure.sort((a, b) => ti[a[0]] - ti[b[0]]);
+  const seg = pure.map(([s, n]) => `<i class="t${ti[s]}" style="width:${100 * n / c.n}%" title="${esc(s)} ${n}"></i>`).join("") +
+    (hy ? `<i class="th" style="width:${100 * hy / c.n}%" title="Hybrid ${hy}"></i>` : "");
+  const key = pure.map(([s, n]) => `<span class="k${ti[s]}"><b>${esc(s)}</b> ${pct(n, c.n)}%</span>`).join("") +
+    (hy ? `<span class="kh"><b>Hybrid</b> ${pct(hy, c.n)}%</span>` : "");
+  const tr = trees.map(([t, p], i) => `<div class="tree"><div class="tn">${esc(t)}</div><div class="tv" style="color:var(${["--gold","--blue","--green"][i]})">${p}</div></div>`).join("");
+  const tal = c.tal.map(t => {
+    const on = Math.round(t.avgRank);
+    const pips = Array.from({length: t.max}, (_, k) => `<i${k < on ? ' class="on"' : ""}></i>`).join("");
+    return `<li><img src="${ICON(t.icon)}" alt="" width="34" height="34"><span class="tt"><b>${esc(t.name)}</b>
+      <span class="meta"><span class="pips" title="avg rank ${t.avgRank} of ${t.max}">${pips}</span>${esc(t.tree)}</span></span>
+      <span class="pick"><b>${t.pct}%</b><div class="mini"><i style="width:${t.pct}%"></i></div></span></li>`;
+  }).join("");
+  return `<article class="card" data-class="${cf}" style="--c:${col}">
+    <div class="card-h"><img src="../static/assets/images/wow/icons/large/classicon_${cf.toLowerCase()}.jpg" alt="" width="40" height="40"><h4>${cn}</h4>
+      <div class="cn"><b>${c.n}</b>inspected · ${pct(c.n, D.n)}%</div></div>
+    <div class="card-b">
+      <p class="lbl">Spec split</p><div class="specbar">${seg}</div><div class="speckey">${key}</div>
+      <p class="lbl">Avg points per tree</p><div class="trees">${tr}</div>
+      <p class="lbl">Most-picked talents</p><ul class="tal">${tal}</ul>
+    </div>
+    <div class="card-f">Median level ${c.medLv}${c.n < 30 ? " · small sample, read loosely" : ""}</div>
+  </article>`;
+}).join("");
+
+// class filter chips, mirrored in ?class=
+const chips = document.getElementById("classchips");
+chips.innerHTML = `<button class="chip" data-c="">All</button>` + order.map(cf => `<button class="chip" data-c="${cf}">${CLASS[cf][0]}</button>`).join("");
+function apply(sel) {
+  chips.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.c === sel));
+  document.querySelectorAll(".card").forEach(c => c.hidden = !!sel && c.dataset.class !== sel);
+}
+chips.addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  const u = new URL(location); b.dataset.c ? u.searchParams.set("class", b.dataset.c) : u.searchParams.delete("class");
+  history.pushState(null, "", u); apply(b.dataset.c);
+});
+addEventListener("popstate", () => apply(new URL(location).searchParams.get("class") || ""));
+apply(new URL(location).searchParams.get("class") || "");
+</script>
+</body></html>

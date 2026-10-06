@@ -66,7 +66,7 @@ Four faces, each with one job. Never swap their roles.
   4-5px tiles, 6px panels/tables), no blur, no radius.
 - Hover raises the border to gold. Focus is a visible 2px outline (blue or
   gold), never removed without a replacement.
-- The `.crt` overlay and `.wrap` container (max 1130px) wrap every page.
+- The `.wrap` container (max 1130px) wraps every page. Do not render scan lines or a CRT overlay.
 
 ## 5. Page anatomy (every static page, every game)
 
@@ -85,6 +85,8 @@ In this order:
 Every edition gets every page, even with no data. An empty page says so plainly
 in the normal layout; it never disappears or breaks the nav. Navigation is
 identical across editions: adding a page or game means adding it everywhere.
+Edition-specific race profiles may have their own nested routes when supported
+by inspected data; they link from that edition's Talents page.
 
 ## 6. Data honesty is part of the design
 

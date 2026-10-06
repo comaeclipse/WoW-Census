@@ -79,6 +79,19 @@ def main():
                 errors.append(f"Missing data: {edition}/{name}")
             else:
                 json.loads(file.read_text(encoding="utf-8"))
+    for name in ("index.html", "index.md"):
+        if not (root / "forever" / "dwarf" / name).is_file():
+            errors.append(f"Missing Dwarf profile: forever/dwarf/{name}")
+    dwarf_html = root / "forever" / "dwarf" / "index.html"
+    if dwarf_html.is_file():
+        parser = Links()
+        parser.feed(dwarf_html.read_text(encoding="utf-8"))
+        for ref in parser.urls:
+            url = urlsplit(urljoin("https://wowcensus.io/forever/dwarf/", ref))
+            if url.netloc == "wowcensus.io" and not resolve_asset(root, url.path):
+                errors.append(f"Missing Dwarf asset: {ref}")
+        if "https://wow.zamimg.com/" in dwarf_html.read_text(encoding="utf-8"):
+            errors.append("Remote Dwarf icon URL")
     for file in root.rglob("*"):
         if not file.is_file() or file.suffix not in (".html", ".js", ".css") or "assets" in file.parts:
             continue

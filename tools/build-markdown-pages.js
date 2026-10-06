@@ -148,6 +148,13 @@ function main() {
     }
   }
 
+  if (!editionArg || editions.includes('')) {
+    const html = path.join(root, 'forever', 'dwarf', 'index.html');
+    if (!fs.existsSync(html)) throw new Error(`Missing Dwarf profile: ${html}`);
+    writeFile(path.join(root, 'forever', 'dwarf', 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
+    routes.push('/forever/dwarf/');
+  }
+
   console.log(`Built ${routes.length} Markdown page variants in ${root}`);
 }
 

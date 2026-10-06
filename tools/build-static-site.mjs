@@ -15,6 +15,7 @@ import { DatabaseSync } from "node:sqlite";
 import { localJson } from "./local-site-data.mjs";
 import { EDITIONS, PAGES, SITE_ORIGIN, editionPath, pagePath,
   fetchEditionData, buildEditionModels, renderEditionPage } from "../site/src/edition.mjs";
+import { renderDwarfProfile } from "../site/src/race-profile.mjs";
 
 const require = createRequire(import.meta.url);
 const { stylesheet } = require("./layout-id.js");
@@ -105,7 +106,7 @@ function outputDir(source) {
   return path.join(out, editionPath(source).replace(/^\//, ""));
 }
 function writeSiteMetadata() {
-  const routes = Object.keys(EDITIONS).flatMap((source) => PAGES.map((page) => pagePath(source, page)));
+  const routes = Object.keys(EDITIONS).flatMap((source) => PAGES.map((page) => pagePath(source, page))).concat("/forever/dwarf/");
   write(path.join(out, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     routes.map((route) => `  <url><loc>${SITE_ORIGIN}${route}</loc></url>`).join("\n") +
@@ -188,6 +189,12 @@ async function main() {
         html = html.replace(link, `<style>${css}</style>`);
       }
       write(path.join(dir, `${page}.html`), html);
+    }
+    if (source === "classic-beta") {
+      write(path.join(out, "forever", "dwarf", "index.html"), renderDwarfProfile(data.inspects, {
+        stylesheet: cssName, canonical: SITE_ORIGIN + "/forever/dwarf/",
+        generatedNote: builtAt.slice(0, 16).replace("T", " ") + "Z",
+      }));
     }
     write(path.join(dir, "inspects.json"), JSON.stringify(data.inspects) + "\n");
     write(path.join(dir, "census.json"), JSON.stringify({ ...data.census,
