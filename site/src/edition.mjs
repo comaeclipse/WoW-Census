@@ -7,6 +7,7 @@ import { renderGuildHtml } from "./guilds.mjs";
 import { renderGeographyHtml } from "./geography.mjs";
 import { renderTalentsHtml, renderInspectCoverage } from "./talents.mjs";
 import { renderGearHtml } from "./gear.mjs";
+import { RACE_PROFILES } from "./race-profile.mjs";
 
 export const SITE_ORIGIN = "https://wowcensus.io";
 export const PAGES = ["index", "combos", "auctionhouse", "guilds", "geography", "talents", "gear"];
@@ -324,7 +325,7 @@ export function renderEditionPage(source, page, model, { stylesheet, generatedAt
     case "geography":
       return renderGeographyHtml(model.views, model.dims, { ...common, notes: ["Latest location observation: " + utcTimestamp(model.lastT)] });
     case "talents":
-      return renderTalentsHtml(model.inspects, { ...common, dwarfHref: source === "classic-beta" ? "/forever/dwarf/" : null });
+      return renderTalentsHtml(model.inspects, { ...common, raceProfiles: source === "classic-beta" ? RACE_PROFILES : null });
     case "gear":
       return renderGearHtml(model.inspects, { ...common, branch: edition.branch });
   }

@@ -78,7 +78,7 @@ export function renderTalentsHtml(data, opts={}) {
     <div class="page-controls">${nav.pages||""}</div>
     <section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div>
     <p class="hint talent-summary" style="margin:0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>
-    ${opts.dwarfHref ? `<p class="talent-summary"><a href="${esc(opts.dwarfHref)}">Explore Dwarf builds and talents</a></p>` : ""}
+    ${opts.raceProfiles ? `<p class="talent-summary">${Object.entries(opts.raceProfiles).map(([race, p]) => `<a href="${esc(p.path)}">Explore ${esc(p.label || race)} builds and talents</a>`).join(" · ")}</p>` : ""}
     <div class="talent-filters" id="talent-filters">${talentMarkup("filters", data.records)}</div></section>
     <div id="talent-content" aria-live="polite">${talentMarkup("content", data.records)}</div>
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>

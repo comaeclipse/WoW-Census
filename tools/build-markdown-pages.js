@@ -149,10 +149,13 @@ function main() {
   }
 
   if (!editionArg || editions.includes('')) {
-    const html = path.join(root, 'forever', 'dwarf', 'index.html');
-    if (!fs.existsSync(html)) throw new Error(`Missing Dwarf profile: ${html}`);
-    writeFile(path.join(root, 'forever', 'dwarf', 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
-    routes.push('/forever/dwarf/');
+    // Keep in step with RACE_PROFILES in site/src/race-profile.mjs.
+    for (const race of ['human', 'dwarf', 'gnome', 'skyborne', 'night-elf', 'orc', 'undead', 'tauren', 'horde-skyborne', 'troll']) {
+      const html = path.join(root, 'forever', race, 'index.html');
+      if (!fs.existsSync(html)) throw new Error(`Missing race profile: ${html}`);
+      writeFile(path.join(root, 'forever', race, 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
+      routes.push(`/forever/${race}/`);
+    }
   }
 
   console.log(`Built ${routes.length} Markdown page variants in ${root}`);

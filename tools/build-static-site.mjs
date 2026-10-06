@@ -15,7 +15,7 @@ import { DatabaseSync } from "node:sqlite";
 import { localJson } from "./local-site-data.mjs";
 import { EDITIONS, PAGES, SITE_ORIGIN, editionPath, pagePath,
   fetchEditionData, buildEditionModels, renderEditionPage } from "../site/src/edition.mjs";
-import { renderDwarfProfile } from "../site/src/race-profile.mjs";
+import { RACE_PROFILES, renderRaceProfile } from "../site/src/race-profile.mjs";
 
 const require = createRequire(import.meta.url);
 const { stylesheet } = require("./layout-id.js");
@@ -106,7 +106,7 @@ function outputDir(source) {
   return path.join(out, editionPath(source).replace(/^\//, ""));
 }
 function writeSiteMetadata() {
-  const routes = Object.keys(EDITIONS).flatMap((source) => PAGES.map((page) => pagePath(source, page))).concat("/forever/dwarf/");
+  const routes = Object.keys(EDITIONS).flatMap((source) => PAGES.map((page) => pagePath(source, page))).concat(Object.values(RACE_PROFILES).map((p) => p.path));
   write(path.join(out, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     routes.map((route) => `  <url><loc>${SITE_ORIGIN}${route}</loc></url>`).join("\n") +
@@ -191,10 +191,11 @@ async function main() {
       write(path.join(dir, `${page}.html`), html);
     }
     if (source === "classic-beta") {
-      write(path.join(out, "forever", "dwarf", "index.html"), renderDwarfProfile(data.inspects, {
-        stylesheet: cssName, canonical: SITE_ORIGIN + "/forever/dwarf/",
-        generatedNote: builtAt.slice(0, 16).replace("T", " ") + "Z",
-      }));
+      for (const [race, { path: route }] of Object.entries(RACE_PROFILES))
+        write(path.join(out, route, "index.html"), renderRaceProfile(data.inspects, race, {
+          stylesheet: cssName, canonical: SITE_ORIGIN + route,
+          generatedNote: builtAt.slice(0, 16).replace("T", " ") + "Z",
+        }));
     }
     write(path.join(dir, "inspects.json"), JSON.stringify(data.inspects) + "\n");
     write(path.join(dir, "census.json"), JSON.stringify({ ...data.census,

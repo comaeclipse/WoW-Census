@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dwarf Specs &amp; Talents – WoW Forever – WoWCensus</title>
+<title>{{RACE}} Specs &amp; Talents – WoW Forever – WoWCensus</title>
 <link rel="preload" href="../static/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../static/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../static/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -30,11 +30,20 @@ a{color:var(--blue)}
 .game-nav{justify-content:flex-end;margin:0 0 10px auto}
 .game,.chip{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);padding:8px 10px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
 .game:hover,.chip:hover{border-color:var(--gold)}
-.game[aria-current="true"],.chip[aria-pressed="true"]{background:var(--gold);color:#161018;border-color:var(--gold)}
+.game[aria-current="true"],.chip[aria-pressed="true"],.page-controls .chip[aria-current="page"]{background:var(--gold);color:#161018;border-color:var(--gold)}
 .game:focus-visible,.chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
 .breadcrumbs a{color:var(--blue);text-decoration:none}.breadcrumbs [aria-current="page"]{color:var(--ink)}
 .page-controls{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+.race-filter{display:flex;align-items:flex-start;flex-wrap:wrap;gap:8px;min-width:0}
+.race-filter .chips{flex:1 1 100px;min-width:0}
+.faction-picker{display:inline-flex;align-items:center;position:relative;flex:none;height:34px;border:2px solid var(--gold);box-shadow:3px 3px 0 var(--shadow);background:var(--panel)}
+.faction-picker select{appearance:none;border:0;border-radius:0;background:transparent;color:var(--ink);font:8px var(--pixel);letter-spacing:1px;text-transform:uppercase;padding:0 26px 0 10px;height:100%;cursor:pointer}
+.faction-picker select:hover{color:var(--gold)}
+.faction-picker select:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.faction-picker option{background:var(--panel);color:var(--ink)}
+.faction-picker::after{content:"";position:absolute;right:9px;top:10px;width:6px;height:6px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);pointer-events:none}
+.race-filter .chips .chip[hidden]{display:none}
 .ptitle{font-family:var(--pixel);font-size:9px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin:0 0 14px}
 .panel{background:var(--panel);border:2px solid var(--line);box-shadow:6px 6px 0 var(--shadow);padding:16px}
 
@@ -49,6 +58,7 @@ a{color:var(--blue)}
 .hero h2{font-family:var(--pixel);font-size:26px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);margin:0 0 12px;text-shadow:4px 4px 0 var(--shadow)}
 .hero h2 span{color:var(--gold)}
 .hero p{font-family:"Friz Quadrata Web","Friz Quadrata",Georgia,serif;font-size:16px;line-height:1.6;color:#ccc;margin:0;max-width:62ch}
+.hero p strong{color:var(--ink)}
 .hero .fresh{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
 .bignum{text-align:right}
 .bignum b{display:block;font-family:var(--pixel);font-size:40px;color:var(--gold);text-shadow:4px 4px 0 var(--shadow);line-height:1}
@@ -131,11 +141,9 @@ a{color:var(--blue)}
 .card-f{padding:10px 14px;border-top:2px solid var(--line);background:var(--panel2);font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);line-height:1.8}
 .card[hidden]{display:none}
 
-.src{margin-top:30px;font-size:16px;color:var(--muted);text-align:center;line-height:1.5}
-
 @media (max-width:760px){
   .page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}
-  .page-controls{display:block}.page-controls .chips{margin-top:12px}
+  .page-controls{display:block}.page-controls .race-filter{margin-top:12px}.race-filter .chips{display:contents}
   .hero{grid-template-columns:auto 1fr;padding:16px;align-items:start}
   .hero .bignum{grid-column:1/-1;text-align:left;display:flex;align-items:baseline;gap:12px}
   .hero .bignum small{margin:0}
@@ -153,7 +161,7 @@ a{color:var(--blue)}
 
 <header class="ihead">
   <div class="page-heading">
-    <h1 class="iname">WoWCensus<span class="itopic">WoW Forever Dwarf Specs &amp; Talents</span></h1>
+    <h1 class="iname">WoWCensus<span class="itopic">WoW Forever {{RACE}} Specs &amp; Talents</span></h1>
     <nav class="games game-nav">
       <a class="game" aria-current="true" href="#">Forever</a>
       <a class="game" href="#">TBC Anniversary</a>
@@ -167,7 +175,7 @@ a{color:var(--blue)}
     <a href="#">WoWCensus</a><span aria-hidden="true">/</span>
     <a href="#">Forever</a><span aria-hidden="true">/</span>
     <a href="#">Talents</a><span aria-hidden="true">/</span>
-    <span aria-current="page">Dwarf</span>
+    <span aria-current="page">{{RACE}}</span>
   </nav>
 </header>
 
@@ -180,29 +188,38 @@ a{color:var(--blue)}
     <a class="game" aria-current="true" href="#">Talents</a>
     <a class="game" href="#">Gear</a>
   </nav>
-  <div class="chips" aria-label="Race">
+  <div class="race-filter">
+    <label class="faction-picker"><select aria-label="Faction"><option value="Alliance">Alliance</option><option value="Horde">Horde</option></select></label>
+    <div class="chips" aria-label="Race">
     <a class="chip" href="#">Human</a>
-    <a class="chip" aria-pressed="true" href="#">Dwarf</a>
+    <a class="chip" href="#">Dwarf</a>
     <a class="chip" href="#">Gnome</a>
+    <a class="chip" href="#">Alliance Skyborne</a>
     <a class="chip" href="#">Night Elf</a>
+    <a class="chip" href="#">Orc</a>
+    <a class="chip" href="#">Undead</a>
+    <a class="chip" href="#">Tauren</a>
+    <a class="chip" href="#">Horde Skyborne</a>
+    <a class="chip" href="#">Troll</a>
+    </div>
   </div>
 </div>
 
 <section class="hero slab">
-  <img class="portrait" src="../static/assets/images/wow/icons/large/achievement_character_dwarf_male.jpg" alt="" width="96" height="96">
+  <img class="portrait" src="../static/assets/images/wow/icons/large/achievement_character_{{RACE_SLUG}}_male.jpg" alt="" width="96" height="96">
   <div>
-    <h2>Dwarf <span>builds</span></h2>
+    <h2>{{RACE}} <span>builds</span></h2>
     <p>Dwarves seen nearby on Forever are mostly Shamans, and three in four of those run Enhancement. Paladins split between Protection and Retribution, and Hunters lean Beast Mastery. This is an inspected sample, not every Dwarf on the realm.</p>
     <div class="fresh"><span class="tag">Latest inspection 2026-10-05 23:33Z</span><span class="tag ghost">Last 14 days · all realms</span></div>
   </div>
-  <div class="bignum"><b>425</b><small>Dwarves inspected</small></div>
+  <div class="bignum"><b>425</b><small>{{RACES}} inspected</small></div>
 </section>
 
 <div class="tiles">
   <div class="tile" style="--c:#0070DE"><div class="k">Top class</div><div class="v">Shaman</div><div class="s">202 of 425 · 48%</div></div>
   <div class="tile" style="--c:#0070DE"><div class="k">Top spec</div><div class="v">Enhancement</div><div class="s">152 players · 36%</div></div>
   <div class="tile" style="--c:#F58CBA"><div class="k">Top tank spec</div><div class="v">Prot Paladin</div><div class="s">42 · ahead of Prot Warrior (18)</div></div>
-  <div class="tile"><div class="k">Median level</div><div class="v">20</div><div class="s">No level 60s seen yet</div></div>
+  <div class="tile"><div class="k">Median level</div><div class="v">20</div></div>
 </div>
 
 <div class="split2">
@@ -230,18 +247,20 @@ a{color:var(--blue)}
 </div>
 <div class="cards" id="cards"></div>
 
-<p class="src">Inspected nearby players with readable talent selections, pooled across every Forever realm. Pick rate = share of that class's inspected Dwarves with at least one point in the talent. Pips show the average rank taken.</p>
 </div>
 
 <script>
 const ICON = n => "https://wow.zamimg.com/images/wow/icons/large/" + n + ".jpg";
-const CLASS = {SHAMAN:["Shaman","#0070DE"],PALADIN:["Paladin","#F58CBA"],HUNTER:["Hunter","#ABD473"],WARRIOR:["Warrior","#C79C6E"],PRIEST:["Priest","#FFFFFF"],ROGUE:["Rogue","#FFF569"]};
+const CLASS = {SHAMAN:["Shaman","#0070DE"],PALADIN:["Paladin","#F58CBA"],HUNTER:["Hunter","#ABD473"],WARRIOR:["Warrior","#C79C6E"],PRIEST:["Priest","#FFFFFF"],ROGUE:["Rogue","#FFF569"],MAGE:["Mage","#69CCF0"],WARLOCK:["Warlock","#9482C9"],DRUID:["Druid","#FF7D0A"]};
 const SPECICON = {"Enhancement":"spell_nature_lightningshield","Restoration:SHAMAN":"spell_nature_magicimmunity","Elemental":"spell_nature_lightning",
   "Protection:PALADIN":"spell_holy_devotionaura","Retribution":"spell_holy_auraoflight","Holy:PALADIN":"spell_holy_holybolt",
   "Beast Mastery":"ability_hunter_beasttaming","Marksmanship":"ability_marksmanship","Survival":"ability_hunter_swiftstrike",
   "Protection:WARRIOR":"inv_shield_06","Arms":"ability_warrior_savageblow","Fury":"ability_warrior_innerrage",
   "Discipline":"spell_holy_wordfortitude","Holy:PRIEST":"spell_holy_guardianspirit","Shadow":"spell_shadow_shadowwordpain",
-  "Combat":"ability_backstab","Assassination":"ability_rogue_eviscerate","Subtlety":"ability_stealth"};
+  "Combat":"ability_backstab","Assassination":"ability_rogue_eviscerate","Subtlety":"ability_stealth",
+  "Arcane":"spell_holy_magicalsentry","Fire":"spell_fire_firebolt02","Frost":"spell_frost_frostbolt02",
+  "Affliction":"spell_shadow_deathcoil","Demonology":"spell_shadow_metamorphosis","Destruction":"spell_shadow_rainoffire",
+  "Balance":"spell_nature_starfall","Feral Combat":"ability_racial_bearform","Restoration:DRUID":"spell_nature_healingtouch"};
 const D = {"n":425,"classes":{"WARRIOR":{"n":37,"spec":{"Arms":9,"Protection":18,"Arms/Fury":2,"Fury":5,"Unknown build":2,"Fury/Arms":1},"tal":[{"name":"Shield Specialization","pct":49,"avgRank":4.3,"max":5,"icon":"inv_shield_06","tree":"Protection"},{"name":"Improved Rend","pct":27,"avgRank":2.5,"max":3,"icon":"ability_gouge","tree":"Arms"},{"name":"Cruelty","pct":27,"avgRank":3.9,"max":5,"icon":"ability_rogue_eviscerate","tree":"Fury"},{"name":"Improved Bloodrage","pct":27,"avgRank":1.7,"max":2,"icon":"ability_racial_bloodrage","tree":"Protection"},{"name":"Improved Thunder Clap","pct":24,"avgRank":2.8,"max":3,"icon":"ability_thunderclap","tree":"Protection"},{"name":"Improved Heroic Strike","pct":16,"avgRank":2.8,"max":3,"icon":"ability_rogue_ambush","tree":"Arms"}],"trees":{"Protection":4.1,"Arms":2.5,"Fury":1.6},"medLv":18},"SHAMAN":{"n":202,"spec":{"Enhancement":152,"Restoration":27,"Elemental":14,"Enhancement/Restoration":4,"Restoration/Enhancement":3,"Restoration/Elemental/Enhancement":1,"Elemental/Enhancement":1},"tal":[{"name":"Thundering Strikes","pct":71,"avgRank":4.5,"max":5,"icon":"ability_thunderbolt","tree":"Enhancement"},{"name":"Mental Dexterity","pct":65,"avgRank":2.8,"max":3,"icon":"spell_nature_mentalquickness","tree":"Enhancement"},{"name":"Improved Ghost Wolf","pct":52,"avgRank":1.9,"max":2,"icon":"spell_nature_spiritwolf","tree":"Enhancement"},{"name":"Shamanistic Focus","pct":46,"avgRank":1,"max":1,"icon":"spell_nature_elementalabsorption","tree":"Enhancement"},{"name":"Elemental Weapons","pct":38,"avgRank":2.5,"max":3,"icon":"spell_fire_flametounge","tree":"Enhancement"},{"name":"Ancestral Knowledge","pct":35,"avgRank":2.6,"max":5,"icon":"spell_shadow_grimward","tree":"Enhancement"}],"trees":{"Enhancement":9.3,"Restoration":1.8,"Elemental":0.5},"medLv":21},"HUNTER":{"n":61,"spec":{"Beast Mastery/Marksmanship":6,"Marksmanship":18,"Beast Mastery":32,"Marksmanship/Beast Mastery":2,"Beast Mastery/Survival":1,"Survival/Marksmanship":1,"Beast Mastery/Marksmanship/Survival":1},"tal":[{"name":"Deadly Aspects","pct":56,"avgRank":3.4,"max":5,"icon":"spell_nature_ravenform","tree":"Beast Mastery"},{"name":"Endurance Training","pct":49,"avgRank":2.9,"max":5,"icon":"spell_nature_reincarnation","tree":"Beast Mastery"},{"name":"Lethal Attacks","pct":38,"avgRank":4.3,"max":5,"icon":"ability_searingarrow","tree":"Marksmanship"},{"name":"Focused Fire","pct":31,"avgRank":1.8,"max":2,"icon":"inv_weapon_crossbow_10","tree":"Beast Mastery"},{"name":"Careful Aim","pct":26,"avgRank":4.1,"max":5,"icon":"ability_hunter_zenarchery","tree":"Marksmanship"},{"name":"Hawk Eye","pct":18,"avgRank":2.5,"max":3,"icon":"ability_townwatch","tree":"Marksmanship"}],"trees":{"Beast Mastery":5.7,"Marksmanship":3.9,"Survival":0.2},"medLv":19},"PRIEST":{"n":21,"spec":{"Discipline":8,"Shadow":3,"Discipline/Shadow":2,"Discipline/Holy":1,"Shadow/Holy":1,"Holy":4,"Holy/Shadow":2},"tal":[{"name":"Wand Specialization","pct":76,"avgRank":1.9,"max":2,"icon":"inv_wand_01","tree":"Discipline"},{"name":"Twin Disciplines","pct":43,"avgRank":3.8,"max":5,"icon":"spell_holy_sealofvengeance","tree":"Discipline"},{"name":"Spirit Tap","pct":38,"avgRank":4.8,"max":5,"icon":"spell_shadow_requiem","tree":"Shadow"},{"name":"Improved Power Word: Shield","pct":33,"avgRank":2.7,"max":3,"icon":"spell_holy_powerwordshield","tree":"Discipline"},{"name":"Meditation","pct":29,"avgRank":3,"max":3,"icon":"spell_nature_sleep","tree":"Discipline"},{"name":"Improved Renew","pct":29,"avgRank":2.5,"max":3,"icon":"spell_holy_renew","tree":"Holy"}],"trees":{"Discipline":6.7,"Shadow":2.8,"Holy":2.5},"medLv":20},"ROGUE":{"n":11,"spec":{"Combat/Subtlety":1,"Combat":5,"Assassination":1,"Assassination/Combat":1,"Combat/Assassination":2,"Subtlety":1},"tal":[{"name":"Improved Sinister Strike","pct":82,"avgRank":1.9,"max":2,"icon":"spell_shadow_ritualofsacrifice","tree":"Combat"},{"name":"Improved Eviscerate","pct":73,"avgRank":2.6,"max":3,"icon":"ability_rogue_eviscerate","tree":"Combat"},{"name":"Precision","pct":45,"avgRank":2.6,"max":3,"icon":"ability_marksmanship","tree":"Combat"},{"name":"Deflection","pct":36,"avgRank":3,"max":3,"icon":"ability_parry","tree":"Combat"},{"name":"Malice","pct":36,"avgRank":4.5,"max":5,"icon":"ability_racial_bloodrage","tree":"Assassination"},{"name":"Riposte","pct":27,"avgRank":1,"max":1,"icon":"ability_warrior_challange","tree":"Combat"}],"trees":{"Combat":6.5,"Assassination":3.9,"Subtlety":1},"medLv":22},"PALADIN":{"n":93,"spec":{"Protection":42,"Retribution":35,"Protection/Retribution":1,"Retribution/Holy":3,"Holy":9,"Holy/Retribution":1,"Protection/Holy/Retribution":1,"Protection/Holy":1},"tal":[{"name":"Redoubt","pct":47,"avgRank":4.5,"max":5,"icon":"ability_defend","tree":"Protection"},{"name":"Benediction","pct":39,"avgRank":4,"max":5,"icon":"spell_frost_windwalkon","tree":"Retribution"},{"name":"Precision","pct":34,"avgRank":2.9,"max":3,"icon":"ability_rogue_ambush","tree":"Protection"},{"name":"Improved Judgement","pct":31,"avgRank":1.9,"max":2,"icon":"spell_holy_righteousfury","tree":"Retribution"},{"name":"Anticipation","pct":30,"avgRank":2.3,"max":5,"icon":"spell_magic_lesserinvisibilty","tree":"Protection"},{"name":"Shield Specialization","pct":29,"avgRank":2.2,"max":3,"icon":"inv_shield_06","tree":"Protection"}],"trees":{"Protection":5.7,"Retribution":4.5,"Holy":1.1},"medLv":21}}};
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
