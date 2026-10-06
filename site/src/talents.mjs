@@ -60,6 +60,11 @@ export function renderTalentsHtml(data, opts={}) {
     .talent-summary{font-family:"Friz Quadrata Web","Friz Quadrata","Friz Quadrata Std","Fritz Quadrata","Cinzel",Georgia,serif;font-size:16px;font-weight:400;letter-spacing:normal;line-height:1.66;color:#ccc;text-align:left}
     .talent-filters{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}.talent-filters label{display:grid;gap:5px;font-size:17px;color:var(--muted)}
     .talent-filters select{color:var(--ink);background:var(--panel2);border:2px solid var(--line);font-family:var(--term);font-size:18px;padding:6px 10px;max-width:230px}
+    .class-row{display:flex;justify-content:space-between;gap:8px;margin:4px 0 8px;list-style:none;padding:0}.class-row li{flex:1 1 0;min-width:0}
+    .class-row a{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 2px;text-decoration:none;color:var(--c)}
+    .class-row img{width:56px;height:56px;border:3px solid var(--c);box-shadow:3px 3px 0 #000}.class-row span{font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-align:center}
+    .class-row a:hover img,.class-row a:focus-visible img{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #000}.class-row a:hover span{text-decoration:underline}
+    @media(max-width:720px){.class-row{flex-wrap:wrap;justify-content:center}.class-row li{flex:0 0 calc(20% - 8px)}.class-row img{width:44px;height:44px}.class-row span{font-size:11px}}
     .talent-section{margin-top:22px}.talent-empty{margin:0}
     .talent-combo-table{min-width:0}.talent-combo-table th:first-child,.talent-combo-table td:first-child{width:72%}
     .talent-combo-table th:nth-child(2),.talent-combo-table td:nth-child(2){width:12%}
@@ -76,10 +81,11 @@ export function renderTalentsHtml(data, opts={}) {
     </style></head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
     <header class="ihead"><div class="page-heading">${pageHeading("WoWCensus", nav, topic)}${nav.games||""}</div>${nav.breadcrumbs||""}</header>
     <div class="page-controls">${nav.pages||""}</div>
-    <section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div>
-    <p class="hint talent-summary" style="margin:0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>
-    ${opts.raceProfiles ? `<p class="talent-summary">${Object.entries(opts.raceProfiles).map(([race, p]) => `<a href="${esc(p.path)}">Explore ${esc(p.label || race)} builds and talents</a>`).join(" · ")}</p>` : ""}
-    ${opts.classProfiles?.length ? `<p class="talent-summary">${opts.classProfiles.map((p) => `<a href="${esc(p.path)}">Explore ${esc(p.label)} talents by spec</a>`).join(" · ")}</p>` : ""}
+    <section class="panel" style="margin-bottom:22px">
+    ${opts.classProfiles?.length
+      ? `<ul class="class-row">${opts.classProfiles.map((p) => `<li><a href="${esc(p.path)}" style="--c:${esc(p.color)}"><img src="https://wow.zamimg.com/images/wow/icons/large/${esc(p.icon)}.jpg" alt="" width="56" height="56"><span>${esc(p.label)}</span></a></li>`).join("")}</ul>`
+      : `<div class="ptitle">What this sample shows</div>
+    <p class="hint talent-summary" style="margin:0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>`}
     <div class="talent-filters" id="talent-filters">${talentMarkup("filters", data.records)}</div></section>
     <div id="talent-content" aria-live="polite">${talentMarkup("content", data.records)}</div>
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>

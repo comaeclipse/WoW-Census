@@ -3,6 +3,7 @@ import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 import { parseHTML } from "linkedom";
 import { CLASS_META } from "./census.mjs";
+import { SPEC_COLORS } from "./class-profile.mjs";
 
 const template = fileURLToPath(new URL("./race-template.html", import.meta.url));
 // Forever races with their own profile route, linked from the Talents page.
@@ -44,7 +45,8 @@ export function renderRaceProfile(inspects,race,opts){
   const D=raceProfile(inspects,race),{plural,path,label=race,icon}=RACE_PROFILES[race];
   let source=fs.readFileSync(template,"utf8").replaceAll("{{RACES}}",plural).replaceAll("{{RACE_SLUG}}",label.toLowerCase().replace(/\s+/g,"")).replaceAll("{{RACE}}",label).replaceAll("../static/fonts/","../../fonts/").replaceAll("../static/assets/","../../assets/")
     .replace('const ICON = n => "https://wow.zamimg.com/images/wow/icons/large/" + n + ".jpg";','const ICON = n => "../../assets/images/wow/icons/large/" + n + ".jpg";')
-    .replace(/const D = \{.*\};/, "const D = "+JSON.stringify({n:D.n,classes:D.classes})+";");
+    .replace("const SPECCOLOR = {};", "const SPECCOLOR = "+JSON.stringify(SPEC_COLORS)+";")
+    .replace(/const D = \{.*\};/,"const D = "+JSON.stringify({n:D.n,classes:D.classes})+";");
   const script=source.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   if(!script)throw new Error("Race template script missing");
   const {document}=parseHTML(source);
@@ -80,7 +82,7 @@ export function renderRaceProfile(inspects,race,opts){
   hero.querySelector(".bignum small").textContent=plural+" with talents";
   const tiles=document.querySelectorAll(".tile");
   if(top){tiles[0].style.setProperty("--c","#"+(CLASS_META[top]?.[1]||"ffce43"));tiles[0].querySelector(".v").textContent=CLASS_META[top]?.[0]||top;tiles[0].querySelector(".s").textContent=topN+" of "+D.n+" · "+pct(topN,D.n)+"%";}
-  if(first){tiles[1].style.setProperty("--c","#"+(CLASS_META[first.cf]?.[1]||"ffce43"));tiles[1].querySelector(".v").textContent=first.s;tiles[1].querySelector(".s").textContent=first.n+" players · "+pct(first.n,D.n)+"%";}
+  if(first){tiles[1].style.setProperty("--c",SPEC_COLORS[first.s+":"+first.cf]||"#"+(CLASS_META[first.cf]?.[1]||"ffce43"));tiles[1].querySelector(".v").textContent=first.s;tiles[1].querySelector(".s").textContent=first.n+" players · "+pct(first.n,D.n)+"%";}
   tiles[2].querySelector(".v").textContent=tank[0]?"Prot "+(CLASS_META[tank[0].cf]?.[0]||tank[0].cf):"None classified";
   tiles[2].querySelector(".s").textContent=tank[0]?tank[0].n+" inspected"+(tank[1]?" · ahead of "+tank[1].n+" "+(CLASS_META[tank[1].cf]?.[0]||tank[1].cf):""):"No Protection build observed";
   tiles[3].querySelector(".v").textContent=D.medLv??"—";

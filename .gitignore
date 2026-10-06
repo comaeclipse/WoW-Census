@@ -26,3 +26,5 @@ Thumbs.db
 
 # Local upload instructions
 upload.md
+
+.playwright-mcp/

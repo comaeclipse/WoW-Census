@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Talents Class Row</title>
+<link rel="stylesheet" href="https://a96dc6c5.wowcensus-static-preview.pages.dev/style.45f98f4b2a22.css">
+<style>
+body{padding:24px 16px;max-width:1100px;margin:0 auto}
+.class-row{display:flex;justify-content:space-between;gap:8px;margin:4px 0 22px;list-style:none;padding:0}
+.class-row li{flex:1 1 0;min-width:0}
+.class-row a{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 2px;text-decoration:none;color:var(--c)}
+.class-row img{width:56px;height:56px;border:3px solid var(--c);box-shadow:3px 3px 0 #000;image-rendering:auto}
+.class-row span{font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-align:center}
+.class-row a:hover img,.class-row a:focus-visible img{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #000}
+.class-row a:hover span{text-decoration:underline}
+@media (max-width:720px){
+  .class-row{flex-wrap:wrap;justify-content:center}
+  .class-row li{flex:0 0 calc(20% - 8px)}
+  .class-row img{width:44px;height:44px}
+  .class-row span{font-size:11px}
+}
+/* copied from the live /talents page */
+.vsel{position:relative}
+.vsel-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:150px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;color:var(--ink);background:var(--panel);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);padding:9px 8px 9px 10px;cursor:pointer}
+.vsel-trigger:hover{border-color:var(--gold)}
+.vsel-trigger svg{width:14px;height:14px;flex:0 0 auto;fill:none;stroke:currentcolor;stroke-width:2.5;stroke-linecap:square}
+.talent-filters{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+.talent-filters label{display:grid;gap:5px;font-size:17px;color:var(--muted)}
+@media (max-width:600px){.talent-filters label{flex:1 1 40%}.talent-filters .vsel-trigger{width:100%}}
+.note{opacity:.6;font-size:14px;margin-top:28px}
+</style>
+</head>
+<body>
+<section class="panel" style="margin-bottom:22px">
+  <ul class="class-row" id="row"></ul>
+  <div class="talent-filters" id="talent-filters"><label>Class<div class="vsel"><button class="vsel-trigger" type="button"><span class="vsel-value">All</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div></label><label>Race<div class="vsel"><button class="vsel-trigger" type="button"><span class="vsel-value">All</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div></label><label>Realm<div class="vsel"><button class="vsel-trigger" type="button"><span class="vsel-value">All</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div></label><label>Faction<div class="vsel"><button class="vsel-trigger" type="button"><span class="vsel-value">All</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div></label><label>Level<div class="vsel"><button class="vsel-trigger" type="button"><span class="vsel-value">All</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></div></label></div>
+</section>
+<p class="note">Mockup: replaces the sample sentence and both "Explore …" link rows. Filters unchanged (styling only here; they don't open).</p>
+<script>
+const BASE = "https://a96dc6c5.wowcensus-static-preview.pages.dev";
+const CLASSES = [["Paladin","#F58CBA"],["Warrior","#C79C6E"],["Druid","#FF7D0A"],["Hunter","#ABD473"],["Shaman","#0070DE"],["Priest","#FFFFFF"],["Rogue","#FFF569"],["Mage","#69CCF0"],["Warlock","#9482C9"]];
+document.getElementById("row").innerHTML = CLASSES.map(([n, c]) =>
+  `<li><a href="${BASE}/forever/${n.toLowerCase()}/" style="--c:${c}"><img src="${BASE}/assets/images/wow/icons/large/classicon_${n.toLowerCase()}.jpg" alt=""><span>${n}</span></a></li>`).join("");
+</script>
+</body>
+</html>

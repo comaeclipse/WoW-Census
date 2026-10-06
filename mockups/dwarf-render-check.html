@@ -1,0 +1,420 @@
+<!doctype html><!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WoW Forever Dwarf Specs & Talents – WoWCensus</title>
+<!-- MOCKUP for wowcensus.io/forever/dwarf/ — data is a real aggregate of the Forever
+     inspection sample (static/inspects.json, Dwarf rows with readable talents).
+     Fonts resolve from ../static/fonts so it renders locally. -->
+<link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin="">
+<style>
+@font-face{font-family:"Press Start 2P";src:url("/fonts/press-start-2p-latin.woff2") format("woff2");font-display:optional}
+@font-face{font-family:"VT323";src:url("/fonts/vt323-latin.woff2") format("woff2");font-display:optional}
+@font-face{font-family:"Cinzel";src:url("/fonts/cinzel-latin-800-normal.woff2") format("woff2");font-weight:800;font-display:optional}
+@font-face{font-family:"Friz Quadrata Web";src:url("/fonts/friz-quadrata-regular.woff2") format("woff2");font-display:optional}
+:root{
+  --bg:#0d0f17; --panel:#161a28; --panel2:#1e2334; --ink:#eae7d6;
+  --muted:#8b90a0; --gold:#ffce43; --green:#66d16b; --red:#e8595f;
+  --blue:#5fb0f0; --line:#2b3145; --shadow:#000;
+  --pixel:"Press Start 2P", ui-monospace, monospace;
+  --term:"VT323", ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--term);font-size:20px;line-height:1.15;-webkit-font-smoothing:none}
+a{color:var(--blue)}
+.wrap{max-width:1130px;margin:0 auto;padding:22px 18px 60px}
+
+/* ---- shared anatomy (as on the live site) ---- */
+.ihead{border-bottom:3px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+.page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.iname{font-family:"Cinzel",Georgia,serif;font-size:32px;font-weight:800;letter-spacing:1px;color:var(--gold);margin:0 0 10px;line-height:1.2;text-shadow:2px 2px 0 var(--shadow)}
+.iname .itopic{display:block;margin-top:6px;font-family:var(--pixel);font-size:9px;font-weight:400;letter-spacing:1px;line-height:1.6;text-transform:uppercase;color:var(--muted);text-shadow:none}
+.games{display:flex;gap:8px;flex-wrap:wrap}
+.game-nav{justify-content:flex-end;margin:0 0 10px auto}
+.game,.chip{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);padding:8px 10px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.game:hover,.chip:hover{border-color:var(--gold)}
+.game[aria-current="true"],.chip[aria-pressed="true"]{background:var(--gold);color:#161018;border-color:var(--gold)}
+.game:focus-visible,.chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.breadcrumbs a{color:var(--blue);text-decoration:none}.breadcrumbs [aria-current="page"]{color:var(--ink)}
+.page-controls{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+.ptitle{font-family:var(--pixel);font-size:9px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin:0 0 14px}
+.panel{background:var(--panel);border:2px solid var(--line);box-shadow:6px 6px 0 var(--shadow);padding:16px}
+
+/* ---- neobrutalist layer: thicker frames, bigger hard shadows, gold slabs ---- */
+.slab{border:3px solid var(--ink);box-shadow:8px 8px 0 var(--shadow)}
+.tag{display:inline-block;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;background:var(--gold);color:#161018;padding:6px 8px;border:2px solid var(--shadow)}
+.tag.ghost{background:var(--panel2);color:var(--muted);border-color:var(--line)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;background:var(--panel);padding:20px 22px;margin-bottom:26px}
+.portrait{width:96px;height:96px;border:4px solid #b99b55;box-shadow:5px 5px 0 var(--shadow);background:#111;display:block}
+.hero h2{font-family:var(--pixel);font-size:26px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);margin:0 0 12px;text-shadow:4px 4px 0 var(--shadow)}
+.hero h2 span{color:var(--gold)}
+.hero p{font-family:"Friz Quadrata Web","Friz Quadrata",Georgia,serif;font-size:16px;line-height:1.6;color:#ccc;margin:0;max-width:62ch}
+.hero .fresh{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.bignum{text-align:right}
+.bignum b{display:block;font-family:var(--pixel);font-size:40px;color:var(--gold);text-shadow:4px 4px 0 var(--shadow);line-height:1}
+.bignum small{display:block;margin-top:10px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+.tile{background:var(--panel);border:2px solid var(--line);box-shadow:5px 5px 0 var(--shadow);padding:12px 13px 13px;border-top:6px solid var(--c,var(--gold))}
+.tile .k{font-family:var(--pixel);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.tile .v{font-family:var(--pixel);font-size:15px;color:var(--gold);margin-top:12px;line-height:1.35}
+.tile .s{font-size:18px;color:var(--muted);margin-top:6px}
+
+/* class mix strip */
+.strip{display:flex;height:46px;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--shadow);margin-bottom:12px}
+.strip i{display:block;height:100%;border-right:3px solid var(--shadow)}
+.strip i:last-child{border-right:0}
+.strip-key{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:18px;color:var(--muted)}
+.strip-key span::before{content:"";display:inline-block;width:12px;height:12px;margin-right:6px;background:var(--c);border:2px solid var(--shadow);vertical-align:-1px}
+.strip-key b{color:var(--ink);font-weight:400}
+
+/* spec leaderboard */
+.board{list-style:none;margin:0;padding:0}
+.board li{display:grid;grid-template-columns:44px 34px minmax(100px,150px) 1fr 64px;align-items:center;gap:12px;padding:8px 0;border-bottom:2px dashed var(--line)}
+.board li:last-child{border-bottom:0}
+.rank{font-family:var(--pixel);font-size:13px;text-align:center;background:var(--panel2);border:2px solid var(--line);padding:8px 0;color:var(--muted)}
+.board li:nth-child(-n+3) .rank{background:var(--gold);color:#161018;border-color:var(--shadow);box-shadow:3px 3px 0 var(--shadow)}
+.board img,.tal img{width:34px;height:34px;border:2px solid #b99b55;box-shadow:2px 2px 0 var(--shadow);background:#111;display:block}
+.sname{font-family:var(--pixel);font-size:9px;line-height:1.6;text-transform:uppercase;letter-spacing:1px}
+.sname small{display:block;font-size:7px;color:var(--c)}
+.track{height:24px;background:var(--panel2);border:2px solid var(--line)}
+.track i{display:block;height:100%;background:var(--c);border-right:3px solid var(--shadow)}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.num b{font-family:var(--pixel);font-size:11px;color:var(--gold);font-weight:400}
+.num span{display:block;color:var(--muted);font-size:17px;margin-top:2px}
+
+.split2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;align-items:start;margin-bottom:30px}
+
+/* class filter */
+.secthead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:6px 0 18px;padding-bottom:12px;border-bottom:3px solid var(--line)}
+.secthead h3{margin:0;font-family:var(--pixel);font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);text-shadow:3px 3px 0 var(--shadow)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+
+/* class cards */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.card{background:var(--panel);border:3px solid var(--line);box-shadow:8px 8px 0 var(--shadow)}
+.card:hover{border-color:var(--gold)}
+.card-h{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--c);color:#161018;border-bottom:3px solid var(--shadow)}
+.card-h img{width:40px;height:40px;border:3px solid var(--shadow);display:block}
+.card-h h4{margin:0;font-family:var(--pixel);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.card-h .cn{margin-left:auto;text-align:right;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;line-height:1.7}
+.card-h .cn b{display:block;font-size:15px;font-weight:400}
+.card-b{padding:14px}
+.lbl{font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.specbar{display:flex;height:30px;border:3px solid var(--shadow);margin-bottom:8px;background:var(--panel2)}
+.specbar i{display:block;height:100%;border-right:3px solid var(--shadow)}
+.specbar i:last-child{border-right:0}
+.t0{background:var(--gold)}.t1{background:var(--blue)}.t2{background:var(--green)}
+.th{background:repeating-linear-gradient(45deg,var(--muted) 0 4px,var(--panel2) 4px 8px)}
+.speckey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:17px;color:var(--muted);margin-bottom:16px}
+.speckey span::before{content:"";display:inline-block;width:11px;height:11px;margin-right:5px;border:2px solid var(--shadow);vertical-align:-1px}
+.speckey .k0::before{background:var(--gold)}.speckey .k1::before{background:var(--blue)}.speckey .k2::before{background:var(--green)}
+.speckey .kh::before{background:repeating-linear-gradient(45deg,var(--muted) 0 3px,var(--panel2) 3px 6px)}
+.speckey b{color:var(--ink);font-weight:400}
+.trees{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.tree{background:var(--panel2);border:2px solid var(--line);padding:8px}
+.tree .tn{font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tree .tv{font-family:var(--pixel);font-size:13px;margin-top:8px}
+.tal{list-style:none;margin:0;padding:0}
+.tal li{display:grid;grid-template-columns:34px minmax(0,1fr) 70px;gap:10px;align-items:center;padding:7px 0;border-top:2px solid #20263a}
+.tal .tt{min-width:0}
+.tal .tt b{display:block;font-weight:400;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tal .meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:16px;color:var(--muted)}
+.pips{display:inline-flex;gap:2px}
+.pips i{width:7px;height:11px;background:#31374d;display:inline-block}
+.pips i.on{background:var(--gold)}
+.pick{text-align:right}
+.pick b{font-family:var(--pixel);font-size:11px;color:var(--ink);font-weight:400}
+.pick .mini{height:8px;background:var(--panel2);border:1px solid var(--line);margin-top:6px}
+.pick .mini i{display:block;height:100%;background:var(--gold)}
+.card-f{padding:10px 14px;border-top:2px solid var(--line);background:var(--panel2);font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);line-height:1.8}
+.card[hidden]{display:none}
+
+.src{margin-top:30px;font-size:16px;color:var(--muted);text-align:center;line-height:1.5}
+
+@media (max-width:760px){
+  .page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}
+  .page-controls{display:block}.page-controls .chips{margin-top:12px}
+  .hero{grid-template-columns:auto 1fr;padding:16px;align-items:start}
+  .hero .bignum{grid-column:1/-1;text-align:left;display:flex;align-items:baseline;gap:12px}
+  .hero .bignum small{margin:0}
+  .portrait{width:64px;height:64px}
+  .hero h2{font-size:17px}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .split2,.cards{grid-template-columns:minmax(0,1fr)}
+  .board li{grid-template-columns:40px 30px minmax(0,1fr) 72px;gap:9px}
+  .board li .track{grid-column:3/5;grid-row:2;height:14px}
+  .board img{width:30px;height:30px}
+}
+@media (max-width:420px){.wrap{padding:17px 15px 48px}.iname{font-size:26px}.trees{grid-template-columns:1fr 1fr 1fr;gap:5px}.tree .tv{font-size:11px}}
+</style><meta name="description" content="Dwarf class builds and selected talents observed in WoW Forever nearby-player inspections."><link rel="canonical" href="https://wowcensus.io/forever/dwarf/"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="WoW Forever Dwarf Specs & Talents – WoWCensus"><meta property="og:url" content="https://wowcensus.io/forever/dwarf/"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/style.test.css"></head>
+<body><div class="wrap">
+
+<header class="ihead">
+  <div class="page-heading">
+    <h1 class="iname">WoWCensus<span class="itopic">WoW Forever Dwarf Specs &amp; Talents</span></h1>
+    <nav class="games game-nav">
+      <a class="game" aria-current="true" href="/">Forever</a>
+      <a class="game" href="/tbc/">TBC Anniversary</a>
+      <a class="game" href="/classic/">Classic Era</a>
+      <a class="game" href="/sod/">SoD</a>
+      <a class="game" href="/mop/">MoP Classic</a>
+      <a class="game" href="/retail/">Retail</a>
+    </nav>
+  </div>
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">WoWCensus</a><span aria-hidden="true">/</span>
+    <a href="/">Forever</a><span aria-hidden="true">/</span>
+    <a href="/talents">Talents</a><span aria-hidden="true">/</span>
+    <span aria-current="page">Dwarf</span>
+  </nav>
+</header>
+
+<div class="page-controls">
+  <nav class="games page-nav">
+    <a class="game" href="/">Census</a>
+    <a class="game" href="/auctionhouse">Auction House</a>
+    <a class="game" href="/guilds">Guilds</a>
+    <a class="game" href="/geography">Geography</a>
+    <a class="game" aria-current="true" href="/talents">Talents</a>
+    <a class="game" href="/gear">Gear</a>
+  </nav>
+  <div class="chips" aria-label="Race">
+    <a class="chip" href="/talents?race=Human">Human</a>
+    <a aria-current="page" class="chip" href="/forever/dwarf/">Dwarf</a>
+    <a class="chip" href="/talents?race=Gnome">Gnome</a>
+    <a class="chip" href="/talents?race=Night Elf">Night Elf</a>
+  </div>
+</div>
+
+<section class="hero slab">
+  <img class="portrait" src="/assets/images/wow/icons/large/achievement_character_dwarf_male.jpg" alt="" width="96" height="96">
+  <div>
+    <h2>Dwarf <span>builds</span></h2>
+    <p>Shaman is the most inspected Dwarf class, and Enhancement is the most common classified build. These are nearby-player inspections, not every Dwarf in WoW Forever.</p>
+    <div class="fresh"><span class="tag">Latest inspection 2026-10-05 23:33Z</span><span class="tag ghost">Last 14 days · all realms</span></div>
+  </div>
+  <div class="bignum"><b>425</b><small>Dwarves inspected</small></div>
+</section>
+
+<div class="tiles">
+  <div class="tile" style="--c:#0070DE"><div class="k">Top class</div><div class="v">Shaman</div><div class="s">202 of 425 · 48%</div></div>
+  <div class="tile" style="--c:#0070DE"><div class="k">Top spec</div><div class="v">Enhancement</div><div class="s">152 players · 36%</div></div>
+  <div class="tile" style="--c:#F58CBA"><div class="k">Top tank spec</div><div class="v">Prot Paladin</div><div class="s">42 inspected · ahead of 18 Warrior</div></div>
+  <div class="tile"><div class="k">Median level</div><div class="v">20</div><div class="s">2 unknown builds</div></div>
+</div>
+
+<div class="split2">
+  <section class="panel">
+    <div class="ptitle">Most popular specs</div>
+    <ol class="board" id="board"><li style="--c:#0070DE"><span class="rank">1</span><img src="/assets/images/wow/icons/large/spell_nature_lightningshield.jpg" alt="" width="34" height="34">
+    <span class="sname">Enhancement<small>Shaman</small></span>
+    <span class="track"><i style="width:100.0%"></i></span>
+    <span class="num"><b>152</b><span>36%</span></span></li><li style="--c:#F58CBA"><span class="rank">2</span><img src="/assets/images/wow/icons/large/spell_holy_devotionaura.jpg" alt="" width="34" height="34">
+    <span class="sname">Protection<small>Paladin</small></span>
+    <span class="track"><i style="width:27.6%"></i></span>
+    <span class="num"><b>42</b><span>10%</span></span></li><li style="--c:#F58CBA"><span class="rank">3</span><img src="/assets/images/wow/icons/large/spell_holy_auraoflight.jpg" alt="" width="34" height="34">
+    <span class="sname">Retribution<small>Paladin</small></span>
+    <span class="track"><i style="width:23.0%"></i></span>
+    <span class="num"><b>35</b><span>8%</span></span></li><li style="--c:#ABD473"><span class="rank">4</span><img src="/assets/images/wow/icons/large/ability_hunter_beasttaming.jpg" alt="" width="34" height="34">
+    <span class="sname">Beast Mastery<small>Hunter</small></span>
+    <span class="track"><i style="width:21.1%"></i></span>
+    <span class="num"><b>32</b><span>8%</span></span></li><li style="--c:#0070DE"><span class="rank">5</span><img src="/assets/images/wow/icons/large/spell_nature_magicimmunity.jpg" alt="" width="34" height="34">
+    <span class="sname">Restoration<small>Shaman</small></span>
+    <span class="track"><i style="width:17.8%"></i></span>
+    <span class="num"><b>27</b><span>6%</span></span></li><li style="--c:#ABD473"><span class="rank">6</span><img src="/assets/images/wow/icons/large/ability_marksmanship.jpg" alt="" width="34" height="34">
+    <span class="sname">Marksmanship<small>Hunter</small></span>
+    <span class="track"><i style="width:11.8%"></i></span>
+    <span class="num"><b>18</b><span>4%</span></span></li><li style="--c:#C79C6E"><span class="rank">7</span><img src="/assets/images/wow/icons/large/inv_shield_06.jpg" alt="" width="34" height="34">
+    <span class="sname">Protection<small>Warrior</small></span>
+    <span class="track"><i style="width:11.8%"></i></span>
+    <span class="num"><b>18</b><span>4%</span></span></li><li style="--c:#0070DE"><span class="rank">8</span><img src="/assets/images/wow/icons/large/spell_nature_lightning.jpg" alt="" width="34" height="34">
+    <span class="sname">Elemental<small>Shaman</small></span>
+    <span class="track"><i style="width:9.2%"></i></span>
+    <span class="num"><b>14</b><span>3%</span></span></li><li style="--c:#F58CBA"><span class="rank">9</span><img src="/assets/images/wow/icons/large/spell_holy_holybolt.jpg" alt="" width="34" height="34">
+    <span class="sname">Holy<small>Paladin</small></span>
+    <span class="track"><i style="width:5.9%"></i></span>
+    <span class="num"><b>9</b><span>2%</span></span></li><li style="--c:#C79C6E"><span class="rank">10</span><img src="/assets/images/wow/icons/large/ability_warrior_savageblow.jpg" alt="" width="34" height="34">
+    <span class="sname">Arms<small>Warrior</small></span>
+    <span class="track"><i style="width:5.9%"></i></span>
+    <span class="num"><b>9</b><span>2%</span></span></li><li style="--c:#FFFFFF"><span class="rank">11</span><img src="/assets/images/wow/icons/large/spell_holy_wordfortitude.jpg" alt="" width="34" height="34">
+    <span class="sname">Discipline<small>Priest</small></span>
+    <span class="track"><i style="width:5.3%"></i></span>
+    <span class="num"><b>8</b><span>2%</span></span></li><li style="--c:#C79C6E"><span class="rank">12</span><img src="/assets/images/wow/icons/large/ability_warrior_innerrage.jpg" alt="" width="34" height="34">
+    <span class="sname">Fury<small>Warrior</small></span>
+    <span class="track"><i style="width:3.3%"></i></span>
+    <span class="num"><b>5</b><span>1%</span></span></li></ol>
+  </section>
+  <div style="display:flex;flex-direction:column;gap:22px;min-width:0">
+    <section class="panel">
+      <div class="ptitle">Class mix of the sample</div>
+      <div class="strip" id="strip"><i style="width:47.529411764705884%;background:#0070DE" title="Shaman"></i><i style="width:21.88235294117647%;background:#F58CBA" title="Paladin"></i><i style="width:14.352941176470589%;background:#ABD473" title="Hunter"></i><i style="width:8.705882352941176%;background:#C79C6E" title="Warrior"></i><i style="width:4.9411764705882355%;background:#FFFFFF" title="Priest"></i><i style="width:2.588235294117647%;background:#FFF569" title="Rogue"></i></div>
+      <div class="strip-key" id="stripkey"><span style="--c:#0070DE"><b>Shaman</b> 48%</span><span style="--c:#F58CBA"><b>Paladin</b> 22%</span><span style="--c:#ABD473"><b>Hunter</b> 14%</span><span style="--c:#C79C6E"><b>Warrior</b> 9%</span><span style="--c:#FFFFFF"><b>Priest</b> 5%</span><span style="--c:#FFF569"><b>Rogue</b> 3%</span></div>
+    </section>
+    <section class="panel">
+      <div class="ptitle">Hybrids &amp; unknowns</div>
+      <p style="margin:0 0 10px;font-size:18px;color:var(--muted)">Builds with points split across trees. Counted per class, never folded into a spec above.</p>
+      <ol class="board" id="hybrids"><li style="--c:#ABD473"><span class="rank">~</span><img src="/assets/images/wow/icons/large/classicon_hunter.jpg" alt="" width="34" height="34">
+    <span class="sname">Hunter<small>Hybrid / unknown</small></span>
+    <span class="track"><i style="width:7.2%"></i></span>
+    <span class="num"><b>11</b><span>3%</span></span></li><li style="--c:#0070DE"><span class="rank">~</span><img src="/assets/images/wow/icons/large/classicon_shaman.jpg" alt="" width="34" height="34">
+    <span class="sname">Shaman<small>Hybrid / unknown</small></span>
+    <span class="track"><i style="width:5.9%"></i></span>
+    <span class="num"><b>9</b><span>2%</span></span></li><li style="--c:#F58CBA"><span class="rank">~</span><img src="/assets/images/wow/icons/large/classicon_paladin.jpg" alt="" width="34" height="34">
+    <span class="sname">Paladin<small>Hybrid / unknown</small></span>
+    <span class="track"><i style="width:4.6%"></i></span>
+    <span class="num"><b>7</b><span>2%</span></span></li><li style="--c:#FFFFFF"><span class="rank">~</span><img src="/assets/images/wow/icons/large/classicon_priest.jpg" alt="" width="34" height="34">
+    <span class="sname">Priest<small>Hybrid / unknown</small></span>
+    <span class="track"><i style="width:3.9%"></i></span>
+    <span class="num"><b>6</b><span>1%</span></span></li><li style="--c:#C79C6E"><span class="rank">~</span><img src="/assets/images/wow/icons/large/classicon_warrior.jpg" alt="" width="34" height="34">
+    <span class="sname">Warrior<small>Hybrid / unknown</small></span>
+    <span class="track"><i style="width:3.3%"></i></span>
+    <span class="num"><b>5</b><span>1%</span></span></li><li style="--c:#FFF569"><span class="rank">~</span><img src="/assets/images/wow/icons/large/classicon_rogue.jpg" alt="" width="34" height="34">
+    <span class="sname">Rogue<small>Hybrid / unknown</small></span>
+    <span class="track"><i style="width:2.6%"></i></span>
+    <span class="num"><b>4</b><span>1%</span></span></li></ol>
+    </section>
+  </div>
+</div>
+
+<div class="secthead">
+  <h3>Talents by class</h3>
+  <div class="chips" id="classchips" role="group" aria-label="Class"><button aria-pressed="true" class="chip" data-c="">All</button><button aria-pressed="false" class="chip" data-c="SHAMAN">Shaman</button><button aria-pressed="false" class="chip" data-c="PALADIN">Paladin</button><button aria-pressed="false" class="chip" data-c="HUNTER">Hunter</button><button aria-pressed="false" class="chip" data-c="WARRIOR">Warrior</button><button aria-pressed="false" class="chip" data-c="PRIEST">Priest</button><button aria-pressed="false" class="chip" data-c="ROGUE">Rogue</button></div>
+</div>
+<div class="cards" id="cards"><article class="card" data-class="SHAMAN" style="--c:#0070DE">
+    <div class="card-h"><img src="/assets/images/wow/icons/large/classicon_shaman.jpg" alt="" width="40" height="40"><h4>Shaman</h4>
+      <div class="cn"><b>202</b>inspected · 48%</div></div>
+    <div class="card-b">
+      <p class="lbl">Spec split</p><div class="specbar"><i class="t0" style="width:75.24752475247524%" title="Enhancement 152"></i><i class="t1" style="width:13.366336633663366%" title="Restoration 27"></i><i class="t2" style="width:6.930693069306931%" title="Elemental 14"></i><i class="th" style="width:4.455445544554456%" title="Hybrid 9"></i></div><div class="speckey"><span class="k0"><b>Enhancement</b> 75%</span><span class="k1"><b>Restoration</b> 13%</span><span class="k2"><b>Elemental</b> 7%</span><span class="kh"><b>Hybrid</b> 4%</span></div>
+      <p class="lbl">Avg points per tree</p><div class="trees"><div class="tree"><div class="tn">Enhancement</div><div class="tv" style="color:var(--gold)">9.3</div></div><div class="tree"><div class="tn">Restoration</div><div class="tv" style="color:var(--blue)">1.8</div></div><div class="tree"><div class="tn">Elemental</div><div class="tv" style="color:var(--green)">0.5</div></div></div>
+      <p class="lbl">Most-picked talents</p><ul class="tal"><li><img src="/assets/images/wow/icons/large/ability_thunderbolt.jpg" alt="" width="34" height="34"><span class="tt"><b>Thundering Strikes</b>
+      <span class="meta"><span class="pips" title="avg rank 4.5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Enhancement</span></span>
+      <span class="pick"><b>71%</b><div class="mini"><i style="width:71%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_nature_mentalquickness.jpg" alt="" width="34" height="34"><span class="tt"><b>Mental Dexterity</b>
+      <span class="meta"><span class="pips" title="avg rank 2.8 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Enhancement</span></span>
+      <span class="pick"><b>65%</b><div class="mini"><i style="width:65%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_nature_spiritwolf.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Ghost Wolf</b>
+      <span class="meta"><span class="pips" title="avg rank 1.9 of 2"><i class="on"></i><i class="on"></i></span>Enhancement</span></span>
+      <span class="pick"><b>52%</b><div class="mini"><i style="width:52%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_nature_elementalabsorption.jpg" alt="" width="34" height="34"><span class="tt"><b>Shamanistic Focus</b>
+      <span class="meta"><span class="pips" title="avg rank 1 of 1"><i class="on"></i></span>Enhancement</span></span>
+      <span class="pick"><b>46%</b><div class="mini"><i style="width:46%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_fire_flametounge.jpg" alt="" width="34" height="34"><span class="tt"><b>Elemental Weapons</b>
+      <span class="meta"><span class="pips" title="avg rank 2.5 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Enhancement</span></span>
+      <span class="pick"><b>38%</b><div class="mini"><i style="width:38%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_shadow_grimward.jpg" alt="" width="34" height="34"><span class="tt"><b>Ancestral Knowledge</b>
+      <span class="meta"><span class="pips" title="avg rank 2.6 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>Enhancement</span></span>
+      <span class="pick"><b>35%</b><div class="mini"><i style="width:35%"></i></div></span></li></ul>
+    </div>
+    <div class="card-f">Median level 21</div>
+  </article><article class="card" data-class="PALADIN" style="--c:#F58CBA">
+    <div class="card-h"><img src="/assets/images/wow/icons/large/classicon_paladin.jpg" alt="" width="40" height="40"><h4>Paladin</h4>
+      <div class="cn"><b>93</b>inspected · 22%</div></div>
+    <div class="card-b">
+      <p class="lbl">Spec split</p><div class="specbar"><i class="t0" style="width:45.16129032258065%" title="Protection 42"></i><i class="t1" style="width:37.634408602150536%" title="Retribution 35"></i><i class="t2" style="width:9.67741935483871%" title="Holy 9"></i><i class="th" style="width:7.526881720430108%" title="Hybrid 7"></i></div><div class="speckey"><span class="k0"><b>Protection</b> 45%</span><span class="k1"><b>Retribution</b> 38%</span><span class="k2"><b>Holy</b> 10%</span><span class="kh"><b>Hybrid</b> 8%</span></div>
+      <p class="lbl">Avg points per tree</p><div class="trees"><div class="tree"><div class="tn">Protection</div><div class="tv" style="color:var(--gold)">5.7</div></div><div class="tree"><div class="tn">Retribution</div><div class="tv" style="color:var(--blue)">4.5</div></div><div class="tree"><div class="tn">Holy</div><div class="tv" style="color:var(--green)">1.1</div></div></div>
+      <p class="lbl">Most-picked talents</p><ul class="tal"><li><img src="/assets/images/wow/icons/large/ability_defend.jpg" alt="" width="34" height="34"><span class="tt"><b>Redoubt</b>
+      <span class="meta"><span class="pips" title="avg rank 4.5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Protection</span></span>
+      <span class="pick"><b>47%</b><div class="mini"><i style="width:47%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_frost_windwalkon.jpg" alt="" width="34" height="34"><span class="tt"><b>Benediction</b>
+      <span class="meta"><span class="pips" title="avg rank 4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Retribution</span></span>
+      <span class="pick"><b>39%</b><div class="mini"><i style="width:39%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_rogue_ambush.jpg" alt="" width="34" height="34"><span class="tt"><b>Precision</b>
+      <span class="meta"><span class="pips" title="avg rank 2.9 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Protection</span></span>
+      <span class="pick"><b>34%</b><div class="mini"><i style="width:34%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_holy_righteousfury.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Judgement</b>
+      <span class="meta"><span class="pips" title="avg rank 1.9 of 2"><i class="on"></i><i class="on"></i></span>Retribution</span></span>
+      <span class="pick"><b>31%</b><div class="mini"><i style="width:31%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_magic_lesserinvisibilty.jpg" alt="" width="34" height="34"><span class="tt"><b>Anticipation</b>
+      <span class="meta"><span class="pips" title="avg rank 2.3 of 5"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>Protection</span></span>
+      <span class="pick"><b>30%</b><div class="mini"><i style="width:30%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/inv_shield_06.jpg" alt="" width="34" height="34"><span class="tt"><b>Shield Specialization</b>
+      <span class="meta"><span class="pips" title="avg rank 2.2 of 3"><i class="on"></i><i class="on"></i><i></i></span>Protection</span></span>
+      <span class="pick"><b>29%</b><div class="mini"><i style="width:29%"></i></div></span></li></ul>
+    </div>
+    <div class="card-f">Median level 21</div>
+  </article><article class="card" data-class="HUNTER" style="--c:#ABD473">
+    <div class="card-h"><img src="/assets/images/wow/icons/large/classicon_hunter.jpg" alt="" width="40" height="40"><h4>Hunter</h4>
+      <div class="cn"><b>61</b>inspected · 14%</div></div>
+    <div class="card-b">
+      <p class="lbl">Spec split</p><div class="specbar"><i class="t0" style="width:52.459016393442624%" title="Beast Mastery 32"></i><i class="t1" style="width:29.508196721311474%" title="Marksmanship 18"></i><i class="th" style="width:18.0327868852459%" title="Hybrid 11"></i></div><div class="speckey"><span class="k0"><b>Beast Mastery</b> 52%</span><span class="k1"><b>Marksmanship</b> 30%</span><span class="kh"><b>Hybrid</b> 18%</span></div>
+      <p class="lbl">Avg points per tree</p><div class="trees"><div class="tree"><div class="tn">Beast Mastery</div><div class="tv" style="color:var(--gold)">5.7</div></div><div class="tree"><div class="tn">Marksmanship</div><div class="tv" style="color:var(--blue)">3.9</div></div><div class="tree"><div class="tn">Survival</div><div class="tv" style="color:var(--green)">0.2</div></div></div>
+      <p class="lbl">Most-picked talents</p><ul class="tal"><li><img src="/assets/images/wow/icons/large/spell_nature_ravenform.jpg" alt="" width="34" height="34"><span class="tt"><b>Deadly Aspects</b>
+      <span class="meta"><span class="pips" title="avg rank 3.4 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>Beast Mastery</span></span>
+      <span class="pick"><b>56%</b><div class="mini"><i style="width:56%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_nature_reincarnation.jpg" alt="" width="34" height="34"><span class="tt"><b>Endurance Training</b>
+      <span class="meta"><span class="pips" title="avg rank 2.9 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>Beast Mastery</span></span>
+      <span class="pick"><b>49%</b><div class="mini"><i style="width:49%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_searingarrow.jpg" alt="" width="34" height="34"><span class="tt"><b>Lethal Attacks</b>
+      <span class="meta"><span class="pips" title="avg rank 4.3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Marksmanship</span></span>
+      <span class="pick"><b>38%</b><div class="mini"><i style="width:38%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/inv_weapon_crossbow_10.jpg" alt="" width="34" height="34"><span class="tt"><b>Focused Fire</b>
+      <span class="meta"><span class="pips" title="avg rank 1.8 of 2"><i class="on"></i><i class="on"></i></span>Beast Mastery</span></span>
+      <span class="pick"><b>31%</b><div class="mini"><i style="width:31%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_hunter_zenarchery.jpg" alt="" width="34" height="34"><span class="tt"><b>Careful Aim</b>
+      <span class="meta"><span class="pips" title="avg rank 4.1 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Marksmanship</span></span>
+      <span class="pick"><b>26%</b><div class="mini"><i style="width:26%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_townwatch.jpg" alt="" width="34" height="34"><span class="tt"><b>Hawk Eye</b>
+      <span class="meta"><span class="pips" title="avg rank 2.5 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Marksmanship</span></span>
+      <span class="pick"><b>18%</b><div class="mini"><i style="width:18%"></i></div></span></li></ul>
+    </div>
+    <div class="card-f">Median level 19</div>
+  </article><article class="card" data-class="WARRIOR" style="--c:#C79C6E">
+    <div class="card-h"><img src="/assets/images/wow/icons/large/classicon_warrior.jpg" alt="" width="40" height="40"><h4>Warrior</h4>
+      <div class="cn"><b>37</b>inspected · 9%</div></div>
+    <div class="card-b">
+      <p class="lbl">Spec split</p><div class="specbar"><i class="t0" style="width:48.648648648648646%" title="Protection 18"></i><i class="t1" style="width:24.324324324324323%" title="Arms 9"></i><i class="t2" style="width:13.513513513513514%" title="Fury 5"></i><i class="th" style="width:13.513513513513514%" title="Hybrid 5"></i></div><div class="speckey"><span class="k0"><b>Protection</b> 49%</span><span class="k1"><b>Arms</b> 24%</span><span class="k2"><b>Fury</b> 14%</span><span class="kh"><b>Hybrid</b> 14%</span></div>
+      <p class="lbl">Avg points per tree</p><div class="trees"><div class="tree"><div class="tn">Protection</div><div class="tv" style="color:var(--gold)">4.1</div></div><div class="tree"><div class="tn">Arms</div><div class="tv" style="color:var(--blue)">2.5</div></div><div class="tree"><div class="tn">Fury</div><div class="tv" style="color:var(--green)">1.6</div></div></div>
+      <p class="lbl">Most-picked talents</p><ul class="tal"><li><img src="/assets/images/wow/icons/large/inv_shield_06.jpg" alt="" width="34" height="34"><span class="tt"><b>Shield Specialization</b>
+      <span class="meta"><span class="pips" title="avg rank 4.3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Protection</span></span>
+      <span class="pick"><b>49%</b><div class="mini"><i style="width:49%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_rogue_eviscerate.jpg" alt="" width="34" height="34"><span class="tt"><b>Cruelty</b>
+      <span class="meta"><span class="pips" title="avg rank 3.9 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Fury</span></span>
+      <span class="pick"><b>27%</b><div class="mini"><i style="width:27%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_racial_bloodrage.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Bloodrage</b>
+      <span class="meta"><span class="pips" title="avg rank 1.7 of 2"><i class="on"></i><i class="on"></i></span>Protection</span></span>
+      <span class="pick"><b>27%</b><div class="mini"><i style="width:27%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_gouge.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Rend</b>
+      <span class="meta"><span class="pips" title="avg rank 2.5 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Arms</span></span>
+      <span class="pick"><b>27%</b><div class="mini"><i style="width:27%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_thunderclap.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Thunder Clap</b>
+      <span class="meta"><span class="pips" title="avg rank 2.8 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Protection</span></span>
+      <span class="pick"><b>24%</b><div class="mini"><i style="width:24%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_parry.jpg" alt="" width="34" height="34"><span class="tt"><b>Deflection</b>
+      <span class="meta"><span class="pips" title="avg rank 3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>Arms</span></span>
+      <span class="pick"><b>16%</b><div class="mini"><i style="width:16%"></i></div></span></li></ul>
+    </div>
+    <div class="card-f">Median level 18</div>
+  </article><article class="card" data-class="PRIEST" style="--c:#FFFFFF">
+    <div class="card-h"><img src="/assets/images/wow/icons/large/classicon_priest.jpg" alt="" width="40" height="40"><h4>Priest</h4>
+      <div class="cn"><b>21</b>inspected · 5%</div></div>
+    <div class="card-b">
+      <p class="lbl">Spec split</p><div class="specbar"><i class="t0" style="width:38.095238095238095%" title="Discipline 8"></i><i class="t1" style="width:14.285714285714286%" title="Shadow 3"></i><i class="t2" style="width:19.047619047619047%" title="Holy 4"></i><i class="th" style="width:28.571428571428573%" title="Hybrid 6"></i></div><div class="speckey"><span class="k0"><b>Discipline</b> 38%</span><span class="k1"><b>Shadow</b> 14%</span><span class="k2"><b>Holy</b> 19%</span><span class="kh"><b>Hybrid</b> 29%</span></div>
+      <p class="lbl">Avg points per tree</p><div class="trees"><div class="tree"><div class="tn">Discipline</div><div class="tv" style="color:var(--gold)">6.7</div></div><div class="tree"><div class="tn">Shadow</div><div class="tv" style="color:var(--blue)">2.8</div></div><div class="tree"><div class="tn">Holy</div><div class="tv" style="color:var(--green)">2.5</div></div></div>
+      <p class="lbl">Most-picked talents</p><ul class="tal"><li><img src="/assets/images/wow/icons/large/inv_wand_01.jpg" alt="" width="34" height="34"><span class="tt"><b>Wand Specialization</b>
+      <span class="meta"><span class="pips" title="avg rank 1.9 of 2"><i class="on"></i><i class="on"></i></span>Discipline</span></span>
+      <span class="pick"><b>76%</b><div class="mini"><i style="width:76%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_holy_sealofvengeance.jpg" alt="" width="34" height="34"><span class="tt"><b>Twin Disciplines</b>
+      <span class="meta"><span class="pips" title="avg rank 3.8 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Discipline</span></span>
+      <span class="pick"><b>43%</b><div class="mini"><i style="width:43%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_shadow_requiem.jpg" alt="" width="34" height="34"><span class="tt"><b>Spirit Tap</b>
+      <span class="meta"><span class="pips" title="avg rank 4.8 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Shadow</span></span>
+      <span class="pick"><b>38%</b><div class="mini"><i style="width:38%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_holy_powerwordshield.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Power Word: Shield</b>
+      <span class="meta"><span class="pips" title="avg rank 2.7 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Discipline</span></span>
+      <span class="pick"><b>33%</b><div class="mini"><i style="width:33%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_holy_renew.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Renew</b>
+      <span class="meta"><span class="pips" title="avg rank 2.5 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Holy</span></span>
+      <span class="pick"><b>29%</b><div class="mini"><i style="width:29%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/spell_nature_sleep.jpg" alt="" width="34" height="34"><span class="tt"><b>Meditation</b>
+      <span class="meta"><span class="pips" title="avg rank 3 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Discipline</span></span>
+      <span class="pick"><b>29%</b><div class="mini"><i style="width:29%"></i></div></span></li></ul>
+    </div>
+    <div class="card-f">Median level 20 · small sample, read loosely</div>
+  </article><article class="card" data-class="ROGUE" style="--c:#FFF569">
+    <div class="card-h"><img src="/assets/images/wow/icons/large/classicon_rogue.jpg" alt="" width="40" height="40"><h4>Rogue</h4>
+      <div class="cn"><b>11</b>inspected · 3%</div></div>
+    <div class="card-b">
+      <p class="lbl">Spec split</p><div class="specbar"><i class="t0" style="width:45.45454545454545%" title="Combat 5"></i><i class="t1" style="width:9.090909090909092%" title="Assassination 1"></i><i class="t2" style="width:9.090909090909092%" title="Subtlety 1"></i><i class="th" style="width:36.36363636363637%" title="Hybrid 4"></i></div><div class="speckey"><span class="k0"><b>Combat</b> 45%</span><span class="k1"><b>Assassination</b> 9%</span><span class="k2"><b>Subtlety</b> 9%</span><span class="kh"><b>Hybrid</b> 36%</span></div>
+      <p class="lbl">Avg points per tree</p><div class="trees"><div class="tree"><div class="tn">Combat</div><div class="tv" style="color:var(--gold)">6.5</div></div><div class="tree"><div class="tn">Assassination</div><div class="tv" style="color:var(--blue)">3.9</div></div><div class="tree"><div class="tn">Subtlety</div><div class="tv" style="color:var(--green)">1</div></div></div>
+      <p class="lbl">Most-picked talents</p><ul class="tal"><li><img src="/assets/images/wow/icons/large/spell_shadow_ritualofsacrifice.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Sinister Strike</b>
+      <span class="meta"><span class="pips" title="avg rank 1.9 of 2"><i class="on"></i><i class="on"></i></span>Combat</span></span>
+      <span class="pick"><b>82%</b><div class="mini"><i style="width:82%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_rogue_eviscerate.jpg" alt="" width="34" height="34"><span class="tt"><b>Improved Eviscerate</b>
+      <span class="meta"><span class="pips" title="avg rank 2.6 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Combat</span></span>
+      <span class="pick"><b>73%</b><div class="mini"><i style="width:73%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_marksmanship.jpg" alt="" width="34" height="34"><span class="tt"><b>Precision</b>
+      <span class="meta"><span class="pips" title="avg rank 2.6 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Combat</span></span>
+      <span class="pick"><b>45%</b><div class="mini"><i style="width:45%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_parry.jpg" alt="" width="34" height="34"><span class="tt"><b>Deflection</b>
+      <span class="meta"><span class="pips" title="avg rank 3 of 3"><i class="on"></i><i class="on"></i><i class="on"></i></span>Combat</span></span>
+      <span class="pick"><b>36%</b><div class="mini"><i style="width:36%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_racial_bloodrage.jpg" alt="" width="34" height="34"><span class="tt"><b>Malice</b>
+      <span class="meta"><span class="pips" title="avg rank 4.5 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Assassination</span></span>
+      <span class="pick"><b>36%</b><div class="mini"><i style="width:36%"></i></div></span></li><li><img src="/assets/images/wow/icons/large/ability_fiegndead.jpg" alt="" width="34" height="34"><span class="tt"><b>Remorseless Attacks</b>
+      <span class="meta"><span class="pips" title="avg rank 2 of 2"><i class="on"></i><i class="on"></i></span>Assassination</span></span>
+      <span class="pick"><b>27%</b><div class="mini"><i style="width:27%"></i></div></span></li></ul>
+    </div>
+    <div class="card-f">Median level 22 · small sample, read loosely</div>
+  </article></div>
+
+<p class="src">Inspected nearby players with readable talent selections, pooled across every Forever realm. Pick rate = share of that class's inspected Dwarves with at least one point in the talent. Pips show the average rank taken. Page generated: test.</p>
+</div>
+
+
+<script>(()=>{const chips=document.getElementById('classchips'),cards=[...document.querySelectorAll('.card')];function apply(s){const v=cards.some(c=>c.dataset.class===s)?s:'';chips.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.c===v)));cards.forEach(c=>c.hidden=!!v&&c.dataset.class!==v)}chips.addEventListener('click',e=>{const b=e.target.closest('button[data-c]');if(!b)return;const u=new URL(location.href);b.dataset.c?u.searchParams.set('class',b.dataset.c):u.searchParams.delete('class');history.pushState(null,'',u.pathname+u.search+u.hash);apply(b.dataset.c)});addEventListener('popstate',()=>apply(new URL(location.href).searchParams.get('class')||''));apply(new URL(location.href).searchParams.get('class')||'')})();</script></body></html>

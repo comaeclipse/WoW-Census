@@ -12,14 +12,16 @@ export const CLASS_PROFILES = {
 const CLASS_TREES = {
   PALADIN: [["Holy", "spell_holy_holybolt", "#eeb138"], ["Protection", "spell_holy_devotionaura", "#4c9ddb"], ["Retribution", "spell_holy_auraoflight", "#a96be0"]],
   DRUID: [["Balance", "spell_nature_starfall", "#7d6fe0"], ["Feral Combat", "ability_racial_bearform", "#e88a3a"], ["Restoration", "spell_nature_healingtouch", "#5fbf5f"]],
-  HUNTER: [["Beast Mastery", "ability_hunter_beasttaming", "#d9534a"], ["Marksmanship", "ability_marksmanship", "#4c9ddb"], ["Survival", "ability_hunter_swiftstrike", "#8fbf4a"]],
+  HUNTER: [["Beast Mastery", "ability_hunter_beasttaming", "#b6c95e"], ["Marksmanship", "ability_marksmanship", "#e0524a"], ["Survival", "ability_hunter_swiftstrike", "#8fbf4a"]],
   SHAMAN: [["Elemental", "spell_nature_lightning", "#e0763a"], ["Enhancement", "spell_nature_lightningshield", "#4c9ddb"], ["Restoration", "spell_nature_magicimmunity", "#5fbf8f"]],
   PRIEST: [["Discipline", "spell_holy_wordfortitude", "#d8d2c0"], ["Holy", "spell_holy_guardianspirit", "#eeb138"], ["Shadow", "spell_shadow_shadowwordpain", "#8a63c9"]],
   ROGUE: [["Assassination", "ability_rogue_eviscerate", "#5fbf5f"], ["Combat", "ability_backstab", "#e0524a"], ["Subtlety", "ability_stealth", "#8a63c9"]],
   MAGE: [["Arcane", "spell_holy_magicalsentry", "#b06be0"], ["Fire", "spell_fire_firebolt02", "#e0763a"], ["Frost", "spell_frost_frostbolt02", "#5fb0f0"]],
-  WARLOCK: [["Affliction", "spell_shadow_deathcoil", "#6fbf4a"], ["Demonology", "spell_shadow_metamorphosis", "#8a63c9"], ["Destruction", "spell_shadow_rainoffire", "#e0763a"]],
+  WARLOCK: [["Affliction", "spell_shadow_deathcoil", "#84d84e"], ["Demonology", "spell_shadow_metamorphosis", "#8a63c9"], ["Destruction", "spell_shadow_rainoffire", "#e0763a"]],
   WARRIOR: [["Arms", "ability_warrior_savageblow", "#e0524a"], ["Fury", "ability_warrior_innerrage", "#eeac38"], ["Protection", "inv_shield_06", "#539ad4"]],
 };
+// "Spec:CLASS" -> color, shared with the race profiles.
+export const SPEC_COLORS = Object.fromEntries(Object.entries(CLASS_TREES).flatMap(([cf, trees]) => trees.map(([t, , c]) => [t + ":" + cf, c])));
 const GAME_NAV = [["Forever", "/"], ["TBC Anniversary", "/tbc/"], ["Classic Era", "/classic/"], ["SoD", "/sod/"], ["MoP Classic", "/mop/"], ["Retail", "/retail/"]];
 const PAGE_NAV = [["Census", "/"], ["Auction House", "/auctionhouse"], ["Guilds", "/guilds"], ["Geography", "/geography"], ["Talents", "/talents"], ["Gear", "/gear"]];
 

@@ -42,5 +42,5 @@ for (const [cls, label, trees] of [["paladin", "Paladin", ["Holy", "Protection",
   for (const [, ref] of html.matchAll(/(?:src|href)="(\.\.\/\.\.\/[^"]*)"/g))
     assert.ok(fs.existsSync(new URL(ref, pageUrl)), `Local asset missing: ${ref}`);
   assert.ok(fs.readFileSync(new URL("../static/sitemap.xml", import.meta.url), "utf8").includes(`<loc>https://wowcensus.io/forever/${cls}/</loc>`));
-  assert.ok(fs.readFileSync(new URL("../static/talents.html", import.meta.url), "utf8").includes(`<a href="/forever/${cls}/">Explore ${label} talents by spec</a>`));
+  assert.ok(fs.readFileSync(new URL("../static/talents.html", import.meta.url), "utf8").includes(`<a href="/forever/${cls}/" style="--c:`));
 });
