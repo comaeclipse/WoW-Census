@@ -16,6 +16,7 @@ import { localJson } from "./local-site-data.mjs";
 import { EDITIONS, PAGES, SITE_ORIGIN, editionPath, pagePath,
   fetchEditionData, buildEditionModels, renderEditionPage } from "../site/src/edition.mjs";
 import { RACE_PROFILES, renderRaceProfile } from "../site/src/race-profile.mjs";
+import { CLASS_PROFILES, classRoute, classRoutes, renderClassProfile } from "../site/src/class-profile.mjs";
 
 const require = createRequire(import.meta.url);
 const { stylesheet } = require("./layout-id.js");
@@ -106,7 +107,7 @@ function outputDir(source) {
   return path.join(out, editionPath(source).replace(/^\//, ""));
 }
 function writeSiteMetadata() {
-  const routes = Object.keys(EDITIONS).flatMap((source) => PAGES.map((page) => pagePath(source, page))).concat(Object.values(RACE_PROFILES).map((p) => p.path));
+  const routes = Object.keys(EDITIONS).flatMap((source) => PAGES.map((page) => pagePath(source, page))).concat(Object.values(RACE_PROFILES).map((p) => p.path), classRoutes());
   write(path.join(out, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     routes.map((route) => `  <url><loc>${SITE_ORIGIN}${route}</loc></url>`).join("\n") +
@@ -196,6 +197,12 @@ async function main() {
           stylesheet: cssName, canonical: SITE_ORIGIN + route,
           generatedNote: builtAt.slice(0, 16).replace("T", " ") + "Z",
         }));
+    }
+    for (const classFile of CLASS_PROFILES[source]?.classes || []) {
+      const route = classRoute(source, classFile);
+      write(path.join(out, route, "index.html"), renderClassProfile(data.inspects, source, classFile, {
+        stylesheet: cssName, canonical: SITE_ORIGIN + route,
+      }));
     }
     write(path.join(dir, "inspects.json"), JSON.stringify(data.inspects) + "\n");
     write(path.join(dir, "census.json"), JSON.stringify({ ...data.census,

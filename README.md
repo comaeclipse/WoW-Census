@@ -309,6 +309,8 @@ Forever spec IDs in the current cache identify classes, and the raw role field
 reports DAMAGER for every player. Neither field is used to classify builds or roles.
 The versioned catalog in `site/src/forever-talents.json` comes from Wowhead's Forever
 node dataset; nodes must match class, spell and maximum rank before branch assignment.
+After a Forever patch reworks talents, refresh it with `node tools/update-forever-talents.mjs`
+and rebuild; an "Unmapped talent" on the talent pages is the usual sign it is stale.
 Tree-based builds retain ranked points for each mapped branch. A second or third
 tree joins a named hybrid when it has at least 25% of allocated points and is
 within 10 points of the leader. Retail and MoP Classic use class-validated

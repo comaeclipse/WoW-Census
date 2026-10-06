@@ -1,7 +1,7 @@
 {
-  "version": "forever-1790292378-5fb8fc2878f9",
-  "source": "https://nether.wowhead.com/forever/data/talents-classic?dv=29&db=1790292378",
-  "retrievedAt": "2026-10-01T00:06:22.331Z",
+  "version": "forever-1791301431-3f26702cdfc9",
+  "source": "https://nether.wowhead.com/forever/data/talents-classic?dv=29",
+  "retrievedAt": "2026-10-06T15:43:51.735Z",
   "nodes": [
     {
       "node": 105781,
@@ -73,10 +73,10 @@
       "classFile": "MAGE",
       "branch": "Fire",
       "tab": 41,
-      "name": "Hot Streak",
+      "name": "Heating Up",
       "spell": 400624,
       "max": 1,
-      "icon": "ability_mage_hotstreak",
+      "icon": "spell_fire_firebolt",
       "definition": 135316,
       "row": 3,
       "col": 2
@@ -949,7 +949,7 @@
       "max": 3,
       "icon": "ability_warrior_focusedrage",
       "definition": 135492,
-      "row": 5,
+      "row": 4,
       "col": 2
     },
     {
@@ -962,8 +962,8 @@
       "max": 5,
       "icon": "inv_shield_04",
       "definition": 135493,
-      "row": 4,
-      "col": 3
+      "row": 5,
+      "col": 2
     },
     {
       "node": 105963,
@@ -975,7 +975,7 @@
       "max": 2,
       "icon": "ability_warrior_shieldbash",
       "definition": 135494,
-      "row": 4,
+      "row": 3,
       "col": 2
     },
     {
@@ -1015,7 +1015,7 @@
       "icon": "ability_warrior_shieldcharge",
       "definition": 135497,
       "row": 3,
-      "col": 2
+      "col": 1
     },
     {
       "node": 105967,
@@ -1027,8 +1027,8 @@
       "max": 3,
       "icon": "ability_warrior_disarm",
       "definition": 135498,
-      "row": 3,
-      "col": 1
+      "row": 2,
+      "col": 2
     },
     {
       "node": 105968,
@@ -1053,7 +1053,7 @@
       "max": 3,
       "icon": "ability_warrior_revenge",
       "definition": 135500,
-      "row": 2,
+      "row": 1,
       "col": 2
     },
     {
@@ -1096,19 +1096,6 @@
       "col": 3
     },
     {
-      "node": 105973,
-      "classFile": "WARRIOR",
-      "branch": "Protection",
-      "tab": 163,
-      "name": "Toughness",
-      "spell": 12299,
-      "max": 5,
-      "icon": "spell_holy_devotion",
-      "definition": 135504,
-      "row": 1,
-      "col": 2
-    },
-    {
       "node": 105974,
       "classFile": "WARRIOR",
       "branch": "Protection",
@@ -1118,7 +1105,7 @@
       "max": 2,
       "icon": "ability_racial_bloodrage",
       "definition": 135505,
-      "row": 1,
+      "row": 0,
       "col": 0
     },
     {
@@ -1131,8 +1118,8 @@
       "max": 5,
       "icon": "spell_nature_mirrorimage",
       "definition": 135506,
-      "row": 0,
-      "col": 2
+      "row": 1,
+      "col": 0
     },
     {
       "node": 105976,
@@ -1159,6 +1146,19 @@
       "definition": 142602,
       "row": 2,
       "col": 3
+    },
+    {
+      "node": 113570,
+      "classFile": "WARRIOR",
+      "branch": "Protection",
+      "tab": 163,
+      "name": "Iron Will",
+      "spell": 12962,
+      "max": 5,
+      "icon": "spell_magic_magearmor",
+      "definition": 145864,
+      "row": 0,
+      "col": 2
     },
     {
       "node": 105926,
@@ -1197,20 +1197,7 @@
       "icon": "ability_ghoulfrenzy",
       "definition": 135459,
       "row": 5,
-      "col": 2
-    },
-    {
-      "node": 105929,
-      "classFile": "WARRIOR",
-      "branch": "Fury",
-      "tab": 164,
-      "name": "Precision",
-      "spell": 1225295,
-      "max": 3,
-      "icon": "ability_marksmanship",
-      "definition": 135460,
-      "row": 4,
-      "col": 0
+      "col": 1
     },
     {
       "node": 105930,
@@ -1291,19 +1278,6 @@
       "col": 1
     },
     {
-      "node": 105936,
-      "classFile": "WARRIOR",
-      "branch": "Fury",
-      "tab": 164,
-      "name": "Improved Cleave",
-      "spell": 12329,
-      "max": 3,
-      "icon": "ability_warrior_cleave",
-      "definition": 135467,
-      "row": 2,
-      "col": 0
-    },
-    {
       "node": 105937,
       "classFile": "WARRIOR",
       "branch": "Fury",
@@ -1347,13 +1321,13 @@
       "classFile": "WARRIOR",
       "branch": "Fury",
       "tab": 164,
-      "name": "Boundless Rage",
-      "spell": 1310236,
+      "name": "Furious Precision",
+      "spell": 1323963,
       "max": 3,
-      "icon": "ability_warrior_intensifyrage",
+      "icon": "ability_warrior_incite",
       "definition": 135484,
       "row": 2,
-      "col": 3
+      "col": 0
     },
     {
       "node": 105977,
@@ -1378,7 +1352,7 @@
       "max": 2,
       "icon": "spell_nature_ancestralguardian",
       "definition": 135509,
-      "row": 5,
+      "row": 4,
       "col": 0
     },
     {
@@ -1386,13 +1360,26 @@
       "classFile": "WARRIOR",
       "branch": "Fury",
       "tab": 164,
-      "name": "Iron Will",
-      "spell": 12962,
+      "name": "Lingering Rage",
+      "spell": 1323964,
       "max": 5,
-      "icon": "spell_magic_magearmor",
+      "icon": "ability_warrior_secondwind",
       "definition": 142603,
       "row": 1,
       "col": 1
+    },
+    {
+      "node": 113569,
+      "classFile": "WARRIOR",
+      "branch": "Fury",
+      "tab": 164,
+      "name": "Gore Drinker",
+      "spell": 1323967,
+      "max": 2,
+      "icon": "racial_troll_berserk",
+      "definition": 145863,
+      "row": 5,
+      "col": 2
     },
     {
       "node": 105708,
@@ -3523,7 +3510,7 @@
       "max": 3,
       "icon": "spell_shadow_vampiricaura",
       "definition": 134406,
-      "row": 3,
+      "row": 2,
       "col": 0
     },
     {
@@ -3589,20 +3576,20 @@
       "icon": "ability_druid_predatoryinstincts",
       "definition": 134411,
       "row": 4,
-      "col": 0
+      "col": 3
     },
     {
       "node": 104951,
       "classFile": "DRUID",
       "branch": "Feral",
       "tab": 281,
-      "name": "King of the Jungle",
-      "spell": 417046,
-      "max": 3,
-      "icon": "ability_druid_kingofthejungle",
+      "name": "Shifting Power",
+      "spell": 1322605,
+      "max": 1,
+      "icon": "spell_druid_displacement",
       "definition": 134412,
-      "row": 4,
-      "col": 3
+      "row": 3,
+      "col": 0
     },
     {
       "node": 104952,
@@ -3668,6 +3655,19 @@
       "definition": 134417,
       "row": 6,
       "col": 1
+    },
+    {
+      "node": 113563,
+      "classFile": "DRUID",
+      "branch": "Feral",
+      "tab": 281,
+      "name": "Improved Shifting Power",
+      "spell": 1322670,
+      "max": 2,
+      "icon": "ability_hunter_aspectmastery",
+      "definition": 145859,
+      "row": 4,
+      "col": 0
     },
     {
       "node": 104909,
@@ -4454,7 +4454,7 @@
       "classFile": "WARLOCK",
       "branch": "Curses",
       "tab": 302,
-      "name": "Soul Harvesting",
+      "name": "Soul Harvest",
       "spell": 437032,
       "max": 2,
       "icon": "inv_elemental_primal_shadow",
@@ -5198,7 +5198,7 @@
       "name": "Predator's Edge",
       "spell": 1310627,
       "max": 5,
-      "icon": "ability_hunter_hatchettoss",
+      "icon": "ability_dualwield",
       "definition": 142607,
       "row": 3,
       "col": 1
@@ -5406,7 +5406,7 @@
       "name": "Improved Stings",
       "spell": 1310661,
       "max": 3,
-      "icon": "hunter_pvp_spidersting",
+      "icon": "ability_hunter_quickshot",
       "definition": 142622,
       "row": 1,
       "col": 0
@@ -6060,6 +6060,45 @@
       "definition": 142631,
       "row": 5,
       "col": 2
+    },
+    {
+      "node": 105973,
+      "classFile": "WARRIOR",
+      "branch": "Protection",
+      "tab": 163,
+      "name": "Toughness",
+      "spell": 12299,
+      "max": 5,
+      "icon": "spell_holy_devotion",
+      "definition": 135504,
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 105929,
+      "classFile": "WARRIOR",
+      "branch": "Fury",
+      "tab": 164,
+      "name": "Precision",
+      "spell": 1225295,
+      "max": 3,
+      "icon": "ability_marksmanship",
+      "definition": 135460,
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 105936,
+      "classFile": "WARRIOR",
+      "branch": "Fury",
+      "tab": 164,
+      "name": "Improved Cleave",
+      "spell": 12329,
+      "max": 3,
+      "icon": "ability_warrior_cleave",
+      "definition": 135467,
+      "row": 2,
+      "col": 0
     }
   ]
 }

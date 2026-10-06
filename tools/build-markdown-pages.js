@@ -156,6 +156,13 @@ function main() {
       writeFile(path.join(root, 'forever', race, 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
       routes.push(`/forever/${race}/`);
     }
+    // Keep in step with CLASS_PROFILES in site/src/class-profile.mjs.
+    for (const cls of ['paladin', 'warrior', 'druid', 'hunter', 'shaman', 'priest', 'rogue', 'mage', 'warlock']) {
+      const html = path.join(root, 'forever', cls, 'index.html');
+      if (!fs.existsSync(html)) throw new Error(`Missing class profile: ${html}`);
+      writeFile(path.join(root, 'forever', cls, 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
+      routes.push(`/forever/${cls}/`);
+    }
   }
 
   console.log(`Built ${routes.length} Markdown page variants in ${root}`);

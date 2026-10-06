@@ -32,7 +32,7 @@ wrong.
 
 - Use tokens, not literals. The only sanctioned literals are WoW's own colors:
   class colors (`CLASS_META` in `site/src/census.mjs`), faction colors
-  (`FACTION_COLOR`), and the `#b99b55` gilt frame around race/class icons.
+  (`FACTION_COLOR`), spec colors (`CLASS_TREES` in `site/src/class-profile.mjs`), and the `#b99b55` gilt frame around race/class icons.
 - Active state is always gold fill with dark text (`#161018`), never a new color.
 - Don't add tokens casually. A new token means updating this table and the test.
 
@@ -101,7 +101,8 @@ by inspected data; they link from that edition's Talents page.
 ## 7. Layout and responsiveness
 
 - Grids collapse at 760px (tiles 4→2, two-column panels →1); the five-tile row
-  steps 5→3→2. Tables scroll horizontally inside `.tablewrap`; the page never does.
+  steps 5→3→2. The three spec columns on class talent pages go 3→1 at 960px,
+  since a column narrower than ~300px squeezes its header. Tables scroll horizontally inside `.tablewrap`; the page never does.
 - Data-heavy pages prefer two-column `.panelgrid` over long vertical stacks.
 
 ## 8. Build rules
