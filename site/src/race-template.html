@@ -105,20 +105,20 @@ a{color:var(--blue)}
 .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
 .card{background:var(--panel);border:3px solid var(--line);box-shadow:8px 8px 0 var(--shadow)}
 .card:hover{border-color:var(--gold)}
-.card-h{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--c);color:#161018;border-bottom:3px solid var(--shadow)}
+.card-h{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--panel2);color:var(--ink);border-bottom:5px solid var(--c)}
 .card-h img{width:40px;height:40px;border:3px solid var(--shadow);display:block}
 .card-h h4{margin:0;font-family:var(--pixel);font-size:12px;letter-spacing:1px;text-transform:uppercase}
 .card-h .cn{margin-left:auto;text-align:right;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;line-height:1.7}
 .card-h .cn b{display:block;font-size:15px;font-weight:400}
 .card-b{padding:14px}
 .lbl{font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
-.specbar{display:flex;height:30px;border:3px solid var(--shadow);margin-bottom:8px;background:var(--panel2)}
-.specbar i{display:block;height:100%;border-right:3px solid var(--shadow)}
-.specbar i:last-child{border-right:0}
+/* Panel-style frame, segments split by dark gaps rather than black rules (harsh on some displays). */
+.specbar{display:flex;gap:2px;height:30px;border:2px solid var(--line);margin-bottom:8px;background:var(--bg)}
+.specbar i{display:block;height:100%;min-width:2px}
 .specbar i:not(.th){background:var(--k)}
 .th{background:repeating-linear-gradient(45deg,var(--muted) 0 4px,var(--panel2) 4px 8px)}
 .speckey{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:17px;color:var(--muted);margin-bottom:16px}
-.speckey span::before{content:"";display:inline-block;width:11px;height:11px;margin-right:5px;border:2px solid var(--shadow);vertical-align:-1px}
+.speckey span::before{content:"";display:inline-block;width:11px;height:11px;margin-right:5px;vertical-align:-1px}
 .speckey span:not(.kh)::before{background:var(--k)}
 .speckey .kh::before{background:repeating-linear-gradient(45deg,var(--muted) 0 3px,var(--panel2) 3px 6px)}
 .speckey b{color:var(--ink);font-weight:400}

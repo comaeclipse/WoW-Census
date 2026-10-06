@@ -88,8 +88,7 @@ const CLASS_STYLE = `
 .colnote{margin:0;padding:12px 0 4px;font-size:17px;color:var(--muted)}
 .speccol .card-h .cn{white-space:nowrap}
 .specbar{height:22px}
-/* Spec color as an underline rather than a fill; the columns are not clickable, so no hover. */
-.speccol .card-h{background:var(--panel2);color:var(--ink);border-bottom:5px solid var(--c)}
+/* The columns are not clickable, so no hover. */
 .speccol:hover{border-color:var(--line)}
 /* Three columns need ~300px each; below that one column reads better than squeezed headers. */
 @media (max-width:960px){.speccols{grid-template-columns:minmax(0,1fr)}}`;
@@ -105,12 +104,12 @@ export function renderClassProfile(inspects, source, classFile, opts) {
   const named = (t) => `<strong>${esc(t.tree)}</strong> (${pct(t.n, D.n)}%)`;
   const intro = !D.n ? `No ${esc(className)} inspections with readable talents are available in this snapshot.`
     : `Among ${esc(plural)} we've inspected, ${named(ranked[0])} is the most common build, followed by ${ranked.slice(1).filter((t) => t.n).map(named).join(" and ") || "no other single-tree build"}.`;
-  const seg = D.trees.map((t, i) => t.n ? `<i style="background:${treeColor(i)};width:${(100 * t.n / D.n).toFixed(2)}%" title="${esc(t.tree)} ${t.n}"></i>` : "").join("") +
-    (D.hybrid ? `<i class="th" style="width:${(100 * D.hybrid / D.n).toFixed(2)}%" title="Hybrid ${D.hybrid}"></i>` : "") +
-    (D.unknown ? `<i style="background:var(--line);width:${(100 * D.unknown / D.n).toFixed(2)}%" title="Unknown ${D.unknown}"></i>` : "");
+  const seg = D.trees.map((t, i) => t.n ? `<i style="background:${treeColor(i)};flex:${t.n}" title="${esc(t.tree)} ${t.n}"></i>` : "").join("") +
+    (D.hybrid ? `<i class="th" style="flex:${D.hybrid}" title="Hybrid ${D.hybrid}"></i>` : "") +
+    (D.unknown ? `<i style="background:var(--muted);flex:${D.unknown}" title="Unknown ${D.unknown}"></i>` : "");
   const key = D.trees.map((t, i) => `<span style="--c:${treeColor(i)}"><b>${esc(t.tree)}</b> ${t.n} · ${pct(t.n, D.n)}%</span>`).join("") +
     (D.hybrid ? `<span class="kh"><b>Hybrid</b> ${D.hybrid} · ${pct(D.hybrid, D.n)}%</span>` : "") +
-    (D.unknown ? `<span style="--c:var(--line)"><b>Unknown</b> ${D.unknown} · ${pct(D.unknown, D.n)}%</span>` : "");
+    (D.unknown ? `<span style="--c:var(--muted)"><b>Unknown</b> ${D.unknown} · ${pct(D.unknown, D.n)}%</span>` : "");
   const column = (t, i) => {
     const rows = t.talents.map((x, k) => {
       const on = Math.round(x.avgRank);
