@@ -80,13 +80,15 @@ function talentSummary(packed) {
   return lines.join('\n');
 }
 
-// The Markdown companion of one rendered content page.
-function htmlToMarkdown(source) {
+// The Markdown companion of one rendered content page. `dir` is the page's
+// directory, which its filter data file path is relative to.
+function htmlToMarkdown(source, dir) {
   const { document } = parseHTML(source);
   const title = document.querySelector('title')?.textContent.trim() || 'WoWCensus';
   const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
   const canonical = document.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
-  const talentData = document.querySelector('#talent-data')?.textContent;
+  const talentFile = document.querySelector('#talent-content')?.getAttribute('data-src');
+  const talentData = talentFile && fs.readFileSync(path.join(dir, talentFile), 'utf8');
   for (const el of [...document.querySelectorAll('script, style, nav, header, footer, .crt, .page-controls, .talent-filters, .gear-filters, button, select, img, .ptitle a')]) el.remove();
   // Headings are styled divs in the browser layout. Give them semantic structure here.
   for (const el of [...document.querySelectorAll('.ptitle')]) {
@@ -147,7 +149,7 @@ function main() {
       const dir = path.join(root, edition);
       const html = path.join(dir, `${name}.html`);
       if (!fs.existsSync(html)) throw new Error(`Missing content page: ${html}`);
-      writeFile(path.join(dir, `${name}.md`), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
+      writeFile(path.join(dir, `${name}.md`), htmlToMarkdown(fs.readFileSync(html, 'utf8'), dir));
       const prefix = edition ? `/${edition}` : '';
       routes.push(name === 'index' ? (prefix || '/') + (prefix ? '/' : '') : `${prefix}/${name}`);
     }
@@ -158,7 +160,7 @@ function main() {
   for (const route of profileRoutes(root)) {
     const html = path.join(root, route, 'index.html');
     if (!fs.existsSync(html)) throw new Error(`Missing profile page: ${html}`);
-    writeFile(path.join(root, route, 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8')));
+    writeFile(path.join(root, route, 'index.md'), htmlToMarkdown(fs.readFileSync(html, 'utf8'), path.join(root, route)));
     routes.push(route);
   }
 

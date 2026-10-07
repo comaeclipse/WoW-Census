@@ -17,14 +17,17 @@ class Links(HTMLParser):
         super().__init__()
         self.urls = []
         self.sources = []
+        self.data = []
 
     def handle_starttag(self, tag, attrs):
         fields = dict(attrs)
-        for key in ("href", "src"):
+        for key in ("href", "src", "data-src"):
             if fields.get(key):
                 self.urls.append(fields[key])
         if fields.get("src"):
             self.sources.append(fields["src"])
+        if fields.get("data-src"):
+            self.data.append(fields["data-src"])
 
 
 def resolve_asset(root, pathname):
@@ -74,12 +77,22 @@ def main():
             for ref in parser.sources:
                 if ref.startswith(("https://wow.zamimg.com/", "https://www.wowhead.com/")):
                     errors.append(f"Remote asset load: {route} -> {ref}")
-        for name in ("census.json", "inspects.json"):
-            file = directory / name
-            if not file.is_file():
-                errors.append(f"Missing data: {edition}/{name}")
-            else:
-                json.loads(file.read_text(encoding="utf-8"))
+            # Filter pages load their records from a separate file, never inline.
+            if 'type="application/json"' in source:
+                errors.append(f"Inline filter data: {route}")
+            if page == "talents" and not parser.data:
+                errors.append(f"Talents page has no filter data file: {route}")
+            for ref in parser.data:
+                data = resolve_asset(root, urlsplit(urljoin("https://wowcensus.io" + route, ref)).path)
+                if data:
+                    json.loads(data.read_text(encoding="utf-8"))
+        file = directory / "census.json"
+        if not file.is_file():
+            errors.append(f"Missing data: {edition}/census.json")
+        else:
+            json.loads(file.read_text(encoding="utf-8"))
+        if (directory / "inspects.json").exists():
+            errors.append(f"Raw inspect dump published: {edition}/inspects.json")
     # Race and class profiles are the sitemap's two-segment routes (/forever/troll/, /tbc/paladin/).
     sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
     profiles = re.findall(r"<loc>https://[^/<]+(/[^/<]+/[^/<]+/)</loc>", sitemap)

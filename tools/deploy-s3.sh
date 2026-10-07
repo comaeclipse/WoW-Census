@@ -14,15 +14,15 @@ P=(--profile "${AWS_PROFILE_NAME:-wowcensus}" --region us-east-2)
 SHORT="public, max-age=300"
 LONG="public, max-age=31536000, immutable"
 
-# Hashed CSS and fonts never change under the same name.
+# Hashed CSS, fonts and filter data never change under the same name.
 "$AWS" s3 sync "$SRC" "s3://$BUCKET" "${P[@]}" --exclude "*" --include "*.css" --include "fonts/*" \
-  --cache-control "$LONG"
+  --include "data/*" --include "*/data/*" --cache-control "$LONG"
 # Markdown twins need an explicit type.
 "$AWS" s3 sync "$SRC" "s3://$BUCKET" "${P[@]}" --exclude "*" --include "*.md" \
   --content-type "text/markdown; charset=utf-8" --cache-control "$SHORT"
 # Everything else (html, json, images, js, txt).
 "$AWS" s3 sync "$SRC" "s3://$BUCKET" "${P[@]}" --exclude "*.css" --exclude "fonts/*" --exclude "*.md" \
-  --exclude "_headers" --cache-control "$SHORT"
+  --exclude "data/*" --exclude "*/data/*" --exclude "_headers" --cache-control "$SHORT"
 
 # S3 website hosting has no pretty URLs: /gear must exist as a key. Mirror every
 # non-index page (foo.html -> foo) as text/html.

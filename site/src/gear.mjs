@@ -1,4 +1,4 @@
-import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE, SELECT_SCRIPT } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE, SELECT_SCRIPT, filterData, FILTER_LOADER } from "./census.mjs";
 
 function time(t) { return t ? new Date(t*1000).toISOString().slice(0,16).replace("T"," ")+"Z" : "Unavailable"; }
 
@@ -32,13 +32,20 @@ export function unpackGearRecords(packed) {
  });
 }
 
+// The filter records, written by the build next to the page (see filterData).
+function packGearPage(data, branch) {
+  const packed=packGearRecords(data.records);
+  packed.wowhead="https://www.wowhead.com/"+(branch?branch+"/":"")+"item=";
+  return packed;
+}
+export function gearData(data, opts={}) { return filterData("gear", packGearPage(data, opts.branch)); }
+
 export function renderGearHtml(data, opts={}) {
   const nav=opts.nav||{};
   const seoGameLabel=seoLabel(opts.gameLabel||"WoW Forever");
   const topic=seoGameLabel+" Gear: Most Equipped Items";
-  const packed=packGearRecords(data.records);
-  packed.wowhead="https://www.wowhead.com/"+(opts.branch?opts.branch+"/":"")+"item=";
-  const payload=JSON.stringify(packed).replace(/</g,"\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
+  const packed=packGearPage(data, opts.branch);
+  const dataFile=filterData("gear", packed).file;
   const records=unpackGearRecords(packed);
   const withGear=records.length;
   const summary=withGear
@@ -82,10 +89,9 @@ export function renderGearHtml(data, opts={}) {
     <header class="ihead"><div class="page-heading">${pageHeading("WoWCensus", nav, topic)}${nav.games||""}</div>${nav.breadcrumbs||""}</header>
     <div class="page-controls">${nav.pages||""}</div>
     ${withGear?`<section class="panel gear-top-panel"><div class="ptitle">Most equipped by slot</div><div id="gear-top">${gearMarkup("top", records, packed.wowhead)}</div><div class="gear-filters" id="gear-filters">${gearMarkup("filters", records, packed.wowhead)}</div><p class="hint" style="margin:14px 0 0">${summary}</p></section>`:`<section class="panel" style="margin-bottom:22px"><p class="hint gear-summary" style="margin:0">${summary}</p></section>`}
-    ${withGear?`<div id="gear-content" aria-live="polite">${gearMarkup("content", records, packed.wowhead)}</div>`:""}
+    ${withGear?`<div id="gear-content" aria-live="polite" data-src="${esc(dataFile)}">${gearMarkup("content", records, packed.wowhead)}</div>`:""}
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>
-    ${withGear?`<script type="application/json" id="gear-data">${payload}</script>
-    <script>${GEAR_SCRIPT}</script>${SELECT_SCRIPT}
+    ${withGear?`<script>${GEAR_SCRIPT}</script>${SELECT_SCRIPT}
     <script>const whTooltips={colorLinks:false,iconizeLinks:false,renameLinks:false};</script><script src="https://wow.zamimg.com/js/tooltips.js" async></script>`:""}</body></html>`;
 }
 
@@ -131,8 +137,15 @@ const GEAR_SCRIPT = `
 (()=>{
  ${unpackGearRecords}
  ${gearMarkup}
- const packed=JSON.parse(document.getElementById('gear-data').textContent), records=unpackGearRecords(packed);
- const selects=[...document.querySelectorAll('#gear-filters select')], content=document.getElementById('gear-content'), top=document.getElementById('gear-top');
- const render=()=>{const filtered=records.filter(r=>selects.every(s=>!s.value||String(r[s.dataset.field])===s.value));top.innerHTML=gearMarkup('top',filtered,packed.wowhead);content.innerHTML=gearMarkup('content',filtered,packed.wowhead);};
+ ${FILTER_LOADER}
+ const filters=document.getElementById('gear-filters'), selects=[...filters.querySelectorAll('select')], content=document.getElementById('gear-content'), top=document.getElementById('gear-top');
+ const load=loadFilterData(filters,content,packed=>({wowhead:packed.wowhead,records:unpackGearRecords(packed)}));
+ const render=async()=>{
+  content.setAttribute('aria-busy','true');
+  let data;try{data=await load();}catch{filterError(content);return;}
+  const filtered=data.records.filter(r=>selects.every(s=>!s.value||String(r[s.dataset.field])===s.value));
+  top.innerHTML=gearMarkup('top',filtered,data.wowhead);content.innerHTML=gearMarkup('content',filtered,data.wowhead);
+  content.removeAttribute('aria-busy');
+ };
  for(const s of selects)s.addEventListener('change',render);
 })();`;

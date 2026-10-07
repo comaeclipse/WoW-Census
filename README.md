@@ -321,7 +321,8 @@ shown as Unknown build with a reason and excluded from build shares; raw
 inspection data remains available for later reclassification. Combat role
 remains unknown.
 
-The shared builder creates `talents.html` and `inspects.json` for every edition,
+The shared builder creates `talents.html` for every edition (raw inspect records
+stay in the local database and are never published),
 updates navigation/sitemap/discovery, and adds inspect coverage to census pages.
 Talent popularity uses unique players with readable node data within each filtered
 class; string-only builds are explicitly excluded. These nearby samples are not

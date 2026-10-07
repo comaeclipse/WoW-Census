@@ -1,4 +1,4 @@
-import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE, SELECT_SCRIPT } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE, SELECT_SCRIPT, filterData, FILTER_LOADER } from "./census.mjs";
 
 function time(t) { return t ? new Date(t*1000).toISOString().slice(0,16).replace("T"," ")+"Z" : "Unavailable"; }
 export function renderInspectCoverage(data, href) {
@@ -9,7 +9,7 @@ export function renderInspectCoverage(data, href) {
     <p class="hint">Latest inspection: ${esc(time(data.lastT))}</p><a class="game" href="${esc(href)}">Explore talents</a></section>`;
 }
 
-// The page embeds only what its filters and tables read, packed: repeated
+// The filter file carries only what the filters and tables read, packed: repeated
 // strings become indexes into per-field lists, and each talent is an index into
 // one name table keyed by class and node. A full inspect record carries ~40x
 // more (talent coordinates, spell ids, import strings), which once made
@@ -44,12 +44,15 @@ export function unpackTalentRecords(packed) {
  });
 }
 
+// The filter records, written by the build next to the page (see filterData).
+export function talentData(data) { return filterData("talents", packTalentRecords(data.records)); }
+
 // Filtering and aggregation run against this page's frozen snapshot.
 export function renderTalentsHtml(data, opts={}) {
   const nav=opts.nav||{};
   const seoGameLabel=seoLabel(opts.gameLabel||"WoW Forever");
   const topic=seoGameLabel+" Talent Builds & Popular Specs";
-  const payload=JSON.stringify(packTalentRecords(data.records)).replace(/</g,"\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
+  const dataFile=talentData(data).file;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     ${seoHead(topic+" – WoWCensus", seoGameLabel+" talent builds seen on inspected players: most common builds, talent tree point totals and selected talent popularity.", opts.canonical)}
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96"><link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
@@ -87,9 +90,8 @@ export function renderTalentsHtml(data, opts={}) {
       : `<div class="ptitle">What this sample shows</div>
     <p class="hint talent-summary" style="margin:0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>`}
     <div class="talent-filters" id="talent-filters">${talentMarkup("filters", data.records)}</div></section>
-    <div id="talent-content" aria-live="polite">${talentMarkup("content", data.records)}</div>
+    <div id="talent-content" aria-live="polite" data-src="${esc(dataFile)}">${talentMarkup("content", data.records)}</div>
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>
-    <script type="application/json" id="talent-data">${payload}</script>
     <script>${TALENT_SCRIPT}</script>${SELECT_SCRIPT}</body></html>`;
 }
 // Builds the filter row or the results for a set of inspection records. It runs
@@ -130,8 +132,14 @@ const TALENT_SCRIPT = `
 (()=>{
  ${unpackTalentRecords}
  ${talentMarkup}
- const records=unpackTalentRecords(JSON.parse(document.getElementById('talent-data').textContent));
- const selects=[...document.querySelectorAll('#talent-filters select')], content=document.getElementById('talent-content');
- const render=()=>{content.innerHTML=talentMarkup('content',records.filter(r=>selects.every(s=>!s.value||String(r[s.dataset.field])===s.value)));};
+ ${FILTER_LOADER}
+ const filters=document.getElementById('talent-filters'), selects=[...filters.querySelectorAll('select')], content=document.getElementById('talent-content');
+ const load=loadFilterData(filters,content,unpackTalentRecords);
+ const render=async()=>{
+  content.setAttribute('aria-busy','true');
+  let records;try{records=await load();}catch{filterError(content);return;}
+  content.innerHTML=talentMarkup('content',records.filter(r=>selects.every(s=>!s.value||String(r[s.dataset.field])===s.value)));
+  content.removeAttribute('aria-busy');
+ };
  for(const s of selects)s.addEventListener('change',render);
 })();`;

@@ -5,8 +5,8 @@ import { renderCensusHtml, renderComboBreakdownHtml, realmName, CLASS_META } fro
 import { renderMarketHtml } from "./market.mjs";
 import { renderGuildHtml } from "./guilds.mjs";
 import { renderGeographyHtml } from "./geography.mjs";
-import { renderTalentsHtml, renderInspectCoverage } from "./talents.mjs";
-import { renderGearHtml } from "./gear.mjs";
+import { renderTalentsHtml, renderInspectCoverage, talentData } from "./talents.mjs";
+import { renderGearHtml, gearData } from "./gear.mjs";
 import { CLASS_PROFILES, classRoute } from "./class-profile.mjs";
 
 export const SITE_ORIGIN = "https://wowcensus.io";
@@ -293,6 +293,15 @@ export function buildEditionModels(source, { inspects, census, games, snaps }) {
 
 // Render one page from its model. `generatedAt` is when the data was shaped
 // (build time for the static bundle, publish time for edge snapshots).
+// The filter data file a page fetches ({ file, json }, file relative to the
+// edition directory), or null for pages without one.
+export function renderEditionData(source, page, model) {
+  if (page === "talents") return talentData(model.inspects);
+  if (page === "gear" && model.inspects.records.some((r) => r.gear && r.gear.length))
+    return gearData(model.inspects, { branch: EDITIONS[source].branch });
+  return null;
+}
+
 export function renderEditionPage(source, page, model, { stylesheet, generatedAt }) {
   const edition = EDITIONS[source];
   const generatedNote = "Page generated: " + utcTimestamp(generatedAt);

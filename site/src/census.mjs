@@ -1,4 +1,5 @@
 // Shared rendering for the Forever (Beta) cross-faction census in the static build.
+import { createHash } from "node:crypto";
 
 // Race/class shares cover characters seen in this many days of census /who
 // queries (see loadCensus in tools/local-site-data.mjs).
@@ -7,6 +8,27 @@ export const CENSUS_WINDOW_DAYS = 14;
 export function esc(s) {
   return String(s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 }
+
+// A filter page's records live in their own file, fetched only once a visitor
+// reaches for a filter; the default view is pre-rendered HTML. The name carries
+// the content hash, so the file is cacheable forever. The path is relative to
+// the edition directory, like the stylesheet.
+export function filterData(page, packed) {
+  const json = JSON.stringify(packed);
+  return { json, file: `data/${page}.${createHash("sha256").update(json).digest("hex").slice(0, 12)}.json` };
+}
+
+// Page script half of filterData: loads the records on first interest (pointer
+// over or focus into the filter row) and re-renders on each change. `unpack`
+// and `draw(records)` are the page's own functions.
+export const FILTER_LOADER = `
+ const loadFilterData=(filters,content,unpack)=>{
+  let pending=null;
+  const load=()=>pending||=fetch(content.dataset.src).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(unpack).catch(e=>{pending=null;throw e;});
+  for(const type of ['pointerover','focusin','touchstart'])filters.addEventListener(type,()=>load().catch(()=>{}),{once:true,passive:true});
+  return load;
+ };
+ const filterError=content=>{content.removeAttribute('aria-busy');content.querySelector('.filter-error')?.remove();content.insertAdjacentHTML('afterbegin','<section class="panel filter-error"><p class="hint" style="margin:0">Filters could not load. Check your connection and try again.</p></section>');};`;
 
 // Search-facing labels always lead with "WoW" ("TBC Anniversary" -> "WoW TBC Anniversary").
 export function seoLabel(gameLabel) {

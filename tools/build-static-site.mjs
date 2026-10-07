@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import { localJson } from "./local-site-data.mjs";
 import { EDITIONS, PAGES, SITE_ORIGIN, editionPath, pagePath,
-  fetchEditionData, buildEditionModels, renderEditionPage } from "../site/src/edition.mjs";
+  fetchEditionData, buildEditionModels, renderEditionPage, renderEditionData } from "../site/src/edition.mjs";
 import { RACE_PROFILES, raceRoutes, renderRaceProfile } from "../site/src/race-profile.mjs";
 import { CLASS_PROFILES, classRoute, classRoutes, renderClassProfile } from "../site/src/class-profile.mjs";
 
@@ -143,7 +143,12 @@ function writeHeaders() {
   write(path.join(out, "_headers"),
     `/*.css\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
     `/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
-    `/*.json\n  Cache-Control: public, max-age=300\n\n` +
+    // Content-hashed filter data. Pages joins the values of every matching rule,
+    // so the short JSON rule names census.json files rather than all *.json.
+    `/data/*\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
+    `/:edition/data/*\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
+    `/census.json\n  Cache-Control: public, max-age=300\n\n` +
+    `/:edition/census.json\n  Cache-Control: public, max-age=300\n\n` +
     `/*.md\n  Content-Type: text/markdown; charset=utf-8\n\n` +
     `/*\n  X-Content-Type-Options: nosniff\n`);
 }
@@ -167,7 +172,13 @@ async function main() {
     const caches = applyLocalCaches(source, models);
     const dir = outputDir(source);
     fs.mkdirSync(dir, { recursive: true });
+    const filterFiles = new Set();
     for (const page of PAGES) {
+      const filter = renderEditionData(source, page, models[page]);
+      if (filter) {
+        write(path.join(dir, filter.file), filter.json + "\n");
+        filterFiles.add(path.basename(filter.file));
+      }
       let html = renderEditionPage(source, page, models[page],
         { stylesheet: cssName, generatedAt: builtAt });
       if (page === "index") {
@@ -177,6 +188,10 @@ async function main() {
       }
       write(path.join(dir, `${page}.html`), html);
     }
+    // Filter data files are content-hashed; drop the previous builds'.
+    const dataDir = path.join(dir, "data");
+    for (const name of fs.existsSync(dataDir) ? fs.readdirSync(dataDir) : [])
+      if (!filterFiles.has(name)) fs.rmSync(path.join(dataDir, name), { force: true });
     for (const [race, { path: route }] of Object.entries(RACE_PROFILES[source] || {}))
       write(path.join(out, route, "index.html"), renderRaceProfile(data.inspects, source, race, {
         stylesheet: cssName, canonical: SITE_ORIGIN + route,
@@ -187,7 +202,8 @@ async function main() {
         stylesheet: cssName, canonical: SITE_ORIGIN + route,
       }));
     }
-    write(path.join(dir, "inspects.json"), JSON.stringify(data.inspects) + "\n");
+    // Raw inspect records are rendered into pages, never published as a download.
+    fs.rmSync(path.join(dir, "inspects.json"), { force: true });
     write(path.join(dir, "census.json"), JSON.stringify({ ...data.census,
       units: (data.census.units || []).map(({ guilds, zones, ...unit }) => unit),
     }) + "\n");
