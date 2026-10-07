@@ -1,0 +1,47 @@
+.iname .itopic{display:block; margin-top:6px; font-family:var(--pixel); font-size:9px; font-weight:400; letter-spacing:1px; line-height:1.6; text-transform:uppercase; color:var(--muted); text-shadow:none}
+  .chartgrid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start}
+  @media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
+  .census .legend{display:flex; gap:18px; margin:0 0 14px}
+  .census .key{display:inline-flex; align-items:center; gap:7px; font-size:17px; color:var(--muted)}
+  .census .key i{width:13px; height:13px; display:inline-block}
+  .race-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+  .race-head .ptitle{margin-bottom:10px}
+  .race-toggle{display:inline-flex;border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);flex-wrap:wrap}
+  .race-toggle button{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel2);border:0;border-right:2px solid var(--line);padding:9px 11px;cursor:pointer}
+  .race-toggle button:last-child{border-right:0}
+  .race-toggle button:hover{color:var(--gold)}
+  .race-toggle button[aria-pressed="true"]{background:var(--gold);color:#161018}
+  .race-toggle button[aria-pressed="true"]:hover{color:#161018}
+  .race-toggle button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .bar{display:grid; grid-template-columns:172px 1fr 62px; align-items:center; gap:10px; margin-bottom:6px}
+  .bar .bl{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-align:right;
+    color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .bar .bt{background:var(--panel2); border:2px solid var(--line); height:20px; padding:1px}
+  .bar .bt i{display:block; height:100%}
+  .bar .bn{text-align:right; color:var(--ink)}
+  @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
+  .vchips{margin-bottom:18px}
+  .combos{margin:0 0 22px}.combos>.ptitle{margin:0 0 10px}
+  .combo-title{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .combo-more{color:var(--blue);font-family:var(--term);font-size:20px;font-weight:400;letter-spacing:0;text-transform:none}
+  .combogrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .comboblock{background:var(--panel);border:2px solid var(--line);border-left:5px solid var(--fac);
+    box-shadow:4px 4px 0 var(--shadow)}
+  .comboblock>.combofaction{padding:15px 17px 11px}
+  .combocard{display:flex;align-items:center;gap:16px;padding:10px 17px}
+  .combocard+.combocard{border-top:2px solid var(--line)}
+  .comboicons{display:flex;min-width:74px}.comboicons img{width:40px;height:40px;object-fit:cover;
+    border:3px solid #b99b55;box-shadow:2px 2px 0 #000;background:#111;image-rendering:auto}
+  .comboicons img+img{margin-left:-14px;margin-top:12px}
+  .combofaction{font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--fac)}
+  .comboname{font-family:var(--pixel);font-size:11px;line-height:1.5;color:var(--ink);margin-bottom:5px}
+  .combostat{color:var(--muted);font-size:17px}
+  @font-face{font-family:"Friz Quadrata Web";src:url("/fonts/friz-quadrata-regular.woff2") format("woff2");font-style:normal;font-weight:400;font-display:optional}
+  .combo-analysis{font-family:"Friz Quadrata Web","Friz Quadrata","Friz Quadrata Std","Fritz Quadrata","Cinzel",Georgia,serif;font-size:17px;letter-spacing:.025em;line-height:1.55;color:var(--ink)}
+  .combo-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
+  .combo-panel{margin:0}.combo-table{min-width:0}.combo-table th,.combo-table td{width:auto}.combo-table th:nth-child(1),.combo-table td:nth-child(1){width:64%}
+  .combo-name{display:flex;align-items:center;gap:7px}.combo-name img{width:24px;height:24px;border:2px solid #b99b55;box-shadow:1px 1px 0 #000;background:#111}
+  @media (max-width:760px){.combogrid{grid-template-columns:1fr}}
+  @media (max-width:760px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
+  @media (max-width:420px){.combocard{padding:10px 12px;gap:11px}.comboicons{min-width:74px}
+    .comboname{font-size:9px}}

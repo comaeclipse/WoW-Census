@@ -6,7 +6,7 @@
 // Only what a scan actually observes is shown. Listings are not sales, so
 // "popular" here means listed in quantity, never sold.
 
-import { esc, seoLabel, seoHead, pageHeading, realmName, barChart, sortedEntries, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, realmName, barChart, sortedEntries, chipRow, CENSUS_STYLESHEET, TOGGLE_SCRIPT } from "./census.mjs";
 
 // Copper -> the site's usual g/s/c shorthand.
 function money(cop) {
@@ -259,7 +259,7 @@ ${seoHead(topic + " – WoWCensus", seoGameLabel + " auction house snapshot with
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 ${opts.tbcAnalysis ? '<link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>' : ''}
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">
-<style>${CENSUS_STYLE}
+${CENSUS_STYLESHEET}<style>
 ${MARKET_STYLE}
 </style>
 </head><body>

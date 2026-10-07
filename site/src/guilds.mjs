@@ -2,7 +2,7 @@
 // surveyed characters grouped by their latest observed guild, never accounts or
 // a claim about a guild's complete/current roster.
 
-import { esc, seoLabel, seoHead, pageHeading, realmName, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, realmName, chipRow, CENSUS_STYLESHEET, TOGGLE_SCRIPT } from "./census.mjs";
 
 const GUILD_STYLE = `
   .guildtable{width:100%;border-collapse:collapse;table-layout:fixed}
@@ -89,7 +89,7 @@ ${seoHead(topic + " – WoWCensus", seoGameLabel + " guild activity by realm and
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">
-<style>${CENSUS_STYLE}${GUILD_STYLE}</style>
+${CENSUS_STYLESHEET}<style>${GUILD_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
   <header class="ihead"><div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>
     ${navigation.breadcrumbs || notes}

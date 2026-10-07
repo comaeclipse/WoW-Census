@@ -13,6 +13,7 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import { localJson } from "./local-site-data.mjs";
+import { renderWithPageTime } from "./page-build-time.mjs";
 import { EDITIONS, PAGES, SITE_ORIGIN, editionPath, pagePath,
   fetchEditionData, buildEditionModels, renderEditionPage, renderEditionData } from "../site/src/edition.mjs";
 import { RACE_PROFILES, raceRoutes, renderRaceProfile } from "../site/src/race-profile.mjs";
@@ -44,6 +45,7 @@ const db = {
   },
 };
 const env = { DB: db };
+let changedOutputs = false;
 const jsonCache = new Map();
 async function getLocalJson(route) {
   if (jsonCache.has(route)) return jsonCache.get(route);
@@ -82,8 +84,13 @@ function write(file, content) {
   // Leave identical files alone so an edition-only build touches only what changed.
   if (fs.existsSync(file) && fs.readFileSync(file).equals(Buffer.from(content))) return;
   fs.writeFileSync(file, content);
+  changedOutputs = true;
   if (fs.statSync(file).size > 25 * 1024 * 1024)
     throw new Error(`Cloudflare Pages asset exceeds 25 MiB: ${file}`);
+}
+function localizeContent(content) {
+  return content.replaceAll('https://wow.zamimg.com/', '/assets/')
+    .replace(/<script\s+src="\/assets\/js\/tooltips\.js"[^>]*><\/script>/g, '');
 }
 function localizeMirroredAssets() {
   const visit = (dir) => {
@@ -93,12 +100,10 @@ function localizeMirroredAssets() {
       if (entry.isDirectory()) { visit(file); continue; }
       if (!/\.(?:html|js|css)$/.test(entry.name)) continue;
       const original = fs.readFileSync(file, 'utf8');
-      let content = original;
-      content = content.replaceAll('https://wow.zamimg.com/', '/assets/');
       // The mirrored library still asks Wowhead for hover-card data at runtime.
       // Static pages render their own names and locally mirrored icons instead.
-      content = content.replace(/<script\s+src="\/assets\/js\/tooltips\.js"[^>]*><\/script>/g, '');
-      if (content !== original) fs.writeFileSync(file, content);
+      const content = localizeContent(original);
+      if (content !== original) { fs.writeFileSync(file, content); changedOutputs = true; }
     }
   };
   visit(out);
@@ -141,7 +146,9 @@ function writeSiteMetadata() {
 // visit by ETag, which suits pages that only change when a build is deployed.
 function writeHeaders() {
   write(path.join(out, "_headers"),
-    `/*.css\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
+    `/style.*.css\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
+    `/:edition/style.*.css\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
+    `/census.css\n  Cache-Control: public, max-age=300\n\n` +
     `/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n\n` +
     // Content-hashed filter data. Pages joins the values of every matching rule,
     // so the short JSON rule names census.json files rather than all *.json.
@@ -158,8 +165,9 @@ async function main() {
   const { css, name: cssName } = stylesheet();
   const builtAt = new Date().toISOString();
   const reportFile = path.join(out, "build-report.json");
-  const previous = only && fs.existsSync(reportFile) ? JSON.parse(fs.readFileSync(reportFile, "utf8")) : {};
+  const previous = fs.existsSync(reportFile) ? JSON.parse(fs.readFileSync(reportFile, "utf8")) : {};
   const report = { builtAt, source: "local SQLite snapshot", editions: { ...previous.editions } };
+  write(path.join(out, "census.css"), fs.readFileSync(path.join(repo, "site/public/census.css"), "utf8"));
   if (only) {
     // Untouched editions keep linking their own stylesheet; a changed one needs every edition rebuilt.
     for (const source of Object.keys(EDITIONS).filter((s) => !only.includes(s)))
@@ -179,14 +187,20 @@ async function main() {
         write(path.join(dir, filter.file), filter.json + "\n");
         filterFiles.add(path.basename(filter.file));
       }
-      let html = renderEditionPage(source, page, models[page],
-        { stylesheet: cssName, generatedAt: builtAt });
-      if (page === "index") {
-        const link = `<link rel="stylesheet" href="${cssName}">`;
-        if (!html.includes(link)) throw new Error(`Landing page stylesheet missing: ${source}`);
-        html = html.replace(link, `<style>${css}</style>`);
-      }
-      write(path.join(dir, `${page}.html`), html);
+      const htmlFile = path.join(dir, `${page}.html`);
+      const render = (generatedAt) => {
+        let html = renderEditionPage(source, page, models[page], { stylesheet: cssName, generatedAt });
+        if (page === "index") {
+          const link = `<link rel="stylesheet" href="${cssName}">`;
+          if (!html.includes(link)) throw new Error(`Landing page stylesheet missing: ${source}`);
+          html = html.replace(link, `<style>${css}</style>`);
+        }
+        return localizeContent(html);
+      };
+      const oldHtml = fs.existsSync(htmlFile) ? fs.readFileSync(htmlFile, "utf8") : null;
+      // Keep this page's own generation time if its rendered content is identical.
+      const html = renderWithPageTime(oldHtml, builtAt, render);
+      write(htmlFile, html);
     }
     // Filter data files are content-hashed; drop the previous builds'.
     const dataDir = path.join(dir, "data");
@@ -233,7 +247,8 @@ async function main() {
   if (markdown.status !== 0) throw new Error("Markdown build failed");
   localizeMirroredAssets();
   writeHeaders();
-  write(path.join(out, "build-report.json"), JSON.stringify(report, null, 2) + "\n");
+  if (!changedOutputs && previous.builtAt) report.builtAt = previous.builtAt;
+  write(reportFile, JSON.stringify(report, null, 2) + "\n");
   for (const forbidden of ["_worker.js", "_routes.json"])
     if (fs.existsSync(path.join(out, forbidden))) throw new Error(`Function artifact in static output: ${forbidden}`);
   const verify = spawnSync("python", ["-B", path.join(repo, "tools/verify-static-site.py"), out],

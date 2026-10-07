@@ -2,7 +2,7 @@
 // the dataset's latest rolling window, each at its latest observed location.
 // Not movement history or proof of an activity.
 
-import { esc, seoLabel, seoHead, pageHeading, realmName, chipRow, CENSUS_STYLE, TOGGLE_SCRIPT } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, realmName, chipRow, CENSUS_STYLESHEET, TOGGLE_SCRIPT } from "./census.mjs";
 
 const CAPITALS = new Set([
   "Darnassus", "Dornogal", "Exodar", "Ironforge", "Orgrimmar", "Shattrath City",
@@ -139,7 +139,7 @@ ${seoHead(topic + " – WoWCensus", seoGameLabel + " player activity by zone, re
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}${GEO_STYLE}</style>
+<link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">${CENSUS_STYLESHEET}<style>${GEO_STYLE}</style>
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
 <header class="ihead"><div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>
 ${navigation.breadcrumbs || notes}</header>

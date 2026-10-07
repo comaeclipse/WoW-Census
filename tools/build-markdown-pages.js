@@ -15,6 +15,7 @@ const editions = editionArg ? editionArg.slice(10).split(',') : ['', 'tbc', 'cla
 const names = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents', 'gear'];
 const routes = [];
 function writeFile(file, content) {
+  if (fs.existsSync(file) && fs.readFileSync(file, 'utf8') === content) return;
   const temporary = `${file}.${crypto.randomBytes(6).toString('hex')}.tmp`;
   try {
     fs.writeFileSync(temporary, content);

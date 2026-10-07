@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Content hash of the static site's render modules and stylesheet.
+// Content hash of the static site's render modules and stylesheets.
 //
 //   node tools/layout-id.js            print the current layout
 
@@ -26,6 +26,7 @@ function layout() {
   const hash = crypto.createHash("sha256");
   for (const name of RENDER_MODULES) hash.update(readLf(path.join(repo, "site/src", name)));
   hash.update(cssName);
+  hash.update(readLf(path.join(repo, "site/public/census.css")));
   return { id: hash.digest("hex").slice(0, 12), css: cssName };
 }
 

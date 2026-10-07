@@ -1,4 +1,4 @@
-import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLE, SELECT_SCRIPT, filterData, FILTER_LOADER } from "./census.mjs";
+import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLESHEET, SELECT_SCRIPT, filterData, FILTER_LOADER } from "./census.mjs";
 
 function time(t) { return t ? new Date(t*1000).toISOString().slice(0,16).replace("T"," ")+"Z" : "Unavailable"; }
 
@@ -56,8 +56,8 @@ export function renderGearHtml(data, opts={}) {
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96"><link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
     <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="${esc(opts.stylesheet||"/style.css")}">
+    ${CENSUS_STYLESHEET}
     <style>
-    ${CENSUS_STYLE}
     .gear-summary{font-family:"Friz Quadrata Web","Friz Quadrata","Friz Quadrata Std","Fritz Quadrata","Cinzel",Georgia,serif;font-size:16px;font-weight:400;letter-spacing:normal;line-height:1.66;color:#ccc;text-align:left}
     .gear-filters{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}.gear-filters label{display:grid;gap:5px;font-size:17px;color:var(--muted)}
     .gear-filters select{color:var(--ink);background:var(--panel2);border:2px solid var(--line);font-family:var(--term);font-size:18px;padding:6px 10px;max-width:230px}

@@ -78,7 +78,7 @@ a{color:var(--blue)}
   .mobile-menu-label:not(:first-child){border-top:2px solid var(--line);margin-top:8px}
   .mobile-menu-panel a{color:var(--ink);text-decoration:none;font-family:var(--pixel);font-size:8px;line-height:1.5;padding:10px 7px;border:1px solid var(--line)}
   .mobile-menu-panel a[aria-current]{color:var(--gold);border-color:var(--gold)}
-  .census-home .page-controls,.census-home .vpane>.tiles{display:none}
+  .census-home .page-controls{display:none}
 }
 .game{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-transform:uppercase;
   color:var(--ink); background:var(--panel); border:2px solid var(--line);

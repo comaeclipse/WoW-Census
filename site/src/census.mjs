@@ -100,24 +100,25 @@ function classIcon(token) { return iconUrl("classicon_" + String(token || "warri
 function raceIcon(race) { return iconUrl(RACE_ICON[race] || "inv_misc_questionmark"); }
 
 function comboCards(groups, opts = {}) {
-  const cards = groups.map((g) => {
-    const top = sortedEntries(g.combos || {})[0];
-    if (!top) return "";
-    const [race, token] = top[0].split("\t");
-    const className = CLASS_META[token] ? CLASS_META[token][0] : token;
-    const share = g.characters ? ((top[1] / g.characters) * 100).toFixed(1) : "0.0";
-    return '<article class="combocard" style="--fac:' + factionColor(g.faction) + '">' +
-      '<div class="comboicons"><img src="' + esc(raceIcon(race)) + '" alt="' + esc(race) + ' icon" loading="lazy">' +
-      '<img src="' + esc(classIcon(token)) + '" alt="' + esc(className) + ' icon" loading="lazy"></div>' +
-      '<div><div class="combofaction">' + esc(g.faction) + '</div>' +
-      '<div class="comboname">' + esc(race) + ' ' + esc(className) + '</div>' +
-      '<div class="combostat">' + top[1].toLocaleString() + ' characters &middot; ' + share + '% of ' + esc(g.faction) + '</div></div>' +
-      '</article>';
+  const blocks = groups.map((g) => {
+    const cards = sortedEntries(g.combos || {}).slice(0, 3).map(([key, count]) => {
+      const [race, token] = key.split("\t");
+      const className = CLASS_META[token] ? CLASS_META[token][0] : token;
+      const share = g.characters ? ((count / g.characters) * 100).toFixed(1) : "0.0";
+      return '<article class="combocard">' +
+        '<div class="comboicons"><img src="' + esc(raceIcon(race)) + '" alt="' + esc(race) + ' icon" loading="lazy">' +
+        '<img src="' + esc(classIcon(token)) + '" alt="' + esc(className) + ' icon" loading="lazy"></div>' +
+        '<div><div class="comboname">' + esc(race) + ' ' + esc(className) + '</div>' +
+        '<div class="combostat">' + count.toLocaleString() + ' characters &middot; ' + share + '% of ' + esc(g.faction) + '</div></div>' +
+        '</article>';
+    }).join("");
+    return cards ? '<section class="comboblock" style="--fac:' + factionColor(g.faction) + '">' +
+      '<div class="combofaction">' + esc(g.faction) + '</div>' + cards + '</section>' : "";
   }).filter(Boolean).join("");
   const more = opts.comboHref
     ? '<a class="combo-more" href="' + esc(opts.comboHref) + '">Explore race and class combinations</a>'
     : "";
-  return cards ? '<section class="combos"><div class="ptitle combo-title">Most popular race + class' + more + '</div><div class="combogrid">' + cards + '</div></section>' : "";
+  return blocks ? '<section class="combos"><div class="ptitle combo-title">Most popular race + class' + more + '</div><div class="combogrid">' + blocks + '</div></section>' : "";
 }
 
 function comboLabel(key) {
@@ -177,51 +178,7 @@ export function sortedEntries(dist) {
     .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])));
 }
 
-export const CENSUS_STYLE = `
-  .iname .itopic{display:block; margin-top:6px; font-family:var(--pixel); font-size:9px; font-weight:400; letter-spacing:1px; line-height:1.6; text-transform:uppercase; color:var(--muted); text-shadow:none}
-  .chartgrid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start}
-  @media (max-width:820px){.chartgrid{grid-template-columns:1fr}}
-  .census .legend{display:flex; gap:18px; margin:0 0 14px}
-  .census .key{display:inline-flex; align-items:center; gap:7px; font-size:17px; color:var(--muted)}
-  .census .key i{width:13px; height:13px; display:inline-block}
-  .race-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
-  .race-head .ptitle{margin-bottom:10px}
-  .race-toggle{display:inline-flex;border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);flex-wrap:wrap}
-  .race-toggle button{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel2);border:0;border-right:2px solid var(--line);padding:9px 11px;cursor:pointer}
-  .race-toggle button:last-child{border-right:0}
-  .race-toggle button:hover{color:var(--gold)}
-  .race-toggle button[aria-pressed="true"]{background:var(--gold);color:#161018}
-  .race-toggle button[aria-pressed="true"]:hover{color:#161018}
-  .race-toggle button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-  .bar{display:grid; grid-template-columns:172px 1fr 62px; align-items:center; gap:10px; margin-bottom:6px}
-  .bar .bl{font-family:var(--pixel); font-size:8px; letter-spacing:1px; text-align:right;
-    color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-  .bar .bt{background:var(--panel2); border:2px solid var(--line); height:20px; padding:1px}
-  .bar .bt i{display:block; height:100%}
-  .bar .bn{text-align:right; color:var(--ink)}
-  @media (max-width:520px){.bar{grid-template-columns:96px 1fr 52px}}
-  .vchips{margin-bottom:18px}
-  .combos{margin:0 0 22px}.combos>.ptitle{margin:0 0 10px}
-  .combo-title{display:flex;align-items:center;justify-content:space-between;gap:14px}
-  .combo-more{color:var(--blue);font-family:var(--term);font-size:20px;font-weight:400;letter-spacing:0;text-transform:none}
-  .combogrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .combocard{display:flex;align-items:center;gap:16px;padding:15px 17px;background:var(--panel);
-    border:2px solid var(--line);border-left:5px solid var(--fac);box-shadow:4px 4px 0 rgba(0,0,0,.32)}
-  .comboicons{display:flex;min-width:98px}.comboicons img{width:56px;height:56px;object-fit:cover;
-    border:3px solid #b99b55;box-shadow:2px 2px 0 #000;background:#111;image-rendering:auto}
-  .comboicons img+img{margin-left:-14px;margin-top:12px}
-  .combofaction{font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--fac);margin-bottom:7px}
-  .comboname{font-family:var(--pixel);font-size:11px;line-height:1.5;color:var(--ink);margin-bottom:5px}
-  .combostat{color:var(--muted);font-size:17px}
-  @font-face{font-family:"Friz Quadrata Web";src:url("/fonts/friz-quadrata-regular.woff2") format("woff2");font-style:normal;font-weight:400;font-display:optional}
-  .combo-analysis{font-family:"Friz Quadrata Web","Friz Quadrata","Friz Quadrata Std","Fritz Quadrata","Cinzel",Georgia,serif;font-size:17px;letter-spacing:.025em;line-height:1.55;color:var(--ink)}
-  .combo-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
-  .combo-panel{margin:0}.combo-table{min-width:0}.combo-table th,.combo-table td{width:auto}.combo-table th:nth-child(1),.combo-table td:nth-child(1){width:64%}
-  .combo-name{display:flex;align-items:center;gap:7px}.combo-name img{width:24px;height:24px;border:2px solid #b99b55;box-shadow:1px 1px 0 #000;background:#111}
-  @media (max-width:760px){.combogrid{grid-template-columns:1fr}}
-  @media (max-width:760px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
-  @media (max-width:420px){.combocard{padding:12px;gap:11px}.comboicons{min-width:82px}
-    .comboicons img{width:48px;height:48px}.comboname{font-size:9px}}`;
+export const CENSUS_STYLESHEET = '<link rel="stylesheet" href="/census.css">';
 
 
 // A page can slice its content on more than one axis (realm, faction). Each
@@ -436,11 +393,8 @@ export const TOGGLE_SCRIPT = `<script>
 // opts.notes       extra lines under the header (data freshness and static build time)
 function renderCensusView(census, opts = {}) {
   const groups = (census && census.groups) || [];
-  const realms = (census && census.realms) || [];
-  const lastT = (census && census.lastT) || 0;
   const total = groups.reduce((a, g) => a + g.characters, 0);
   const samples = groups.reduce((a, g) => a + g.samples, 0);
-  const sightings = groups.reduce((a, g) => a + g.observed, 0);
 
   let body;
   if (!total && !samples) {
@@ -489,18 +443,7 @@ function renderCensusView(census, opts = {}) {
       (links ? '<div class="ptitle" style="margin:26px 0 12px">Per-realm detail</div><nav class="games">' + links + "</nav>" : "");
   }
 
-  const tiles =
-    '<div class="tile"><div class="k">Characters</div><div class="v">' + total.toLocaleString() +
-      '</div><div class="s">unique, all time</div></div>' +
-    '<div class="tile"><div class="k">Realms</div><div class="v">' + (realms.length || "&mdash;") +
-      "</div></div>" +
-    '<div class="tile"><div class="k">Scans</div><div class="v">' + samples.toLocaleString() +
-      '</div><div class="s">' + sightings.toLocaleString() + " sightings</div></div>" +
-    '<div class="tile"><div class="k">Updated</div><div class="v">' +
-      (lastT ? new Date(lastT * 1000).toISOString().slice(0, 10) : "&mdash;") +
-      '</div><div class="s">last sample</div></div>';
-
-  return '<section class="tiles">' + tiles + "</section>" + body;
+  return body;
 }
 
 export function renderComboBreakdownHtml(census, opts = {}) {
@@ -525,7 +468,7 @@ ${seoHead(topic + " – WoWCensus", seoGameLabel + " observed race and class com
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}"><style>${CENSUS_STYLE}</style>
+<link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">${CENSUS_STYLESHEET}
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
 <header class="ihead"><div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>${navigation.breadcrumbs || notes}</header>
 <div class="page-controls">${navigation.pages || ""}</div>
@@ -569,8 +512,7 @@ ${seoHead(opts.title || topic + " – WoWCensus", description, opts.canonical)}
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "/style.css")}">
-<style>${CENSUS_STYLE}
-</style>
+${CENSUS_STYLESHEET}
 </head><body${opts.mobileHome ? ' class="census-home"' : ''}>
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">

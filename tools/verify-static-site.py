@@ -58,8 +58,10 @@ def main():
             parser = Links()
             source = html.read_text(encoding="utf-8")
             parser.feed(source)
-            if page == "index" and ('rel="stylesheet"' in source or "<style>" not in source):
-                errors.append(f"Landing page CSS is not inline: {edition or '/'}")
+            if page == "index" and "<style>" not in source:
+                errors.append(f"Landing page base CSS is not inline: {edition or '/'}")
+            if 'href="/census.css"' not in source:
+                errors.append(f"Shared census CSS is missing: {edition or '/'} {page}")
             if page == "index":
                 if source.count("<main>") != 1 or source.count("</main>") != 1:
                     errors.append(f"Landing page needs one main landmark: {edition or '/'}")

@@ -32,6 +32,9 @@ test('no font face swaps in layout', () => {
 test('every edition ships every page', () => {
   for (const { file } of files) assert.ok(exists(file), file);
   assert.ok(exists('static/' + cssName), 'bundle is missing the current stylesheet ' + cssName);
+  assert.ok(exists('static/census.css'), 'bundle is missing shared census CSS');
+  assert.match(read('static/census.css'), /\.combocard\{[^}]*padding:10px 17px/, 'approved combo row spacing');
+  assert.match(read('static/census.css'), /\.comboicons img\{width:40px;height:40px/, 'approved icon size');
 });
 
 for (const { dir, page, file } of files) {
@@ -40,6 +43,8 @@ for (const { dir, page, file } of files) {
     assert.match(html, /^<!doctype html><html lang="en">/i);
     assert.match(html, /<meta name="viewport" content="width=device-width,initial-scale=1">/);
     assert.ok(html.includes('href="' + cssName + '"') || (page === 'index' && html.includes('<style>' + css)), 'stale or missing stylesheet (rebuild every edition after CSS changes)');
+    assert.match(html, /<link rel="stylesheet" href="\/census\.css">/, 'shared census stylesheet');
+    assert.doesNotMatch(html, /<style>\s*\.iname \.itopic/, 'census CSS should not be copied into HTML');
     for (const font of ['press-start-2p-latin.woff2', 'vt323-latin.woff2', 'cinzel-latin-800-normal.woff2'])
       assert.ok(html.includes('rel="preload" href="/fonts/' + font + '"'), 'preload ' + font);
     assert.match(html, /<div class="crt" aria-hidden="true"><\/div>\s*<div class="wrap">/);
@@ -70,7 +75,7 @@ for (const { dir, page, file } of files) {
       assert.doesNotMatch(html, /\.talent-combo-table[^{]*\{[^}]*font-size/, 'talent tables keep base type size');
       // The default view ships in the HTML; script only re-renders on filter changes.
       assert.match(html, /<div class="talent-filters" id="talent-filters"><label>/, 'filters pre-rendered');
-      assert.match(html, /<div id="talent-content" aria-live="polite"><(div class="combo-breakdown"|section class="panel")/, 'talent content pre-rendered');
+      assert.match(html, /<div id="talent-content" aria-live="polite" data-src="data\/talents\.[0-9a-f]{12}\.json"><(div class="combo-breakdown"|section class="panel")/, 'talent content pre-rendered');
       assert.equal(count(html, /<select class="vsel-native" data-field="\w+" autocomplete="off">/g), 5, 'filters opt out of form restore');
     }
   });

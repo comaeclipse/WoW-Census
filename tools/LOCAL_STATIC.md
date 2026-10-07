@@ -49,6 +49,18 @@ To check a build first, deploy it to the static preview project
 npx wrangler pages deploy static --project-name wowcensus-static-preview --branch main --commit-dirty=true
 ```
 
+The optional S3 website mirror uses content hashes rather than file times. Check
+the exact upload plan first, then upload only changed objects:
+
+```powershell
+python -B tools/deploy-s3.py --dry-run
+python -B tools/deploy-s3.py
+```
+
+The S3 command leaves unrelated bucket keys in place. Pass `--prune` only when
+you intend to remove objects absent from the complete `static/` tree. It also
+compares the extensionless copies needed by S3 website routes such as `/combos`.
+
 The build writes `static/_headers` with a `Cache-Control: public, max-age=300`
 rule per HTML page (pages are served at extensionless URLs, so a `/*.html`
 rule would not match them), immutable caching for fingerprinted CSS and fonts,

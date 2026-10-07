@@ -79,8 +79,8 @@ In this order:
 3. `.page-controls`: the **page nav** (Census, Auction House, Guilds,
    Geography, Talents; exactly one current) and, where the page slices data,
    the realm/faction chip rows (`.vchips`).
-4. Content: tiles or a concise market analysis, then panels/tables. Every TBC
-   auction view has an analysis tied to its selected realm and faction.
+4. Content: census combo cards or a concise market analysis, then panels/tables.
+   Every TBC auction view has an analysis tied to its selected realm and faction.
 
 Every edition gets every page, even with no data. An empty page says so plainly
 in the normal layout; it never disappears or breaks the nav. Navigation is
@@ -111,13 +111,16 @@ prefix (`/forever/troll/`, `/tbc/paladin/`), configured in
 
 ## 8. Build rules
 
-- `site/src/*.mjs` renderers are shared across all six editions. Style changes
-  go into `site/public/style.css` or the renderer's shared `CENSUS_STYLE`,
-  never by hand-editing generated `static/` files.
+- `site/src/*.mjs` renderers are shared across all six editions. Base styles
+  live in `site/public/style.css`; census, chart, and combo styles shared by
+  page types live in `site/public/census.css`. Never hand-edit generated `static/` files.
 - The static stylesheet is content-hashed (`style.<sha256:12>.css`) and served
   immutable on interior pages. Static landing pages inline it to remove the
   render-blocking stylesheet request on a cold visit. Rebuild every edition
   after a CSS change so no page references a stale hash.
+- `/census.css` is a stable, shared URL with a short cache lifetime. A change to
+  it must not rewrite every page or advance a page's generated timestamp.
+  The page timestamp advances only when that page's rendered HTML changes.
 - Pages are static: no runtime fetches. View toggles show/hide pre-rendered
   panes and mirror state in the URL query.
 - The default view is always in the HTML. Scripts may re-render on

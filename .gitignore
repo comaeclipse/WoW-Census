@@ -15,6 +15,10 @@ site/.dev.vars
 # Node
 node_modules/
 
+# Python tooling
+__pycache__/
+*.pyc
+
 # Locally rendered Pages output; private SQLite data stays outside the repo.
 static/
 pages/
