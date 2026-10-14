@@ -127,6 +127,40 @@ def main():
             errors.append(f"Remote tooltip runtime remains: {file.relative_to(root)}")
     if (root / "assets/wow.zamimg.com").exists():
         errors.append("Old asset directory remains")
+    # Content-hashed files (stylesheets, filter data) are replaced, never edited,
+    # so every build leaves the previous one's behind unless it prunes them.
+    # Each one published must be referenced by some page.
+    referenced = set()
+    for page in root.rglob("*.html"):
+        if "assets" in page.parts:
+            continue
+        relative = page.relative_to(root).as_posix()
+        route = "/" + (relative[:-len("index.html")] if relative.endswith("index.html") else relative[:-len(".html")])
+        parser = Links()
+        parser.feed(page.read_text(encoding="utf-8"))
+        for ref in parser.urls:
+            url = urlsplit(urljoin("https://wowcensus.io" + route, ref))
+            if url.netloc == "wowcensus.io":
+                referenced.add(url.path)
+    hashed = re.compile(r"(^|/)(style\.[0-9a-f]{12}\.css|data/[^/]+\.[0-9a-f]{12}\.json)$")
+    for file in root.rglob("*"):
+        path = "/" + file.relative_to(root).as_posix()
+        if file.is_file() and hashed.search(path) and path not in referenced:
+            errors.append(f"Unreferenced hashed file (stale build output): {path.lstrip('/')}")
+    # Every Markdown copy must be discoverable: listed in llms.txt and announced
+    # by its HTML page with a rel="alternate" link.
+    llms = (root / "llms.txt").read_text(encoding="utf-8") if (root / "llms.txt").is_file() else ""
+    if not llms:
+        errors.append("Missing llms.txt")
+    for markdown in root.rglob("*.md"):
+        if "assets" in markdown.parts:
+            continue
+        route = "/" + markdown.relative_to(root).as_posix()
+        if f"(https://wowcensus.io{route})" not in llms:
+            errors.append(f"Markdown copy not in llms.txt: {route}")
+        html = markdown.with_suffix(".html")
+        if not html.is_file() or f'<link rel="alternate" type="text/markdown" href="{route}">' not in html.read_text(encoding="utf-8"):
+            errors.append(f"Markdown copy not announced by its page: {route}")
     files = [file for file in root.rglob("*") if file.is_file()]
     for file in files:
         if file.stat().st_size > LIMIT:

@@ -10,10 +10,12 @@ export const PROFILE_GAMES = {
   "mop-classic": { dir: "mop", home: "/mop/", nav: "MoP Classic", gameLabel: "Mists of Pandaria Classic" },
   retail: { dir: "retail", home: "/retail/", nav: "Retail", gameLabel: "Retail" },
 };
-export const GAME_NAV = [["Forever", "/"], ["TBC Anniversary", "/tbc/"], ["Classic Era", "/classic/"], ["SoD", "/sod/"], ["Hardcore", "/hardcore/"], ["MoP Classic", "/mop/"], ["Retail", "/retail/"]];
 const PAGE_NAV = [["Census", ""], ["Auction House", "auctionhouse"], ["Guilds", "guilds"], ["Geography", "geography"], ["Talents", "talents"], ["Gear", "gear"]];
 export const pageNav = (source) => PAGE_NAV.map(([label, page]) => [label, PROFILE_GAMES[source].home + page]);
 export const talentsPath = (source) => PROFILE_GAMES[source].home + "talents";
+// Edition switcher for a profile page: each game's own copy of this page
+// (`counterpart` returns its route, or nothing), else that game's talents page.
+export const gameNav = (counterpart) => Object.entries(PROFILE_GAMES).map(([source, g]) => [g.nav, counterpart(source) || talentsPath(source)]);
 // Below this many players a spec column or class card shows its count instead
 // of ranking talents: with a handful of players every pick reads as 0% or 100%.
 export const MIN_SAMPLE = 20;

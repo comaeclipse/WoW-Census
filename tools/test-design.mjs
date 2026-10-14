@@ -53,7 +53,9 @@ for (const { dir, page, file } of files) {
     assert.ok(games, 'game nav');
     assert.equal(count(games[1], /class="game"/g), Object.keys(editions).length, 'one button per edition');
     assert.equal(count(games[1], /aria-current="true"/g), 1, 'one current game');
-    assert.ok(games[1].includes('aria-current="true" href="/' + (dir ? dir + '/' : '') + '"'), 'current game is this edition');
+    assert.ok(games[1].includes('aria-current="true" href="/' + (dir ? dir + '/' : '') + (page === 'index' ? '' : page) + '"'), 'current game is this edition');
+    for (const other of Object.keys(editions))
+      assert.ok(games[1].includes('href="/' + (other ? other + '/' : '') + (page === 'index' ? '' : page) + '"'), 'edition switch keeps the page: ' + other);
     const crumbs = html.match(/<nav class="breadcrumbs" aria-label="Breadcrumb">(.*?)<\/nav>/s);
     assert.ok(crumbs, 'breadcrumbs');
     assert.ok(crumbs[1].includes('>' + editions[dir] + '</a>'), 'breadcrumb names the edition');
@@ -75,7 +77,7 @@ for (const { dir, page, file } of files) {
       assert.doesNotMatch(html, /\.talent-combo-table[^{]*\{[^}]*font-size/, 'talent tables keep base type size');
       // The default view ships in the HTML; script only re-renders on filter changes.
       assert.match(html, /<div class="talent-filters" id="talent-filters"><label>/, 'filters pre-rendered');
-      assert.match(html, /<div id="talent-content" aria-live="polite" data-src="data\/talents\.[0-9a-f]{12}\.json"><(div class="combo-breakdown"|section class="panel")/, 'talent content pre-rendered');
+      assert.match(html, /<div id="talent-content" aria-live="polite" data-src="data\/talents\.[0-9a-f]{12}\.json" data-class-paths="[^"]*"><(div class="combo-breakdown"|section class="panel")/, 'talent content pre-rendered');
       assert.equal(count(html, /<select class="vsel-native" data-field="\w+" autocomplete="off">/g), 5, 'filters opt out of form restore');
     }
   });

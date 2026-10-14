@@ -18,6 +18,7 @@ import { EDITIONS, PAGES, SITE_ORIGIN, editionPath, pagePath,
   fetchEditionData, buildEditionModels, renderEditionPage, renderEditionData } from "../site/src/edition.mjs";
 import { RACE_PROFILES, raceRoutes, renderRaceProfile } from "../site/src/race-profile.mjs";
 import { CLASS_PROFILES, classRoute, classRoutes, renderClassProfile } from "../site/src/class-profile.mjs";
+import { CLASS_META } from "../site/src/census.mjs";
 
 const require = createRequire(import.meta.url);
 const { stylesheet } = require("./layout-id.js");
@@ -111,6 +112,16 @@ function localizeMirroredAssets() {
 function outputDir(source) {
   return path.join(out, editionPath(source).replace(/^\//, ""));
 }
+// Every HTML page has a Markdown copy (tools/build-markdown-pages.js) at its
+// route + ".md", or "index.md" inside a directory route. Pages announce theirs
+// with a rel="alternate" link, and llms.txt lists them all.
+const PAGE_LABELS = { index: "Census", combos: "Race + Class", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography", talents: "Talents", gear: "Gear" };
+const markdownPath = (route) => route.endsWith("/") ? route + "index.md" : route + ".md";
+function withMarkdownAlternate(html, route) {
+  if (!html.includes("</head>")) throw new Error(`No </head> to announce the Markdown copy of ${route}`);
+  return html.replace("</head>", `<link rel="alternate" type="text/markdown" href="${markdownPath(route)}"></head>`);
+}
+
 function writeSiteMetadata() {
   const routes = Object.keys(EDITIONS).flatMap((source) => PAGES.map((page) => pagePath(source, page))).concat(raceRoutes(), classRoutes());
   write(path.join(out, "sitemap.xml"), '<?xml version="1.0" encoding="UTF-8"?>\n' +
@@ -118,13 +129,18 @@ function writeSiteMetadata() {
     routes.map((route) => `  <url><loc>${SITE_ORIGIN}${route}</loc></url>`).join("\n") +
     '\n</urlset>\n');
   write(path.join(out, "robots.txt"),
-    `User-agent: *\nContent-Signal: ai-train=no, search=yes, ai-input=no\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`);
+    `User-agent: *\nContent-Signal: ai-train=no, search=yes, ai-input=yes\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`);
   write(path.join(out, "llms.txt"), "# WoWCensus\n\nStatic population, auction, guild, geography, talent, and gear snapshots.\n" +
     "Data is collected in game and frozen when these files are built.\n\n" +
-    Object.keys(EDITIONS).flatMap((source) => [
-      `## ${EDITIONS[source].label}`, "",
-      ...PAGES.map((page) => `- [${page}](${SITE_ORIGIN}${pagePath(source, page)})`), "",
-    ]).join("\n") + "\n");
+    "Each link is the Markdown copy of a page; drop the .md (or index.md) for the HTML page.\n\n" +
+    Object.keys(EDITIONS).flatMap((source) => {
+      const link = (label, route) => `- [${label}](${SITE_ORIGIN}${markdownPath(route)})`;
+      const classes = (CLASS_PROFILES[source]?.classes || []).map((cf) => link(CLASS_META[cf]?.[0] || cf, classRoute(source, cf)));
+      const races = Object.entries(RACE_PROFILES[source] || {}).map(([race, p]) => link(p.label || race, p.path));
+      return [`## ${EDITIONS[source].label}`, "", ...PAGES.map((page) => link(PAGE_LABELS[page], pagePath(source, page))), "",
+        ...(classes.length ? ["### Class talents", "", ...classes, ""] : []),
+        ...(races.length ? ["### Race talents", "", ...races, ""] : [])];
+    }).join("\n") + "\n");
   write(path.join(out, ".well-known/ai-catalog.json"), JSON.stringify({
     specVersion: "1.0",
     host: { displayName: "wowcensus", documentationUrl: `${SITE_ORIGIN}/llms.txt` },
@@ -195,7 +211,7 @@ async function main() {
           if (!html.includes(link)) throw new Error(`Landing page stylesheet missing: ${source}`);
           html = html.replace(link, `<style>${css}</style>`);
         }
-        return localizeContent(html);
+        return localizeContent(withMarkdownAlternate(html, pagePath(source, page)));
       };
       const oldHtml = fs.existsSync(htmlFile) ? fs.readFileSync(htmlFile, "utf8") : null;
       // Keep this page's own generation time if its rendered content is identical.
@@ -207,14 +223,14 @@ async function main() {
     for (const name of fs.existsSync(dataDir) ? fs.readdirSync(dataDir) : [])
       if (!filterFiles.has(name)) fs.rmSync(path.join(dataDir, name), { force: true });
     for (const [race, { path: route }] of Object.entries(RACE_PROFILES[source] || {}))
-      write(path.join(out, route, "index.html"), renderRaceProfile(data.inspects, source, race, {
+      write(path.join(out, route, "index.html"), withMarkdownAlternate(renderRaceProfile(data.inspects, source, race, {
         stylesheet: cssName, canonical: SITE_ORIGIN + route,
-      }));
+      }), route));
     for (const classFile of CLASS_PROFILES[source]?.classes || []) {
       const route = classRoute(source, classFile);
-      write(path.join(out, route, "index.html"), renderClassProfile(data.inspects, source, classFile, {
+      write(path.join(out, route, "index.html"), withMarkdownAlternate(renderClassProfile(data.inspects, source, classFile, {
         stylesheet: cssName, canonical: SITE_ORIGIN + route,
-      }));
+      }), route));
     }
     // Raw inspect records are rendered into pages, never published as a download.
     fs.rmSync(path.join(dir, "inspects.json"), { force: true });
@@ -230,6 +246,14 @@ async function main() {
     };
     console.log(`${source}: ${report.editions[source].censusCharacters} census characters, ` +
       `${data.snaps.length} auction datasets, ${data.inspects.records.length} inspections`);
+  }
+  // Stylesheets are content-hashed too; drop the previous builds'. Every edition
+  // links the current one (the --source check above guarantees it for untouched
+  // editions), so no page can still point at a removed file.
+  for (const source of Object.keys(EDITIONS)) {
+    const dir = outputDir(source);
+    for (const name of fs.existsSync(dir) ? fs.readdirSync(dir) : [])
+      if (/^style\.[0-9a-f]{12}\.css$/.test(name) && name !== cssName) fs.rmSync(path.join(dir, name), { force: true });
   }
   fs.cpSync(path.join(repo, "site/public/fonts"), path.join(out, "fonts"), { recursive: true, force: true });
   for (const name of ["favicon.ico", "favicon-96.png"])

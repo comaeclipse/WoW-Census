@@ -141,6 +141,7 @@ const GEAR_SCRIPT = `
  const filters=document.getElementById('gear-filters'), selects=[...filters.querySelectorAll('select')], content=document.getElementById('gear-content'), top=document.getElementById('gear-top');
  const load=loadFilterData(filters,content,packed=>({wowhead:packed.wowhead,records:unpackGearRecords(packed)}));
  const render=async()=>{
+  writeFilterUrl(selects);
   content.setAttribute('aria-busy','true');
   let data;try{data=await load();}catch{filterError(content);return;}
   const filtered=data.records.filter(r=>selects.every(s=>!s.value||String(r[s.dataset.field])===s.value));
@@ -148,4 +149,5 @@ const GEAR_SCRIPT = `
   content.removeAttribute('aria-busy');
  };
  for(const s of selects)s.addEventListener('change',render);
+ if(readFilterUrl(selects))render();
 })();`;

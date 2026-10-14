@@ -20,7 +20,8 @@ export function filterData(page, packed) {
 
 // Page script half of filterData: loads the records on first interest (pointer
 // over or focus into the filter row) and re-renders on each change. `unpack`
-// and `draw(records)` are the page's own functions.
+// and `draw(records)` are the page's own functions. The chosen filters live in
+// the query string (?class=mage&level=70), so a filtered view can be shared.
 export const FILTER_LOADER = `
  const loadFilterData=(filters,content,unpack)=>{
   let pending=null;
@@ -28,6 +29,9 @@ export const FILTER_LOADER = `
   for(const type of ['pointerover','focusin','touchstart'])filters.addEventListener(type,()=>load().catch(()=>{}),{once:true,passive:true});
   return load;
  };
+ const filterParam=s=>s.dataset.field==='classFile'?'class':s.dataset.field;
+ const readFilterUrl=selects=>{const q=new URLSearchParams(location.search);let set=false;for(const s of selects){const v=(q.get(filterParam(s))||'').toLowerCase(),o=v&&[...s.options].find(o=>o.value.toLowerCase()===v);if(o){s.value=o.value;set=true;}}return set;};
+ const writeFilterUrl=selects=>{const u=new URL(location.href);for(const s of selects)s.value?u.searchParams.set(filterParam(s),s.value.toLowerCase()):u.searchParams.delete(filterParam(s));history.replaceState(null,'',u.pathname+u.search+u.hash);};
  const filterError=content=>{content.removeAttribute('aria-busy');content.querySelector('.filter-error')?.remove();content.insertAdjacentHTML('afterbegin','<section class="panel filter-error"><p class="hint" style="margin:0">Filters could not load. Check your connection and try again.</p></section>');};`;
 
 // Search-facing labels always lead with "WoW" ("TBC Anniversary" -> "WoW TBC Anniversary").

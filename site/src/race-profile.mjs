@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { parseHTML } from "linkedom";
 import { CLASS_META } from "./census.mjs";
 import { SPEC_COLORS } from "./class-profile.mjs";
-import { PROFILE_GAMES, GAME_NAV, pageNav, talentsPath, MIN_SAMPLE, rootPrefix } from "./profile-games.mjs";
+import { PROFILE_GAMES, gameNav, pageNav, talentsPath, MIN_SAMPLE, rootPrefix } from "./profile-games.mjs";
 
 const template = fileURLToPath(new URL("./race-template.html", import.meta.url));
 // Races with their own profile page, per game, keyed by the race name in the
@@ -67,7 +67,7 @@ export function renderRaceProfile(inspects,game,race,opts){
   document.head.querySelector("style").insertAdjacentHTML("beforebegin",'<link rel="stylesheet" href="'+prefix+opts.stylesheet+'">');
   // Navigation comes from the game config, not the template's placeholder links.
   const links=(nav,items,current)=>{nav.innerHTML="";for(const [text,href] of items){const a=document.createElement("a");a.className="game";a.href=href;a.textContent=text;if(text===current)a.setAttribute("aria-current","true");nav.appendChild(a);}};
-  links(document.querySelector(".game-nav"),GAME_NAV,G.nav);
+  links(document.querySelector(".game-nav"),gameNav(g=>RACE_PROFILES[g]?.[race]?.path),G.nav);
   links(document.querySelector(".page-nav"),pageNav(game),"Talents");
   const crumbs=document.querySelectorAll(".breadcrumbs a");
   crumbs[0].href="/";crumbs[1].href=G.home;crumbs[1].textContent=G.nav;crumbs[2].href=talentsPath(game);

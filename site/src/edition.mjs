@@ -47,7 +47,8 @@ export function utcTimestamp(value) {
 }
 
 // The pages link to each other; the bundle has no Worker behind it, so the
-// header carries no crumb back to one.
+// header carries no crumb back to one. Every edition builds every page, so the
+// edition switcher keeps the visitor on the page they are reading.
 export function nav(source, current) {
   const edition = EDITIONS[source];
   const currentPage = current.replace(/\.html$/, "");
@@ -59,14 +60,14 @@ export function nav(source, current) {
     '<a' + (active ? ' aria-current="page"' : '') + ' href="' + href + '">' + label + '</a>';
   const mobileMenu = '<details class="mobile-menu"><summary aria-label="Open site menu"><span aria-hidden="true">☰</span> Menu</summary>' +
     '<div class="mobile-menu-panel"><div class="mobile-menu-label">Edition</div>' +
-    Object.entries(EDITIONS).map(([s, e]) => mobileLink(pagePath(s, "index"), e.nav, s === source)).join("") +
+    Object.entries(EDITIONS).map(([s, e]) => mobileLink(pagePath(s, currentPage), e.nav, s === source)).join("") +
     '<div class="mobile-menu-label">Explore ' + edition.nav + '</div>' +
     Object.entries({ index: "Census", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography", talents: "Talents", gear: "Gear" })
       .map(([page, label]) => mobileLink(pagePath(source, page), label, page === currentPage || (page === "index" && currentPage === "combos"))).join("") +
     '</div></details><div class="mobile-edition">' + edition.nav + ' <span>›</span> ' + pageLabels[currentPage] + '</div>';
   return {
     games: '<nav class="games game-nav">' +
-      Object.entries(EDITIONS).map(([s, e]) => item(pagePath(s, "index"), e.nav, s === source)).join("") + "</nav>" + mobileMenu,
+      Object.entries(EDITIONS).map(([s, e]) => item(pagePath(s, currentPage), e.nav, s === source)).join("") + "</nav>" + mobileMenu,
     pages: '<nav class="games page-nav">' +
     item(pagePath(source, "index"), "Census", currentPage === "index" || currentPage === "combos") +
       item(pagePath(source, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +

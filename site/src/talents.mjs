@@ -53,6 +53,7 @@ export function renderTalentsHtml(data, opts={}) {
   const seoGameLabel=seoLabel(opts.gameLabel||"WoW Forever");
   const topic=seoGameLabel+" Talent Builds & Popular Specs";
   const dataFile=talentData(data).file;
+  const classPaths=Object.fromEntries((opts.classTiles||[]).filter((p)=>p.path).map((p)=>[p.classFile,p.path]));
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     ${seoHead(topic+" – WoWCensus", seoGameLabel+" talent builds seen on inspected players: most common builds, talent tree point totals and selected talent popularity.", opts.canonical)}
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96"><link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
@@ -77,6 +78,7 @@ export function renderTalentsHtml(data, opts={}) {
     .talent-combo-table th:not(:first-child),.talent-combo-table td:not(:first-child){padding-left:6px;padding-right:6px}
     .talent-combo-table .combo-name{display:table-cell;text-align:left;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.4}
     .talent-combo-table .combo-name img{vertical-align:middle;margin-right:7px;flex:none}
+    .talent-combo-table .combo-name a{color:inherit;text-decoration:none}.talent-combo-table .combo-name a:hover,.talent-combo-table .combo-name a:focus-visible{text-decoration:underline}
     .talent-popularity-table{table-layout:auto}.talent-popularity-table td:nth-child(2){white-space:normal;text-overflow:clip}
     @media(max-width:1050px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
     @media(max-width:600px){.talent-filters label{flex:1 1 40%}.talent-filters select{max-width:100%;width:100%}.talent-filters .vsel-trigger{width:100%}
@@ -93,7 +95,7 @@ export function renderTalentsHtml(data, opts={}) {
       <img src="https://wow.zamimg.com/images/wow/icons/large/${esc(p.icon)}.jpg" alt="" width="56" height="56"><span>${esc(p.label)}</span>${p.path ? "</a>" : "</button>"}</li>`).join("")}</ul>
     <div class="talent-filters" id="talent-filters">${talentMarkup("filters", data.records)}</div>
     ${opts.classTiles?.some((p) => !p.path) ? `<p class="hint talent-summary" style="margin:12px 0 0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>` : ""}</section>
-    <div id="talent-content" aria-live="polite" data-src="${esc(dataFile)}">${talentMarkup("content", data.records)}</div>
+    <div id="talent-content" aria-live="polite" data-src="${esc(dataFile)}" data-class-paths="${esc(JSON.stringify(classPaths))}">${talentMarkup("content", data.records, classPaths)}</div>
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>
     <script>${TALENT_SCRIPT}</script>${SELECT_SCRIPT}</body></html>`;
 }
@@ -102,7 +104,9 @@ export function renderTalentsHtml(data, opts={}) {
 // layout shift, and again in the browser on each filter change: the page
 // script embeds this function's source, so the two renders cannot drift.
 // autocomplete="off" stops Back/reload restoring a filter over unfiltered content.
-function talentMarkup(part, records) {
+// `classPaths` maps a class to its talent page; a class + build row links to
+// that page's column for the build.
+function talentMarkup(part, records, classPaths={}) {
  const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const num=n=>n.toLocaleString('en-US');
  const classNames={WARRIOR:'Warrior',PALADIN:'Paladin',HUNTER:'Hunter',ROGUE:'Rogue',PRIEST:'Priest',SHAMAN:'Shaman',MAGE:'Mage',WARLOCK:'Warlock',DRUID:'Druid',MONK:'Monk',DEATHKNIGHT:'Death Knight',DEMONHUNTER:'Demon Hunter',EVOKER:'Evoker'};
@@ -123,7 +127,9 @@ function talentMarkup(part, records) {
   for(const r of members){const key=r.classFile+'\t'+r.classification;const group=combos.get(key)||{n:0,hybrid:false};group.n++;group.hybrid ||= !!r.hybrid;combos.set(key,group);}
   const body=[...combos].sort((a,b)=>b[1].n-a[1].n||a[0].localeCompare(b[0])).map(([key,n])=>{
    const [c,tree]=key.split('\t'),classTotal=members.filter(r=>r.classFile===c).length,share=(100*n.n/classTotal).toFixed(1);
-   return '<tr><td class="combo-name"><img src="'+iconRoot+'classicon_'+escape(c.toLowerCase())+'.jpg" alt="" loading="lazy">'+escape(cls(c))+' · '+escape(tree)+(n.hybrid?' Hybrid':'')+'</td><td>'+num(n.n)+'</td><td>'+share+'%</td></tr>';
+   const label='<img src="'+iconRoot+'classicon_'+escape(c.toLowerCase())+'.jpg" alt="" loading="lazy">'+escape(cls(c))+' · '+escape(tree)+(n.hybrid?' Hybrid':'');
+   const anchor=String(tree).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+   return '<tr><td class="combo-name">'+(classPaths[c]?'<a href="'+escape(classPaths[c]+'#'+anchor)+'">'+label+'</a>':label)+'</td><td>'+num(n.n)+'</td><td>'+share+'%</td></tr>';
   }).join('');
   return '<section class="panel combo-panel"><div class="ptitle">'+escape(faction)+' class + build</div>'+(members.length?'<div class="tablewrap"><table class="combo-table talent-combo-table"><thead><tr><th class="l">Combination</th><th>Players</th><th>%</th></tr></thead><tbody>'+body+'</tbody></table></div>':'')+'</section>';
  }).join('');
@@ -139,16 +145,19 @@ const TALENT_SCRIPT = `
  const filters=document.getElementById('talent-filters'), selects=[...filters.querySelectorAll('select')], content=document.getElementById('talent-content');
  const classSelect=filters.querySelector('select[data-field="classFile"]');
  const classTiles=[...document.querySelectorAll('.class-row button[data-class]')];
+ const classPaths=JSON.parse(content.dataset.classPaths||'{}');
  const syncClassTiles=()=>{for(const tile of classTiles)tile.setAttribute('aria-pressed',String(classSelect?.value===tile.dataset.class));};
  for(const tile of classTiles)tile.addEventListener('click',()=>{classSelect.value=classSelect.value===tile.dataset.class?'':tile.dataset.class;classSelect.dispatchEvent(new Event('change',{bubbles:true}));});
  classSelect?.addEventListener('change',syncClassTiles);
  syncClassTiles();
  const load=loadFilterData(filters,content,unpackTalentRecords);
  const render=async()=>{
+  writeFilterUrl(selects);
   content.setAttribute('aria-busy','true');
   let records;try{records=await load();}catch{filterError(content);return;}
-  content.innerHTML=talentMarkup('content',records.filter(r=>selects.every(s=>!s.value||String(r[s.dataset.field])===s.value)));
+  content.innerHTML=talentMarkup('content',records.filter(r=>selects.every(s=>!s.value||String(r[s.dataset.field])===s.value)),classPaths);
   content.removeAttribute('aria-busy');
  };
  for(const s of selects)s.addEventListener('change',render);
+ if(readFilterUrl(selects)){syncClassTiles();render();}
 })();`;
