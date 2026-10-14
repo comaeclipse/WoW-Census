@@ -139,14 +139,18 @@ function comboAnalysis(groups, flavorNote) {
     (leaders.length ? leaders.join("; ") + "." : "");
 }
 
-function comboBreakdown(groups) {
+function comboBreakdown(groups, raceProfiles = {}) {
   return groups.map((g) => {
     const rows = sortedEntries(g.combos || {}).map(([key, count]) => {
       const combo = comboLabel(key);
       const share = g.characters ? ((count / g.characters) * 100).toFixed(1) : "0.0";
-      return '<tr><td class="combo-name"><img src="' + esc(raceIcon(combo.race)) + '" alt="" loading="lazy">' +
-        '<img src="' + esc(classIcon(combo.token)) + '" alt="" loading="lazy">' + esc(combo.race) + " " + esc(combo.className) +
-        '</td><td>' + count.toLocaleString() + '</td><td>' + share + "%</td></tr>";
+      const racePath = raceProfiles[combo.race]?.path;
+      const raceName = racePath
+        ? '<a href="' + esc(racePath) + '">' + esc(combo.race) + '</a>'
+        : esc(combo.race);
+      return '<tr><td class="combo-name"><span class="combo-name-content"><img src="' + esc(raceIcon(combo.race)) + '" alt="" loading="lazy">' +
+        '<img src="' + esc(classIcon(combo.token)) + '" alt="" loading="lazy"><span class="combo-name-text">' + raceName + " " + esc(combo.className) +
+        '</span></span></td><td>' + count.toLocaleString() + '</td><td>' + share + "%</td></tr>";
     }).join("");
     return '<section class="panel combo-panel"><div class="ptitle">' + esc(g.faction) + ' race + class</div>' +
       '<p class="hint" style="margin-top:0">' + g.characters.toLocaleString() + ' observed characters, most common first.</p>' +
@@ -467,13 +471,12 @@ ${seoHead(topic + " – WoWCensus", seoGameLabel + " observed race and class com
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${esc(opts.stylesheet || "style.css")}">${CENSUS_STYLESHEET}
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
 <header class="ihead"><div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>${navigation.breadcrumbs || notes}</header>
 <div class="page-controls">${navigation.pages || ""}</div>
-<section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div><p class="hint combo-analysis" style="margin:0">${esc(comboAnalysis(groups, opts.flavorNote))}</p></section>
-<div class="combo-breakdown">${comboBreakdown(groups)}</div>${generatedNote}
+<section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div>${(opts.analysisText || comboAnalysis(groups, opts.flavorNote)).split(/\n\s*\n/).map((paragraph) => `<p class="hint combo-analysis" style="margin:0 0 12px">${esc(paragraph)}</p>`).join("")}</section>
+<div class="combo-breakdown">${comboBreakdown(groups, opts.raceProfiles)}</div>${generatedNote}
 </div></body></html>`;
 }
 
@@ -517,7 +520,7 @@ ${CENSUS_STYLESHEET}
 <div class="crt" aria-hidden="true"></div>
 <div class="wrap">
   <header class="ihead">
-    <div class="page-heading">${pageHeading(heading, navigation, topic)}${navigation.games || ""}</div>
+    <div class="page-heading">${pageHeading(heading, navigation, opts.headingTopic || topic)}${navigation.games || ""}</div>
     ${navigation.breadcrumbs || notes}
   </header>
   <main>

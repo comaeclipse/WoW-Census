@@ -92,7 +92,6 @@ export function renderRaceProfile(inspects,game,race,opts){
     if(first){const topBuild=document.createElement("strong");topBuild.textContent=first.s;intro.appendChild(document.createTextNode(", with "));intro.appendChild(topBuild);intro.appendChild(document.createTextNode(" leading among identified builds."));}
     else intro.appendChild(document.createTextNode(". No identified builds are available in this sample."));
   }else intro.textContent="No "+label+" inspections with readable talents are available in this snapshot.";
-  hero.querySelector(".fresh").innerHTML='<span class="tag">Latest inspection '+(D.lastT?new Date(D.lastT*1000).toISOString().slice(0,16).replace("T"," ")+"Z":"unavailable")+'</span><span class="tag ghost">Last '+D.windowDays+' days · all realms</span>';
   hero.querySelector(".bignum b").textContent=D.n.toLocaleString("en-US");
   hero.querySelector(".bignum small").textContent=plural+" with talents";
   const tiles=document.querySelectorAll(".tile");

@@ -4,8 +4,13 @@
 export const PROFILE_GAMES = {
   "classic-beta": { dir: "forever", home: "/", nav: "Forever", gameLabel: "WoW Forever" },
   "classic-progression": { dir: "tbc", home: "/tbc/", nav: "TBC Anniversary", gameLabel: "TBC Anniversary" },
+  classic: { dir: "classic", home: "/classic/", nav: "Classic Era", gameLabel: "Classic Era" },
+  sod: { dir: "sod", home: "/sod/", nav: "SoD", gameLabel: "Season of Discovery" },
+  hardcore: { dir: "hardcore", home: "/hardcore/", nav: "Hardcore", gameLabel: "Classic Hardcore" },
+  "mop-classic": { dir: "mop", home: "/mop/", nav: "MoP Classic", gameLabel: "Mists of Pandaria Classic" },
+  retail: { dir: "retail", home: "/retail/", nav: "Retail", gameLabel: "Retail" },
 };
-export const GAME_NAV = [["Forever", "/"], ["TBC Anniversary", "/tbc/"], ["Classic Era", "/classic/"], ["SoD", "/sod/"], ["MoP Classic", "/mop/"], ["Retail", "/retail/"]];
+export const GAME_NAV = [["Forever", "/"], ["TBC Anniversary", "/tbc/"], ["Classic Era", "/classic/"], ["SoD", "/sod/"], ["Hardcore", "/hardcore/"], ["MoP Classic", "/mop/"], ["Retail", "/retail/"]];
 const PAGE_NAV = [["Census", ""], ["Auction House", "auctionhouse"], ["Guilds", "guilds"], ["Geography", "geography"], ["Talents", "talents"], ["Gear", "gear"]];
 export const pageNav = (source) => PAGE_NAV.map(([label, page]) => [label, PROFILE_GAMES[source].home + page]);
 export const talentsPath = (source) => PROFILE_GAMES[source].home + "talents";

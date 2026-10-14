@@ -45,15 +45,16 @@ Four faces, each with one job. Never swap their roles.
 | Press Start 2P | `--pixel` | chrome: nav buttons, chips, table headers, tile labels, panel titles, breadcrumbs, tags. Always uppercase, `letter-spacing:1px`, 7-11px (logo 30px, tile values 13-16px) |
 | VT323 | `--term` | body and data: table cells, stats, legends, inputs. 20px base (15-18px for secondary) |
 | Cinzel 800 | `"Cinzel"` | the H1 (`.iname`) only |
-| Friz Quadrata | `"Friz Quadrata Web"` | prose: analysis and summary paragraphs (`.combo-analysis`, `.talent-summary`) |
+| Friz Quadrata | `"Friz Quadrata Web"` | prose: talent summary paragraphs (`.talent-summary`) |
 
 - No new font families and no third-party font hosts. Fonts are self-hosted in
   `/fonts/` with their OFL licence next to them.
+- Race and class combination paragraphs use the terminal face in sentence case.
 - Every face uses `font-display:optional`, ships as woff2, and is preloaded on
   the pages that use it, so the layout never shifts when a font arrives
   (commit b680543; Cinzel and Friz Quadrata followed on 2026-10-02). Pixel,
   terminal and Cinzel are preloaded on every page; Friz Quadrata only on the
-  prose pages (combos, talents).
+  talent summary pages.
 - Don't shrink type inside one table to make it fit; widen the column or let it
   wrap. Talent tables regressed this way once (fixed in a136eb2).
 - Numbers in tables use `font-variant-numeric:tabular-nums` and align right;

@@ -8,6 +8,7 @@ import { renderGeographyHtml } from "./geography.mjs";
 import { renderTalentsHtml, renderInspectCoverage, talentData } from "./talents.mjs";
 import { renderGearHtml, gearData } from "./gear.mjs";
 import { CLASS_PROFILES, classRoute } from "./class-profile.mjs";
+import { RACE_PROFILES } from "./race-profile.mjs";
 
 export const SITE_ORIGIN = "https://wowcensus.io";
 export const PAGES = ["index", "combos", "auctionhouse", "guilds", "geography", "talents", "gear"];
@@ -17,7 +18,10 @@ export const EDITIONS = {
   "classic-progression": { dir: "tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc", comboBlurb: "TBC Anniversary’s smaller era roster makes race and class choices a direct view of the currently visible progression community." },
   classic: { dir: "classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic", comboBlurb: "Classic Era keeps the original-era roster, so the mix reflects the characters currently active in its long-lived realms rather than modern class availability." },
   sod: { dir: "sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic", comboBlurb: "Season of Discovery class balance and player activity can shift sharply between phases, so treat the mix as a current activity signal rather than a durable meta ranking." },
-  "mop-classic": { dir: "mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", flavor: "mop-classic", branch: "mop-classic", comboBlurb: "MoP Classic includes its era-specific roster and progression, so the mix captures who is visibly active during this phase rather than a prediction of endgame demand." },
+  hardcore: { dir: "hardcore", label: "Classic Hardcore", nav: "Hardcore", flavor: "hardcore", branch: "classic", comboBlurb: "Hardcore's one-life rules shape who appears in each sample. These are observed characters from in-game scans, not a count of active accounts." },
+  "mop-classic": { dir: "mop", label: "Mists of Pandaria Classic", nav: "MoP Classic", flavor: "mop-classic", branch: "mop-classic", connectedMarket: true, comboAnalysisText: `Human and Blood Elf Paladins remain the most common race/class combinations, while Hunters lead overall across both factions. Compared with TBC Anniversary, MoP's population is spread more evenly across character choices, with Monks adding variety without overtaking the established favorites.
+
+Activity spans both endgame and leveling content: Siege of Orgrimmar leads individual locations, but leveling areas collectively account for slightly more recent character sightings than endgame areas.` },
   retail: { dir: "retail", label: "Retail", nav: "Retail", flavor: "retail", branch: "", factionlessMarket: true, marketMetric: "quantity", comboBlurb: "Retail’s broad modern roster and cross-faction play make this a view of the current population mix." },
 };
 
@@ -175,14 +179,16 @@ export async function fetchEditionData(source, getJson, { items = true } = {}) {
 export function buildEditionModels(source, { inspects, census, games, snaps }) {
   const edition = EDITIONS[source];
   const snapshotOf = (from, fallbackRealms) => {
-    // Retail's commodity auction house is regional and cross-realm. Multiple
-    // realm uploads are repeated captures of the same market, not independent
-    // inventories that can be added together. Use the newest capture for the
-    // aggregate view; the realm chips still expose each capture separately.
+    // Connected scan origins can capture the same inventory. Retail is one
+    // regional market; MoP has separate Alliance and Horde markets.
+    const newest = (captures) => captures.reduce((latest, snap) =>
+      String(snap.updatedAt || "") > String(latest.updatedAt || "") ? snap : latest);
     const selected = edition.factionlessMarket && from.length > 1
-      ? [from.reduce((latest, snap) =>
-          String(snap.updatedAt || "") > String(latest.updatedAt || "") ? snap : latest)]
-      : from;
+      ? [newest(from)]
+      : edition.connectedMarket && from.length > 1
+        ? [...new Set(from.map((snap) => snap.faction))].map((faction) =>
+            newest(from.filter((snap) => snap.faction === faction)))
+        : from;
     return {
       items: mergeItems(selected),
       realms: selected.length ? selected.map((s2) => s2.realm) : fallbackRealms,
@@ -200,8 +206,8 @@ export function buildEditionModels(source, { inspects, census, games, snaps }) {
   const realmNames = [...new Set(betaRealms.map((r) => r.replace(/-(Alliance|Horde)$/, "")))].sort();
   const marketRealmLabels = realmLabels(realmNames);
   const dims = {
-    realm: [{ key: "all", label: edition.factionlessMarket ? "Latest regional scan" : "All realms" }]
-      .concat(realmNames.map((r) => ({ key: r, label: marketRealmLabels.get(r) }))),
+    realm: [{ key: "all", label: edition.factionlessMarket ? "Latest regional scan" : edition.connectedMarket ? "Connected group" : "All realms" }]
+      .concat(realmNames.map((r) => ({ key: r, label: marketRealmLabels.get(r) + (edition.connectedMarket ? " scan" : "") }))),
     faction: [{ key: "all", label: "Both" }].concat(factions.map((f) => ({ key: f, label: f }))),
   };
   // Retail auction houses are cross-faction. Population and guild census data
@@ -209,7 +215,9 @@ export function buildEditionModels(source, { inspects, census, games, snaps }) {
   // split that Blizzard's Retail API does not provide.
   const marketDims = edition.factionlessMarket
     ? { realm: dims.realm, faction: [{ key: "all", label: "Cross-faction" }] }
-    : dims;
+    : edition.connectedMarket
+      ? { realm: [{ ...dims.realm[0], label: "Latest connected scan" }, ...dims.realm.slice(1)], faction: dims.faction }
+      : dims;
   const marketViews = [];
   for (const r of marketDims.realm) {
     for (const f of marketDims.faction) {
@@ -275,10 +283,10 @@ export function buildEditionModels(source, { inspects, census, games, snaps }) {
   });
   const censusRealmLabels = realmLabels(censusRealms);
   const censusViews = censusUnits.length
-    ? [censusView("all", "All realms", censusUnits)].concat(
+    ? [censusView("all", edition.connectedMarket ? "Connected group" : "All realms", censusUnits)].concat(
         censusRealms.map((r) =>
-          censusView(r, censusRealmLabels.get(r), censusUnits.filter((u) => u.realm === r))))
-    : [{ key: "all", label: "All realms", census }];
+          censusView(r, censusRealmLabels.get(r) + (edition.connectedMarket ? " scan" : ""), censusUnits.filter((u) => u.realm === r))))
+    : [{ key: "all", label: edition.connectedMarket ? "Connected group" : "All realms", census }];
 
   return {
     index: { censusViews, lastT: census.lastT, inspect: { coverage: inspects.coverage, lastT: inspects.lastT } },
@@ -305,7 +313,10 @@ export function renderEditionData(source, page, model) {
 export function renderEditionPage(source, page, model, { stylesheet, generatedAt }) {
   const edition = EDITIONS[source];
   const generatedNote = "Page generated: " + utcTimestamp(generatedAt);
-  const common = { stylesheet, nav: nav(source, page + ".html"), generatedNote, gameLabel: edition.label,
+  const navigation = nav(source, page + ".html");
+  if (edition.connectedMarket) navigation.breadcrumbs +=
+    '<p class="hint">Galakras and Nazgrim tabs show scan origins within the Pagle connected group. Shared character identities count once; the auction overview uses the newest scan per faction.</p>';
+  const common = { stylesheet, nav: navigation, generatedNote, gameLabel: edition.label,
     canonical: SITE_ORIGIN + pagePath(source, page) };
   switch (page) {
     case "index":
@@ -317,10 +328,12 @@ export function renderEditionPage(source, page, model, { stylesheet, generatedAt
         notes: ["Latest census observation: " + utcTimestamp(model.lastT)],
         uploadFlavor: edition.flavor,
         title: edition.title, description: edition.description,
+        headingTopic: source === "mop-classic" ? "MoP Classic" : undefined,
       });
     case "combos":
       return renderComboBreakdownHtml(model.census, {
         ...common, notes: ["Latest census observation: " + utcTimestamp(model.lastT)], flavorNote: edition.comboBlurb,
+        analysisText: edition.comboAnalysisText, raceProfiles: RACE_PROFILES[source],
       });
     case "auctionhouse": {
       const first = model.views[0];
@@ -333,9 +346,17 @@ export function renderEditionPage(source, page, model, { stylesheet, generatedAt
       return renderGuildHtml(model.views, model.dims, { ...common, notes: ["Latest census observation: " + utcTimestamp(model.lastT)] });
     case "geography":
       return renderGeographyHtml(model.views, model.dims, { ...common, notes: ["Latest location observation: " + utcTimestamp(model.lastT)] });
-    case "talents":
+    case "talents": {
+      const observedClasses = new Set(model.inspects.records.map((record) => record.classFile));
+      const profileClasses = CLASS_PROFILES[source]?.classes;
+      const classicOrder = CLASS_PROFILES["classic-beta"].classes;
+      const classes = profileClasses || [...classicOrder, ...Object.keys(CLASS_META).filter((cf) => !classicOrder.includes(cf))]
+        .filter((cf) => observedClasses.has(cf));
       return renderTalentsHtml(model.inspects, { ...common,
-        classProfiles: (CLASS_PROFILES[source]?.classes || []).map((cf) => ({ label: CLASS_META[cf]?.[0] || cf, path: classRoute(source, cf), color: "#" + (CLASS_META[cf]?.[1] || "ffce43"), icon: "classicon_" + cf.toLowerCase() })) });
+        classTiles: classes.map((cf) => ({ classFile: cf, label: CLASS_META[cf]?.[0] || cf,
+          path: profileClasses ? classRoute(source, cf) : null,
+          color: "#" + (CLASS_META[cf]?.[1] || "ffce43"), icon: "classicon_" + cf.toLowerCase() })) });
+    }
     case "gear":
       return renderGearHtml(model.inspects, { ...common, branch: edition.branch });
   }

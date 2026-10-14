@@ -271,7 +271,7 @@ to keep `SavedVariables` small.
 The website is generated locally from a verified SQLite snapshot. New data is
 collected in WoW and saved to `MarketLens.lua` and `NameplateInspect.lua`.
 `tools/refresh-local-static.py` merges those files with the historical D1
-snapshot, then renders all six editions. `tools/local-site-data.mjs` runs
+snapshot, then renders all seven editions. `tools/local-site-data.mjs` runs
 read-only SQLite queries during the build; no site Worker or live API is used.
 
 ### Static site (`static/` -> wowcensus.io)
@@ -327,5 +327,5 @@ updates navigation/sitemap/discovery, and adds inspect coverage to census pages.
 Talent popularity uses unique players with readable node data within each filtered
 class; string-only builds are explicitly excluded. These nearby samples are not
 population-wide spec shares. Run `node --test tools/test-inspects.mjs` for identity,
-classification, validation, replay/history and HTML escaping checks. Rebuild all six
+classification, validation, replay/history and HTML escaping checks. Rebuild all seven
 editions and deploy the verified `static/` directory.

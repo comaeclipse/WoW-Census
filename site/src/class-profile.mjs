@@ -5,7 +5,11 @@ import { PROFILE_GAMES, GAME_NAV, pageNav, talentsPath, MIN_SAMPLE, rootPrefix }
 
 // Class talent pages, one column per talent tree, for every game in PROFILE_GAMES.
 const CLASSES = ["PALADIN", "WARRIOR", "DRUID", "HUNTER", "SHAMAN", "PRIEST", "ROGUE", "MAGE", "WARLOCK"];
-export const CLASS_PROFILES = Object.fromEntries(Object.entries(PROFILE_GAMES).map(([source, game]) => [source, { ...game, classes: CLASSES }]));
+const MODERN_CLASSES = [...CLASSES, "DEATHKNIGHT", "MONK"];
+export const CLASS_PROFILES = Object.fromEntries(Object.entries(PROFILE_GAMES).map(([source, game]) => [source, {
+  ...game, classes: source === "retail" ? [...MODERN_CLASSES, "DEMONHUNTER", "EVOKER"]
+    : source === "mop-classic" ? MODERN_CLASSES : CLASSES,
+}]));
 // Trees in the game's own order, with the icon and spec color each tree uses.
 const CLASS_TREES = {
   PALADIN: [["Holy", "spell_holy_holybolt", "#eeb138"], ["Protection", "spell_holy_devotionaura", "#4c9ddb"], ["Retribution", "spell_holy_auraoflight", "#a96be0"]],
@@ -17,6 +21,15 @@ const CLASS_TREES = {
   MAGE: [["Arcane", "spell_holy_magicalsentry", "#b06be0"], ["Fire", "spell_fire_firebolt02", "#e0763a"], ["Frost", "spell_frost_frostbolt02", "#5fb0f0"]],
   WARLOCK: [["Affliction", "spell_shadow_deathcoil", "#84d84e"], ["Demonology", "spell_shadow_metamorphosis", "#8a63c9"], ["Destruction", "spell_shadow_rainoffire", "#e0763a"]],
   WARRIOR: [["Arms", "ability_warrior_savageblow", "#e0524a"], ["Fury", "ability_warrior_innerrage", "#eeac38"], ["Protection", "inv_shield_06", "#539ad4"]],
+  DEATHKNIGHT: [["Blood", "classicon_deathknight", "#bd3949"], ["Frost", "classicon_deathknight", "#5fb0f0"], ["Unholy", "classicon_deathknight", "#84d84e"]],
+  MONK: [["Brewmaster", "classicon_monk", "#eeb138"], ["Windwalker", "classicon_monk", "#5fbf5f"], ["Mistweaver", "classicon_monk", "#5fb0f0"]],
+  DEMONHUNTER: [["Havoc", "classicon_demonhunter", "#a96be0"], ["Vengeance", "classicon_demonhunter", "#e0524a"]],
+  EVOKER: [["Devastation", "classicon_evoker", "#e0763a"], ["Preservation", "classicon_evoker", "#5fbf5f"], ["Augmentation", "classicon_evoker", "#a96be0"]],
+};
+const MODERN_TREES = {
+  ...Object.fromEntries(Object.entries(CLASS_TREES).map(([cf, trees]) => [cf, trees.map(([name]) => name)])),
+  DRUID: ["Balance", "Feral", "Guardian", "Restoration"],
+  ROGUE: ["Assassination", "Outlaw", "Subtlety"],
 };
 // "Spec:CLASS" -> color, shared with the race profiles.
 export const SPEC_COLORS = Object.fromEntries(Object.entries(CLASS_TREES).flatMap(([cf, trees]) => trees.map(([t, , c]) => [t + ":" + cf, c])));
@@ -33,22 +46,26 @@ const pct = (a, b) => (b ? Math.round(100 * a / b) : 0);
 // every talent of that tree seen on any player of the class by how many of
 // those players selected it. Hybrids (points across trees) and unknown builds
 // (a talent no tree claims) count in the split, not in a column.
-export function classProfile(inspects, classFile) {
-  const rows = (inspects.records || []).filter((r) => r.classFile === classFile && r.talents?.length);
-  const known = CLASS_TREES[classFile]?.map(([t]) => t) ||
+export function classProfile(inspects, classFile, source = "classic-beta") {
+  const modern = source === "retail" || source === "mop-classic";
+  const rows = (inspects.records || []).filter((r) => r.classFile === classFile && (modern ? r.classification && r.classification !== "Unknown build" : r.talents?.length));
+  const known = (modern ? (source === "mop-classic" && classFile === "ROGUE" ? ["Assassination", "Combat", "Subtlety"] : MODERN_TREES[classFile]) : CLASS_TREES[classFile]?.map(([t]) => t)) ||
     [...new Set(rows.flatMap((r) => r.talents.map((t) => t.branch)).filter(Boolean))].sort();
   const nodes = new Map();
-  for (const r of rows) for (const t of r.talents)
-    if (!nodes.has(t.node)) nodes.set(t.node, { name: t.name, max: t.max, icon: t.icon || "inv_misc_questionmark", tree: t.branch });
+  for (const r of rows) for (const t of r.talents || []) {
+    const tree = modern ? r.classification : t.branch;
+    const key = modern ? `${tree}:${t.node}` : t.node;
+    if (!nodes.has(key)) nodes.set(key, { name: t.name, max: t.max, icon: t.icon || "inv_misc_questionmark", tree });
+  }
   const trees = known.map((tree) => {
     const members = rows.filter((r) => r.classification === tree), picks = new Map();
-    for (const r of members) for (const t of new Map(r.talents.map((t) => [t.node, t])).values()) {
-      if (t.branch !== tree) continue;
+    for (const r of members) for (const t of new Map((r.talents || []).map((t) => [t.node, t])).values()) {
+      if (!modern && t.branch !== tree) continue;
       const v = picks.get(t.node) || { n: 0, ranks: 0 };
       v.n++; v.ranks += t.rank || 0; picks.set(t.node, v);
     }
     const talents = [...nodes].filter(([, t]) => t.tree === tree).map(([node, t]) => {
-      const p = picks.get(node) || { n: 0, ranks: 0 };
+      const p = picks.get(modern ? Number(String(node).split(":").pop()) : node) || { n: 0, ranks: 0 };
       return { name: t.name, icon: t.icon, max: t.max, n: p.n, pct: pct(p.n, members.length), avgRank: p.n ? +(p.ranks / p.n).toFixed(1) : 0 };
     }).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name));
     return { tree, n: members.length, medLv: med(members.map((r) => r.level)), talents };
@@ -79,7 +96,6 @@ const CLASS_STYLE = `
 .ranks li:nth-child(-n+3) .rank{background:var(--gold);color:#161018;border-color:var(--shadow);box-shadow:2px 2px 0 var(--shadow)}
 .ranks img{width:30px;height:30px;border:2px solid #b99b55;box-shadow:2px 2px 0 var(--shadow);background:#111;display:block}
 .ranks .tt b{display:block;font-weight:400;font-size:19px;line-height:1.05}
-.ranks .meta{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:16px;color:var(--muted)}
 .ranks li.none{opacity:.5}
 .speccol .card-h .cn{white-space:nowrap}
 .specbar{height:22px}
@@ -89,7 +105,7 @@ const CLASS_STYLE = `
 @media (max-width:960px){.speccols{grid-template-columns:minmax(0,1fr)}}`;
 
 export function renderClassProfile(inspects, source, classFile, opts) {
-  const P = CLASS_PROFILES[source], D = classProfile(inspects, classFile);
+  const P = CLASS_PROFILES[source], D = classProfile(inspects, classFile, source);
   const route = classRoute(source, classFile), prefix = rootPrefix(route);
   const icon = (n) => prefix + "assets/images/wow/icons/large/" + n + ".jpg";
   const treeColor = (i) => CLASS_TREES[classFile]?.[i]?.[2] || ["var(--gold)", "var(--blue)", "var(--green)"][i] || "var(--gold)";
@@ -97,7 +113,8 @@ export function renderClassProfile(inspects, source, classFile, opts) {
   const plural = className + "s", title = `${P.gameLabel} ${className} Talents – WoWCensus`;
   const ranked = [...D.trees].sort((a, b) => b.n - a.n);
   const named = (t) => `<strong>${esc(t.tree)}</strong> (${pct(t.n, D.n)}%)`;
-  const intro = !D.n ? `No ${esc(className)} inspections with readable talents are available in this snapshot.`
+  const modern = source === "retail" || source === "mop-classic";
+  const intro = !D.n ? `No ${esc(className)} inspections with ${modern ? "a recognized specialization" : "readable talents"} are available in this snapshot.`
     : `Among ${esc(plural)} we've inspected, ${named(ranked[0])} is the most common build, followed by ${ranked.slice(1).filter((t) => t.n).map(named).join(" and ") || "no other single-tree build"}.`;
   const seg = D.trees.map((t, i) => t.n ? `<i style="background:${treeColor(i)};flex:${t.n}" title="${esc(t.tree)} ${t.n}"></i>` : "").join("") +
     (D.hybrid ? `<i class="th" style="flex:${D.hybrid}" title="Hybrid ${D.hybrid}"></i>` : "") +
@@ -107,14 +124,13 @@ export function renderClassProfile(inspects, source, classFile, opts) {
     (D.unknown ? `<span style="--c:var(--muted)"><b>Unknown</b> ${D.unknown} · ${pct(D.unknown, D.n)}%</span>` : "");
   const column = (t, i) => {
     const rows = t.talents.map((x, k) => {
-      const on = Math.round(x.avgRank);
-      const pips = Array.from({ length: x.max }, (_, j) => `<i${j < on ? ' class="on"' : ""}></i>`).join("");
       return `<li${x.n ? "" : ' class="none"'}><span class="rank">${k + 1}</span><img src="${esc(icon(x.icon))}" alt="" width="30" height="30" loading="lazy">` +
-        `<span class="tt"><b>${esc(x.name)}</b><span class="meta"><span class="pips" title="Average rank ${x.avgRank} of ${x.max}">${pips}</span></span></span>` +
+        `<span class="tt"><b>${esc(x.name)}</b></span>` +
         `<span class="pick"><b>${x.pct}%</b><div class="mini"><i style="width:${x.pct}%"></i></div></span></li>`;
     }).join("");
     const body = !t.n ? `<p class="colnote">No ${esc(t.tree)} ${esc(plural)} in this sample.</p>`
-      : t.n < MIN_SAMPLE ? `<p class="colnote">Not enough data yet to rank talents.</p>` : `<ol class="ranks">${rows}</ol>`;
+      : !t.talents.length ? `<p class="colnote">No readable talent selections for this spec.</p>`
+      : t.n < MIN_SAMPLE ? `<p class="colnote">Not enough data yet to rank talents (${t.n} inspected; minimum ${MIN_SAMPLE}).</p>` : `<ol class="ranks">${rows}</ol>`;
     return `<article class="card speccol" data-tree="${esc(t.tree)}" style="--c:${treeColor(i)}">` +
       `<div class="card-h"><img src="${esc(icon(CLASS_TREES[classFile]?.[i]?.[1] || "classicon_" + classFile.toLowerCase()))}" alt="" width="40" height="40"><h4>${esc(t.tree)}</h4>` +
       `<div class="cn" title="${t.n} players"><b>${t.n}</b>${pct(t.n, D.n)}%</div></div>` +
@@ -146,9 +162,8 @@ ${fonts.map((f) => `<link rel="preload" href="${prefix}fonts/${f}.woff2" as="fon
   <div>
     <h2>${esc(className)} <span>talents</span></h2>
     <p>${intro}</p>
-    <div class="fresh"><span class="tag">Latest inspection ${D.lastT ? new Date(D.lastT * 1000).toISOString().slice(0, 16).replace("T", " ") + "Z" : "unavailable"}</span><span class="tag ghost">Last ${esc(D.windowDays)} days · all realms</span></div>
   </div>
-  <div class="bignum"><b>${D.n.toLocaleString("en-US")}</b><small>${esc(plural)} with talents</small></div>
+  <div class="bignum"><b>${D.n.toLocaleString("en-US")}</b><small>${esc(plural)} with ${modern ? "known specs" : "talents"}</small></div>
 </section>
 <section class="panel split">
   <div class="ptitle">Spec split</div>

@@ -67,7 +67,7 @@ rule would not match them), immutable caching for fingerprinted CSS and fonts,
 and five minutes for JSON. Cloudflare Pages ignores rules past the 100th, so the
 build fails if the page count would exceed that.
 
-The six WoWCensus edition pages are pre-rendered. The old worker's item browser
+The seven WoWCensus editions are pre-rendered. The old worker's item browser
 (`/item/<slug>`, `/seller/<slug>`) has no static equivalent. Admin imports remain
 a local build step and cannot be submitted to the static site.
 

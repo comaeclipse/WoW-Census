@@ -27,7 +27,8 @@ a{color:var(--blue)}
 .iname{font-family:"Cinzel",Georgia,serif;font-size:32px;font-weight:800;letter-spacing:1px;color:var(--gold);margin:0 0 10px;line-height:1.2;text-shadow:2px 2px 0 var(--shadow)}
 .iname .itopic{display:block;margin-top:6px;font-family:var(--pixel);font-size:9px;font-weight:400;letter-spacing:1px;line-height:1.6;text-transform:uppercase;color:var(--muted);text-shadow:none}
 .games{display:flex;gap:8px;flex-wrap:wrap}
-.game-nav{justify-content:flex-end;margin:0 0 10px auto}
+.game-nav{justify-content:flex-end;flex-wrap:nowrap;gap:6px;margin:0 0 10px auto}
+.game-nav .game{padding-inline:7px;white-space:nowrap}
 .game,.chip{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);padding:8px 10px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
 .game:hover,.chip:hover{border-color:var(--gold)}
 .game[aria-current="true"],.chip[aria-pressed="true"],.page-controls .chip[aria-current="page"]{background:var(--gold);color:#161018;border-color:var(--gold)}
@@ -142,6 +143,7 @@ a{color:var(--blue)}
 .card[hidden]{display:none}
 .colnote{margin:0;padding:12px 0 4px;font-size:17px;color:var(--muted)}
 
+@media (min-width:761px) and (max-width:1160px){.page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}}
 @media (max-width:760px){
   .page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}
   .page-controls{display:block}.page-controls .race-filter{margin-top:12px}.race-filter .chips{display:contents}
@@ -211,7 +213,6 @@ a{color:var(--blue)}
   <div>
     <h2>{{RACE}} <span>builds</span></h2>
     <p>Dwarves seen nearby on Forever are mostly Shamans, and three in four of those run Enhancement. Paladins split between Protection and Retribution, and Hunters lean Beast Mastery. This is an inspected sample, not every Dwarf on the realm.</p>
-    <div class="fresh"><span class="tag">Latest inspection 2026-10-05 23:33Z</span><span class="tag ghost">Last 14 days · all realms</span></div>
   </div>
   <div class="bignum"><b>425</b><small>{{RACES}} inspected</small></div>
 </section>

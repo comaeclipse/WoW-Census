@@ -37,10 +37,10 @@
   .comboname{font-family:var(--pixel);font-size:11px;line-height:1.5;color:var(--ink);margin-bottom:5px}
   .combostat{color:var(--muted);font-size:17px}
   @font-face{font-family:"Friz Quadrata Web";src:url("/fonts/friz-quadrata-regular.woff2") format("woff2");font-style:normal;font-weight:400;font-display:optional}
-  .combo-analysis{font-family:"Friz Quadrata Web","Friz Quadrata","Friz Quadrata Std","Fritz Quadrata","Cinzel",Georgia,serif;font-size:17px;letter-spacing:.025em;line-height:1.55;color:var(--ink)}
+  .combo-analysis,.combo-panel > .hint{font-family:var(--term);font-size:20px;letter-spacing:0;line-height:1.45;text-transform:none;color:var(--ink)}
   .combo-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
   .combo-panel{margin:0}.combo-table{min-width:0}.combo-table th,.combo-table td{width:auto}.combo-table th:nth-child(1),.combo-table td:nth-child(1){width:64%}
-  .combo-name{display:flex;align-items:center;gap:7px}.combo-name img{width:24px;height:24px;border:2px solid #b99b55;box-shadow:1px 1px 0 #000;background:#111}
+  .combo-name{text-align:left;white-space:normal;text-overflow:clip}.combo-name-content{display:flex;align-items:center;gap:7px}.combo-name-text{min-width:0;overflow-wrap:anywhere}.combo-name img{width:24px;height:24px;flex:none;border:2px solid #b99b55;box-shadow:1px 1px 0 #000;background:#111}
   @media (max-width:760px){.combogrid{grid-template-columns:1fr}}
   @media (max-width:760px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
   @media (max-width:420px){.combocard{padding:10px 12px;gap:11px}.comboicons{min-width:74px}

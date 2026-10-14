@@ -14,7 +14,9 @@ let selected = 0;
 let rejected = 0;
 for (const [guid, data] of Object.entries(db)) {
   if (!/^Player-/.test(guid) || !data || typeof data !== "object") continue;
-  const flavor = data.flavor ? sourceByFlavor[data.flavor] || data.flavor : "classic-beta";
+  const realm = String(data.realm || data.observerRealm || "");
+  const flavor = data.flavor === "classic-era" && /^Doomhowl(?:$|-)/i.test(realm)
+    ? "hardcore" : data.flavor ? sourceByFlavor[data.flavor] || data.flavor : "classic-beta";
   if (flavor !== source) continue;
   selected++;
   const raw = { guid, ...data, list: Object.values(data.list || {}).map(t => ({

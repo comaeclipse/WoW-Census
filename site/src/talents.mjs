@@ -64,9 +64,11 @@ export function renderTalentsHtml(data, opts={}) {
     .talent-filters{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}.talent-filters label{display:grid;gap:5px;font-size:17px;color:var(--muted)}
     .talent-filters select{color:var(--ink);background:var(--panel2);border:2px solid var(--line);font-family:var(--term);font-size:18px;padding:6px 10px;max-width:230px}
     .class-row{display:flex;justify-content:space-between;gap:8px;margin:4px 0 8px;list-style:none;padding:0}.class-row li{flex:1 1 0;min-width:0}
-    .class-row a{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 2px;text-decoration:none;color:var(--c)}
+    .class-row a,.class-row button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 2px;text-decoration:none;color:var(--c);background:none;border:0;font:inherit;cursor:pointer}
     .class-row img{width:56px;height:56px;border:3px solid var(--c);box-shadow:3px 3px 0 #000}.class-row span{font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-align:center}
-    .class-row a:hover img,.class-row a:focus-visible img{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #000}.class-row a:hover span{text-decoration:underline}
+    .class-row a:hover img,.class-row a:focus-visible img,.class-row button:hover img,.class-row button:focus-visible img{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #000}
+    .class-row button[aria-pressed="true"] img{outline:3px solid var(--gold);outline-offset:3px}
+    .class-row a:hover span,.class-row button:hover span{text-decoration:underline}
     @media(max-width:720px){.class-row{flex-wrap:wrap;justify-content:center}.class-row li{flex:0 0 calc(20% - 8px)}.class-row img{width:44px;height:44px}.class-row span{font-size:11px}}
     .talent-section{margin-top:22px}.talent-empty{margin:0}
     .talent-combo-table{min-width:0}.talent-combo-table th:first-child,.talent-combo-table td:first-child{width:72%}
@@ -85,11 +87,12 @@ export function renderTalentsHtml(data, opts={}) {
     <header class="ihead"><div class="page-heading">${pageHeading("WoWCensus", nav, topic)}${nav.games||""}</div>${nav.breadcrumbs||""}</header>
     <div class="page-controls">${nav.pages||""}</div>
     <section class="panel" style="margin-bottom:22px">
-    ${opts.classProfiles?.length
-      ? `<ul class="class-row">${opts.classProfiles.map((p) => `<li><a href="${esc(p.path)}" style="--c:${esc(p.color)}"><img src="https://wow.zamimg.com/images/wow/icons/large/${esc(p.icon)}.jpg" alt="" width="56" height="56"><span>${esc(p.label)}</span></a></li>`).join("")}</ul>`
-      : `<div class="ptitle">What this sample shows</div>
-    <p class="hint talent-summary" style="margin:0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>`}
-    <div class="talent-filters" id="talent-filters">${talentMarkup("filters", data.records)}</div></section>
+    <ul class="class-row">${(opts.classTiles || []).map((p) => `<li>${p.path
+      ? `<a href="${esc(p.path)}" style="--c:${esc(p.color)}">`
+      : `<button type="button" data-class="${esc(p.classFile)}" aria-pressed="false" aria-label="Filter ${esc(p.label)} talents" style="--c:${esc(p.color)}">`}
+      <img src="https://wow.zamimg.com/images/wow/icons/large/${esc(p.icon)}.jpg" alt="" width="56" height="56"><span>${esc(p.label)}</span>${p.path ? "</a>" : "</button>"}</li>`).join("")}</ul>
+    <div class="talent-filters" id="talent-filters">${talentMarkup("filters", data.records)}</div>
+    ${opts.classTiles?.some((p) => !p.path) ? `<p class="hint talent-summary" style="margin:12px 0 0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>` : ""}</section>
     <div id="talent-content" aria-live="polite" data-src="${esc(dataFile)}">${talentMarkup("content", data.records)}</div>
     ${opts.generatedNote?`<div class="itag" style="margin-top:16px;line-height:1.6">${esc(opts.generatedNote)}</div>`:""}</div>
     <script>${TALENT_SCRIPT}</script>${SELECT_SCRIPT}</body></html>`;
@@ -134,6 +137,12 @@ const TALENT_SCRIPT = `
  ${talentMarkup}
  ${FILTER_LOADER}
  const filters=document.getElementById('talent-filters'), selects=[...filters.querySelectorAll('select')], content=document.getElementById('talent-content');
+ const classSelect=filters.querySelector('select[data-field="classFile"]');
+ const classTiles=[...document.querySelectorAll('.class-row button[data-class]')];
+ const syncClassTiles=()=>{for(const tile of classTiles)tile.setAttribute('aria-pressed',String(classSelect?.value===tile.dataset.class));};
+ for(const tile of classTiles)tile.addEventListener('click',()=>{classSelect.value=classSelect.value===tile.dataset.class?'':tile.dataset.class;classSelect.dispatchEvent(new Event('change',{bubbles:true}));});
+ classSelect?.addEventListener('change',syncClassTiles);
+ syncClassTiles();
  const load=loadFilterData(filters,content,unpackTalentRecords);
  const render=async()=>{
   content.setAttribute('aria-busy','true');

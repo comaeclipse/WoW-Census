@@ -33,6 +33,7 @@ SOURCES = {
     "classic-beta": "classic-beta",
     "classic-era": "classic",
     "sod": "sod",
+    "hardcore": "hardcore",
     "retail": "retail",
 }
 
@@ -82,6 +83,8 @@ def source_for(flavor, bucket):
     # SoD and Era use the same installation, but not the same game data.
     if flavor == "_classic_era_" and bucket.startswith("Wild Growth-"):
         return "sod", "sod"
+    if flavor == "_classic_era_" and bucket.startswith("Doomhowl-"):
+        return "hardcore", "hardcore"
     normalized = FLAVORS[flavor]
     return normalized, SOURCES[normalized]
 
@@ -471,7 +474,7 @@ def main():
                   flush=True)
     for entry in realm_inventory:
         flavor = entry["flavor"]
-        sources = ["classic", "sod"] if flavor == "_classic_era_" else [SOURCES[FLAVORS[flavor]]]
+        sources = ["classic", "sod", "hardcore"] if flavor == "_classic_era_" else [SOURCES[FLAVORS[flavor]]]
         path = (root / "savedvariables" / entry["file"]).with_name("NameplateInspect.lua")
         digest = sha256(path)
         for source in sources:

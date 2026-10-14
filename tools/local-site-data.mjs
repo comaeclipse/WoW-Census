@@ -9,6 +9,7 @@ const GAMES = {
   "classic-beta":        { label: "Forever (Beta)" },
   "mop-classic":         { label: "Mists of Pandaria Classic" },
   "sod":                 { label: "Season of Discovery" },
+  "hardcore":            { label: "Classic Hardcore" },
 };
 const DEFAULT_GAME = "classic-progression";
 const ITEM_COLUMNS = ["id", "name", "slug", "mv", "asp", "q", "pq", "sc", "tc", "cat", "src", "crafter"];
@@ -97,13 +98,16 @@ async function loadCensus(env, sourceGame = "classic-beta") {
   // /ml who or a census sweep. The characters table already merges both paths
   // and keeps the most recent race/class/level for each identity.
   const allObserved = sourceGame === "classic-beta";
+  // Nazgrim and Galakras scans see the same connected MoP population. Assign
+  // each character to its latest scan origin before building additive units.
+  const connected = sourceGame === "mop-classic";
   // Other editions retain their rolling census selection. It excludes zone
   // queries and ends each window at that dataset's newest census sighting.
   const censusWindow = CENSUS_WINDOW_DAYS * 86400;
   const censusRows = allObserved ? [] : (await env.DB.prepare(
     `WITH obs AS (
        SELECT o.game game, o.race race, o.class_file cf, o.observed_at t,
-         ROW_NUMBER() OVER (PARTITION BY o.game, o.character_key ORDER BY o.observed_at DESC) rn
+         ROW_NUMBER() OVER (PARTITION BY ${connected ? "o.character_key" : "o.game, o.character_key"} ORDER BY o.observed_at DESC) rn
        FROM character_location_observations o
        JOIN population_sweeps s
          ON s.game = o.game AND s.source_game = o.source_game AND s.sweep_id = o.sweep_id
@@ -134,7 +138,7 @@ async function loadCensus(env, sourceGame = "classic-beta") {
   const raceCensusRows = allObserved ? [] : (await env.DB.prepare(
     `WITH obs AS (
        SELECT o.game, o.race, o.observed_at t,
-         ROW_NUMBER() OVER (PARTITION BY o.game, o.character_key ORDER BY o.observed_at DESC) rn
+         ROW_NUMBER() OVER (PARTITION BY ${connected ? "o.character_key" : "o.game, o.character_key"} ORDER BY o.observed_at DESC) rn
        FROM character_location_observations o
        JOIN population_sweeps s ON s.game=o.game AND s.source_game=o.source_game AND s.sweep_id=o.sweep_id
        JOIN population_sweep_queries q ON q.game=o.game AND q.source_game=o.source_game AND q.sweep_id=o.sweep_id AND q.query_index=o.query_index
@@ -165,8 +169,9 @@ async function loadCensus(env, sourceGame = "classic-beta") {
   ).bind(sourceGame).all()).results;
   const guilds = (await env.DB.prepare(
     `SELECT c.game game, c.guild guild, COUNT(*) members
-     FROM characters c JOIN datasets d ON d.game = c.game
-     WHERE d.source_game = ? AND TRIM(COALESCE(c.guild, '')) <> ''
+     FROM ${connected ? "(SELECT *, ROW_NUMBER() OVER (PARTITION BY character_key ORDER BY last_seen DESC) rn FROM characters WHERE source_game='mop-classic')" : "characters"} c
+     JOIN datasets d ON d.game = c.game
+     WHERE d.source_game = ? ${connected ? "AND c.rn=1" : ""} AND TRIM(COALESCE(c.guild, '')) <> ''
      GROUP BY c.game, c.guild`
   ).bind(sourceGame).all()).results;
   // Geography is a rolling window, not a lifetime tally: only characters seen
@@ -177,9 +182,9 @@ async function loadCensus(env, sourceGame = "classic-beta") {
   const zones = (await env.DB.prepare(
     `SELECT c.game game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') zone,
        COUNT(*) characters, CAST(ROUND(AVG(c.level)) AS INT) avgLevel, MAX(c.level) maxLevel
-     FROM characters c JOIN datasets d ON d.game = c.game
+     FROM ${connected ? "(SELECT *, ROW_NUMBER() OVER (PARTITION BY character_key ORDER BY last_seen DESC) rn FROM characters WHERE source_game='mop-classic')" : "characters"} c JOIN datasets d ON d.game = c.game
      JOIN (SELECT game, MAX(last_seen) latest FROM characters GROUP BY game) m ON m.game = c.game
-     WHERE d.source_game = ? AND c.last_seen >= m.latest - ?
+     WHERE d.source_game = ? ${connected ? "AND c.rn=1" : ""} AND c.last_seen >= m.latest - ?
      GROUP BY c.game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown')`
   ).bind(sourceGame, ZONE_WINDOW_DAYS * 86400).all()).results;
 
@@ -278,7 +283,7 @@ function mergeCensusUnits(units) {
 
 async function apiCensus(url, env) {
   const sourceGame = url.searchParams.get("source") || "classic-beta";
-  if (!["classic-beta", "classic-progression", "classic", "retail", "mop-classic", "sod"].includes(sourceGame))
+  if (!["classic-beta", "classic-progression", "classic", "retail", "mop-classic", "sod", "hardcore"].includes(sourceGame))
     return json({ error: "unknown source game" }, 400);
   return json(await loadCensus(env, sourceGame), 300);
 }

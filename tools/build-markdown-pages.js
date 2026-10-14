@@ -11,7 +11,7 @@ const { unpackTalentRecords } = require('../site/src/talents.mjs');
 const outputArg = process.argv.find((arg) => arg.startsWith('--out='));
 const root = path.resolve(__dirname, '..', outputArg ? outputArg.slice(6) : 'static');
 const editionArg = process.argv.find((arg) => arg.startsWith('--edition='));
-const editions = editionArg ? editionArg.slice(10).split(',') : ['', 'tbc', 'classic', 'sod', 'mop', 'retail'];
+const editions = editionArg ? editionArg.slice(10).split(',') : ['', 'tbc', 'classic', 'sod', 'hardcore', 'mop', 'retail'];
 const names = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents', 'gear'];
 const routes = [];
 function writeFile(file, content) {

@@ -9,7 +9,7 @@ const root = new URL('../', import.meta.url);
 const read = (p) => fs.readFileSync(new URL(p, root), 'utf8');
 const exists = (p) => fs.existsSync(new URL(p, root));
 const { css, name: cssName } = createRequire(import.meta.url)('./layout-id.js').stylesheet();
-const editions = { '': 'Forever', tbc: 'TBC Anniversary', classic: 'Classic Era', sod: 'SoD', mop: 'MoP Classic', retail: 'Retail' };
+const editions = { '': 'Forever', tbc: 'TBC Anniversary', classic: 'Classic Era', sod: 'SoD', hardcore: 'Hardcore', mop: 'MoP Classic', retail: 'Retail' };
 const pages = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents', 'gear'];
 const files = Object.keys(editions).flatMap((dir) => pages.map((page) => ({ dir, page, file: 'static/' + (dir ? dir + '/' : '') + page + '.html' })));
 const count = (html, re) => (html.match(re) || []).length;
@@ -69,7 +69,7 @@ for (const { dir, page, file } of files) {
       assert.match(face, /font-display:optional/, 'inline face swaps in layout: ' + face);
       assert.match(face, /format\("woff2"\)/, 'inline face is not woff2: ' + face);
     }
-    if (/class="[^"]*\b(combo-analysis|talent-summary)\b/.test(html))
+    if (/class="[^"]*\btalent-summary\b/.test(html))
       assert.ok(html.includes('rel="preload" href="/fonts/friz-quadrata-regular.woff2"'), 'prose page preloads Friz Quadrata');
     if (page === 'talents') {
       assert.doesNotMatch(html, /\.talent-combo-table[^{]*\{[^}]*font-size/, 'talent tables keep base type size');

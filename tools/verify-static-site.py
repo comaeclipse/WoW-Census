@@ -7,7 +7,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
-EDITIONS = ("", "tbc", "classic", "sod", "mop", "retail")
+EDITIONS = ("", "tbc", "classic", "sod", "hardcore", "mop", "retail")
 PAGES = ("index", "combos", "auctionhouse", "guilds", "geography", "talents", "gear")
 LIMIT = 25 * 1024 * 1024
 

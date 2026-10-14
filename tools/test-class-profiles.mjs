@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { classProfile, renderClassProfile } from "../site/src/class-profile.mjs";
+import { CLASS_PROFILES, classProfile, classRoute, renderClassProfile } from "../site/src/class-profile.mjs";
+import { PROFILE_GAMES } from "../site/src/profile-games.mjs";
 import { MIN_SAMPLE } from "../site/src/profile-games.mjs";
 
 test("class profile ranks each tree's talents among that spec's players only", () => {
@@ -36,10 +37,35 @@ test("spec columns below the minimum sample show a note instead of a ranking", (
   const records = (n) => Array.from({ length: n }, () => ({ classFile: "PALADIN", classification: "Holy", level: 20, talents: [talent] }));
   const opts = { canonical: "https://wowcensus.io/tbc/paladin/", stylesheet: "style.css" };
   const small = renderClassProfile({ records: records(MIN_SAMPLE - 1) }, "classic-progression", "PALADIN", opts);
-  assert.match(small, /Not enough data yet to rank talents\./);
+  assert.doesNotMatch(small, /Latest inspection|Last 14 days|class="fresh"/);
+  assert.match(small, /Not enough data yet to rank talents \(19 inspected; minimum 20\)\./);
   assert.doesNotMatch(small, /<ol class="ranks">/);
   const enough = renderClassProfile({ records: records(MIN_SAMPLE) }, "classic-progression", "PALADIN", opts);
   assert.match(enough, /<ol class="ranks"><li><span class="rank">1<\/span>/);
+  assert.doesNotMatch(enough, /class="pips"|Average rank/);
+  assert.match(enough, /class="pick"><b>100%<\/b><div class="mini"><i style="width:100%"><\/i>/);
+});
+
+test("modern profiles use inspected specs and retain counts when talent nodes are unavailable", () => {
+  const records = [
+    { classFile: "DRUID", classification: "Guardian", level: 60, talents: [] },
+    { classFile: "DRUID", classification: "Feral", level: 61, talents: [{ node: 1, name: "Observed pick", branch: "Tree 42", rank: 1, max: 1 }] },
+  ];
+  const data = classProfile({ records }, "DRUID", "retail");
+  assert.equal(data.n, 2);
+  assert.deepEqual(data.trees.map((tree) => [tree.tree, tree.n]), [["Balance", 0], ["Feral", 1], ["Guardian", 1], ["Restoration", 0]]);
+  assert.equal(data.trees[1].talents[0].name, "Observed pick");
+  assert.deepEqual(classProfile({ records: [{ classFile: "ROGUE", classification: "Combat", talents: [] }] }, "ROGUE", "mop-classic").trees.map((tree) => tree.tree), ["Assassination", "Combat", "Subtlety"]);
+});
+
+test("every edition has only its playable class routes", () => {
+  assert.deepEqual(Object.keys(CLASS_PROFILES), Object.keys(PROFILE_GAMES));
+  for (const [source, game] of Object.entries(CLASS_PROFILES)) {
+    assert.ok(game.classes.includes("DRUID"));
+    assert.equal(classRoute(source, "DRUID"), `/${game.dir}/druid/`);
+    assert.equal(game.classes.includes("MONK"), ["mop-classic", "retail"].includes(source));
+    assert.equal(game.classes.includes("EVOKER"), source === "retail");
+  }
 });
 
 const CLASS_GAMES = [{ dir: "forever", home: "/", talentsPage: "talents.html" }, { dir: "tbc", home: "/tbc/", talentsPage: "tbc/talents.html" }];
@@ -60,4 +86,26 @@ for (const game of CLASS_GAMES) for (const [cls, label, trees] of [["paladin", "
     assert.ok(fs.existsSync(new URL(ref, pageUrl)), `Local asset missing: ${ref}`);
   assert.ok(fs.readFileSync(new URL("../static/sitemap.xml", import.meta.url), "utf8").includes(`<loc>https://wowcensus.io/${game.dir}/${cls}/</loc>`));
   assert.ok(fs.readFileSync(new URL(`../static/${game.talentsPage}`, import.meta.url), "utf8").includes(`<a href="/${game.dir}/${cls}/" style="--c:`));
+});
+
+test("every configured class route is built, linked from talents, and listed in the sitemap", () => {
+  const sitemap = fs.readFileSync(new URL("../static/sitemap.xml", import.meta.url), "utf8");
+  for (const [source, game] of Object.entries(CLASS_PROFILES)) {
+    const talents = fs.readFileSync(new URL(`../static/${game.home.replace(/^\//, "")}talents.html`, import.meta.url), "utf8");
+    for (const cf of game.classes) {
+      const route = classRoute(source, cf);
+      const html = fs.readFileSync(new URL(`../static${route}index.html`, import.meta.url), "utf8");
+      assert.ok(sitemap.includes(`<loc>https://wowcensus.io${route}</loc>`), route);
+      assert.ok(talents.includes(`<a href="${route}" style="--c:`), route);
+      assert.ok(html.includes(`<link rel="canonical" href="https://wowcensus.io${route}">`), route);
+      assert.match(html, /data-tree="[^"]+"/, route);
+    }
+  }
+});
+
+test("built MoP Mage page has spell icons and explains the Fire sample threshold", () => {
+  const html = fs.readFileSync(new URL("../static/mop/mage/index.html", import.meta.url), "utf8");
+  assert.doesNotMatch(html, /inv_misc_questionmark\.jpg/);
+  assert.match(html, /spell_fire_burningspeed\.jpg/);
+  assert.match(html, /Not enough data yet to rank talents \(\d+ inspected; minimum 20\)\./);
 });
