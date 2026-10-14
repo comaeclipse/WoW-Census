@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { CLASS_META } from "./census.mjs";
-import { PROFILE_GAMES, gameNav, pageNav, talentsPath, MIN_SAMPLE, rootPrefix } from "./profile-games.mjs";
+import { PROFILE_GAMES, gameNav, pageNav, talentsPath, rootPrefix } from "./profile-games.mjs";
 
 // Class talent pages, one column per talent tree, for every game in PROFILE_GAMES.
 const CLASSES = ["PALADIN", "WARRIOR", "DRUID", "HUNTER", "SHAMAN", "PRIEST", "ROGUE", "MAGE", "WARLOCK"];
@@ -134,7 +134,7 @@ export function renderClassProfile(inspects, source, classFile, opts) {
     }).join("");
     const body = !t.n ? `<p class="colnote">No ${esc(t.tree)} ${esc(plural)} in this sample.</p>`
       : !t.talents.length ? `<p class="colnote">No readable talent selections for this spec.</p>`
-      : t.n < MIN_SAMPLE ? `<p class="colnote">Not enough data yet to rank talents (${t.n} inspected; minimum ${MIN_SAMPLE}).</p>` : `<ol class="ranks">${rows}</ol>`;
+      : `<ol class="ranks">${rows}</ol>`;
     return `<article class="card speccol" id="${esc(String(t.tree).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""))}" data-tree="${esc(t.tree)}" style="--c:${treeColor(i)}">` +
       `<div class="card-h"><img src="${esc(icon(CLASS_TREES[classFile]?.[i]?.[1] || "classicon_" + classFile.toLowerCase()))}" alt="" width="40" height="40"><h4>${esc(t.tree)}</h4>` +
       `<div class="cn" title="${t.n} players"><b>${t.n}</b>${pct(t.n, D.n)}%</div></div>` +

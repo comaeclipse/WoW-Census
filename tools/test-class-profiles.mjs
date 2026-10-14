@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { CLASS_PROFILES, classProfile, classRoute, renderClassProfile } from "../site/src/class-profile.mjs";
 import { PROFILE_GAMES } from "../site/src/profile-games.mjs";
-import { MIN_SAMPLE } from "../site/src/profile-games.mjs";
 
 test("class profile ranks each tree's talents among that spec's players only", () => {
   const t = (node, name, branch, rank = 1) => ({ node, name, branch, rank, max: 3, icon: "x" });
@@ -32,18 +31,16 @@ test("unknown builds are counted apart from hybrids", () => {
   assert.deepEqual([data.hybrid, data.unknown, data.trees[0].n], [1, 1, 1]);
 });
 
-test("spec columns below the minimum sample show a note instead of a ranking", () => {
+test("spec columns rank talents at any sample size", () => {
   const talent = { node: 1, name: "Divine Intellect", branch: "Holy", rank: 1, max: 5 };
   const records = (n) => Array.from({ length: n }, () => ({ classFile: "PALADIN", classification: "Holy", level: 20, talents: [talent] }));
   const opts = { canonical: "https://wowcensus.io/tbc/paladin/", stylesheet: "style.css" };
-  const small = renderClassProfile({ records: records(MIN_SAMPLE - 1) }, "classic-progression", "PALADIN", opts);
+  const small = renderClassProfile({ records: records(1) }, "classic-progression", "PALADIN", opts);
   assert.doesNotMatch(small, /Latest inspection|Last 14 days|class="fresh"/);
-  assert.match(small, /Not enough data yet to rank talents \(19 inspected; minimum 20\)\./);
-  assert.doesNotMatch(small, /<ol class="ranks">/);
-  const enough = renderClassProfile({ records: records(MIN_SAMPLE) }, "classic-progression", "PALADIN", opts);
-  assert.match(enough, /<ol class="ranks"><li><span class="rank">1<\/span>/);
-  assert.doesNotMatch(enough, /class="pips"|Average rank/);
-  assert.match(enough, /class="pick"><b>100%<\/b><div class="mini"><i style="width:100%"><\/i>/);
+  assert.doesNotMatch(small, /Not enough data/);
+  assert.match(small, /<ol class="ranks"><li><span class="rank">1<\/span>/);
+  assert.doesNotMatch(small, /class="pips"|Average rank/);
+  assert.match(small, /class="pick"><b>100%<\/b><div class="mini"><i style="width:100%"><\/i>/);
 });
 
 test("modern profiles use inspected specs and retain counts when talent nodes are unavailable", () => {
@@ -103,9 +100,9 @@ test("every configured class route is built, linked from talents, and listed in 
   }
 });
 
-test("built MoP Mage page has spell icons and explains the Fire sample threshold", () => {
+test("built MoP Mage page has spell icons and ranks every spec", () => {
   const html = fs.readFileSync(new URL("../static/mop/mage/index.html", import.meta.url), "utf8");
   assert.doesNotMatch(html, /inv_misc_questionmark\.jpg/);
   assert.match(html, /spell_fire_burningspeed\.jpg/);
-  assert.match(html, /Not enough data yet to rank talents \(\d+ inspected; minimum 20\)\./);
+  assert.doesNotMatch(html, /Not enough data/);
 });

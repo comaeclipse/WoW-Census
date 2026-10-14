@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { parseHTML } from "linkedom";
 import { CLASS_META, RACE_ICON } from "./census.mjs";
 import { SPEC_COLORS, SPEC_ICONS } from "./class-profile.mjs";
-import { PROFILE_GAMES, gameNav, pageNav, talentsPath, MIN_SAMPLE, rootPrefix } from "./profile-games.mjs";
+import { PROFILE_GAMES, gameNav, pageNav, talentsPath, rootPrefix } from "./profile-games.mjs";
 
 const template = fileURLToPath(new URL("./race-template.html", import.meta.url));
 // Races with their own profile page, per game, keyed by the race name in the
@@ -81,7 +81,6 @@ export function renderRaceProfile(inspects,game,race,opts){
     .replace(/const CLASS = \{.*\};/,"const CLASS = "+JSON.stringify(Object.fromEntries(Object.entries(CLASS_META).map(([cf,[n,c]])=>[cf,[n,"#"+c]])))+";")
     .replace(/const SPECICON = \{[\s\S]*?\};/,"const SPECICON = "+JSON.stringify(SPEC_ICONS)+";")
     .replace("const SPECCOLOR = {};", "const SPECCOLOR = "+JSON.stringify(SPEC_COLORS)+";")
-    .replace("const MIN_SAMPLE = 0;", "const MIN_SAMPLE = "+MIN_SAMPLE+";")
     .replace(/const D = \{.*\};/,"const D = "+JSON.stringify({n:D.n,classes:D.classes})+";");
   const script=source.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   if(!script)throw new Error("Race template script missing");
