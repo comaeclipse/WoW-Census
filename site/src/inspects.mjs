@@ -1,6 +1,7 @@
 import catalog from "./forever-talents.json" with { type: "json" };
 import tbcCatalog from "./tbc-talents.json" with { type: "json" };
 import mopIcons from "./mop-talent-icons.json" with { type: "json" };
+import retailIcons from "./retail-talent-icons.json" with { type: "json" };
 
 export const INSPECT_WINDOW_DAYS = 14;
 const classes = new Set(["WARRIOR","PALADIN","HUNTER","ROGUE","PRIEST","SHAMAN","MAGE","WARLOCK","DRUID","MONK","DEATHKNIGHT","DEMONHUNTER","EVOKER"]);
@@ -111,7 +112,8 @@ export function describeBuild(e, source) {
     else unresolved.push(t.node);
     const tbc = source === "classic-progression" ? tbcNodes.get(t.node) : null;
     const icon = mapped?.icon || (tbc && tbc.classFile === e.class && tbc.max === t.max ? tbc.icon : null)
-      || (source === "mop-classic" ? mopIcons.spells[t.spell] : null);
+      || (source === "mop-classic" ? mopIcons.spells[t.spell] : null)
+      || (source === "retail" ? retailIcons.spells[t.spell] : null);
     talents.push({...t,branch:branch || (specBased&&t.tree?`Tree ${t.tree}`:"Unmapped talent"),icon});
   }
   const orderedPoints = Object.entries(points).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))
