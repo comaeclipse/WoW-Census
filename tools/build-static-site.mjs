@@ -9,6 +9,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { DatabaseSync } from "node:sqlite";
@@ -183,7 +184,9 @@ async function main() {
   const reportFile = path.join(out, "build-report.json");
   const previous = fs.existsSync(reportFile) ? JSON.parse(fs.readFileSync(reportFile, "utf8")) : {};
   const report = { builtAt, source: "local SQLite snapshot", editions: { ...previous.editions } };
-  write(path.join(out, "census.css"), fs.readFileSync(path.join(repo, "site/public/census.css"), "utf8"));
+  const censusCss = fs.readFileSync(path.join(repo, "site/public/census.css"), "utf8");
+  const censusCssVersion = createHash("sha256").update(censusCss).digest("hex").slice(0, 12);
+  write(path.join(out, "census.css"), censusCss);
   if (only) {
     // Untouched editions keep linking their own stylesheet; a changed one needs every edition rebuilt.
     for (const source of Object.keys(EDITIONS).filter((s) => !only.includes(s)))
@@ -206,6 +209,7 @@ async function main() {
       const htmlFile = path.join(dir, `${page}.html`);
       const render = (generatedAt) => {
         let html = renderEditionPage(source, page, models[page], { stylesheet: cssName, generatedAt });
+        html = html.replaceAll('href="/census.css"', `href="/census.css?v=${censusCssVersion}"`);
         if (page === "index") {
           const link = `<link rel="stylesheet" href="${cssName}">`;
           if (!html.includes(link)) throw new Error(`Landing page stylesheet missing: ${source}`);

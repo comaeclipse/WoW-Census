@@ -78,7 +78,7 @@ const FACTION_COLOR = { Alliance: "#3f83f8", Horde: "#d9363e", Unknown: "#8b90a0
 function factionColor(f) { return FACTION_COLOR[f] || FACTION_COLOR.Unknown; }
 
 const ICON_ROOT = "https://wow.zamimg.com/images/wow/icons/large/";
-const RACE_ICON = {
+export const RACE_ICON = {
   Human: "achievement_character_human_male", Dwarf: "achievement_character_dwarf_male",
   Gnome: "achievement_character_gnome_male", "Night Elf": "achievement_character_nightelf_male",
   Orc: "achievement_character_orc_male", Tauren: "achievement_character_tauren_male",
@@ -95,7 +95,7 @@ const RACE_ICON = {
   "Kul Tiran": "achievement_alliedrace_kultiranhuman",
   "Zandalari Troll": "achievement_alliedrace_zandalaritroll",
   Mechagnome: "achievement_alliedrace_mechagnome", Vulpera: "achievement_alliedrace_vulpera",
-  Dracthyr: "race_dracthyr_male",
+  Dracthyr: "race_dracthyr_male", Earthen: "race_earthendwarf_male", Haranir: "race_harronir_male",
   "High Order Skyborne": "achievement_character_bloodelf_male",
   "Windshaper Skyborne": "achievement_character_bloodelf_male",
 };
@@ -109,9 +109,13 @@ function comboCards(groups, opts = {}) {
       const [race, token] = key.split("\t");
       const className = CLASS_META[token] ? CLASS_META[token][0] : token;
       const share = g.characters ? ((count / g.characters) * 100).toFixed(1) : "0.0";
+      const raceImage = '<img src="' + esc(raceIcon(race)) + '" alt="' + esc(race) + ' icon" loading="lazy">';
+      const classImage = '<img src="' + esc(classIcon(token)) + '" alt="' + esc(className) + ' icon" loading="lazy">';
+      const racePath = opts.raceProfiles?.[race]?.path;
+      const classPath = opts.classProfiles?.classes?.includes(token) ? opts.classRoute?.(token) : null;
       return '<article class="combocard">' +
-        '<div class="comboicons"><img src="' + esc(raceIcon(race)) + '" alt="' + esc(race) + ' icon" loading="lazy">' +
-        '<img src="' + esc(classIcon(token)) + '" alt="' + esc(className) + ' icon" loading="lazy"></div>' +
+        '<div class="comboicons">' + (racePath ? '<a href="' + esc(racePath) + '" aria-label="' + esc(race) + ' race page">' + raceImage + '</a>' : raceImage) +
+        (classPath ? '<a href="' + esc(classPath) + '" aria-label="' + esc(className) + ' class page">' + classImage + '</a>' : classImage) + '</div>' +
         '<div><div class="comboname">' + esc(race) + ' ' + esc(className) + '</div>' +
         '<div class="combostat">' + count.toLocaleString() + ' characters &middot; ' + share + '% of ' + esc(g.faction) + '</div></div>' +
         '</article>';

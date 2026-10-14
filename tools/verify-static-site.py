@@ -60,7 +60,7 @@ def main():
             parser.feed(source)
             if page == "index" and "<style>" not in source:
                 errors.append(f"Landing page base CSS is not inline: {edition or '/'}")
-            if 'href="/census.css"' not in source:
+            if not re.search(r'href="/census\.css(?:\?v=[0-9a-f]{12})?"', source):
                 errors.append(f"Shared census CSS is missing: {edition or '/'} {page}")
             if page == "index":
                 if source.count("<main>") != 1 or source.count("</main>") != 1:

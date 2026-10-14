@@ -19,6 +19,21 @@ test("race profile counts only readable inspections of that race", () => {
     icon: "ability_example", tree: "Enhancement" });
 });
 
+test("retail race profiles classify by spec, not tree points", () => {
+  const t = (node, name) => ({ node, name, rank: 1, max: 1, branch: "Tree 790", icon: "x" });
+  const record = (classification, talents) => ({ race: "Dracthyr", classFile: "EVOKER", classification, talents, level: 90,
+    orderedPoints: [{ tree: "Tree 790", points: 30 }] });
+  const data = raceProfile({ records: [
+    record("Devastation", [t(1, "Shared Talent"), t(2, "Devastation Talent"), t(99851, "node 99851")]),
+    record("Preservation", [t(1, "Shared Talent")]),
+    record("Unknown build", [t(1, "Shared Talent")]),
+  ] }, "Dracthyr", "retail");
+  assert.equal(data.n, 2);
+  assert.deepEqual(data.classes.EVOKER.trees, {});
+  assert.deepEqual(data.classes.EVOKER.tal.map((x) => [x.name, x.tree]),
+    [["Shared Talent", "Shared"], ["Devastation Talent", "Devastation"]]);
+});
+
 test("Skyborne profiles keep Alliance and Horde records separate", () => {
   const talent = { node: 1, name: "Example Talent", rank: 1, max: 5, branch: "Feral Combat" };
   const records = [

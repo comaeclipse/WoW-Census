@@ -31,7 +31,11 @@ const MODERN_TREES = {
   DRUID: ["Balance", "Feral", "Guardian", "Restoration"],
   ROGUE: ["Assassination", "Outlaw", "Subtlety"],
 };
-// "Spec:CLASS" -> color, shared with the race profiles.
+// "Spec:CLASS" -> icon and color, shared with the race profiles.
+export const SPEC_ICONS = {
+  ...Object.fromEntries(Object.entries(CLASS_TREES).flatMap(([cf, trees]) => trees.map(([t, icon]) => [t + ":" + cf, icon]))),
+  "Feral:DRUID": "ability_druid_catform", "Guardian:DRUID": "ability_racial_bearform", "Outlaw:ROGUE": "ability_rogue_waylay",
+};
 export const SPEC_COLORS = Object.fromEntries(Object.entries(CLASS_TREES).flatMap(([cf, trees]) => trees.map(([t, , c]) => [t + ":" + cf, c])));
 
 export const classSlug = (cf) => (CLASS_META[cf]?.[0] || cf).toLowerCase().replace(/\s+/g, "-");

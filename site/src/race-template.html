@@ -307,7 +307,7 @@ document.getElementById("cards").innerHTML = order.map(cf => {
   const ti = Object.fromEntries(trees.map(([t], i) => [t, i]));
   let hy = 0; const pure = [];
   for (const [s, n] of Object.entries(c.spec)) isPure(s) ? pure.push([s, n]) : hy += n;
-  pure.sort((a, b) => ti[a[0]] - ti[b[0]]);
+  pure.sort((a, b) => (ti[a[0]] ?? 99) - (ti[b[0]] ?? 99) || b[1] - a[1]);
   const seg = pure.map(([s, n]) => `<i style="--k:${specColor(s, cf)};width:${100 * n / c.n}%" title="${esc(s)} ${n}"></i>`).join("") +
     (hy ? `<i class="th" style="width:${100 * hy / c.n}%" title="Hybrid ${hy}"></i>` : "");
   const key = pure.map(([s, n]) => `<span style="--k:${specColor(s, cf)}"><b>${esc(s)}</b> ${pct(n, c.n)}%</span>`).join("") +
@@ -325,7 +325,7 @@ document.getElementById("cards").innerHTML = order.map(cf => {
       <div class="cn"><b>${c.n}</b>inspected · ${pct(c.n, D.n)}%</div></div>
     <div class="card-b">
       <p class="lbl">Spec split</p><div class="specbar">${seg}</div><div class="speckey">${key}</div>
-      <p class="lbl">Avg points per tree</p><div class="trees">${tr}</div>
+      ${trees.length ? `<p class="lbl">Avg points per tree</p><div class="trees">${tr}</div>` : ""}
       <p class="lbl">Most-picked talents</p>${c.n < MIN_SAMPLE ? `<p class="colnote">Not enough data yet to rank talents.</p>` : `<ul class="tal">${tal}</ul>`}
     </div>
     <div class="card-f">Median level ${c.medLv}</div>

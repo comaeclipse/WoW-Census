@@ -30,9 +30,10 @@
   .comboblock>.combofaction{padding:15px 17px 11px}
   .combocard{display:flex;align-items:center;gap:16px;padding:10px 17px}
   .combocard+.combocard{border-top:2px solid var(--line)}
-  .comboicons{display:flex;min-width:74px}.comboicons img{width:40px;height:40px;object-fit:cover;
+  .comboicons{display:flex;align-items:flex-start;min-width:74px}.comboicons img{display:block;width:40px;height:40px;object-fit:cover;
     border:3px solid #b99b55;box-shadow:2px 2px 0 #000;background:#111;image-rendering:auto}
-  .comboicons img+img{margin-left:-14px;margin-top:12px}
+  .comboicons>a{display:block;flex:none}.comboicons>a+a,.comboicons>img+a,.comboicons>a+img,.comboicons>img+img{margin-left:-14px;margin-top:12px}
+  .comboicons a:hover img,.comboicons a:focus-visible img{border-color:var(--ink)}
   .combofaction{font-family:var(--pixel);font-size:8px;letter-spacing:1px;color:var(--fac)}
   .comboname{font-family:var(--pixel);font-size:11px;line-height:1.5;color:var(--ink);margin-bottom:5px}
   .combostat{color:var(--muted);font-size:17px}
