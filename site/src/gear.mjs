@@ -3,10 +3,11 @@ import { esc, seoLabel, seoHead, pageHeading, CENSUS_STYLESHEET, SELECT_SCRIPT, 
 function time(t) { return t ? new Date(t*1000).toISOString().slice(0,16).replace("T"," ")+"Z" : "Unavailable"; }
 
 // Packed like the talents page: repeated strings become indexes into per-field
-// lists, and each equipped item is [slot, item-table index, enchanted].
+// lists, and each equipped item is [slot, item-table index, enchanted], plus a
+// fourth index into `runes` when the item carries a Season of Discovery rune.
 const PACKED_FIELDS = ["classFile", "race", "realm", "faction"];
 export function packGearRecords(records) {
-  const values = {}, index = {}, items = [], itemIndex = new Map();
+  const values = {}, index = {}, items = [], itemIndex = new Map(), runes = [], runeIndex = new Map();
   for (const f of PACKED_FIELDS) { values[f] = []; index[f] = new Map(); }
   const ref = (f, v) => {
     if (v == null || v === "") return -1;
@@ -16,9 +17,14 @@ export function packGearRecords(records) {
   const rows = records.filter((r) => r.gear && r.gear.length).map((r) => [...PACKED_FIELDS.map((f) => ref(f, r[f])), r.level ?? -1,
     r.gear.map((g) => {
       if (!itemIndex.has(g.id)) { itemIndex.set(g.id, items.length); items.push([g.id, g.name, g.quality ?? -1, g.icon || ""]); }
-      return [g.slot, itemIndex.get(g.id), g.enchant ? 1 : 0];
+      const w = [g.slot, itemIndex.get(g.id), g.enchant ? 1 : 0];
+      if (g.rune) {
+        if (!runeIndex.has(g.rune)) { runeIndex.set(g.rune, runes.length); runes.push(g.rune); }
+        w.push(runeIndex.get(g.rune));
+      }
+      return w;
     })]);
-  return { fields: PACKED_FIELDS, values, items, rows };
+  return { fields: PACKED_FIELDS, values, items, rows, ...(runes.length ? { runes } : {}) };
 }
 // Inverse of packGearRecords, in the record shape gearMarkup reads. The page
 // script embeds this function's source.
@@ -27,7 +33,7 @@ export function unpackGearRecords(packed) {
  return packed.rows.map(row=>{
   const r={};packed.fields.forEach((f,i)=>{r[f]=row[i]<0?null:packed.values[f][row[i]];});
   r.level=row[n]<0?null:row[n];
-  r.gear=row[n+1].map(([slot,i,enchanted])=>{const it=packed.items[i];return {slot,id:it[0],name:it[1],quality:it[2]<0?null:it[2],icon:it[3]||null,enchanted:enchanted===1};});
+  r.gear=row[n+1].map(([slot,i,enchanted,rune])=>{const it=packed.items[i];return {slot,id:it[0],name:it[1],quality:it[2]<0?null:it[2],icon:it[3]||null,enchanted:enchanted===1,rune:rune==null?null:packed.runes[rune]};});
   return r;
  });
 }
@@ -69,7 +75,7 @@ export function renderGearHtml(data, opts={}) {
     .gear-top-item img{border:2px solid #000;box-shadow:0 0 0 1px var(--line);margin:3px 0 6px}
     .gear-top-name{font-family:var(--term);font-size:18px;line-height:1.05;overflow-wrap:anywhere}
     .gear-top-count{font-family:var(--term);font-size:15px;color:var(--muted);margin-top:auto;padding-top:5px}
-    .gear-slot .hint{margin:0 0 8px}
+    .gear-slot .hint{margin:0 0 8px}.gear-slot .gear-rune-hint{margin:16px 0 8px}.gear-table td.gear-rune{color:#1eff00}
     .gear-table{table-layout:fixed;min-width:0}.gear-table th:first-child,.gear-table td:first-child{width:54%}
     .gear-table th:not(:first-child),.gear-table td:not(:first-child){padding-left:6px;padding-right:6px}
     .gear-table th:nth-child(2),.gear-table td:nth-child(2){width:26%}.gear-table th:nth-child(3),.gear-table td:nth-child(3){width:20%}
@@ -114,12 +120,16 @@ function gearMarkup(part, records, wowhead) {
   ['Rings',[11,12]],['Trinkets',[13,14]],['Main hand',[16]],['Off hand',[17]],['Ranged',[18]],['Shirt',[4]],['Tabard',[19]]];
  const total=records.length;
  const tiles=groups.map(([label,slots])=>{
-  const items=new Map(),iconRoot='https://wow.zamimg.com/images/wow/icons/small/';let filled=0,enchanted=0;
+  const items=new Map(),runes=new Map(),iconRoot='https://wow.zamimg.com/images/wow/icons/small/';let filled=0,enchanted=0,runed=0;
   for(const r of records){
    const worn=r.gear.filter(g=>slots.includes(g.slot));
    if(!worn.length)continue;
    filled++;if(worn.some(g=>g.enchanted))enchanted++;
    for(const id of new Set(worn.map(g=>g.id))){const g=worn.find(w=>w.id===id),old=items.get(id)||{id,name:g.name,quality:g.quality,icon:g.icon,players:0};old.players++;items.set(id,old);}
+   // Season of Discovery: each player counts once per rune; paired rings pool.
+   const wornRunes=new Set(worn.map(g=>g.rune).filter(Boolean));
+   if(wornRunes.size)runed++;
+   for(const name of wornRunes)runes.set(name,(runes.get(name)||0)+1);
   }
   if(!filled)return '';
   const top=[...items.values()].sort((a,b)=>b.players-a.players||String(a.name).localeCompare(String(b.name))).slice(0,10);
@@ -128,7 +138,10 @@ function gearMarkup(part, records, wowhead) {
    return '<a class="gear-top-item" href="'+escape(wowhead+it.id)+'" target="_blank" rel="noopener"><span class="gear-top-slot">'+escape(label)+'</span><img src="https://wow.zamimg.com/images/wow/icons/large/'+escape(it.icon||'inv_misc_questionmark')+'.jpg" alt="" width="40" height="40"><span class="gear-top-name iq'+(it.quality??1)+'">'+escape(it.name)+'</span><span class="gear-top-count">'+it.players.toLocaleString('en-US')+' players</span></a>';
   }
   const body=top.map(it=>'<tr><td class="l"><a class="iq'+(it.quality??1)+'" href="'+escape(wowhead+it.id)+'" target="_blank" rel="noopener"><img src="'+iconRoot+escape(it.icon||'inv_misc_questionmark')+'.jpg" alt="" width="20" height="20" loading="lazy"><span>'+escape(it.name)+'</span></a></td><td>'+it.players.toLocaleString('en-US')+'</td><td>'+(100*it.players/filled).toFixed(1)+'%</td></tr>').join('');
-  return '<section class="panel gear-slot"><div class="ptitle">'+escape(label)+'</div><p class="hint">'+filled.toLocaleString('en-US')+' of '+total.toLocaleString('en-US')+' players with this slot filled · '+(100*enchanted/filled).toFixed(0)+'% enchanted · '+items.size.toLocaleString('en-US')+' distinct item'+(items.size===1?'':'s')+'</p><div class="tablewrap"><table class="gear-table"><thead><tr><th class="l">Item</th><th>Players</th><th>%</th></tr></thead><tbody>'+body+'</tbody></table></div></section>';
+  // Shares are of players with a rune recorded here: older inspects carry none.
+  const runeRows=[...runes].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,10).map(([name,n])=>'<tr><td class="l gear-rune">'+escape(name)+'</td><td>'+n.toLocaleString('en-US')+'</td><td>'+(100*n/runed).toFixed(1)+'%</td></tr>').join('');
+  const runeTable=runed?'<p class="hint gear-rune-hint">Runes · '+runed.toLocaleString('en-US')+' player'+(runed===1?'':'s')+' with a rune recorded</p><div class="tablewrap"><table class="gear-table"><thead><tr><th class="l">Rune</th><th>Players</th><th>%</th></tr></thead><tbody>'+runeRows+'</tbody></table></div>':'';
+  return '<section class="panel gear-slot"><div class="ptitle">'+escape(label)+'</div><p class="hint">'+filled.toLocaleString('en-US')+' of '+total.toLocaleString('en-US')+' players with this slot filled · '+(100*enchanted/filled).toFixed(0)+'% enchanted · '+items.size.toLocaleString('en-US')+' distinct item'+(items.size===1?'':'s')+'</p><div class="tablewrap"><table class="gear-table"><thead><tr><th class="l">Item</th><th>Players</th><th>%</th></tr></thead><tbody>'+body+'</tbody></table></div>'+runeTable+'</section>';
  }).join('');
  return '<div class="'+(part==='top'?'gear-top-grid':'gear-grid')+'">'+tiles+'</div>';
 }

@@ -366,6 +366,82 @@ local function gearEnabled()
   return GEAR_CAPTURE[flavor] and not gearOff and type(GetInventoryItemLink) == "function"
 end
 
+------------------------------------------------------------------------
+-- SEASON OF DISCOVERY RUNES
+-- A rune is NOT in the item link: the link's enchant field holds only the
+-- regular enchant (verified from saved SoD inspects: level-60 hands carry a
+-- glove enchant such as 931/2564, never the hands rune). C_Engraving reads the
+-- player's own runes only; it takes no unit. The inspected item's tooltip is
+-- what shows the rune, so it is read from there, inside INSPECT_READY like the
+-- links.
+--
+-- The rune and the enchant are both green tooltip lines, as are Equip:/Use:/
+-- Chance on hit: effects and set bonuses. Those effect lines are skipped and
+-- the rest are kept raw, so the site can tell rune from enchant by name.
+-- Verified in game (level-60 rogue): Head "Honor Among Thieves", Chest "Deadly
+-- Brew", Back "Crimson Tempest", rings "Sword/Dagger Specialization", Shoulder
+-- "Attack Power +26 and +1% Critical Strike" (enchant) + "Efficient Striking".
+------------------------------------------------------------------------
+local scanTip
+-- Active set bonuses read "Set: ..." in green (ITEM_SET_BONUS = "Set: %s");
+-- inactive ones carry a "(2) " count prefix instead. Verified on a SoD rogue.
+local SKIP_PREFIXES = { ITEM_SPELL_TRIGGER_ONEQUIP, ITEM_SPELL_TRIGGER_ONUSE, ITEM_SPELL_TRIGGER_ONPROC,
+  type(ITEM_SET_BONUS) == "string" and ITEM_SET_BONUS:match("^(.-)%%s") or "Set: " }
+
+local function isGreen(r, g, b)
+  return g and g > 0.9 and r < 0.2 and b < 0.2
+end
+
+local function effectLine(line)
+  if line:match("^%(%d+%)") then return true end  -- "(2) Set: ..." set bonus
+  for _, prefix in ipairs(SKIP_PREFIXES) do
+    -- Trimmed: a set bonus can wrap so the line is just "Set:" (seen in SoD imports).
+    prefix = type(prefix) == "string" and strtrim(prefix) or ""
+    if prefix ~= "" and line:sub(1, #prefix) == prefix then return true end
+  end
+  return false
+end
+
+-- Green, non-effect tooltip lines of an inspected item: its enchant and rune.
+local function greenLines(unit, slot)
+  if flavor ~= "sod" then return nil end
+  if not scanTip then
+    scanTip = CreateFrame("GameTooltip", "NameplateInspectScanTip", nil, "GameTooltipTemplate")
+  end
+  scanTip:SetOwner(WorldFrame, "ANCHOR_NONE")
+  scanTip:ClearLines()
+  local ok = pcall(scanTip.SetInventoryItem, scanTip, unit, slot)
+  if not ok then return nil end
+  local lines
+  for i = 2, scanTip:NumLines() do
+    local fs = _G["NameplateInspectScanTipTextLeft" .. i]
+    local line = fs and fs:GetText()
+    if type(line) == "string" and not isSecret(line) and isGreen(fs:GetTextColor()) then
+      line = strtrim((line:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")))
+      if line ~= "" and not effectLine(line) then
+        lines = lines or {}
+        lines[#lines + 1] = line
+      end
+    end
+  end
+  scanTip:Hide()
+  return lines
+end
+------------------------------------------------------------------------
+-- END SEASON OF DISCOVERY RUNES
+------------------------------------------------------------------------
+
+local function gearEntry(unit, slot, itemLink)
+  local linesOK, green = pcall(greenLines, unit, slot)
+  return {
+    slot = slot,
+    slotName = SLOT_NAMES[slot],
+    itemID = tonumber(itemLink:match("item:(%d+)")),
+    itemLink = itemLink,
+    green = linesOK and green or nil,  -- SoD only: enchant + rune tooltip lines
+  }
+end
+
 -- Empty slots are omitted. Returns nil when nothing was equipped/readable.
 local function captureGear(unit)
   if not gearEnabled() then return nil end
@@ -373,12 +449,7 @@ local function captureGear(unit)
   for slot = 1, 19 do
     local ok, itemLink = pcall(GetInventoryItemLink, unit, slot)
     if ok and not isSecret(itemLink) and type(itemLink) == "string" then
-      gear[slot] = {
-        slot = slot,
-        slotName = SLOT_NAMES[slot],
-        itemID = tonumber(itemLink:match("item:(%d+)")),
-        itemLink = itemLink,
-      }
+      gear[slot] = gearEntry(unit, slot, itemLink)
       count = count + 1
     end
   end
@@ -421,8 +492,7 @@ local function fillUnlinked(record, unit, missing)
     local ok, itemLink = pcall(GetInventoryItemLink, unit, slot)
     if ok and not isSecret(itemLink) and type(itemLink) == "string" then
       record.gear = record.gear or {}
-      record.gear[slot] = { slot = slot, slotName = SLOT_NAMES[slot],
-        itemID = tonumber(itemLink:match("item:(%d+)")), itemLink = itemLink }
+      record.gear[slot] = gearEntry(unit, slot, itemLink)
       missing[slot] = nil
     else
       left = left + 1
@@ -784,7 +854,10 @@ local function show(e)
   if e.gear then
     for slot = 1, 19 do
       local g = e.gear[slot]
-      if g then print(("   %-8s %s"):format(g.slotName or tostring(slot), g.itemLink or "?")) end
+      if g then
+        print(("   %-8s %s%s"):format(g.slotName or tostring(slot), g.itemLink or "?",
+          g.green and ("  |cff1eff00" .. table.concat(g.green, " / ") .. "|r") or ""))
+      end
     end
   end
   if e.gearUnlinked and next(e.gearUnlinked) then
@@ -873,7 +946,7 @@ SlashCmdList.NAMEPLATEINSPECT = function(msg)
 
   elseif lower == "diag" then
     local _, build, _, interface = GetBuildInfo()
-    print(("NPI: diagnostics v3.1.2, %s, client=%s build=%s interface=%s"):format(flavor,
+    print(("NPI: diagnostics v3.2.0, %s, client=%s build=%s interface=%s"):format(flavor,
       clientVersion, tostring(build), tostring(interface)))
     print(("NPI: plates=%d requests=%d ready=%d saved=%d timeouts=%d queued=%d pending=%s"):format(
       stats.plates, stats.requests, stats.ready, stats.saved, stats.timeouts, #queue,

@@ -52,7 +52,11 @@ export function normalizeGear(gear) {
     const slot = g && g.slot, item = g && parseItemLink(g.itemLink);
     if (!integer(slot) || slot < 1 || slot > 19 || seen.has(slot) || !item) continue;
     seen.add(slot);
-    out.push({slot,...item,link:text(g.itemLink,600)});
+    // SoD: the item's green tooltip lines (enchant + rune); runes are not in the link.
+    // savedvariables.js reads a Lua list as {"1":..,"2":..}, so accept both shapes.
+    const lines = Array.isArray(g.green) ? g.green : g.green && typeof g.green === "object" ? Object.values(g.green) : [];
+    const green = lines.map(l => text(l, 120)).filter(Boolean).slice(0, 6);
+    out.push({slot,...item,link:text(g.itemLink,600),...(green.length ? {green} : {})});
   }
   return out.sort((a,b)=>a.slot-b.slot);
 }
