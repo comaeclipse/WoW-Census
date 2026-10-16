@@ -1,0 +1,73 @@
+<?php
+// Map a request path to the file the static build would have published there.
+// Returns [content-type, body] or null for a 404.
+
+declare(strict_types=1);
+
+function route_request(string $path): ?array {
+  $html = 'text/html; charset=utf-8';
+  $md = 'text/markdown; charset=utf-8';
+  $json = 'application/json';
+  ['name' => $cssName, 'css' => $css] = stylesheet();
+
+  switch ($path) {
+    case '/sitemap.xml': return ['application/xml', sitemap_xml()];
+    case '/robots.txt': return ['text/plain; charset=utf-8', robots_txt()];
+    case '/llms.txt': return ['text/plain; charset=utf-8', llms_txt()];
+    case '/.well-known/ai-catalog.json': return [$json, ai_catalog_json()];
+    case '/404.html': return [$html, not_found_html()];
+    case '/_headers': return ['application/octet-stream', headers_file()];
+    case '/census.css': return ['text/css', localize_content(census_css())];
+    case '/notice-discord.png': return ['image/png', resource('public/notice-discord.png')];
+  }
+
+  if (preg_match('#^/retail/skin-colors(?:/([a-z0-9-]+))?/(index|detail)\.html$#', $path, $m)) {
+    if (($m[1] ?? '') !== '' && !isset(retail_skin_color_races()[$m[1]])) return null;
+    return [$html, localize_content(retail_skin_colors_page($cssName, $m[1] ?? null, $m[2] === 'detail'))];
+  }
+  if (preg_match('#^/retail/skin-colors(?:/([a-z0-9-]+))?/?$#', $path, $m)) {
+    if (($m[1] ?? '') !== '' && !isset(retail_skin_color_races()[$m[1]])) return null;
+    return [$html, localize_content(retail_skin_colors_page($cssName, $m[1] ?? null))];
+  }
+
+  // Realm explorer: /realms, /classic/realms (+ .html). It has no Markdown copy.
+  if (preg_match('#^/(?:([a-z]+)/)?realms(\.html)?$#', $path, $m)) {
+    $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
+    return $source ? [$html, realms_page_html($source)] : null;
+  }
+
+  // Edition pages: /, /combos, /classic/, /classic/combos (+ .html and .md copies).
+  if (preg_match('#^/(?:([a-z]+)/)?(?:(index|combos|auctionhouse|guilds|geography|talents|gear)(\.html|\.md)?)?$#', $path, $m)) {
+    $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
+    $page = ($m[2] ?? '') !== '' ? $m[2] : 'index';
+    $ext = $m[3] ?? '';
+    // The directory index is served as "/" and "/index.html"; a bare "/index" was never published.
+    if ($source && !($page === 'index' && ($m[2] ?? '') !== '' && $ext === '')) {
+      if ($ext === '.md') return [$md, page_markdown($source, $page)];
+      if ($page === 'index' && ($m[2] ?? '') === '' && !str_ends_with($path, '/')) return null;
+      return [$html, edition_page_html($source, $page)];
+    }
+  }
+
+  // Per-edition files.
+  if (preg_match('#^/(?:([a-z]+)/)?(census\.json|style\.[0-9a-f]{12}\.css|data/(talents|gear)\.[0-9a-f]{12}\.json)$#', $path, $m)) {
+    $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
+    if (!$source) return null;
+    if ($m[2] === 'census.json') return [$json, census_json($source)];
+    if (str_starts_with($m[2], 'style.')) return $m[2] === $cssName ? ['text/css', localize_content($css)] : null;
+    $data = render_edition_data($source, $m[3]);
+    return $data && $data['file'] === $m[2] ? [$json, $data['json'] . "\n"] : null;
+  }
+
+  // Race and class talent pages: /classic/human/ (+ index.html, index.md).
+  if (preg_match('#^/([a-z]+)/([a-z0-9-]+)/(index\.html|index\.md)?$#', $path, $m)) {
+    $route = '/' . $m[1] . '/' . $m[2] . '/';
+    foreach (race_profiles() as $source => $races)
+      foreach ($races as $race => $p)
+        if ($p['path'] === $route) return ($m[3] ?? '') === 'index.md' ? [$md, profile_markdown(race_page_html($source, $race), $route)] : [$html, race_page_html($source, $race)];
+    foreach (class_profiles() as $source => $p)
+      foreach ($p['classes'] as $cf)
+        if (class_route($source, $cf) === $route) return ($m[3] ?? '') === 'index.md' ? [$md, profile_markdown(class_page_html($source, $cf), $route)] : [$html, class_page_html($source, $cf)];
+  }
+  return null;
+}

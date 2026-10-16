@@ -42,7 +42,31 @@
   .combo-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
   .combo-panel{margin:0}.combo-table{min-width:0}.combo-table th,.combo-table td{width:auto}.combo-table th:nth-child(1),.combo-table td:nth-child(1){width:64%}
   .combo-name{text-align:left;white-space:normal;text-overflow:clip}.combo-name-content{display:flex;align-items:center;gap:7px}.combo-name-text{min-width:0;overflow-wrap:anywhere}.combo-name img{width:24px;height:24px;flex:none;border:2px solid #b99b55;box-shadow:1px 1px 0 #000;background:#111}
+  /* Retail: faction combos stacked left, role split + compact race panel right. */
+  .combocol,.sidecol{display:grid;gap:14px;min-width:0;align-content:start}
+  .roleblock,.raceblock{--fac:var(--gold);min-width:0;background:var(--panel);border:2px solid var(--line);border-left:5px solid var(--fac);box-shadow:4px 4px 0 var(--shadow)}
+  .rolehead{display:flex;align-items:center;gap:10px;padding:15px 17px 11px}
+  .roletiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 17px}
+  .roletile{display:flex;align-items:center;gap:8px;background:var(--panel2);border:2px solid var(--shadow);padding:7px 8px;min-width:0}
+  .roletile b{display:block;font-family:var(--pixel);font-size:14px;font-weight:400;line-height:1}
+  .roletile span{display:block;font-size:17px;color:var(--muted);margin-top:4px}
+  .roletile.tank b{color:var(--blue)}.roletile.heal b{color:var(--green)}.roletile.dps b{color:var(--red)}
+  .roleicon{flex:none;width:40px;height:40px;background:url("/role-icons.png") no-repeat;background-size:120px 40px;image-rendering:auto}
+  .roleicon.heal{background-position:-40px 0}.roleicon.dps{background-position:-80px 0}
+  .rolestack{display:flex;gap:2px;height:12px;margin:10px 17px 15px;border:2px solid var(--shadow);background:var(--shadow)}
+  .rolestack .tank{background:var(--blue)}.rolestack .heal{background:var(--green)}.rolestack .dps{background:var(--red)}
+  .racehead{justify-content:space-between;flex-wrap:wrap}
+  .raceblock .race-toggle{box-shadow:2px 2px 0 var(--shadow)}.raceblock .race-toggle button{font-size:7px;padding:6px 8px}
+  .rgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 17px 14px}.rgrid[hidden]{display:none}
+  .rcol{min-width:0}.rcol>.combofaction{margin-bottom:6px}
+  .rrow{margin-bottom:3px}
+  .rlab{display:flex;justify-content:space-between;gap:8px;font-size:16px;line-height:1}
+  .rlab span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rlab b{font-weight:400;color:var(--muted)}
+  .rbar{height:5px;background:var(--panel2);margin-top:2px}.rbar i{display:block;height:100%}
   @media (max-width:760px){.combogrid{grid-template-columns:1fr}}
   @media (max-width:760px){.combo-breakdown{grid-template-columns:1fr}.combo-panel{margin-bottom:22px}.combo-panel:last-child{margin-bottom:0}}
   @media (max-width:420px){.combocard{padding:10px 12px;gap:11px}.comboicons{min-width:74px}
-    .comboname{font-size:9px}}
+    .comboname{font-size:9px}
+    .rolehead,.rgrid,.roletiles{padding-left:12px;padding-right:12px}.rolestack{margin-left:12px;margin-right:12px}
+    .roletile{flex-direction:column;text-align:center;gap:6px;padding:8px 4px}}
