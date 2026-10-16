@@ -181,5 +181,6 @@ HTML;
 
 function realms_page_html(string $source): string {
   $html = render_realms_html($source, stylesheet()['name'], generated_at());
+  $html = str_replace('href="/census.css"', 'href="/census.css?v=' . census_css_version() . '"', $html);
   return localize_content($html);
 }

@@ -13,11 +13,13 @@ function resource(string $path): string {
 // The bundled stylesheet and its content-hashed name (tools/layout-id.js).
 function stylesheet(): array {
   $css = str_replace("\r\n", "\n", resource('public/style.css'));
-  // A fixed name with a short cache: a CSS change rewrites one file, not every page.
-  return ['css' => $css, 'name' => 'style.css'];
+  // Content-hashed: Cloudflare edge-caches CSS far past its max-age, so only a
+  // new URL reliably delivers a changed stylesheet.
+  return ['css' => $css, 'name' => 'style.' . substr(hash('sha256', $css), 0, 12) . '.css'];
 }
 
 function census_css(): string { return resource('public/census.css'); }
+function census_css_version(): string { return substr(hash('sha256', census_css()), 0, 12); }
 
 function localize_content(string $content): string {
   $content = str_replace('https://wow.zamimg.com/', '/assets/', $content);
@@ -71,6 +73,7 @@ function generated_at(): string {
 function edition_page_html(string $source, string $page): string {
   ['css' => $css, 'name' => $cssName] = stylesheet();
   $html = render_edition_page($source, $page, $cssName, generated_at());
+  $html = str_replace('href="/census.css"', 'href="/census.css?v=' . census_css_version() . '"', $html);
   if ($page === 'index') {
     $link = '<link rel="stylesheet" href="' . $cssName . '">';
     if (!str_contains($html, $link)) throw new RuntimeException("Landing page stylesheet missing: $source");
@@ -170,8 +173,8 @@ function not_found_html(): string {
 }
 
 function headers_file(): string {
-  return "/style.css\n  Cache-Control: public, max-age=300\n\n" .
-    "/:edition/style.css\n  Cache-Control: public, max-age=300\n\n" .
+  return "/style.*.css\n  Cache-Control: public, max-age=31536000, immutable\n\n" .
+    "/:edition/style.*.css\n  Cache-Control: public, max-age=31536000, immutable\n\n" .
     "/census.css\n  Cache-Control: public, max-age=300\n\n" .
     "/fonts/*\n  Cache-Control: public, max-age=31536000, immutable\n\n" .
     "/data/*\n  Cache-Control: public, max-age=31536000, immutable\n\n" .

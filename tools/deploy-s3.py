@@ -28,7 +28,7 @@ def objects(source):
         if not file.is_file() or file.name == "_headers":
             continue
         key = file.relative_to(source).as_posix()
-        immutable = (
+        immutable = (file.suffix == ".css" and key != "census.css") or (
             key.startswith(("fonts/", "data/")) or "/data/" in key
         )
         cache = LONG if immutable else SHORT
