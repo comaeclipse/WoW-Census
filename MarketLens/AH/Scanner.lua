@@ -328,6 +328,7 @@ function S:Abort(reason)
     self.scanning = false
     self.awaitingPage = false
     driver:Hide()
+    ML.ScanRows:Cancel()
     ML:Print("Scan aborted: %s", reason or "unknown")
     ML:Fire("SCAN_ABORT", reason)
 end
@@ -385,6 +386,8 @@ function S:Finish()
         self:FinishItemQuery(itemCount)
         return
     end
+    -- Bulk scans also keep their individual rows for the liquidity diff.
+    ML.ScanRows:Finish()
 
     -- Whether the latest full item snapshot has complete seller names. Partial
     -- seller samples update seller profiles, but must not make per-item seller
@@ -449,6 +452,7 @@ function S:BeginGetAllRead()
     local shown = GetNumAuctionItems("list")
     self.readTotal = shown or 0
     self.readIndex = 1
+    ML.ScanRows:Begin("getAll")
     if self.readTotal == 0 then
         self:Finish()
         return
@@ -461,7 +465,10 @@ function S:ReadBatch()
     local stop = math.min(self.readIndex + READ_BATCH - 1, self.readTotal)
     for i = self.readIndex, stop do
         local a = P:GetAuction(i)
-        if a then accumulate(self.acc.items, a) end
+        if a then
+            accumulate(self.acc.items, a)
+            ML.ScanRows:Add(a, ML.ScanRows:LegacyTimeLeft(i))
+        end
     end
     self.acc.totalRows = stop
     self.readIndex = stop + 1
@@ -619,6 +626,7 @@ function S:OnReplicate()
     self.awaitingPage = false
     self.readTotal = C_AuctionHouse.GetNumReplicateItems() or 0
     self.readIndex = 0 -- replicate indices are 0-based
+    ML.ScanRows:Begin("replicate")
     if self.readTotal == 0 then self:Finish() return end
     self:ReadModernBatch()
 end
@@ -628,7 +636,10 @@ function S:ReadModernBatch()
     local stop = math.min(self.readIndex + READ_BATCH - 1, self.readTotal - 1)
     for i = self.readIndex, stop do
         local a = P:GetReplicate(i)
-        if a then accumulate(self.acc.items, a) end
+        if a then
+            accumulate(self.acc.items, a)
+            ML.ScanRows:Add(a, ML.ScanRows:ReplicateTimeLeft(i))
+        end
     end
     self.readIndex = stop + 1
     self.acc.totalRows = self.readIndex
