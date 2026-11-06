@@ -141,12 +141,13 @@ export function renderClassProfile(inspects, source, classFile, opts) {
       `<div class="card-b">${body}</div>` +
       `<div class="card-f">${t.n ? `Median level ${t.medLv}` : "No players classified"}</div></article>`;
   };
-  const classChips = P.classes.length > 1 ? `<div class="chips" aria-label="Class">${P.classes.map((cf) =>
-    `<a class="chip" href="${classRoute(source, cf)}"${cf === classFile ? ' aria-current="page"' : ""}>${esc(CLASS_META[cf]?.[0] || cf)}</a>`).join("")}</div>` : "";
+  const classChips = P.classes.length > 1 ? `<div class="chips class-chip-links" aria-label="Class">${P.classes.map((cf) =>
+    `<a class="chip" href="${classRoute(source, cf)}"${cf === classFile ? ' aria-current="page"' : ""}>` +
+    `<img src="${esc(icon("classicon_" + cf.toLowerCase()))}" alt="" width="20" height="20"><span>${esc(CLASS_META[cf]?.[0] || cf)}</span></a>`).join("")}</div>` : "";
   const fonts = ["press-start-2p-latin", "vt323-latin", "cinzel-latin-800-normal", "friz-quadrata-regular"];
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title>
-<meta name="description" content="${esc(className)} talent picks observed in ${esc(P.gameLabel)} nearby-player inspections, ranked by popularity within each spec."><link rel="canonical" href="${esc(opts.canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="${esc(title)}"><meta property="og:url" content="${esc(opts.canonical)}"><link rel="icon" href="${prefix}favicon.ico">
+<meta name="description" content="${esc(className)} talents in ${esc(P.gameLabel)}: which talents players pick in each spec, ranked by how often they appear in nearby-player inspections."><link rel="canonical" href="${esc(opts.canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="${esc(title)}"><meta property="og:url" content="${esc(opts.canonical)}"><link rel="icon" href="${prefix}favicon.ico">
 ${fonts.map((f) => `<link rel="preload" href="${prefix}fonts/${f}.woff2" as="font" type="font/woff2" crossorigin>`).join("\n")}
 <link rel="stylesheet" href="${prefix}${esc(opts.stylesheet)}">
 <style>${profileStyle(prefix)}${CLASS_STYLE}</style></head>
@@ -154,13 +155,14 @@ ${fonts.map((f) => `<link rel="preload" href="${prefix}fonts/${f}.woff2" as="fon
 <header class="ihead">
   <div class="page-heading">
     <h1 class="iname">WoWCensus<span class="itopic">${esc(P.gameLabel)} ${esc(className)} Talents</span></h1>
-    <nav class="games game-nav">${gameNav((game) => CLASS_PROFILES[game].classes.includes(classFile) && classRoute(game, classFile)).map(([label, href]) => `<a class="game"${label === P.nav ? ' aria-current="true"' : ""} href="${href}">${label}</a>`).join("")}</nav>
+    <div class="site-nav-stack">
+      <nav class="games game-nav" aria-label="Game edition">${gameNav((game) => CLASS_PROFILES[game].classes.includes(classFile) && classRoute(game, classFile)).map(([label, href]) => `<a class="game"${label === P.nav ? ' aria-current="true"' : ""} href="${href}">${label}</a>`).join("")}</nav>
+      <nav class="games page-nav" aria-label="Site pages">${pageNav(source).map(([label, href]) => `<a class="game"${label === "Talents" ? ' aria-current="true"' : ""} href="${href}">${label}</a>`).join("")}</nav>
+    </div>
   </div>
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="${P.home}">${esc(P.nav)}</a><span aria-hidden="true">/</span><a href="${talentsPath(source)}">Talents</a><span aria-hidden="true">/</span><span aria-current="page">${esc(className)}</span></nav>
 </header>
-<div class="page-controls">
-  <nav class="games page-nav">${pageNav(source).map(([label, href]) => `<a class="game"${label === "Talents" ? ' aria-current="true"' : ""} href="${href}">${label}</a>`).join("")}</nav>${classChips}
-</div>
+${classChips}
 <section class="hero slab">
   <img class="portrait" src="${esc(icon("classicon_" + classFile.toLowerCase()))}" alt="" width="96" height="96">
   <div>

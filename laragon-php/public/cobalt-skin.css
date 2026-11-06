@@ -1,0 +1,62 @@
+.skin-switch{display:inline-flex;align-items:center;gap:3px;padding:3px;border:1px solid #557ac1;border-radius:5px;background:#0b1b3a}
+.skin-switch button{appearance:none;border:0;border-radius:3px;background:transparent;color:#b9c9eb;padding:7px 11px;font:600 12px/1.2 system-ui,sans-serif;cursor:pointer}
+.skin-switch button[aria-pressed="true"]{background:#315fc0;color:#fff;box-shadow:inset 0 0 0 1px #82a3ed}
+.skin-switch button:focus-visible{outline:2px solid #c9dcff;outline-offset:2px}
+.site-nav-stack>.skin-switch{margin:8px 0}
+
+html[data-skin="cobalt"]{background:#07112a;color:#dce7ff;color-scheme:dark}
+html[data-skin="cobalt"] body{margin:0;background:radial-gradient(ellipse at 50% 0,#122d63 0,transparent 40%),#07112a;color:#dce7ff;font:14px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+html[data-skin="cobalt"] body:before,html[data-skin="cobalt"] .crt{display:none!important}
+html[data-skin="cobalt"] a{color:#a9c7ff}
+html[data-skin="cobalt"] a:hover{color:#fff}
+html[data-skin="cobalt"] .ihead{display:none!important}
+html[data-skin="cobalt"] .wrap.cobalt-wrap{width:min(1120px,calc(100% - 36px));max-width:none;margin:0 auto;padding:0 0 52px}
+.cobalt-top{position:relative;z-index:30;background:#071736;border-bottom:1px solid #294b8c;box-shadow:0 3px 18px #02091966}
+.cobalt-top-inner{width:min(1120px,calc(100% - 36px));margin:auto;min-height:66px;display:flex;align-items:center;gap:28px}
+.cobalt-brand{flex:none;color:#e4edff!important;text-decoration:none;font:700 22px/1 Georgia,serif;letter-spacing:-.02em}
+.cobalt-brand span{color:#79a4ff}
+.cobalt-page-nav{display:flex;align-items:center;gap:18px;flex:1;min-width:0;overflow:auto;white-space:nowrap;scrollbar-width:thin}
+.cobalt-page-nav a{font:600 12px/1.3 system-ui,sans-serif;text-decoration:none;color:#a8bde5!important;padding:25px 0 22px;border:0!important;border-bottom:2px solid transparent!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;text-shadow:none!important}
+.cobalt-page-nav a[aria-current]{color:#fff!important;border-color:#8aafff}
+.cobalt-edition-nav{display:flex;gap:5px;overflow:auto;white-space:nowrap;padding:16px 0 10px;scrollbar-width:thin}
+.cobalt-edition-nav a{font:600 12px/1.3 system-ui,sans-serif;text-decoration:none;color:#aac0e8!important;padding:8px 11px;border:1px solid transparent!important;border-radius:4px;background:transparent!important;box-shadow:none!important;text-shadow:none!important}
+.cobalt-edition-nav a[aria-current]{background:#183b7f!important;border-color:#5b82ce!important;color:#fff!important}
+.cobalt-hero{position:relative;overflow:hidden;min-height:220px;display:flex;flex-direction:column;justify-content:center;padding:34px 42px;margin:6px 0 16px;border:1px solid #577ac0;border-radius:6px;background:radial-gradient(circle at 83% 35%,#315b9f 0,transparent 27%),linear-gradient(110deg,#183a81,#112a5a 64%,#0c1f45);box-shadow:inset 0 1px #a0bbfa2b}
+.cobalt-hero:after{content:"";position:absolute;right:3%;bottom:-85px;width:320px;height:400px;background:url('/cobalt-character.webp') center bottom / contain no-repeat;filter:drop-shadow(0 0 24px #6697ef44);pointer-events:none}
+.cobalt-eyebrow{margin:0 0 11px!important;color:#b1c9f6!important;font:700 11px/1.3 system-ui,sans-serif!important;letter-spacing:.15em;text-transform:uppercase}
+.cobalt-hero h1{position:relative;z-index:1;max-width:65%;margin:0;color:#f1f5ff;font:400 clamp(29px,4vw,49px)/1.1 Georgia,serif;letter-spacing:-.025em}
+.cobalt-intro{position:relative;z-index:1;max-width:58%;margin:17px 0 0!important;color:#c0d2f5!important;font:14px/1.6 system-ui,sans-serif!important}
+.cobalt-content{display:grid;gap:15px}
+.cobalt-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 15px}
+.cobalt-metric{display:flex;flex-direction:column;gap:5px;min-width:0;padding:17px;border:1px solid #41619c;border-radius:5px;background:#142c57}
+.cobalt-metric span{color:#a8c0ea;font:700 10px/1.3 system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.cobalt-metric strong{color:#eaf1ff;font:400 26px/1.2 Georgia,serif;overflow-wrap:anywhere}
+.cobalt-metric small{color:#aabfe4;font:12px/1.3 system-ui,sans-serif}
+.cobalt-content,.cobalt-content :where(button,input,select,table,th,td,.chip,.game,.hint,.meta,.key,.vsel-trigger,.vsel-item,.combostat,.comboname){font-family:system-ui,-apple-system,Segoe UI,sans-serif!important;letter-spacing:normal!important}
+.cobalt-content>main,.cobalt-content>.combo-breakdown{min-width:0}
+.cobalt-content .site-notice{margin:0!important;border:1px solid #365ba0!important;background:#102653!important;color:#dce8ff!important;box-shadow:none!important}
+.cobalt-content .page-controls,.cobalt-content .realm-controls,.cobalt-content .chips,.cobalt-content .vchips{border:1px solid #34558f!important;border-radius:5px!important;background:#10254c!important;padding:14px!important;margin:0 0 14px!important;box-shadow:none!important}
+.cobalt-content .vpane,.cobalt-content .panel,.cobalt-content .slab,.cobalt-content .combo-panel,.cobalt-content .race-panel,.cobalt-content .realm-detail,.cobalt-content .tile,.cobalt-content .card,.cobalt-content .board{min-width:0;border:1px solid #34558f!important;border-radius:5px!important;background:#102347!important;color:#dce8ff!important;box-shadow:none!important}
+.cobalt-content .vpane,.cobalt-content .panel,.cobalt-content .slab,.cobalt-content .combo-panel,.cobalt-content .race-panel,.cobalt-content .realm-detail{padding:22px!important;margin:0 0 15px!important}
+.cobalt-content .tile,.cobalt-content .card{padding:15px!important}
+.cobalt-content h1,.cobalt-content h2,.cobalt-content h3,.cobalt-content .ptitle,.cobalt-content .secthead{color:#edf3ff!important;font-family:Georgia,serif!important}
+.cobalt-content h2,.cobalt-content .ptitle{font-size:25px!important;font-weight:400!important;line-height:1.2!important;border-bottom:1px solid #37588e;padding-bottom:11px!important;margin:0 0 16px!important}
+.cobalt-content h3{font-size:19px!important}
+.cobalt-content p,.cobalt-content .hint,.cobalt-content .meta,.cobalt-content .itag{color:#b8cae9}
+.cobalt-content .bar,.cobalt-content .track,.cobalt-content .chart-track{background:#091a39!important;border-radius:4px!important}
+.cobalt-content .bar>*,.cobalt-content .chart-fill{background:#7da6ff!important}
+.cobalt-content input,.cobalt-content select,.cobalt-content button{color:#e6efff;background:#142e60;border:1px solid #5577b8;border-radius:4px}
+.cobalt-content button,.cobalt-content select{cursor:pointer}
+.cobalt-content button:hover,.cobalt-content .chip:hover{background:#254e9e!important}
+.cobalt-content :where(.chip,.vsel-trigger,.vsel-item,.race-toggle,.pick,.game){background:#172e5b!important;border:1px solid #5475b4!important;color:#dbe8ff!important;box-shadow:none!important;text-shadow:none!important}
+.cobalt-content :where(.chip[aria-current],.chip.on,.vsel-item[aria-selected="true"],.pick.on){background:#315fc0!important;color:#fff!important}
+.cobalt-content table{width:100%;border-collapse:collapse;color:#dbe7ff}
+.cobalt-content th{color:#a9c5f5;background:#153365;text-align:left;font:700 11px/1.3 system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.cobalt-content td,.cobalt-content th{padding:10px 12px;border-bottom:1px solid #34517f}
+.cobalt-content tr:nth-child(even) td{background:#142b53}
+.cobalt-table-scroll,.cobalt-content .tablewrap{overflow-x:auto;max-width:100%}
+.cobalt-content .chartgrid,.cobalt-content .combogrid,.cobalt-content .panelgrid,.cobalt-content .tiles,.cobalt-content .cards{gap:12px!important}
+.cobalt-content .itag{text-align:center;margin:7px 0 0}
+.cobalt-content :where(.tile .v,.card .num,.realm-grid strong,.realm-detail strong,.combostat,.bignum){color:#dceaff!important}
+@media(max-width:850px){.cobalt-top-inner{flex-wrap:wrap;gap:0 16px;padding:10px 0}.cobalt-page-nav{order:3;flex-basis:100%;gap:16px}.cobalt-page-nav a{padding:10px 0}.cobalt-top .skin-switch{margin-left:auto}.cobalt-hero{padding:28px;min-height:180px}.cobalt-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){html[data-skin="cobalt"] .wrap.cobalt-wrap,.cobalt-top-inner{width:min(100% - 24px,1120px)}.cobalt-hero{padding:24px 20px;min-height:170px}.cobalt-hero h1,.cobalt-intro{max-width:100%}.cobalt-hero:after{opacity:.12;width:180px;height:220px;right:-25px;bottom:-35px}.cobalt-content .vpane,.cobalt-content .panel,.cobalt-content .slab,.cobalt-content .combo-panel,.cobalt-content .race-panel,.cobalt-content .realm-detail{padding:16px!important}.cobalt-content .page-controls,.cobalt-content .realm-controls{padding:10px!important}.cobalt-content .tiles,.cobalt-content .cards,.cobalt-content .panelgrid{grid-template-columns:1fr!important}.cobalt-metrics{grid-template-columns:1fr 1fr}.cobalt-metric{padding:12px}.cobalt-metric strong{font-size:20px}}

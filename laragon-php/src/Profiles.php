@@ -4,7 +4,8 @@
 declare(strict_types=1);
 
 const PROFILE_GAMES = [
-  'classic-beta' => ['dir' => 'forever', 'home' => '/', 'nav' => 'Forever', 'gameLabel' => 'WoW Forever'],
+  'forever' => ['dir' => 'forever', 'home' => '/forever/', 'nav' => 'Forever', 'gameLabel' => 'WoW: Forever'],
+  'classic-beta' => ['dir' => 'forever-beta', 'home' => '/forever-beta/', 'nav' => 'Forever (Beta)', 'gameLabel' => 'WoW: Forever (Beta)'],
   'classic-progression' => ['dir' => 'tbc', 'home' => '/tbc/', 'nav' => 'TBC Anniversary', 'gameLabel' => 'TBC Anniversary'],
   'classic' => ['dir' => 'classic', 'home' => '/classic/', 'nav' => 'Classic Era', 'gameLabel' => 'Classic Era'],
   'sod' => ['dir' => 'sod', 'home' => '/sod/', 'nav' => 'SoD', 'gameLabel' => 'Season of Discovery'],
@@ -150,9 +151,9 @@ function race_template(): string {
 
 function esc_profile(mixed $s): string { return esc_markup($s); }
 
-function render_class_profile(array $inspects, string $source, string $classFile, string $stylesheet, string $canonical): string {
+// $D is class_profile() for this class, as class_profiles_model() publishes it.
+function render_class_profile(array $D, string $source, string $classFile, string $stylesheet, string $canonical): string {
   $P = class_profiles()[$source];
-  $D = class_profile($inspects, $classFile, $source);
   $route = class_route($source, $classFile);
   $prefix = root_prefix($route);
   $icon = fn($n) => $prefix . 'assets/images/wow/icons/large/' . $n . '.jpg';
@@ -209,7 +210,7 @@ function render_class_profile(array $inspects, string $source, string $classFile
   return <<<HTML
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>$eTitle</title>
-<meta name="description" content="$eClass talent picks observed in $eGame nearby-player inspections, ranked by popularity within each spec."><link rel="canonical" href="$eCanon"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="$eTitle"><meta property="og:url" content="$eCanon"><link rel="icon" href="{$prefix}favicon.ico">
+<meta name="description" content="$eClass talents in $eGame: which talents players pick in each spec, ranked by how often they appear in nearby-player inspections."><link rel="canonical" href="$eCanon"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="$eTitle"><meta property="og:url" content="$eCanon"><link rel="icon" href="{$prefix}favicon.ico">
 $fonts
 <link rel="stylesheet" href="$prefix$eSheet">
 <style>$style</style></head>
@@ -225,7 +226,7 @@ $fonts
   <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="{$P['home']}">$eNav</a><span aria-hidden="true">/</span><a href="$talents">Talents</a><span aria-hidden="true">/</span><span aria-current="page">$eClass</span></nav>
 </header>
 $classChips
-<section class="hero slab">
+<section class="hero slab class-profile-summary">
   <img class="portrait" src="$portrait" alt="" width="96" height="96">
   <div>
     <h2>$eClass <span>talents</span></h2>

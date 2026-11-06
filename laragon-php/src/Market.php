@@ -65,28 +65,62 @@ function sort_desc_by(array $items, string $field): array {
   return js_sort($items, fn($a, $b) => ($b[$field] ?: 0) - ($a[$field] ?: 0));
 }
 
-function render_market_view(?array $snapshot, int|float $threshold, string $analysisLabel = ''): string {
+// What one auction view shows: totals, the leading markets and the few items
+// its tables list. The compact origin publishes these rather than every item
+// of every view, which took more memory than the origin droplet has.
+function market_view_summary(?array $snapshot, int|float $threshold): array {
   $all = $snapshot['items'] ?? [];
   $aggregateOnly = !empty($snapshot['aggregateOnly']);
   $joke = $aggregateOnly ? [] : sort_desc_by(array_values(array_filter($all, fn($it) => ($it['asp'] ?: 0) > $threshold)), 'asp');
   $items = $joke ? array_values(array_filter($all, fn($it) => ($it['asp'] ?: 0) <= $threshold)) : $all;
-  $realms = $snapshot['realms'] ?? [];
-  $branch = $snapshot['branch'] ?? '';
-  $updatedAt = $snapshot['updatedAt'] ?? null;
 
   $totalValue = 0; $totalQty = 0;
   foreach ($items as $it) { $totalValue += $it['mv'] ?: 0; $totalQty += $it['q'] ?: 0; }
-
-  $byQty = array_slice(sort_desc_by($items, 'q'), 0, 15);
-  $byPrice = array_slice(sort_desc_by(array_values(array_filter($items, fn($it) => ($it['q'] ?: 0) > 0)), 'asp'), 0, 15);
-  $byValue = array_slice(sort_desc_by($items, 'mv'), 0, 15);
 
   $cats = [];
   foreach ($items as $it) {
     $k = $it['cat'] ?: 'Uncategorized';
     $cats[$k] = ($cats[$k] ?? 0) + ($aggregateOnly ? ($it['q'] ?: 0) : ($it['mv'] ?: 0));
   }
-  $catEntries = array_slice(sorted_entries($cats), 0, 14);
+
+  $breakouts = [];
+  foreach ($items as $it)
+    if (($it['q'] ?: 0) >= 500 && ($it['pq'] ?: 0) >= 100) {
+      $it['pct'] = js_round(($it['q'] - $it['pq']) / $it['pq'] * 100);
+      if ($it['pct'] > 0) $breakouts[] = $it;
+    }
+
+  return [
+    'realms' => $snapshot['realms'] ?? [], 'branch' => $snapshot['branch'] ?? '', 'updatedAt' => $snapshot['updatedAt'] ?? null,
+    'aggregateOnly' => $aggregateOnly, 'itemCount' => count($items), 'totalValue' => $totalValue, 'totalQty' => $totalQty,
+    'byQty' => array_slice(sort_desc_by($items, 'q'), 0, 15),
+    'byPrice' => array_slice(sort_desc_by(array_values(array_filter($items, fn($it) => ($it['q'] ?: 0) > 0)), 'asp'), 0, 15),
+    'byValue' => array_slice(sort_desc_by($items, 'mv'), 0, 15),
+    'cats' => array_slice(sorted_entries($cats), 0, 14),
+    'breakouts' => array_slice(js_sort($breakouts, fn($a, $b) => js_or($b['pct'] - $a['pct'], fn() => $b['q'] - $a['q'])), 0, 2),
+    'joke' => array_slice($joke, 0, 10),
+    // INF, when nothing is a joke listing, has no JSON form; it is shown only beside jokes.
+    'jokeThreshold' => $joke ? $threshold : null,
+  ];
+}
+
+// Each view's summary, with joke listings judged by the widest view's prices.
+function market_view_summaries(array $views): array {
+  $widest = ['items' => []];
+  foreach ($views as $v) if (count($v['snapshot']['items'] ?? []) > count($widest['items'] ?? [])) $widest = $v['snapshot'];
+  $threshold = joke_price_threshold($widest['items']);
+  return array_map(fn($v) => ['realm' => $v['realm'], 'faction' => $v['faction'], 'summary' => market_view_summary($v['snapshot'], $threshold)], $views);
+}
+
+function render_market_view(array $summary, string $analysisLabel = ''): string {
+  $aggregateOnly = $summary['aggregateOnly'];
+  $joke = $summary['joke'];
+  $realms = $summary['realms'];
+  $branch = $summary['branch'];
+  $updatedAt = $summary['updatedAt'];
+  $totalValue = $summary['totalValue']; $totalQty = $summary['totalQty'];
+  $byQty = $summary['byQty']; $byPrice = $summary['byPrice']; $byValue = $summary['byValue'];
+  $catEntries = $summary['cats'];
   $catMax = $catEntries ? $catEntries[0][1] : 0;
   $catPanel = '<div class="panel census" style="margin-bottom:22px">' .
     '<div class="ptitle">' . ($aggregateOnly
@@ -101,7 +135,7 @@ function render_market_view(?array $snapshot, int|float $threshold, string $anal
       : '<p class="hint">No market data yet.</p>') . '</div>';
 
   $tiles =
-    '<div class="tile"><div class="k">Items listed</div><div class="v">' . js_locale(count($items)) .
+    '<div class="tile"><div class="k">Items listed</div><div class="v">' . js_locale($summary['itemCount']) .
       '</div><div class="s">distinct items seen</div></div>' .
     ($aggregateOnly
       ? '<div class="tile"><div class="k">Price coverage</div><div class="v">MINIMUM</div><div class="s">aggregate browse summaries</div></div>'
@@ -113,13 +147,7 @@ function render_market_view(?array $snapshot, int|float $threshold, string $anal
       ($updatedAt ? esc(substr((string)$updatedAt, 0, 10)) : '&mdash;') .
       '</div></div>';
 
-  $breakouts = [];
-  foreach ($items as $it)
-    if (($it['q'] ?: 0) >= 500 && ($it['pq'] ?: 0) >= 100) {
-      $it['pct'] = js_round(($it['q'] - $it['pq']) / $it['pq'] * 100);
-      if ($it['pct'] > 0) $breakouts[] = $it;
-    }
-  $supplyBreakouts = array_slice(js_sort($breakouts, fn($a, $b) => js_or($b['pct'] - $a['pct'], fn() => $b['q'] - $a['q'])), 0, 2);
+  $supplyBreakouts = $summary['breakouts'];
 
   $qtyCell = fn($it) => js_locale($it['q'] ?: 0);
   $linkCell = fn($it, $b) => item_link($it, $b);
@@ -144,7 +172,7 @@ function render_market_view(?array $snapshot, int|float $threshold, string $anal
   ]);
 
   $realmText = implode(' · ', array_map('realm_name', $realms));
-  $body = $items
+  $body = $summary['itemCount']
     ? '<div class="mktgrid">' . $qtyTable . $priceTable . '</div>' . $catPanel . ($aggregateOnly ? '' : $valueTable)
     : '<div class="panel"><p class="hint">No auction scan is in the current snapshot for ' .
       esc($realmText !== '' ? $realmText : 'this faction') .
@@ -152,8 +180,8 @@ function render_market_view(?array $snapshot, int|float $threshold, string $anal
 
   $jokePanel = $joke
     ? top_table('Excluded as joke listings',
-        'Priced above ' . big_gold($threshold) . ' a unit — left out of the totals and lists above.',
-        array_slice($joke, 0, 10), $branch, [
+        'Priced above ' . big_gold($summary['jokeThreshold']) . ' a unit — left out of the totals and lists above.',
+        $joke, $branch, [
           ['label' => 'Item', 'left' => true, 'cell' => $linkCell],
           ['label' => 'Unit', 'cell' => fn($it) => esc(money($it['asp']))],
           ['label' => 'Qty', 'cell' => $qtyCell],
@@ -162,13 +190,13 @@ function render_market_view(?array $snapshot, int|float $threshold, string $anal
     : '';
 
   $marketAnalysis = '';
-  if ($analysisLabel !== '' && $items) {
+  if ($analysisLabel !== '' && $summary['itemCount']) {
     $sectors = implode(', ', array_map(fn($e) => js_lower((string)$e[0]) . ' at ' . big_gold($e[1]), array_slice($catEntries, 0, 3)));
     $marketAnalysis = '<section class="panel market-analysis" aria-label="' . esc($analysisLabel) . ' market update">' .
       '<div class="ptitle">' . esc($analysisLabel) . ' market update</div>' .
       '<p>Scanned ' . esc($updatedAt ? substr((string)$updatedAt, 0, 10) : 'date unavailable') .
       ': The auction house held <strong>' . js_locale($totalQty) .
-      ' units across ' . js_locale(count($items)) . ' items</strong> with <strong>' .
+      ' units across ' . js_locale($summary['itemCount']) . ' items</strong> with <strong>' .
       esc(big_gold($totalValue)) . '</strong> in listed asking value. Leading sectors: ' .
       esc($sectors) .
       '. ' . ($supplyBreakouts ? 'Supply breakouts: ' .
@@ -181,6 +209,7 @@ function render_market_view(?array $snapshot, int|float $threshold, string $anal
     ($jokePanel !== '' ? '<div style="margin-top:22px">' . $jokePanel . '</div>' : '');
 }
 
+// $views come from market_view_summaries().
 function render_market_html(array $views, array $dims, array $opts): string {
   $list = array_values(array_filter($views));
   $realmOpts = $dims['realm'] ?? [];
@@ -188,14 +217,11 @@ function render_market_html(array $views, array $dims, array $opts): string {
   $activeRealm = $realmOpts ? $realmOpts[0]['key'] : 'all';
   $activeFaction = $factionOpts ? $factionOpts[0]['key'] : 'all';
   $chips = chip_row('realm', $realmOpts, $activeRealm) . chip_row('faction', $factionOpts, $activeFaction);
-  $widest = ['items' => []];
-  foreach ($list as $v) if (count($v['snapshot']['items'] ?? []) > count($widest['items'] ?? [])) $widest = $v['snapshot'];
-  $threshold = joke_price_threshold($widest['items']);
   $sections = '';
   foreach ($list as $v) {
     $on = $v['realm'] === $activeRealm && $v['faction'] === $activeFaction;
     $sections .= '<div class="vpane" data-realm="' . esc($v['realm']) . '" data-faction="' . esc($v['faction']) . '"' .
-      ($on ? '' : ' hidden') . '>' . render_market_view($v['snapshot'], $threshold,
+      ($on ? '' : ' hidden') . '>' . render_market_view($v['summary'],
         !empty($opts['tbcAnalysis']) ? ($v['realm'] === 'all' ? 'TBC' : $v['realm']) .
           ($v['faction'] === 'all' ? ' combined' : ' ' . $v['faction']) : '') . '</div>';
   }
@@ -207,7 +233,7 @@ function render_market_html(array $views, array $dims, array $opts): string {
   $generatedNote = generated_note_html($opts['generatedNote'] ?? null);
   $seoGameLabel = seo_label($gameLabel);
   $topic = $seoGameLabel . ' Auction House Prices';
-  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' auction house snapshot with item supply, asking prices, listed value, and market changes from recent scans.', $opts['canonical'] ?? null);
+  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' auction house prices: item supply, asking prices, total listed value and recent market changes per realm from regular scans.', $opts['canonical'] ?? null);
   $friz = !empty($opts['tbcAnalysis']) ? '<link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>' : '';
   $stylesheet = esc($opts['stylesheet'] ?? 'style.css');
   $census_css = CENSUS_STYLESHEET;

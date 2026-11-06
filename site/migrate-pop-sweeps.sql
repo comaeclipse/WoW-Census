@@ -44,6 +44,6 @@ CREATE TABLE IF NOT EXISTS character_location_observations (
   PRIMARY KEY (game, source_game, sweep_id, character_key)
 );
 CREATE INDEX IF NOT EXISTS idx_character_location_observations_sweep
-  ON character_location_observations(game, source_game, sweep_id);
+  ON character_location_observations(game, source_game, sweep_id, query_index);
 CREATE INDEX IF NOT EXISTS idx_character_location_observations_zone
   ON character_location_observations(game, zone, observed_at DESC);

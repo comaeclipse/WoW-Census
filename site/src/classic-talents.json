@@ -1,0 +1,4327 @@
+{
+  "version": "classic-1792077542-0a996e080739",
+  "source": "https://nether.wowhead.com/classic/data/talents-classic?dv=29",
+  "retrievedAt": "2026-10-15T15:19:02.971Z",
+  "nodes": [
+    {
+      "node": 23,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11083,
+      "max": 2,
+      "icon": "spell_fire_fire",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 24,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11094,
+      "max": 2,
+      "icon": "spell_fire_firearmor",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 25,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11095,
+      "max": 3,
+      "icon": "spell_fire_soulburn",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 26,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11069,
+      "max": 5,
+      "icon": "spell_fire_flamebolt",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 27,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11078,
+      "max": 3,
+      "icon": "spell_fire_fireball",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 28,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11100,
+      "max": 2,
+      "icon": "spell_fire_flare",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 29,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11366,
+      "max": 1,
+      "icon": "spell_fire_fireball02",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 30,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11103,
+      "max": 5,
+      "icon": "spell_fire_meteorstorm",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 31,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11108,
+      "max": 3,
+      "icon": "spell_fire_selfdestruct",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 32,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11113,
+      "max": 1,
+      "icon": "spell_holy_excorcism_02",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 33,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11115,
+      "max": 3,
+      "icon": "spell_nature_wispheal",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 34,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11119,
+      "max": 5,
+      "icon": "spell_fire_incinerate",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 35,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11124,
+      "max": 5,
+      "icon": "spell_fire_immolation",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 36,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 11129,
+      "max": 1,
+      "icon": "spell_fire_sealoffire",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1141,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 18459,
+      "max": 2,
+      "icon": "spell_fire_flameshock",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1639,
+      "classFile": "MAGE",
+      "tab": 41,
+      "spell": 29074,
+      "max": 3,
+      "icon": "spell_fire_masterofelements",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 37,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11070,
+      "max": 5,
+      "icon": "spell_frost_frostbolt02",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 38,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11071,
+      "max": 3,
+      "icon": "spell_frost_frostarmor",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 61,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11151,
+      "max": 3,
+      "icon": "spell_frost_frostbolt",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 62,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11165,
+      "max": 2,
+      "icon": "spell_frost_freezingbreath",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 63,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11185,
+      "max": 3,
+      "icon": "spell_frost_icestorm",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 64,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11190,
+      "max": 3,
+      "icon": "spell_frost_glacier",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 65,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11175,
+      "max": 3,
+      "icon": "spell_frost_wisp",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 66,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11160,
+      "max": 3,
+      "icon": "spell_frost_stun",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 67,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11170,
+      "max": 5,
+      "icon": "spell_frost_frostshock",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 68,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11180,
+      "max": 5,
+      "icon": "spell_frost_chillingblast",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 69,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 12472,
+      "max": 1,
+      "icon": "spell_frost_wizardmark",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 70,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11189,
+      "max": 2,
+      "icon": "spell_frost_frostward",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 71,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11426,
+      "max": 1,
+      "icon": "spell_ice_lament",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 72,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11958,
+      "max": 1,
+      "icon": "spell_frost_frost",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 73,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 11207,
+      "max": 5,
+      "icon": "spell_frost_iceshard",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 741,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 16757,
+      "max": 2,
+      "icon": "spell_shadow_darkritual",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 1649,
+      "classFile": "MAGE",
+      "tab": 61,
+      "spell": 29438,
+      "max": 3,
+      "icon": "spell_ice_magicdamage",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 74,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11210,
+      "max": 2,
+      "icon": "spell_holy_dispelmagic",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 75,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11213,
+      "max": 5,
+      "icon": "spell_shadow_manaburn",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 76,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11222,
+      "max": 5,
+      "icon": "spell_holy_devotion",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 77,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11232,
+      "max": 5,
+      "icon": "spell_shadow_charm",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 78,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 6057,
+      "max": 2,
+      "icon": "inv_wand_01",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 80,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11237,
+      "max": 5,
+      "icon": "spell_nature_starfall",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 81,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11242,
+      "max": 3,
+      "icon": "spell_nature_wispsplode",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 82,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11247,
+      "max": 2,
+      "icon": "spell_nature_abolishmagic",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 83,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11252,
+      "max": 2,
+      "icon": "spell_shadow_detectlesserinvisibility",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 85,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 28574,
+      "max": 1,
+      "icon": "spell_arcane_arcaneresilience",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 86,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 12043,
+      "max": 1,
+      "icon": "spell_nature_enchantarmor",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 87,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 12042,
+      "max": 1,
+      "icon": "spell_nature_lightning",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 88,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 11255,
+      "max": 2,
+      "icon": "spell_frost_iceshock",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 421,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 15058,
+      "max": 3,
+      "icon": "spell_shadow_teleport",
+      "row": 5,
+      "col": 1
+    },
+    {
+      "node": 1142,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 18462,
+      "max": 3,
+      "icon": "spell_shadow_siphonmana",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 1650,
+      "classFile": "MAGE",
+      "tab": 81,
+      "spell": 29441,
+      "max": 5,
+      "icon": "spell_nature_astralrecalgroup",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 121,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12834,
+      "max": 3,
+      "icon": "ability_backstab",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 123,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12281,
+      "max": 5,
+      "icon": "inv_sword_27",
+      "row": 4,
+      "col": 3
+    },
+    {
+      "node": 124,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12282,
+      "max": 3,
+      "icon": "ability_rogue_ambush",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 125,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12284,
+      "max": 5,
+      "icon": "inv_mace_01",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 126,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12285,
+      "max": 2,
+      "icon": "ability_warrior_charge",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 127,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12286,
+      "max": 3,
+      "icon": "ability_gouge",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 128,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12287,
+      "max": 3,
+      "icon": "ability_thunderclap",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 129,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12289,
+      "max": 3,
+      "icon": "ability_shockwave",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 130,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 16462,
+      "max": 5,
+      "icon": "ability_parry",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 131,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12290,
+      "max": 2,
+      "icon": "inv_sword_05",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 132,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12700,
+      "max": 5,
+      "icon": "inv_axe_06",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 133,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12292,
+      "max": 1,
+      "icon": "ability_rogue_slicedice",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 134,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12165,
+      "max": 5,
+      "icon": "inv_weapon_halbard_01",
+      "row": 5,
+      "col": 0
+    },
+    {
+      "node": 135,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12294,
+      "max": 1,
+      "icon": "ability_warrior_savageblow",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 136,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12163,
+      "max": 5,
+      "icon": "inv_axe_09",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 137,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12296,
+      "max": 1,
+      "icon": "spell_holy_blessingofstamina",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 641,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 12295,
+      "max": 5,
+      "icon": "spell_nature_enchantarmor",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 662,
+      "classFile": "WARRIOR",
+      "tab": 161,
+      "spell": 16493,
+      "max": 2,
+      "icon": "ability_searingarrow",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 138,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12297,
+      "max": 5,
+      "icon": "spell_nature_mirrorimage",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 140,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12299,
+      "max": 5,
+      "icon": "spell_holy_devotion",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 141,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12300,
+      "max": 5,
+      "icon": "spell_magic_magearmor",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 142,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12301,
+      "max": 2,
+      "icon": "ability_racial_bloodrage",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 143,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12302,
+      "max": 2,
+      "icon": "spell_nature_reincarnation",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 144,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12303,
+      "max": 5,
+      "icon": "ability_warrior_innerrage",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 145,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12945,
+      "max": 3,
+      "icon": "ability_defend",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 146,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12308,
+      "max": 3,
+      "icon": "ability_warrior_sunder",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 147,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12797,
+      "max": 3,
+      "icon": "ability_warrior_revenge",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 148,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 23922,
+      "max": 1,
+      "icon": "inv_shield_05",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 149,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12311,
+      "max": 2,
+      "icon": "ability_warrior_shieldbash",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 150,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12312,
+      "max": 2,
+      "icon": "ability_warrior_shieldwall",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 151,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12313,
+      "max": 3,
+      "icon": "ability_warrior_disarm",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 152,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12809,
+      "max": 1,
+      "icon": "ability_thunderbolt",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 153,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12975,
+      "max": 1,
+      "icon": "spell_holy_ashestoashes",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 702,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 16538,
+      "max": 5,
+      "icon": "inv_sword_20",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1601,
+      "classFile": "WARRIOR",
+      "tab": 163,
+      "spell": 12298,
+      "max": 5,
+      "icon": "inv_shield_06",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 154,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12318,
+      "max": 5,
+      "icon": "ability_warrior_battleshout",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 155,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12317,
+      "max": 5,
+      "icon": "spell_shadow_unholyfrenzy",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 156,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12319,
+      "max": 5,
+      "icon": "ability_ghoulfrenzy",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 157,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12320,
+      "max": 5,
+      "icon": "ability_rogue_eviscerate",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 158,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12321,
+      "max": 5,
+      "icon": "spell_nature_purge",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 159,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12322,
+      "max": 5,
+      "icon": "spell_nature_stoneclawtotem",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 160,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12323,
+      "max": 1,
+      "icon": "spell_shadow_deathscream",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 161,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12324,
+      "max": 5,
+      "icon": "ability_warrior_warcry",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 165,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12328,
+      "max": 1,
+      "icon": "spell_shadow_deathpact",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 166,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12329,
+      "max": 3,
+      "icon": "ability_warrior_cleave",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 167,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 23881,
+      "max": 1,
+      "icon": "spell_nature_bloodlust",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 168,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 12862,
+      "max": 5,
+      "icon": "ability_warrior_decisivestrike",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 661,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 16487,
+      "max": 3,
+      "icon": "spell_shadow_summonimp",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 1541,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 20500,
+      "max": 2,
+      "icon": "spell_nature_ancestralguardian",
+      "row": 5,
+      "col": 0
+    },
+    {
+      "node": 1542,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 20502,
+      "max": 2,
+      "icon": "inv_sword_48",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1543,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 20504,
+      "max": 2,
+      "icon": "ability_rogue_sprint",
+      "row": 4,
+      "col": 3
+    },
+    {
+      "node": 1581,
+      "classFile": "WARRIOR",
+      "tab": 164,
+      "spell": 23584,
+      "max": 5,
+      "icon": "ability_dualwield",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 181,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13705,
+      "max": 5,
+      "icon": "ability_marksmanship",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 182,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13706,
+      "max": 5,
+      "icon": "inv_weapon_shortblade_05",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 183,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13707,
+      "max": 5,
+      "icon": "inv_gauntlets_04",
+      "row": 4,
+      "col": 3
+    },
+    {
+      "node": 184,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13709,
+      "max": 5,
+      "icon": "inv_mace_01",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 186,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13712,
+      "max": 5,
+      "icon": "spell_nature_invisibilty",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 187,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13713,
+      "max": 5,
+      "icon": "ability_parry",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 201,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13732,
+      "max": 2,
+      "icon": "spell_shadow_ritualofsacrifice",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 202,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13733,
+      "max": 3,
+      "icon": "ability_backstab",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 203,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13741,
+      "max": 3,
+      "icon": "ability_gouge",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 204,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13742,
+      "max": 2,
+      "icon": "spell_shadow_shadowward",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 205,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13750,
+      "max": 1,
+      "icon": "spell_shadow_shadowworddominate",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 206,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13754,
+      "max": 2,
+      "icon": "ability_kick",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 221,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13715,
+      "max": 5,
+      "icon": "ability_dualwield",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 222,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13743,
+      "max": 2,
+      "icon": "ability_rogue_sprint",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 223,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13877,
+      "max": 1,
+      "icon": "ability_warrior_punishingblow",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 242,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 13960,
+      "max": 5,
+      "icon": "inv_sword_27",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 301,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 14251,
+      "max": 1,
+      "icon": "ability_warrior_challange",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1122,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 18427,
+      "max": 3,
+      "icon": "ability_racial_avatar",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1703,
+      "classFile": "ROGUE",
+      "tab": 181,
+      "spell": 30919,
+      "max": 2,
+      "icon": "spell_holy_blessingofstrength",
+      "row": 5,
+      "col": 1
+    },
+    {
+      "node": 268,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14113,
+      "max": 5,
+      "icon": "ability_poisons",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 269,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14128,
+      "max": 5,
+      "icon": "ability_criticalstrike",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 270,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14138,
+      "max": 5,
+      "icon": "ability_racial_bloodrage",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 272,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14144,
+      "max": 2,
+      "icon": "ability_fiegndead",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 273,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14156,
+      "max": 3,
+      "icon": "ability_druid_disembowel",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 274,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14158,
+      "max": 2,
+      "icon": "spell_shadow_deathscream",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 276,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14162,
+      "max": 3,
+      "icon": "ability_rogue_eviscerate",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 277,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14165,
+      "max": 3,
+      "icon": "ability_rogue_slicedice",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 278,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14168,
+      "max": 2,
+      "icon": "ability_warrior_riposte",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 279,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14174,
+      "max": 3,
+      "icon": "ability_rogue_kidneyshot",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 280,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14177,
+      "max": 1,
+      "icon": "spell_ice_lament",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 281,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14179,
+      "max": 1,
+      "icon": "ability_warrior_decisivestrike",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 283,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14186,
+      "max": 5,
+      "icon": "spell_shadow_chilltouch",
+      "row": 5,
+      "col": 1
+    },
+    {
+      "node": 382,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 14983,
+      "max": 1,
+      "icon": "spell_nature_earthbindtotem",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 682,
+      "classFile": "ROGUE",
+      "tab": 182,
+      "spell": 16513,
+      "max": 5,
+      "icon": "ability_rogue_feigndeath",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 241,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 13958,
+      "max": 5,
+      "icon": "spell_shadow_charm",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 244,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 13975,
+      "max": 5,
+      "icon": "ability_stealth",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 245,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 13976,
+      "max": 3,
+      "icon": "spell_shadow_fumble",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 246,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 13983,
+      "max": 3,
+      "icon": "spell_nature_mirrorimage",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 247,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 13981,
+      "max": 2,
+      "icon": "spell_magic_lesserinvisibilty",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 261,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 14057,
+      "max": 5,
+      "icon": "ability_warrior_warcry",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 262,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 14076,
+      "max": 3,
+      "icon": "ability_sap",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 263,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 14079,
+      "max": 3,
+      "icon": "ability_rogue_ambush",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 265,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 14082,
+      "max": 2,
+      "icon": "spell_shadow_summonsuccubus",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 284,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 14185,
+      "max": 1,
+      "icon": "spell_shadow_antishadow",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 303,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 14278,
+      "max": 1,
+      "icon": "spell_shadow_curse",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 381,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 14183,
+      "max": 1,
+      "icon": "spell_shadow_possession",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 681,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 16511,
+      "max": 1,
+      "icon": "spell_shadow_lifedrain",
+      "row": 4,
+      "col": 3
+    },
+    {
+      "node": 1123,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 14171,
+      "max": 3,
+      "icon": "inv_sword_17",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 1700,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 30892,
+      "max": 2,
+      "icon": "ability_rogue_feint",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 1701,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 30894,
+      "max": 2,
+      "icon": "ability_ambush",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 1702,
+      "classFile": "ROGUE",
+      "tab": 183,
+      "spell": 30902,
+      "max": 5,
+      "icon": "inv_weapon_crossbow_11",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 321,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14531,
+      "max": 2,
+      "icon": "spell_nature_tranquility",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 322,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 10060,
+      "max": 1,
+      "icon": "spell_holy_powerinfusion",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 341,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14520,
+      "max": 5,
+      "icon": "ability_hibernation",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 342,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14522,
+      "max": 5,
+      "icon": "spell_magic_magearmor",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 343,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14748,
+      "max": 3,
+      "icon": "spell_holy_powerwordshield",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 344,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14749,
+      "max": 2,
+      "icon": "spell_holy_wordfortitude",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 345,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14524,
+      "max": 5,
+      "icon": "inv_wand_01",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 346,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14747,
+      "max": 3,
+      "icon": "spell_holy_innerfire",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 347,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14521,
+      "max": 3,
+      "icon": "spell_nature_sleep",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 348,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14751,
+      "max": 1,
+      "icon": "spell_frost_windwalkon",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 350,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14750,
+      "max": 2,
+      "icon": "spell_shadow_manaburn",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 351,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14752,
+      "max": 1,
+      "icon": "spell_holy_divinespirit",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 352,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 14523,
+      "max": 5,
+      "icon": "spell_nature_manaregentotem",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 1201,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 18551,
+      "max": 5,
+      "icon": "spell_nature_enchantarmor",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1202,
+      "classFile": "PRIEST",
+      "tab": 201,
+      "spell": 18544,
+      "max": 5,
+      "icon": "spell_nature_slowingtotem",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 361,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14892,
+      "max": 3,
+      "icon": "spell_holy_layonhands",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 401,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14889,
+      "max": 5,
+      "icon": "spell_holy_sealofsalvation",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 402,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14901,
+      "max": 5,
+      "icon": "spell_holy_spiritualguidence",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 403,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14909,
+      "max": 2,
+      "icon": "spell_holy_searinglightpriest",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 404,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14898,
+      "max": 5,
+      "icon": "spell_nature_moonglow",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 406,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14908,
+      "max": 3,
+      "icon": "spell_holy_renew",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 408,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14912,
+      "max": 3,
+      "icon": "spell_holy_heal02",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 410,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14913,
+      "max": 2,
+      "icon": "spell_holy_healingfocus",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 411,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 27900,
+      "max": 5,
+      "icon": "spell_holy_spellwarding",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 413,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 14911,
+      "max": 2,
+      "icon": "spell_holy_prayerofhealing02",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 442,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 15237,
+      "max": 1,
+      "icon": "spell_holy_holynova",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1181,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 18530,
+      "max": 5,
+      "icon": "spell_holy_sealofwrath",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1561,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 20711,
+      "max": 1,
+      "icon": "inv_enchant_essenceeternallarge",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1635,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 27789,
+      "max": 2,
+      "icon": "spell_holy_purify",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 1636,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 27811,
+      "max": 3,
+      "icon": "spell_holy_blessedrecovery",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1637,
+      "classFile": "PRIEST",
+      "tab": 202,
+      "spell": 724,
+      "max": 1,
+      "icon": "spell_holy_summonlightwell",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 461,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15257,
+      "max": 5,
+      "icon": "spell_shadow_blackplague",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 462,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15259,
+      "max": 5,
+      "icon": "spell_shadow_twilight",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 463,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15260,
+      "max": 5,
+      "icon": "spell_shadow_burningspirit",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 464,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15268,
+      "max": 5,
+      "icon": "spell_shadow_gathershadows",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 465,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15270,
+      "max": 5,
+      "icon": "spell_shadow_requiem",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 466,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15318,
+      "max": 3,
+      "icon": "spell_shadow_shadowward",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 481,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15273,
+      "max": 5,
+      "icon": "spell_shadow_unholyfrenzy",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 482,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15275,
+      "max": 2,
+      "icon": "spell_shadow_shadowwordpain",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 483,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15274,
+      "max": 2,
+      "icon": "spell_magic_lesserinvisibilty",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 484,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15286,
+      "max": 1,
+      "icon": "spell_shadow_unsummonbuilding",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 501,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15407,
+      "max": 1,
+      "icon": "spell_shadow_siphonmana",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 521,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15473,
+      "max": 1,
+      "icon": "spell_shadow_shadowform",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 541,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15487,
+      "max": 1,
+      "icon": "spell_shadow_impphaseshift",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 542,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 15392,
+      "max": 2,
+      "icon": "spell_shadow_psychicscream",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 881,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 17322,
+      "max": 3,
+      "icon": "spell_shadow_chilltouch",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 1638,
+      "classFile": "PRIEST",
+      "tab": 203,
+      "spell": 27839,
+      "max": 2,
+      "icon": "spell_shadow_improvedvampiricembrace",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 561,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16038,
+      "max": 3,
+      "icon": "spell_fire_immolation",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 562,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16041,
+      "max": 5,
+      "icon": "spell_nature_callstorm",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 563,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16035,
+      "max": 5,
+      "icon": "spell_fire_fireball",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 564,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16039,
+      "max": 5,
+      "icon": "spell_nature_wispsplode",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 565,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16089,
+      "max": 1,
+      "icon": "spell_fire_volcano",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 567,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16086,
+      "max": 2,
+      "icon": "spell_fire_sealoffire",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 572,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16043,
+      "max": 2,
+      "icon": "spell_nature_stoneclawtotem",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 573,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16166,
+      "max": 1,
+      "icon": "spell_nature_wispheal",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 574,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16164,
+      "max": 1,
+      "icon": "spell_shadow_manaburn",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 575,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16040,
+      "max": 5,
+      "icon": "spell_frost_frostward",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 721,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 16578,
+      "max": 5,
+      "icon": "spell_lightning_lightningbolt01",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1640,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 28996,
+      "max": 3,
+      "icon": "spell_nature_spiritarmor",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1641,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 28999,
+      "max": 2,
+      "icon": "spell_nature_stormreach",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 1642,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 29062,
+      "max": 3,
+      "icon": "spell_nature_eyeofthestorm",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1645,
+      "classFile": "SHAMAN",
+      "tab": 261,
+      "spell": 30160,
+      "max": 3,
+      "icon": "classic_spell_fire_elementaldevastation",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 581,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16176,
+      "max": 3,
+      "icon": "spell_nature_undyingstrength",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 582,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16189,
+      "max": 1,
+      "icon": "spell_nature_nullward",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 583,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16180,
+      "max": 3,
+      "icon": "spell_frost_stun",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 586,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16182,
+      "max": 5,
+      "icon": "spell_nature_magicimmunity",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 587,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16181,
+      "max": 5,
+      "icon": "spell_nature_healingwavelesser",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 588,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16187,
+      "max": 5,
+      "icon": "spell_nature_manaregentotem",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 589,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16184,
+      "max": 2,
+      "icon": "spell_nature_reincarnation",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 590,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16190,
+      "max": 1,
+      "icon": "spell_frost_summonwaterelemental",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 591,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16188,
+      "max": 1,
+      "icon": "spell_nature_ravenform",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 592,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16178,
+      "max": 5,
+      "icon": "spell_frost_wizardmark",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 593,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16179,
+      "max": 5,
+      "icon": "spell_frost_manarecharge",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 594,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16194,
+      "max": 5,
+      "icon": "spell_nature_tranquility",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 595,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 16173,
+      "max": 5,
+      "icon": "spell_nature_moonglow",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1646,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 29187,
+      "max": 3,
+      "icon": "spell_nature_healingtouch",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 1648,
+      "classFile": "SHAMAN",
+      "tab": 262,
+      "spell": 29206,
+      "max": 3,
+      "icon": "classic_spell_nature_healingway",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 601,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16254,
+      "max": 5,
+      "icon": "spell_nature_mirrorimage",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 602,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16256,
+      "max": 5,
+      "icon": "ability_ghoulfrenzy",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 605,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16262,
+      "max": 2,
+      "icon": "spell_nature_spiritwolf",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 607,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16261,
+      "max": 3,
+      "icon": "spell_nature_lightningshield",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 609,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16258,
+      "max": 2,
+      "icon": "spell_nature_stoneskintotem",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 610,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16259,
+      "max": 2,
+      "icon": "spell_nature_earthbindtotem",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 611,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16266,
+      "max": 3,
+      "icon": "spell_fire_flametounge",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 612,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16253,
+      "max": 5,
+      "icon": "inv_shield_06",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 613,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16255,
+      "max": 5,
+      "icon": "ability_thunderbolt",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 614,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 17485,
+      "max": 5,
+      "icon": "spell_shadow_grimward",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 615,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16252,
+      "max": 5,
+      "icon": "spell_holy_devotion",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 616,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16268,
+      "max": 1,
+      "icon": "ability_parry",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 617,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 16269,
+      "max": 1,
+      "icon": "inv_axe_10",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 901,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 17364,
+      "max": 1,
+      "icon": "spell_holy_sealofmight",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1643,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 29082,
+      "max": 5,
+      "icon": "ability_hunter_swiftstrike",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1647,
+      "classFile": "SHAMAN",
+      "tab": 263,
+      "spell": 29192,
+      "max": 2,
+      "icon": "spell_fire_enchantweapon",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 794,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16929,
+      "max": 5,
+      "icon": "inv_misc_pelt_bear_03",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 795,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16858,
+      "max": 5,
+      "icon": "classic_ability_druid_demoralizingroar",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 796,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16934,
+      "max": 5,
+      "icon": "ability_hunter_pet_hyena",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 797,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16940,
+      "max": 2,
+      "icon": "ability_druid_bash",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 798,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16942,
+      "max": 3,
+      "icon": "inv_misc_monsterclaw_04",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 799,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16947,
+      "max": 5,
+      "icon": "ability_ambush",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 800,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16952,
+      "max": 2,
+      "icon": "ability_ghoulfrenzy",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 801,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16958,
+      "max": 2,
+      "icon": "ability_racial_cannibalize",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 802,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16966,
+      "max": 2,
+      "icon": "spell_shadow_vampiricaura",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 803,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16972,
+      "max": 3,
+      "icon": "ability_hunter_pet_cat",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 804,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16979,
+      "max": 1,
+      "icon": "ability_hunter_pet_bear",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 805,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16998,
+      "max": 2,
+      "icon": "ability_druid_ravage",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 807,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 17002,
+      "max": 2,
+      "icon": "spell_nature_spiritwolf",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 808,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 17003,
+      "max": 5,
+      "icon": "spell_holy_blessingofagility",
+      "row": 5,
+      "col": 1
+    },
+    {
+      "node": 809,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 17007,
+      "max": 1,
+      "icon": "spell_nature_unyeildingstamina",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1162,
+      "classFile": "DRUID",
+      "tab": 281,
+      "spell": 16857,
+      "max": 1,
+      "icon": "spell_nature_faeriefire",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 821,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17050,
+      "max": 5,
+      "icon": "spell_nature_regeneration",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 822,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17056,
+      "max": 5,
+      "icon": "spell_holy_blessingofstamina",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 823,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17063,
+      "max": 5,
+      "icon": "spell_nature_healingwavegreater",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 824,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17069,
+      "max": 5,
+      "icon": "spell_nature_healingtouch",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 825,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17074,
+      "max": 5,
+      "icon": "spell_nature_resistnature",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 826,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17079,
+      "max": 2,
+      "icon": "ability_druid_enrage",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 827,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 5570,
+      "max": 1,
+      "icon": "spell_nature_insectswarm",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 828,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17104,
+      "max": 5,
+      "icon": "spell_nature_protectionformnature",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 829,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17106,
+      "max": 3,
+      "icon": "spell_frost_windwalkon",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 830,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17111,
+      "max": 3,
+      "icon": "spell_nature_rejuvenation",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 831,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17116,
+      "max": 1,
+      "icon": "spell_nature_ravenform",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 841,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17118,
+      "max": 5,
+      "icon": "ability_eyeoftheowl",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 842,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 17123,
+      "max": 2,
+      "icon": "spell_nature_tranquility",
+      "row": 4,
+      "col": 3
+    },
+    {
+      "node": 843,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 24968,
+      "max": 5,
+      "icon": "spell_holy_elunesgrace",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 844,
+      "classFile": "DRUID",
+      "tab": 282,
+      "spell": 18562,
+      "max": 1,
+      "icon": "inv_relics_idolofrejuvenation",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 761,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16689,
+      "max": 1,
+      "icon": "spell_nature_natureswrath",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 762,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16814,
+      "max": 5,
+      "icon": "spell_nature_abolishmagic",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 763,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16821,
+      "max": 5,
+      "icon": "spell_nature_starfall",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 764,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16819,
+      "max": 2,
+      "icon": "spell_nature_naturetouchgrow",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 781,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16833,
+      "max": 3,
+      "icon": "spell_nature_wispsplode",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 782,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16836,
+      "max": 3,
+      "icon": "spell_nature_thorns",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 783,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16845,
+      "max": 3,
+      "icon": "spell_nature_sentinal",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 784,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16850,
+      "max": 5,
+      "icon": "spell_arcane_starfire",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 787,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16918,
+      "max": 3,
+      "icon": "spell_nature_stranglevines",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 788,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16864,
+      "max": 1,
+      "icon": "spell_nature_crystalball",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 789,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16880,
+      "max": 1,
+      "icon": "spell_nature_naturesblessing",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 790,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16896,
+      "max": 5,
+      "icon": "spell_nature_moonglow",
+      "row": 5,
+      "col": 1
+    },
+    {
+      "node": 791,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16902,
+      "max": 5,
+      "icon": "inv_staff_01",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 792,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 16909,
+      "max": 5,
+      "icon": "spell_nature_purge",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 793,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 24858,
+      "max": 1,
+      "icon": "spell_nature_forceofnature",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 921,
+      "classFile": "DRUID",
+      "tab": 283,
+      "spell": 17245,
+      "max": 4,
+      "icon": "spell_nature_natureswrath",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 941,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17778,
+      "max": 5,
+      "icon": "spell_fire_windsofwoe",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 943,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17788,
+      "max": 5,
+      "icon": "spell_shadow_deathpact",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 944,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17793,
+      "max": 5,
+      "icon": "spell_shadow_shadowbolt",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 961,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17815,
+      "max": 5,
+      "icon": "spell_fire_immolation",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 963,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17877,
+      "max": 1,
+      "icon": "spell_shadow_scourgebuild",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 964,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17917,
+      "max": 2,
+      "icon": "spell_shadow_corpseexplode",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 965,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17927,
+      "max": 5,
+      "icon": "spell_fire_soulburn",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 966,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17954,
+      "max": 5,
+      "icon": "spell_fire_selfdestruct",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 967,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17959,
+      "max": 1,
+      "icon": "spell_shadow_shadowwordpain",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 968,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 17962,
+      "max": 1,
+      "icon": "spell_fire_fireball",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 981,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 18130,
+      "max": 5,
+      "icon": "spell_fire_flameshock",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 982,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 18119,
+      "max": 5,
+      "icon": "spell_fire_fire",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 983,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 18126,
+      "max": 2,
+      "icon": "spell_fire_firebolt",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 984,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 18128,
+      "max": 2,
+      "icon": "spell_shadow_curse",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 985,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 18135,
+      "max": 2,
+      "icon": "spell_fire_lavaspawn",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 986,
+      "classFile": "WARLOCK",
+      "tab": 301,
+      "spell": 18096,
+      "max": 2,
+      "icon": "spell_fire_volcano",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 1001,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 17783,
+      "max": 5,
+      "icon": "spell_shadow_fingerofdeath",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1002,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18094,
+      "max": 2,
+      "icon": "spell_shadow_twilight",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1003,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 17810,
+      "max": 5,
+      "icon": "spell_shadow_abominationexplosion",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 1004,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 17804,
+      "max": 5,
+      "icon": "spell_shadow_lifedrain02",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 1005,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18174,
+      "max": 5,
+      "icon": "spell_shadow_unsummonbuilding",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 1006,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18179,
+      "max": 3,
+      "icon": "spell_shadow_curseofmannoroth",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 1007,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18182,
+      "max": 2,
+      "icon": "spell_shadow_burningspirit",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1021,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18218,
+      "max": 2,
+      "icon": "spell_shadow_callofbone",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 1022,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18220,
+      "max": 1,
+      "icon": "spell_shadow_darkritual",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1041,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18265,
+      "max": 1,
+      "icon": "spell_shadow_requiem",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1042,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18271,
+      "max": 5,
+      "icon": "spell_shadow_shadetruesight",
+      "row": 5,
+      "col": 1
+    },
+    {
+      "node": 1061,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18288,
+      "max": 1,
+      "icon": "spell_shadow_contagion",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 1081,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18223,
+      "max": 1,
+      "icon": "spell_shadow_grimward",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 1082,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18310,
+      "max": 4,
+      "icon": "spell_shadow_grimward",
+      "row": 4,
+      "col": 3
+    },
+    {
+      "node": 1101,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18213,
+      "max": 2,
+      "icon": "spell_shadow_haunting",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1121,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 17864,
+      "max": 2,
+      "icon": "spell_shadow_siphonmana",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 1284,
+      "classFile": "WARLOCK",
+      "tab": 302,
+      "spell": 18827,
+      "max": 3,
+      "icon": "spell_shadow_curseofsargeras",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1221,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18692,
+      "max": 2,
+      "icon": "inv_stone_04",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 1222,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18694,
+      "max": 3,
+      "icon": "spell_shadow_summonimp",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 1223,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18697,
+      "max": 5,
+      "icon": "spell_shadow_metamorphosis",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 1224,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18703,
+      "max": 2,
+      "icon": "spell_shadow_lifedrain",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 1225,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18705,
+      "max": 3,
+      "icon": "spell_shadow_summonvoidwalker",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1226,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18708,
+      "max": 1,
+      "icon": "spell_nature_removecurse",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1227,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18709,
+      "max": 2,
+      "icon": "spell_shadow_impphaseshift",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1241,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18748,
+      "max": 5,
+      "icon": "spell_shadow_antishadow",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 1242,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18731,
+      "max": 5,
+      "icon": "spell_holy_magicalsentry",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1243,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18754,
+      "max": 3,
+      "icon": "ability_warlock_randomizesuccubusincubus",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1244,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 23785,
+      "max": 5,
+      "icon": "spell_shadow_shadowpact",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1261,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18767,
+      "max": 2,
+      "icon": "inv_ammo_firetar",
+      "row": 4,
+      "col": 3
+    },
+    {
+      "node": 1262,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18769,
+      "max": 5,
+      "icon": "spell_shadow_shadowworddominate",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 1263,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18774,
+      "max": 2,
+      "icon": "inv_misc_gem_sapphire_01",
+      "row": 6,
+      "col": 2
+    },
+    {
+      "node": 1281,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18788,
+      "max": 1,
+      "icon": "spell_shadow_psychicscream",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1282,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 19028,
+      "max": 1,
+      "icon": "spell_shadow_gathershadows",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1283,
+      "classFile": "WARLOCK",
+      "tab": 303,
+      "spell": 18821,
+      "max": 5,
+      "icon": "spell_shadow_enslavedemon",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 1381,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19549,
+      "max": 5,
+      "icon": "ability_hunter_aspectofthemonkey",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1382,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19552,
+      "max": 5,
+      "icon": "spell_nature_ravenform",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 1384,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19559,
+      "max": 2,
+      "icon": "ability_mount_jungletiger",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1385,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19572,
+      "max": 2,
+      "icon": "ability_hunter_mendpet",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1386,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19574,
+      "max": 1,
+      "icon": "ability_druid_ferociousbite",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1387,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19577,
+      "max": 1,
+      "icon": "ability_devour",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1388,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19578,
+      "max": 2,
+      "icon": "classic_ability_druid_demoralizingroar",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 1389,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19583,
+      "max": 5,
+      "icon": "spell_nature_reincarnation",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 1390,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19590,
+      "max": 2,
+      "icon": "spell_nature_abolishmagic",
+      "row": 4,
+      "col": 3
+    },
+    {
+      "node": 1391,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19596,
+      "max": 1,
+      "icon": "ability_druid_dash",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1393,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19598,
+      "max": 5,
+      "icon": "inv_misc_monsterclaw_04",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 1395,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19609,
+      "max": 3,
+      "icon": "inv_misc_pelt_bear_03",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1396,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19616,
+      "max": 5,
+      "icon": "ability_bullrush",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 1397,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19621,
+      "max": 5,
+      "icon": "inv_misc_monsterclaw_03",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1624,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 19557,
+      "max": 2,
+      "icon": "ability_eyeoftheowl",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 1625,
+      "classFile": "HUNTER",
+      "tab": 361,
+      "spell": 24443,
+      "max": 2,
+      "icon": "ability_hunter_beastsoothe",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 1301,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19151,
+      "max": 3,
+      "icon": "spell_holy_prayerofhealing",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 1303,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19168,
+      "max": 5,
+      "icon": "spell_nature_invisibilty",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1304,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19184,
+      "max": 5,
+      "icon": "spell_nature_stranglevines",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 1305,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19228,
+      "max": 5,
+      "icon": "ability_rogue_trip",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1306,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19239,
+      "max": 2,
+      "icon": "spell_nature_timestop",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1308,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19263,
+      "max": 1,
+      "icon": "ability_whirlwind",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 1309,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19286,
+      "max": 2,
+      "icon": "ability_rogue_feigndeath",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "node": 1310,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19290,
+      "max": 3,
+      "icon": "ability_kick",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1311,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19295,
+      "max": 5,
+      "icon": "ability_parry",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 1312,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19306,
+      "max": 1,
+      "icon": "ability_warrior_challange",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 1321,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19370,
+      "max": 3,
+      "icon": "spell_holy_blessingofstamina",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1322,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19376,
+      "max": 2,
+      "icon": "ability_ensnare",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 1325,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19386,
+      "max": 1,
+      "icon": "inv_spear_02",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1621,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19159,
+      "max": 2,
+      "icon": "ability_racial_bloodrage",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1622,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 19255,
+      "max": 5,
+      "icon": "spell_shadow_twilight",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1623,
+      "classFile": "HUNTER",
+      "tab": 362,
+      "spell": 24293,
+      "max": 3,
+      "icon": "inv_misc_head_dragon_black",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "node": 1341,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19407,
+      "max": 5,
+      "icon": "spell_frost_stun",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 1342,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19416,
+      "max": 5,
+      "icon": "spell_frost_wizardmark",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 1343,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19421,
+      "max": 5,
+      "icon": "ability_hunter_snipershot",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1344,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19426,
+      "max": 5,
+      "icon": "ability_searingarrow",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1345,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19434,
+      "max": 1,
+      "icon": "inv_spear_07",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1346,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19454,
+      "max": 5,
+      "icon": "ability_impalingbolt",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1347,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19461,
+      "max": 3,
+      "icon": "ability_upgrademoonglaive",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1348,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19464,
+      "max": 5,
+      "icon": "ability_hunter_quickshot",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1349,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19485,
+      "max": 5,
+      "icon": "ability_piercedamage",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 1351,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19491,
+      "max": 3,
+      "icon": "ability_hunter_criticalshot",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 1352,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19498,
+      "max": 3,
+      "icon": "ability_townwatch",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 1353,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19503,
+      "max": 1,
+      "icon": "ability_golemstormbolt",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 1361,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19506,
+      "max": 1,
+      "icon": "ability_trueshot",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1362,
+      "classFile": "HUNTER",
+      "tab": 363,
+      "spell": 19507,
+      "max": 5,
+      "icon": "inv_weapon_rifle_06",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1401,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20042,
+      "max": 5,
+      "icon": "spell_holy_fistofjustice",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 1402,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20049,
+      "max": 5,
+      "icon": "ability_racial_avatar",
+      "row": 5,
+      "col": 1
+    },
+    {
+      "node": 1403,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20060,
+      "max": 5,
+      "icon": "ability_parry",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1405,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20091,
+      "max": 2,
+      "icon": "spell_holy_auraoflight",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 1407,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20101,
+      "max": 5,
+      "icon": "spell_frost_windwalkon",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 1409,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20218,
+      "max": 1,
+      "icon": "spell_holy_mindvision",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 1410,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20111,
+      "max": 3,
+      "icon": "inv_hammer_04",
+      "row": 4,
+      "col": 0
+    },
+    {
+      "node": 1411,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20117,
+      "max": 5,
+      "icon": "spell_holy_retributionaura",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1441,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20066,
+      "max": 1,
+      "icon": "spell_holy_prayerofhealing",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1464,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20335,
+      "max": 3,
+      "icon": "spell_holy_holysmite",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1481,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 20375,
+      "max": 1,
+      "icon": "ability_warrior_innerrage",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 1631,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 25956,
+      "max": 2,
+      "icon": "spell_holy_righteousfury",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "node": 1632,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 9799,
+      "max": 2,
+      "icon": "spell_holy_eyeforaneye",
+      "row": 3,
+      "col": 0
+    },
+    {
+      "node": 1633,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 9452,
+      "max": 3,
+      "icon": "spell_holy_vindication",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1634,
+      "classFile": "PALADIN",
+      "tab": 381,
+      "spell": 26022,
+      "max": 2,
+      "icon": "spell_holy_persuitofjustice",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 1432,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20205,
+      "max": 5,
+      "icon": "spell_arcane_blink",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1433,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20216,
+      "max": 1,
+      "icon": "spell_holy_heal",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1435,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 26573,
+      "max": 1,
+      "icon": "spell_holy_innerfire",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1443,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20234,
+      "max": 2,
+      "icon": "spell_holy_layonhands",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 1444,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20237,
+      "max": 3,
+      "icon": "spell_holy_holybolt",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1446,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20244,
+      "max": 2,
+      "icon": "spell_holy_sealofwisdom",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 1449,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20257,
+      "max": 5,
+      "icon": "spell_nature_sleep",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 1450,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20262,
+      "max": 5,
+      "icon": "ability_golemthunderclap",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 1461,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20210,
+      "max": 5,
+      "icon": "spell_holy_greaterheal",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1463,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20224,
+      "max": 5,
+      "icon": "ability_thunderbolt",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "node": 1465,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20359,
+      "max": 3,
+      "icon": "spell_holy_healingaura",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 1502,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 20473,
+      "max": 1,
+      "icon": "spell_holy_searinglight",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1627,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 5923,
+      "max": 5,
+      "icon": "spell_holy_power",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1628,
+      "classFile": "PALADIN",
+      "tab": 382,
+      "spell": 9453,
+      "max": 2,
+      "icon": "spell_holy_unyieldingfaith",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 1421,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20127,
+      "max": 5,
+      "icon": "ability_defend",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "node": 1422,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20138,
+      "max": 5,
+      "icon": "spell_holy_devotionaura",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "node": 1423,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20143,
+      "max": 5,
+      "icon": "spell_holy_devotion",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "node": 1424,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20148,
+      "max": 3,
+      "icon": "inv_shield_06",
+      "row": 2,
+      "col": 2
+    },
+    {
+      "node": 1425,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20174,
+      "max": 2,
+      "icon": "spell_holy_sealofprotection",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "node": 1426,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20177,
+      "max": 5,
+      "icon": "spell_holy_blessingofstrength",
+      "row": 4,
+      "col": 2
+    },
+    {
+      "node": 1429,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20196,
+      "max": 5,
+      "icon": "inv_sword_20",
+      "row": 5,
+      "col": 2
+    },
+    {
+      "node": 1430,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20925,
+      "max": 1,
+      "icon": "classic_spell_holy_blessingofprotection",
+      "row": 6,
+      "col": 1
+    },
+    {
+      "node": 1431,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20911,
+      "max": 1,
+      "icon": "spell_nature_lightningshield",
+      "row": 4,
+      "col": 1
+    },
+    {
+      "node": 1442,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20217,
+      "max": 1,
+      "icon": "spell_magic_magearmor",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "node": 1501,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20468,
+      "max": 3,
+      "icon": "spell_holy_sealoffury",
+      "row": 2,
+      "col": 1
+    },
+    {
+      "node": 1521,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20487,
+      "max": 3,
+      "icon": "spell_holy_sealofmight",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "node": 1626,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20254,
+      "max": 3,
+      "icon": "spell_holy_mindsooth",
+      "row": 3,
+      "col": 2
+    },
+    {
+      "node": 1629,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20096,
+      "max": 5,
+      "icon": "spell_magic_lesserinvisibilty",
+      "row": 2,
+      "col": 3
+    },
+    {
+      "node": 1630,
+      "classFile": "PALADIN",
+      "tab": 383,
+      "spell": 20189,
+      "max": 3,
+      "icon": "ability_rogue_ambush",
+      "row": 1,
+      "col": 0
+    }
+  ]
+}

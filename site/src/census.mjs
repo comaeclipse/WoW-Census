@@ -1,8 +1,9 @@
 // Shared rendering for the Forever (Beta) cross-faction census in the static build.
 import { createHash } from "node:crypto";
+import { siteNoticeHtml } from "./notice.mjs";
 
 // Race/class shares cover characters seen in this many days of census /who
-// queries (see loadCensus in tools/local-site-data.mjs).
+// queries (see load_census in laragon-php/src/Data.php).
 export const CENSUS_WINDOW_DAYS = 14;
 
 export function esc(s) {
@@ -60,6 +61,8 @@ export function pageHeading(heading, navigation, topic) {
 // data keys. Handles "-Faction" suffixes and "realm:" game keys.
 export function realmName(name) {
   const s = String(name == null ? "" : name).replace(/^realm:/, "");
+  const regional = s.match(/^(us|eu|kr|tw|cn):[a-z0-9-]+:(.+)$/i);
+  if (regional) return `${regional[2]} (${regional[1].toUpperCase()})`;
   if (!/^Classic Beta\s+/i.test(s)) return s;
   return s.replace(/^Classic Beta\s+/i, "").replace(/\s+\d+(?=-|$)/, "").trim() || s;
 }
@@ -473,7 +476,7 @@ export function renderComboBreakdownHtml(census, opts = {}) {
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
-${seoHead(topic + " – WoWCensus", seoGameLabel + " observed race and class combinations from sampled in-game /who results.", opts.canonical)}
+${seoHead(topic + " – WoWCensus", seoGameLabel + " race and class combinations: how often each race plays each class and which pairings are most and least common in /who results.", opts.canonical)}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -512,7 +515,7 @@ export function renderCensusHtml(views, opts = {}) {
   const heading = navigation.games ? "WoWCensus" : (gameLabel === "WoW Forever" ? "WoW Forever Beta" : gameLabel + " — Census");
   const seoGameLabel = seoLabel(gameLabel);
   const topic = seoGameLabel + " Population Census";
-  const description = opts.description || seoGameLabel + " realm population, faction balance, race and class distribution from sampled in-game /who results.";
+  const description = opts.description || seoGameLabel + " population census: realm population, faction balance and the race and class mix of characters seen in sampled /who results.";
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
@@ -531,6 +534,7 @@ ${CENSUS_STYLESHEET}
     <div class="page-heading">${pageHeading(heading, navigation, opts.headingTopic || topic)}${navigation.games || ""}</div>
     ${navigation.breadcrumbs || notes}
   </header>
+  ${opts.mobileHome ? siteNoticeHtml() : ""}
   <main>
   <div class="page-controls">${navigation.pages || ""}${chips}</div>
   ${panes}

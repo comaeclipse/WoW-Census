@@ -133,7 +133,7 @@ export function renderGeographyHtml(views, dims = {}, opts = {}) {
   return `<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="google-site-verification" content="N0-ZNJyDo16jefYUGxfcAda_mKf7S2oATfRGWETdsHs">
-${seoHead(topic + " – WoWCensus", seoGameLabel + " player activity by zone, realm, and faction from latest-known character locations collected through /who.", opts.canonical)}
+${seoHead(topic + " – WoWCensus", seoGameLabel + " player activity by zone, realm and faction: where characters were last seen, from latest-known locations gathered by /who scans.", opts.canonical)}
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>

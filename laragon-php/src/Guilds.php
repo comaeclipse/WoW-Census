@@ -19,7 +19,7 @@ function render_guild_view(array $snapshot): string {
   foreach ($top as $i => $g)
     $rows .= '<tr>' .
       '<td class="rank">' . ($i + 1) . '</td>' .
-      '<td>&lt;' . esc($g['name']) . '&gt;</td>' .
+      '<td>&lt;' . esc(guild_display_name($g['name'])) . '&gt;</td>' .
       '<td class="scope">' . esc(guild_scope_label($g, $snapshot)) . '</td>' .
       '<td class="members">' . js_locale($g['members']) . '</td></tr>';
   $realmText = implode(' · ', array_map('realm_name', $realms));
@@ -66,7 +66,7 @@ function render_guild_html(array $views, array $dims, array $opts): string {
   $generatedNote = generated_note_html($opts['generatedNote'] ?? null);
   $seoGameLabel = seo_label($gameLabel);
   $topic = $seoGameLabel . ' Guilds by Realm';
-  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' guild activity by realm and faction, based on characters found in sampled in-game /who results.', $opts['canonical'] ?? null);
+  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' guild activity by realm and faction: the guilds with the most characters seen and how large they are, from sampled /who results.', $opts['canonical'] ?? null);
   $stylesheet = esc($opts['stylesheet'] ?? 'style.css');
   $census_css = CENSUS_STYLESHEET;
   $style = js_template_const('guilds.mjs', 'GUILD_STYLE');
@@ -106,6 +106,41 @@ function activity_hint(array $z, int|float $observedMax): string {
   if (($z['avgLevel'] ?: 0) <= 10) return 'Starting';
   if ($observedMax > 0 && ($z['avgLevel'] ?: 0) >= $observedMax * .88) return 'End game';
   return 'Leveling';
+}
+
+function render_geography_aero_view(array $snapshot): string {
+  $zones = array_values(array_filter($snapshot['zones'] ?? [], fn($z) => $z['name'] !== 'Unknown'));
+  $total = (int)(($snapshot['characters'] ?? 0) ?: array_sum(array_column($zones, 'characters')));
+  $max = $zones ? max(1, (int)$zones[0]['characters']) : 1;
+  $observedMax = 0;
+  foreach ($zones as $zone) $observedMax = max($observedMax, $zone['maxLevel'] ?: 0);
+  $window = !empty($snapshot['windowDays']) ? 'Last ' . (int)$snapshot['windowDays'] . ' days' : 'All observations';
+  $updated = !empty($snapshot['lastT']) ? gmdate('M j, Y', (int)$snapshot['lastT']) : 'Unknown';
+  $html = '<div class="geo-aero">';
+  $html .= '<div class="geo-aero-metrics">'
+    . '<div><span>CHARACTERS LOCATED</span><strong>' . js_locale($total) . '</strong><small>Unique, latest known zone</small></div>'
+    . '<div><span>LOCATIONS OBSERVED</span><strong>' . js_locale(count($zones)) . '</strong><small>' . esc($window) . '</small></div>'
+    . '<div><span>LATEST OBSERVATION</span><strong class="geo-aero-metric-name">' . esc($updated) . '</strong><small>Population sample</small></div></div>';
+  if (!$zones) return $html . '<p class="geo-aero-note">No location data is available for this selection yet.</p></div>';
+  $html .= '<section class="geo-aero-section" aria-label="Most observed locations"><div class="geo-aero-heading"><div><span>THE WORLD\'S PULSE</span><h2>Most observed locations</h2></div><small>Top three in this selection</small></div><div class="geo-aero-featured">';
+  foreach (array_slice($zones, 0, 3) as $index => $zone) {
+    $type = activity_hint($zone, $observedMax);
+    $html .= '<article class="geo-aero-feature geo-aero-feature-' . ($index + 1) . '"><div class="geo-aero-feature-top"><span>0' . ($index + 1) . '</span><span>' . esc($type) . '</span></div>'
+      . '<div class="geo-aero-feature-bottom"><span class="geo-aero-ornament" aria-hidden="true">' . ['✦','◇','✧'][$index] . '</span><h3>' . esc($zone['name']) . '</h3><p><strong>' . js_locale($zone['characters']) . '</strong> characters last seen here <span>·</span> avg. level ' . ($zone['avgLevel'] ?: '&mdash;') . '</p></div></article>';
+  }
+  $html .= '</div></section><section class="geo-aero-section geo-aero-explorer" aria-label="Location rankings"><div class="geo-aero-heading"><div><span>EXPLORE THE MAP</span><h2>Location rankings</h2></div><small>' . js_locale(count($zones)) . ' places in this selection</small></div>';
+  $html .= '<div class="geo-aero-filter" role="group" aria-label="Filter locations by type">';
+  foreach (['All locations','Capital','End game','Leveling','Starting'] as $index => $type)
+    $html .= '<button type="button" data-geo-filter="' . esc($type) . '" aria-pressed="' . ($index === 0 ? 'true' : 'false') . '">' . esc($type) . '</button>';
+  $html .= '</div><div class="geo-aero-list-head"><span>LOCATION</span><span>CHARACTERS</span><span>AVG. LEVEL</span></div><div class="geo-aero-list">';
+  foreach (array_slice($zones, 0, 50) as $index => $zone) {
+    $type = activity_hint($zone, $observedMax);
+    $width = js_fixed($zone['characters'] / $max * 100, 1);
+    $html .= '<div class="geo-aero-row" data-geo-type="' . esc($type) . '"><div class="geo-aero-row-title"><span class="geo-aero-row-index">' . str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT) . '</span><div><strong>' . esc($zone['name']) . '</strong><small>' . esc($type) . '</small></div></div>'
+      . '<div class="geo-aero-row-measure"><span class="geo-aero-row-track"><i style="width:' . $width . '%"></i></span><strong>' . js_locale($zone['characters']) . '</strong></div><span class="geo-aero-row-level">' . ($zone['avgLevel'] ?: '&mdash;') . '</span></div>';
+  }
+  $html .= '</div><p class="geo-aero-note"><span aria-hidden="true">ⓘ</span> Each character appears once in its latest known location within this sample window. These counts are not simultaneous players or a live population.</p></section></div>';
+  return $html;
 }
 
 function render_geography_view(array $snapshot): string {
@@ -170,7 +205,8 @@ function render_geography_html(array $views, array $dims, array $opts): string {
   $activeRealm = $realms ? $realms[0]['key'] : 'all';
   $activeFaction = $factions ? $factions[0]['key'] : 'all';
   $chips = chip_row('realm', $realms, $activeRealm) . chip_row('faction', $factions, $activeFaction);
-  $panes = view_panes($views, $activeRealm, $activeFaction, 'render_geography_view');
+  $renderer = ($_COOKIE['wowcensus_skin'] ?? '') === 'cobalt' ? 'render_geography_aero_view' : 'render_geography_view';
+  $panes = view_panes($views, $activeRealm, $activeFaction, $renderer);
   $gameLabel = $opts['gameLabel'] ?? 'WoW Forever';
   $navigation = $opts['nav'];
   $heading = ($navigation['games'] ?? '') !== '' ? 'WoWCensus' : $gameLabel . ' — Geography';
@@ -178,7 +214,7 @@ function render_geography_html(array $views, array $dims, array $opts): string {
   $generatedNote = generated_note_html($opts['generatedNote'] ?? null);
   $seoGameLabel = seo_label($gameLabel);
   $topic = $seoGameLabel . ' Population by Zone';
-  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' player activity by zone, realm, and faction from latest-known character locations collected through /who.', $opts['canonical'] ?? null);
+  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' player activity by zone, realm and faction: where characters were last seen, from latest-known locations gathered by /who scans.', $opts['canonical'] ?? null);
   $stylesheet = esc($opts['stylesheet'] ?? 'style.css');
   $census_css = CENSUS_STYLESHEET;
   $style = js_template_const('geography.mjs', 'GEO_STYLE');
@@ -187,6 +223,7 @@ function render_geography_html(array $views, array $dims, array $opts): string {
   $crumbs = ($navigation['breadcrumbs'] ?? '') !== '' ? $navigation['breadcrumbs'] : $notes;
   $pages = $navigation['pages'] ?? '';
   $toggle = $chips !== '' ? toggle_script() : '';
+  if ($renderer === 'render_geography_aero_view') $toggle .= '<script src="/geo-aero.js?v=1" defer></script>';
   return <<<HTML
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -201,7 +238,7 @@ $seo
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
 <header class="ihead"><div class="page-heading">$headingHtml$games</div>
 $crumbs</header>
-<div class="page-controls">$pages$chips</div>$panes
+<div class="page-controls" id="geo-location-controls">$pages$chips</div>$panes
 $generatedNote
 </div>$toggle</body></html>
 HTML;

@@ -1,0 +1,5061 @@
+{
+  "sampled_at_utc": "2026-11-06T05:25:53.586Z",
+  "requested": 1018,
+  "statuses": {
+    "200": 1000,
+    "404": 18
+  },
+  "swatch_build": "1.60.1.70790",
+  "races": {
+    "Gnome": {
+      "queried": 107,
+      "rows": [
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1236,
+          "swatch_hex": "#DA9D74"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1176,
+          "swatch_hex": "#F79172"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1239,
+          "swatch_hex": "#D08559"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1176,
+          "swatch_hex": "#F79172"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1239,
+          "swatch_hex": "#D08559"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1236,
+          "swatch_hex": "#DA9D74"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1239,
+          "swatch_hex": "#D08559"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1236,
+          "swatch_hex": "#DA9D74"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1176,
+          "swatch_hex": "#F79172"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1176,
+          "swatch_hex": "#F79172"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1236,
+          "swatch_hex": "#DA9D74"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 8783,
+          "swatch_hex": "#311916"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1238,
+          "swatch_hex": "#CB9267"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 8789,
+          "swatch_hex": "#311916"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1239,
+          "swatch_hex": "#D08559"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1238,
+          "swatch_hex": "#CB9267"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1239,
+          "swatch_hex": "#D08559"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1238,
+          "swatch_hex": "#CB9267"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1238,
+          "swatch_hex": "#CB9267"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1236,
+          "swatch_hex": "#DA9D74"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 8782,
+          "swatch_hex": "#521F18"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1238,
+          "swatch_hex": "#CB9267"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 8783,
+          "swatch_hex": "#311916"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1238,
+          "swatch_hex": "#CB9267"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1239,
+          "swatch_hex": "#D08559"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1239,
+          "swatch_hex": "#D08559"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1236,
+          "swatch_hex": "#DA9D74"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1238,
+          "swatch_hex": "#CB9267"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1176,
+          "swatch_hex": "#F79172"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1236,
+          "swatch_hex": "#DA9D74"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1237,
+          "swatch_hex": "#BE7D5A"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1236,
+          "swatch_hex": "#DA9D74"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1239,
+          "swatch_hex": "#D08559"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 8789,
+          "swatch_hex": "#311916"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 1235,
+          "swatch_hex": "#D89571"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1175,
+          "swatch_hex": "#FF9763"
+        },
+        {
+          "option_id": 85,
+          "choice_id": 8783,
+          "swatch_hex": "#311916"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1174,
+          "swatch_hex": "#FFAC80"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1176,
+          "swatch_hex": "#F79172"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1177,
+          "swatch_hex": "#E38D62"
+        },
+        {
+          "option_id": 80,
+          "choice_id": 1178,
+          "swatch_hex": "#CC793D"
+        }
+      ]
+    },
+    "Night Elf": {
+      "queried": 165,
+      "rows": [
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 803,
+          "swatch_hex": "#B78D9C"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 805,
+          "swatch_hex": "#B6A595"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 702,
+          "swatch_hex": "#AF7D74"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 805,
+          "swatch_hex": "#B6A595"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 699,
+          "swatch_hex": "#817A89"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 803,
+          "swatch_hex": "#B78D9C"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 695,
+          "swatch_hex": "#A37680"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 702,
+          "swatch_hex": "#AF7D74"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 808,
+          "swatch_hex": "#D69E97"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 805,
+          "swatch_hex": "#B6A595"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 808,
+          "swatch_hex": "#D69E97"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 805,
+          "swatch_hex": "#B6A595"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 699,
+          "swatch_hex": "#817A89"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 805,
+          "swatch_hex": "#B6A595"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 697,
+          "swatch_hex": "#785D6F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 703,
+          "swatch_hex": "#A66874"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 697,
+          "swatch_hex": "#785D6F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 697,
+          "swatch_hex": "#785D6F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 703,
+          "swatch_hex": "#A66874"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 695,
+          "swatch_hex": "#A37680"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 703,
+          "swatch_hex": "#A66874"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 696,
+          "swatch_hex": "#967287"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 801,
+          "swatch_hex": "#CE9CAB"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 703,
+          "swatch_hex": "#A66874"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 801,
+          "swatch_hex": "#CE9CAB"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 699,
+          "swatch_hex": "#817A89"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 703,
+          "swatch_hex": "#A66874"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 803,
+          "swatch_hex": "#B78D9C"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 696,
+          "swatch_hex": "#967287"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 703,
+          "swatch_hex": "#A66874"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 808,
+          "swatch_hex": "#D69E97"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 702,
+          "swatch_hex": "#AF7D74"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 695,
+          "swatch_hex": "#A37680"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 695,
+          "swatch_hex": "#A37680"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 697,
+          "swatch_hex": "#785D6F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 808,
+          "swatch_hex": "#D69E97"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 808,
+          "swatch_hex": "#D69E97"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 702,
+          "swatch_hex": "#AF7D74"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 699,
+          "swatch_hex": "#817A89"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 702,
+          "swatch_hex": "#AF7D74"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 696,
+          "swatch_hex": "#967287"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 697,
+          "swatch_hex": "#785D6F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 808,
+          "swatch_hex": "#D69E97"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 805,
+          "swatch_hex": "#B6A595"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 702,
+          "swatch_hex": "#AF7D74"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 703,
+          "swatch_hex": "#A66874"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 702,
+          "swatch_hex": "#AF7D74"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 803,
+          "swatch_hex": "#B78D9C"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 699,
+          "swatch_hex": "#817A89"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 804,
+          "swatch_hex": "#C8A5A3"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 697,
+          "swatch_hex": "#785D6F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 801,
+          "swatch_hex": "#CE9CAB"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 801,
+          "swatch_hex": "#CE9CAB"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 700,
+          "swatch_hex": "#797E8F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 806,
+          "swatch_hex": "#ACABB4"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 697,
+          "swatch_hex": "#785D6F"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 803,
+          "swatch_hex": "#B78D9C"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 807,
+          "swatch_hex": "#DFB4A9"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 698,
+          "swatch_hex": "#8B9497"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 808,
+          "swatch_hex": "#D69E97"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 40,
+          "choice_id": 701,
+          "swatch_hex": "#9B8170"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 808,
+          "swatch_hex": "#D69E97"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 809,
+          "swatch_hex": "#C38897"
+        },
+        {
+          "option_id": 49,
+          "choice_id": 802,
+          "swatch_hex": "#BB96A5"
+        }
+      ]
+    },
+    "Troll": {
+      "queried": 55,
+      "rows": [
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1363,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1297,
+          "swatch_hex": "#6EB5AF"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1297,
+          "swatch_hex": "#6EB5AF"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1297,
+          "swatch_hex": "#6EB5AF"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1301,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1297,
+          "swatch_hex": "#6EB5AF"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1299,
+          "swatch_hex": "#778CD4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1298,
+          "swatch_hex": "#59BA95"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1299,
+          "swatch_hex": "#778CD4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1298,
+          "swatch_hex": "#59BA95"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1298,
+          "swatch_hex": "#59BA95"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1368,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1366,
+          "swatch_hex": "#778CD4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1301,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1299,
+          "swatch_hex": "#778CD4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1297,
+          "swatch_hex": "#6EB5AF"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1301,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1301,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1298,
+          "swatch_hex": "#59BA95"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1297,
+          "swatch_hex": "#6EB5AF"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1298,
+          "swatch_hex": "#59BA95"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1298,
+          "swatch_hex": "#59BA95"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1298,
+          "swatch_hex": "#59BA95"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1367,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1368,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1297,
+          "swatch_hex": "#6EB5AF"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1301,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1368,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1363,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1368,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1366,
+          "swatch_hex": "#778CD4"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1363,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1300,
+          "swatch_hex": "#6295CA"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1301,
+          "swatch_hex": "#4EBBC0"
+        },
+        {
+          "option_id": 95,
+          "choice_id": 1366,
+          "swatch_hex": "#778CD4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1299,
+          "swatch_hex": "#778CD4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1299,
+          "swatch_hex": "#778CD4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        },
+        {
+          "option_id": 90,
+          "choice_id": 1296,
+          "swatch_hex": "#61A8D4"
+        }
+      ]
+    },
+    "Undead": {
+      "queried": 109,
+      "rows": [
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 989,
+          "swatch_hex": "#7DB567"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 984,
+          "swatch_hex": "#95B591"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 985,
+          "swatch_hex": "#99C282"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 914,
+          "swatch_hex": "#8EAD78"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 984,
+          "swatch_hex": "#95B591"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 989,
+          "swatch_hex": "#7DB567"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 984,
+          "swatch_hex": "#95B591"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 914,
+          "swatch_hex": "#8EAD78"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 984,
+          "swatch_hex": "#95B591"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 914,
+          "swatch_hex": "#8EAD78"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 914,
+          "swatch_hex": "#8EAD78"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 914,
+          "swatch_hex": "#8EAD78"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 984,
+          "swatch_hex": "#95B591"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 986,
+          "swatch_hex": "#B38DA9"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 914,
+          "swatch_hex": "#8EAD78"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 913,
+          "swatch_hex": "#A5AB79"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 985,
+          "swatch_hex": "#99C282"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 984,
+          "swatch_hex": "#95B591"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 988,
+          "swatch_hex": "#6FB388"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 914,
+          "swatch_hex": "#8EAD78"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 915,
+          "swatch_hex": "#80AB9D"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 918,
+          "swatch_hex": "#9996B0"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 916,
+          "swatch_hex": "#89A1AB"
+        },
+        {
+          "option_id": 58,
+          "choice_id": 917,
+          "swatch_hex": "#8D8BB5"
+        },
+        {
+          "option_id": 63,
+          "choice_id": 987,
+          "swatch_hex": "#9AA13B"
+        }
+      ]
+    },
+    "Dwarf": {
+      "queried": 111,
+      "rows": [
+        {
+          "option_id": 30,
+          "choice_id": 7142,
+          "swatch_hex": "#6A3B32"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 617,
+          "swatch_hex": "#CAA68F"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 531,
+          "swatch_hex": "#AA927B"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 7143,
+          "swatch_hex": "#472E2A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 617,
+          "swatch_hex": "#CAA68F"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 530,
+          "swatch_hex": "#BA9A78"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 615,
+          "swatch_hex": "#CD9979"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 530,
+          "swatch_hex": "#BA9A78"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 615,
+          "swatch_hex": "#CD9979"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 532,
+          "swatch_hex": "#9A7A6A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 7143,
+          "swatch_hex": "#472E2A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 616,
+          "swatch_hex": "#D7B085"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 7142,
+          "swatch_hex": "#6A3B32"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 529,
+          "swatch_hex": "#765D47"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 623,
+          "swatch_hex": "#B79D95"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 616,
+          "swatch_hex": "#D7B085"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 615,
+          "swatch_hex": "#CD9979"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 532,
+          "swatch_hex": "#9A7A6A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 529,
+          "swatch_hex": "#765D47"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 623,
+          "swatch_hex": "#B79D95"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 7143,
+          "swatch_hex": "#472E2A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 615,
+          "swatch_hex": "#CD9979"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 532,
+          "swatch_hex": "#9A7A6A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 7143,
+          "swatch_hex": "#472E2A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 619,
+          "swatch_hex": "#B6835C"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 529,
+          "swatch_hex": "#765D47"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 623,
+          "swatch_hex": "#B79D95"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 532,
+          "swatch_hex": "#9A7A6A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 7142,
+          "swatch_hex": "#6A3B32"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 615,
+          "swatch_hex": "#CD9979"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 621,
+          "swatch_hex": "#C9AF87"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 620,
+          "swatch_hex": "#9A684A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 7135,
+          "swatch_hex": "#4C2620"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 623,
+          "swatch_hex": "#B79D95"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 532,
+          "swatch_hex": "#9A7A6A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 620,
+          "swatch_hex": "#9A684A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 623,
+          "swatch_hex": "#B79D95"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 620,
+          "swatch_hex": "#9A684A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 615,
+          "swatch_hex": "#CD9979"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 531,
+          "swatch_hex": "#AA927B"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 619,
+          "swatch_hex": "#B6835C"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 526,
+          "swatch_hex": "#CFB395"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 524,
+          "swatch_hex": "#BA7F5A"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 530,
+          "swatch_hex": "#BA9A78"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 7143,
+          "swatch_hex": "#472E2A"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 617,
+          "swatch_hex": "#CAA68F"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 527,
+          "swatch_hex": "#B7764E"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 619,
+          "swatch_hex": "#B6835C"
+        },
+        {
+          "option_id": 35,
+          "choice_id": 615,
+          "swatch_hex": "#CD9979"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 528,
+          "swatch_hex": "#A07651"
+        },
+        {
+          "option_id": 30,
+          "choice_id": 525,
+          "swatch_hex": "#C69261"
+        }
+      ]
+    },
+    "Human": {
+      "queried": 193,
+      "rows": [
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 90,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4979,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 9,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 87,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 91,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 9,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4972,
+          "swatch_hex": "#291716"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 88,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 93,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 94,
+          "swatch_hex": "#653C1C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 88,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 90,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 7,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 9,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 92,
+          "swatch_hex": "#9D724E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 87,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 6,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 6,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 91,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 89,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 87,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 88,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4979,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 7,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 88,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 87,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 6,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 8,
+          "swatch_hex": "#9D724E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 92,
+          "swatch_hex": "#9D724E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 88,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 6,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 90,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 87,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 90,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4979,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 87,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 7,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 87,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 93,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4979,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 94,
+          "swatch_hex": "#653C1C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4979,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 88,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 7,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 90,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 92,
+          "swatch_hex": "#9D724E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 6,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 10,
+          "swatch_hex": "#653C1C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 8,
+          "swatch_hex": "#9D724E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 91,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 94,
+          "swatch_hex": "#653C1C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 7,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 89,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 10,
+          "swatch_hex": "#653C1C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 91,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 89,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 93,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 91,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 91,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 88,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 94,
+          "swatch_hex": "#653C1C"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 8,
+          "swatch_hex": "#9D724E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 89,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 93,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 8,
+          "swatch_hex": "#9D724E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 9,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 8,
+          "swatch_hex": "#9D724E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 6,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 9,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 9,
+          "swatch_hex": "#936743"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 4,
+          "swatch_hex": "#C79F7C"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 6,
+          "swatch_hex": "#B28865"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 7,
+          "swatch_hex": "#A87D5A"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 3,
+          "swatch_hex": "#D1AA87"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 5,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 89,
+          "swatch_hex": "#BD9471"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 1,
+          "swatch_hex": "#E6C09E"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 86,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 4971,
+          "swatch_hex": "#A56F49"
+        },
+        {
+          "option_id": 9,
+          "choice_id": 2,
+          "swatch_hex": "#DCB593"
+        },
+        {
+          "option_id": 14,
+          "choice_id": 85,
+          "swatch_hex": "#E6C09E"
+        }
+      ]
+    },
+    "High Order Skyborne": {
+      "queried": 102,
+      "rows": [
+        {
+          "option_id": 9021,
+          "choice_id": 62229,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60809,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62226,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60816,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60991,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60809,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62211,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62213,
+          "swatch_hex": "#7C4646"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62226,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60991,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62228,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62226,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60816,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62214,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62213,
+          "swatch_hex": "#7C4646"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62208,
+          "swatch_hex": "#66AACE"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62228,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62226,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60816,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62209,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62230,
+          "swatch_hex": "#7C4646"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62211,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60991,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60991,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60816,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62225,
+          "swatch_hex": "#66AACE"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62230,
+          "swatch_hex": "#7C4646"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62214,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62226,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60809,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62211,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62229,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60991,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62209,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62211,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62214,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62209,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62208,
+          "swatch_hex": "#66AACE"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60816,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62228,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62211,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62208,
+          "swatch_hex": "#66AACE"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62229,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62209,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62214,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62213,
+          "swatch_hex": "#7C4646"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62226,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60816,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62227,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        }
+      ]
+    },
+    "Windshaper Skyborne": {
+      "queried": 51,
+      "rows": [
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62225,
+          "swatch_hex": "#66AACE"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62228,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62230,
+          "swatch_hex": "#7C4646"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62229,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60809,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62230,
+          "swatch_hex": "#7C4646"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62211,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60991,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60991,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60816,
+          "swatch_hex": "#EAA788"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62228,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62211,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62209,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62229,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 60809,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62228,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62209,
+          "swatch_hex": "#6C9CCB"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62230,
+          "swatch_hex": "#7C4646"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62208,
+          "swatch_hex": "#66AACE"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62214,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62208,
+          "swatch_hex": "#66AACE"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62229,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62229,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62231,
+          "swatch_hex": "#491925"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62228,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9021,
+          "choice_id": 62228,
+          "swatch_hex": "#D39A7D"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62210,
+          "swatch_hex": "#5B97CC"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62211,
+          "swatch_hex": "#E1B599"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 62212,
+          "swatch_hex": "#BF7C66"
+        },
+        {
+          "option_id": 9034,
+          "choice_id": 60997,
+          "swatch_hex": "#D39A7D"
+        }
+      ]
+    },
+    "Orc": {
+      "queried": 55,
+      "rows": [
+        {
+          "option_id": 25,
+          "choice_id": 440,
+          "swatch_hex": "#92B83B"
+        },
+        {
+          "option_id": 25,
+          "choice_id": 445,
+          "swatch_hex": "#B8A637"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 360,
+          "swatch_hex": "#7AA13D"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 353,
+          "swatch_hex": "#8AA62E"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 361,
+          "swatch_hex": "#92B53F"
+        },
+        {
+          "option_id": 25,
+          "choice_id": 443,
+          "swatch_hex": "#A1983A"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 359,
+          "swatch_hex": "#528569"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 359,
+          "swatch_hex": "#528569"
+        },
+        {
+          "option_id": 25,
+          "choice_id": 440,
+          "swatch_hex": "#92B83B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 360,
+          "swatch_hex": "#7AA13D"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 354,
+          "swatch_hex": "#A7BA29"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 358,
+          "swatch_hex": "#AD9E28"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 358,
+          "swatch_hex": "#AD9E28"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 361,
+          "swatch_hex": "#92B53F"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 355,
+          "swatch_hex": "#ADAB24"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 361,
+          "swatch_hex": "#92B53F"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 357,
+          "swatch_hex": "#A18C23"
+        },
+        {
+          "option_id": 25,
+          "choice_id": 440,
+          "swatch_hex": "#92B83B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 359,
+          "swatch_hex": "#528569"
+        },
+        {
+          "option_id": 25,
+          "choice_id": 446,
+          "swatch_hex": "#75A681"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 358,
+          "swatch_hex": "#AD9E28"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 358,
+          "swatch_hex": "#AD9E28"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 353,
+          "swatch_hex": "#8AA62E"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 25,
+          "choice_id": 448,
+          "swatch_hex": "#9EBF4B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 360,
+          "swatch_hex": "#7AA13D"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 359,
+          "swatch_hex": "#528569"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 361,
+          "swatch_hex": "#92B53F"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 358,
+          "swatch_hex": "#AD9E28"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 357,
+          "swatch_hex": "#A18C23"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 353,
+          "swatch_hex": "#8AA62E"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 359,
+          "swatch_hex": "#528569"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 354,
+          "swatch_hex": "#A7BA29"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 359,
+          "swatch_hex": "#528569"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 357,
+          "swatch_hex": "#A18C23"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 357,
+          "swatch_hex": "#A18C23"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 353,
+          "swatch_hex": "#8AA62E"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 354,
+          "swatch_hex": "#A7BA29"
+        },
+        {
+          "option_id": 25,
+          "choice_id": 440,
+          "swatch_hex": "#92B83B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 354,
+          "swatch_hex": "#A7BA29"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 353,
+          "swatch_hex": "#8AA62E"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 353,
+          "swatch_hex": "#8AA62E"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 357,
+          "swatch_hex": "#A18C23"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 360,
+          "swatch_hex": "#7AA13D"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 358,
+          "swatch_hex": "#AD9E28"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 356,
+          "swatch_hex": "#948F2B"
+        },
+        {
+          "option_id": 19,
+          "choice_id": 361,
+          "swatch_hex": "#92B53F"
+        }
+      ]
+    },
+    "Tauren": {
+      "queried": 52,
+      "rows": [
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1054,
+          "swatch_hex": "#946026"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1051,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1047,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 74,
+          "choice_id": 1120,
+          "swatch_hex": "#946026"
+        },
+        {
+          "option_id": 74,
+          "choice_id": 1122,
+          "swatch_hex": "#6B533F"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1051,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 74,
+          "choice_id": 1115,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1056,
+          "swatch_hex": "#946026"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1058,
+          "swatch_hex": "#83928B"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1063,
+          "swatch_hex": "#BEBCAA"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1049,
+          "swatch_hex": "#857B54"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1048,
+          "swatch_hex": "#857B54"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1053,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1053,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1053,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1047,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1050,
+          "swatch_hex": "#857B54"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1051,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1054,
+          "swatch_hex": "#946026"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 74,
+          "choice_id": 1121,
+          "swatch_hex": "#946026"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1051,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1051,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1054,
+          "swatch_hex": "#946026"
+        },
+        {
+          "option_id": 74,
+          "choice_id": 1116,
+          "swatch_hex": "#857B54"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1048,
+          "swatch_hex": "#857B54"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1063,
+          "swatch_hex": "#BEBCAA"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1052,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1057,
+          "swatch_hex": "#83928B"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1046,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1057,
+          "swatch_hex": "#83928B"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 74,
+          "choice_id": 1117,
+          "swatch_hex": "#857B54"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1060,
+          "swatch_hex": "#6B533F"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1057,
+          "swatch_hex": "#83928B"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1056,
+          "swatch_hex": "#946026"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1045,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1048,
+          "swatch_hex": "#857B54"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1059,
+          "swatch_hex": "#83928B"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1051,
+          "swatch_hex": "#573228"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1046,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1054,
+          "swatch_hex": "#946026"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1047,
+          "swatch_hex": "#343333"
+        },
+        {
+          "option_id": 68,
+          "choice_id": 1062,
+          "swatch_hex": "#6B533F"
+        }
+      ]
+    }
+  }
+}

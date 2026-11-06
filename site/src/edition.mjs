@@ -14,7 +14,8 @@ export const SITE_ORIGIN = "https://wowcensus.io";
 export const PAGES = ["index", "combos", "auctionhouse", "guilds", "geography", "talents", "gear"];
 
 export const EDITIONS = {
-  "classic-beta": { dir: "", label: "WoW Forever", nav: "Forever", flavor: "classic-beta", branch: "forever", title: "WoW Forever & Classic+ Population Census – WoWCensus", description: "WoWCensus - World of Warcraft: Forever and Classic+ population tracker. Realm population, faction balance, and race/class breakdowns from in-game /who scans.", comboBlurb: "Forever Beta is still evolving, so this snapshot is most useful for reading the current visible community rather than a settled long-term meta." },
+  forever: { dir: "forever", label: "WoW: Forever", nav: "Forever", flavor: "forever", branch: "forever", title: "WoW: Forever Population Census – WoWCensus", description: "WoW: Forever launch census, realms, auctions, and inspected talent builds.", comboBlurb: "Launch observations begin with the official release. Census counts are characters observed during scans." },
+  "classic-beta": { dir: "forever-beta", label: "WoW: Forever (Beta)", nav: "Forever (Beta)", flavor: "classic-beta", branch: "forever", title: "WoW: Forever (Beta) Census Archive – WoWCensus", description: "Archived WoW: Forever beta census, realms, auctions, and inspected talent builds.", comboBlurb: "This archive contains observations from the Forever beta." },
   "classic-progression": { dir: "tbc", label: "TBC Anniversary", nav: "TBC Anniversary", flavor: "tbc-anniversary", branch: "tbc", comboBlurb: "TBC Anniversary’s smaller era roster makes race and class choices a direct view of the currently visible progression community." },
   classic: { dir: "classic", label: "Classic Era", nav: "Classic Era", flavor: "classic-era", branch: "classic", comboBlurb: "Classic Era keeps the original-era roster, so the mix reflects the characters currently active in its long-lived realms rather than modern class availability." },
   sod: { dir: "sod", label: "Season of Discovery", nav: "SoD", flavor: "sod", branch: "classic", comboBlurb: "Season of Discovery class balance and player activity can shift sharply between phases, so treat the mix as a current activity signal rather than a durable meta ranking." },
@@ -32,6 +33,7 @@ export function editionPath(source) {
 }
 
 export function sourceForPath(dir) {
+  if (dir === "/") return "forever";
   return Object.keys(EDITIONS).find((source) => editionPath(source) === dir) || null;
 }
 
@@ -56,25 +58,18 @@ export function nav(source, current) {
   const item = (href, label, active = href === currentPage) =>
     '<a class="game"' + (active ? ' aria-current="true"' : "") +
     ' href="' + href + '">' + label + "</a>";
-  const mobileLink = (href, label, active) =>
-    '<a' + (active ? ' aria-current="page"' : '') + ' href="' + href + '">' + label + '</a>';
-  const mobileMenu = '<details class="mobile-menu"><summary aria-label="Open site menu"><span aria-hidden="true">☰</span> Menu</summary>' +
-    '<div class="mobile-menu-panel"><div class="mobile-menu-label">Edition</div>' +
-    Object.entries(EDITIONS).map(([s, e]) => mobileLink(pagePath(s, currentPage), e.nav, s === source)).join("") +
-    '<div class="mobile-menu-label">Explore ' + edition.nav + '</div>' +
-    Object.entries({ index: "Census", auctionhouse: "Auction House", guilds: "Guilds", geography: "Geography", talents: "Talents", gear: "Gear" })
-      .map(([page, label]) => mobileLink(pagePath(source, page), label, page === currentPage || (page === "index" && currentPage === "combos"))).join("") +
-    '</div></details><div class="mobile-edition">' + edition.nav + ' <span>›</span> ' + pageLabels[currentPage] + '</div>';
-  return {
-    games: '<nav class="games game-nav">' +
-      Object.entries(EDITIONS).map(([s, e]) => item(pagePath(s, currentPage), e.nav, s === source)).join("") + "</nav>" + mobileMenu,
-    pages: '<nav class="games page-nav">' +
+  const games = '<nav class="games game-nav" aria-label="Game edition">' +
+    Object.entries(EDITIONS).map(([s, e]) => item(pagePath(s, currentPage), e.nav, s === source)).join("") + "</nav>";
+  const pages = '<nav class="games page-nav" aria-label="Site pages">' +
     item(pagePath(source, "index"), "Census", currentPage === "index" || currentPage === "combos") +
-      item(pagePath(source, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
-      item(pagePath(source, "guilds"), "Guilds", currentPage === "guilds") +
-      item(pagePath(source, "geography"), "Geography", currentPage === "geography") +
-      item(pagePath(source, "talents"), "Talents", currentPage === "talents") +
-      item(pagePath(source, "gear"), "Gear", currentPage === "gear") + "</nav>",
+    item(pagePath(source, "auctionhouse"), "Auction House", currentPage === "auctionhouse") +
+    item(pagePath(source, "guilds"), "Guilds", currentPage === "guilds") +
+    item(pagePath(source, "geography"), "Geography", currentPage === "geography") +
+    item(pagePath(source, "talents"), "Talents", currentPage === "talents") +
+    item(pagePath(source, "gear"), "Gear", currentPage === "gear") + "</nav>";
+  return {
+    games: '<div class="site-nav-stack">' + games + pages + '</div>',
+    pages: "",
     breadcrumbs: '<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="' +
       pagePath(source, "index") + '">' + edition.nav + '</a><span aria-hidden="true">/</span><span aria-current="page">' +
       pageLabels[currentPage] + "</span></nav>",

@@ -24,10 +24,12 @@ a{color:var(--blue)}
 /* ---- shared anatomy (as on the live site) ---- */
 .ihead{border-bottom:3px solid var(--line);padding-bottom:14px;margin-bottom:18px}
 .page-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.site-nav-stack{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-left:auto;min-width:0}
+.site-nav-stack .games{justify-content:flex-end;margin:0;flex-wrap:wrap}
 .iname{font-family:"Cinzel",Georgia,serif;font-size:32px;font-weight:800;letter-spacing:1px;color:var(--gold);margin:0 0 10px;line-height:1.2;text-shadow:2px 2px 0 var(--shadow)}
 .iname .itopic{display:block;margin-top:6px;font-family:var(--pixel);font-size:9px;font-weight:400;letter-spacing:1px;line-height:1.6;text-transform:uppercase;color:var(--muted);text-shadow:none}
 .games{display:flex;gap:8px;flex-wrap:wrap}
-.game-nav{justify-content:flex-end;flex-wrap:nowrap;gap:6px;margin:0 0 10px auto}
+.game-nav{gap:6px}
 .game-nav .game{padding-inline:7px;white-space:nowrap}
 .game,.chip{font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink);background:var(--panel);border:2px solid var(--line);box-shadow:3px 3px 0 var(--shadow);padding:8px 10px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
 .game:hover,.chip:hover{border-color:var(--gold)}
@@ -36,6 +38,7 @@ a{color:var(--blue)}
 .breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;font-family:var(--pixel);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
 .breadcrumbs a{color:var(--blue);text-decoration:none}.breadcrumbs [aria-current="page"]{color:var(--ink)}
 .page-controls{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 20px;margin-bottom:22px}
+.page-controls:empty{display:none}
 .race-filter{display:flex;align-items:flex-start;flex-wrap:wrap;gap:8px;min-width:0}
 .race-filter .chips{flex:1 1 100px;min-width:0}
 .faction-picker{display:inline-flex;align-items:center;position:relative;flex:none;height:34px;border:2px solid var(--gold);box-shadow:3px 3px 0 var(--shadow);background:var(--panel)}
@@ -143,12 +146,12 @@ a{color:var(--blue)}
 .card[hidden]{display:none}
 .colnote{margin:0;padding:12px 0 4px;font-size:17px;color:var(--muted)}
 
-@media (min-width:761px) and (max-width:1160px){.page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}}
+@media (max-width:1160px){.page-heading{flex-wrap:wrap}.site-nav-stack{width:100%}}
 @media (max-width:760px){
-  .page-heading{display:block}.game-nav{justify-content:flex-start;margin-left:0}
+  .site-nav-stack{width:100%}
   .page-controls{display:block}.page-controls .race-filter{margin-top:12px}.race-filter .chips{display:contents}
   .hero{grid-template-columns:auto 1fr;padding:16px;align-items:start}
-  .hero .bignum{grid-column:1/-1;text-align:left;display:flex;align-items:baseline;gap:12px}
+  .hero .bignum{grid-column:1/-1;text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:12px}
   .hero .bignum small{margin:0}
   .portrait{width:64px;height:64px}
   .hero h2{font-size:17px}
@@ -165,7 +168,8 @@ a{color:var(--blue)}
 <header class="ihead">
   <div class="page-heading">
     <h1 class="iname">WoWCensus<span class="itopic">{{GAME}} {{RACE}} Specs &amp; Talents</span></h1>
-    <nav class="games game-nav">
+    <div class="site-nav-stack">
+    <nav class="games game-nav" aria-label="Game edition">
       <a class="game" aria-current="true" href="#">Forever</a>
       <a class="game" href="#">TBC Anniversary</a>
       <a class="game" href="#">Classic Era</a>
@@ -173,6 +177,15 @@ a{color:var(--blue)}
       <a class="game" href="#">MoP Classic</a>
       <a class="game" href="#">Retail</a>
     </nav>
+    <nav class="games page-nav" aria-label="Site pages">
+      <a class="game" href="#">Census</a>
+      <a class="game" href="#">Auction House</a>
+      <a class="game" href="#">Guilds</a>
+      <a class="game" href="#">Geography</a>
+      <a class="game" aria-current="true" href="#">Talents</a>
+      <a class="game" href="#">Gear</a>
+    </nav>
+    </div>
   </div>
   <nav class="breadcrumbs" aria-label="Breadcrumb">
     <a href="#">WoWCensus</a><span aria-hidden="true">/</span>
@@ -183,14 +196,6 @@ a{color:var(--blue)}
 </header>
 
 <div class="page-controls">
-  <nav class="games page-nav">
-    <a class="game" href="#">Census</a>
-    <a class="game" href="#">Auction House</a>
-    <a class="game" href="#">Guilds</a>
-    <a class="game" href="#">Geography</a>
-    <a class="game" aria-current="true" href="#">Talents</a>
-    <a class="game" href="#">Gear</a>
-  </nav>
   <div class="race-filter">
     <label class="faction-picker"><select aria-label="Faction"><option value="Alliance">Alliance</option><option value="Horde">Horde</option></select></label>
     <div class="chips" aria-label="Race">

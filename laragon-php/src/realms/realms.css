@@ -5,6 +5,9 @@
 .realm-table th:nth-child(1){width:27%}.realm-table th:nth-child(2){width:16%}
 .realm-table th:nth-child(3){width:21%}.realm-table th:nth-child(4){width:14%}.realm-table th:nth-child(5){width:22%}
 .realm-table tbody tr{cursor:pointer}
+.realm-table tbody .realm-region-heading,.realm-table tbody .realm-type-heading{cursor:default}
+.realm-table tbody .realm-region-heading th{padding:12px;color:var(--gold);background:var(--panel2);text-align:left;font-family:var(--pixel);font-size:10px}
+.realm-table tbody .realm-type-heading th{padding:8px 12px;color:var(--ink);background:var(--panel);text-align:left;font-size:18px}
 .realm-table tbody td{padding:9px 12px}
 .realm-table tbody tr[aria-selected="true"]{background:var(--panel2);box-shadow:inset 4px 0 0 var(--gold)}
 .realm-table tbody tr[aria-selected="true"] .rname{color:var(--gold)}
@@ -36,6 +39,10 @@ td.bal{text-align:left}
 .realm-detail .bar .bl{display:flex;align-items:center;justify-content:flex-end;gap:6px}
 .realm-detail .bar .bl img{width:16px;height:16px;border:1px solid #b99b55;flex:none}
 .realm-detail .bar .bn{font-size:18px}
+.faction-class+.faction-class{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.faction-class-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin:0 0 10px;padding-left:9px;border-left:4px solid var(--faction-color);color:var(--faction-color);font-family:var(--pixel);font-size:9px;line-height:1.5}
+.faction-class-head span:last-child{color:var(--muted);font-family:var(--term);font-size:17px;text-align:right}
+.faction-class-note{margin:-4px 0 16px;line-height:1.3}
 .realm-combos{margin-top:4px}
 .realm-combos{margin:0}.realm-combos .combogrid{grid-template-columns:1fr}
 .combocard .rank{font-family:var(--pixel);font-size:9px;color:var(--muted);width:22px;flex:none}

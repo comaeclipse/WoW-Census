@@ -111,8 +111,38 @@ function page_heading(string $heading, array $navigation, ?string $topic): strin
     (($navigation['games'] ?? '') !== '' && $topic ? '<span class="itopic">' . esc($topic) . '</span>' : '') . '</h1>';
 }
 
-function realm_name(mixed $name): string {
+/**
+ * Realm names that exist in more than one region, as "<flavor or edition key>|<name>"
+ * keys: names the site has collections for in two regions, and Retail names that
+ * Blizzard's connected-realm lists hold in both US and EU.
+ */
+function shared_realm_names(): array {
+  static $shared = null;
+  if ($shared !== null) return $shared;
+  $regions = [];
+  foreach (Db::all("SELECT DISTINCT game, source_game FROM datasets WHERE game ~ '^realm:(us|eu|kr|tw|cn):'") as $r)
+    if (preg_match('/^realm:([a-z]{2}):([^:]+):(.+?)(?:-(?:Alliance|Horde|Neutral))?$/', $r['game'], $m)) {
+      $regions["$m[2]|$m[3]"][$m[1]] = true;
+      $regions["$r[source_game]|$m[3]"][$m[1]] = true;
+    }
+  $retail = json_decode(file_get_contents(__DIR__ . '/retail-connected-realms.json'), true);
+  foreach (['us', 'eu'] as $region)
+    foreach ($retail[$region] ?? [] as $group) foreach ($group['realms'] as $realm) $regions['retail|' . $realm['name']][$region] = true;
+  $shared = array_map(fn() => true, array_filter($regions, fn($r) => count($r) > 1));
+  return $shared;
+}
+
+/** Whether a realm name needs its region to tell it apart ("Wild Growth (US)"). */
+function realm_region_shown(string $flavor, string $name): bool {
+  return isset(shared_realm_names()["$flavor|" . preg_replace('/-(Alliance|Horde|Neutral)$/', '', $name)]);
+}
+
+// The region is shown only for realm names that exist in more than one region,
+// or always with $withRegion.
+function realm_name(mixed $name, bool $withRegion = false): string {
   $s = preg_replace('/^realm:/', '', $name === null ? '' : js_string($name));
+  if (preg_match('/^(us|eu|kr|tw|cn):([a-z0-9-]+):(.+)$/i', $s, $m))
+    return $m[3] . ($withRegion || realm_region_shown($m[2], $m[3]) ? ' (' . strtoupper($m[1]) . ')' : '');
   if (!preg_match('/^Classic Beta\s+/i', $s)) return $s;
   $short = trim(preg_replace('/\s+\d+(?=-|$)/', '', preg_replace('/^Classic Beta\s+/i', '', $s), 1));
   return $short !== '' ? $short : $s;
@@ -169,8 +199,8 @@ function role_split(array $inspects): ?array {
   $counts = ['TANK' => 0, 'HEALER' => 0, 'DAMAGER' => 0];
   $unassigned = 0;
   foreach ($inspects['records'] as $r) {
-    if ($r['classificationMethod'] === 'inspected-specialization-id') $role = $r['rawRole'] ?? null;
-    elseif (($tree = $r['primaryTree']) === null) $role = null;
+    if (($r['classificationMethod'] ?? null) === 'inspected-specialization-id') $role = $r['rawRole'] ?? null;
+    elseif (($tree = $r['primaryTree'] ?? null) === null) $role = null;
     elseif ($tree === 'Feral Combat') { $unassigned++; continue; }
     else $role = $tree === 'Protection' ? 'TANK' : (in_array($tree, HEALER_TREES, true) ? 'HEALER' : 'DAMAGER');
     if (isset($counts[$role ?? ''])) $counts[$role]++;
@@ -377,6 +407,13 @@ function render_census_view(?array $census, array $opts): string {
     ($links !== '' ? '<div class="ptitle" style="margin:26px 0 12px">Per-realm detail</div><nav class="games">' . $links . '</nav>' : '');
 }
 
+// 980 -> "980", 1386 -> "1.4k", 46210 -> "46k".
+function compact_count(int $n): string {
+  if ($n < 1000) return (string)$n;
+  $k = $n / 1000;
+  return ($k < 10 ? rtrim(rtrim(number_format($k, 1), '0'), '.') : (string)round($k)) . 'k';
+}
+
 function render_combo_breakdown_html(?array $census, array $opts): string {
   $groups = $census['groups'] ?? [];
   $navigation = $opts['nav'];
@@ -389,7 +426,9 @@ function render_combo_breakdown_html(?array $census, array $opts): string {
   $analysis = $opts['analysisText'] ?? combo_analysis($groups, $opts['flavorNote'] ?? null);
   $paragraphs = implode('', array_map(fn($p) => '<p class="hint combo-analysis" style="margin:0 0 12px">' . esc($p) . '</p>',
     preg_split('/\n\s*\n/', $analysis)));
-  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' observed race and class combinations from sampled in-game /who results.', $opts['canonical'] ?? null);
+  $inspected = $opts['recentInspects'] ?? null;
+  $bignum = $inspected ? '<div class="combo-bignum"><b>' . compact_count($inspected) . '</b><small>players inspected recently</small></div>' : '';
+  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' race and class combinations: how often each race plays each class and which pairings are most and least common in /who results.', $opts['canonical'] ?? null);
   $stylesheet = esc($opts['stylesheet'] ?? 'style.css');
   $headingHtml = page_heading($heading, $navigation, $topic);
   $games = $navigation['games'] ?? '';
@@ -411,7 +450,7 @@ $seo
 </head><body><div class="crt" aria-hidden="true"></div><div class="wrap">
 <header class="ihead"><div class="page-heading">$headingHtml$games</div>$crumbs</header>
 <div class="page-controls">$pages</div>
-<section class="panel" style="margin-bottom:22px"><div class="ptitle">What this sample shows</div>$paragraphs</section>
+<section class="panel" style="margin-bottom:22px">$bignum<div class="ptitle">What this sample shows</div>$paragraphs</section>
 <div class="combo-breakdown">$breakdown</div>$generatedNote
 </div></body></html>
 HTML;
@@ -432,7 +471,7 @@ function render_census_html(array $views, array $opts): string {
   $heading = ($navigation['games'] ?? '') !== '' ? 'WoWCensus' : ($gameLabel === 'WoW Forever' ? 'WoW Forever Beta' : $gameLabel . ' — Census');
   $seoGameLabel = seo_label($gameLabel);
   $topic = $seoGameLabel . ' Population Census';
-  $description = $opts['description'] ?? ($seoGameLabel . ' realm population, faction balance, race and class distribution from sampled in-game /who results.');
+  $description = $opts['description'] ?? ($seoGameLabel . ' population census: realm population, faction balance and the race and class mix of characters seen in sampled /who results.');
   $seo = seo_head($opts['title'] ?? ($topic . ' – WoWCensus'), $description, $opts['canonical'] ?? null);
   $stylesheet = esc($opts['stylesheet'] ?? '/style.css');
   $bodyClass = !empty($opts['mobileHome']) ? ' class="census-home"' : '';

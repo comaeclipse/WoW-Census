@@ -19,6 +19,8 @@ function route_request(string $path): ?array {
     case '/_headers': return ['application/octet-stream', headers_file()];
     case '/census.css': return ['text/css', localize_content(census_css())];
     case '/notice-discord.png': return ['image/png', resource('public/notice-discord.png')];
+    // The 2008 skin shows its front page at "/" and Forever's census here.
+    case '/forever/': return [$html, edition_page_html('forever', 'index')];
   }
 
   if (preg_match('#^/retail/skin-colors(?:/([a-z0-9-]+))?/(index|detail)\.html$#', $path, $m)) {
@@ -29,15 +31,36 @@ function route_request(string $path): ?array {
     if (($m[1] ?? '') !== '' && !isset(retail_skin_color_races()[$m[1]])) return null;
     return [$html, localize_content(retail_skin_colors_page($cssName, $m[1] ?? null))];
   }
+  if (preg_match('#^/forever/skin-colors(?:/([a-z0-9-]+))?/(index|detail)\.html$#', $path, $m)) {
+    if (($m[1] ?? '') !== '' && !isset(forever_skin_color_races()[$m[1]])) return null;
+    return [$html, localize_content(forever_skin_colors_page($cssName, $m[1] ?? null, $m[2] === 'detail'))];
+  }
+  if (preg_match('#^/forever/skin-colors(?:/([a-z0-9-]+))?/?$#', $path, $m)) {
+    if (($m[1] ?? '') !== '' && !isset(forever_skin_color_races()[$m[1]])) return null;
+    return [$html, localize_content(forever_skin_colors_page($cssName, $m[1] ?? null))];
+  }
+
+  // Race to 60 leaderboard: /forever/race-to-60 (+ .html). It has no Markdown copy.
+  if (preg_match('#^/([a-z-]+)/race-to-60(\.html)?$#', $path, $m)) {
+    $source = source_for_path('/' . $m[1] . '/');
+    return $source && in_array($source, RACE_TO_60_SOURCES, true) ? [$html, race_to_60_html($source)] : null;
+  }
 
   // Realm explorer: /realms, /classic/realms (+ .html). It has no Markdown copy.
-  if (preg_match('#^/(?:([a-z]+)/)?realms(\.html)?$#', $path, $m)) {
+  if (preg_match('#^/(?:([a-z-]+)/)?realms(\.html)?$#', $path, $m)) {
     $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
     return $source ? [$html, realms_page_html($source)] : null;
   }
 
+  // Guild rosters: /guilds/<id>/, /classic/guilds/<id>/. Served by the origin only; the static site has none.
+  if (preg_match('#^/(?:([a-z-]+)/)?guilds/(\d{12})/(?:index\.html)?$#', $path, $m)) {
+    $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
+    $roster = $source ? guild_roster($source, $m[2]) : null;
+    return $roster ? [$html, guild_page_html($source, $roster)] : null;
+  }
+
   // Edition pages: /, /combos, /classic/, /classic/combos (+ .html and .md copies).
-  if (preg_match('#^/(?:([a-z]+)/)?(?:(index|combos|auctionhouse|guilds|geography|talents|gear)(\.html|\.md)?)?$#', $path, $m)) {
+  if (preg_match('#^/(?:([a-z-]+)/)?(?:(index|combos|auctionhouse|guilds|geography|talents|gear)(\.html|\.md)?)?$#', $path, $m)) {
     $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
     $page = ($m[2] ?? '') !== '' ? $m[2] : 'index';
     $ext = $m[3] ?? '';
@@ -50,7 +73,7 @@ function route_request(string $path): ?array {
   }
 
   // Per-edition files.
-  if (preg_match('#^/(?:([a-z]+)/)?(census\.json|style\.[0-9a-f]{12}\.css|data/(talents|gear)\.[0-9a-f]{12}\.json)$#', $path, $m)) {
+  if (preg_match('#^/(?:([a-z-]+)/)?(census\.json|style\.[0-9a-f]{12}\.css|data/(talents|gear)\.[0-9a-f]{12}\.json)$#', $path, $m)) {
     $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
     if (!$source) return null;
     if ($m[2] === 'census.json') return [$json, census_json($source)];
@@ -60,7 +83,7 @@ function route_request(string $path): ?array {
   }
 
   // Race and class talent pages: /classic/human/ (+ index.html, index.md).
-  if (preg_match('#^/([a-z]+)/([a-z0-9-]+)/(index\.html|index\.md)?$#', $path, $m)) {
+  if (preg_match('#^/([a-z-]+)/([a-z0-9-]+)/(index\.html|index\.md)?$#', $path, $m)) {
     $route = '/' . $m[1] . '/' . $m[2] . '/';
     foreach (race_profiles() as $source => $races)
       foreach ($races as $race => $p)

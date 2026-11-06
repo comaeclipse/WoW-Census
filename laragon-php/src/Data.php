@@ -1,5 +1,6 @@
 <?php
-// Port of tools/local-site-data.mjs and the read side of site/src/inspects.mjs.
+// Census and inspect data for the pages (once a port of the retired Node generator's queries
+// and the read side of site/src/inspects.mjs).
 // Each query mirrors the SQLite original. SQLite's LIKE ignores ASCII case
 // (ILIKE here), and its GROUP BY returns groups in binary key order, which the
 // pages depend on, so those queries order explicitly with COLLATE "C".
@@ -8,16 +9,129 @@ declare(strict_types=1);
 
 const REGION = 'us';
 const GAMES = [
+  'forever' => 'WoW: Forever',
   'classic-progression' => 'TBC Anniversary',
   'classic' => 'Classic Era',
   'retail' => 'Retail',
-  'classic-beta' => 'Forever (Beta)',
+  'classic-beta' => 'WoW: Forever (Beta)',
   'mop-classic' => 'Mists of Pandaria Classic',
   'sod' => 'Season of Discovery',
   'hardcore' => 'Classic Hardcore',
 ];
 const ITEM_COLUMNS = ['id', 'name', 'slug', 'mv', 'asp', 'q', 'pq', 'sc', 'tc', 'cat', 'src', 'crafter'];
 const ZONE_WINDOW_DAYS = 30;
+
+// Old MarketLens collections ("realm:Thunderstrike-Horde") carry no region, but they
+// hold the same realms as the region-labelled WoWCensus ones
+// ("realm:eu:tbc-anniversary:Thunderstrike-Horde") and share many of their characters.
+// The census pages count an old collection as the labelled collection of its region,
+// each character there once. Its region is the one all its rows have
+// (tools/collection-region-provenance.sql), or for rows of no region the one their
+// characters' home realms point to (scan_region_map()). For a realm name in one region
+// only, it is also the one region its scans or labelled twins show; a collection of no
+// characters takes its realm's other collections' region. Old collections
+// of names in two regions without that stay apart. old game => labelled game.
+function collection_aliases(): array {
+  static $aliases = null;
+  if ($aliases !== null) return $aliases;
+  $aliases = [];
+  // build-census-cache.php stores this function's answer for the current import.
+  if (census_cache_fresh()) {
+    foreach (Db::all('SELECT old_game, alias FROM census_aliases ORDER BY seq') as $r) $aliases[$r['old_game']] = $r['alias'];
+    return $aliases;
+  }
+  $rows = Db::all("WITH old AS (
+      SELECT DISTINCT game, source_game, regexp_replace(substr(game, 7), '-(Alliance|Horde|Neutral)$', '') realm FROM datasets
+      WHERE game LIKE 'realm:%' AND game !~ '^realm:(us|eu|kr|tw|cn):'),
+    labelled AS (
+      SELECT DISTINCT source_game, split_part(game, ':', 2) region, split_part(game, ':', 3) flavor,
+        regexp_replace(regexp_replace(game, '^realm:[a-z]{2}:[^:]+:', ''), '-(Alliance|Horde|Neutral)$', '') realm
+      FROM datasets WHERE game ~ '^realm:(us|eu|kr|tw|cn):[^:]+:'),
+    flavors AS (SELECT source_game, MIN(flavor) flavor FROM labelled GROUP BY source_game HAVING COUNT(DISTINCT flavor) = 1),
+    rows AS (SELECT o.game, o.source_game, o.realm, c.collection_region region
+      FROM old o JOIN characters_with_region c ON c.game = o.game),
+    -- Group the ~500k character rows once. Looking them up per collection
+    -- rescanned all of them twice for each one (10 s instead of under 2 s).
+    -- MATERIALIZED keeps PostgreSQL from folding these back into per-row lookups.
+    by_game AS MATERIALIZED (SELECT game, string_agg(DISTINCT COALESCE(region, '?'), ',') regions FROM rows GROUP BY game),
+    by_realm AS MATERIALIZED (SELECT source_game, realm, string_agg(DISTINCT region, ',') regions FROM rows GROUP BY source_game, realm)
+    SELECT o.game, o.source_game, o.realm, f.flavor,
+      (SELECT g.regions FROM by_game g WHERE g.game = o.game) game_regions,
+      (SELECT b.regions FROM by_realm b WHERE b.source_game = o.source_game AND b.realm = o.realm) realm_regions,
+      (SELECT string_agg(DISTINCT l.region, ',') FROM labelled l WHERE l.source_game = o.source_game AND l.realm = o.realm) twin_regions
+    FROM old o JOIN flavors f ON f.source_game = o.source_game
+    ORDER BY o.game COLLATE \"C\"");
+  foreach ($rows as $r) {
+    $own = array_filter(explode(',', (string)$r['game_regions']));
+    $known = array_values(array_diff($own, ['?']));
+    // Rows of no region: their characters' home realms can tell (Retail, MoP).
+    $homes = in_array('?', $own, true) && count($known) <= 1 && ($groups = connected_realm_groups($r['source_game']))
+      ? scan_region_map($r['source_game'], $groups)[$r['game']] ?? null : null;
+    if (count($own) === 1 && $own[0] !== '?') $region = $own[0];
+    elseif ($homes && (!$known || $known[0] === $homes)) $region = $homes;
+    // A collection with no characters (Retail's cross-faction auction scans) goes
+    // with the region of the realm's other old collections.
+    elseif (!$own && count($sibling = array_filter(explode(',', (string)$r['realm_regions']))) === 1) $region = reset($sibling);
+    elseif (!realm_region_shown($r['source_game'], $r['realm'])) {
+      $seen = array_unique(array_filter(array_merge(explode(',', (string)$r['realm_regions']), explode(',', (string)$r['twin_regions']))));
+      $region = count($seen) === 1 ? reset($seen) : null;
+    } else $region = null;
+    if ($region) $aliases[$r['game']] = "realm:$region:$r[flavor]:" . substr($r['game'], 6);
+  }
+  return $aliases;
+}
+
+function canonical_game(string $game): string { return collection_aliases()[$game] ?? $game; }
+
+/** SQL for the canonical collection of a game column. */
+function canonical_game_sql(string $column): string {
+  $cases = '';
+  foreach (collection_aliases() as $from => $to)
+    $cases .= " WHEN '" . str_replace("'", "''", $from) . "' THEN '" . str_replace("'", "''", $to) . "'";
+  return "CASE $column$cases ELSE $column END";
+}
+
+/**
+ * Pre-computed census sets (laragon-php/build-census-cache.php): census_characters,
+ * census_latest, census_sightings and census_seen hold exactly what the *_live_sql()
+ * fragments below compute on every page, built once per import. Used only while
+ * census_cache_meta.version names the latest import; otherwise (no tables, data
+ * imported since, ML_NO_CENSUS_CACHE=1) pages run the live SQL, unchanged.
+ */
+function census_cache_fresh(): bool {
+  static $fresh = null;
+  if ($fresh !== null) return $fresh;
+  if (getenv('ML_NO_CENSUS_CACHE') === '1') return $fresh = false;
+  try {
+    $row = Db::uncached("SELECT (SELECT version FROM census_cache_meta) = (SELECT max(imported_at_utc) FROM local_imports) fresh")[0] ?? [];
+    return $fresh = !empty($row['fresh']);
+  } catch (Throwable $e) {
+    return $fresh = false;  // No tables yet, or published data without them.
+  }
+}
+
+/**
+ * characters, one row per character and canonical collection (per character on
+ * connected MoP realms), from its latest sighting: filter on rn = 1. Adds cgame.
+ */
+function census_characters_sql(string $sourceGame): string {
+  if (census_cache_fresh())
+    return "(SELECT * FROM census_characters WHERE source_game = '" . str_replace("'", "''", $sourceGame) . "')";
+  return census_characters_live_sql($sourceGame);
+}
+
+/** The newest sighting per canonical collection. */
+function census_latest_sql(): string {
+  if (census_cache_fresh()) return '(SELECT game, latest FROM census_latest)';
+  return '(SELECT ' . canonical_game_sql('game') . ' game, MAX(last_seen) latest FROM characters GROUP BY 1)';
+}
+
+function census_characters_live_sql(string $sourceGame): string {
+  $cg = canonical_game_sql('c0.game');
+  $partition = $sourceGame === 'mop-classic' ? 'c0.character_key' : "$cg, c0.character_key";
+  return "(SELECT c0.*, $cg cgame, ROW_NUMBER() OVER (PARTITION BY $partition ORDER BY c0.last_seen DESC) rn
+     FROM characters c0 WHERE c0.source_game = '" . str_replace("'", "''", $sourceGame) . "')";
+}
 const INSPECT_WINDOW_DAYS = 14;
 
 function api_items(string $game): array {
@@ -91,13 +205,20 @@ function merge_census_units(array $units): array {
 function load_census(string $sourceGame): array {
   static $cache = [];
   if (isset($cache[$sourceGame])) return $cache[$sourceGame];
-  $allObserved = $sourceGame === 'classic-beta';
+  $allObserved = in_array($sourceGame, ['classic-beta', 'forever'], true);
   $connected = $sourceGame === 'mop-classic';
-  $partition = $connected ? 'o.character_key' : 'o.game, o.character_key';
+  $og = canonical_game_sql('o.game');
+  $partition = $connected ? 'o.character_key' : "$og, o.character_key";
+  $chars = census_characters_sql($sourceGame);
+  $latestByGame = census_latest_sql();
   $censusWindow = CENSUS_WINDOW_DAYS * 86400;
+  // The census-sweep sightings, ranked per character (both queries below). The
+  // live bodies are kept byte for byte: published query keys hash the SQL text.
+  $cached = census_cache_fresh();
+  $sightings = "SELECT game, race, cf, t, rn FROM census_sightings WHERE source_game = ?";
   $censusRows = $allObserved ? [] : Db::all(
-    "WITH obs AS (
-       SELECT o.game game, o.race race, o.class_file cf, o.observed_at t,
+    "WITH obs AS (" . ($cached ? $sightings : "
+       SELECT $og game, o.race race, o.class_file cf, o.observed_at t,
          ROW_NUMBER() OVER (PARTITION BY $partition ORDER BY o.observed_at DESC) rn
        FROM character_location_observations o
        JOIN population_sweeps s
@@ -107,7 +228,7 @@ function load_census(string $sourceGame): array {
         AND q.query_index = o.query_index
        JOIN datasets d ON d.game = o.game
        WHERE d.source_game = ? AND s.label ILIKE 'census %' AND COALESCE(q.filter, '') NOT ILIKE '%z-%'
-     ), latest AS MATERIALIZED (SELECT game, MAX(t) t FROM obs GROUP BY game)
+     ") . "), latest AS MATERIALIZED (SELECT game, MAX(t) t FROM obs GROUP BY game)
      SELECT obs.game game, obs.race race, obs.cf cf, COUNT(*) n
      FROM obs JOIN latest l ON l.game = obs.game
      WHERE obs.rn = 1 AND obs.t >= l.t - ?
@@ -116,24 +237,24 @@ function load_census(string $sourceGame): array {
   $censused = [];
   foreach ($censusRows as $r) $censused[$r['game']] = true;
   $sightingRows = array_values(array_filter(Db::all(
-    "SELECT c.game game, c.race race, c.class_file cf, COUNT(*) n
-     FROM characters c JOIN datasets d ON d.game = c.game
-     " . ($allObserved ? '' : 'JOIN (SELECT game, MAX(last_seen) latest FROM characters GROUP BY game) m ON m.game = c.game') . "
-     WHERE d.source_game = ? " . ($allObserved ? '' : 'AND c.last_seen >= m.latest - ?') . "
-     GROUP BY c.game, c.race, c.class_file
-     ORDER BY c.game COLLATE \"C\", c.race COLLATE \"C\" NULLS FIRST, c.class_file COLLATE \"C\" NULLS FIRST",
+    "SELECT c.cgame game, c.race race, c.class_file cf, COUNT(*) n
+     FROM $chars c JOIN datasets d ON d.game = c.game
+     " . ($allObserved ? '' : "JOIN $latestByGame m ON m.game = c.cgame") . "
+     WHERE d.source_game = ? AND c.rn = 1 " . ($allObserved ? '' : 'AND c.last_seen >= m.latest - ?') . "
+     GROUP BY c.cgame, c.race, c.class_file
+     ORDER BY c.cgame COLLATE \"C\", c.race COLLATE \"C\" NULLS FIRST, c.class_file COLLATE \"C\" NULLS FIRST",
     $allObserved ? [$sourceGame] : [$sourceGame, $censusWindow]), fn($r) => !isset($censused[$r['game']])));
   $rows = array_merge($censusRows, $sightingRows);
   $raceCensusRows = $allObserved ? [] : Db::all(
-    "WITH obs AS (
-       SELECT o.game, o.race, o.observed_at t,
+    "WITH obs AS (" . ($cached ? $sightings : "
+       SELECT $og game, o.race, o.observed_at t,
          ROW_NUMBER() OVER (PARTITION BY $partition ORDER BY o.observed_at DESC) rn
        FROM character_location_observations o
        JOIN population_sweeps s ON s.game=o.game AND s.source_game=o.source_game AND s.sweep_id=o.sweep_id
        JOIN population_sweep_queries q ON q.game=o.game AND q.source_game=o.source_game AND q.sweep_id=o.sweep_id AND q.query_index=o.query_index
        JOIN datasets d ON d.game=o.game
        WHERE d.source_game=? AND s.label ILIKE 'census %' AND COALESCE(q.filter,'') NOT ILIKE '%z-%'
-     ), latest AS MATERIALIZED (SELECT game, MAX(t) t FROM obs GROUP BY game)
+     ") . "), latest AS MATERIALIZED (SELECT game, MAX(t) t FROM obs GROUP BY game)
      SELECT o.game, o.race, COUNT(*) all_count,
        SUM(CASE WHEN o.t>=l.t-604800 THEN 1 ELSE 0 END) week_count,
        SUM(CASE WHEN o.t>=l.t-86400 THEN 1 ELSE 0 END) day_count
@@ -142,35 +263,34 @@ function load_census(string $sourceGame): array {
      GROUP BY o.game,o.race
      ORDER BY o.game COLLATE \"C\", o.race COLLATE \"C\"", [$sourceGame]);
   $raceSightingRows = array_values(array_filter(Db::all(
-    "SELECT c.game, c.race, COUNT(*) all_count,
+    "SELECT c.cgame game, c.race, COUNT(*) all_count,
        SUM(CASE WHEN c.last_seen>=m.latest-604800 THEN 1 ELSE 0 END) week_count,
        SUM(CASE WHEN c.last_seen>=m.latest-86400 THEN 1 ELSE 0 END) day_count
-     FROM characters c JOIN datasets d ON d.game=c.game
-     JOIN (SELECT game,MAX(last_seen) latest FROM characters GROUP BY game) m ON m.game=c.game
-     WHERE d.source_game=? AND c.race IS NOT NULL
-     GROUP BY c.game,c.race
-     ORDER BY c.game COLLATE \"C\", c.race COLLATE \"C\"", [$sourceGame]), fn($r) => !isset($censused[$r['game']])));
+     FROM $chars c JOIN datasets d ON d.game=c.game
+     JOIN $latestByGame m ON m.game=c.cgame
+     WHERE d.source_game=? AND c.rn=1 AND c.race IS NOT NULL
+     GROUP BY c.cgame,c.race
+     ORDER BY c.cgame COLLATE \"C\", c.race COLLATE \"C\"", [$sourceGame]), fn($r) => !isset($censused[$r['game']])));
   $raceWindowRows = array_merge($raceCensusRows, $raceSightingRows);
   $scans = Db::all(
-    'SELECT p.game game, COUNT(*) samples, SUM(p.observed) observed, MAX(p.t) "lastT"
+    'SELECT ' . canonical_game_sql('p.game') . ' game, COUNT(*) samples, SUM(p.observed) observed, MAX(p.t) "lastT"
      FROM pop_samples p JOIN datasets d ON d.game = p.game
-     WHERE d.source_game = ? GROUP BY p.game ORDER BY p.game COLLATE "C"', [$sourceGame]);
-  $charSource = $connected ? "(SELECT *, ROW_NUMBER() OVER (PARTITION BY character_key ORDER BY last_seen DESC) rn FROM characters WHERE source_game='mop-classic')" : 'characters';
+     WHERE d.source_game = ? GROUP BY ' . canonical_game_sql('p.game') . ' ORDER BY ' . canonical_game_sql('p.game') . ' COLLATE "C"', [$sourceGame]);
   $guilds = Db::all(
-    "SELECT c.game game, c.guild guild, COUNT(*) members
-     FROM $charSource c
+    "SELECT c.cgame game, c.guild guild, COUNT(*) members
+     FROM $chars c
      JOIN datasets d ON d.game = c.game
-     WHERE d.source_game = ? " . ($connected ? 'AND c.rn=1' : '') . " AND TRIM(COALESCE(c.guild, '')) <> ''
-     GROUP BY c.game, c.guild
-     ORDER BY c.game COLLATE \"C\", c.guild COLLATE \"C\"", [$sourceGame]);
+     WHERE d.source_game = ? AND c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''
+     GROUP BY c.cgame, c.guild
+     ORDER BY c.cgame COLLATE \"C\", c.guild COLLATE \"C\"", [$sourceGame]);
   $zones = Db::all(
-    "SELECT c.game game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') zone,
+    "SELECT c.cgame game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') zone,
        COUNT(*) characters, CAST(ROUND(AVG(c.level)) AS INT) \"avgLevel\", MAX(c.level) \"maxLevel\"
-     FROM $charSource c JOIN datasets d ON d.game = c.game
-     JOIN (SELECT game, MAX(last_seen) latest FROM characters GROUP BY game) m ON m.game = c.game
-     WHERE d.source_game = ? " . ($connected ? 'AND c.rn=1' : '') . " AND c.last_seen >= m.latest - ?
-     GROUP BY c.game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown')
-     ORDER BY c.game COLLATE \"C\", COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') COLLATE \"C\"", [$sourceGame, ZONE_WINDOW_DAYS * 86400]);
+     FROM $chars c JOIN datasets d ON d.game = c.game
+     JOIN $latestByGame m ON m.game = c.cgame
+     WHERE d.source_game = ? AND c.rn=1 AND c.last_seen >= m.latest - ?
+     GROUP BY c.cgame, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown')
+     ORDER BY c.cgame COLLATE \"C\", COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') COLLATE \"C\"", [$sourceGame, ZONE_WINDOW_DAYS * 86400]);
 
   $units = [];
   $realms = [];
@@ -250,6 +370,106 @@ function gear_rune(array $g): ?string {
     $rune = mb_substr($line, 0, 60);
   }
   return $rune;
+}
+
+// Distinct players inspected in the inspect window, without load_inspects' record cap.
+// Null when published query data predates this count, so the page just omits it.
+function recent_inspect_count(string $source): ?int {
+  try {
+    $row = Db::first('SELECT COUNT(DISTINCT guid) n FROM character_inspects WHERE source_game=?
+      AND captured_at>=(SELECT MAX(captured_at) FROM character_inspects WHERE source_game=?)-?',
+      [$source, $source, INSPECT_WINDOW_DAYS * 86400]);
+  } catch (RuntimeException $e) {
+    return null;
+  }
+  return $row['n'] ?? null;
+}
+
+/** Every sighting day of every character of one edition (three ? = the edition). */
+function seen_sightings_live_sql(): string {
+  [$og, $cg] = [canonical_game_sql('o.game'), canonical_game_sql('c.game')];
+  return "SELECT $og g, o.character_key k, o.observed_at / 86400 dy FROM character_location_observations o
+       JOIN datasets d ON d.game = o.game WHERE d.source_game = ?
+     UNION SELECT $cg, c.character_key, c.first_seen / 86400 FROM characters c JOIN datasets d ON d.game = c.game WHERE d.source_game = ?
+     UNION SELECT $cg, c.character_key, c.last_seen / 86400 FROM characters c JOIN datasets d ON d.game = c.game WHERE d.source_game = ?";
+}
+
+/** Census-sweep sightings of one edition, ranked per character (one ? = the edition). */
+function census_sightings_live_sql(string $sourceGame): string {
+  $og = canonical_game_sql('o.game');
+  $partition = $sourceGame === 'mop-classic' ? 'o.character_key' : "$og, o.character_key";
+  return "SELECT $og game, o.race race, o.class_file cf, o.observed_at t,
+         ROW_NUMBER() OVER (PARTITION BY $partition ORDER BY o.observed_at DESC) rn
+       FROM character_location_observations o
+       JOIN population_sweeps s
+         ON s.game = o.game AND s.source_game = o.source_game AND s.sweep_id = o.sweep_id
+       JOIN population_sweep_queries q
+         ON q.game = o.game AND q.source_game = o.source_game AND q.sweep_id = o.sweep_id
+        AND q.query_index = o.query_index
+       JOIN datasets d ON d.game = o.game
+       WHERE d.source_game = ? AND s.label ILIKE 'census %' AND COALESCE(q.filter, '') NOT ILIKE '%z-%'";
+}
+
+// Distinct characters seen in the last 7 and 30 days and overall, each as a
+// running total by UTC day (the banner's "seen recently" chart) and with the
+// count for the same span just before it, for a change figure. A sighting is a
+// /who observation or a character's first or last sighting. Days count back
+// from the newest sighting, not from today. Null when published query data
+// predates this, so the banner just omits it.
+function seen_activity(string $source): ?array {
+  try {
+    if (census_cache_fresh()) {
+      // build-census-cache.php ran seen_activity_rows() for this import.
+      $row = Db::first('SELECT firsts, spans FROM census_seen_rows WHERE source_game = ?', [$source]);
+      $firsts = $row ? json_decode($row['firsts'], true, 512, JSON_THROW_ON_ERROR) : [];
+      $spans = $row ? json_decode($row['spans'], true, 512, JSON_THROW_ON_ERROR) : null;
+    } else {
+      [$firsts, $spans] = seen_activity_rows(seen_sightings_live_sql(), [$source, $source, $source]);
+    }
+  } catch (RuntimeException $e) {
+    return null;
+  }
+  if (!$firsts || !$spans) return null;
+  $new = [];
+  foreach ($firsts as $r) $new[$r['span']][$r['dy']] = $r['n'];
+  $first = (int)array_key_first($new['all']);
+  $last = (int)array_key_last($new['all']);
+  $span = function (string $key, int $from, string $n, string $p) use ($new, $last, $spans): array {
+    $total = 0;
+    $running = [];
+    foreach (range($from, $last) as $d) $running[] = $total += $new[$key][$d] ?? 0;
+    return ['n' => $spans[$n], 'prev' => $spans[$p], 'firstDay' => $from, 'running' => $running];
+  };
+  return [
+    'lastDay' => $last,
+    'all' => $span('all', $first, 'nall', 'pall'),
+    '30' => $span('30', max($first, $last - 29), 'n30', 'p30'),
+    '7' => $span('7', max($first, $last - 6), 'n7', 'p7'),
+  ];
+}
+
+/**
+ * seen_activity()'s two query results over a sightings query (columns g, k, dy):
+ * [new characters per day per span, distinct-character counts per span].
+ */
+function seen_activity_rows(string $sightings, array $params): array {
+    // New characters per day within each span: a character counts on its first sighting day in the span.
+    $firsts = Db::all("WITH s AS ($sightings), l AS (SELECT MAX(dy) dy FROM s),
+      f AS (SELECT MIN(s.dy) a, MIN(s.dy) FILTER (WHERE s.dy > l.dy - 30) m30, MIN(s.dy) FILTER (WHERE s.dy > l.dy - 7) m7
+        FROM s, l GROUP BY s.g, s.k, l.dy)
+      SELECT 'all' span, a dy, COUNT(*) n FROM f GROUP BY a
+      UNION ALL SELECT '30', m30, COUNT(*) FROM f WHERE m30 IS NOT NULL GROUP BY m30
+      UNION ALL SELECT '7', m7, COUNT(*) FROM f WHERE m7 IS NOT NULL GROUP BY m7
+      ORDER BY 1, 2", $params);
+    $spans = Db::first("WITH s AS ($sightings), l AS (SELECT MAX(dy) dy FROM s)
+      SELECT COUNT(DISTINCT (s.g, s.k)) FILTER (WHERE s.dy > l.dy - 7) n7,
+        COUNT(DISTINCT (s.g, s.k)) FILTER (WHERE s.dy > l.dy - 14 AND s.dy <= l.dy - 7) p7,
+        COUNT(DISTINCT (s.g, s.k)) FILTER (WHERE s.dy > l.dy - 30) n30,
+        COUNT(DISTINCT (s.g, s.k)) FILTER (WHERE s.dy > l.dy - 60 AND s.dy <= l.dy - 30) p30,
+        COUNT(DISTINCT (s.g, s.k)) nall,
+        COUNT(DISTINCT (s.g, s.k)) FILTER (WHERE s.dy <= l.dy - 30) pall
+      FROM s, l", $params);
+    return [$firsts, $spans];
 }
 
 function load_inspects(string $source): array {

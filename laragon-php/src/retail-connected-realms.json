@@ -1,0 +1,4338 @@
+{
+ "fetchedAt": "2026-10-27T21:49:52Z",
+ "source": "Blizzard Game Data API, /data/wow/search/connected-realm (dynamic namespace)",
+ "us": [
+  {
+   "id": 4,
+   "realms": [
+    {
+     "name": "Kilrogg",
+     "alt": [
+      "基尔罗格",
+      "基爾羅格"
+     ]
+    },
+    {
+     "name": "Winterhoof",
+     "alt": [
+      "冬蹄",
+      "冬蹄部族"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "realms": [
+    {
+     "name": "Proudmoore",
+     "alt": [
+      "普勞德摩爾",
+      "普罗德摩"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "realms": [
+    {
+     "name": "Kil'jaeden",
+     "alt": [
+      "基尔加丹",
+      "基爾加丹"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "realms": [
+    {
+     "name": "Tichondrius",
+     "alt": [
+      "提克迪奥斯",
+      "提克迪奧斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "realms": [
+    {
+     "name": "Farstriders",
+     "alt": [
+      "Странники",
+      "远行者",
+      "遠行者"
+     ]
+    },
+    {
+     "name": "Silver Hand",
+     "alt": [
+      "白銀之手",
+      "白银之手"
+     ]
+    },
+    {
+     "name": "Thorium Brotherhood",
+     "alt": [
+      "瑟銀兄弟會",
+      "瑟银兄弟会"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 47,
+   "realms": [
+    {
+     "name": "Eitrigg",
+     "alt": [
+      "Etrigg",
+      "伊崔格"
+     ]
+    },
+    {
+     "name": "Shu'halo",
+     "alt": [
+      "舒哈魯",
+      "舒哈鲁"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 52,
+   "realms": [
+    {
+     "name": "Alleria",
+     "alt": [
+      "奥蕾莉亚",
+      "艾蘭里亞"
+     ]
+    },
+    {
+     "name": "Exodar",
+     "alt": [
+      "埃索达",
+      "艾克索達"
+     ]
+    },
+    {
+     "name": "Khadgar",
+     "alt": [
+      "Кадгар",
+      "卡德加"
+     ]
+    },
+    {
+     "name": "Medivh",
+     "alt": [
+      "麥迪文",
+      "麦迪文"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 53,
+   "realms": [
+    {
+     "name": "Eredar",
+     "alt": [
+      "埃雷达尔",
+      "埃雷達爾"
+     ]
+    },
+    {
+     "name": "Gorefiend",
+     "alt": [
+      "血牙魔王",
+      "血魔"
+     ]
+    },
+    {
+     "name": "Hellscream",
+     "alt": [
+      "地狱咆哮",
+      "地獄吼"
+     ]
+    },
+    {
+     "name": "Spinebreaker",
+     "alt": [
+      "断背",
+      "斷脊氏族"
+     ]
+    },
+    {
+     "name": "Wildhammer",
+     "alt": [
+      "蛮锤",
+      "蠻錘"
+     ]
+    },
+    {
+     "name": "Zangarmarsh",
+     "alt": [
+      "贊格沼澤",
+      "赞加沼泽"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 54,
+   "realms": [
+    {
+     "name": "Blackhand",
+     "alt": [
+      "黑手军团",
+      "黑手氏族"
+     ]
+    },
+    {
+     "name": "Galakrond",
+     "alt": [
+      "葛拉克朗",
+      "迦拉克隆"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 55,
+   "realms": [
+    {
+     "name": "Dentarg",
+     "alt": [
+      "丹塔格",
+      "登塔格"
+     ]
+    },
+    {
+     "name": "Whisperwind",
+     "alt": [
+      "語風",
+      "轻风之语"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 57,
+   "realms": [
+    {
+     "name": "Illidan",
+     "alt": [
+      "伊利丹"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 58,
+   "realms": [
+    {
+     "name": "Stormreaver",
+     "alt": [
+      "暴掠氏族",
+      "风暴裂隙"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 60,
+   "realms": [
+    {
+     "name": "Stormrage",
+     "alt": [
+      "怒風",
+      "风暴之怒"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 61,
+   "realms": [
+    {
+     "name": "Zul'jin",
+     "alt": [
+      "祖尔金",
+      "祖爾金"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 63,
+   "realms": [
+    {
+     "name": "Durotan",
+     "alt": [
+      "杜洛坦",
+      "杜隆坦"
+     ]
+    },
+    {
+     "name": "Ysera",
+     "alt": [
+      "Изера",
+      "伊瑟拉"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 64,
+   "realms": [
+    {
+     "name": "Bloodhoof",
+     "alt": [
+      "凯恩血蹄",
+      "血蹄"
+     ]
+    },
+    {
+     "name": "Duskwood",
+     "alt": [
+      "暮色森林"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 67,
+   "realms": [
+    {
+     "name": "Auchindoun",
+     "alt": [
+      "Аукиндон",
+      "奥金顿",
+      "奧齊頓"
+     ]
+    },
+    {
+     "name": "Cho'gall",
+     "alt": [
+      "丘加利",
+      "古加尔"
+     ]
+    },
+    {
+     "name": "Elune",
+     "alt": [
+      "伊露恩",
+      "艾露恩"
+     ]
+    },
+    {
+     "name": "Gilneas",
+     "alt": [
+      "吉尔尼斯",
+      "吉爾尼斯"
+     ]
+    },
+    {
+     "name": "Laughing Skull",
+     "alt": [
+      "嘲颅",
+      "獰笑骷髏"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 69,
+   "realms": [
+    {
+     "name": "Arthas",
+     "alt": [
+      "阿尔萨斯",
+      "阿薩斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 71,
+   "realms": [
+    {
+     "name": "Alterac Mountains",
+     "alt": [
+      "奥特兰克",
+      "奧特蘭克山脈"
+     ]
+    },
+    {
+     "name": "Anvilmar",
+     "alt": [
+      "安威玛尔",
+      "安威瑪"
+     ]
+    },
+    {
+     "name": "Balnazzar",
+     "alt": [
+      "巴納札爾",
+      "巴纳扎尔"
+     ]
+    },
+    {
+     "name": "Gorgonnash",
+     "alt": [
+      "戈古納斯",
+      "戈古纳斯"
+     ]
+    },
+    {
+     "name": "The Forgotten Coast",
+     "alt": [
+      "被遺忘的海岸",
+      "遗忘海岸"
+     ]
+    },
+    {
+     "name": "Undermine",
+     "alt": [
+      "安德麦",
+      "幽坑城"
+     ]
+    },
+    {
+     "name": "Warsong",
+     "alt": [
+      "战歌",
+      "戰歌"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 73,
+   "realms": [
+    {
+     "name": "Bleeding Hollow",
+     "alt": [
+      "血之谷",
+      "血环"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 75,
+   "realms": [
+    {
+     "name": "Argent Dawn",
+     "alt": [
+      "Серебряный Рассвет",
+      "銀色黎明",
+      "银色黎明"
+     ]
+    },
+    {
+     "name": "The Scryers",
+     "alt": [
+      "占卜者",
+      "占星者"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 76,
+   "realms": [
+    {
+     "name": "Sargeras",
+     "alt": [
+      "萨格拉斯",
+      "薩格拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 77,
+   "realms": [
+    {
+     "name": "Azgalor",
+     "alt": [
+      "亞茲加洛",
+      "埃加洛尔"
+     ]
+    },
+    {
+     "name": "Azshara",
+     "alt": [
+      "艾萨拉",
+      "艾薩拉"
+     ]
+    },
+    {
+     "name": "Blood Furnace",
+     "alt": [
+      "血熔爐",
+      "鲜血熔炉"
+     ]
+    },
+    {
+     "name": "Destromath",
+     "alt": [
+      "代斯特麥斯",
+      "迪托马斯"
+     ]
+    },
+    {
+     "name": "Mannoroth",
+     "alt": [
+      "玛诺洛斯",
+      "瑪諾洛斯"
+     ]
+    },
+    {
+     "name": "Nazjatar",
+     "alt": [
+      "納沙塔爾",
+      "纳沙塔尔"
+     ]
+    },
+    {
+     "name": "Thunderlord",
+     "alt": [
+      "雷霆之王",
+      "雷霆王"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 78,
+   "realms": [
+    {
+     "name": "Altar of Storms",
+     "alt": [
+      "暴风祭坛",
+      "風暴祭壇"
+     ]
+    },
+    {
+     "name": "Anetheron",
+     "alt": [
+      "安納塞隆",
+      "安纳塞隆"
+     ]
+    },
+    {
+     "name": "Magtheridon",
+     "alt": [
+      "玛瑟里顿",
+      "瑪瑟里頓"
+     ]
+    },
+    {
+     "name": "Ysondre",
+     "alt": [
+      "伊森德雷",
+      "伊索德雷"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 84,
+   "realms": [
+    {
+     "name": "Akama",
+     "alt": [
+      "阿卡玛",
+      "阿卡瑪"
+     ]
+    },
+    {
+     "name": "Antonidas",
+     "alt": [
+      "安东尼达斯",
+      "安東尼達斯"
+     ]
+    },
+    {
+     "name": "Dragonmaw",
+     "alt": [
+      "巨龙之吼",
+      "龍喉"
+     ]
+    },
+    {
+     "name": "Eldre'Thalas",
+     "alt": [
+      "埃德萨拉",
+      "埃德薩拉斯"
+     ]
+    },
+    {
+     "name": "Korialstrasz",
+     "alt": [
+      "考雷斯塔茲",
+      "考雷斯特拉兹"
+     ]
+    },
+    {
+     "name": "Mug'thol",
+     "alt": [
+      "玛格索尔",
+      "瑪格索爾"
+     ]
+    },
+    {
+     "name": "Uldum",
+     "alt": [
+      "奥丹姆",
+      "奧丹姆"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 86,
+   "realms": [
+    {
+     "name": "Borean Tundra",
+     "alt": [
+      "北風凍原",
+      "北风苔原"
+     ]
+    },
+    {
+     "name": "Drak'thul",
+     "alt": [
+      "德拉克蘇爾"
+     ]
+    },
+    {
+     "name": "Hydraxis",
+     "alt": [
+      "海达希亚",
+      "海達克西斯"
+     ]
+    },
+    {
+     "name": "Mok'Nathal",
+     "alt": [
+      "Мок'Натал",
+      "摩克納薩爾",
+      "莫克纳萨"
+     ]
+    },
+    {
+     "name": "Shadowsong",
+     "alt": [
+      "影歌"
+     ]
+    },
+    {
+     "name": "Silvermoon",
+     "alt": [
+      "銀月",
+      "银月"
+     ]
+    },
+    {
+     "name": "Skywall",
+     "alt": [
+      "天空之墙",
+      "天空之牆"
+     ]
+    },
+    {
+     "name": "Terenas",
+     "alt": [
+      "Теренас",
+      "泰瑞納斯",
+      "泰瑞纳斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 96,
+   "realms": [
+    {
+     "name": "Andorhal",
+     "alt": [
+      "安多哈尔",
+      "安多哈爾"
+     ]
+    },
+    {
+     "name": "Black Dragonflight",
+     "alt": [
+      "Род черных драконов",
+      "黑龍軍團",
+      "黑龙军团"
+     ]
+    },
+    {
+     "name": "Eonar",
+     "alt": [
+      "伊歐娜",
+      "艾欧娜尔"
+     ]
+    },
+    {
+     "name": "Gul'dan",
+     "alt": [
+      "古尔丹",
+      "古爾丹"
+     ]
+    },
+    {
+     "name": "Scilla",
+     "alt": [
+      "席拉"
+     ]
+    },
+    {
+     "name": "Skullcrusher",
+     "alt": [
+      "碎顱氏族",
+      "碎颅者"
+     ]
+    },
+    {
+     "name": "Ursin",
+     "alt": [
+      "烏爾辛"
+     ]
+    },
+    {
+     "name": "Velen",
+     "alt": [
+      "维伦",
+      "費倫"
+     ]
+    },
+    {
+     "name": "Zuluhed",
+     "alt": [
+      "祖魯希德",
+      "祖鲁希德"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 99,
+   "realms": [
+    {
+     "name": "Arygos",
+     "alt": [
+      "亚雷戈斯",
+      "亞雷戈斯"
+     ]
+    },
+    {
+     "name": "Llane",
+     "alt": [
+      "莱恩",
+      "萊恩"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 100,
+   "realms": [
+    {
+     "name": "Earthen Ring",
+     "alt": [
+      "Служители Земли",
+      "大地之环",
+      "陶土議會"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 104,
+   "realms": [
+    {
+     "name": "Burning Blade",
+     "alt": [
+      "燃刃",
+      "燃烧之刃"
+     ]
+    },
+    {
+     "name": "Garona",
+     "alt": [
+      "迦罗娜",
+      "迦羅娜"
+     ]
+    },
+    {
+     "name": "Icecrown",
+     "alt": [
+      "寒冰皇冠"
+     ]
+    },
+    {
+     "name": "Lightning's Blade",
+     "alt": [
+      "閃電之刃",
+      "闪电之刃"
+     ]
+    },
+    {
+     "name": "Malygos",
+     "alt": [
+      "玛里苟斯",
+      "瑪里苟斯"
+     ]
+    },
+    {
+     "name": "Onyxia",
+     "alt": [
+      "奥妮克希亚",
+      "奧妮克希亞"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 106,
+   "realms": [
+    {
+     "name": "Aggramar",
+     "alt": [
+      "阿格拉玛",
+      "阿格拉瑪"
+     ]
+    },
+    {
+     "name": "Fizzcrank",
+     "alt": [
+      "嘶軸",
+      "菲兹兰克"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 113,
+   "realms": [
+    {
+     "name": "Darrowmere",
+     "alt": [
+      "达隆米尔",
+      "達隆米爾"
+     ]
+    },
+    {
+     "name": "Draka",
+     "alt": [
+      "德拉卡"
+     ]
+    },
+    {
+     "name": "Suramar",
+     "alt": [
+      "苏拉玛",
+      "蘇拉瑪爾"
+     ]
+    },
+    {
+     "name": "Windrunner",
+     "alt": [
+      "Ветрокрылая",
+      "風行者",
+      "风行者"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 114,
+   "realms": [
+    {
+     "name": "Dragonblight",
+     "alt": [
+      "龍骨荒野",
+      "龙骨平原"
+     ]
+    },
+    {
+     "name": "Fenris",
+     "alt": [
+      "芬里斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 115,
+   "realms": [
+    {
+     "name": "Draenor",
+     "alt": [
+      "德拉諾",
+      "德拉诺"
+     ]
+    },
+    {
+     "name": "Echo Isles",
+     "alt": [
+      "回音群岛",
+      "回音群島"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 117,
+   "realms": [
+    {
+     "name": "Bronzebeard",
+     "alt": [
+      "山丘之王",
+      "銅鬚"
+     ]
+    },
+    {
+     "name": "Shandris",
+     "alt": [
+      "珊蒂斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 118,
+   "realms": [
+    {
+     "name": "Feathermoon",
+     "alt": [
+      "羽月"
+     ]
+    },
+    {
+     "name": "Scarlet Crusade",
+     "alt": [
+      "血色十字军",
+      "血色十字軍"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 120,
+   "realms": [
+    {
+     "name": "Darkspear",
+     "alt": [
+      "暗矛部族",
+      "黑暗之矛"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 121,
+   "realms": [
+    {
+     "name": "Azjol-Nerub",
+     "alt": [
+      "蜘蛛王国",
+      "阿茲歐-奈幽"
+     ]
+    },
+    {
+     "name": "Blackrock",
+     "alt": [
+      "黑石尖塔",
+      "黑石氏族"
+     ]
+    },
+    {
+     "name": "Khaz Modan",
+     "alt": [
+      "卡兹莫丹",
+      "卡茲莫丹"
+     ]
+    },
+    {
+     "name": "Muradin",
+     "alt": [
+      "Мурадин",
+      "穆拉丁"
+     ]
+    },
+    {
+     "name": "Nordrassil",
+     "alt": [
+      "諾達希爾",
+      "诺达希尔"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 125,
+   "realms": [
+    {
+     "name": "Blackwater Raiders",
+     "alt": [
+      "黑水強盜",
+      "黑水强盗"
+     ]
+    },
+    {
+     "name": "Cenarion Circle",
+     "alt": [
+      "Круг Кенария",
+      "塞納里奧議會",
+      "塞纳里奥议会"
+     ]
+    },
+    {
+     "name": "Shadow Council",
+     "alt": [
+      "暗影議會",
+      "暗影议会"
+     ]
+    },
+    {
+     "name": "Sisters of Elune",
+     "alt": [
+      "伊露恩姐妹",
+      "艾露恩姐妹"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 127,
+   "realms": [
+    {
+     "name": "Drak'Tharon",
+     "alt": [
+      "德拉克薩隆",
+      "达克萨隆"
+     ]
+    },
+    {
+     "name": "Firetree",
+     "alt": [
+      "火焰之树",
+      "火焰之樹"
+     ]
+    },
+    {
+     "name": "Frostwolf",
+     "alt": [
+      "霜狼"
+     ]
+    },
+    {
+     "name": "Malorne",
+     "alt": [
+      "玛洛恩",
+      "瑪洛尼"
+     ]
+    },
+    {
+     "name": "Rivendare",
+     "alt": [
+      "瑞文戴尔",
+      "瑞文戴爾"
+     ]
+    },
+    {
+     "name": "Spirestone",
+     "alt": [
+      "尖石",
+      "岩石巨塔"
+     ]
+    },
+    {
+     "name": "Stormscale",
+     "alt": [
+      "雷鱗",
+      "风暴之鳞"
+     ]
+    },
+    {
+     "name": "Vashj",
+     "alt": [
+      "瓦丝琪",
+      "瓦許"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 151,
+   "realms": [
+    {
+     "name": "Runetotem",
+     "alt": [
+      "Public Test EU",
+      "符文圖騰"
+     ]
+    },
+    {
+     "name": "Uther",
+     "alt": [
+      "乌瑟尔",
+      "烏瑟"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 154,
+   "realms": [
+    {
+     "name": "Blackwing Lair",
+     "alt": [
+      "黑翼之巢"
+     ]
+    },
+    {
+     "name": "Dethecus",
+     "alt": [
+      "迪塞庫斯"
+     ]
+    },
+    {
+     "name": "Detheroc",
+     "alt": [
+      "戴瑟洛克",
+      "迪瑟洛克"
+     ]
+    },
+    {
+     "name": "Haomarush",
+     "alt": [
+      "哈姆魯什"
+     ]
+    },
+    {
+     "name": "Lethon",
+     "alt": [
+      "莱索恩",
+      "雷索"
+     ]
+    },
+    {
+     "name": "Shadowmoon",
+     "alt": [
+      "暗影之月"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 155,
+   "realms": [
+    {
+     "name": "Deathwing",
+     "alt": [
+      "Смертокрыл",
+      "死亡之翼"
+     ]
+    },
+    {
+     "name": "Executus",
+     "alt": [
+      "埃克索图斯",
+      "埃克索圖斯"
+     ]
+    },
+    {
+     "name": "Kalecgos",
+     "alt": [
+      "Калесгос",
+      "卡雷苟斯"
+     ]
+    },
+    {
+     "name": "Shattered Halls",
+     "alt": [
+      "破碎大厅",
+      "破碎大廳"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 157,
+   "realms": [
+    {
+     "name": "Coilfang",
+     "alt": [
+      "盘牙",
+      "盤牙"
+     ]
+    },
+    {
+     "name": "Dalvengyr",
+     "alt": [
+      "达文格尔",
+      "達拉溫格"
+     ]
+    },
+    {
+     "name": "Dark Iron",
+     "alt": [
+      "黑鐵氏族",
+      "黑铁"
+     ]
+    },
+    {
+     "name": "Demon Soul",
+     "alt": [
+      "Alma de demonio",
+      "恶魔之魂",
+      "惡魔之魂"
+     ]
+    },
+    {
+     "name": "Shattered Hand",
+     "alt": [
+      "破碎之手",
+      "碎手"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 158,
+   "realms": [
+    {
+     "name": "Greymane",
+     "alt": [
+      "Седогрив",
+      "格雷迈恩",
+      "葛雷邁恩"
+     ]
+    },
+    {
+     "name": "Tanaris",
+     "alt": [
+      "塔納利斯",
+      "塔纳利斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 160,
+   "realms": [
+    {
+     "name": "Azuremyst",
+     "alt": [
+      "秘蓝岛",
+      "藍謎島"
+     ]
+    },
+    {
+     "name": "Dawnbringer",
+     "alt": [
+      "黎明使者"
+     ]
+    },
+    {
+     "name": "Madoran",
+     "alt": [
+      "玛多兰",
+      "瑪多蘭"
+     ]
+    },
+    {
+     "name": "Staghelm",
+     "alt": [
+      "范达尔鹿盔",
+      "鹿盔"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 162,
+   "realms": [
+    {
+     "name": "Emerald Dream",
+     "alt": [
+      "翡翠夢境",
+      "翡翠梦境"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 163,
+   "realms": [
+    {
+     "name": "Lightninghoof",
+     "alt": [
+      "雷蹄"
+     ]
+    },
+    {
+     "name": "Maelstrom",
+     "alt": [
+      "大漩涡",
+      "漩渦"
+     ]
+    },
+    {
+     "name": "Ravenholdt",
+     "alt": [
+      "拉文霍德"
+     ]
+    },
+    {
+     "name": "The Venture Co",
+     "alt": [
+      "The Venture Co.",
+      "風險投資公司"
+     ]
+    },
+    {
+     "name": "Twisting Nether",
+     "alt": [
+      "扭曲虛空",
+      "黑暗虚空"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1070,
+   "realms": [
+    {
+     "name": "Alexstrasza",
+     "alt": [
+      "红龙女王",
+      "雅立史卓莎"
+     ]
+    },
+    {
+     "name": "Terokkar",
+     "alt": [
+      "泰洛卡",
+      "泰罗卡"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1071,
+   "realms": [
+    {
+     "name": "Kirin Tor",
+     "alt": [
+      "祈倫托",
+      "肯瑞托"
+     ]
+    },
+    {
+     "name": "Sentinels",
+     "alt": [
+      "哨兵"
+     ]
+    },
+    {
+     "name": "Steamwheedle Cartel",
+     "alt": [
+      "热砂港",
+      "熱砂企業"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1072,
+   "realms": [
+    {
+     "name": "Ravencrest",
+     "alt": [
+      "拉文凯斯",
+      "黑羽"
+     ]
+    },
+    {
+     "name": "Uldaman",
+     "alt": [
+      "奥达曼",
+      "奧達曼"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1129,
+   "realms": [
+    {
+     "name": "Agamaggan",
+     "alt": [
+      "阿迦玛甘",
+      "阿迦瑪甘"
+     ]
+    },
+    {
+     "name": "Archimonde",
+     "alt": [
+      "阿克蒙德"
+     ]
+    },
+    {
+     "name": "Blade's Edge",
+     "alt": [
+      "刀锋山",
+      "劍刃山脈"
+     ]
+    },
+    {
+     "name": "Burning Legion",
+     "alt": [
+      "燃烧军团",
+      "燃燒軍團"
+     ]
+    },
+    {
+     "name": "Jaedenar",
+     "alt": [
+      "加德納爾",
+      "加德纳尔"
+     ]
+    },
+    {
+     "name": "Kargath",
+     "alt": [
+      "卡加斯",
+      "卡格斯"
+     ]
+    },
+    {
+     "name": "Norgannon",
+     "alt": [
+      "諾甘農",
+      "诺甘农"
+     ]
+    },
+    {
+     "name": "The Underbog",
+     "alt": [
+      "幽暗沼泽",
+      "深幽泥沼"
+     ]
+    },
+    {
+     "name": "Thunderhorn",
+     "alt": [
+      "雷角",
+      "雷霆号角"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1136,
+   "realms": [
+    {
+     "name": "Aegwynn",
+     "alt": [
+      "艾格文"
+     ]
+    },
+    {
+     "name": "Bonechewer",
+     "alt": [
+      "噬骨者",
+      "嚼骨者"
+     ]
+    },
+    {
+     "name": "Daggerspine",
+     "alt": [
+      "刺脊部族",
+      "刺骨利刃"
+     ]
+    },
+    {
+     "name": "Garrosh",
+     "alt": [
+      "加尔鲁什",
+      "卡爾洛斯"
+     ]
+    },
+    {
+     "name": "Gurubashi",
+     "alt": [
+      "古拉巴什"
+     ]
+    },
+    {
+     "name": "Hakkar",
+     "alt": [
+      "哈卡"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1138,
+   "realms": [
+    {
+     "name": "Anub'arak",
+     "alt": [
+      "阿努巴拉克"
+     ]
+    },
+    {
+     "name": "Arathor",
+     "alt": [
+      "阿拉索"
+     ]
+    },
+    {
+     "name": "Chromaggus",
+     "alt": [
+      "克洛玛古斯",
+      "克洛瑪古斯"
+     ]
+    },
+    {
+     "name": "Crushridge",
+     "alt": [
+      "破碎之嶺",
+      "破碎岭"
+     ]
+    },
+    {
+     "name": "Drenden",
+     "alt": [
+      "德蘭丹"
+     ]
+    },
+    {
+     "name": "Garithos",
+     "alt": [
+      "加里索斯"
+     ]
+    },
+    {
+     "name": "Nathrezim",
+     "alt": [
+      "納斯雷茲姆",
+      "纳斯雷兹姆"
+     ]
+    },
+    {
+     "name": "Smolderthorn",
+     "alt": [
+      "烈焰荆棘",
+      "燃棘"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1147,
+   "realms": [
+    {
+     "name": "Bladefist",
+     "alt": [
+      "刃拳",
+      "利刃之拳"
+     ]
+    },
+    {
+     "name": "Kul Tiras",
+     "alt": [
+      "库尔提拉斯",
+      "庫爾提拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1151,
+   "realms": [
+    {
+     "name": "Misha",
+     "alt": [
+      "Миша",
+      "米莎"
+     ]
+    },
+    {
+     "name": "Rexxar",
+     "alt": [
+      "雷克萨",
+      "雷克薩"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1168,
+   "realms": [
+    {
+     "name": "Cairne",
+     "alt": [
+      "凯恩",
+      "凱恩"
+     ]
+    },
+    {
+     "name": "Cenarius",
+     "alt": [
+      "塞納留斯",
+      "塞纳留斯"
+     ]
+    },
+    {
+     "name": "Frostmane",
+     "alt": [
+      "冰霜之刃",
+      "冰霜之刺"
+     ]
+    },
+    {
+     "name": "Korgath",
+     "alt": [
+      "寇格斯"
+     ]
+    },
+    {
+     "name": "Ner'zhul",
+     "alt": [
+      "耐奥祖",
+      "耐祖奧"
+     ]
+    },
+    {
+     "name": "Perenolde",
+     "alt": [
+      "匹瑞諾德",
+      "匹瑞诺德"
+     ]
+    },
+    {
+     "name": "Tortheldrin",
+     "alt": [
+      "托塞德林"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1171,
+   "realms": [
+    {
+     "name": "Wyrmrest Accord",
+     "alt": [
+      "龍眠協調者"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1175,
+   "realms": [
+    {
+     "name": "Ghostlands",
+     "alt": [
+      "幽魂之地",
+      "鬼魂之地"
+     ]
+    },
+    {
+     "name": "Gnomeregan",
+     "alt": [
+      "諾姆瑞根",
+      "诺莫瑞根"
+     ]
+    },
+    {
+     "name": "Grizzly Hills",
+     "alt": [
+      "灰熊丘陵",
+      "灰白之丘"
+     ]
+    },
+    {
+     "name": "Kael'thas",
+     "alt": [
+      "凯尔萨斯",
+      "凱爾薩斯"
+     ]
+    },
+    {
+     "name": "Lothar",
+     "alt": [
+      "洛萨",
+      "洛薩"
+     ]
+    },
+    {
+     "name": "Malfurion",
+     "alt": [
+      "玛法里奥",
+      "瑪法里恩"
+     ]
+    },
+    {
+     "name": "Moonrunner",
+     "alt": [
+      "月行者"
+     ]
+    },
+    {
+     "name": "Trollbane",
+     "alt": [
+      "托尔贝恩",
+      "托爾貝恩"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1184,
+   "realms": [
+    {
+     "name": "Nazgrel",
+     "alt": [
+      "納茲格雷爾",
+      "纳兹格雷尔"
+     ]
+    },
+    {
+     "name": "Nesingwary",
+     "alt": [
+      "奈辛瓦里"
+     ]
+    },
+    {
+     "name": "Vek'nilash",
+     "alt": [
+      "維克尼拉斯",
+      "维克尼拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1185,
+   "realms": [
+    {
+     "name": "Bloodscalp",
+     "alt": [
+      "血頂部族",
+      "血顶"
+     ]
+    },
+    {
+     "name": "Boulderfist",
+     "alt": [
+      "冰川之拳",
+      "石拳"
+     ]
+    },
+    {
+     "name": "Dunemaul",
+     "alt": [
+      "流沙之槌"
+     ]
+    },
+    {
+     "name": "Maiev",
+     "alt": [
+      "Майев",
+      "玛维",
+      "瑪翼夫"
+     ]
+    },
+    {
+     "name": "Quel'dorei",
+     "alt": [
+      "奎尔多雷",
+      "眾星之子"
+     ]
+    },
+    {
+     "name": "Sen'jin",
+     "alt": [
+      "森金"
+     ]
+    },
+    {
+     "name": "Stonemaul",
+     "alt": [
+      "石槌",
+      "石锤"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1190,
+   "realms": [
+    {
+     "name": "Baelgun",
+     "alt": [
+      "巴尔古恩",
+      "巴爾古恩"
+     ]
+    },
+    {
+     "name": "Doomhammer",
+     "alt": [
+      "末日錘",
+      "毁灭之锤"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1425,
+   "realms": [
+    {
+     "name": "Drakkari",
+     "alt": [
+      "德拉克瑞",
+      "达卡莱"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1426,
+   "realms": [
+    {
+     "name": "Aerie Peak",
+     "alt": [
+      "鷹巢山",
+      "鹰巢山"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1427,
+   "realms": [
+    {
+     "name": "Ragnaros",
+     "alt": [
+      "拉格納羅斯",
+      "拉格纳罗斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1428,
+   "realms": [
+    {
+     "name": "Quel'Thalas",
+     "alt": [
+      "奎尔萨拉斯",
+      "奎爾薩拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3207,
+   "realms": [
+    {
+     "name": "Goldrinn",
+     "alt": [
+      "戈德林"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3208,
+   "realms": [
+    {
+     "name": "Nemesis",
+     "alt": [
+      "Némesis",
+      "涅墨西斯",
+      "涅密希斯"
+     ]
+    },
+    {
+     "name": "Tol Barad",
+     "alt": [
+      "托尔巴拉德",
+      "托巴拉德"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3209,
+   "realms": [
+    {
+     "name": "Azralon",
+     "alt": [
+      "阿兹拉隆"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3234,
+   "realms": [
+    {
+     "name": "Gallywix",
+     "alt": [
+      "加里維克斯",
+      "加里维克斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3661,
+   "realms": [
+    {
+     "name": "Hyjal",
+     "alt": [
+      "海加尔",
+      "海加爾山"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3675,
+   "realms": [
+    {
+     "name": "Moon Guard",
+     "alt": [
+      "月之守卫",
+      "月之守衛"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3676,
+   "realms": [
+    {
+     "name": "Area 52",
+     "alt": [
+      "52區"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3678,
+   "realms": [
+    {
+     "name": "Thrall",
+     "alt": [
+      "索爾",
+      "萨尔"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3683,
+   "realms": [
+    {
+     "name": "Dalaran",
+     "alt": [
+      "达拉然",
+      "達拉然"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3684,
+   "realms": [
+    {
+     "name": "Mal'Ganis",
+     "alt": [
+      "梅尔加尼",
+      "瑪爾加尼斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3685,
+   "realms": [
+    {
+     "name": "Turalyon",
+     "alt": [
+      "图拉扬",
+      "圖拉揚"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3693,
+   "realms": [
+    {
+     "name": "Kel'Thuzad",
+     "alt": [
+      "克尔苏加德",
+      "科爾蘇加德"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3694,
+   "realms": [
+    {
+     "name": "Lightbringer",
+     "alt": [
+      "光明使者"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3721,
+   "realms": [
+    {
+     "name": "Caelestrasz",
+     "alt": [
+      "Caelestrasz US9",
+      "凯雷斯特拉兹",
+      "凱雷斯塔茲"
+     ]
+    },
+    {
+     "name": "Nagrand",
+     "alt": [
+      "Nagrand US9",
+      "納葛蘭",
+      "纳格兰"
+     ]
+    },
+    {
+     "name": "Saurfang",
+     "alt": [
+      "Saurfang US9",
+      "萨鲁法尔",
+      "薩魯法爾"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3723,
+   "realms": [
+    {
+     "name": "Barthilas",
+     "alt": [
+      "Barthilas US9",
+      "巴瑟拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3725,
+   "realms": [
+    {
+     "name": "Dreadmaul",
+     "alt": [
+      "Dreadmaul US9",
+      "巨槌"
+     ]
+    },
+    {
+     "name": "Frostmourne",
+     "alt": [
+      "Frostmourne US9",
+      "霜之哀伤",
+      "霜之哀傷"
+     ]
+    },
+    {
+     "name": "Gundrak",
+     "alt": [
+      "Gundrak US9",
+      "剛德拉克",
+      "古达克"
+     ]
+    },
+    {
+     "name": "Jubei'Thos",
+     "alt": [
+      "Jubei'Thos US9",
+      "朱倍尔索斯",
+      "裘比索斯"
+     ]
+    },
+    {
+     "name": "Thaurissan",
+     "alt": [
+      "Thaurissan US9",
+      "索瑞森"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3726,
+   "realms": [
+    {
+     "name": "Aman'Thul",
+     "alt": [
+      "Aman'Thul US9",
+      "Aman'thul",
+      "阿曼苏尔",
+      "阿曼蘇爾"
+     ]
+    },
+    {
+     "name": "Dath'Remar",
+     "alt": [
+      "Dath'Remar US9",
+      "达斯雷玛",
+      "達斯雷瑪"
+     ]
+    },
+    {
+     "name": "Khaz'goroth",
+     "alt": [
+      "Khaz'goroth US9",
+      "卡兹格罗斯",
+      "卡茲格羅斯"
+     ]
+    }
+   ]
+  }
+ ],
+ "eu": [
+  {
+   "id": 509,
+   "realms": [
+    {
+     "name": "Garona",
+     "alt": [
+      "迦罗娜",
+      "迦羅娜"
+     ]
+    },
+    {
+     "name": "Ner'zhul",
+     "alt": [
+      "耐奥祖",
+      "耐祖奧"
+     ]
+    },
+    {
+     "name": "Sargeras",
+     "alt": [
+      "萨格拉斯",
+      "薩格拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 510,
+   "realms": [
+    {
+     "name": "Chants éternels",
+     "alt": [
+      "Chants eternels"
+     ]
+    },
+    {
+     "name": "Vol'jin",
+     "alt": [
+      "沃金"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 512,
+   "realms": [
+    {
+     "name": "Arak-arahm",
+     "alt": [
+      "阿兰卡拉",
+      "阿蘭卡拉"
+     ]
+    },
+    {
+     "name": "Kael'thas",
+     "alt": [
+      "凯尔萨斯",
+      "凱爾薩斯"
+     ]
+    },
+    {
+     "name": "Rashgarroth",
+     "alt": [
+      "瑞許加羅斯"
+     ]
+    },
+    {
+     "name": "Throk'Feroth",
+     "alt": [
+      "索克費羅斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 531,
+   "realms": [
+    {
+     "name": "Dethecus",
+     "alt": [
+      "閃電之刃"
+     ]
+    },
+    {
+     "name": "Mug'thol",
+     "alt": [
+      "玛格索尔",
+      "瑪格索爾"
+     ]
+    },
+    {
+     "name": "Onyxia",
+     "alt": [
+      "奥妮克希亚",
+      "奧妮克希亞"
+     ]
+    },
+    {
+     "name": "Terrordar",
+     "alt": [
+      "泰洛達",
+      "泰罗达尔"
+     ]
+    },
+    {
+     "name": "Theradras",
+     "alt": [
+      "瑟莱德丝",
+      "瑟萊德絲"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 570,
+   "realms": [
+    {
+     "name": "Azshara",
+     "alt": [
+      "艾萨拉",
+      "艾薩拉"
+     ]
+    },
+    {
+     "name": "Baelgun",
+     "alt": [
+      "巴尔古恩",
+      "巴爾古恩"
+     ]
+    },
+    {
+     "name": "Krag'jin",
+     "alt": [
+      "克雷金"
+     ]
+    },
+    {
+     "name": "Lothar",
+     "alt": [
+      "洛萨",
+      "洛薩"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 578,
+   "realms": [
+    {
+     "name": "Arthas",
+     "alt": [
+      "阿尔萨斯",
+      "阿薩斯"
+     ]
+    },
+    {
+     "name": "Blutkessel",
+     "alt": [
+      "布魯克塞爾"
+     ]
+    },
+    {
+     "name": "Durotan",
+     "alt": [
+      "杜洛坦",
+      "杜隆坦"
+     ]
+    },
+    {
+     "name": "Kel'Thuzad",
+     "alt": [
+      "克尔苏加德",
+      "科爾蘇加德"
+     ]
+    },
+    {
+     "name": "Tirion",
+     "alt": [
+      "提里奥",
+      "提里奧"
+     ]
+    },
+    {
+     "name": "Vek'lor",
+     "alt": [
+      "維克洛爾",
+      "维克洛尔"
+     ]
+    },
+    {
+     "name": "Wrathbringer",
+     "alt": [
+      "天罚使者",
+      "憤怒使者"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 580,
+   "realms": [
+    {
+     "name": "Blackmoore",
+     "alt": [
+      "布莱克摩",
+      "布萊克摩爾"
+     ]
+    },
+    {
+     "name": "Lordaeron",
+     "alt": [
+      "洛丹伦",
+      "羅德隆"
+     ]
+    },
+    {
+     "name": "Tichondrius",
+     "alt": [
+      "提克迪奥斯",
+      "提克迪奧斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 581,
+   "realms": [
+    {
+     "name": "Blackrock",
+     "alt": [
+      "黑石尖塔",
+      "黑石氏族"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 604,
+   "realms": [
+    {
+     "name": "Ambossar",
+     "alt": [
+      "安伯薩"
+     ]
+    },
+    {
+     "name": "Kargath",
+     "alt": [
+      "卡加斯",
+      "卡格斯"
+     ]
+    },
+    {
+     "name": "Thrall",
+     "alt": [
+      "索爾",
+      "萨尔"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 612,
+   "realms": [
+    {
+     "name": "Destromath",
+     "alt": [
+      "代斯特麥斯",
+      "迪托马斯"
+     ]
+    },
+    {
+     "name": "Gilneas",
+     "alt": [
+      "吉尔尼斯",
+      "吉爾尼斯"
+     ]
+    },
+    {
+     "name": "Gorgonnash",
+     "alt": [
+      "戈古納斯",
+      "戈古纳斯"
+     ]
+    },
+    {
+     "name": "Mannoroth",
+     "alt": [
+      "玛诺洛斯",
+      "瑪諾洛斯"
+     ]
+    },
+    {
+     "name": "Nefarian",
+     "alt": [
+      "奈法利安"
+     ]
+    },
+    {
+     "name": "Nera'thor",
+     "alt": [
+      "奈拉索爾"
+     ]
+    },
+    {
+     "name": "Ulduar",
+     "alt": [
+      "奥杜尔",
+      "奧杜亞"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 633,
+   "realms": [
+    {
+     "name": "Bloodfeather",
+     "alt": [
+      "血羽"
+     ]
+    },
+    {
+     "name": "Burning Steppes",
+     "alt": [
+      "燃烧平原",
+      "燃燒平原"
+     ]
+    },
+    {
+     "name": "Darkspear",
+     "alt": [
+      "暗矛部族",
+      "黑暗之矛"
+     ]
+    },
+    {
+     "name": "Executus",
+     "alt": [
+      "埃克索图斯",
+      "埃克索圖斯"
+     ]
+    },
+    {
+     "name": "Kor'gall",
+     "alt": [
+      "寇加爾",
+      "考戈尔"
+     ]
+    },
+    {
+     "name": "Saurfang",
+     "alt": [
+      "萨鲁法尔",
+      "薩魯法爾"
+     ]
+    },
+    {
+     "name": "Shattered Hand",
+     "alt": [
+      "破碎之手",
+      "碎手"
+     ]
+    },
+    {
+     "name": "Terokkar",
+     "alt": [
+      "泰洛卡",
+      "泰罗卡"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1080,
+   "realms": [
+    {
+     "name": "Bloodhoof",
+     "alt": [
+      "凯恩血蹄",
+      "血蹄"
+     ]
+    },
+    {
+     "name": "Khadgar",
+     "alt": [
+      "卡德加"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1082,
+   "realms": [
+    {
+     "name": "Alonsus",
+     "alt": [
+      "阿隆索斯"
+     ]
+    },
+    {
+     "name": "Anachronos",
+     "alt": [
+      "安納克羅斯",
+      "阿纳克洛斯"
+     ]
+    },
+    {
+     "name": "Kul Tiras",
+     "alt": [
+      "库尔提拉斯",
+      "庫爾提拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1084,
+   "realms": [
+    {
+     "name": "Dentarg",
+     "alt": [
+      "丹塔格",
+      "登塔格"
+     ]
+    },
+    {
+     "name": "Tarren Mill",
+     "alt": [
+      "塔伦米尔",
+      "塔倫米爾"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1085,
+   "realms": [
+    {
+     "name": "Moonglade",
+     "alt": [
+      "月光林地"
+     ]
+    },
+    {
+     "name": "Steamwheedle Cartel",
+     "alt": [
+      "热砂港",
+      "熱砂企業"
+     ]
+    },
+    {
+     "name": "The Sha'tar",
+     "alt": [
+      "沙塔尔",
+      "薩塔"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1091,
+   "realms": [
+    {
+     "name": "Agamaggan",
+     "alt": [
+      "阿迦玛甘",
+      "阿迦瑪甘"
+     ]
+    },
+    {
+     "name": "Bloodscalp",
+     "alt": [
+      "血頂部族",
+      "血顶"
+     ]
+    },
+    {
+     "name": "Crushridge",
+     "alt": [
+      "破碎之嶺",
+      "破碎岭"
+     ]
+    },
+    {
+     "name": "Emeriss",
+     "alt": [
+      "艾莫莉丝",
+      "艾莫莉絲"
+     ]
+    },
+    {
+     "name": "Hakkar",
+     "alt": [
+      "哈卡"
+     ]
+    },
+    {
+     "name": "Twilight's Hammer",
+     "alt": [
+      "暮光之錘",
+      "暮光之锤"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1092,
+   "realms": [
+    {
+     "name": "Burning Blade",
+     "alt": [
+      "燃刃",
+      "燃烧之刃"
+     ]
+    },
+    {
+     "name": "Drak'thul",
+     "alt": [
+      "德拉克蘇爾"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1096,
+   "realms": [
+    {
+     "name": "Darkmoon Faire",
+     "alt": [
+      "暗月馬戲團",
+      "暗月马戏团"
+     ]
+    },
+    {
+     "name": "Defias Brotherhood",
+     "alt": [
+      "迪菲亚兄弟会",
+      "迪菲亞兄弟會"
+     ]
+    },
+    {
+     "name": "Earthen Ring",
+     "alt": [
+      "大地之环",
+      "陶土議會"
+     ]
+    },
+    {
+     "name": "Ravenholdt",
+     "alt": [
+      "拉文霍德"
+     ]
+    },
+    {
+     "name": "Scarshield Legion",
+     "alt": [
+      "裂盾军团",
+      "裂盾軍團"
+     ]
+    },
+    {
+     "name": "Sporeggar",
+     "alt": [
+      "孢子村",
+      "斯博格爾"
+     ]
+    },
+    {
+     "name": "The Venture Co",
+     "alt": [
+      "The Venture Co.",
+      "風險投資公司"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1097,
+   "realms": [
+    {
+     "name": "Malorne",
+     "alt": [
+      "玛洛恩",
+      "瑪洛尼"
+     ]
+    },
+    {
+     "name": "Ysera",
+     "alt": [
+      "伊瑟拉"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1098,
+   "realms": [
+    {
+     "name": "Malfurion",
+     "alt": [
+      "玛法里奥",
+      "瑪法里恩"
+     ]
+    },
+    {
+     "name": "Malygos",
+     "alt": [
+      "玛里苟斯",
+      "瑪里苟斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1099,
+   "realms": [
+    {
+     "name": "Alleria",
+     "alt": [
+      "奥蕾莉亚",
+      "艾蘭里亞"
+     ]
+    },
+    {
+     "name": "Rexxar",
+     "alt": [
+      "雷克萨",
+      "雷克薩"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1104,
+   "realms": [
+    {
+     "name": "Anetheron",
+     "alt": [
+      "安納塞隆",
+      "安纳塞隆"
+     ]
+    },
+    {
+     "name": "Festung der Stürme",
+     "alt": [
+      "Festung der Sturme"
+     ]
+    },
+    {
+     "name": "Gul'dan",
+     "alt": [
+      "古尔丹",
+      "古爾丹"
+     ]
+    },
+    {
+     "name": "Kil'jaeden",
+     "alt": [
+      "基尔加丹",
+      "基爾加丹"
+     ]
+    },
+    {
+     "name": "Nathrezim",
+     "alt": [
+      "納斯雷茲姆",
+      "纳斯雷兹姆"
+     ]
+    },
+    {
+     "name": "Rajaxx",
+     "alt": [
+      "拉賈克斯",
+      "拉贾克斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1105,
+   "realms": [
+    {
+     "name": "Aman'Thul",
+     "alt": [
+      "Aman'thul",
+      "阿曼苏尔",
+      "阿曼蘇爾"
+     ]
+    },
+    {
+     "name": "Anub'arak",
+     "alt": [
+      "阿努巴拉克"
+     ]
+    },
+    {
+     "name": "Dalvengyr",
+     "alt": [
+      "达文格尔",
+      "達拉溫格"
+     ]
+    },
+    {
+     "name": "Frostmourne",
+     "alt": [
+      "霜之哀伤",
+      "霜之哀傷"
+     ]
+    },
+    {
+     "name": "Nazjatar",
+     "alt": [
+      "納沙塔爾",
+      "纳沙塔尔"
+     ]
+    },
+    {
+     "name": "Zuluhed",
+     "alt": [
+      "祖魯希德",
+      "祖鲁希德"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1121,
+   "realms": [
+    {
+     "name": "Das Konsortium"
+    },
+    {
+     "name": "Das Syndikat"
+    },
+    {
+     "name": "Der abyssische Rat",
+     "alt": [
+      "Der Abyssische Rat"
+     ]
+    },
+    {
+     "name": "Die Arguswacht"
+    },
+    {
+     "name": "Die Silberne Hand",
+     "alt": [
+      "白銀之手"
+     ]
+    },
+    {
+     "name": "Die Todeskrallen"
+    },
+    {
+     "name": "Die ewige Wacht"
+    },
+    {
+     "name": "Kult der Verdammten"
+    }
+   ]
+  },
+  {
+   "id": 1122,
+   "realms": [
+    {
+     "name": "Drek'Thar",
+     "alt": [
+      "德雷克塔尔",
+      "德雷克塔爾"
+     ]
+    },
+    {
+     "name": "Eitrigg",
+     "alt": [
+      "Etrigg",
+      "伊崔格"
+     ]
+    },
+    {
+     "name": "Krasus",
+     "alt": [
+      "克拉苏斯",
+      "卡薩斯"
+     ]
+    },
+    {
+     "name": "Uldaman",
+     "alt": [
+      "奥达曼",
+      "奧達曼"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1127,
+   "realms": [
+    {
+     "name": "Confrérie du Thorium",
+     "alt": [
+      "Confrerie du Thorium"
+     ]
+    },
+    {
+     "name": "Conseil des Ombres"
+    },
+    {
+     "name": "Culte de la Rive noire",
+     "alt": [
+      "Kurdran"
+     ]
+    },
+    {
+     "name": "Kirin Tor",
+     "alt": [
+      "祈倫托",
+      "肯瑞托"
+     ]
+    },
+    {
+     "name": "La Croisade écarlate",
+     "alt": [
+      "La Croisade ecarlate"
+     ]
+    },
+    {
+     "name": "Les Clairvoyants"
+    },
+    {
+     "name": "Les Sentinelles"
+    }
+   ]
+  },
+  {
+   "id": 1301,
+   "realms": [
+    {
+     "name": "Outland",
+     "alt": [
+      "外域"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1302,
+   "realms": [
+    {
+     "name": "Archimonde",
+     "alt": [
+      "阿克蒙德"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1303,
+   "realms": [
+    {
+     "name": "Aggra (Português)",
+     "alt": [
+      "Aggra (Portugiesisch)",
+      "阿格拉（葡萄牙語）"
+     ]
+    },
+    {
+     "name": "Frostmane",
+     "alt": [
+      "冰霜之刃",
+      "冰霜之刺"
+     ]
+    },
+    {
+     "name": "Grim Batol",
+     "alt": [
+      "格瑞姆巴托"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1305,
+   "realms": [
+    {
+     "name": "Kazzak",
+     "alt": [
+      "卡扎克",
+      "卡札克"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1307,
+   "realms": [
+    {
+     "name": "Chamber of Aspects",
+     "alt": [
+      "守護巨龍之間",
+      "龙神之厅"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1309,
+   "realms": [
+    {
+     "name": "Pozzo dell'Eternità",
+     "alt": [
+      "Well of Eternity"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1313,
+   "realms": [
+    {
+     "name": "Thunderhorn",
+     "alt": [
+      "雷角",
+      "雷霆号角"
+     ]
+    },
+    {
+     "name": "Wildhammer",
+     "alt": [
+      "蛮锤",
+      "蠻錘"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1315,
+   "realms": [
+    {
+     "name": "Elune",
+     "alt": [
+      "伊露恩",
+      "艾露恩"
+     ]
+    },
+    {
+     "name": "Varimathras",
+     "alt": [
+      "瓦里玛萨斯",
+      "瓦里瑪薩斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1316,
+   "realms": [
+    {
+     "name": "Nemesis",
+     "alt": [
+      "涅墨西斯",
+      "涅密希斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1325,
+   "realms": [
+    {
+     "name": "Aggramar",
+     "alt": [
+      "阿格拉玛",
+      "阿格拉瑪"
+     ]
+    },
+    {
+     "name": "Hellscream",
+     "alt": [
+      "地狱咆哮",
+      "地獄吼"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1329,
+   "realms": [
+    {
+     "name": "Ravencrest",
+     "alt": [
+      "拉文凯斯",
+      "黑羽"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1331,
+   "realms": [
+    {
+     "name": "Medivh",
+     "alt": [
+      "麥迪文",
+      "麦迪文"
+     ]
+    },
+    {
+     "name": "Suramar",
+     "alt": [
+      "苏拉玛",
+      "蘇拉瑪爾"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1335,
+   "realms": [
+    {
+     "name": "Ysondre",
+     "alt": [
+      "伊森德雷",
+      "伊索德雷"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1378,
+   "realms": [
+    {
+     "name": "C'Thun",
+     "alt": [
+      "克苏恩",
+      "克蘇恩"
+     ]
+    },
+    {
+     "name": "Dun Modr",
+     "alt": [
+      "丹莫德"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1379,
+   "realms": [
+    {
+     "name": "Sanguino",
+     "alt": [
+      "杉圭諾"
+     ]
+    },
+    {
+     "name": "Shen'dralar",
+     "alt": [
+      "辛德拉"
+     ]
+    },
+    {
+     "name": "Uldum",
+     "alt": [
+      "奥丹姆",
+      "奧丹姆"
+     ]
+    },
+    {
+     "name": "Zul'jin",
+     "alt": [
+      "祖尔金",
+      "祖爾金"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1384,
+   "realms": [
+    {
+     "name": "Colinas Pardas",
+     "alt": [
+      "Spirestone"
+     ]
+    },
+    {
+     "name": "Los Errantes"
+    },
+    {
+     "name": "Tyrande",
+     "alt": [
+      "泰兰德",
+      "泰蘭妲"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1385,
+   "realms": [
+    {
+     "name": "Exodar",
+     "alt": [
+      "埃索达",
+      "艾克索達"
+     ]
+    },
+    {
+     "name": "Minahonda",
+     "alt": [
+      "米那弘達"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1388,
+   "realms": [
+    {
+     "name": "Lightbringer",
+     "alt": [
+      "光明使者"
+     ]
+    },
+    {
+     "name": "Mazrigos",
+     "alt": [
+      "馬茲瑞葛斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1390,
+   "realms": [
+    {
+     "name": "Hyjal",
+     "alt": [
+      "海加尔",
+      "海加爾山"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1393,
+   "realms": [
+    {
+     "name": "Bronze Dragonflight",
+     "alt": [
+      "铜龙军团",
+      "青銅龍軍團"
+     ]
+    },
+    {
+     "name": "Nordrassil",
+     "alt": [
+      "諾達希爾",
+      "诺达希尔"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1396,
+   "realms": [
+    {
+     "name": "Azjol-Nerub",
+     "alt": [
+      "蜘蛛王国",
+      "阿茲歐-奈幽"
+     ]
+    },
+    {
+     "name": "Quel'Thalas",
+     "alt": [
+      "奎尔萨拉斯",
+      "奎爾薩拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1400,
+   "realms": [
+    {
+     "name": "Area 52",
+     "alt": [
+      "52區"
+     ]
+    },
+    {
+     "name": "Sen'jin",
+     "alt": [
+      "森金"
+     ]
+    },
+    {
+     "name": "Un'Goro",
+     "alt": [
+      "安戈洛"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1401,
+   "realms": [
+    {
+     "name": "Garrosh",
+     "alt": [
+      "加尔鲁什",
+      "卡爾洛斯"
+     ]
+    },
+    {
+     "name": "Nozdormu",
+     "alt": [
+      "諾茲多姆",
+      "诺滋多姆"
+     ]
+    },
+    {
+     "name": "Perenolde",
+     "alt": [
+      "匹瑞諾德",
+      "匹瑞诺德"
+     ]
+    },
+    {
+     "name": "Shattrath",
+     "alt": [
+      "撒塔斯",
+      "沙塔斯"
+     ]
+    },
+    {
+     "name": "Teldrassil",
+     "alt": [
+      "泰达希尔",
+      "泰達希爾"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1402,
+   "realms": [
+    {
+     "name": "Doomhammer",
+     "alt": [
+      "末日錘",
+      "毁灭之锤"
+     ]
+    },
+    {
+     "name": "Turalyon",
+     "alt": [
+      "图拉扬",
+      "圖拉揚"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1403,
+   "realms": [
+    {
+     "name": "Draenor",
+     "alt": [
+      "德拉諾",
+      "德拉诺"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1405,
+   "realms": [
+    {
+     "name": "Der Mithrilorden"
+    },
+    {
+     "name": "Der Rat von Dalaran"
+    },
+    {
+     "name": "Die Nachtwache"
+    },
+    {
+     "name": "Forscherliga",
+     "alt": [
+      "弗塞雷迦"
+     ]
+    },
+    {
+     "name": "Todeswache"
+    },
+    {
+     "name": "Zirkel des Cenarius"
+    }
+   ]
+  },
+  {
+   "id": 1406,
+   "realms": [
+    {
+     "name": "Arygos",
+     "alt": [
+      "亚雷戈斯",
+      "亞雷戈斯"
+     ]
+    },
+    {
+     "name": "Khaz'goroth",
+     "alt": [
+      "卡兹格罗斯",
+      "卡茲格羅斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1408,
+   "realms": [
+    {
+     "name": "Dun Morogh",
+     "alt": [
+      "丹莫洛",
+      "丹莫罗"
+     ]
+    },
+    {
+     "name": "Norgannon",
+     "alt": [
+      "諾甘農",
+      "诺甘农"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1416,
+   "realms": [
+    {
+     "name": "Aerie Peak",
+     "alt": [
+      "鷹巢山",
+      "鹰巢山"
+     ]
+    },
+    {
+     "name": "Blade's Edge",
+     "alt": [
+      "刀锋山",
+      "劍刃山脈"
+     ]
+    },
+    {
+     "name": "Bronzebeard",
+     "alt": [
+      "山丘之王",
+      "銅鬚"
+     ]
+    },
+    {
+     "name": "Eonar",
+     "alt": [
+      "伊歐娜",
+      "艾欧娜尔"
+     ]
+    },
+    {
+     "name": "Vek'nilash",
+     "alt": [
+      "維克尼拉斯",
+      "维克尼拉斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1417,
+   "realms": [
+    {
+     "name": "Azuremyst",
+     "alt": [
+      "秘蓝岛",
+      "藍謎島"
+     ]
+    },
+    {
+     "name": "Stormrage",
+     "alt": [
+      "怒風",
+      "风暴之怒"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1587,
+   "realms": [
+    {
+     "name": "Arathor",
+     "alt": [
+      "阿拉索"
+     ]
+    },
+    {
+     "name": "Hellfire",
+     "alt": [
+      "地狱火",
+      "地獄火"
+     ]
+    },
+    {
+     "name": "Kilrogg",
+     "alt": [
+      "基尔罗格",
+      "基爾羅格"
+     ]
+    },
+    {
+     "name": "Nagrand",
+     "alt": [
+      "納葛蘭",
+      "纳格兰"
+     ]
+    },
+    {
+     "name": "Runetotem",
+     "alt": [
+      "符文图腾",
+      "符文圖騰"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1596,
+   "realms": [
+    {
+     "name": "Deathwing",
+     "alt": [
+      "死亡之翼"
+     ]
+    },
+    {
+     "name": "Dragonblight",
+     "alt": [
+      "龍骨荒野",
+      "龙骨平原"
+     ]
+    },
+    {
+     "name": "Ghostlands",
+     "alt": [
+      "幽魂之地",
+      "鬼魂之地"
+     ]
+    },
+    {
+     "name": "Karazhan",
+     "alt": [
+      "卡拉贊",
+      "卡拉赞"
+     ]
+    },
+    {
+     "name": "Lightning's Blade",
+     "alt": [
+      "閃電之刃",
+      "闪电之刃"
+     ]
+    },
+    {
+     "name": "The Maelstrom",
+     "alt": [
+      "大漩涡",
+      "大漩渦"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1597,
+   "realms": [
+    {
+     "name": "Auchindoun",
+     "alt": [
+      "奥金顿",
+      "奧齊頓"
+     ]
+    },
+    {
+     "name": "Dunemaul",
+     "alt": [
+      "流沙之槌"
+     ]
+    },
+    {
+     "name": "Jaedenar",
+     "alt": [
+      "加德納爾",
+      "加德纳尔"
+     ]
+    },
+    {
+     "name": "Sylvanas",
+     "alt": [
+      "希尔瓦娜斯",
+      "希瓦娜斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1598,
+   "realms": [
+    {
+     "name": "Ahn'Qiraj",
+     "alt": [
+      "安其拉"
+     ]
+    },
+    {
+     "name": "Balnazzar",
+     "alt": [
+      "巴納札爾",
+      "巴纳扎尔"
+     ]
+    },
+    {
+     "name": "Boulderfist",
+     "alt": [
+      "冰川之拳",
+      "石拳"
+     ]
+    },
+    {
+     "name": "Chromaggus",
+     "alt": [
+      "克洛玛古斯",
+      "克洛瑪古斯"
+     ]
+    },
+    {
+     "name": "Daggerspine",
+     "alt": [
+      "刺脊部族",
+      "刺骨利刃"
+     ]
+    },
+    {
+     "name": "Laughing Skull",
+     "alt": [
+      "嘲颅",
+      "獰笑骷髏"
+     ]
+    },
+    {
+     "name": "Shattered Halls",
+     "alt": [
+      "破碎大厅",
+      "破碎大廳"
+     ]
+    },
+    {
+     "name": "Sunstrider",
+     "alt": [
+      "逐日者"
+     ]
+    },
+    {
+     "name": "Talnivarr",
+     "alt": [
+      "托尼瓦尔",
+      "泰爾尼瓦"
+     ]
+    },
+    {
+     "name": "Trollbane",
+     "alt": [
+      "托尔贝恩",
+      "托爾貝恩"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1602,
+   "realms": [
+    {
+     "name": "Gordunni",
+     "alt": [
+      "Гордунни",
+      "戈杜尼"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1604,
+   "realms": [
+    {
+     "name": "Soulflayer",
+     "alt": [
+      "Свежеватель Душ",
+      "全球爭霸戰11",
+      "夺灵者"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1605,
+   "realms": [
+    {
+     "name": "Deathguard",
+     "alt": [
+      "Страж Смерти",
+      "亡灵卫士",
+      "全球爭霸戰12"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1614,
+   "realms": [
+    {
+     "name": "Deepholm",
+     "alt": [
+      "Deephome",
+      "Подземье",
+      "深渊之巢"
+     ]
+    },
+    {
+     "name": "Galakrond",
+     "alt": [
+      "Галакронд",
+      "迦拉克隆"
+     ]
+    },
+    {
+     "name": "Razuvious",
+     "alt": [
+      "Разувий",
+      "拉苏维奥斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1615,
+   "realms": [
+    {
+     "name": "Howling Fjord",
+     "alt": [
+      "Ревущий фьорд",
+      "嚎风峡湾"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1618,
+   "realms": [
+    {
+     "name": "Die Aldor"
+    }
+   ]
+  },
+  {
+   "id": 1621,
+   "realms": [
+    {
+     "name": "Cho'gall",
+     "alt": [
+      "丘加利",
+      "古加尔"
+     ]
+    },
+    {
+     "name": "Dalaran",
+     "alt": [
+      "达拉然",
+      "達拉然"
+     ]
+    },
+    {
+     "name": "Eldre'Thalas",
+     "alt": [
+      "埃德萨拉",
+      "埃德薩拉斯"
+     ]
+    },
+    {
+     "name": "Marécage de Zangar",
+     "alt": [
+      "Marecage de Zangar"
+     ]
+    },
+    {
+     "name": "Sinstralis",
+     "alt": [
+      "辛司特拉利斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1623,
+   "realms": [
+    {
+     "name": "Fordragon",
+     "alt": [
+      "Дракономор",
+      "弗塔根"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1624,
+   "realms": [
+    {
+     "name": "Arathi",
+     "alt": [
+      "阿拉希"
+     ]
+    },
+    {
+     "name": "Illidan",
+     "alt": [
+      "伊利丹"
+     ]
+    },
+    {
+     "name": "Naxxramas",
+     "alt": [
+      "納克薩瑪斯",
+      "纳克萨玛斯"
+     ]
+    },
+    {
+     "name": "Temple noir",
+     "alt": [
+      "黑暗神廟"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1922,
+   "realms": [
+    {
+     "name": "Azuregos",
+     "alt": [
+      "Азурегос",
+      "埃苏雷格",
+      "艾索雷苟斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1923,
+   "realms": [
+    {
+     "name": "Ashenvale",
+     "alt": [
+      "Ясеневый лес",
+      "灰谷"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1925,
+   "realms": [
+    {
+     "name": "Eversong",
+     "alt": [
+      "Вечная Песня",
+      "永歌"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1928,
+   "realms": [
+    {
+     "name": "Goldrinn",
+     "alt": [
+      "Голдринн",
+      "戈德林"
+     ]
+    },
+    {
+     "name": "Greymane",
+     "alt": [
+      "Седогрив",
+      "格雷迈恩"
+     ]
+    },
+    {
+     "name": "Lich King",
+     "alt": [
+      "Король-лич",
+      "巫妖之王"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1929,
+   "realms": [
+    {
+     "name": "Blackscar",
+     "alt": [
+      "Черный Шрам",
+      "黑痕"
+     ]
+    },
+    {
+     "name": "Booty Bay",
+     "alt": [
+      "Пиратская Бухта",
+      "Пиратская бухта",
+      "藏宝海湾"
+     ]
+    },
+    {
+     "name": "Borean Tundra",
+     "alt": [
+      "Борейская тундра",
+      "北风苔原"
+     ]
+    },
+    {
+     "name": "Deathweaver",
+     "alt": [
+      "Ткач Смерти",
+      "织亡者"
+     ]
+    },
+    {
+     "name": "Grom",
+     "alt": [
+      "Гром",
+      "格罗姆"
+     ]
+    },
+    {
+     "name": "Thermaplugg",
+     "alt": [
+      "Термоштепсель",
+      "瑟玛普拉格"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2073,
+   "realms": [
+    {
+     "name": "Stormscale",
+     "alt": [
+      "雷鱗",
+      "风暴之鳞"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2074,
+   "realms": [
+    {
+     "name": "Emerald Dream",
+     "alt": [
+      "翡翠夢境",
+      "翡翠梦境"
+     ]
+    },
+    {
+     "name": "Terenas",
+     "alt": [
+      "泰瑞納斯",
+      "泰瑞纳斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3391,
+   "realms": [
+    {
+     "name": "Silvermoon",
+     "alt": [
+      "銀月",
+      "银月"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3656,
+   "realms": [
+    {
+     "name": "Dragonmaw",
+     "alt": [
+      "巨龙之吼",
+      "龍喉"
+     ]
+    },
+    {
+     "name": "Haomarush",
+     "alt": [
+      "哈姆魯什"
+     ]
+    },
+    {
+     "name": "Spinebreaker",
+     "alt": [
+      "断背",
+      "斷脊氏族"
+     ]
+    },
+    {
+     "name": "Stormreaver",
+     "alt": [
+      "暴掠氏族",
+      "风暴裂隙"
+     ]
+    },
+    {
+     "name": "Vashj",
+     "alt": [
+      "瓦丝琪",
+      "瓦許"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3657,
+   "realms": [
+    {
+     "name": "Bladefist",
+     "alt": [
+      "刃拳",
+      "利刃之拳"
+     ]
+    },
+    {
+     "name": "Darksorrow",
+     "alt": [
+      "暗悲"
+     ]
+    },
+    {
+     "name": "Frostwhisper",
+     "alt": [
+      "霜語",
+      "霜语"
+     ]
+    },
+    {
+     "name": "Genjuros",
+     "alt": [
+      "洛克漢"
+     ]
+    },
+    {
+     "name": "Neptulon",
+     "alt": [
+      "奈普圖隆",
+      "耐普图隆"
+     ]
+    },
+    {
+     "name": "Zenedar",
+     "alt": [
+      "奈達"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3666,
+   "realms": [
+    {
+     "name": "Aszune",
+     "alt": [
+      "亞斯隼",
+      "艾苏恩"
+     ]
+    },
+    {
+     "name": "Shadowsong",
+     "alt": [
+      "影歌"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3674,
+   "realms": [
+    {
+     "name": "Twisting Nether",
+     "alt": [
+      "扭曲虛空",
+      "黑暗虚空"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3679,
+   "realms": [
+    {
+     "name": "Aegwynn",
+     "alt": [
+      "艾格文"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3681,
+   "realms": [
+    {
+     "name": "Magtheridon",
+     "alt": [
+      "玛瑟里顿",
+      "瑪瑟里頓"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3682,
+   "realms": [
+    {
+     "name": "Ragnaros",
+     "alt": [
+      "拉格納羅斯",
+      "拉格纳罗斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3686,
+   "realms": [
+    {
+     "name": "Antonidas",
+     "alt": [
+      "安东尼达斯",
+      "安東尼達斯"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3690,
+   "realms": [
+    {
+     "name": "Khaz Modan",
+     "alt": [
+      "卡兹莫丹",
+      "卡茲莫丹"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3691,
+   "realms": [
+    {
+     "name": "Blackhand",
+     "alt": [
+      "黑手军团",
+      "黑手氏族"
+     ]
+    },
+    {
+     "name": "Echsenkessel"
+    },
+    {
+     "name": "Mal'Ganis",
+     "alt": [
+      "梅尔加尼",
+      "瑪爾加尼斯"
+     ]
+    },
+    {
+     "name": "Taerar",
+     "alt": [
+      "泰拉尔",
+      "泰拉爾"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3692,
+   "realms": [
+    {
+     "name": "Eredar",
+     "alt": [
+      "埃雷达尔",
+      "埃雷達爾"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3696,
+   "realms": [
+    {
+     "name": "Alexstrasza",
+     "alt": [
+      "红龙女王",
+      "雅立史卓莎"
+     ]
+    },
+    {
+     "name": "Madmortem",
+     "alt": [
+      "麥德摩迪"
+     ]
+    },
+    {
+     "name": "Nethersturm",
+     "alt": [
+      "奈瑟史頓",
+      "虚空风暴"
+     ]
+    },
+    {
+     "name": "Proudmoore",
+     "alt": [
+      "普勞德摩爾",
+      "普罗德摩"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3702,
+   "realms": [
+    {
+     "name": "Argent Dawn",
+     "alt": [
+      "銀色黎明",
+      "银色黎明"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3703,
+   "realms": [
+    {
+     "name": "Frostwolf",
+     "alt": [
+      "霜狼"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3713,
+   "realms": [
+    {
+     "name": "Al'Akir",
+     "alt": [
+      "奥拉基尔",
+      "奧拉基爾"
+     ]
+    },
+    {
+     "name": "Burning Legion",
+     "alt": [
+      "燃烧军团",
+      "燃燒軍團"
+     ]
+    },
+    {
+     "name": "Skullcrusher",
+     "alt": [
+      "碎顱氏族",
+      "碎颅者"
+     ]
+    },
+    {
+     "name": "Xavius",
+     "alt": [
+      "萨维斯",
+      "薩維斯"
+     ]
+    }
+   ]
+  }
+ ]
+}

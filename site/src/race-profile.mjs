@@ -40,6 +40,7 @@ const RACES = {
     "Mag'har Orc": { slug: "maghar-orc", plural: "Mag'har Orcs", faction: "Horde" },
     "Zandalari Troll": { plural: "Zandalari Trolls", faction: "Horde" }, Vulpera: { plural: "Vulpera", faction: "Horde" } },
 };
+RACES.forever = RACES["classic-beta"];
 export const RACE_PROFILES = Object.fromEntries(Object.entries(RACES).map(([source, races]) => [source, Object.fromEntries(
   Object.entries(races).map(([race, p]) => [race, { ...p, path: `/${PROFILE_GAMES[source].dir}/${p.slug || (p.label || race).toLowerCase().replace(/\s+/g, "-")}/` }]))]));
 export const raceRoutes = () => Object.values(RACE_PROFILES).flatMap((races) => Object.values(races).map((p) => p.path));
@@ -89,7 +90,7 @@ export function renderRaceProfile(inspects,game,race,opts){
   vm.runInNewContext(script,{document,URL,location:"https://wowcensus.io"+path,history:{pushState(){}},addEventListener(){}},{timeout:5000});
   document.querySelector("script").remove();
   document.title=G.gameLabel+" "+label+" Specs & Talents – WoWCensus";
-  document.head.insertAdjacentHTML("beforeend",'<meta name="description" content="'+label+' class builds and selected talents observed in '+G.gameLabel+' nearby-player inspections."><link rel="canonical" href="'+opts.canonical+'"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="'+G.gameLabel+' '+label+' Specs &amp; Talents – WoWCensus"><meta property="og:url" content="'+opts.canonical+'"><link rel="icon" href="'+prefix+'favicon.ico">');
+  document.head.insertAdjacentHTML("beforeend",'<meta name="description" content="'+label+' class builds in '+G.gameLabel+': which classes '+plural+' play, their most popular specs and most-picked talents, from player inspections."><link rel="canonical" href="'+opts.canonical+'"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="'+G.gameLabel+' '+label+' Specs &amp; Talents – WoWCensus"><meta property="og:url" content="'+opts.canonical+'"><link rel="icon" href="'+prefix+'favicon.ico">');
   document.head.querySelector("style").insertAdjacentHTML("beforebegin",'<link rel="stylesheet" href="'+prefix+opts.stylesheet+'">');
   // Navigation comes from the game config, not the template's placeholder links.
   const links=(nav,items,current)=>{nav.innerHTML="";for(const [text,href] of items){const a=document.createElement("a");a.className="game";a.href=href;a.textContent=text;if(text===current)a.setAttribute("aria-current","true");nav.appendChild(a);}};

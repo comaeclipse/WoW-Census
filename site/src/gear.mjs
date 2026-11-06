@@ -58,7 +58,7 @@ export function renderGearHtml(data, opts={}) {
     ? `Latest inspection: ${esc(time(data.lastT))}`
     : `No inspected gear for ${esc(opts.gameLabel||"this edition")} yet. Gear is collected during the same inspection as talents and will appear in a future snapshot when available.`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    ${seoHead(topic+" – WoWCensus", seoGameLabel+" equipment seen on inspected players: the most equipped items in every slot and how often they are enchanted.", opts.canonical)}
+    ${seoHead(topic+" – WoWCensus", seoGameLabel+" gear seen on inspected players: the most equipped items in every slot for each class and spec, and how often they are enchanted.", opts.canonical)}
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96"><link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
     <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="${esc(opts.stylesheet||"/style.css")}">

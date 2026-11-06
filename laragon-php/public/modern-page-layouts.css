@@ -1,0 +1,182 @@
+/* Layouts adapted from the Modern mockup for the live PHP data views. */
+.cobalt-content .page-controls:empty{display:none}
+.cobalt-content .panel:empty{display:none}
+.cobalt-content .vpane:not([hidden]){grid-template-columns:minmax(0,1fr)}
+.cobalt-content :is(.panelcol,.tiles,.panel,.combo-panel){min-width:0}
+.cobalt-content .panel.census:has(> table){overflow-x:auto}
+.cobalt-content :is(.gear-top-panel,.talent-class-chips,.talent-filters,.gear-filters){min-width:0}
+.cobalt-content .census-panel .ptitle,.cobalt-content .panel .ptitle{font:400 26px/1.2 Georgia,serif}
+
+/* Gear: a character-centered equipment view, then readable slot tables. */
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-panel{padding:24px 28px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-panel>.hint{margin:18px 0 0;color:var(--c-muted);font-size:12px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,31%) minmax(0,1fr);grid-template-rows:repeat(9,minmax(65px,auto));gap:8px;align-items:stretch}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid::before{content:"";grid-column:2;grid-row:1/span 9;background:radial-gradient(ellipse at 50% 62%,#3160af66,transparent 62%),url('/cobalt-character.webp') center bottom / contain no-repeat;border:1px solid #456ab2;border-radius:6px;box-shadow:inset 0 0 50px #071633;min-height:610px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item{display:grid;grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto 1fr auto;column-gap:10px;align-items:center;min-width:0;min-height:65px;padding:8px 11px;border:1px solid #4969a6;border-radius:4px;background:#122b59;color:#e7efff;text-decoration:none}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:hover,html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:focus-visible{border-color:#9cbbff;background:#1a3973}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item img{grid-column:1;grid-row:1/span 3;width:40px;height:40px;border:1px solid #7195d5;border-radius:3px;object-fit:cover}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-slot{grid-column:2;color:#9fbcec;font-size:10px;text-transform:uppercase;letter-spacing:.09em}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-name{grid-column:2;font-size:12px;font-weight:650;line-height:1.2;overflow-wrap:anywhere}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-count{grid-column:2;color:#aebfe1;font-size:10px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(-n+9){grid-column:1}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(n+10){grid-column:3}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(1),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(10){grid-row:1}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(2),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(11){grid-row:2}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(3),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(12){grid-row:3}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(4),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(13){grid-row:4}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(5),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(14){grid-row:5}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(6),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(15){grid-row:6}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(7),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(16){grid-row:7}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(8),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(17){grid-row:8}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(9){grid-row:9}
+html[data-cobalt-page="gear"] .cobalt-content .gear-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px;margin-top:20px;padding:18px;border:1px solid #4668a7;border-radius:5px;background:#102650}
+html[data-cobalt-page="gear"] .cobalt-content .gear-filters label{display:grid;gap:5px;min-width:0;color:#b8d0fb;font-size:11px;font-weight:700}
+html[data-cobalt-page="gear"] .cobalt-content .gear-filters select,html[data-cobalt-page="gear"] .cobalt-content .gear-filters .vsel-trigger{width:100%;min-width:0}
+html[data-cobalt-page="gear"] .cobalt-content .gear-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;margin-top:18px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-slot{min-width:0;margin:0;padding:20px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-slot .hint{margin:0 0 13px;font-size:12px;line-height:1.5}
+html[data-cobalt-page="gear"] .cobalt-content .gear-table{table-layout:fixed;min-width:0}
+html[data-cobalt-page="gear"] .cobalt-content .gear-table th:first-child,html[data-cobalt-page="gear"] .cobalt-content .gear-table td:first-child{width:60%}
+html[data-cobalt-page="gear"] .cobalt-content .gear-table td:first-child{white-space:normal;overflow-wrap:anywhere}
+html[data-cobalt-page="gear"] .cobalt-content .gear-table td:not(:first-child),html[data-cobalt-page="gear"] .cobalt-content .gear-table th:not(:first-child){text-align:right}
+html[data-cobalt-page="gear"] .cobalt-content .gear-table a{display:inline-flex;align-items:center;gap:8px;min-width:0;text-decoration:none}
+html[data-cobalt-page="gear"] .cobalt-content .gear-table a span{min-width:0;overflow-wrap:anywhere}
+html[data-cobalt-page="gear"] .cobalt-content .gear-table img{width:22px;height:22px;flex:none;border:1px solid #6787c7;border-radius:3px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-rune{color:#88d887}
+
+/* Talents: compact filter controls above separate faction rankings. */
+html[data-cobalt-page="talents"] .cobalt-content .talent-class-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 19px;padding:0;border:0;background:none}
+html[data-cobalt-page="talents"] .cobalt-content .talent-class-chips .chip{display:inline-flex;align-items:center;gap:7px;min-height:39px;text-decoration:none}
+html[data-cobalt-page="talents"] .cobalt-content .talent-class-chips img{display:block;width:22px;height:22px;border:1px solid #698bd0;border-radius:3px}
+html[data-cobalt-page="talents"] .cobalt-content .talent-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:end}
+html[data-cobalt-page="talents"] .cobalt-content .talent-filters label{display:grid;gap:6px;min-width:0;color:#adc7f5;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+html[data-cobalt-page="talents"] .cobalt-content .talent-filters select,html[data-cobalt-page="talents"] .cobalt-content .talent-filters .vsel-trigger{width:100%;min-width:0}
+html[data-cobalt-page="talents"] .cobalt-content .talent-summary{margin:18px 0 0!important;padding-top:14px;border-top:1px solid #3c5d9b;color:#bdceeb;font-size:12px;line-height:1.5}
+html[data-cobalt-page="talents"] .cobalt-content .combo-breakdown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;margin-top:18px}
+html[data-cobalt-page="talents"] .cobalt-content .combo-panel{min-width:0;margin:0}
+html[data-cobalt-page="talents"] .cobalt-content .combo-panel .tablewrap{max-height:650px;overflow:auto}
+html[data-cobalt-page="talents"] .cobalt-content .talent-section{margin-top:18px}
+html[data-cobalt-page="talents"] .cobalt-content .talent-section .tablewrap{max-height:780px;overflow:auto}
+html[data-cobalt-page="talents"] .cobalt-content .combo-table,html[data-cobalt-page="talents"] .cobalt-content .talent-popularity-table{table-layout:fixed;min-width:0}
+html[data-cobalt-page="talents"] .cobalt-content .combo-table th:first-child,html[data-cobalt-page="talents"] .cobalt-content .combo-table td:first-child{width:70%}
+html[data-cobalt-page="talents"] .cobalt-content .talent-popularity-table th:nth-child(2),html[data-cobalt-page="talents"] .cobalt-content .talent-popularity-table td:nth-child(2){width:45%}
+html[data-cobalt-page="talents"] .cobalt-content :is(.combo-table,.talent-popularity-table) thead{position:sticky;top:0;z-index:2;background:#153264}
+html[data-cobalt-page="talents"] .cobalt-content .combo-name{white-space:normal;overflow-wrap:anywhere}
+html[data-cobalt-page="talents"] .cobalt-content .combo-name a{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+html[data-cobalt-page="talents"] .cobalt-content .combo-name img{width:23px;height:23px;flex:none;border:1px solid #688aca;border-radius:3px}
+
+/* Realm explorer: compact class icons, a single metric row, and faction bars. */
+html[data-cobalt-page="realms"] .cobalt-content .realm-table .tc{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+html[data-cobalt-page="realms"] .cobalt-content .realm-table .tc img{width:22px;height:22px;border:1px solid #6687c7;border-radius:3px}
+html[data-cobalt-page="realms"] .cobalt-content .realm-detail{min-width:0;border:0;border-radius:0;background:none;padding:0;box-shadow:none}
+/* The realm table gets the same card as the panels beside it, so both columns read alike. */
+html[data-cobalt-page="realms"] .cobalt-content .realm-grid > .panelcol > .tablewrap{border:1px solid #4469ae;border-radius:7px;background:#0e2145;box-shadow:0 15px 32px #0003}
+html[data-cobalt-page="realms"] .cobalt-content .realm-grid > .panelcol > .tablewrap .foot{padding:8px 10px}
+html[data-cobalt-page="realms"] .cobalt-content .rd-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+html[data-cobalt-page="realms"] .cobalt-content .rd-name{font:400 21px Georgia,serif;color:#e9f1ff}
+html[data-cobalt-page="realms"] .cobalt-content .rd-sub{color:#a9c1e9;font-size:12px}
+html[data-cobalt-page="realms"] .cobalt-content .rd-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 20px}
+html[data-cobalt-page="realms"] .cobalt-content .rd-stats .tile{padding:10px}
+html[data-cobalt-page="realms"] .cobalt-content .rd-stats .k{color:#a9c1e9;font-size:10px;text-transform:uppercase;letter-spacing:.07em}
+html[data-cobalt-page="realms"] .cobalt-content .rd-stats .v{font:400 20px Georgia,serif;color:#eaf1ff}
+/* Summary tiles above the table: small label, large figure, muted note (as the realm panel's figures). */
+html[data-cobalt-page="realms"] .cobalt-content .tiles > .tile{display:flex;flex-direction:column;gap:4px}
+html[data-cobalt-page="realms"] .cobalt-content .tiles > .tile .k{color:#a9c1e9;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em}
+html[data-cobalt-page="realms"] .cobalt-content .tiles > .tile .v{font:400 28px/1.15 Georgia,serif;color:#eaf1ff}
+html[data-cobalt-page="realms"] .cobalt-content .tiles > .tile .v.mu{font-size:22px;line-height:1.45}
+html[data-cobalt-page="realms"] .cobalt-content .tiles > .tile .s{color:#a9c1e9;font-size:12px}
+@media(max-width:650px){html[data-cobalt-page="realms"] .cobalt-content .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}html[data-cobalt-page="realms"] .cobalt-content .tiles > .tile .v{font-size:22px}html[data-cobalt-page="realms"] .cobalt-content .tiles > .tile .v.mu{font-size:17px;line-height:1.49}}
+@media(max-width:359px){html[data-cobalt-page="realms"] .cobalt-content .tiles{grid-template-columns:1fr}}
+html[data-cobalt-page="realms"] .cobalt-content .fbal-bar{display:flex;height:15px;overflow:hidden;border-radius:10px;background:#091734}
+html[data-cobalt-page="realms"] .cobalt-content .fbal-bar i{display:block;height:100%}
+html[data-cobalt-page="realms"] .cobalt-content .fbal-key{display:flex;justify-content:space-between;gap:12px;margin-top:9px;color:#b7c9e8;font-size:11px}
+html[data-cobalt-page="realms"] .cobalt-content .bar .bl{display:flex;align-items:center;gap:6px;min-width:0}
+html[data-cobalt-page="realms"] .cobalt-content .bar .bl img{width:22px;height:22px;flex:none;border:1px solid #6687c7;border-radius:3px}
+html[data-cobalt-page="realms"] .cobalt-content .bar .bl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-cobalt-page="realms"] .cobalt-content .realm-combos{margin-top:20px}
+
+/* Race + class table: icon pair and label read as one Modern list item. */
+html[data-cobalt-page="combos"] .cobalt-content .combo-name-content{display:inline-flex;align-items:center;gap:5px;min-width:0}
+html[data-cobalt-page="combos"] .cobalt-content .combo-name-content img{width:30px;height:30px;flex:none;border:1px solid #688aca;border-radius:3px}
+html[data-cobalt-page="combos"] .cobalt-content .combo-name-text{margin-left:8px;white-space:normal;line-height:1.35}
+html[data-cobalt-page="combos"] .cobalt-content .combo-table td{vertical-align:middle}
+
+/* Class and race profiles: Modern summary card and distinct talent panels. */
+html[data-cobalt-page="profile"] .cobalt-content .hero.slab{display:grid;grid-template-columns:100px minmax(0,1fr) auto;align-items:center;gap:24px;min-width:0;padding:28px;background:radial-gradient(circle at 73% 20%,#274c9380,transparent 42%),#102650}
+html[data-cobalt-page="profile"] .cobalt-content .class-chip-links .chip{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;gap:7px;min-height:50px;padding:8px 12px;line-height:1.2;text-align:center;white-space:nowrap;text-decoration:none}
+html[data-cobalt-page="profile"] .cobalt-content .class-chip-links .chip img{display:block;width:22px;height:22px;flex:none;object-fit:cover}
+html[data-cobalt-page="profile"] .cobalt-content .hero.slab .portrait{width:96px;height:96px;object-fit:cover;border:2px solid #82a9f3;border-radius:50%;box-shadow:0 0 0 6px #2856a266}
+html[data-cobalt-page="profile"] .cobalt-content .hero.slab h2{margin:0 0 9px;color:#eff5ff;font:400 29px Georgia,serif}
+html[data-cobalt-page="profile"] .cobalt-content .hero.slab p{margin:0;color:#c2d2ee;font-size:13px;line-height:1.55}
+html[data-cobalt-page="profile"] .cobalt-content .hero.slab .bignum{display:grid;justify-items:end;gap:3px;min-width:110px;padding-left:18px;border-left:1px solid #5274b2;color:#c3d5f4}
+html[data-cobalt-page="profile"] .cobalt-content .hero.slab .bignum b{font:400 32px Georgia,serif;color:#fff}
+html[data-cobalt-page="profile"] .cobalt-content .hero.slab .bignum small{font-size:11px;text-align:right}
+html[data-cobalt-page="profile"] .cobalt-content .specbar{display:flex;height:22px;overflow:hidden;border-radius:4px;background:#091734}
+html[data-cobalt-page="profile"] .cobalt-content .specbar i{display:block;height:100%}
+html[data-cobalt-page="profile"] .cobalt-content .speckey{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;color:#bfd0ed;font-size:12px}
+html[data-cobalt-page="profile"] .cobalt-content .speckey span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:2px;background:var(--c,#8fa9db)}
+html[data-cobalt-page="profile"] .cobalt-content .speccols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+html[data-cobalt-page="profile"] .cobalt-content .speccol{min-width:0}
+html[data-cobalt-page="profile"] .cobalt-content .card-h{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid #4868a6}
+html[data-cobalt-page="profile"] .cobalt-content .card-h img{width:40px;height:40px;flex:none;border:1px solid #7799d8;border-radius:4px}
+html[data-cobalt-page="profile"] .cobalt-content .card-h h4{flex:1;margin:0;color:#ecf3ff;font:400 22px Georgia,serif}
+html[data-cobalt-page="profile"] .cobalt-content .card-h .cn{color:#a8c1ed;font-size:12px;text-align:right}
+html[data-cobalt-page="profile"] .cobalt-content .card-h .cn b{display:block;color:#fff;font:400 22px Georgia,serif}
+html[data-cobalt-page="profile"] .cobalt-content .ranks{list-style:none;margin:0;padding:0}
+html[data-cobalt-page="profile"] .cobalt-content .ranks li{display:grid;grid-template-columns:24px 30px minmax(0,1fr) 70px;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #365793;color:#dce8ff;font-size:12px}
+html[data-cobalt-page="profile"] .cobalt-content .ranks li>img{width:30px;height:30px;border:1px solid #698bca;border-radius:3px}
+html[data-cobalt-page="profile"] .cobalt-content .ranks .rank{color:#91aee3}
+html[data-cobalt-page="profile"] .cobalt-content .ranks .pick{text-align:right;color:#a8c0e8}
+html[data-cobalt-page="profile"] .cobalt-content .ranks .mini{height:5px;margin-top:3px;border-radius:3px;background:#091734;overflow:hidden}
+html[data-cobalt-page="profile"] .cobalt-content .ranks .mini i{display:block;height:100%;background:#7ba6ff}
+
+@media(max-width:900px){html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid{grid-template-columns:minmax(0,1fr) minmax(175px,30%) minmax(0,1fr)}html[data-cobalt-page="gear"] .cobalt-content .gear-filters,html[data-cobalt-page="talents"] .cobalt-content .talent-filters{grid-template-columns:repeat(3,minmax(0,1fr))}html[data-cobalt-page="gear"] .cobalt-content .gear-grid,html[data-cobalt-page="talents"] .cobalt-content .combo-breakdown,html[data-cobalt-page="profile"] .cobalt-content .speccols{grid-template-columns:1fr}}
+@media(max-width:650px){html[data-cobalt-page="gear"] .cobalt-content .gear-top-panel{padding:16px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto;gap:7px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid::before{grid-column:1/-1;grid-row:1;min-height:220px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item{grid-column:auto!important;grid-row:auto!important;min-height:76px;padding:7px;grid-template-columns:32px minmax(0,1fr);column-gap:6px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item img{width:30px;height:30px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-name{font-size:11px}html[data-cobalt-page="gear"] .cobalt-content .gear-filters,html[data-cobalt-page="talents"] .cobalt-content .talent-filters{grid-template-columns:repeat(2,minmax(0,1fr))}html[data-cobalt-page="gear"] .cobalt-content .gear-slot{padding:15px}html[data-cobalt-page="talents"] .cobalt-content .combo-panel .tablewrap{max-height:550px}}
+@media(max-width:650px){html[data-cobalt-page="realms"] .cobalt-content .rd-stats{grid-template-columns:repeat(3,minmax(0,1fr))}html[data-cobalt-page="realms"] .cobalt-content .rd-stats .v{font-size:16px}html[data-cobalt-page="profile"] .cobalt-content .hero.slab{grid-template-columns:64px minmax(0,1fr);gap:14px;padding:17px}html[data-cobalt-page="profile"] .cobalt-content .hero.slab .portrait{width:64px;height:64px}html[data-cobalt-page="profile"] .cobalt-content .hero.slab h2{font-size:22px}html[data-cobalt-page="profile"] .cobalt-content .hero.slab .bignum{grid-column:1/-1;display:flex;align-items:baseline;gap:9px;justify-items:start;padding:10px 0 0;border-left:0;border-top:1px solid #5274b2}html[data-cobalt-page="profile"] .cobalt-content .hero.slab .bignum small{text-align:left}}
+
+/* The original Modern character sheet, adapted to aggregate inspection data. */
+html[data-cobalt-page="gear"] .cobalt-hero{min-height:0;padding:0 34px}
+html[data-cobalt-page="gear"] .cobalt-hero .census-hero-copy{padding:20px 0;max-width:100%}
+html[data-cobalt-page="gear"] .cobalt-hero h1{font-size:clamp(30px,3vw,44px);line-height:1.1}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-panel{padding:0;overflow:hidden;background:linear-gradient(#0e2147,#091832);border:1px solid #4568b5;border-radius:8px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-panel>.ptitle{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0;padding:16px 24px;border-bottom:1px solid #36569b;font:400 19px Georgia,serif}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-panel>.ptitle small{font:12px system-ui,sans-serif;color:#9badcf}
+html[data-cobalt-page="gear"] .cobalt-content .gear-context{margin:0;padding:14px 24px 0;color:#b7c8e9;font-size:12px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid{grid-template-columns:minmax(155px,1fr) minmax(220px,1.65fr) minmax(155px,1fr);grid-template-rows:repeat(8,54px) 54px;gap:9px 18px;min-height:580px;padding:23px 26px 8px;background:radial-gradient(ellipse at 50% 52%,#2854a0 0%,#112c65 40%,#0b1a37 79%)}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid::before{grid-column:2;grid-row:1/span 9;min-height:0;border:0;border-radius:0;box-shadow:none;background:radial-gradient(circle at 50% 48%,transparent 0 37%,#82b4ff55 37.2%,transparent 37.5%,transparent 44%,#609cff17 44.2%,transparent 44.6%),url('/cobalt-character.webp') center bottom/contain no-repeat}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item{display:grid;grid-template-columns:50px minmax(0,1fr);grid-template-rows:1fr 1fr;gap:0 10px;min-height:53px;padding:2px;border:0;background:transparent;box-shadow:none;text-align:left}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:hover,html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:focus-visible{background:#23478388;outline:1px solid #7198ef}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item img{grid-column:1;grid-row:1/span 2;width:49px;height:49px;padding:3px;border:1px solid #7394dd;background:#102657;box-shadow:0 0 0 2px #10234c}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-slot{grid-column:2;grid-row:1;align-self:end;min-height:0;color:#d7e2f7;font:12px system-ui,sans-serif;letter-spacing:0;text-transform:none}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-name{grid-column:2;grid-row:2;align-self:start;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#90a5d1;font:11px system-ui,sans-serif}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-count{display:none}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(n+9){grid-column:3;direction:rtl;text-align:right}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(n+9) img{grid-column:1}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(n+9) :is(.gear-top-slot,.gear-top-name){grid-column:2}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(9){grid-row:1}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(10){grid-row:2}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(11){grid-row:3}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(12){grid-row:4}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(13){grid-row:5}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(14){grid-row:6}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(15){grid-row:7}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(16){grid-row:8}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(17){grid-column:2;grid-row:9;justify-self:center;min-width:170px;direction:ltr;text-align:left}
+html[data-cobalt-page="gear"] .cobalt-content .gear-filters{margin:0;padding:18px 24px;border:0;border-top:1px solid #36569b;border-radius:0;background:#0d2147;align-items:end}
+html[data-cobalt-page="gear"] .cobalt-content .gear-filters button{min-height:37px;padding:7px 12px;border:1px solid #7094db;border-radius:4px;background:#183976;color:#e6efff;cursor:pointer}
+html[data-cobalt-page="gear"] .cobalt-content .gear-snapshot{margin:0!important;padding:0 24px 20px;color:#9db0d4;font-size:12px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-detail{margin-top:22px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-detail-heading{padding:18px 22px;border:1px solid #4568b5;border-bottom:0;border-radius:7px 7px 0 0;background:#102650}
+html[data-cobalt-page="gear"] .cobalt-content .gear-detail-heading h2{margin:0;color:#d4e3ff;font:400 22px Georgia,serif}
+html[data-cobalt-page="gear"] .cobalt-content .gear-detail-heading p{margin:5px 0 0;color:#aebfe1;font-size:12px}
+html[data-cobalt-page="gear"] .cobalt-content .gear-detail .gear-grid{display:block;margin:0}
+html[data-cobalt-page="gear"] .cobalt-content .gear-detail .gear-slot{border-radius:0 0 7px 7px}
+@media(max-width:700px){html[data-cobalt-page="gear"] .cobalt-hero{padding:22px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid{grid-template-columns:49px minmax(0,1fr) 49px;grid-template-rows:repeat(9,50px);gap:5px;min-height:510px;padding:15px 8px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-grid::before{grid-column:2;grid-row:1/span 9;min-height:0}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item{grid-template-columns:43px;min-height:48px;padding:1px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item img{grid-column:1;grid-row:1;width:42px;height:42px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item :is(.gear-top-slot,.gear-top-name){display:none}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(-n+8){grid-column:1!important}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(n+9):nth-child(-n+16){grid-column:3!important}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(17){grid-column:2!important;grid-row:9;min-width:0;justify-self:center}html[data-cobalt-page="gear"] .cobalt-content .gear-top-panel>.ptitle{display:block;padding:15px}html[data-cobalt-page="gear"] .cobalt-content .gear-top-panel>.ptitle small{display:block;margin-top:5px}html[data-cobalt-page="gear"] .cobalt-content .gear-context{padding:12px 15px 0}html[data-cobalt-page="gear"] .cobalt-content .gear-filters{grid-template-columns:repeat(2,minmax(0,1fr));padding:16px}}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(n+9):nth-child(-n+15){grid-column:3}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(16),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(17){grid-column:2;grid-row:9;min-width:0;direction:ltr;text-align:left}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(16){justify-self:start;margin-left:calc(50% - 76px)}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(17){justify-self:end;margin-right:calc(50% - 76px)}
+html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(n+16) :is(.gear-top-slot,.gear-top-name){display:none}
+@media(max-width:700px){html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(n+9):nth-child(-n+15){grid-column:3!important}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(16),html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(17){grid-column:2!important;grid-row:9}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(16){margin-left:calc(50% - 46px)}html[data-cobalt-page="gear"] .cobalt-content .gear-top-item:nth-child(17){margin-right:calc(50% - 46px)}}
+
+html[data-cobalt-page="skin-colors"] .cobalt-content .summary{display:block}

@@ -1,14 +1,17 @@
 import catalog from "./forever-talents.json" with { type: "json" };
 import tbcCatalog from "./tbc-talents.json" with { type: "json" };
+import classicCatalog from "./classic-talents.json" with { type: "json" };
 import mopIcons from "./mop-talent-icons.json" with { type: "json" };
 import retailIcons from "./retail-talent-icons.json" with { type: "json" };
 
 export const INSPECT_WINDOW_DAYS = 14;
 const classes = new Set(["WARRIOR","PALADIN","HUNTER","ROGUE","PRIEST","SHAMAN","MAGE","WARLOCK","DRUID","MONK","DEATHKNIGHT","DEMONHUNTER","EVOKER"]);
-const sources = new Set(["classic-beta","classic-progression","classic","retail","mop-classic","sod","hardcore"]);
+const sources = new Set(["forever","classic-beta","classic-progression","classic","retail","mop-classic","sod","hardcore"]);
 const nodeCatalog = new Map(catalog.nodes.map(n => [n.node, n]));
 // TBC Anniversary reports its own tree names; its catalog only supplies icons.
 const tbcNodes = new Map(tbcCatalog.nodes.map(n => [n.node, n]));
+// Classic Era, Season of Discovery and Hardcore share one icon catalog.
+const classicNodes = new Map(classicCatalog.nodes.map(n => [n.node, n]));
 // The Forever catalog contains internal or shortened labels for these tabs.
 // Keep its raw provenance, but classify builds with the player-facing names.
 const foreverTreeNames = {
@@ -103,22 +106,30 @@ export function matchInspect(e, characters) {
 export function describeBuild(e, source) {
   const points = {}, talents = [], unresolved = [];
   const specBased=source==="retail"||source==="mop-classic";
+  const listed = new Set((e.list || []).map(t => t.node));
   for (const t of e.list || []) {
-    const candidate = source === "classic-beta" ? nodeCatalog.get(t.node) : null;
+    const candidate = ["classic-beta","forever"].includes(source) ? nodeCatalog.get(t.node) : null;
     // Validate node identity against the observed spell and maximum rank before
     // assigning a beta branch. Old catalogs must not silently mislabel changes.
     const mapped = candidate && candidate.classFile === e.class && candidate.max === t.max
       && (!t.spell || candidate.spell === t.spell) ? candidate : null;
     const branch = mapped
       ? (foreverTreeNames[mapped.classFile]?.[mapped.tab] || mapped.branch)
-      : (source !== "classic-beta" && t.branch ? t.branch : null);
+      : (!["classic-beta","forever"].includes(source) && t.branch ? t.branch : null);
     if (branch) points[branch] = (points[branch] || 0) + t.rank;
     else unresolved.push(t.node);
-    const tbc = source === "classic-progression" ? tbcNodes.get(t.node) : null;
+    const tbc = source === "classic-progression" ? tbcNodes.get(t.node)
+      : ["classic","sod","hardcore"].includes(source) ? classicNodes.get(t.node) : null;
     const icon = mapped?.icon || (tbc && tbc.classFile === e.class && tbc.max === t.max ? tbc.icon : null)
       || (source === "mop-classic" ? mopIcons.spells[t.spell] : null)
       || (source === "retail" ? retailIcons.spells[t.spell] : null);
-    talents.push({...t,branch:branch || (specBased&&t.tree?`Tree ${t.tree}`:"Unmapped talent"),icon});
+    const talent = {...t,branch:branch || (specBased&&t.tree?`Tree ${t.tree}`:"Unmapped talent"),icon};
+    // A retail hero-tree choice node has no spell: name it after the subtree
+    // whose talents the player took, and count each subtree separately.
+    const heroID = source === "retail" && t.spell == null
+      ? retailIcons.heroChoices[t.node]?.find(id => retailIcons.heroTrees[id].nodes.some(n => listed.has(n))) : null;
+    if (heroID != null) Object.assign(talent, {node:`hero:${heroID}`,name:retailIcons.heroTrees[heroID].name,icon:retailIcons.heroTrees[heroID].icon});
+    talents.push(talent);
   }
   const orderedPoints = Object.entries(points).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))
     .map(([tree,points])=>({tree,points}));
@@ -144,7 +155,7 @@ export function describeBuild(e, source) {
   return {points,orderedPoints,primaryTree,classification,hybrid,unknownReason,
     dominant:classification,talents,unresolvedNodes:unresolved.length,totalPoints,
     classificationMethod:specBased?"inspected-specialization-id":"inferred-talent-trees",
-    role:null,catalogVersion:source==="classic-beta"?catalog.version:null};
+    role:null,catalogVersion:["classic-beta","forever"].includes(source)?catalog.version:null};
 }
 
 const response = (body, status = 200) => Response.json(body,{status,headers:{"cache-control":"no-store"}});
@@ -233,7 +244,7 @@ export async function loadInspects(env, source) {
     coverage:{inspected:records.length,withSelectedTalents:records.filter(r=>r.talents.length).length,
       withGear:records.filter(r=>r.gear.length).length,linked,unmatched:records.filter(r=>!r.game).length,
       ambiguous:records.filter(r=>r.matchStatus==="ambiguous").length,retainedCensusCharacters:retained,history},
-    catalog:source==="classic-beta"?catalogInfo:null};
+    catalog:["classic-beta","forever"].includes(source)?catalogInfo:null};
 }
 export async function apiInspects(url,env) {
   const source=url.searchParams.get("source")||"classic-beta";

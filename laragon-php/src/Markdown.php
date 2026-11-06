@@ -1,5 +1,5 @@
 <?php
-// Markdown companions: port of tools/build-markdown-pages.js and the parts of
+// Markdown companions: port of the retired build-markdown-pages.js and the parts of
 // turndown 7.2 and turndown-plugin-gfm it uses. The generated HTML is
 // well-formed, so a small tree builder stands in for linkedom and domino.
 
@@ -549,7 +549,7 @@ function md_merge_text(HNode $node): void {
 }
 
 function page_markdown(string $source, string $page): string {
-  $packed = $page === 'talents' ? pack_talent_records(load_inspects($source)['records']) : null;
+  $packed = $page === 'talents' ? talent_page_model($source) : null;
   return html_to_markdown(edition_page_html($source, $page), $packed);
 }
 

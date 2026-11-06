@@ -37,12 +37,12 @@ function describe_build(array $e, string $source): array {
   $specBased = $source === 'retail' || $source === 'mop-classic';
   $listed = array_flip(array_map(fn($t) => $t['node'], $e['list'] ?? []));
   foreach ($e['list'] ?? [] as $t) {
-    $candidate = $source === 'classic-beta' ? ($cat['forever'][$t['node']] ?? null) : null;
+    $candidate = in_array($source, ['classic-beta', 'forever'], true) ? ($cat['forever'][$t['node']] ?? null) : null;
     $mapped = $candidate && $candidate['classFile'] === $e['class'] && $candidate['max'] === $t['max']
       && (empty($t['spell']) || $candidate['spell'] === $t['spell']) ? $candidate : null;
     $branch = $mapped
       ? (FOREVER_TREE_NAMES[$mapped['classFile']][$mapped['tab']] ?? null ?: $mapped['branch'])
-      : ($source !== 'classic-beta' && ($t['branch'] ?? '') !== '' ? $t['branch'] : null);
+      : (!in_array($source, ['classic-beta', 'forever'], true) && ($t['branch'] ?? '') !== '' ? $t['branch'] : null);
     if ($branch !== null && $branch !== '') $points[$branch] = ($points[$branch] ?? 0) + $t['rank'];
     else $unresolved[] = $t['node'];
     // TBC and the Classic Era clients report tree names; their catalogs only supply icons.
@@ -93,5 +93,5 @@ function describe_build(array $e, string $source): array {
     'hybrid' => $hybrid, 'unknownReason' => $unknownReason, 'dominant' => $classification, 'talents' => $talents,
     'unresolvedNodes' => count($unresolved), 'totalPoints' => $totalPoints,
     'classificationMethod' => $specBased ? 'inspected-specialization-id' : 'inferred-talent-trees',
-    'role' => null, 'catalogVersion' => $source === 'classic-beta' ? $cat['foreverVersion'] : null];
+    'role' => null, 'catalogVersion' => in_array($source, ['classic-beta', 'forever'], true) ? $cat['foreverVersion'] : null];
 }

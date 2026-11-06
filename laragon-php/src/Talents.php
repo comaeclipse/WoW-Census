@@ -55,7 +55,21 @@ function pack_talent_records(array $records): array {
   return ['fields' => TALENT_PACKED_FIELDS, 'values' => $values, 'names' => $names, 'rows' => $rows];
 }
 
-function talent_data(array $data): array { return filter_data('talents', pack_talent_records($data['records'])); }
+// Records keep their talents as indexes into $packed['names'], one per class
+// and node, rather than expanding each selection into its own array.
+function talent_rows(array $packed): array {
+  $n = count($packed['fields']);
+  $out = [];
+  foreach ($packed['rows'] as $row) {
+    $r = [];
+    foreach ($packed['fields'] as $i => $f) $r[$f] = $row[$i] < 0 ? null : $packed['values'][$f][$row[$i]];
+    $r['level'] = $row[$n] < 0 ? null : $row[$n];
+    $r['hybrid'] = $row[$n + 1] === 1;
+    $r['talents'] = $row[$n + 2];
+    $out[] = $r;
+  }
+  return $out;
+}
 
 // Distinct non-empty values of one record field, as the filter selects list them.
 function filter_values(array $records, string $key): array {
@@ -81,7 +95,8 @@ function filter_selects(array $records): string {
   return $out;
 }
 
-function talent_markup(string $part, array $records, array $classPaths = []): string {
+// $records come from talent_rows(); $names is the packed talent names.
+function talent_markup(string $part, array $records, array $names = [], array $classPaths = []): string {
   if ($part === 'filters') return filter_selects($records);
   $rows = $records;
   $withNodes = array_values(array_filter($rows, fn($r) => count($r['talents']) > 0));
@@ -90,9 +105,8 @@ function talent_markup(string $part, array $records, array $classPaths = []): st
   foreach ($withNodes as $r) $denominators[$r['classFile']] = ($denominators[$r['classFile']] ?? 0) + 1;
   foreach ($withNodes as $r)
     foreach ($r['talents'] as $t) {
-      $k = $r['classFile'] . "\t" . js_string($t['node']);
-      $talents[$k] ??= ['name' => $t['name'], 'classFile' => $r['classFile'], 'players' => 0];
-      $talents[$k]['players']++;
+      $talents[$t] ??= ['name' => $names[$t], 'classFile' => $r['classFile'], 'players' => 0];
+      $talents[$t]['players']++;
     }
   $iconRoot = 'https://wow.zamimg.com/images/wow/icons/large/';
   $factions = [];
@@ -140,14 +154,16 @@ function talent_markup(string $part, array $records, array $classPaths = []): st
     : '');
 }
 
-function render_talents_html(array $data, array $opts): string {
+// $data is inspect_summary(); $packed is talent_page_model().
+function render_talents_html(array $data, array $packed, array $opts): string {
   $nav = $opts['nav'] ?? [];
   $seoGameLabel = seo_label($opts['gameLabel'] ?? 'WoW Forever');
   $topic = $seoGameLabel . ' Talent Builds & Popular Specs';
-  $dataFile = talent_data($data)['file'];
+  $dataFile = filter_data('talents', $packed)['file'];
+  $records = talent_rows($packed);
   $classPaths = [];
   foreach ($opts['classTiles'] ?? [] as $p) if (!empty($p['path'])) $classPaths[$p['classFile']] = $p['path'];
-  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' talent builds seen on inspected players: most common builds, talent tree point totals and selected talent popularity.', $opts['canonical'] ?? null);
+  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' talent builds from inspected players: the most common builds per class, tree point totals and how often each talent is picked.', $opts['canonical'] ?? null);
   $stylesheet = esc($opts['stylesheet'] ?? '/style.css');
   $census_css = CENSUS_STYLESHEET;
   $headingHtml = page_heading('WoWCensus', $nav, $topic);
@@ -163,13 +179,13 @@ function render_talents_html(array $data, array $opts): string {
       : '<button class="chip" type="button" data-class="' . esc($p['classFile']) . '" aria-pressed="false" aria-label="Filter ' . esc($p['label']) . ' talents">') .
       "\n      " . '<img src="https://wow.zamimg.com/images/wow/icons/large/' . esc($p['icon']) . '.jpg" alt="" width="20" height="20"><span>' . esc($p['label']) . '</span>' . (!empty($p['path']) ? '</a>' : '</button>');
   }
-  $filters = talent_markup('filters', $data['records']);
+  $filters = talent_markup('filters', $records);
   $summary = $anyFilterTile ? '<p class="hint talent-summary" style="margin:12px 0 0">' . js_locale($data['coverage']['inspected']) . ' nearby players inspected in the latest ' . $data['windowDays'] . ' days; ' .
     js_locale($data['coverage']['withSelectedTalents']) . ' have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ' .
     esc(inspect_time($data['lastT'])) . '.' . ($data['truncated'] ? ' Results are limited to the newest 10,000 inspected players.' : '') . '</p>' : '';
   $dataSrc = esc($dataFile);
   $classPathsAttr = esc(js_json((object)$classPaths));
-  $content = talent_markup('content', $data['records'], $classPaths);
+  $content = talent_markup('content', $records, $packed['names'], $classPaths);
   $generated = !empty($opts['generatedNote']) ? '<div class="itag" style="margin-top:16px;line-height:1.6">' . esc($opts['generatedNote']) . '</div>' : '';
   $script = js_template_const('talents.mjs', 'TALENT_SCRIPT');
   $select = select_script();
@@ -242,6 +258,9 @@ function pack_gear_records(array $records): array {
   return $packed;
 }
 
+// Records keep their worn items packed as [slot, item index, enchanted, rune
+// index?]: expanding every item of every record costs more memory than the
+// origin has.
 function unpack_gear_records(array $packed): array {
   $n = count($packed['fields']);
   $out = [];
@@ -249,12 +268,7 @@ function unpack_gear_records(array $packed): array {
     $r = [];
     foreach ($packed['fields'] as $i => $f) $r[$f] = $row[$i] < 0 ? null : $packed['values'][$f][$row[$i]];
     $r['level'] = $row[$n] < 0 ? null : $row[$n];
-    $r['gear'] = array_map(function ($w) use ($packed) {
-      [$slot, $i, $enchanted] = $w;
-      $it = $packed['items'][$i];
-      return ['slot' => $slot, 'id' => $it[0], 'name' => $it[1], 'quality' => $it[2] < 0 ? null : $it[2], 'icon' => $it[3] ?: null, 'enchanted' => $enchanted === 1,
-        'rune' => isset($w[3]) ? $packed['runes'][$w[3]] : null];
-    }, $row[$n + 1]);
+    $r['gear'] = $row[$n + 1];
     $out[] = $r;
   }
   return $out;
@@ -266,32 +280,34 @@ function pack_gear_page(array $data, string $branch): array {
   return $packed;
 }
 
-function gear_data(array $data, string $branch): array { return filter_data('gear', pack_gear_page($data, $branch)); }
-
-function gear_markup(string $part, array $records, string $wowhead): string {
+function gear_markup(string $part, array $records, array $packed, string $selected = '', bool $cobalt = false): string {
   if ($part === 'filters') return filter_selects($records);
+  $wowhead = $packed['wowhead'];
   if (!$records) return $part === 'top' ? '<p class="hint">No inspected gear for these filters.</p>' : '<section class="panel"><p class="hint" style="margin:0">No inspected gear for these filters.</p></section>';
   $groups = [['Head', [1]], ['Neck', [2]], ['Shoulder', [3]], ['Back', [15]], ['Chest', [5]], ['Wrist', [9]], ['Hands', [10]], ['Waist', [6]], ['Legs', [7]], ['Feet', [8]],
     ['Rings', [11, 12]], ['Trinkets', [13, 14]], ['Main hand', [16]], ['Off hand', [17]], ['Ranged', [18]], ['Shirt', [4]], ['Tabard', [19]]];
+  if ($cobalt && $part === 'top') $groups = array_merge(array_slice($groups, 0, 12), array_slice($groups, 14), array_slice($groups, 12, 2));
   $total = count($records);
   $tiles = '';
   foreach ($groups as [$label, $slots]) {
+    if ($part === 'content' && $selected !== '' && $selected !== $label) continue;
     $items = []; $runes = []; $iconRoot = 'https://wow.zamimg.com/images/wow/icons/small/'; $filled = 0; $enchanted = 0; $runed = 0;
     foreach ($records as $r) {
-      $worn = array_values(array_filter($r['gear'], fn($g) => in_array($g['slot'], $slots, true)));
+      $worn = array_values(array_filter($r['gear'], fn($w) => in_array($w[0], $slots, true)));
       if (!$worn) continue;
       $filled++;
-      foreach ($worn as $g) if ($g['enchanted']) { $enchanted++; break; }
+      foreach ($worn as $w) if ($w[2] === 1) { $enchanted++; break; }
       $seen = [];
       foreach ($worn as $w) {
-        $key = js_string($w['id']);
-        if (isset($seen[$key])) continue;
-        $seen[$key] = true;
-        $items[$key] ??= ['id' => $w['id'], 'name' => $w['name'], 'quality' => $w['quality'], 'icon' => $w['icon'], 'players' => 0];
-        $items[$key]['players']++;
+        // Packing gave each item id one index.
+        if (isset($seen[$w[1]])) continue;
+        $seen[$w[1]] = true;
+        $it = $packed['items'][$w[1]];
+        $items[$w[1]] ??= ['id' => $it[0], 'name' => $it[1], 'quality' => $it[2] < 0 ? null : $it[2], 'icon' => $it[3] ?: null, 'players' => 0];
+        $items[$w[1]]['players']++;
       }
       // Season of Discovery: each player counts once per rune; paired rings pool.
-      $wornRunes = array_values(array_unique(array_filter(array_map(fn($g) => $g['rune'] ?? null, $worn), fn($n) => ($n ?? '') !== '')));
+      $wornRunes = array_values(array_unique(array_filter(array_map(fn($w) => isset($w[3]) ? $packed['runes'][$w[3]] : null, $worn), fn($n) => ($n ?? '') !== '')));
       if ($wornRunes) $runed++;
       foreach ($wornRunes as $name) $runes[$name] = ($runes[$name] ?? 0) + 1;
     }
@@ -299,7 +315,9 @@ function gear_markup(string $part, array $records, string $wowhead): string {
     $top = array_slice(js_sort(array_values($items), fn($a, $b) => js_or($b['players'] - $a['players'], fn() => js_cmp(js_string($a['name']), js_string($b['name'])))), 0, 10);
     if ($part === 'top') {
       $it = $top[0];
-      $tiles .= '<a class="gear-top-item" href="' . esc_markup($wowhead . js_string($it['id'])) . '" target="_blank" rel="noopener"><span class="gear-top-slot">' . esc_markup($label) .
+      $slotHref = $cobalt ? '?' . http_build_query(array_merge($_GET, ['slot' => $label])) : $wowhead . js_string($it['id']);
+      $external = $cobalt ? '' : ' target="_blank" rel="noopener"';
+      $tiles .= '<a class="gear-top-item" href="' . esc_markup($slotHref) . '"' . $external . '><span class="gear-top-slot">' . esc_markup($label) .
         '</span><img src="https://wow.zamimg.com/images/wow/icons/large/' . esc_markup($it['icon'] ?: 'inv_misc_questionmark') . '.jpg" alt="" width="40" height="40"><span class="gear-top-name iq' .
         js_string($it['quality'] ?? 1) . '">' . esc_markup($it['name']) . '</span><span class="gear-top-count">' . js_locale($it['players']) . ' players</span></a>';
       continue;
@@ -326,32 +344,50 @@ function gear_markup(string $part, array $records, string $wowhead): string {
   return '<div class="' . ($part === 'top' ? 'gear-top-grid' : 'gear-grid') . '">' . $tiles . '</div>';
 }
 
-function render_gear_html(array $data, array $opts): string {
+// $model is gear_page_model(): the packed gear records and lastT.
+function render_gear_html(array $model, array $opts): string {
   $nav = $opts['nav'] ?? [];
   $seoGameLabel = seo_label($opts['gameLabel'] ?? 'WoW Forever');
   $topic = $seoGameLabel . ' Gear: Most Equipped Items';
-  $packed = pack_gear_page($data, $opts['branch'] ?? '');
+  $packed = $model['packed'];
   $dataFile = filter_data('gear', $packed)['file'];
   $records = unpack_gear_records($packed);
   $withGear = count($records);
   $summary = $withGear
-    ? 'Latest inspection: ' . esc(inspect_time($data['lastT']))
+    ? 'Latest inspection: ' . esc(inspect_time($model['lastT']))
     : 'No inspected gear for ' . esc($opts['gameLabel'] ?? 'this edition') . ' yet. Gear is collected during the same inspection as talents and will appear in a future snapshot when available.';
-  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' equipment seen on inspected players: the most equipped items in every slot and how often they are enchanted.', $opts['canonical'] ?? null);
+  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' gear seen on inspected players: the most equipped items in every slot for each class and spec, and how often they are enchanted.', $opts['canonical'] ?? null);
   $stylesheet = esc($opts['stylesheet'] ?? '/style.css');
   $census_css = CENSUS_STYLESHEET;
   $headingHtml = page_heading('WoWCensus', $nav, $topic);
   $games = $nav['games'] ?? '';
   $crumbs = $nav['breadcrumbs'] ?? '';
   $pages = $nav['pages'] ?? '';
-  $wowhead = $packed['wowhead'];
+  $cobalt = ($_COOKIE['wowcensus_skin'] ?? '') === 'cobalt';
+  if ($cobalt && $withGear) {
+    $allRecords = $records;
+    foreach (['classFile', 'race', 'realm', 'faction', 'level'] as $field) {
+      $value = $_GET[$field] ?? '';
+      if (!is_scalar($value) || (string)$value === '') continue;
+      $records = array_values(array_filter($records, static fn($r) => (string)($r[$field] ?? '') === (string)$value));
+    }
+    $selected = $_GET['slot'] ?? 'Head';
+    $labels = ['Head','Neck','Shoulder','Back','Chest','Wrist','Hands','Waist','Legs','Feet','Rings','Trinkets','Main hand','Off hand','Ranged','Shirt','Tabard'];
+    if (!is_string($selected) || !in_array($selected, $labels, true)) $selected = 'Head';
+    $filters = filter_selects($allRecords);
+    $panel = '<section class="panel gear-top-panel"><div class="ptitle">Character equipment <small>Most equipped items in the inspection sample</small></div><p class="gear-context">Each slot shows its most observed item across inspected characters. This is an aggregate view, not one character\'s equipment.</p><div id="gear-top">' . gear_markup('top', $records, $packed, '', true) . '</div><form class="gear-filters" id="gear-filters" method="get">' . $filters . '<input type="hidden" name="slot" value="' . esc_markup($selected) . '"><button type="submit">Apply filters</button></form><p class="hint gear-snapshot">' . $summary . ' · ' . js_locale(count($records)) . ' matching inspected characters</p></section>';
+    $content = '<div id="gear-content" class="gear-detail"><div class="gear-detail-heading"><h2>' . esc_markup($selected) . ' items</h2><p>Select another slot on the equipment sheet to see its leading items.</p></div>' . gear_markup('content', $records, $packed, $selected, true) . '</div>';
+    $generated = !empty($opts['generatedNote']) ? '<div class="itag" style="margin-top:16px;line-height:1.6">' . esc($opts['generatedNote']) . '</div>' : '';
+    $scripts = '<script>document.querySelectorAll("#gear-filters select").forEach(s=>{const v=new URLSearchParams(location.search).get(s.dataset.field);if(v!==null)s.value=v;});</script>';
+  } else {
   $panel = $withGear
-    ? '<section class="panel gear-top-panel"><div class="ptitle">Most equipped by slot</div><div id="gear-top">' . gear_markup('top', $records, $wowhead) . '</div><div class="gear-filters" id="gear-filters">' . gear_markup('filters', $records, $wowhead) . '</div><p class="hint" style="margin:14px 0 0">' . $summary . '</p></section>'
+    ? '<section class="panel gear-top-panel"><div class="ptitle">Most equipped by slot</div><div id="gear-top">' . gear_markup('top', $records, $packed) . '</div><div class="gear-filters" id="gear-filters">' . gear_markup('filters', $records, $packed) . '</div><p class="hint" style="margin:14px 0 0">' . $summary . '</p></section>'
     : '<section class="panel" style="margin-bottom:22px"><p class="hint gear-summary" style="margin:0">' . $summary . '</p></section>';
-  $content = $withGear ? '<div id="gear-content" aria-live="polite" data-src="' . esc($dataFile) . '">' . gear_markup('content', $records, $wowhead) . '</div>' : '';
+  $content = $withGear ? '<div id="gear-content" aria-live="polite" data-src="' . esc($dataFile) . '">' . gear_markup('content', $records, $packed) . '</div>' : '';
   $generated = !empty($opts['generatedNote']) ? '<div class="itag" style="margin-top:16px;line-height:1.6">' . esc($opts['generatedNote']) . '</div>' : '';
   $scripts = $withGear ? '<script>' . js_template_const('gear.mjs', 'GEAR_SCRIPT') . '</script>' . select_script() . "\n" .
     '    <script>const whTooltips={colorLinks:false,iconizeLinks:false,renameLinks:false};</script><script src="https://wow.zamimg.com/js/tooltips.js" async></script>' : '';
+  }
   return <<<HTML
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     $seo

@@ -2,7 +2,8 @@
 // (/forever/troll/, /tbc/paladin/); `home` is where that game's own pages live,
 // which for Forever is the site root.
 export const PROFILE_GAMES = {
-  "classic-beta": { dir: "forever", home: "/", nav: "Forever", gameLabel: "WoW Forever" },
+  forever: { dir: "forever", home: "/forever/", nav: "Forever", gameLabel: "WoW: Forever" },
+  "classic-beta": { dir: "forever-beta", home: "/forever-beta/", nav: "Forever (Beta)", gameLabel: "WoW: Forever (Beta)" },
   "classic-progression": { dir: "tbc", home: "/tbc/", nav: "TBC Anniversary", gameLabel: "TBC Anniversary" },
   classic: { dir: "classic", home: "/classic/", nav: "Classic Era", gameLabel: "Classic Era" },
   sod: { dir: "sod", home: "/sod/", nav: "SoD", gameLabel: "Season of Discovery" },

@@ -20,6 +20,29 @@ function retail_skin_color_races(): array {
   return $races;
 }
 
+function skin_color_body_options(string $race): ?array {
+  return match ($race) {
+    'Undead' => [58 => 'Body 1', 63 => 'Body 2'],
+    'Goblin' => [100 => 'Body 1', 105 => 'Body 2'],
+    default => null,
+  };
+}
+
+// ChrCustomizationOption -> ChrModel -> ChrRaceXChrModel. Worgen uses its
+// human-form Skin Color options; Dracthyr uses its Visage options. Vulpera's
+// sampled "Skin Color" options map to dragon mounts, not its playable model.
+function skin_color_race_options(): array {
+  static $options = null;
+  return $options ??= json_decode(file_get_contents(__DIR__ . '/retail-skin-option-ids.json'), true, 512, JSON_THROW_ON_ERROR);
+}
+
+// The appearance sample retains the census race at selection time. A character
+// can change race before the API lookup. The API can also return mount options
+// named "Skin Color", so only race/form options are accepted.
+function skin_color_option_is_valid(string $race, int $optionId): bool {
+  return in_array($optionId, skin_color_race_options()[$race] ?? [], true);
+}
+
 // CIE L* from the sRGB UI swatch, on a shared 0–100 scale across races.
 function skin_swatch_lightness(string $hex): float {
   [$red, $green, $blue] = sscanf(substr($hex, 1), '%02x%02x%02x');
@@ -65,22 +88,89 @@ function skin_treemap(array $values, float $width, float $height): array {
   return $cells;
 }
 
-function retail_skin_spectrum(?string $selectedSlug): string {
-  $factionColors = ['Alliance' => '#5fb0f0', 'Horde' => '#e0574f', 'Either faction' => '#9a9a9a'];
-  $factionByRace = [];
-  foreach (retail_skin_color_factions() as $faction => $races)
-    foreach ($races as $race) $factionByRace[$race] = $faction;
+function skin_swatch_rows(array $rows): array {
+  $colors = [];
+  foreach ($rows as $row) {
+    $hex = (string)$row['swatch_hex'];
+    if (!preg_match('/^#[0-9A-F]{6}$/', $hex)) $hex = '#777777';
+    $colors[$hex] = ($colors[$hex] ?? 0) + (int)$row['n'];
+  }
+  arsort($colors, SORT_NUMERIC);
+  $result = [];
+  foreach ($colors as $hex => $count) $result[] = ['swatch_hex' => $hex, 'n' => $count];
+  return $result;
+}
+
+function skin_heatmap(array $rows): string {
+  $matched = array_sum(array_column($rows, 'n'));
+  if (!$matched) return '';
+  $counts = array_map(static fn($row) => (int)$row['n'], $rows);
+  $wide = skin_treemap($counts, 300, 100);
+  $narrow = skin_treemap($counts, 150, 100);
+  $heatmap = '';
+  foreach ($rows as $index => $row) {
+    $count = (int)$row['n'];
+    $hex = (string)$row['swatch_hex'];
+    [$x, $y, $w, $h] = $wide[$index];
+    [$nx, $ny, $nw, $nh] = $narrow[$index];
+    $percent = round($count / $matched * 100);
+    $box = sprintf('--x:%.3f%%;--y:%.3f%%;--w:%.3f%%;--h:%.3f%%;--nx:%.3f%%;--ny:%.3f%%;--nw:%.3f%%;--nh:%.3f%%',
+      $x / 3, $y, $w / 3, $h, $nx / 1.5, $ny, $nw / 1.5, $nh);
+    $ink = skin_swatch_lightness($hex) > 62 ? ' dark' : '';
+    $label = min($w / 3, $nw / 1.5) >= 6 && min($h, $nh) >= 10 ? '<span>' . $percent . '%</span>' : '';
+    $heatmap .= '<div class="skin-heat-cell' . $ink . '" role="listitem" style="' . $box . ';--c:' . $hex . '" title="' . $hex . ' · ' . $count . ' sampled (' . $percent . '%)" aria-label="Color ' . substr($hex, 1) . ': ' . $count . ' sampled characters, ' . $percent . ' percent">' . $label . '</div>';
+  }
+  return '<div class="skin-heatmap" role="list" aria-label="Observed skin color swatches, sorted by frequency; area is proportional to character count">' . $heatmap . '</div>';
+}
+
+// One race's sample: characters queried, the valid option rows, and the merged
+// swatch rows. Shared with the WoW 2008 skin, so the queries stay identical.
+function retail_skin_race_sample(string $shown): array {
+  $totals = Db::first("SELECT COUNT(*) AS queried, COUNT(*) FILTER (WHERE skin_choice_id IS NOT NULL) AS matched
+    FROM character_appearance_latest WHERE source_game = 'retail' AND race_at_query = ?", [$shown]);
+  $rawRows = Db::all("SELECT skin_option_id AS option_id, skin_choice_id AS choice_id, swatch_hex, COUNT(*) AS n
+    FROM character_appearance_latest
+    WHERE source_game = 'retail' AND race_at_query = ? AND skin_choice_id IS NOT NULL
+    GROUP BY skin_option_id, skin_choice_id, swatch_hex ORDER BY n DESC, skin_choice_id", [$shown]);
+  $validRows = array_values(array_filter($rawRows, static fn($row) => skin_color_option_is_valid($shown, (int)$row['option_id'])));
+  return ['queried' => (int)($totals['queried'] ?? 0), 'validRows' => $validRows, 'rows' => skin_swatch_rows($validRows)];
+}
+
+/** Swatch rows per body type, for races whose two bodies have separate options; null otherwise. */
+function retail_skin_body_rows(string $race, array $validRows): ?array {
+  $bodyOptions = skin_color_body_options($race);
+  if ($bodyOptions === null) return null;
+  $out = [];
+  foreach ($bodyOptions as $optionId => $body)
+    $out[$body] = skin_swatch_rows(array_values(array_filter($validRows, static fn($row) => (int)$row['option_id'] === $optionId)));
+  return $out;
+}
+
+function retail_skin_form_note(string $race): string {
+  return match ($race) {
+    'Worgen' => 'The sampled Skin Color options are for the Worgen human form.',
+    'Dracthyr' => 'The sampled Skin Color options are for the Dracthyr Visage form.',
+    'Vulpera' => 'The sampled Skin Color options mapped to dragon mounts and were excluded.',
+    default => '',
+  };
+}
+
+// Every race's distinct swatches with lightness and count, ordered by median
+// lightness (lightest first), and the largest single-swatch share on the chart.
+function retail_skin_spectrum_data(): array {
   $samples = [];
   foreach (retail_skin_color_races() as $race) $samples[$race] = [];
-  $rows = Db::all("SELECT race_at_query, skin_choice_id, swatch_hex, COUNT(*) AS n
+  $rows = Db::all("SELECT race_at_query, skin_option_id, swatch_hex, COUNT(*) AS n
     FROM character_appearance_latest
     WHERE source_game = 'retail' AND skin_choice_id IS NOT NULL
-    GROUP BY race_at_query, skin_choice_id, swatch_hex", []);
+    GROUP BY race_at_query, skin_option_id, swatch_hex", []);
   foreach ($rows as $row) {
     $race = $row['race_at_query'];
     if (!isset($samples[$race])) continue;
+    if (!skin_color_option_is_valid($race, (int)$row['skin_option_id'])) continue;
     $hex = preg_match('/^#[0-9A-F]{6}$/', (string)$row['swatch_hex']) ? $row['swatch_hex'] : '#777777';
-    $samples[$race][] = ['lightness' => skin_swatch_lightness($hex), 'hex' => $hex, 'choice' => (int)$row['skin_choice_id'], 'n' => (int)$row['n']];
+    if (!isset($samples[$race][$hex])) $samples[$race][$hex] = ['lightness' => skin_swatch_lightness($hex), 'hex' => $hex, 'n' => 0];
+    $samples[$race][$hex]['n'] += (int)$row['n'];
   }
   $medians = [];
   foreach ($samples as $race => $points) {
@@ -96,9 +186,18 @@ function retail_skin_spectrum(?string $selectedSlug): string {
     $total = array_sum(array_column($points, 'n'));
     foreach ($points as $point) $maxShare = max($maxShare, $point['n'] / $total);
   }
+  return ['samples' => $samples, 'medians' => $medians, 'maxShare' => $maxShare];
+}
+
+function retail_skin_spectrum(?string $selectedSlug): string {
+  $factionColors = ['Alliance' => '#5fb0f0', 'Horde' => '#e0574f', 'Either faction' => '#9a9a9a'];
+  $factionByRace = [];
+  foreach (retail_skin_color_factions() as $faction => $races)
+    foreach ($races as $race) $factionByRace[$race] = $faction;
+  ['samples' => $samples, 'medians' => $medians, 'maxShare' => $maxShare] = retail_skin_spectrum_data();
   $output = '<section class="panel skin-chart" data-skin-chart aria-label="Lightness spectrum by race">' .
     '<div class="ptitle">Light to dark · all races</div>' .
-    '<p class="summary">Each square is one skin color, placed by its UI swatch lightness and sized by its share of that race’s sampled characters. The gold line marks the race median. Select a race to view its palette.</p>' .
+    '<p class="summary">Each square is one distinct UI swatch, placed by its lightness and sized by its share of that race’s sampled characters. The gold line marks the race median. Select a race to view its palette.</p>' .
     '<div class="skin-chart-axis"><span>Race</span><span class="skin-chart-ramp"><i></i><small><b>Darker</b><b>Lighter</b></small></span><span>n</span></div>';
   foreach ($samples as $race => $points) {
     $raceSlug = skin_color_slug($race);
@@ -133,14 +232,8 @@ function retail_skin_colors_page(string $cssName, ?string $forcedSlug = null, bo
   $shownSlug = $slug ?? array_key_first($races);
   $shown = $races[$shownSlug];
 
-  $totals = Db::first("SELECT COUNT(*) AS queried, COUNT(*) FILTER (WHERE skin_choice_id IS NOT NULL) AS matched
-    FROM character_appearance_latest WHERE source_game = 'retail' AND race_at_query = ?", [$shown]);
-  $rows = Db::all("SELECT skin_choice_id AS choice_id, swatch_hex, COUNT(*) AS n
-    FROM character_appearance_latest
-    WHERE source_game = 'retail' AND race_at_query = ? AND skin_choice_id IS NOT NULL
-    GROUP BY skin_choice_id, swatch_hex ORDER BY n DESC, skin_choice_id", [$shown]);
-  $queried = (int)($totals['queried'] ?? 0);
-  $matched = (int)($totals['matched'] ?? 0);
+  ['queried' => $queried, 'validRows' => $validRows, 'rows' => $rows] = retail_skin_race_sample($shown);
+  $matched = array_sum(array_column($rows, 'n'));
   $rail = '';
   foreach ($factions as $faction => $members) {
     $links = '';
@@ -153,31 +246,31 @@ function retail_skin_colors_page(string $cssName, ?string $forcedSlug = null, bo
     $rail .= '<section class="race-group faction-col" data-faction="' . esc($faction) . '" aria-label="' . esc($label) . ' races"><h3>' . esc($label) . '<small>' . count($members) . '</small></h3><div class="race-tiles">' . $links . '</div></section>';
   }
 
-  $heatmap = '';
-  // Wide layout for desktop, squarer one for phones; CSS picks one.
-  $counts = array_map(static fn($row) => (int)$row['n'], $rows);
-  $wide = skin_treemap($counts, 300, 100);
-  $narrow = skin_treemap($counts, 150, 100);
-  foreach ($rows as $index => $row) {
-    $count = (int)$row['n'];
-    $hex = preg_match('/^#[0-9A-F]{6}$/', (string)$row['swatch_hex']) ? $row['swatch_hex'] : '#777777';
-    [$x, $y, $w, $h] = $wide[$index];
-    [$nx, $ny, $nw, $nh] = $narrow[$index];
-    $percent = round($count / max(1, $matched) * 100);
-    $box = sprintf('--x:%.3f%%;--y:%.3f%%;--w:%.3f%%;--h:%.3f%%;--nx:%.3f%%;--ny:%.3f%%;--nw:%.3f%%;--nh:%.3f%%',
-      $x / 3, $y, $w / 3, $h, $nx / 1.5, $ny, $nw / 1.5, $nh);
-    $ink = skin_swatch_lightness($hex) > 62 ? ' dark' : '';
-    $label = min($w / 3, $nw / 1.5) >= 6 && min($h, $nh) >= 10 ? '<span>' . $percent . '%</span>' : '';
-    $heatmap .= '<div class="skin-heat-cell' . $ink . '" role="listitem" style="' . $box . ';--c:' . $hex . '" title="' . $hex . ' · ' . $count . ' sampled (' . $percent . '%)" aria-label="Color ' . substr($hex, 1) . ': ' . $count . ' sampled characters, ' . $percent . ' percent">' . $label . '</div>';
+  $heatmap = skin_heatmap($rows);
+  $paletteSummary = '<strong>' . count($rows) . '</strong> distinct sampled swatches.';
+  $matchDescription = 'have a Skin Color option matching this race or form';
+  if (($bodies = retail_skin_body_rows($shown, $validRows)) !== null) {
+    // ChrCustomizationOption maps these pairs to ChrModel Sex 0/1.
+    $heatmap = '';
+    $swatchesByBody = 0;
+    foreach ($bodies as $body => $bodyRows) {
+      $bodyCount = array_sum(array_column($bodyRows, 'n'));
+      $swatchesByBody += count($bodyRows);
+      $heatmap .= '<div class="skin-body-palette"><h3>' . $body . ' <small>' . count($bodyRows) . ' observed swatches · ' . $bodyCount . ' characters</small></h3>' . skin_heatmap($bodyRows) . '</div>';
+    }
+    $paletteSummary = '<strong>' . count($rows) . '</strong> distinct swatches across both body types' . ($swatchesByBody > count($rows) ? '; some are shared.' : '.');
+    $article = $shown === 'Undead' ? 'an' : 'a';
+    $matchDescription = 'have a skin color from ' . $article . ' ' . esc($shown) . ' customization option';
   }
-  $empty = $matched ? '' : '<p>No skin-color choices have been recorded for this race yet.</p>';
+  $empty = $matched ? '' : '<p>No sampled Skin Color option could be verified for this playable race or form.</p>';
+  $formNote = retail_skin_form_note($shown);
   $title = $race === null ? 'All races' : esc($race);
   $css = esc($cssName);
   $nav = edition_nav('retail', 'index.html')['games'];
   $chart = retail_skin_spectrum($shownSlug);
   $canonical = 'https://wowcensus.io/retail/skin-colors/' . ($slug === null ? '' : $slug . '/');
   $shownTitle = esc($shown);
-  $detail = '<section class="panel skin-detail" aria-label="' . $shownTitle . ' popular skin colors"><div class="ptitle">' . $shownTitle . ' · most observed skin colors</div><p class="summary"><strong>' . $matched . '</strong> of <strong>' . $queried . '</strong> sampled characters have a recorded skin color.</p>' . $empty . '<div class="skin-heatmap" role="list" aria-label="Most observed skin colors, sorted by frequency; area is proportional to character count">' . $heatmap . '</div><p class="note">Each color’s area is proportional to its share of sampled characters. Colors are Blizzard customization UI swatches. This is a small API-visible sample, not a population estimate.</p></section>';
+  $detail = '<section class="panel skin-detail" aria-label="' . $shownTitle . ' popular skin colors"><div class="ptitle">' . $shownTitle . ' · most observed skin colors</div><p class="summary"><strong>' . $matched . '</strong> of <strong>' . $queried . '</strong> sampled characters ' . $matchDescription . '. ' . $paletteSummary . '</p>' . $empty . $heatmap . '<p class="note">' . $formNote . ($formNote === '' ? '' : ' ') . 'Repeated Blizzard choice IDs with the same UI swatch are combined. Each color’s area is proportional to its share of sampled characters. UI swatches do not measure rendered skin. This is a small API-visible sample, not a population estimate.</p></section>';
   if ($detailOnly) return $detail . "\n";
   return <<<HTML
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -202,6 +295,8 @@ function retail_skin_colors_page(string $cssName, ?string $forcedSlug = null, bo
 .skin-page .speckey code{display:block;color:var(--muted);font-size:12px;margin-top:4px}.skin-page .spectrum{display:flex;flex-wrap:wrap;gap:3px;margin:14px 0}
 .skin-page .spectrum i{display:block;width:18px;height:18px;border:1px solid #0006}.skin-page .axis{display:flex;justify-content:space-between;color:var(--muted);font-size:16px}
 .skin-page .note{color:var(--muted);font-size:16px;margin:16px 0 0;line-height:1.35}
+.skin-body-palette+.skin-body-palette{margin-top:22px}.skin-body-palette h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin:0 0 8px;color:var(--gold);font:9px/1.5 var(--pixel)}
+.skin-body-palette h3 small{color:var(--muted);font:16px/1.2 VT323,monospace}
 .skin-heatmap{position:relative;width:100%;aspect-ratio:2/1;background:var(--panel)}
 .skin-heat-cell{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);box-sizing:border-box;background:var(--c);display:flex;align-items:flex-start;padding:0;overflow:hidden}
 .skin-heat-cell span{padding:6px 8px;font:18px/1 VT323,monospace;color:#fff;text-shadow:1px 1px 0 #0008}.skin-heat-cell.dark span{color:#161018;text-shadow:none}

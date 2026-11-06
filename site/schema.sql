@@ -42,7 +42,6 @@ CREATE TABLE IF NOT EXISTS history (
   q    INTEGER,                     -- quantity at each snapshot
   PRIMARY KEY (game, id, ts)
 );
-CREATE INDEX IF NOT EXISTS idx_history_item ON history(game, id, ts);
 
 -- Flavor provenance for uploaded datasets plus optional latest seller scan/sample
 -- metadata for realm seller pages.
@@ -179,7 +178,7 @@ CREATE TABLE IF NOT EXISTS character_location_observations (
   PRIMARY KEY (game, source_game, sweep_id, character_key)
 );
 CREATE INDEX IF NOT EXISTS idx_character_location_observations_sweep
-  ON character_location_observations(game, source_game, sweep_id);
+  ON character_location_observations(game, source_game, sweep_id, query_index);
 CREATE INDEX IF NOT EXISTS idx_character_location_observations_zone
   ON character_location_observations(game, zone, observed_at DESC);
 

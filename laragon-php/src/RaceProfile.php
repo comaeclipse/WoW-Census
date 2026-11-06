@@ -39,6 +39,7 @@ function race_profiles(): array {
       "Mag'har Orc" => ['slug' => 'maghar-orc', 'plural' => "Mag'har Orcs", 'faction' => 'Horde'],
       'Zandalari Troll' => ['plural' => 'Zandalari Trolls', 'faction' => 'Horde'], 'Vulpera' => ['plural' => 'Vulpera', 'faction' => 'Horde']],
   ];
+  $races['forever'] = $races['classic-beta'];
   $p = [];
   foreach ($races as $source => $list)
     foreach ($list as $race => $profile)
@@ -100,11 +101,11 @@ function race_profile_data(array $inspects, string $race, string $source): array
 function le_text(mixed $s): string { return strtr(js_string($s), ['&' => '&amp;', '<' => '&lt;', '>' => '&gt;']); }
 function le_attr(mixed $s): string { return str_replace('"', '&quot;', js_string($s)); }
 
-function render_race_profile(array $inspects, string $game, string $race, string $stylesheet, string $canonical): string {
+// $D is race_profile_data() for this race, as race_profiles_model() publishes it.
+function render_race_profile(array $D, string $game, string $race, string $stylesheet, string $canonical): string {
   $G = PROFILE_GAMES[$game];
   $PROFILES = race_profiles()[$game];
   $modern = in_array($game, MODERN_GAMES, true);
-  $D = race_profile_data($inspects, $race, $game);
   $profile = $PROFILES[$race];
   $plural = $profile['plural']; $path = $profile['path']; $label = $profile['label'] ?? $race;
   $icon = $profile['icon'] ?? (RACE_ICON[$race] ?? null);
@@ -130,7 +131,7 @@ function render_race_profile(array $inspects, string $game, string $race, string
   $title = $G['gameLabel'] . ' ' . $label . ' Specs & Talents – WoWCensus';
   $head = preg_replace_callback('/<title>[\s\S]*?<\/title>/', fn() => '<title>' . $title . '</title>', $head, 1);
   $head = str_replace('<style>', '<link rel="stylesheet" href="' . le_attr($prefix . $stylesheet) . '"><style>', $head);
-  $head .= '<meta name="description" content="' . le_attr($label . ' class builds and selected talents observed in ' . $G['gameLabel'] . ' nearby-player inspections.') . '">' .
+  $head .= '<meta name="description" content="' . le_attr($label . ' class builds in ' . $G['gameLabel'] . ': which classes ' . $plural . ' play, their most popular specs and most-picked talents, from player inspections.') . '">' .
     '<link rel="canonical" href="' . le_attr($canonical) . '"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus">' .
     '<meta property="og:title" content="' . le_attr($G['gameLabel'] . ' ' . $label . ' Specs & Talents – WoWCensus') . '"><meta property="og:url" content="' . le_attr($canonical) . '">' .
     '<link rel="icon" href="' . le_attr($prefix . 'favicon.ico') . '">';

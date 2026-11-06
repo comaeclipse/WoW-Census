@@ -9,6 +9,13 @@ final class Db {
 
   public static function pdo(): PDO {
     if (!self::$pdo) {
+      if (getenv('ML_QUERY_CACHE') === '1' && ($snapshot = getenv('ML_SQLITE_PATH'))) {
+        self::$pdo = new PDO('sqlite:file:' . $snapshot . '?mode=ro', null, null, [
+          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+        return self::$pdo;
+      }
       $cfg = ML_CONFIG['db'];
       self::$pdo = new PDO("pgsql:host={$cfg['host']};port={$cfg['port']};dbname={$cfg['name']}",
         $cfg['user'], $cfg['password'], [
@@ -34,6 +41,62 @@ final class Db {
       if ($value === false) throw new RuntimeException('Missing published page data for query ' . $key);
       return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
     }
+    if (self::apcuEnabled()) return self::cached($key, fn() => self::run($sql, $params, $key));
+    return self::run($sql, $params, $key);
+  }
+
+  /** Like all(), but never from APCu: for checks that must see the database as it is now. */
+  public static function uncached(string $sql, array $params = []): array {
+    if (getenv('ML_QUERY_CACHE') === '1') return self::all($sql, $params);
+    return self::run($sql, $params, hash('sha256', json_encode([$sql, array_values($params)], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)));
+  }
+
+  /**
+   * Shared query cache for a server rendering straight from PostgreSQL
+   * (ML_APCU_CACHE=1 and the APCu extension). Many pages run the same heavy
+   * queries, so one render's results serve every page and every PHP worker
+   * until the data changes: entries are keyed by the latest import, and a
+   * PHP-FPM restart empties the cache. While one worker computes a query,
+   * others needing it wait for that result instead of running it again.
+   */
+  private static function apcuEnabled(): bool {
+    static $on = null;
+    return $on ??= getenv('ML_APCU_CACHE') === '1' && function_exists('apcu_enabled') && apcu_enabled();
+  }
+
+  private static function dataVersion(): string {
+    $version = apcu_fetch('ml:data-version', $ok);
+    if ($ok) return $version;
+    $row = self::run('SELECT max(imported_at_utc) v FROM local_imports', [], null)[0] ?? [];
+    $version = (string)($row['v'] ?? '0');
+    apcu_store('ml:data-version', $version, 60);
+    return $version;
+  }
+
+  private static function cached(string $key, callable $compute): array {
+    $entry = 'ml:q:' . self::dataVersion() . ':' . $key;
+    $rows = apcu_fetch($entry, $ok);
+    if ($ok) return $rows;
+    $lock = $entry . ':lock';
+    if (!apcu_add($lock, 1, 300)) {
+      // Another worker is running this query: wait for its result.
+      for ($waited = 0; $waited < 290; $waited += 0.25) {
+        usleep(250000);
+        $rows = apcu_fetch($entry, $ok);
+        if ($ok) return $rows;
+        if (!apcu_exists($lock)) break;
+      }
+    }
+    try {
+      $rows = $compute();
+      apcu_store($entry, $rows, 12 * 3600);  // Too large for the cache: still returned.
+      return $rows;
+    } finally {
+      apcu_delete($lock);
+    }
+  }
+
+  private static function run(string $sql, array $params, ?string $key): array {
     $started = microtime(true);
     $st = self::pdo()->prepare($sql);
     foreach (array_values($params) as $i => $v)
@@ -58,7 +121,7 @@ final class Db {
       $rows[] = $row;
     }
     if (getenv('ML_PROFILE')) self::$profile[] = [round(microtime(true) - $started, 3), preg_replace('/\s+/', ' ', substr($sql, 0, 160)), $params];
-    if ($dir = getenv('ML_CAPTURE_DIR')) {
+    if ($key !== null && ($dir = getenv('ML_CAPTURE_DIR'))) {
       $path = $dir . '/' . $key . '.json';
       if (!is_file($path)) file_put_contents($path, json_encode(['key' => $key, 'sql' => $sql, 'params' => array_values($params), 'rows' => $rows], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR));
     }

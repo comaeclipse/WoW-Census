@@ -55,7 +55,7 @@ export function renderTalentsHtml(data, opts={}) {
   const dataFile=talentData(data).file;
   const classPaths=Object.fromEntries((opts.classTiles||[]).filter((p)=>p.path).map((p)=>[p.classFile,p.path]));
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    ${seoHead(topic+" – WoWCensus", seoGameLabel+" talent builds seen on inspected players: most common builds, talent tree point totals and selected talent popularity.", opts.canonical)}
+    ${seoHead(topic+" – WoWCensus", seoGameLabel+" talent builds from inspected players: the most common builds per class, tree point totals and how often each talent is picked.", opts.canonical)}
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96"><link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
     <link rel="preload" href="/fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/cinzel-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/friz-quadrata-regular.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="${esc(opts.stylesheet||"/style.css")}">
@@ -64,13 +64,6 @@ export function renderTalentsHtml(data, opts={}) {
     .talent-summary{font-family:"Friz Quadrata Web","Friz Quadrata","Friz Quadrata Std","Fritz Quadrata","Cinzel",Georgia,serif;font-size:16px;font-weight:400;letter-spacing:normal;line-height:1.66;color:#ccc;text-align:left}
     .talent-filters{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}.talent-filters label{display:grid;gap:5px;font-size:17px;color:var(--muted)}
     .talent-filters select{color:var(--ink);background:var(--panel2);border:2px solid var(--line);font-family:var(--term);font-size:18px;padding:6px 10px;max-width:230px}
-    .class-row{display:flex;justify-content:space-between;gap:8px;margin:4px 0 8px;list-style:none;padding:0}.class-row li{flex:1 1 0;min-width:0}
-    .class-row a,.class-row button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px 2px;text-decoration:none;color:var(--c);background:none;border:0;font:inherit;cursor:pointer}
-    .class-row img{width:56px;height:56px;border:3px solid var(--c);box-shadow:3px 3px 0 #000}.class-row span{font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-align:center}
-    .class-row a:hover img,.class-row a:focus-visible img,.class-row button:hover img,.class-row button:focus-visible img{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #000}
-    .class-row button[aria-pressed="true"] img{outline:3px solid var(--gold);outline-offset:3px}
-    .class-row a:hover span,.class-row button:hover span{text-decoration:underline}
-    @media(max-width:720px){.class-row{flex-wrap:wrap;justify-content:center}.class-row li{flex:0 0 calc(20% - 8px)}.class-row img{width:44px;height:44px}.class-row span{font-size:11px}}
     .talent-section{margin-top:22px}.talent-empty{margin:0}
     .talent-combo-table{min-width:0}.talent-combo-table th:first-child,.talent-combo-table td:first-child{width:72%}
     .talent-combo-table th:nth-child(2),.talent-combo-table td:nth-child(2){width:12%}
@@ -89,10 +82,10 @@ export function renderTalentsHtml(data, opts={}) {
     <header class="ihead"><div class="page-heading">${pageHeading("WoWCensus", nav, topic)}${nav.games||""}</div>${nav.breadcrumbs||""}</header>
     <div class="page-controls">${nav.pages||""}</div>
     <section class="panel" style="margin-bottom:22px">
-    <ul class="class-row">${(opts.classTiles || []).map((p) => `<li>${p.path
-      ? `<a href="${esc(p.path)}" style="--c:${esc(p.color)}">`
-      : `<button type="button" data-class="${esc(p.classFile)}" aria-pressed="false" aria-label="Filter ${esc(p.label)} talents" style="--c:${esc(p.color)}">`}
-      <img src="https://wow.zamimg.com/images/wow/icons/large/${esc(p.icon)}.jpg" alt="" width="56" height="56"><span>${esc(p.label)}</span>${p.path ? "</a>" : "</button>"}</li>`).join("")}</ul>
+    <div class="chips class-chip-links talent-class-chips" aria-label="Class">${(opts.classTiles || []).map((p) => `${p.path
+      ? `<a class="chip" href="${esc(p.path)}">`
+      : `<button class="chip" type="button" data-class="${esc(p.classFile)}" aria-pressed="false" aria-label="Filter ${esc(p.label)} talents">`}
+      <img src="https://wow.zamimg.com/images/wow/icons/large/${esc(p.icon)}.jpg" alt="" width="20" height="20"><span>${esc(p.label)}</span>${p.path ? "</a>" : "</button>"}`).join("")}</div>
     <div class="talent-filters" id="talent-filters">${talentMarkup("filters", data.records)}</div>
     ${opts.classTiles?.some((p) => !p.path) ? `<p class="hint talent-summary" style="margin:12px 0 0">${data.coverage.inspected.toLocaleString()} nearby players inspected in the latest ${data.windowDays} days; ${data.coverage.withSelectedTalents.toLocaleString()} have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ${esc(time(data.lastT))}.${data.truncated?' Results are limited to the newest 10,000 inspected players.':""}</p>` : ""}</section>
     <div id="talent-content" aria-live="polite" data-src="${esc(dataFile)}" data-class-paths="${esc(JSON.stringify(classPaths))}">${talentMarkup("content", data.records, classPaths)}</div>
@@ -144,7 +137,7 @@ const TALENT_SCRIPT = `
  ${FILTER_LOADER}
  const filters=document.getElementById('talent-filters'), selects=[...filters.querySelectorAll('select')], content=document.getElementById('talent-content');
  const classSelect=filters.querySelector('select[data-field="classFile"]');
- const classTiles=[...document.querySelectorAll('.class-row button[data-class]')];
+ const classTiles=[...document.querySelectorAll('.class-chip-links button[data-class]')];
  const classPaths=JSON.parse(content.dataset.classPaths||'{}');
  const syncClassTiles=()=>{for(const tile of classTiles)tile.setAttribute('aria-pressed',String(classSelect?.value===tile.dataset.class));};
  for(const tile of classTiles)tile.addEventListener('click',()=>{classSelect.value=classSelect.value===tile.dataset.class?'':tile.dataset.class;classSelect.dispatchEvent(new Event('change',{bubbles:true}));});
