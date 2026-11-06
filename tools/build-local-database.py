@@ -21,6 +21,7 @@ REPO = Path(__file__).resolve().parent.parent
 EXPORT_REALM = REPO / "tools" / "export-realm-from-savedvariables.js"
 EXPORT_INSPECTS = REPO / "tools" / "export-local-inspects.mjs"
 FLAVORS = {
+    "_forever_": "forever",
     "_anniversary_": "tbc-anniversary",
     "_classic_": "mop-classic",
     "_classic_beta_": "classic-beta",
@@ -28,6 +29,7 @@ FLAVORS = {
     "_retail_": "retail",
 }
 SOURCES = {
+    "forever": "forever",
     "tbc-anniversary": "classic-progression",
     "mop-classic": "mop-classic",
     "classic-beta": "classic-beta",
@@ -35,6 +37,12 @@ SOURCES = {
     "sod": "sod",
     "hardcore": "hardcore",
     "retail": "retail",
+}
+# Old MarketLens buckets from the Classic Era installation carry no edition:
+# these realms are Season of Discovery or Hardcore, not Classic Era.
+ERA_SEASON_REALMS = {
+    "Wild Growth": "sod", "Crusader Strike": "sod", "Lone Wolf": "sod", "Living Flame": "sod",
+    "Doomhowl": "hardcore", "Soulseeker": "hardcore",
 }
 
 
@@ -76,15 +84,36 @@ def slug(value):
 
 
 def character_key(value, source):
-    return source + value[value.index(":"):] if ":" in value else value
+    # Saves key characters "<flavor>:<realm>:<name>"; WoWCensus puts the region
+    # in front ("us:mop-classic:..."). The game key already holds the region, so
+    # both become "<source>:<realm>:<name>". The realm slug drops hyphens: the
+    # addon writes "ra-den" for its own realm but "raden" from "Name-Raden".
+    parts = re.sub(r"^(?:us|eu|kr|tw|cn):", "", value).split(":", 2)
+    if len(parts) < 3:
+        return value
+    return f"{source}:{parts[1].replace('-', '')}:{parts[2]}"
 
 
 def source_for(flavor, bucket):
+    # A release-client save can still carry retained beta realm buckets.
+    # Route those by their recorded collection identity, not the install path.
+    if flavor == "_forever_" and re.match(r"^(?:us|eu|kr|tw|cn):classic-beta:", bucket):
+        return "classic-beta", SOURCES["classic-beta"]
+    if flavor == "_forever_" and re.match(r"^(?:us|eu|kr|tw|cn):", bucket) and not re.match(
+        r"^(?:us|eu|kr|tw|cn):forever:", bucket
+    ):
+        raise ValueError(f"Unexpected game identity in Forever save: {bucket}")
     # SoD and Era use the same installation, but not the same game data.
-    if flavor == "_classic_era_" and bucket.startswith("Wild Growth-"):
-        return "sod", "sod"
-    if flavor == "_classic_era_" and bucket.startswith("Doomhowl-"):
-        return "hardcore", "hardcore"
+    if flavor == "_classic_era_":
+        match = re.match(r"^(?:us|eu|kr|tw|cn):(sod|hardcore|classic-era):", bucket)
+        if match:
+            game = match.group(1)
+            return game, SOURCES[game]
+    realm_bucket = re.sub(r"^(?:us|eu|kr|tw|cn):[^:]+:", "", bucket)
+    if flavor == "_classic_era_":
+        game = ERA_SEASON_REALMS.get(re.sub(r"-(Alliance|Horde|Neutral)$", "", realm_bucket))
+        if game:
+            return game, SOURCES[game]
     normalized = FLAVORS[flavor]
     return normalized, SOURCES[normalized]
 
@@ -155,6 +184,9 @@ def import_market(db, body, digest, source):
     history = 0
     current = 0
     skipped_older = 0
+    snapshot_sql = """INSERT OR IGNORE INTO local_auction_snapshots VALUES
+      (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+    snapshot_batch = []
     for raw_id, rec in item_data.items():
         item_id = int(raw_id)
         snapshots = rec.get("s") or []
@@ -170,10 +202,12 @@ def import_market(db, body, digest, source):
             if t <= 0:
                 continue
             values = list(point) + [0] * (8 - len(point))
-            db.execute("""INSERT OR IGNORE INTO local_auction_snapshots VALUES
-              (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", (
+            snapshot_batch.append((
                 source, game, item_id, t, name, category, item_source, crafter,
                 *values[1:8], digest))
+            if len(snapshot_batch) >= 2000:
+                db.executemany(snapshot_sql, snapshot_batch)
+                snapshot_batch.clear()
             exact += 1
             day = int(datetime.fromtimestamp(t, timezone.utc).strftime("%Y%m%d"))
             if day not in daily or t > daily[day][0]:
@@ -214,7 +248,15 @@ def import_market(db, body, digest, source):
             game, item_id, name, slug(name), quantity * unit, unit, iso(t),
             quantity, pq, sellers, top, category, item_source, crafter))
         current += 1
+    if snapshot_batch:
+        db.executemany(snapshot_sql, snapshot_batch)
+    stale_current_removed = 0
     if current:
+        # A fresh AH import supersedes current rows left by older scans. Keep
+        # their observations in history, but do not render them as live items.
+        stale_current_removed = db.execute(
+            "DELETE FROM items WHERE game=? AND updated_at<?", (game, iso(cutoff))
+        ).rowcount
         old = db.execute("SELECT updated_at FROM datasets WHERE game=?", (game,)).fetchone()
         if not old or anchor > unix(old[0]):
             db.execute("""INSERT INTO datasets (game,source_game,updated_at) VALUES (?,?,?)
@@ -222,11 +264,12 @@ def import_market(db, body, digest, source):
               updated_at=excluded.updated_at""", (game, source, iso(anchor)))
     return dict(game=game, scanAnchor=anchor, items=len(item_data), exactSnapshots=exact,
                 historyCandidates=history, currentItemsUpdated=current,
-                olderCurrentItemsKept=skipped_older)
+                 olderCurrentItemsKept=skipped_older,
+                 staleCurrentItemsRemoved=stale_current_removed)
 
 
 def import_population(db, body, source):
-    game = "realm:" + body["realm"]
+    game = body.get("game") or "realm:" + body["realm"]
     details = {"game": game}
     samples = [(game, int(s["t"]), s.get("f") or None, int(s.get("o") or 0),
                 int(s.get("tot") or s.get("o") or 0), s.get("flt") or "",
@@ -236,12 +279,13 @@ def import_population(db, body, source):
       (game,t,faction,observed,total,filter,classes,races) VALUES (?,?,?,?,?,?,?,?)""", samples)
     details["samples"] = len(samples)
     characters = []
+    known = known_realms(db)
     for c in body.get("characters", []):
         if not c.get("k") or not c.get("fs") or not c.get("ls"):
             continue
         characters.append((game, source, character_key(c["k"], source),
                            c.get("fn") or c.get("n") or c["k"], c.get("n") or "",
-                           c.get("r") or "", c.get("g") or "", c.get("l") or 0,
+                           canonical_realm(c.get("r") or "", known), c.get("g") or "", c.get("l") or 0,
                            c.get("race") or "", c.get("class") or "", c.get("cf") or "",
                            c.get("z") or "", c["fs"], c["ls"], c.get("sc") or 0))
     db.executemany("""INSERT INTO characters
@@ -280,7 +324,7 @@ def import_population(db, body, source):
     db.executemany("""INSERT INTO population_sweeps VALUES (?,?,?,?,?,?,?,?,?,?,?)
       ON CONFLICT(game,source_game,sweep_id) DO UPDATE SET
       started_at=MIN(population_sweeps.started_at,excluded.started_at),
-      completed_at=MAX(COALESCE(population_sweeps.completed_at,0),COALESCE(excluded.completed_at,0)),
+      completed_at=NULLIF(MAX(COALESCE(population_sweeps.completed_at,0),COALESCE(excluded.completed_at,0)),0),
       status=CASE WHEN population_sweeps.status IN ('complete','partial') THEN population_sweeps.status ELSE excluded.status END,
       label=excluded.label,faction=excluded.faction,
       query_count=MAX(population_sweeps.query_count,excluded.query_count),
@@ -360,34 +404,114 @@ def norm(value):
     return " ".join(unicodedata.normalize("NFC", str(value or "")).casefold().split())
 
 
-def import_inspects(db, body, source):
+# Cross-realm "Name-Realm" strings drop the spaces from the realm ("OldBlanchy",
+# "LeiShen", "Lightning'sBlade"). Store the spaced display name instead.
+REALM_EXCEPTIONS = {"azjolnerub": "Azjol-Nerub"}
+
+
+def realm_key(value):
+    return re.sub(r"[\s'\-]", "", norm(value))
+
+
+def known_realms(db):
+    known = {}
+    for table in ("characters", "character_inspects"):
+        for (realm,) in db.execute(f"SELECT DISTINCT realm FROM {table} WHERE realm LIKE '% %'"):
+            known.setdefault(realm_key(realm), realm)
+    return known
+
+
+def canonical_realm(realm, known):
+    if not realm or " " in realm:
+        return realm
+    key = realm_key(realm)
+    if key in known:
+        return known[key]
+    if key in REALM_EXCEPTIONS:
+        return REALM_EXCEPTIONS[key]
+    spaced = re.sub(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Za-z])(?=\d)", " ", realm)
+    if spaced != realm:
+        known[key] = spaced
+    return spaced
+
+
+def repair_realm_names(db):
+    """Rewrite stored space-less realm names to their spaced display form."""
+    known = known_realms(db)
+    changed = {}
+    for table, column in (("characters", "realm"), ("character_inspects", "realm"),
+                          ("character_inspects", "observer_realm")):
+        for (realm,) in db.execute(f"SELECT DISTINCT {column} FROM {table} WHERE {column} NOT LIKE '% %'").fetchall():
+            fixed = canonical_realm(realm, known)
+            if fixed != realm:
+                count = db.execute(f"UPDATE {table} SET {column}=? WHERE {column}=?", (fixed, realm)).rowcount
+                changed[f"{table}.{column}: {realm} -> {fixed}"] = count
+    # Guilds are stored as "Guild-Realm". Only touch suffixes that are known realms.
+    for table in ("characters", "character_inspects"):
+        for (guild,) in db.execute(f"SELECT DISTINCT guild FROM {table} WHERE guild LIKE '%-%'").fetchall():
+            name, _, realm = guild.rpartition("-")
+            fixed = known.get(realm_key(realm)) if " " not in realm else None
+            if name and fixed and fixed != realm:
+                count = db.execute(f"UPDATE {table} SET guild=? WHERE guild=?",
+                                   (f"{name}-{fixed}", guild)).rowcount
+                changed[f"{table}.guild suffix: {realm} -> {fixed}"] = \
+                    changed.get(f"{table}.guild suffix: {realm} -> {fixed}", 0) + count
+    return changed
+
+
+def inspect_candidates(db, source):
     by_name_class = {}
-    for row in db.execute("SELECT game,character_key,name,realm,race,class_file FROM characters WHERE source_game=?", (source,)):
+    for row in db.execute("SELECT game,character_key,name,realm,race,class_file,last_seen FROM characters WHERE source_game=?", (source,)):
         by_name_class.setdefault((norm(row[2]), row[5]), []).append(row)
+    return by_name_class
+
+
+def match_inspect(by_name_class, name, class_file, race, realm, faction, region):
+    """(game, character_key) of the one census character an inspect is, else (None, "ambiguous"/"unmatched")."""
+    candidates = [c for c in by_name_class.get((norm(name), class_file), [])
+                  if (not region or region == "unknown" or c[0].startswith("realm:" + region + ":"))
+                  if (not race or norm(c[4]) == norm(race))
+                  and (not realm or realm_key(c[3]) == realm_key(realm))
+                  and (not faction or c[0].endswith("-" + faction))]
+    # One character has a row in each collection that saw it (an old collection
+    # and its labelled twin, connected realms); link the latest of them.
+    if len({c[1] for c in candidates}) == 1:
+        return max(candidates, key=lambda c: c[6])[:2]
+    return None, "ambiguous" if candidates else "unmatched"
+
+
+def import_inspects(db, body, source):
+    by_name_class = inspect_candidates(db, source)
     added = nodes = linked = unmatched = ambiguous = 0
+    known = known_realms(db)
+    existing_nodes = {(guid, captured_at): nodes_json for guid, captured_at, nodes_json in db.execute(
+        "SELECT guid,captured_at,nodes_json FROM character_inspects WHERE source_game=?", (source,))}
+    talent_sql = """INSERT OR IGNORE INTO inspect_talents
+      (source_game,guid,captured_at,node_id,tree_id,spell_id,name,rank,max_rank,
+       x,y,entry_id,definition_id,groups_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+    talent_batch = []
     for pair in body["records"]:
         raw, e = pair["raw"], pair["normalized"]
-        candidates = [c for c in by_name_class.get((norm(e["name"]), e["class"]), [])
-                      if (not e.get("race") or norm(c[4]) == norm(e["race"]))
-                      and (not e.get("realm") or norm(c[3]) == norm(e["realm"]))
-                      and (not e.get("faction") or c[0].endswith("-" + e["faction"]))]
-        if len(candidates) == 1:
-            match_game, match_key = candidates[0][:2]
+        region = raw.get("observerRegion")
+        realm = canonical_realm(e.get("realm") or "", known) or None
+        match_game, match_key = match_inspect(by_name_class, e["name"], e["class"], e.get("race"),
+                                              realm, e.get("faction"), region)
+        if match_game:
             status = "context-name" if e["schemaVersion"] >= 2 else "legacy-name"
             linked += 1
         else:
-            match_game = match_key = None
-            status = "ambiguous" if candidates else "unmatched"
+            status, match_key = match_key, None
             ambiguous += status == "ambiguous"
             unmatched += status == "unmatched"
+        nodes_json = encode(e["list"])
         values = (source, e["guid"], e["time"], e["rawName"], e["name"],
-                  e.get("realm") or None, e.get("faction") or None,
-                  e.get("observerRealm") or None, e.get("observerFaction") or None,
+                  realm, e.get("faction") or None,
+                  canonical_realm(e.get("observerRealm") or "", known) or None, e.get("observerFaction") or None,
                   e.get("observerZone") or None, e["class"], e.get("race"),
                   e.get("level"), e.get("guild"), e.get("spec"), e.get("role"),
                   e.get("talents"), e["schemaVersion"], e.get("clientBuild"),
                   e.get("locale"), match_game, match_key, status, "NameplateInspect",
-                  encode(e["list"]), encode(raw), encode(e["gear"]) if e["gear"] else None)
+                  nodes_json, encode(raw), encode(e["gear"]) if e["gear"] else None)
         db.execute("""INSERT INTO character_inspects
           (source_game,guid,captured_at,raw_name,name,realm,faction,observer_realm,
            observer_faction,observer_zone,class_file,race,level,guild,raw_spec_id,
@@ -400,15 +524,19 @@ def import_inspects(db, body, source):
           gear_json=COALESCE(excluded.gear_json,character_inspects.gear_json)
           WHERE excluded.schema_version>=character_inspects.schema_version""", values)
         added += 1
+        nodes += len(e["list"])
+        if existing_nodes.get((e["guid"], e["time"])) == nodes_json:
+            continue
         for talent in e["list"]:
-            db.execute("""INSERT OR IGNORE INTO inspect_talents
-              (source_game,guid,captured_at,node_id,tree_id,spell_id,name,rank,max_rank,
-               x,y,entry_id,definition_id,groups_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                       (source, e["guid"], e["time"], talent["node"], talent.get("tree"),
-                        talent.get("spell"), talent["name"], talent["rank"], talent["max"],
-                        talent.get("x"), talent.get("y"), talent.get("entry"),
-                        talent.get("definition"), encode(talent.get("groups") or [])))
-            nodes += 1
+            talent_batch.append((source, e["guid"], e["time"], talent["node"], talent.get("tree"),
+                                 talent.get("spell"), talent["name"], talent["rank"], talent["max"],
+                                 talent.get("x"), talent.get("y"), talent.get("entry"),
+                                 talent.get("definition"), encode(talent.get("groups") or [])))
+            if len(talent_batch) >= 2000:
+                db.executemany(talent_sql, talent_batch)
+                talent_batch.clear()
+    if talent_batch:
+        db.executemany(talent_sql, talent_batch)
     return {"selected": body["selected"], "rejected": body["rejected"],
             "valid": added, "talentNodes": nodes, "linked": linked,
             "unmatched": unmatched, "ambiguous": ambiguous}
@@ -489,6 +617,10 @@ def main():
                 print(f"inspections {source}: {details}", flush=True)
             except Exception as exc:
                 report["errors"].append({"source": source, "kind": "inspections", "error": str(exc)})
+    with db:
+        report["realmNamesRepaired"] = repair_realm_names(db)
+    for change, count in report["realmNamesRepaired"].items():
+        print(f"realm repaired {change} ({count} rows)", flush=True)
     report["integrityCheck"] = db.execute("PRAGMA integrity_check").fetchone()[0]
     report["tables"] = {name: db.execute(f'SELECT COUNT(*) FROM "{name}"').fetchone()[0]
                         for (name,) in db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")}

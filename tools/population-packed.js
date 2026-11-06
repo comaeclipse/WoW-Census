@@ -11,14 +11,20 @@ function field(value) {
   return `${Buffer.byteLength(text, "utf8")}:${text}`;
 }
 
+// A day is [count, first, last] when unpacked here (0-based JS array), or a
+// Lua table read by savedvariables.js: { count, firstSeen, lastSeen } or the
+// 1-based sequence { "1": count, "2": first, "3": last }.
+function dayValues(d) {
+  if (Array.isArray(d)) return [d[0] || 0, d[1] || 0, d[2] || 0];
+  return [d.count ?? d[1] ?? 0, d.firstSeen ?? d[2] ?? 0, d.lastSeen ?? d[3] ?? 0];
+}
+
 function packCharacters(characters) {
   const chunks = ["MLC1"];
   let records = [];
   for (const [key, c] of Object.entries(characters || {})) {
-    const days = Object.entries(c.days || {}).map(([day, d]) => [
-      day, d.count ?? d[1] ?? 0, d.firstSeen ?? d[2] ?? 0,
-      d.lastSeen ?? d[3] ?? 0,
-    ].join(",")).join(";");
+    const days = Object.entries(c.days || {})
+      .map(([day, d]) => [day, ...dayValues(d)].join(",")).join(";");
     records.push(field(key) + FIELDS.map((name) => field(c[name])).join("") + field(days));
     if (records.length === 256) { chunks.push(records.join("")); records = []; }
   }
@@ -60,4 +66,4 @@ function unpackCharacters(chunks) {
   return characters;
 }
 
-module.exports = { packCharacters, unpackCharacters };
+module.exports = { dayValues, packCharacters, unpackCharacters };

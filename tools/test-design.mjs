@@ -1,13 +1,21 @@
-// Mechanical checks for DESIGN.md against the built static bundle in static/.
+// Mechanical checks for DESIGN.md against rendered pages: run laragon-php/render-routes.php
+// (all editions) first; MARKETLENS_PAGES overrides its default folder.
 // Run: node --test tools/test-design.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 
 const root = new URL('../', import.meta.url);
-const read = (p) => fs.readFileSync(new URL(p, root), 'utf8');
-const exists = (p) => fs.existsSync(new URL(p, root));
+const pagesDir = process.env.MARKETLENS_PAGES || path.join(os.homedir(), 'Documents', 'MarketLensData', 'rendered-pages');
+const pages_ = pathToFileURL(pagesDir + '/');
+// 'static/...' paths name rendered pages; anything else is in the repository.
+const at = (p) => p.startsWith('static/') ? new URL(p.slice(7), pages_) : new URL(p, root);
+const read = (p) => fs.readFileSync(at(p), 'utf8');
+const exists = (p) => fs.existsSync(at(p));
 const { css, name: cssName } = createRequire(import.meta.url)('./layout-id.js').stylesheet();
 const editions = { '': 'Forever', tbc: 'TBC Anniversary', classic: 'Classic Era', sod: 'SoD', hardcore: 'Hardcore', mop: 'MoP Classic', retail: 'Retail' };
 const pages = ['index', 'combos', 'auctionhouse', 'guilds', 'geography', 'talents', 'gear'];
@@ -43,7 +51,7 @@ for (const { dir, page, file } of files) {
     assert.match(html, /^<!doctype html><html lang="en">/i);
     assert.match(html, /<meta name="viewport" content="width=device-width,initial-scale=1">/);
     assert.ok(html.includes('href="' + cssName + '"') || (page === 'index' && html.includes('<style>' + css)), 'stale or missing stylesheet (rebuild every edition after CSS changes)');
-    assert.match(html, /<link rel="stylesheet" href="\/census\.css">/, 'shared census stylesheet');
+    assert.match(html, /<link rel="stylesheet" href="\/census\.css(?:\?v=[0-9a-f]{12})?">/, 'shared census stylesheet');
     assert.doesNotMatch(html, /<style>\s*\.iname \.itopic/, 'census CSS should not be copied into HTML');
     for (const font of ['press-start-2p-latin.woff2', 'vt323-latin.woff2', 'cinzel-latin-800-normal.woff2'])
       assert.ok(html.includes('rel="preload" href="/fonts/' + font + '"'), 'preload ' + font);

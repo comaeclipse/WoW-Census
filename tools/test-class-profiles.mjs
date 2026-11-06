@@ -1,8 +1,22 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { CLASS_PROFILES, classProfile, classRoute, renderClassProfile } from "../site/src/class-profile.mjs";
 import { PROFILE_GAMES } from "../site/src/profile-games.mjs";
+
+// Rendered pages from laragon-php/render-routes.php (all editions); MARKETLENS_PAGES overrides the folder.
+const pages = pathToFileURL((process.env.MARKETLENS_PAGES || path.join(os.homedir(), "Documents", "MarketLensData", "rendered-pages")) + "/");
+const page = (p) => new URL(p.replace(/^\//, ""), pages);
+// The site serves fonts, favicons and mirrored icons straight from the repository.
+const repoFile = (url) => {
+  const rel = decodeURIComponent(url.href.slice(pages.href.length));
+  if (rel.startsWith("fonts/") || /^(favicon[^/]*|role-icons\.png|notice-discord\.png)$/.test(rel)) return new URL(`../site/public/${rel}`, import.meta.url);
+  if (rel.startsWith("assets/")) return new URL(`../assets/wow.zamimg.com/${rel.slice(7)}`, import.meta.url);
+  return url;
+};
 
 test("class profile ranks each tree's talents among that spec's players only", () => {
   const t = (node, name, branch, rank = 1) => ({ node, name, branch, rank, max: 3, icon: "x" });
@@ -67,10 +81,11 @@ test("every edition has only its playable class routes", () => {
 
 const CLASS_GAMES = [{ dir: "forever", home: "/", talentsPage: "talents.html" }, { dir: "tbc", home: "/tbc/", talentsPage: "tbc/talents.html" }];
 for (const game of CLASS_GAMES) for (const [cls, label, trees] of [["paladin", "Paladin", ["Holy", "Protection", "Retribution"]], ["warrior", "Warrior", ["Arms", "Fury", "Protection"]], ["druid", "Druid", ["Balance", "Feral Combat", "Restoration"]], ["hunter", "Hunter", ["Beast Mastery", "Marksmanship", "Survival"]], ["shaman", "Shaman", ["Elemental", "Enhancement", "Restoration"]], ["priest", "Priest", ["Discipline", "Holy", "Shadow"]], ["rogue", "Rogue", ["Assassination", "Combat", "Subtlety"]], ["mage", "Mage", ["Arcane", "Fire", "Frost"]], ["warlock", "Warlock", ["Affliction", "Demonology", "Destruction"]]]) test(`built ${game.dir}/${cls} route has three pre-rendered spec columns and a sitemap entry`, () => {
-  const pageUrl = new URL(`../static/${game.dir}/${cls}/index.html`, import.meta.url);
+  const pageUrl = page(`${game.dir}/${cls}/index.html`);
   const html = fs.readFileSync(pageUrl, "utf8");
   assert.deepEqual([...html.matchAll(/data-tree="([^"]+)"/g)].map((m) => m[1]), trees);
-  assert.match(html, new RegExp(`<a class="chip" href="/${game.dir}/${cls}/" aria-current="page">${label}</a>`));
+  assert.match(html, new RegExp(`<a class="chip" href="/${game.dir}/${cls}/" aria-current="page"><img[^>]+width="20" height="20"><span>${label}</span></a>`));
+  assert.match(html, /<div class="site-nav-stack">\s*<nav class="games game-nav"[^>]*>[\s\S]*?<\/nav>\s*<nav class="games page-nav"/);
   // Every column either ranks talents or says why it does not.
   const bodies = [...html.matchAll(/<div class="card-b">(.*?)<\/div><div class="card-f">/gs)].map((m) => m[1]);
   assert.equal(bodies.length, 3);
@@ -80,20 +95,20 @@ for (const game of CLASS_GAMES) for (const [cls, label, trees] of [["paladin", "
   assert.ok(html.includes(`<a class="game" aria-current="true" href="${game.home}talents">Talents</a>`));
   assert.doesNotMatch(html, /<script|https:\/\/wow\.zamimg\.com/);
   for (const [, ref] of html.matchAll(/(?:src|href)="(\.\.\/\.\.\/[^"]*)"/g))
-    assert.ok(fs.existsSync(new URL(ref, pageUrl)), `Local asset missing: ${ref}`);
-  assert.ok(fs.readFileSync(new URL("../static/sitemap.xml", import.meta.url), "utf8").includes(`<loc>https://wowcensus.io/${game.dir}/${cls}/</loc>`));
-  assert.ok(fs.readFileSync(new URL(`../static/${game.talentsPage}`, import.meta.url), "utf8").includes(`<a href="/${game.dir}/${cls}/" style="--c:`));
+    assert.ok(fs.existsSync(repoFile(new URL(ref, pageUrl))), `Local asset missing: ${ref}`);
+  assert.ok(fs.readFileSync(page("sitemap.xml"), "utf8").includes(`<loc>https://wowcensus.io/${game.dir}/${cls}/</loc>`));
+  assert.ok(fs.readFileSync(page(`${game.talentsPage}`), "utf8").includes(`<a class="chip" href="/${game.dir}/${cls}/">`));
 });
 
 test("every configured class route is built, linked from talents, and listed in the sitemap", () => {
-  const sitemap = fs.readFileSync(new URL("../static/sitemap.xml", import.meta.url), "utf8");
+  const sitemap = fs.readFileSync(page("sitemap.xml"), "utf8");
   for (const [source, game] of Object.entries(CLASS_PROFILES)) {
-    const talents = fs.readFileSync(new URL(`../static/${game.home.replace(/^\//, "")}talents.html`, import.meta.url), "utf8");
+    const talents = fs.readFileSync(page(`${game.home.replace(/^\//, "")}talents.html`), "utf8");
     for (const cf of game.classes) {
       const route = classRoute(source, cf);
-      const html = fs.readFileSync(new URL(`../static${route}index.html`, import.meta.url), "utf8");
+      const html = fs.readFileSync(page(`${route}index.html`), "utf8");
       assert.ok(sitemap.includes(`<loc>https://wowcensus.io${route}</loc>`), route);
-      assert.ok(talents.includes(`<a href="${route}" style="--c:`), route);
+      assert.ok(talents.includes(`<a class="chip" href="${route}">`), route);
       assert.ok(html.includes(`<link rel="canonical" href="https://wowcensus.io${route}">`), route);
       assert.match(html, /data-tree="[^"]+"/, route);
     }
@@ -101,7 +116,7 @@ test("every configured class route is built, linked from talents, and listed in 
 });
 
 test("built MoP Mage page has spell icons and ranks every spec", () => {
-  const html = fs.readFileSync(new URL("../static/mop/mage/index.html", import.meta.url), "utf8");
+  const html = fs.readFileSync(page("mop/mage/index.html"), "utf8");
   assert.doesNotMatch(html, /inv_misc_questionmark\.jpg/);
   assert.match(html, /spell_fire_burningspeed\.jpg/);
   assert.doesNotMatch(html, /Not enough data/);

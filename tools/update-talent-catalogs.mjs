@@ -8,13 +8,14 @@
 // catalog shows up as "Unknown build". Its tabs keep the class and tree names
 // already in the catalog; a new tab stops the run.
 //
-// tbc-talents.json only supplies icons: the TBC client already reports tree
-// names. Wowhead's TBC data has no talent names, so nodes are matched on ID,
-// class and rank count.
+// tbc-talents.json and classic-talents.json only supply icons: those clients
+// already report tree names. Wowhead's data for them has no talent names, so
+// nodes are matched on ID, class and rank count. Classic Era, Season of
+// Discovery and Hardcore share classic-talents.json (Wowhead has no SoD data).
 //
 // Nodes Wowhead dropped are kept so older inspections still resolve. A catalog
 // whose nodes did not change is left alone.
-// Usage: node tools/update-talent-catalogs.mjs
+// Usage: node tools/update-talent-catalogs.mjs [forever|tbc|classic ...]
 import fs from "node:fs";
 import crypto from "node:crypto";
 
@@ -27,14 +28,18 @@ const CATALOGS = [
       return { node: n.id, classFile: t.classFile, branch: t.branch, tab, name: n.name,
         spell: n.ranks[0], max: n.ranks.length, icon: n.icon, definition: n.definition, row: n.row, col: n.col };
     } },
-  { key: "tbc", file: "tbc-talents.json", source: "https://nether.wowhead.com/tbc/data/talents-classic?dv=29",
-    node(n, tab, tabs, trees) {
-      // Tree descriptions read "WarriorArms", "DruidFeralCombat", ...
-      const cls = CLASSES.find((c) => trees[tab]?.description?.startsWith(c));
-      if (!cls) throw new Error(`Unrecognized TBC talent tab ${tab} (${trees[tab]?.description})`);
-      return { node: n.id, classFile: cls.toUpperCase(), tab, spell: n.ranks[0], max: n.ranks.length, icon: n.icon, row: n.row, col: n.col };
-    } },
+  { key: "tbc", file: "tbc-talents.json", source: "https://nether.wowhead.com/tbc/data/talents-classic?dv=29", node: iconNode("TBC") },
+  { key: "classic", file: "classic-talents.json", source: "https://nether.wowhead.com/classic/data/talents-classic?dv=29", node: iconNode("Classic") },
 ];
+
+function iconNode(label) {
+  return (n, tab, tabs, trees) => {
+    // Tree descriptions read "WarriorArms", "DruidFeralCombat", ...
+    const cls = CLASSES.find((c) => trees[tab]?.description?.startsWith(c));
+    if (!cls) throw new Error(`Unrecognized ${label} talent tab ${tab} (${trees[tab]?.description})`);
+    return { node: n.id, classFile: cls.toUpperCase(), tab, spell: n.ranks[0], max: n.ranks.length, icon: n.icon, row: n.row, col: n.col };
+  };
+}
 
 // The payload is a JS call, WH.setPageData("...data",{...}); cut out the object.
 function pageData(text) {
@@ -50,7 +55,8 @@ function pageData(text) {
   return JSON.parse(text.slice(start, end + 1));
 }
 
-for (const catalog of CATALOGS) {
+const only = process.argv.slice(2);
+for (const catalog of CATALOGS.filter((c) => !only.length || only.includes(c.key))) {
   const file = new URL(`../site/src/${catalog.file}`, import.meta.url);
   const old = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : { nodes: [] };
   const res = await fetch(catalog.source);

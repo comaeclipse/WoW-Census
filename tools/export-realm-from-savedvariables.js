@@ -9,7 +9,7 @@ const fs = require("node:fs");
 const input = process.argv[2];
 if (!input) throw new Error("usage: node export-realm-from-savedvariables.js <MarketLens.lua>");
 const { readSavedVariables } = require("./savedvariables.js");
-const { unpackCharacters } = require("./population-packed.js");
+const { dayValues, unpackCharacters } = require("./population-packed.js");
 const db = readSavedVariables(input);
 const realms = db.realms || {};
 if (process.argv.includes("--list-realms")) {
@@ -33,7 +33,8 @@ function normalizeFlavor(flavor) {
     return "tbc-anniversary";
   if (["classic-era", "era", "classic"].includes(f)) return "classic-era";
   if (f === "retail") return "retail";
-  if (["classic-beta", "forever", "classicbeta"].includes(f)) return "classic-beta";
+  if (["classic-beta", "classicbeta"].includes(f)) return "classic-beta";
+  if (["forever", "forever-release"].includes(f)) return "forever";
   if (["mop-classic", "mists-classic", "mop", "mists"].includes(f)) return "mop-classic";
   if (["sod", "season-of-discovery"].includes(f)) return "sod";
   if (["hardcore", "classic-hardcore"].includes(f)) return "hardcore";
@@ -99,6 +100,7 @@ for (const [id, rec] of Object.entries(unpackItems(realm.itemsPacked, { ...(real
 const payload = {
   type: "ml-realm-v1",
   realm: realmName,
+  identity: realm.identity || null,
   exportedAt: Math.floor(Date.now() / 1000),
   capabilities: {
     auctions: realm.auctionsAvailable !== false,
@@ -154,7 +156,7 @@ if (process.argv.includes("--sellers")) {
     process.exit(1);
   }
   process.stdout.write(JSON.stringify({
-    type: "ml-sellers-v1", realm: realmName,
+    type: "ml-sellers-v1", realm: realmName, identity: realm.identity || null,
     exportedAt: Math.floor(Date.now() / 1000), meta, sellers,
   }));
 } else if (process.argv.includes("--population")) {
@@ -184,10 +186,7 @@ if (process.argv.includes("--sellers")) {
       ls: c.lastSeen || 0, sc: c.seenCount || 0,
     });
     for (const [day, d] of Object.entries(c.days || {})) {
-      observations.push([
-        key, Number(day), d.count || d[1] || 0,
-        d.firstSeen || d[2] || 0, d.lastSeen || d[3] || 0,
-      ]);
+      observations.push([key, Number(day), ...dayValues(d)]);
     }
   }
   const sweeps = [];
@@ -222,6 +221,7 @@ if (process.argv.includes("--sellers")) {
   if (!samples.length && !characters.length) throw new Error("population export contains zero data");
   process.stdout.write(JSON.stringify({
     type: "ml-pop-v3", realm: realmName, flavor,
+    identity: realm.identity || null,
     exportedAt: Math.floor(Date.now() / 1000), samples, characters, observations,
     sweeps, sweepQueries, locationObservations,
   }));

@@ -1,28 +1,35 @@
 #!/usr/bin/env node
-// Fills tools/item-icons/<branch>.json for gear items the built gear pages show
-// without an icon (the "?" fallback), then mirrors those icons into assets/.
+// Fills tools/item-icons/<branch>.json for gear and Auction House items the
+// rendered pages show without an icon (the "?" fallback), then mirrors them.
 // The gear data files list items as [id, name, quality, icon]; an empty icon
 // means the cache had no entry, e.g. Season of Discovery items added after the
 // cache was made. Icons come from Wowhead's tooltip API for the edition's branch.
 // The cache was a one-off snapshot until this existed, so every item first
 // seen after it showed "?"; the watcher now runs this after each import.
 //
-// Usage: node tools/update-item-icons.mjs [--sources=sod,classic,...]   (default: every edition)
-// Prints "ADDED icons=<n>"; when n > 0, rebuild those sources so pages pick the icons up.
+// Usage: node tools/update-item-icons.mjs [--sources=sod,classic,...] [--pages=<dir>] [--live-auctions]
+// Reads pages from laragon-php/render-routes.php. --live-auctions also reads the current
+// wowcensus.io AH pages. Prints "ADDED icons=<n>"; the PHP site picks new icons up on request.
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-// Edition key -> static folder and Wowhead branch (laragon-php/src/Edition.php EDITIONS).
+// Rendered pages to read, from laragon-php/render-routes.php (the watcher runs it first).
+const pagesArg = process.argv.find(a => a.startsWith("--pages="));
+const pages = pagesArg ? pagesArg.slice(8)
+  : process.env.MARKETLENS_PAGES || path.join(os.homedir(), "Documents", "MarketLensData", "rendered-pages");
+// Edition key -> page folder and Wowhead branch (laragon-php/src/Edition.php EDITIONS).
 const EDITIONS = {
-  "classic-beta": { dir: "", branch: "forever" }, "classic-progression": { dir: "tbc", branch: "tbc" },
+  "forever": { dir: "forever", branch: "forever" }, "classic-beta": { dir: "forever-beta", branch: "forever" }, "classic-progression": { dir: "tbc", branch: "tbc" },
   classic: { dir: "classic", branch: "classic" }, sod: { dir: "sod", branch: "classic" },
   hardcore: { dir: "hardcore", branch: "classic" }, "mop-classic": { dir: "mop", branch: "mop-classic" },
   retail: { dir: "retail", branch: "" },
 };
 const arg = process.argv.find(a => a.startsWith("--sources="));
 const sources = arg ? arg.slice(10).split(",").filter(s => EDITIONS[s]) : Object.keys(EDITIONS);
+const liveAuctions = process.argv.includes("--live-auctions");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 // Windows can briefly lock the file (virus scan, editor): retry rather than lose the run.
 async function save(file, cache) {
@@ -64,11 +71,27 @@ for (const branch of new Set(sources.map(s => EDITIONS[s].branch))) {
   const cache = fs.existsSync(cacheFile) ? JSON.parse(fs.readFileSync(cacheFile, "utf8")) : {};
   const missing = new Set();
   for (const s of sources.filter(s => EDITIONS[s].branch === branch)) {
-    const data = path.join(repo, "static", EDITIONS[s].dir, "data");
-    if (!fs.existsSync(data)) continue;
-    for (const file of fs.readdirSync(data).filter(f => /^gear\.[0-9a-f]{12}\.json$/.test(f)))
-      for (const [id, , , icon] of JSON.parse(fs.readFileSync(path.join(data, file), "utf8")).items || [])
-        if (!icon && !cache[id]) missing.add(id);
+    const data = path.join(pages, EDITIONS[s].dir, "data");
+    if (fs.existsSync(data)) {
+      for (const file of fs.readdirSync(data).filter(f => /^gear\.[0-9a-f]{12}\.json$/.test(f)))
+        for (const [id, , , icon] of JSON.parse(fs.readFileSync(path.join(data, file), "utf8")).items || [])
+          if (!icon && !cache[id]) missing.add(id);
+    }
+    // Auction House tables are rendered into HTML and do not use gear data.
+    const auctionPage = path.join(pages, EDITIONS[s].dir, "auctionhouse.html");
+    if (fs.existsSync(auctionPage)) {
+      const html = fs.readFileSync(auctionPage, "utf8");
+      for (const match of html.matchAll(/wowhead\.com\/(?:[^"<>\s]+\/)?item=(\d+)/g))
+        if (!cache[match[1]]) missing.add(Number(match[1]));
+    }
+    if (liveAuctions) {
+      const url = `https://wowcensus.io/${EDITIONS[s].dir ? EDITIONS[s].dir + "/" : ""}auctionhouse`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
+      const html = await response.text();
+      for (const match of html.matchAll(/"id":(\d+),"icon":null/g))
+        if (!cache[match[1]]) missing.add(Number(match[1]));
+    }
   }
   if (!missing.size) continue;
   console.log(`${missing.size} ${branch || "retail"} item(s) without an icon`);

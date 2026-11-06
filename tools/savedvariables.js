@@ -1,9 +1,15 @@
 // Parse WoW serialized tables without executing Lua.
 const fs = require("node:fs");
-function readSavedVariables(file) {
+function readSavedVariables(file, variableName) {
 const source = fs.readFileSync(file, "utf8");
-let p = source.indexOf("{");
-if (p < 0) throw new Error("SavedVariables table not found");
+let p;
+if (variableName) {
+  const assignment = source.match(new RegExp("(?:^|\\n)\\s*" + variableName + "\\s*=\\s*\\{"));
+  p = assignment ? source.indexOf("{", assignment.index) : -1;
+} else {
+  p = source.indexOf("{");
+}
+if (p < 0) throw new Error(`SavedVariables table ${variableName || ""} not found`);
 
 function ws() {
   while (p < source.length) {

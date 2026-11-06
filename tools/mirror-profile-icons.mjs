@@ -1,22 +1,28 @@
 #!/usr/bin/env node
-// Mirror the exact class-profile icons referenced by an edition's generated pages.
-// Run after a build introduces new icon names, then rebuild to copy them to static/.
-// Usage: node tools/mirror-profile-icons.mjs [edition dir ...]   (default: every edition with class pages)
+// Mirror the exact class-profile icons referenced by an edition's rendered class pages
+// (laragon-php/render-routes.php writes them). The PHP site serves them from assets/.
+// Usage: node tools/mirror-profile-icons.mjs [--pages=<dir>] [edition dir ...]   (default: every rendered edition)
 // The watcher calls it with no arguments, so the default must cover every edition:
 // it used to be mop only, and retail talent icons stayed missing.
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const editions = process.argv.slice(2).length ? process.argv.slice(2)
-  : ["tbc", "classic", "sod", "hardcore", "mop", "retail"].filter(dir => existsSync(path.join(repo, "static", dir)));
+// Rendered pages to read, from laragon-php/render-routes.php (the watcher runs it first).
+const pagesArg = process.argv.find(a => a.startsWith("--pages="));
+const pages = pagesArg ? pagesArg.slice(8)
+  : process.env.MARKETLENS_PAGES || path.join(os.homedir(), "Documents", "MarketLensData", "rendered-pages");
+const dirs = process.argv.slice(2).filter(a => !a.startsWith("--"));
+const editions = dirs.length ? dirs
+  : ["tbc", "classic", "sod", "hardcore", "mop", "retail"].filter(dir => existsSync(path.join(pages, dir)));
 const icons = path.join(repo, "assets", "wow.zamimg.com", "images", "wow", "icons", "large");
 const names = new Set();
-for (const edition of editions) for (const entry of await fs.readdir(path.join(repo, "static", edition), { withFileTypes: true })) {
+for (const edition of editions) for (const entry of await fs.readdir(path.join(pages, edition), { withFileTypes: true })) {
   if (!entry.isDirectory()) continue;
-  const page = path.join(repo, "static", edition, entry.name, "index.html");
+  const page = path.join(pages, edition, entry.name, "index.html");
   try { await fs.access(page); } catch { continue; }
   const html = await fs.readFile(page, "utf8");
   for (const match of html.matchAll(/\.\.\/\.\.\/assets\/images\/wow\/icons\/large\/([a-z0-9_-]+\.jpg)/g))
