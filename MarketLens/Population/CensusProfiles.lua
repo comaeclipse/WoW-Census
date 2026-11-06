@@ -22,7 +22,7 @@ Pop.Profiles = P
 local ALL_CLASSIC = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "SHAMAN", "MAGE", "WARLOCK", "DRUID" }
 
 -- Vanilla race/class rules (Era, Hardcore, SoD). TBC adds the Draenei/Blood Elf
--- rows below. Profiles without a table (MoP, Retail, Forever) try every race.
+-- rows below. MoP and Forever do not have a race/class table here.
 local VANILLA_RACES_BY_CLASS = {
     WARRIOR = { "Human", "Dwarf", "Night Elf", "Gnome", "Orc", "Undead", "Tauren", "Troll" },
     PALADIN = { "Human", "Dwarf" },
@@ -36,6 +36,19 @@ local VANILLA_RACES_BY_CLASS = {
 }
 
 local TBC_RACES_BY_CLASS = {}
+
+-- Retail class restrictions. Keep this table limited to classes with race
+-- restrictions; classes omitted here can use every race in the faction list.
+-- Source: https://worldofwarcraft.blizzard.com/en-us/game/classes/
+local RETAIL_RACES_BY_CLASS = {
+    DEATHKNIGHT = { "Human", "Dwarf", "Night Elf", "Gnome", "Draenei", "Worgen", "Pandaren", "Void Elf", "Lightforged Draenei", "Dark Iron Dwarf", "Kul Tiran", "Mechagnome", "Earthen", "Orc", "Undead", "Tauren", "Troll", "Blood Elf", "Goblin", "Nightborne", "Highmountain Tauren", "Mag'har Orc", "Zandalari Troll", "Vulpera" },
+    DEMONHUNTER = { "Night Elf", "Void Elf", "Blood Elf" },
+    DRUID = { "Night Elf", "Worgen", "Kul Tiran", "Haranir", "Tauren", "Troll", "Highmountain Tauren", "Zandalari Troll" },
+    EVOKER = { "Dracthyr" },
+    MONK = { "Human", "Dwarf", "Night Elf", "Gnome", "Draenei", "Worgen", "Pandaren", "Void Elf", "Lightforged Draenei", "Dark Iron Dwarf", "Kul Tiran", "Mechagnome", "Earthen", "Haranir", "Orc", "Undead", "Tauren", "Troll", "Blood Elf", "Goblin", "Nightborne", "Highmountain Tauren", "Mag'har Orc", "Zandalari Troll", "Vulpera" },
+    PALADIN = { "Human", "Dwarf", "Draenei", "Lightforged Draenei", "Dark Iron Dwarf", "Earthen", "Tauren", "Blood Elf", "Zandalari Troll" },
+    SHAMAN = { "Dwarf", "Draenei", "Pandaren", "Dark Iron Dwarf", "Kul Tiran", "Earthen", "Haranir", "Orc", "Tauren", "Troll", "Goblin", "Highmountain Tauren", "Mag'har Orc", "Zandalari Troll", "Vulpera" },
+}
 do
     local extra = {
         WARRIOR = { "Draenei" }, PALADIN = { "Draenei", "Blood Elf" },
@@ -113,8 +126,8 @@ P.profiles = {
     },
     ["mop-classic"] = {
         label = "MoP Classic",
-        bands = { {1,9}, {10,19}, {20,29}, {30,39}, {40,49}, {50,59}, {60,69}, {70,79},
-                  {80,84}, {85,86}, {87,88}, {89,89}, {90,90} },
+        -- Broad first pass; capped bands are refined from their live /who result.
+        bands = { {1,39}, {40,59}, {60,69}, {70,79}, {80,84}, {85,87}, {88,89}, {90,90} },
         classes = {
             Alliance = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "DEATHKNIGHT", "SHAMAN", "MAGE", "WARLOCK", "MONK", "DRUID" },
             Horde    = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "DEATHKNIGHT", "SHAMAN", "MAGE", "WARLOCK", "MONK", "DRUID" },
@@ -140,6 +153,7 @@ P.profiles = {
             Alliance = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "DEATHKNIGHT", "SHAMAN", "MAGE", "WARLOCK", "MONK", "DRUID", "DEMONHUNTER", "EVOKER" },
             Horde    = { "WARRIOR", "PALADIN", "HUNTER", "ROGUE", "PRIEST", "DEATHKNIGHT", "SHAMAN", "MAGE", "WARLOCK", "MONK", "DRUID", "DEMONHUNTER", "EVOKER" },
         },
+        racesByClass = RETAIL_RACES_BY_CLASS,
         races = {
             Alliance = { "Human", "Dwarf", "Night Elf", "Gnome", "Draenei", "Worgen", "Pandaren", "Void Elf",
                          "Lightforged Draenei", "Dark Iron Dwarf", "Kul Tiran", "Mechagnome", "Dracthyr", "Earthen", "Haranir" },
@@ -155,14 +169,14 @@ P.profiles = {
         capAt = 45,
     },
     ["forever"] = {
-        label = "WoW: Forever (beta)",
-        -- Begin with levels 10-30 in order, then fully shuffle every level x
-        -- race cell alongside the same number of level x class cells. Capped
-        -- cells are refined by name, never zone.
+        label = "WoW: Forever",
+        -- Start with broad shuffled bands through level 30. Expand toward 60
+        -- as higher levels are observed; capped cells split as needed.
         noZoneFallback = true,
-        -- Forever beta is currently capped at level 30.
+        -- The release cap is level 60.
         dynamicBands = true,
-        levelCap = 30,
+        minLevel = 1,
+        levelCap = 60,
         classes = { Alliance = ALL_CLASSIC, Horde = ALL_CLASSIC },
         races = {
             Alliance = { "Human", "Dwarf", "Night Elf", "Gnome", "High Order Skyborne" },
@@ -221,17 +235,16 @@ function P.DetectID()
     return P.profiles[flavor] and flavor or "tbc-anniversary"
 end
 
--- The client API and stored sightings can describe a higher ruleset level.
--- Use the beta cap explicitly until Forever announces a different one.
-function P.ForeverCap(_, betaCap)
-    return betaCap
+-- Keep the launch cap explicit: some client APIs report a higher generic cap.
+function P.ForeverCap(_, launchCap)
+    return launchCap
 end
 
 -- Decade bands up to the cap, then the cap on its own (everyone piles up there).
-local function foreverBands(cap)
-    local bands, lo = {}, 1
+local function foreverBands(cap, minLevel)
+    local bands, lo = {}, minLevel
     while lo < cap do
-        local hi = math.min(lo + 9 - (lo == 1 and 1 or 0), cap - 1)
+        local hi = math.min(lo + 9, cap - 1)
         bands[#bands + 1] = { lo, hi }
         lo = hi + 1
     end
@@ -251,7 +264,7 @@ function P.Current()
     local def = P.profiles[id]
     local maxL = (GetMaxPlayerLevel and GetMaxPlayerLevel()) or 60
     if def.dynamicBands then maxL = P.ForeverCap(maxL, def.levelCap) end
-    local bands = def.dynamicBands and foreverBands(maxL) or def.bands
+    local bands = def.dynamicBands and foreverBands(maxL, def.minLevel or 1) or def.bands
     local hot = {}
     for _, z in ipairs(def.hotspots[faction] or {}) do hot[#hot + 1] = z end
     for _, z in ipairs(def.hotspots.shared or {}) do hot[#hot + 1] = z end
@@ -259,7 +272,7 @@ function P.Current()
         id = id, label = def.label, faction = faction, bands = bands,
         classes = def.classes[faction], races = def.races[faction],
         racesByClass = def.racesByClass, hotspots = hot,
-        capAt = def.capAt or 49, maxLevel = maxL,
+        capAt = def.capAt or 49, maxLevel = maxL, minLevel = def.minLevel or 1,
         zoneFallback = not def.noZoneFallback, fixedPlan = def.fixedPlan,
         simpleRefresh = def.simpleRefresh,
     }

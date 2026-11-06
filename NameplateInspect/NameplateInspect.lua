@@ -34,11 +34,13 @@ local selfCalling = false
 local collecting = true
 local inspectedThisSession = {}
 local clientVersion = GetBuildInfo()
+local clientInterface = select(4, GetBuildInfo()) or 0
 local clientMajor = tonumber(clientVersion:match("^(%d+)")) or 0
 local clientMinor = tonumber(clientVersion:match("^%d+%.(%d+)")) or 0
-local era = clientMajor == 1 and clientMinor < 60
+local forever = clientInterface >= 16000 and clientInterface < 20000
+local era = not forever and clientMajor == 1 and clientMinor < 60
 local mop = clientMajor == 5
-local classicTalents = era or clientMajor == 2
+local classicTalents = not forever and (era or clientMajor == 2)
 -- SoD shares the Era client and save file; tag it so uploads keep the games apart.
 local function seasonOfDiscovery()
   if not (C_Seasons and C_Seasons.GetActiveSeason) then return false end
@@ -46,8 +48,9 @@ local function seasonOfDiscovery()
   local sod = Enum and Enum.SeasonID and Enum.SeasonID.SeasonOfDiscovery or 2
   return ok and season == sod
 end
-local flavor = era and (seasonOfDiscovery() and "sod" or "classic-era") or clientMajor == 2 and "tbc-anniversary"
-    or mop and "mop-classic" or clientMajor >= 10 and clientMajor < 20 and "retail" or "classic-beta"
+local flavor = forever and "classic-beta" or era and (seasonOfDiscovery() and "sod" or "classic-era")
+    or clientMajor == 2 and "tbc-anniversary" or mop and "mop-classic"
+    or clientMajor >= 10 and clientMajor < 20 and "retail" or "classic-beta"
 local stats = { plates = 0, requests = 0, ready = 0, saved = 0, timeouts = 0 }
 local lastResult = "No inspect response yet"
 
@@ -534,7 +537,6 @@ local function store(guid, unit)
   local name, realm = UnitName(unit)
   if isSecret(name) or isSecret(realm) or not name then return false end
   local observerRealm = GetRealmName()
-  local forever = observerRealm and observerRealm:match("^Classic Beta")
   -- Forever exposes surname in UnitName's second return, rather than realm.
   -- Keep both raw components; do not split arbitrary hyphens in a surname.
   local rawName = (realm and realm ~= "") and (name .. "-" .. realm) or name
@@ -596,6 +598,7 @@ local function store(guid, unit)
   }
   -- SavedVariables cannot safely persist Retail's restricted values.
   if hasSecret(record) then return false end
+  NameplateInspectDB = NameplateInspectDB or {}
   NameplateInspectDB[guid] = record
   inspectedThisSession[guid] = true
   return true

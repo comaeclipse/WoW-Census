@@ -6,7 +6,10 @@ local ML = MarketLens
 
 ML.ADDON = ADDON
 ML.VERSION = "0.1.1"
-ML.DB_VERSION = 4
+ML.DB_VERSION = 5
+
+BINDING_HEADER_MARKETLENS = "MarketLens"
+BINDING_NAME_MARKETLENS_TOGGLE = "Toggle MarketLens window"
 
 -- Modules populate these tables as their files load (see .toc order).
 ML.Scanner    = ML.Scanner    or {}
@@ -58,11 +61,13 @@ function ML:CensusPrint(fmt, ...)
 end
 
 local DEFAULT_SETTINGS = {
+    -- The importer keeps full history in PostgreSQL, so the save only holds
+    -- what in-game features read (the census planner looks back 14 days).
     snapshotRetentionDays = 14,
-    populationRetentionDays = 35, -- daily identity observations retained for 30-day metrics
+    populationRetentionDays = 14, -- characters, daily observations and sweeps
     censusPassive         = false, -- advance an active census from normal play input
     censusAutoStart       = false, -- start/resume a census when this character logs in
-    specRetentionDays     = 35, -- successful inspect observations retained
+    specRetentionDays     = 14, -- successful inspect observations retained
     specSampling          = true, -- opportunistically inspect exposed nearby/group unit tokens
     minimumSamples        = 3,   -- snapshots needed before demand is scored
     scanThrottle          = 0.5, -- seconds between paged AH queries
@@ -98,9 +103,8 @@ end
 
 -- Stable user-facing client flavor used as part of /who character identity.
 function ML:GameFlavor()
-    -- The Forever beta's identities were keyed "retail" while it reported as
-    -- mainline; keep that so its characters stay the same records.
-    if self:IsForeverBeta() then return "retail" end
+    -- The release client starts a fresh collection identity.
+    if self:IsForeverBeta() then return "forever" end
     if WOW_PROJECT_ID and WOW_PROJECT_MAINLINE and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
         return "retail"
     end
@@ -111,6 +115,44 @@ function ML:GameFlavor()
         return "classic-era"
     end
     return "tbc-anniversary"
+end
+
+-- Collection region, resolved the same way as WoWCensus. Bucket keys are
+-- "Realm-Faction" with no region, and many realm names exist in both US and
+-- EU, so each bucket records the region it was collected in (StampIdentity).
+function ML:Region()
+    local portal = GetCVar and tostring(GetCVar("portal") or ""):upper() or ""
+    -- KR is ambiguous here: Taiwan clients have been observed on that portal.
+    local byPortal = { US = "us", EU = "eu", TW = "tw", CN = "cn" }
+    if byPortal[portal] then return byPortal[portal] end
+    local id = GetCurrentRegion and GetCurrentRegion()
+    local byID = { [1] = "us", [3] = "eu", [4] = "tw", [5] = "cn" }
+    local flavor = self:GameFlavor()
+    return (flavor == "retail" or flavor == "forever") and (byID[id] or "unknown") or "unknown"
+end
+
+-- `since` is when the bucket was first stamped: rows older than that were
+-- collected before regions were recorded. A bucket played from a second
+-- region keeps its first region and records the conflict for the importer.
+function ML:StampIdentity(realm)
+    local region = self:Region()
+    if region == "unknown" then return end
+    local id = realm.identity
+    if not id or not id.region then
+        realm.identity = {
+            game = self:GameFlavor(), region = region,
+            regionID = GetCurrentRegion and GetCurrentRegion() or nil,
+            realmID = GetRealmID and GetRealmID() or nil,
+            realmName = GetRealmName and GetRealmName() or nil,
+            faction = UnitFactionGroup and UnitFactionGroup("player") or nil,
+            since = time(),
+        }
+    elseif id.region ~= region then
+        id.conflicts = id.conflicts or {}
+        id.conflicts[region] = id.conflicts[region] or time()
+        self:Print("|cffff5555Region conflict:|r %s was recorded in %s; this session is %s. Its scans will be flagged on import.",
+            self:RealmKey(), id.region:upper(), region:upper())
+    end
 end
 
 function ML:Realm()
@@ -128,6 +170,11 @@ local function migrate(db)
     for k, v in pairs(DEFAULT_SETTINGS) do
         if db.settings[k] == nil then db.settings[k] = v end
     end
+    -- v4 -> v5: retention dropped from 35 to 14 days; saves still hold 35.
+    if db.version < 5 then
+        db.settings.populationRetentionDays = DEFAULT_SETTINGS.populationRetentionDays
+        db.settings.specRetentionDays = DEFAULT_SETTINGS.specRetentionDays
+    end
     db.version = ML.DB_VERSION
 end
 
@@ -144,11 +191,13 @@ function ML:InitDB()
     -- is unpacked into tables. Older saves hold every realm as tables, so
     -- pack those now and let the collector drop them before play starts.
     if self.Snapshots:PackInactive(key) > 0 then collectgarbage("collect") end
+    self.Snapshots:PurgeInactive(key)
     if realm.itemsPacked then
         realm.items = self.Snapshots:Unpack(realm.itemsPacked, realm.items)
         realm.itemsPacked = nil
     end
     realm.items = realm.items or {}
+    self.Snapshots:Purge()
     -- Old builds cached two large JSON copies alongside the authoritative Lua
     -- tables. The uploader rebuilds both payloads directly, so discard them.
     self.db.export = nil
@@ -285,6 +334,7 @@ boot:SetScript("OnEvent", function(_, event, arg1)
         ML:Fire("DB_READY")
     elseif event == "PLAYER_LOGIN" then
         ML:Fire("LOGIN")
+        if ML.realm then ML:StampIdentity(ML.realm) end
         if ML.Scanner.Init then ML.Scanner:Init() end
         if ML.Population.Init then ML.Population:Init() end
         if ML.Population.Passive and ML.Population.Passive.Init then ML.Population.Passive:Init() end
@@ -380,15 +430,19 @@ SlashCmdList["MARKETLENS"] = function(msg)
     elseif msg == "census profile" then
         ML.Population.Census:PrintProfile()
     elseif msg == "census fixed on" or msg == "census fixed off" then
-        -- Applies to the next census started on this client.
-        ML.db.settings.censusFixed = (msg == "census fixed on")
-        ML:Print("Census list: %s.", ML.db.settings.censusFixed
-            and "fixed -- decided at start, never grows" or "adaptive -- capped queries are split")
+        if ML.Population.Census:Profile().id == "tbc-anniversary" then
+            ML:Print("TBC Anniversary census always starts broad and splits queries that hit the 50-result cap.")
+        else
+            -- Applies to the next census started on this client.
+            ML.db.settings.censusFixed = (msg == "census fixed on")
+            ML:Print("Census list: %s.", ML.db.settings.censusFixed
+                and "fixed -- decided at start, never grows" or "adaptive -- capped queries are split")
+        end
     elseif msg == "census chat on" or msg == "census chat off" then
         ML.Population.Census:SetViaChat(msg == "census chat on")
     elseif msg:match("^census cap%s") then
         if ML:IsForeverBeta() then
-            ML:Print("Forever beta census is capped at level 30.")
+            ML:Print("Forever census is capped at level 60.")
         else
             local n = tonumber(msg:match("^census cap%s+(%d+)$"))
             ML.db.settings.censusLevelCap = n

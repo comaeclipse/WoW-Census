@@ -1,0 +1,5 @@
+<Bindings>
+    <Binding name="MARKETLENS_TOGGLE" header="MARKETLENS">
+        if MarketLens and MarketLens.UI and MarketLens.UI.Toggle then MarketLens.UI:Toggle() end
+    </Binding>
+</Bindings>

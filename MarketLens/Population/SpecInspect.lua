@@ -113,7 +113,7 @@ function Inspect:ConsumeCompanion()
         if (entry.time or 0) < cutoff then store.inspectBuilds[guid] = nil end
     end
     for guid, entry in pairs(NameplateInspectDB) do
-        if entry.schemaVersion == 2 and (entry.time or 0) >= cutoff and entry.observerRealm == GetRealmName()
+        if (entry.schemaVersion == 2 or entry.schemaVersion == 3) and (entry.time or 0) >= cutoff and entry.observerRealm == GetRealmName()
             and entry.observerFaction == UnitFactionGroup("player")
             and companionSeen[guid] ~= entry.time then
             store.inspectBuilds[guid] = entry

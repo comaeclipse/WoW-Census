@@ -90,7 +90,10 @@ function UI:BuildBoard()
 
     local heading = board:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     heading:SetPoint("TOPLEFT", 14, -10)
-    heading:SetText("|cffffd100MarketLens|r |cff808080Market Intelligence|r")
+    local version = (C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata("MarketLens", "Version"))
+        or (GetAddOnMetadata and GetAddOnMetadata("MarketLens", "Version"))
+        or "unknown"
+    heading:SetText("|cffffd100MarketLens|r |cff808080v" .. version .. "  Market Intelligence|r")
     board.heading = heading
 
     local sub = board:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")

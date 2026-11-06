@@ -2,7 +2,7 @@
 ## Title: MarketLens
 ## Notes: Auction House market + population analytics for Classic Era, TBC Anniversary, and Retail
 ## Author: skarz
-## Version: 0.1.1
+## Version: 0.1.3
 ## SavedVariables: MarketLensDB
 ## OptionalDeps: NameplateInspect
 ## X-Category: Auction House & Vendors
@@ -13,6 +13,7 @@ Libs/LibStub/LibStub.lua
 Libs/LibAHTab/LibAHTab.lua
 
 Core.lua
+Bindings.xml
 
 Utils/Tables.lua
 Utils/Money.lua

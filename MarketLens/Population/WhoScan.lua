@@ -182,7 +182,9 @@ local function identity(info)
     firstName = trim(firstName ~= "" and firstName or name)
     lastName = trim(lastName)
     if name == "" then return nil end
-    local normalizedRealm = realm:lower():gsub("[%s']", "")
+    -- Cross-realm names drop the hyphen ("Name-Raden"), so drop it from
+    -- the player's own realm ("Ra-den") too.
+    local normalizedRealm = realm:lower():gsub("[%s'%-]", "")
     local key = ML:GameFlavor() .. ":" .. normalizedRealm .. ":" .. name:lower()
     return key, name .. "-" .. realm, name, realm, firstName, lastName
 end
@@ -350,7 +352,7 @@ function Pop:Capture()
     shown = shown or 0
 
     local classes, races, roster = {}, {}, {}
-    local observed = 0
+    local observed, maxObservedLevel = 0, 0
     for i = 1, shown do
         local info = whoInfo(i)
         if info then
@@ -359,6 +361,7 @@ function Pop:Capture()
             classes[token] = (classes[token] or 0) + 1
             races[race]    = (races[race] or 0) + 1
             observed = observed + 1
+            maxObservedLevel = math.max(maxObservedLevel, tonumber(info.level) or 0)
             local key, fullName, name, realm, firstName, lastName = identity(info)
             if key and not roster[key] then
                 roster[key] = {
@@ -377,6 +380,7 @@ function Pop:Capture()
         faction  = UnitFactionGroup and UnitFactionGroup("player") or "Neutral",
         filter   = self.pendingFilter,
         observed = observed,
+        maxObservedLevel = maxObservedLevel,
         total    = total or observed, -- server-reported online matching the filter
         classes  = classes,
         races    = races,
@@ -517,7 +521,8 @@ function Pop:CompactStorage()
                 if (sample.t or 0) >= specCutoff then specs[#specs + 1] = sample end
             end
             store.specSamples = specs
-            for _, c in pairs(store.characters or {}) do
+            for key, c in pairs(store.characters or {}) do
+                if (c.lastSeen or 0) < cutoff then store.characters[key] = nil end
                 for day, d in pairs(c.days or {}) do
                     if (tonumber(day) or 0) < cutoffDay then
                         c.days[day] = nil
@@ -668,8 +673,9 @@ function Pop:Record(sample, roster)
     return unique
 end
 
--- Drop old samples and daily observations. Lifetime character records remain so
--- returning/new-to-dataset status survives beyond the rolling analytics window.
+-- Drop old samples, daily observations, sweeps and characters not seen within
+-- the window. Lifetime first-seen history lives in PostgreSQL (the importer
+-- keeps the earliest first_seen), not in the save.
 function Pop:Purge()
     local store = ML.realm.population
     if not store or not store.samples then return 0 end
@@ -687,9 +693,13 @@ function Pop:Purge()
         if (sample.t or 0) >= specCutoff then keptSpecs[#keptSpecs + 1] = sample end
     end
     store.specSamples = keptSpecs
-    for _, c in pairs(store.characters or {}) do
-        for day in pairs(c.days or {}) do
-            if (tonumber(day) or 0) < cutoffDay then c.days[day] = nil end
+    for key, c in pairs(store.characters or {}) do
+        if (c.lastSeen or 0) < cutoff then
+            store.characters[key] = nil
+        else
+            for day in pairs(c.days or {}) do
+                if (tonumber(day) or 0) < cutoffDay then c.days[day] = nil end
+            end
         end
     end
     for id, sweep in pairs(store.sweeps or {}) do
@@ -730,17 +740,17 @@ end
 function Pop:CharacterStats()
     local store = self:Store()
     local today = math.floor(time() / 86400)
-    local stats = { lifetime = 0, today = 0, week = 0, month = 0,
+    local stats = { lifetime = 0, today = 0, week = 0, twoWeeks = 0,
                     newWeek = 0, returningWeek = 0, active3 = 0 }
-    local weekStart, monthStart = today - 6, today - 29
+    local weekStart, windowStart = today - 6, today - 13
     for _, c in pairs(store.characters) do
         stats.lifetime = stats.lifetime + 1
-        local inToday, inWeek, inMonth, monthDays = false, false, false, 0
+        local inToday, inWeek, inWindow, windowDays = false, false, false, 0
         for day in pairs(c.days or {}) do
             day = tonumber(day) or 0
             if day == today then inToday = true end
             if day >= weekStart then inWeek = true end
-            if day >= monthStart then inMonth, monthDays = true, monthDays + 1 end
+            if day >= windowStart then inWindow, windowDays = true, windowDays + 1 end
         end
         if inToday then stats.today = stats.today + 1 end
         if inWeek then
@@ -751,8 +761,8 @@ function Pop:CharacterStats()
                 stats.returningWeek = stats.returningWeek + 1
             end
         end
-        if inMonth then stats.month = stats.month + 1 end
-        if monthDays >= 3 then stats.active3 = stats.active3 + 1 end
+        if inWindow then stats.twoWeeks = stats.twoWeeks + 1 end
+        if windowDays >= 3 then stats.active3 = stats.active3 + 1 end
     end
     stats.returningRate = stats.week > 0 and U.Round(stats.returningWeek / stats.week * 100) or 0
     return stats

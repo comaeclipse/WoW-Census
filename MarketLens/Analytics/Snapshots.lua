@@ -178,6 +178,37 @@ function Snap:PackInactive(currentKey)
     return packed
 end
 
+-- Purge every other realm bucket straight on its packed string, so a realm
+-- you no longer visit stops carrying history the importer already has.
+function Snap:PurgeInactive(currentKey)
+    local cutoff = time() - (ML.db.settings.snapshotRetentionDays or 14) * 86400
+    local line = "(%d+\t[^\t\n]*\t[^\t\n]*\t[^\t\n]*\t[^\t\n]*\t[^\t\n]*\t)([^\t\n]*)\n"
+    for key, r in pairs(ML.db.realms or {}) do
+        local packed = r.itemsPacked
+        if key ~= currentKey and type(packed) == "string" and packed:sub(1, #PACK_HEADER) == PACK_HEADER then
+            local lines, vals = { PACK_HEADER }, {}
+            for head, nums in packed:gmatch(line) do
+                local k = 0
+                for v in nums:gmatch("[^,]+") do
+                    k = k + 1
+                    vals[k] = v
+                end
+                local kept, n = {}, 0
+                for i = 1, k - NF + 1, NF do
+                    if (tonumber(vals[i]) or 0) >= cutoff then
+                        for f = i, i + NF - 1 do
+                            n = n + 1
+                            kept[n] = vals[f]
+                        end
+                    end
+                end
+                if n > 0 then lines[#lines + 1] = head .. table.concat(kept, ",", 1, n) .. "\n" end
+            end
+            r.itemsPacked = table.concat(lines)
+        end
+    end
+end
+
 -- Drop snapshots older than the retention window; prune emptied items.
 function Snap:Purge()
     local cutoff = time() - (ML.db.settings.snapshotRetentionDays or 14) * 86400

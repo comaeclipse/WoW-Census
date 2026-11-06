@@ -159,12 +159,12 @@ function PT:Rows(mode)
         return {
             { cells = { "Seen today", tostring(s.today), "Unique character names" } },
             { cells = { "Seen in 7 days", tostring(s.week), "Rolling observation window" } },
-            { cells = { "Seen in 30 days", tostring(s.month), "Rolling observation window" } },
+            { cells = { "Seen in 14 days", tostring(s.twoWeeks), "Rolling observation window" } },
             { cells = { "Returning (7 days)", tostring(s.returningWeek), "First seen before this week" } },
             { cells = { "New (7 days)", tostring(s.newWeek), "New to this dataset" } },
-            { cells = { "Seen on 3+ days", tostring(s.active3), "Within the last 30 days" } },
+            { cells = { "Seen on 3+ days", tostring(s.active3), "Within the last 14 days" } },
             { cells = { "7-day return rate", tostring(s.returningRate) .. "%", "Returning / unique this week" } },
-            { cells = { "Lifetime known", tostring(s.lifetime), "Since identity tracking began" } },
+            { cells = { "Known", tostring(s.lifetime), "Seen within the last 14 days" } },
         }
     end
     local agg = ML.Population:Aggregate()

@@ -1,9 +1,10 @@
 -- Adaptive /who census: one button press = one query, MarketLens decides which.
 --
 -- A census starts from its profile's plan (see Population/CensusProfiles.lua)
--- and refines capped /who queries. Forever shuffles a balanced set of
--- level/race and level/class cells after an ordered 10-30 level pass, then
--- refines capped cells by name letters.
+-- and refines capped /who queries. Forever shuffles broad bands through
+-- level 30 and expands toward 60 when a higher-level probe finds players.
+-- Capped bands split by level, then race and class. Only a capped
+-- level/race/class cell falls back to name letters.
 -- Other profiles use an adaptive level backbone with class/race splits:
 --
 --   level range  -> narrower level ranges   (weighted by recent sightings)
@@ -13,9 +14,9 @@
 --                   exhaustive: the cell is counted as "unresolved", so the
 --                   census is reported as a lower bound / partial sweep)
 --
--- Class/race splits are exhaustive where supported. Forever's race and class
--- cells deliberately overlap; stored characters are deduplicated. Name-letter
--- splits are not exhaustive, so capped cells remain lower bounds. Learned
+-- Class/race splits are exhaustive where supported. Forever uses disjoint
+-- level bands and all faction race/class filters so those splits remain
+-- exhaustive. Name-letter splits are not exhaustive. Learned
 -- capped cells are remembered per realm bucket.
 --
 -- SendWho needs a hardware event and is server-throttled, so the census never
@@ -332,6 +333,8 @@ end
 function C:SplitKind(n, st)
     if self:Profile().id == "forever" then
         if n.hi > n.lo then return "level" end
+        if not n.race then return "race" end
+        if not n.class then return "class" end
         if not n.letter then return "letter" end
         return nil
     end
@@ -434,7 +437,7 @@ function C:Children(n, st)
         -- race has MIN_RACE_HISTORY lifetime sightings here, skip classes it
         -- was never seen playing (Human Evoker, Night Elf Paladin, ...), the
         -- same trust rule raceList applies in the other direction.
-        local hist = n.race and not prof.racesByClass and self:History()
+        local hist = n.race and not prof.racesByClass and prof.id ~= "forever" and self:History()
         local trusted = hist and (hist.raceCount[n.race] or 0) >= MIN_RACE_HISTORY
         for _, token in ipairs(prof.classes) do
             local include = true
@@ -451,7 +454,10 @@ function C:Children(n, st)
         end
         return kids, true, kind
     elseif kind == "race" then
-        for _, race in ipairs(raceList(prof, n.class, self:History())) do
+        -- Forever's class/race matrix is not yet known. Keep every faction
+        -- race so a sparse historical sample cannot remove a real combination.
+        local races = prof.id == "forever" and prof.races or raceList(prof, n.class, self:History())
+        for _, race in ipairs(races) do
             kids[#kids + 1] = { lo = n.lo, hi = n.hi, class = n.class, race = race,
                 letter = n.letter, zone = n.zone }
         end
@@ -550,9 +556,10 @@ end
 
 -- Fixed-list mode: the whole query list is decided when the census starts and
 -- never grows; a query that still hits the cap is recorded as a lower bound.
--- /ml census fixed on|off overrides the profile default, except the Forever
--- plan always refines its capped race cells by name.
+-- /ml census fixed on|off overrides other profile defaults. TBC Anniversary
+-- always rechecks broad bands and refines only cells capped in this sweep.
 function C:Fixed(st)
+    if self:Profile().id == "tbc-anniversary" then return false end
     if st and st.fixed ~= nil then return st.fixed end
     local set = ML.db.settings.censusFixed
     if set ~= nil then return set end
@@ -566,6 +573,10 @@ end
 -- list) recent sightings alone already put it near the cap.
 function C:ShouldPreSplit(n, st)
     if n.refreshFilter then return false end
+    -- Classic Era, Retail, Hardcore, MoP and TBC populations can change enough that a previously
+    -- capped cell is sparse today. Recheck the parent before using its splits.
+    local profile = self:Profile().id
+    if (profile == "classic-era" or profile == "retail" or profile == "hardcore" or profile == "mop-classic" or profile == "tbc-anniversary") and not st.fixed then return false end
     if self:Learned(n) then return true end
     return st.fixed and self:Weight(n) >= FIXED_SPLIT_AT
 end
@@ -648,36 +659,64 @@ function C:SeedSeen()
     end
 end
 
--- Replace an old Forever plan before it issues another query.
+-- Replace old plans before they issue another query.
 function C:Outdated()
     local st = self:State()
     local prof = self:Profile()
-    return st and prof and prof.id == "forever" and st.plan ~= "forever-mixed-v2" or false
+    return st and prof and
+        ((prof.id == "forever" and st.plan ~= "forever-broad-v6")
+            or (prof.id == "classic-era" and not st.fixed and st.plan ~= "classic-era-broad-first-v1")
+            or (prof.id == "retail" and not st.fixed and st.plan ~= "retail-broad-first-v1")
+            or (prof.id == "hardcore" and not st.fixed and st.plan ~= "hardcore-broad-first-v1")
+            or (prof.id == "tbc-anniversary" and (st.fixed or st.plan ~= "tbc-broad-first-v1"))
+            or (prof.id == "mop-classic" and not st.fixed and st.plan ~= "mop-broad-first-v1")) or false
 end
 
--- Every level gets all five race filters and five distinct class filters.
--- Pick the least-used classes at each level, randomizing ties, so class
--- frequency differs by at most one across the full plan. Then shuffle every
--- query together; no level, race, or class owns an early block of the run.
-function C:ForeverMixedPlan(prof)
-    local nodes, classCount = {}, {}
-    for _, class in ipairs(prof.classes) do classCount[class] = 0 end
-    for level = 1, prof.maxLevel do
-        for _, race in ipairs(prof.races) do
-            nodes[#nodes + 1] = { lo = level, hi = level, race = race, base = true }
-        end
-        local candidates = {}
-        for _, class in ipairs(prof.classes) do candidates[#candidates + 1] = class end
-        shuffle(candidates)
-        table.sort(candidates, function(a, b) return classCount[a] < classCount[b] end)
-        for i = 1, math.min(#prof.races, #candidates) do
-            local class = candidates[i]
-            nodes[#nodes + 1] = { lo = level, hi = level, class = class, base = true }
-            classCount[class] = classCount[class] + 1
-        end
+-- Shuffle broad, nonoverlapping bands so levels are sampled in varied order.
+function C:ForeverMixedPlan(prof, firstLevel, lastLevel)
+    local nodes = {}
+    local lo = firstLevel or prof.minLevel or 1
+    local last = lastLevel or prof.maxLevel
+    while lo <= last do
+        local hi = math.min(lo + 9, last)
+        nodes[#nodes + 1] = { lo = lo, hi = hi, base = true }
+        lo = hi + 1
     end
     shuffle(nodes)
     return nodes
+end
+
+function C:ForeverProbe(st, prof)
+    if st.activeLevel >= prof.maxLevel then return nil end
+    return { refreshFilter = (st.activeLevel + 1) .. "-" .. prof.maxLevel, probe = true }
+end
+
+function C:ExpandForever(st, prof, level)
+    level = math.min(level or 0, prof.maxLevel)
+    if level <= st.activeLevel then return end
+    local previous = st.activeLevel
+    st.activeLevel = level
+    local nodes = self:ForeverMixedPlan(prof, previous + 1, level)
+    st.baseRemaining = (st.baseRemaining or 0) + #nodes
+    st.refinements = st.refinements or {}
+    for _, node in ipairs(nodes) do
+        table.insert(st.queue, math.random(#st.queue + 1), node)
+    end
+    local probe = self:ForeverProbe(st, prof)
+    local queuedProbe = false
+    for i = #st.queue, 1, -1 do
+        local queued = st.queue[i]
+        if queued.probe then
+            if probe then
+                queued.refreshFilter = probe.refreshFilter
+                queuedProbe = true
+            else
+                table.remove(st.queue, i)
+            end
+        end
+    end
+    if probe and not queuedProbe then st.queue[#st.queue + 1] = probe end
+    ML:Print("Forever reached level %d; added %d shuffled /who queries for levels %d-%d.", level, #nodes, previous + 1, level)
 end
 
 function C:Start()
@@ -686,7 +725,7 @@ function C:Start()
     self.profile, self.hist = prof, nil
     local st, store = self:State()
     if st and self:Outdated() then
-        ML:Print("Replacing the running Forever census with the shuffled level/race/class plan.")
+        ML:Print("Replacing the running census with the current %s plan.", prof.label)
         self:Finish(true)
         st = nil
     end
@@ -714,12 +753,13 @@ function C:Start()
     -- Retail needs an adaptive backbone: nearly everyone sits at 80+.
     local adaptivePassive = ML.db.settings.censusPassive
     if prof.id == "forever" then
-        -- Race cells cover every level; an equal number of class cells provide
-        -- a second, independently sampled view. Hold name-letter refinements
-        -- until the whole randomized base pass has run.
-        st.plan, st.fixed = "forever-mixed-v2", false
+        -- Cover levels 1-30 in broad bands and expand when higher levels are
+        -- observed. Hold refinements until the shuffled base pass has run.
+        st.plan, st.fixed = "forever-broad-v6", false
         st.ratioObs, st.ratioHist = 0, 0
-        backbone = self:ForeverMixedPlan(prof)
+        st.activeLevel = math.min(prof.maxLevel, math.max(30, store.foreverDiscoveredLevel or 30))
+        st.nextProbeAt = 25
+        backbone = self:ForeverMixedPlan(prof, prof.minLevel, st.activeLevel)
         st.baseRemaining = #backbone
         st.refinements = {}
     elseif prof.simpleRefresh and not adaptivePassive then
@@ -737,6 +777,11 @@ function C:Start()
         end
         st.fixed = true
     else
+        if prof.id == "classic-era" and not st.fixed then st.plan = "classic-era-broad-first-v1" end
+        if prof.id == "retail" and not st.fixed then st.plan = "retail-broad-first-v1" end
+        if prof.id == "hardcore" and not st.fixed then st.plan = "hardcore-broad-first-v1" end
+        if prof.id == "tbc-anniversary" and not st.fixed then st.plan = "tbc-broad-first-v1" end
+        if prof.id == "mop-classic" and not st.fixed then st.plan = "mop-broad-first-v1" end
         for i = #prof.bands, 1, -1 do
             local b = prof.bands[i]
             if b[1] <= prof.maxLevel then
@@ -744,18 +789,21 @@ function C:Start()
             end
         end
     end
-    if st.plan == "forever-mixed-v2" then
+    if st.plan == "forever-broad-v6" then
         for _, n in ipairs(backbone) do st.queue[#st.queue + 1] = n end
-        for level = math.min(30, prof.maxLevel), 10, -1 do
-            table.insert(st.queue, 1, { refreshFilter = tostring(level) })
-        end
+        local probe = self:ForeverProbe(st, prof)
+        if probe then st.queue[#st.queue + 1] = probe end
+    elseif st.plan == "classic-era-broad-first-v1" or st.plan == "mop-broad-first-v1" or st.plan == "tbc-broad-first-v1" then
+        -- Query the level cap first, then work downward; capped results add
+        -- adaptive children without front-loading old, low-yield splits.
+        for _, n in ipairs(backbone) do st.queue[#st.queue + 1] = n end
     else
         self:Enqueue(backbone, st)
     end
     if st.fixed then st.ratioObs, st.ratioHist = 0, 0 end
-    if st.plan == "forever-mixed-v2" then
-        ML:Print("Census started: |cffffffff%s|r %s, levels 10-%d in order, then %d shuffled level/race and level/class queries across levels 1-%d. Name refinements follow the base sweep.",
-            prof.label, prof.faction, math.min(30, prof.maxLevel), #backbone, prof.maxLevel)
+    if st.plan == "forever-broad-v6" then
+        ML:Print("Census started: |cffffffff%s|r %s, %d shuffled broad queries through level %d, then a probe for higher levels.",
+            prof.label, prof.faction, #backbone, st.activeLevel)
     else
         ML:Print("Census started: |cffffffff%s|r %s, %s%d queries%s.",
             prof.label, prof.faction, st.fixed and "fixed list of " or "", #st.queue,
@@ -800,6 +848,21 @@ function C:Settle(st, quiet)
             table.remove(st.queue, i)
         elseif n.hi and n.hi > prof.maxLevel then
             n.hi = prof.maxLevel
+        end
+    end
+    -- An in-progress Retail sweep may have queued children under the old
+    -- unrestricted race/class plan. Drop those when the addon is reloaded.
+    if prof.id == "retail" then
+        for i = #st.queue, 1, -1 do
+            local n = st.queue[i]
+            local allowed = n.class and n.race and prof.racesByClass[n.class]
+            if allowed then
+                local found = false
+                for _, race in ipairs(allowed) do
+                    if race == n.race then found = true break end
+                end
+                if not found then table.remove(st.queue, i) end
+            end
         end
     end
     -- Profiles without zone fallback drop zone queries planned before that
@@ -908,7 +971,7 @@ function C:RunNext(quiet, source)
         return
     end
     if self:Outdated() then
-        ML:Print("Replacing the running Forever census with the shuffled level/race/class plan.")
+        ML:Print("Replacing the running census with the current %s plan.", self:Profile().label)
         self:Finish(true)
         self:Start()
         return
@@ -949,7 +1012,7 @@ function C:OnScanComplete(sample, tag)
         if not n.refreshFilter then kids, exhaustive, kind = self:Children(n, st) end
         if exhaustive then
             self:Learn(n, kind, kids)
-        elseif not (n.refreshFilter and st.plan == "forever-mixed-v2")
+        elseif not (n.refreshFilter and st.plan == "forever-broad-v6")
             and not n.zone and not n.letter then
             st.unresolved = st.unresolved + 1 -- letters/zones cannot prove they covered this cell
         end
@@ -959,7 +1022,7 @@ function C:OnScanComplete(sample, tag)
             if exhaustive then st.unresolved = st.unresolved + 1 end
             kids = {}
         end
-        if st.plan == "forever-mixed-v2" and (n.base or (st.baseRemaining or 0) > 0) then
+        if st.plan == "forever-broad-v6" and (n.base or (st.baseRemaining or 0) > 0) then
             for _, kid in ipairs(kids) do st.refinements[#st.refinements + 1] = kid end
             last.split = #kids
         else
@@ -971,8 +1034,7 @@ function C:OnScanComplete(sample, tag)
         local sweep = store.sweeps[st.sweepID]
         local q = sweep and sweep.queries and sweep.queries[#sweep.queries]
         if q and q.filter == sample.filter and
-            ((exhaustive and #kids > 0 and last.split == #kids)
-                or (n.refreshFilter and st.plan == "forever-mixed-v2")) then
+            exhaustive and #kids > 0 and last.split == #kids then
             q.split = true
         end
     else
@@ -993,6 +1055,22 @@ function C:OnScanComplete(sample, tag)
             shuffle(st.refinements)
             for _, kid in ipairs(st.refinements) do st.queue[#st.queue + 1] = kid end
             st.refinements = nil
+        end
+    end
+    if st.plan == "forever-broad-v6" then
+        local prof = self:Profile()
+        local found = sample.maxObservedLevel or 0
+        if found > st.activeLevel then
+            self:ExpandForever(st, prof, found)
+            store.foreverDiscoveredLevel = st.activeLevel
+        end
+        if not n.probe and st.done >= (st.nextProbeAt or 25) and st.activeLevel < prof.maxLevel then
+            local queuedProbe = false
+            for _, queued in ipairs(st.queue) do
+                if queued.probe then queuedProbe = true; break end
+            end
+            if not queuedProbe then table.insert(st.queue, 1, self:ForeverProbe(st, prof)) end
+            st.nextProbeAt = st.done + 25
         end
     end
     st.last = last
