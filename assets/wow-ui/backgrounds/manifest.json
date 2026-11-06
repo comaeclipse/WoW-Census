@@ -1,0 +1,1290 @@
+[
+ {
+  "file": "interface-dialogframe-ui-dialogbox-gold-background.webp",
+  "path": "interface/dialogframe/ui-dialogbox-gold-background.blp",
+  "cat": "Interface",
+  "size": "64x64",
+  "seam": 0,
+  "lum": 0
+ },
+ {
+  "file": "interface-helpframe-tileable-parchment.webp",
+  "path": "interface/helpframe/tileable-parchment.blp",
+  "cat": "Interface",
+  "size": "256x256",
+  "seam": 0,
+  "lum": 0
+ },
+ {
+  "file": "interface-helpframe-darksandstone-tile.webp",
+  "path": "interface/helpframe/darksandstone-tile.blp",
+  "cat": "Interface",
+  "size": "256x256",
+  "seam": 0,
+  "lum": 0
+ },
+ {
+  "file": "interface-framegeneral-ui-background-rock.webp",
+  "path": "interface/framegeneral/ui-background-rock.blp",
+  "cat": "Interface",
+  "size": "256x256",
+  "seam": 0,
+  "lum": 0
+ },
+ {
+  "file": "interface-framegeneral-ui-background-marble.webp",
+  "path": "interface/framegeneral/ui-background-marble.blp",
+  "cat": "Interface",
+  "size": "256x256",
+  "seam": 0,
+  "lum": 0
+ },
+ {
+  "file": "dungeons-textures-metal-jlo-undercity-ice-reflectmap.webp",
+  "path": "dungeons/textures/metal/jlo_undercity_ice_reflectmap.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.494,
+  "lum": 8.6
+ },
+ {
+  "file": "dungeons-textures-sunkentemple-jlo-snkntmp-grate.webp",
+  "path": "dungeons/textures/sunkentemple/jlo_snkntmp_grate.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.658,
+  "lum": 37.4
+ },
+ {
+  "file": "dungeons-textures-metal-bm-brspire-maindoor02.webp",
+  "path": "dungeons/textures/metal/bm_brspire_maindoor02.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.7,
+  "lum": 97.0
+ },
+ {
+  "file": "dungeons-textures-metal-jlo-botbody-snow.webp",
+  "path": "dungeons/textures/metal/jlo_botbody_snow.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.722,
+  "lum": 135.6
+ },
+ {
+  "file": "dungeons-textures-metal-jlo-undercity-grate.webp",
+  "path": "dungeons/textures/metal/jlo_undercity_grate.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.755,
+  "lum": 67.0
+ },
+ {
+  "file": "dungeons-textures-metal-jlo-undercity-reflectmap.webp",
+  "path": "dungeons/textures/metal/jlo_undercity_reflectmap.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.857,
+  "lum": 14.9
+ },
+ {
+  "file": "dungeons-textures-metal-jlo-gnome-metalrubble02.webp",
+  "path": "dungeons/textures/metal/jlo_gnome_metalrubble02.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.899,
+  "lum": 77.1
+ },
+ {
+  "file": "tileset-kalidar-kalidarwoodgold.webp",
+  "path": "tileset/kalidar/kalidarwoodgold.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.939,
+  "lum": 113.0
+ },
+ {
+  "file": "dungeons-textures-sunkentemple-stu-sunken-bronzebacksplash.webp",
+  "path": "dungeons/textures/sunkentemple/stu_sunken_bronzebacksplash.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 0.993,
+  "lum": 45.7
+ },
+ {
+  "file": "dungeons-textures-metal-bm-brspire-metalbars.webp",
+  "path": "dungeons/textures/metal/bm_brspire_metalbars.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.055,
+  "lum": 72.6
+ },
+ {
+  "file": "dungeons-textures-metal-bm-brspire-metalgrate.webp",
+  "path": "dungeons/textures/metal/bm_brspire_metalgrate.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.099,
+  "lum": 65.4
+ },
+ {
+  "file": "tileset-ironforge-ironforgepineneedles.webp",
+  "path": "tileset/ironforge/ironforgepineneedles.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.116,
+  "lum": 83.3
+ },
+ {
+  "file": "tileset-ironforge-ironforgesnow05scrapebrown.webp",
+  "path": "tileset/ironforge/ironforgesnow05scrapebrown.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.14,
+  "lum": 140.2
+ },
+ {
+  "file": "dungeons-textures-floor-bm-brspire-dirtmetal01.webp",
+  "path": "dungeons/textures/floor/bm_brspire_dirtmetal01.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.171,
+  "lum": 65.1
+ },
+ {
+  "file": "tileset-ironforge-ironforgesnowcrop.webp",
+  "path": "tileset/ironforge/ironforgesnowcrop.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.189,
+  "lum": 61.9
+ },
+ {
+  "file": "tileset-ironforge-ironforgerock08brown.webp",
+  "path": "tileset/ironforge/ironforgerock08brown.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.19,
+  "lum": 95.2
+ },
+ {
+  "file": "tileset-ironforge-ironforgerock09browncracks.webp",
+  "path": "tileset/ironforge/ironforgerock09browncracks.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.202,
+  "lum": 132.7
+ },
+ {
+  "file": "dungeons-textures-deadmine-stu-boilerroomplatefloor.webp",
+  "path": "dungeons/textures/deadmine/stu_boilerroomplatefloor.blp",
+  "cat": "Metal",
+  "size": "128x128",
+  "seam": 1.206,
+  "lum": 69.0
+ },
+ {
+  "file": "tileset-ironforge-ironforgerock06road2.webp",
+  "path": "tileset/ironforge/ironforgerock06road2.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.289,
+  "lum": 88.8
+ },
+ {
+  "file": "tileset-ironforge-ironforgesnow03ripple.webp",
+  "path": "tileset/ironforge/ironforgesnow03ripple.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.315,
+  "lum": 215.2
+ },
+ {
+  "file": "dungeons-textures-metal-bm-brspire-catwalk01.webp",
+  "path": "dungeons/textures/metal/bm_brspire_catwalk01.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.34,
+  "lum": 72.0
+ },
+ {
+  "file": "dungeons-textures-deadmine-stu-tiledrustyplate.webp",
+  "path": "dungeons/textures/deadmine/stu_tiledrustyplate.blp",
+  "cat": "Metal",
+  "size": "128x128",
+  "seam": 1.365,
+  "lum": 61.9
+ },
+ {
+  "file": "tileset-ironforge-ironforgerock07mountain.webp",
+  "path": "tileset/ironforge/ironforgerock07mountain.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.37,
+  "lum": 91.5
+ },
+ {
+  "file": "dungeons-textures-metal-mm-gnome-metal-02.webp",
+  "path": "dungeons/textures/metal/mm_gnome_metal_02.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.388,
+  "lum": 112.2
+ },
+ {
+  "file": "dungeons-textures-metal-bm-brspire-supports01.webp",
+  "path": "dungeons/textures/metal/bm_brspire_supports01.blp",
+  "cat": "Metal",
+  "size": "256x256",
+  "seam": 1.514,
+  "lum": 67.2
+ },
+ {
+  "file": "dungeons-textures-decoration-bi-grimbatol-metalbanner01.webp",
+  "path": "dungeons/textures/decoration/bi_grimbatol_metalbanner01.blp",
+  "cat": "Metal",
+  "size": "128x256",
+  "seam": 1.539,
+  "lum": 83.3
+ },
+ {
+  "file": "tileset-generic-checkersalpha.webp",
+  "path": "tileset/generic/checkersalpha.blp",
+  "cat": "Masonry",
+  "size": "128x128",
+  "seam": 0.004,
+  "lum": 19.7
+ },
+ {
+  "file": "tileset-generic-checkers.webp",
+  "path": "tileset/generic/checkers.blp",
+  "cat": "Masonry",
+  "size": "128x128",
+  "seam": 0.125,
+  "lum": 175.0
+ },
+ {
+  "file": "dungeons-textures-walls-jlo-udercity-solidwall03.webp",
+  "path": "dungeons/textures/walls/jlo_udercity_solidwall03.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.427,
+  "lum": 82.5
+ },
+ {
+  "file": "dungeons-textures-walls-jlo-annqiraj-brickwallext.webp",
+  "path": "dungeons/textures/walls/jlo_annqiraj_brickwallext.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.469,
+  "lum": 83.2
+ },
+ {
+  "file": "dungeons-textures-floor-jlo-kzn-intfloor.webp",
+  "path": "dungeons/textures/floor/jlo_kzn_intfloor.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.518,
+  "lum": 99.1
+ },
+ {
+  "file": "dungeons-textures-walls-bm-brspire-stnwall03.webp",
+  "path": "dungeons/textures/walls/bm_brspire_stnwall03.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.561,
+  "lum": 88.6
+ },
+ {
+  "file": "dungeons-textures-northrend-humans-nr-hu-barracks-wall02.webp",
+  "path": "dungeons/textures/northrend/humans/nr_hu_barracks_wall02.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.571,
+  "lum": 101.4
+ },
+ {
+  "file": "dungeons-textures-floor-mm-snkntmp-floor-01.webp",
+  "path": "dungeons/textures/floor/mm_snkntmp_floor_01.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.596,
+  "lum": 89.1
+ },
+ {
+  "file": "dungeons-textures-walls-bm-dmaul-wall01.webp",
+  "path": "dungeons/textures/walls/bm_dmaul_wall01.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.598,
+  "lum": 132.7
+ },
+ {
+  "file": "dungeons-textures-walls-bm-kzn-outerwall06.webp",
+  "path": "dungeons/textures/walls/bm_kzn_outerwall06.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.619,
+  "lum": 64.1
+ },
+ {
+  "file": "dungeons-textures-razorfen-stu-rf-trenchwall02.webp",
+  "path": "dungeons/textures/razorfen/stu_rf_trenchwall02.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.619,
+  "lum": 84.4
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-rfundead-wallscratched.webp",
+  "path": "dungeons/textures/rock/jlo_rfundead_wallscratched.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.624,
+  "lum": 83.3
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-rf-trenchwall-bloody.webp",
+  "path": "dungeons/textures/rock/jlo_rf_trenchwall_bloody.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.64,
+  "lum": 80.5
+ },
+ {
+  "file": "tileset-araithihighlands-arathihighlandsbrickfloor.webp",
+  "path": "tileset/araithihighlands/arathihighlandsbrickfloor.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.645,
+  "lum": 102.1
+ },
+ {
+  "file": "dungeons-textures-walls-jlo-strathhold-brickwall.webp",
+  "path": "dungeons/textures/walls/jlo_strathhold_brickwall.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.649,
+  "lum": 99.9
+ },
+ {
+  "file": "dungeons-textures-floor-mm-drnss-floor-05.webp",
+  "path": "dungeons/textures/floor/mm_drnss_floor_05.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.658,
+  "lum": 66.5
+ },
+ {
+  "file": "dungeons-textures-floor-bm-brspire-ramptile01.webp",
+  "path": "dungeons/textures/floor/bm_brspire_ramptile01.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.659,
+  "lum": 66.3
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaveg-wall2.webp",
+  "path": "dungeons/textures/rock/jlo_mcaveg_wall2.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.667,
+  "lum": 56.6
+ },
+ {
+  "file": "dungeons-textures-walls-jlo-annqiraj-solidwall2.webp",
+  "path": "dungeons/textures/walls/jlo_annqiraj_solidwall2.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.673,
+  "lum": 65.9
+ },
+ {
+  "file": "dungeons-textures-walls-mm-strath-wall-06.webp",
+  "path": "dungeons/textures/walls/mm_strath_wall_06.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.676,
+  "lum": 110.8
+ },
+ {
+  "file": "dungeons-textures-floor-bm-tmbrmw-snow01.webp",
+  "path": "dungeons/textures/floor/bm_tmbrmw_snow01.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.678,
+  "lum": 232.5
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-rfundead-wallbloody02.webp",
+  "path": "dungeons/textures/rock/jlo_rfundead_wallbloody02.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.685,
+  "lum": 75.8
+ },
+ {
+  "file": "dungeons-textures-floor-bm-brspire-hallfloor02.webp",
+  "path": "dungeons/textures/floor/bm_brspire_hallfloor02.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.691,
+  "lum": 89.5
+ },
+ {
+  "file": "dungeons-textures-walls-mm-strmwnd-wall-04.webp",
+  "path": "dungeons/textures/walls/mm_strmwnd_wall_04.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.691,
+  "lum": 140.3
+ },
+ {
+  "file": "dungeons-textures-floor-mm-strmwnd-int-floor-03.webp",
+  "path": "dungeons/textures/floor/mm_strmwnd_int_floor_03.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.696,
+  "lum": 178.6
+ },
+ {
+  "file": "dungeons-textures-walls-mm-abbey-wall-01.webp",
+  "path": "dungeons/textures/walls/mm_abbey_wall_01.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.704,
+  "lum": 155.1
+ },
+ {
+  "file": "dungeons-textures-pillar-mm-ogrmnd-d-pillar-01.webp",
+  "path": "dungeons/textures/pillar/mm_ogrmnd_d_pillar_01.blp",
+  "cat": "Masonry",
+  "size": "128x256",
+  "seam": 0.71,
+  "lum": 130.5
+ },
+ {
+  "file": "dungeons-textures-walls-mm-duskwood-abbey-wall-01.webp",
+  "path": "dungeons/textures/walls/mm_duskwood_abbey_wall_01.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.726,
+  "lum": 117.6
+ },
+ {
+  "file": "dungeons-textures-pillar-mm-aos-pillar-01.webp",
+  "path": "dungeons/textures/pillar/mm_aos_pillar_01.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.727,
+  "lum": 74.5
+ },
+ {
+  "file": "dungeons-textures-walls-mm-gnome-wall-02.webp",
+  "path": "dungeons/textures/walls/mm_gnome_wall_02.blp",
+  "cat": "Masonry",
+  "size": "256x256",
+  "seam": 0.73,
+  "lum": 151.3
+ },
+ {
+  "file": "dungeons-textures-razorfen-jlo-rfkraul-cavepainting.webp",
+  "path": "dungeons/textures/razorfen/jlo_rfkraul_cavepainting.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.406,
+  "lum": 86.0
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaveexs-crystal.webp",
+  "path": "dungeons/textures/rock/jlo_mcaveexs_crystal.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.591,
+  "lum": 132.7
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaves-ledge.webp",
+  "path": "dungeons/textures/rock/jlo_mcaves_ledge.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.608,
+  "lum": 138.5
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaves-ground2-1.webp",
+  "path": "dungeons/textures/rock/jlo_mcaves_ground2.1.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.66,
+  "lum": 232.2
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaves-ceiling.webp",
+  "path": "dungeons/textures/rock/jlo_mcaves_ceiling.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.661,
+  "lum": 96.8
+ },
+ {
+  "file": "dungeons-textures-ceiling-jlo-mrdn-caveclnga.webp",
+  "path": "dungeons/textures/ceiling/jlo_mrdn_caveclnga.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.672,
+  "lum": 77.3
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcavew-ground2.webp",
+  "path": "dungeons/textures/rock/jlo_mcavew_ground2.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.673,
+  "lum": 70.1
+ },
+ {
+  "file": "dungeons-textures-devices-jlo-goblinzep-rocket.webp",
+  "path": "dungeons/textures/devices/jlo_goblinzep_rocket.blp",
+  "cat": "Rock & stone",
+  "size": "128x128",
+  "seam": 0.695,
+  "lum": 71.1
+ },
+ {
+  "file": "dungeons-textures-rock-mm-infrg-king-rock-03.webp",
+  "path": "dungeons/textures/rock/mm_infrg_king_rock_03.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.697,
+  "lum": 89.0
+ },
+ {
+  "file": "dungeons-textures-rock-mm-ogrmnd-d-rock-01.webp",
+  "path": "dungeons/textures/rock/mm_ogrmnd_d_rock_01.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.704,
+  "lum": 86.5
+ },
+ {
+  "file": "dungeons-textures-rock-mm-ogrmnd-rock-03.webp",
+  "path": "dungeons/textures/rock/mm_ogrmnd_rock_03.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.728,
+  "lum": 102.9
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaveexs-rock.webp",
+  "path": "dungeons/textures/rock/jlo_mcaveexs_rock.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.729,
+  "lum": 127.6
+ },
+ {
+  "file": "dungeons-textures-wailingcaverns-stu-wc-interiorrock1.webp",
+  "path": "dungeons/textures/wailingcaverns/stu_wc_interiorrock1.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.74,
+  "lum": 84.1
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-udercity-rock.webp",
+  "path": "dungeons/textures/rock/jlo_udercity_rock.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.747,
+  "lum": 87.9
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaveexg-cave.webp",
+  "path": "dungeons/textures/rock/jlo_mcaveexg_cave.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.767,
+  "lum": 58.1
+ },
+ {
+  "file": "dungeons-textures-rock-bm-tmbrmw-rocksnow01.webp",
+  "path": "dungeons/textures/rock/bm_tmbrmw_rocksnow01.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.774,
+  "lum": 130.7
+ },
+ {
+  "file": "dungeons-textures-rock-bm-pvp-dirt01.webp",
+  "path": "dungeons/textures/rock/bm_pvp_dirt01.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.775,
+  "lum": 71.3
+ },
+ {
+  "file": "dungeons-textures-razorfen-stu-rf-crackedrock.webp",
+  "path": "dungeons/textures/razorfen/stu_rf_crackedrock.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.777,
+  "lum": 78.8
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaveg-ledge.webp",
+  "path": "dungeons/textures/rock/jlo_mcaveg_ledge.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.79,
+  "lum": 42.3
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcave-ceiling.webp",
+  "path": "dungeons/textures/rock/jlo_mcave_ceiling.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.851,
+  "lum": 89.3
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcave-ground2.webp",
+  "path": "dungeons/textures/rock/jlo_mcave_ground2.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.855,
+  "lum": 76.0
+ },
+ {
+  "file": "dungeons-textures-rock-mm-ogrmnd-b-rock-03.webp",
+  "path": "dungeons/textures/rock/mm_ogrmnd_b_rock_03.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.865,
+  "lum": 102.6
+ },
+ {
+  "file": "dungeons-textures-rock-mm-srock-02.webp",
+  "path": "dungeons/textures/rock/mm_srock_02.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.878,
+  "lum": 110.9
+ },
+ {
+  "file": "dungeons-textures-razorfen-jlo-rfkraul-outrock.webp",
+  "path": "dungeons/textures/razorfen/jlo_rfkraul_outrock.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.887,
+  "lum": 71.7
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-bbay-rock.webp",
+  "path": "dungeons/textures/rock/jlo_bbay_rock.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.891,
+  "lum": 88.3
+ },
+ {
+  "file": "dungeons-textures-rock-mm-ogrmnd-c-rock-05.webp",
+  "path": "dungeons/textures/rock/mm_ogrmnd_c_rock_05.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.893,
+  "lum": 62.4
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-wc-rubble.webp",
+  "path": "dungeons/textures/rock/jlo_wc_rubble.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.894,
+  "lum": 95.8
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcavew-ceiling.webp",
+  "path": "dungeons/textures/rock/jlo_mcavew_ceiling.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.895,
+  "lum": 84.7
+ },
+ {
+  "file": "dungeons-textures-rock-jlo-mcaveg-ground2.webp",
+  "path": "dungeons/textures/rock/jlo_mcaveg_ground2.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.896,
+  "lum": 44.6
+ },
+ {
+  "file": "dungeons-textures-rock-bm-barrow-entrance01.webp",
+  "path": "dungeons/textures/rock/bm_barrow_entrance01.blp",
+  "cat": "Rock & stone",
+  "size": "256x256",
+  "seam": 0.902,
+  "lum": 101.5
+ },
+ {
+  "file": "dungeons-textures-devices-mm-aduskwood-clockface-01.webp",
+  "path": "dungeons/textures/devices/mm_aduskwood_clockface_01.blp",
+  "cat": "Wood",
+  "size": "128x128",
+  "seam": 0.06,
+  "lum": 59.7
+ },
+ {
+  "file": "dungeons-textures-wood-bm-thunder-logcap-01.webp",
+  "path": "dungeons/textures/wood/bm_thunder_logcap_01.blp",
+  "cat": "Wood",
+  "size": "128x128",
+  "seam": 0.135,
+  "lum": 134.4
+ },
+ {
+  "file": "dungeons-textures-roof-mm-orc-aroof-02.webp",
+  "path": "dungeons/textures/roof/mm_orc_aroof_02.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.636,
+  "lum": 64.0
+ },
+ {
+  "file": "dungeons-textures-ceiling-bm-shdwfang-wood-clng-01.webp",
+  "path": "dungeons/textures/ceiling/bm_shdwfang_wood_clng_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.675,
+  "lum": 66.7
+ },
+ {
+  "file": "dungeons-textures-roof-mm-ne-roof-01.webp",
+  "path": "dungeons/textures/roof/mm_ne_roof_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.779,
+  "lum": 110.8
+ },
+ {
+  "file": "dungeons-textures-roof-bm-silithus-neroof01.webp",
+  "path": "dungeons/textures/roof/bm_silithus_neroof01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.821,
+  "lum": 65.0
+ },
+ {
+  "file": "dungeons-textures-roof-bm-troll-strawroof01.webp",
+  "path": "dungeons/textures/roof/bm_troll_strawroof01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.829,
+  "lum": 115.9
+ },
+ {
+  "file": "dungeons-textures-roof-mm-snkntmp-weed-top-03.webp",
+  "path": "dungeons/textures/roof/mm_snkntmp_weed_top_03.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.856,
+  "lum": 67.4
+ },
+ {
+  "file": "dungeons-textures-roof-mm-ne-ds-roof-01.webp",
+  "path": "dungeons/textures/roof/mm_ne_ds_roof_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.865,
+  "lum": 95.4
+ },
+ {
+  "file": "dungeons-textures-brian-brokengatewoodburned02.webp",
+  "path": "dungeons/textures/brian/brokengatewoodburned02.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.906,
+  "lum": 67.9
+ },
+ {
+  "file": "dungeons-textures-wood-bm-tmbrmw-wood03.webp",
+  "path": "dungeons/textures/wood/bm_tmbrmw_wood03.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.939,
+  "lum": 112.2
+ },
+ {
+  "file": "dungeons-textures-roof-mm-orc-bkrroof-02.webp",
+  "path": "dungeons/textures/roof/mm_orc_bkrroof_02.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.986,
+  "lum": 49.7
+ },
+ {
+  "file": "dungeons-textures-deadmine-stu-strawroof-02.webp",
+  "path": "dungeons/textures/deadmine/stu_strawroof_02.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 0.997,
+  "lum": 66.2
+ },
+ {
+  "file": "dungeons-textures-roof-bm-troll-kotoskin01.webp",
+  "path": "dungeons/textures/roof/bm_troll_kotoskin01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.019,
+  "lum": 99.1
+ },
+ {
+  "file": "dungeons-textures-shipwreck-stu-shipwreck-plank02.webp",
+  "path": "dungeons/textures/shipwreck/stu_shipwreck_plank02.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.054,
+  "lum": 73.6
+ },
+ {
+  "file": "dungeons-textures-roof-mm-strmwnd-neroof-02.webp",
+  "path": "dungeons/textures/roof/mm_strmwnd_neroof_02.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.12,
+  "lum": 51.3
+ },
+ {
+  "file": "dungeons-textures-roof-mm-strmwnd-mroof-01.webp",
+  "path": "dungeons/textures/roof/mm_strmwnd_mroof_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.131,
+  "lum": 94.0
+ },
+ {
+  "file": "dungeons-textures-deadmine-stu-sailroomroof.webp",
+  "path": "dungeons/textures/deadmine/stu_sailroomroof.blp",
+  "cat": "Wood",
+  "size": "128x128",
+  "seam": 1.145,
+  "lum": 71.8
+ },
+ {
+  "file": "dungeons-textures-roof-mm-strath-roof-01.webp",
+  "path": "dungeons/textures/roof/mm_strath_roof_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.148,
+  "lum": 54.9
+ },
+ {
+  "file": "dungeons-textures-deadmine-stu-deadminelog.webp",
+  "path": "dungeons/textures/deadmine/stu_deadminelog.blp",
+  "cat": "Wood",
+  "size": "128x256",
+  "seam": 1.165,
+  "lum": 92.5
+ },
+ {
+  "file": "dungeons-textures-roof-mm-ne-drnss-roof-01.webp",
+  "path": "dungeons/textures/roof/mm_ne_drnss_roof_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.176,
+  "lum": 78.2
+ },
+ {
+  "file": "dungeons-textures-wood-bm-barrow-treeinterior-ruin01.webp",
+  "path": "dungeons/textures/wood/bm_barrow_treeinterior_ruin01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.178,
+  "lum": 143.0
+ },
+ {
+  "file": "dungeons-textures-wood-bm-barrow-roots01.webp",
+  "path": "dungeons/textures/wood/bm_barrow_roots01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.18,
+  "lum": 97.0
+ },
+ {
+  "file": "dungeons-textures-wood-bm-barrow-treeinterior01.webp",
+  "path": "dungeons/textures/wood/bm_barrow_treeinterior01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.187,
+  "lum": 143.0
+ },
+ {
+  "file": "dungeons-textures-roof-mm-ogrmr-int-roof-01.webp",
+  "path": "dungeons/textures/roof/mm_ogrmr_int_roof_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.198,
+  "lum": 82.6
+ },
+ {
+  "file": "dungeons-textures-wood-jlo-bbay-shipexterior-pirate.webp",
+  "path": "dungeons/textures/wood/jlo_bbay_shipexterior_pirate.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.212,
+  "lum": 38.2
+ },
+ {
+  "file": "dungeons-textures-wood-mm-cask-side-01.webp",
+  "path": "dungeons/textures/wood/mm_cask_side_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.215,
+  "lum": 106.1
+ },
+ {
+  "file": "dungeons-textures-roof-mm-strmwnd-droof-02.webp",
+  "path": "dungeons/textures/roof/mm_strmwnd_droof_02.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.223,
+  "lum": 59.1
+ },
+ {
+  "file": "dungeons-textures-roof-mm-strmwnd-wroof-02.webp",
+  "path": "dungeons/textures/roof/mm_strmwnd_wroof_02.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.225,
+  "lum": 68.4
+ },
+ {
+  "file": "dungeons-textures-roof-mm-orc-roof-01.webp",
+  "path": "dungeons/textures/roof/mm_orc_roof_01.blp",
+  "cat": "Wood",
+  "size": "256x256",
+  "seam": 1.241,
+  "lum": 68.6
+ },
+ {
+  "file": "dungeons-textures-devices-rg-noxi-portal-sides.webp",
+  "path": "dungeons/textures/devices/rg_noxi_portal_sides.blp",
+  "cat": "Elemental",
+  "size": "256x256",
+  "seam": 0.044,
+  "lum": 74.8
+ },
+ {
+  "file": "dungeons-textures-devices-mm-clockface-01.webp",
+  "path": "dungeons/textures/devices/mm_clockface_01.blp",
+  "cat": "Elemental",
+  "size": "128x128",
+  "seam": 0.058,
+  "lum": 88.0
+ },
+ {
+  "file": "dungeons-textures-devices-rg-noxi-portal-sides-frozen.webp",
+  "path": "dungeons/textures/devices/rg_noxi_portal_sides_frozen.blp",
+  "cat": "Elemental",
+  "size": "256x256",
+  "seam": 0.45,
+  "lum": 125.4
+ },
+ {
+  "file": "dungeons-textures-devices-orchangingtarp.webp",
+  "path": "dungeons/textures/devices/orchangingtarp.blp",
+  "cat": "Elemental",
+  "size": "256x256",
+  "seam": 0.55,
+  "lum": 79.5
+ },
+ {
+  "file": "dungeons-textures-lava-mm-molten-01.webp",
+  "path": "dungeons/textures/lava/mm_molten_01.blp",
+  "cat": "Elemental",
+  "size": "128x128",
+  "seam": 0.908,
+  "lum": 24.6
+ },
+ {
+  "file": "dungeons-textures-trim-jlo-udercity-icetrim01.webp",
+  "path": "dungeons/textures/trim/jlo_udercity_icetrim01.blp",
+  "cat": "Elemental",
+  "size": "256x256",
+  "seam": 1.082,
+  "lum": 121.5
+ },
+ {
+  "file": "dungeons-textures-devices-mm-drain-01.webp",
+  "path": "dungeons/textures/devices/mm_drain_01.blp",
+  "cat": "Elemental",
+  "size": "128x128",
+  "seam": 1.431,
+  "lum": 70.2
+ },
+ {
+  "file": "dungeons-textures-devices-mm-gnome-stove-01.webp",
+  "path": "dungeons/textures/devices/mm_gnome_stove_01.blp",
+  "cat": "Elemental",
+  "size": "256x256",
+  "seam": 1.439,
+  "lum": 101.9
+ },
+ {
+  "file": "dungeons-textures-trees-greattreegrass128.webp",
+  "path": "dungeons/textures/trees/greattreegrass128.blp",
+  "cat": "Ground",
+  "size": "128x128",
+  "seam": 0.0,
+  "lum": 7.4
+ },
+ {
+  "file": "dungeons-textures-ceiling-bm-barrow-dirtclng-01.webp",
+  "path": "dungeons/textures/ceiling/bm_barrow_dirtclng_01.blp",
+  "cat": "Ground",
+  "size": "256x256",
+  "seam": 0.764,
+  "lum": 68.6
+ },
+ {
+  "file": "dungeons-textures-ceiling-mm-westfall-int-ceiling-02.webp",
+  "path": "dungeons/textures/ceiling/mm_westfall_int_ceiling_02.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.0,
+  "lum": 17.2
+ },
+ {
+  "file": "dungeons-textures-ceiling-mm-strmwnd-int-ceiling-02.webp",
+  "path": "dungeons/textures/ceiling/mm_strmwnd_int_ceiling_02.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.0,
+  "lum": 17.4
+ },
+ {
+  "file": "dungeons-textures-windows-mm-gnome-window-01.webp",
+  "path": "dungeons/textures/windows/mm_gnome_window_01.blp",
+  "cat": "Abstract & other",
+  "size": "128x128",
+  "seam": 0.044,
+  "lum": 73.2
+ },
+ {
+  "file": "dungeons-textures-trees-kalidatmidtreeleaf01.webp",
+  "path": "dungeons/textures/trees/kalidatmidtreeleaf01.blp",
+  "cat": "Abstract & other",
+  "size": "128x128",
+  "seam": 0.045,
+  "lum": 77.9
+ },
+ {
+  "file": "dungeons-textures-brian-classicalelfruins-azr-vine01.webp",
+  "path": "dungeons/textures/brian/classicalelfruins/azr_vine01.blp",
+  "cat": "Abstract & other",
+  "size": "128x256",
+  "seam": 0.145,
+  "lum": 37.5
+ },
+ {
+  "file": "dungeons-textures-windows-mm-windows-13.webp",
+  "path": "dungeons/textures/windows/mm_windows_13.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.15,
+  "lum": 81.9
+ },
+ {
+  "file": "dungeons-textures-decoration-rg-kelthuzad-throne-skull.webp",
+  "path": "dungeons/textures/decoration/rg_kelthuzad_throne_skull.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.156,
+  "lum": 83.0
+ },
+ {
+  "file": "dungeons-textures-windows-mm-strath-windows-13.webp",
+  "path": "dungeons/textures/windows/mm_strath_windows_13.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.22,
+  "lum": 50.0
+ },
+ {
+  "file": "dungeons-textures-trees-kalidarfattree01.webp",
+  "path": "dungeons/textures/trees/kalidarfattree01.blp",
+  "cat": "Abstract & other",
+  "size": "256x128",
+  "seam": 0.368,
+  "lum": 62.3
+ },
+ {
+  "file": "dungeons-textures-decoration-jlo-goblinzep-cloth.webp",
+  "path": "dungeons/textures/decoration/jlo_goblinzep_cloth.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.435,
+  "lum": 37.6
+ },
+ {
+  "file": "dungeons-textures-ceiling-bm-uldaman-jadeceiling.webp",
+  "path": "dungeons/textures/ceiling/bm_uldaman_jadeceiling.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.437,
+  "lum": 99.4
+ },
+ {
+  "file": "dungeons-textures-ceiling-jlo-snkntmp-ceiling01.webp",
+  "path": "dungeons/textures/ceiling/jlo_snkntmp_ceiling01.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.487,
+  "lum": 46.1
+ },
+ {
+  "file": "dungeons-textures-windows-mm-strath-wwindows-01.webp",
+  "path": "dungeons/textures/windows/mm_strath_wwindows_01.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.506,
+  "lum": 45.8
+ },
+ {
+  "file": "dungeons-textures-ceiling-bm-zul-ceiling01.webp",
+  "path": "dungeons/textures/ceiling/bm_zul_ceiling01.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.51,
+  "lum": 62.9
+ },
+ {
+  "file": "dungeons-textures-decoration-mm-irnfg-exp-symbol-01.webp",
+  "path": "dungeons/textures/decoration/mm_irnfg_exp_symbol_01.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.527,
+  "lum": 78.6
+ },
+ {
+  "file": "dungeons-textures-ceiling-jlo-kzn-intceiling.webp",
+  "path": "dungeons/textures/ceiling/jlo_kzn_intceiling.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.551,
+  "lum": 70.5
+ },
+ {
+  "file": "dungeons-textures-ceiling-bm-ldrn-domeceiling01.webp",
+  "path": "dungeons/textures/ceiling/bm_ldrn_domeceiling01.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.558,
+  "lum": 122.1
+ },
+ {
+  "file": "dungeons-textures-ceiling-jlo-cvrns-ceiling.webp",
+  "path": "dungeons/textures/ceiling/jlo_cvrns_ceiling.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.574,
+  "lum": 102.8
+ },
+ {
+  "file": "dungeons-textures-brian-tents-wmo-centarutent02.webp",
+  "path": "dungeons/textures/brian/tents/wmo_centarutent02.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.624,
+  "lum": 67.9
+ },
+ {
+  "file": "dungeons-textures-shipwreck-js-bbay-ceiling.webp",
+  "path": "dungeons/textures/shipwreck/js_bbay_ceiling.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.64,
+  "lum": 54.5
+ },
+ {
+  "file": "dungeons-textures-windows-mm-strmwnd-mwindows-01.webp",
+  "path": "dungeons/textures/windows/mm_strmwnd_mwindows_01.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.685,
+  "lum": 74.2
+ },
+ {
+  "file": "dungeons-textures-trim-mm2-dire-vinessmall.webp",
+  "path": "dungeons/textures/trim/mm2_dire_vinessmall.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.691,
+  "lum": 38.9
+ },
+ {
+  "file": "dungeons-textures-trim-mm-strath-rubble-02.webp",
+  "path": "dungeons/textures/trim/mm_strath_rubble_02.blp",
+  "cat": "Abstract & other",
+  "size": "128x128",
+  "seam": 0.701,
+  "lum": 132.0
+ },
+ {
+  "file": "dungeons-textures-blackfathom-bm-bf-intceiling01.webp",
+  "path": "dungeons/textures/blackfathom/bm_bf_intceiling01.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.705,
+  "lum": 110.8
+ },
+ {
+  "file": "dungeons-textures-ceiling-jlo-strathhold-int-ceiling.webp",
+  "path": "dungeons/textures/ceiling/jlo_strathhold_int_ceiling.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.763,
+  "lum": 166.6
+ },
+ {
+  "file": "dungeons-textures-ceiling-jlo-bbay-ceiling.webp",
+  "path": "dungeons/textures/ceiling/jlo_bbay_ceiling.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.781,
+  "lum": 70.2
+ },
+ {
+  "file": "dungeons-textures-decoration-jlo-rfundead-bridgevines.webp",
+  "path": "dungeons/textures/decoration/jlo_rfundead_bridgevines.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.783,
+  "lum": 73.9
+ },
+ {
+  "file": "dungeons-textures-trim-mm-abbey-side-01.webp",
+  "path": "dungeons/textures/trim/mm_abbey_side_01.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.8,
+  "lum": 193.0
+ },
+ {
+  "file": "dungeons-textures-razorfen-stu-rf-bridgevines.webp",
+  "path": "dungeons/textures/razorfen/stu_rf_bridgevines.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.805,
+  "lum": 74.8
+ },
+ {
+  "file": "dungeons-textures-ceiling-mm-abbey-ceiling-02.webp",
+  "path": "dungeons/textures/ceiling/mm_abbey_ceiling_02.blp",
+  "cat": "Abstract & other",
+  "size": "256x256",
+  "seam": 0.824,
+  "lum": 117.6
+ }
+]

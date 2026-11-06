@@ -1,0 +1,2778 @@
+[
+ {
+  "file": "trim-dungeons-textures-decoration-bi-grimbatol-symbol-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/bi_grimbatol_symbol 01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-bm-stratholme-throne02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/bm_stratholme_throne02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-jlo-bbay-sail-pirate.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/jlo_bbay_sail_pirate.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-jlo-hive-eggsack02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/jlo_hive_eggsack02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-jlo-rfundead-loghide.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/jlo_rfundead_loghide.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-jlo-rfundead-ovenlimbs.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/jlo_rfundead_ovenlimbs.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-jlo-udercity-slime.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/jlo_udercity_slime.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-jlo-udercity-wormflesh.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/jlo_udercity_wormflesh.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-mm-canopy-side-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/mm_canopy_side_02.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-mm-gnome-dial-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/mm_gnome_dial_01.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-mm-irnfg-bank-deco-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/mm_irnfg_bank_deco_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-mm-irnfg-exp-symbol-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/mm_irnfg_exp_symbol_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-mm-irnfg-metal-banner-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/mm_irnfg_metal_banner_01.blp",
+  "w": 128,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-mm-irnfg-snowy-symbol-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/mm_irnfg_snowy_symbol_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-mm-krzn-ravens-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/mm_krzn_ravens_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-mm-wf-metal-lionhead-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/mm_wf_metal_lionhead_01.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-decoration-rg-kelthuzad-throne-skull.png",
+  "kind": "trim",
+  "path": "dungeons/textures/decoration/rg_kelthuzad_throne_skull.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-bm-brspire-maindoor01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/bm_brspire_maindoor01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-bm-brspire-supports01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/bm_brspire_supports01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-jlo-botbody-snow.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/jlo_botbody_snow.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-jlo-gnome-metalrubble.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/jlo_gnome_metalrubble.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-jlo-gnome-metalsnow.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/jlo_gnome_metalsnow.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-jlo-gnome-solidmetal.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/jlo_gnome_solidmetal.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-jlo-goblinzep-bottom.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/jlo_goblinzep_bottom.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-jlo-undercity-ice-reflectmap.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/jlo_undercity_ice_reflectmap.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-jlo-undercity-reflectmap.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/jlo_undercity_reflectmap.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-mm-furnace-bottom-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/mm_furnace_bottom_01.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-mm-gnome-metal-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/mm_gnome_metal_02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-mm-irnfg-redmetal-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/mm_irnfg_redmetal_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-mm-irnfg-silver-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/mm_irnfg_silver_01.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-metal-mm-minerail-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/metal/mm_minerail_01.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-barrows-entstairs01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_barrows_entstairs01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-barrows-extsupport01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_barrows_extsupport01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-barrows-extsupport-ruin01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_barrows_extsupport_ruin01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-barrows-stonetrim01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_barrows_stonetrim01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-brspire-lavafloortrans.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_brspire_lavafloortrans.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-brspire-lavawalltrans.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_brspire_lavawalltrans.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-brspire-roller01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_brspire_roller01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-brspire-trim01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_brspire_trim01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-kzn-inttrims01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_kzn_inttrims01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-kzn-stairdecor01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_kzn_stairdecor01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-ldrn-curtains01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_ldrn_curtains01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-ldrn-trims01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_ldrn_trims01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-skull-support01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_skull_support01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-strat-bonepile01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_strat_bonepile01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-strat-web01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_strat_web01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-taurenpvp-catwalk03.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_taurenpvp_catwalk03.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-thunder-rope-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_thunder_rope_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-thunder-ttmdesign-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_thunder_ttmdesign_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-uldaman-city01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_uldaman_city01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-uldaman-trim02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_uldaman_trim02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-bm-zeppelin-windowbase01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/bm_zeppelin_windowbase01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-cagreat-wall-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/cagreat_wall_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-dj-irnfg-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/dj_irnfg_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-gp-thunder-rope-ruin01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/gp_thunder_rope_ruin01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jacryptbrick03.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jacryptbrick03.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-annqiraj-trimext01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_annqiraj_trimext01.blp",
+  "w": 512,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-annqiraj-walltrim.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_annqiraj_walltrim.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-cvrns-bridgestone02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_cvrns_bridgestone02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-dmaul-trim01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_dmaul_trim01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-gob-trims02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_gob_trims02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-gob-wood.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_gob_wood.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-rfundead-trenchwalltop.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_rfundead_trenchwalltop.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-rfundead-wall2floor00.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_rfundead_wall2floor00.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-snkntmp-atarborder.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_snkntmp_atarborder.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-snkntmp-border01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_snkntmp_border01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-snkntmp-trim.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_snkntmp_trim.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-jlo-undeadzigg-web128.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/jlo_undeadzigg_web128.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-abbey-side-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_abbey_side_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-chimney-top-01x.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_chimney_top_01x.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-dragon-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_dragon_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-drnss-stone-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_drnss_stone_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-drnss-trim-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_drnss_trim_02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-duskwood-stonebase-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_duskwood_stonebase_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-dwrf-strim-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_dwrf_strim_02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-dwrf-thndlspn-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_dwrf_thndlspn_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-dwrf-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_dwrf_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-gnome-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_gnome_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-gob-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_gob_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-greyborder-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_greyborder_01.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-greyborder-03x.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_greyborder_03x.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-irnfg-entry-trim-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_irnfg_entry_trim_02.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-irnfg-inttrim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_irnfg_inttrim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-irnfg-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_irnfg_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-magetower-spire-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_magetower_spire_01.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-metal-floor-border-01x.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_metal_floor_border_01x.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-mnstry-trim-03.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_mnstry_trim_03.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-ogrmnd-b-trim-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_ogrmnd_b_trim_02.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-ogrmnd-c-trim-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_ogrmnd_c_trim_02.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-ogrmnd-d-trim-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_ogrmnd_d_trim_02.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-ogrmnd-trim-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_ogrmnd_trim_02.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-ogrmr-int-trim-04.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_ogrmr_int_trim_04.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-snkntmp-trim-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_snkntmp_trim_01.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-strath-rubble-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_strath_rubble_01.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-strmwnd-mtrim-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_strmwnd_mtrim_02.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-thndlspn-rubble-02.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_thndlspn_rubble_02.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-wf-chimney-top-01x.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_wf_chimney_top_01x.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-wf-magetower-spire-01.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_wf_magetower_spire_01.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-mm-zul-trim-03.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/mm_zul_trim_03.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-rg-boneclaw.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/rg_boneclaw.blp",
+  "w": 128,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "trim-dungeons-textures-trim-rg-nox-trims.png",
+  "kind": "trim",
+  "path": "dungeons/textures/trim/rg_nox_trims.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-pvp-banner-emblem-1.png",
+  "kind": "ornament",
+  "path": "interface/pvp-banner-emblem-1.blp",
+  "w": 128,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-achievementframe-accountlevel-achievementheader.png",
+  "kind": "divider",
+  "path": "interface/achievementframe/accountlevel-achievementheader.blp",
+  "w": 512,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-guildtabard.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/guildtabard.blp",
+  "w": 128,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-borders.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-borders.blp",
+  "w": 512,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-achievementframe-ui-achievement-comparisonheader.png",
+  "kind": "divider",
+  "path": "interface/achievementframe/ui-achievement-comparisonheader.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-header.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-header.blp",
+  "w": 512,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-iconframe.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-iconframe.blp",
+  "w": 128,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-metalborder-joint.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-metalborder-joint.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-metalborder-left.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-metalborder-left.blp",
+  "w": 16,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-achievementframe-ui-achievement-metalborder-top.png",
+  "kind": "divider",
+  "path": "interface/achievementframe/ui-achievement-metalborder-top.blp",
+  "w": 512,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-achievementframe-ui-achievement-progressbar-border.png",
+  "kind": "divider",
+  "path": "interface/achievementframe/ui-achievement-progressbar-border.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-progressive-iconborder.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-progressive-iconborder.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-achievementframe-ui-achievement-recentheader.png",
+  "kind": "divider",
+  "path": "interface/achievementframe/ui-achievement-recentheader.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-statusbar-highlight.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-statusbar-highlight.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-tsunami-corners.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-tsunami-corners.blp",
+  "w": 64,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-achievementframe-ui-achievement-woodborder-corner.png",
+  "kind": "ornament",
+  "path": "interface/achievementframe/ui-achievement-woodborder-corner.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-achievementframe-ui-achievement-woodborder.png",
+  "kind": "backdrop",
+  "path": "interface/achievementframe/ui-achievement-woodborder.blp",
+  "w": 192,
+  "h": 192,
+  "slice": 64
+ },
+ {
+  "file": "ornament-interface-alliedraces-alliedracesunlockingframe.png",
+  "kind": "ornament",
+  "path": "interface/alliedraces/alliedracesunlockingframe.blp",
+  "w": 1024,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-alliedraces-alliedracesunlockingframecrests.png",
+  "kind": "ornament",
+  "path": "interface/alliedraces/alliedracesunlockingframecrests.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-alliedraces-alliedracesunlockingframemodelbackground.png",
+  "kind": "ornament",
+  "path": "interface/alliedraces/alliedracesunlockingframemodelbackground.blp",
+  "w": 1024,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-alliedraces-alliedracesunlockingframemodelbackgroundpart2.png",
+  "kind": "ornament",
+  "path": "interface/alliedraces/alliedracesunlockingframemodelbackgroundpart2.blp",
+  "w": 512,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-alliedraces-alliedracesunlockingframepart2.png",
+  "kind": "ornament",
+  "path": "interface/alliedraces/alliedracesunlockingframepart2.blp",
+  "w": 512,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-arenaenemyframe-ui-arena-border.png",
+  "kind": "backdrop",
+  "path": "interface/arenaenemyframe/ui-arena-border.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "ornament-interface-arenaenemyframe-ui-arenatargetingframe.png",
+  "kind": "ornament",
+  "path": "interface/arenaenemyframe/ui-arenatargetingframe.blp",
+  "w": 128,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-artifacts-artifacts-dependencybar-fill.png",
+  "kind": "divider",
+  "path": "interface/artifacts/_artifacts-dependencybar-fill.blp",
+  "w": 128,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-artifacts-artifacts-dependencybar-fillscroll1.png",
+  "kind": "divider",
+  "path": "interface/artifacts/_artifacts-dependencybar-fillscroll1.blp",
+  "w": 128,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-artifacts-artifactpower-questborder.png",
+  "kind": "ornament",
+  "path": "interface/artifacts/artifactpower-questborder.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-artifacts-reliciconframe.png",
+  "kind": "ornament",
+  "path": "interface/artifacts/reliciconframe.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-auctionframe-auctionhousedressupframe-bottom.png",
+  "kind": "ornament",
+  "path": "interface/auctionframe/auctionhousedressupframe-bottom.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-auctionframe-auctionhousedressupframe-corner.png",
+  "kind": "ornament",
+  "path": "interface/auctionframe/auctionhousedressupframe-corner.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-auctionframe-ui-auctionframe-auction-bot.png",
+  "kind": "ornament",
+  "path": "interface/auctionframe/ui-auctionframe-auction-bot.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-auctionframe-ui-auctionframe-bid-bot.png",
+  "kind": "ornament",
+  "path": "interface/auctionframe/ui-auctionframe-bid-bot.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-auctionframe-ui-auctionframe-browse-bot.png",
+  "kind": "ornament",
+  "path": "interface/auctionframe/ui-auctionframe-browse-bot.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-auctionframe-ui-auctionframe-filterbg.png",
+  "kind": "divider",
+  "path": "interface/auctionframe/ui-auctionframe-filterbg.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-auctionframe-ui-auctionframe-filterlines.png",
+  "kind": "ornament",
+  "path": "interface/auctionframe/ui-auctionframe-filterlines.blp",
+  "w": 16,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-auctionframe-ui-auctionframe-itemslot.png",
+  "kind": "divider",
+  "path": "interface/auctionframe/ui-auctionframe-itemslot.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-auctionframe-ui-auctionitemnameframe.png",
+  "kind": "divider",
+  "path": "interface/auctionframe/ui-auctionitemnameframe.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-bankframe-ui-bankframe-botleft.png",
+  "kind": "ornament",
+  "path": "interface/bankframe/ui-bankframe-botleft.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-barbershop-ui-barbershop-banner.png",
+  "kind": "ornament",
+  "path": "interface/barbershop/ui-barbershop-banner.blp",
+  "w": 512,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-battlefieldframe-ui-battlefield-bar.png",
+  "kind": "divider",
+  "path": "interface/battlefieldframe/ui-battlefield-bar.blp",
+  "w": 512,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-battlefieldframe-ui-battlefieldminimap-border.png",
+  "kind": "ornament",
+  "path": "interface/battlefieldframe/ui-battlefieldminimap-border.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-blackmarket-woodframe-tilevertical.png",
+  "kind": "ornament",
+  "path": "interface/blackmarket/!woodframe-tilevertical.blp",
+  "w": 64,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-blackmarket-woodframe-tilehorizontal.png",
+  "kind": "divider",
+  "path": "interface/blackmarket/_woodframe-tilehorizontal.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-blackmarket-woodframecorner-botleft.png",
+  "kind": "ornament",
+  "path": "interface/blackmarket/woodframecorner-botleft.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-buttons-collapsibleheader.png",
+  "kind": "divider",
+  "path": "interface/buttons/collapsibleheader.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-buttons-lockbutton-border.png",
+  "kind": "ornament",
+  "path": "interface/buttons/lockbutton-border.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-buttons-scrollbarproportionalhorizontal.png",
+  "kind": "divider",
+  "path": "interface/buttons/scrollbarproportionalhorizontal.blp",
+  "w": 1024,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-buttons-ui-button-borders.png",
+  "kind": "divider",
+  "path": "interface/buttons/ui-button-borders.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-buttons-ui-debuff-border.png",
+  "kind": "ornament",
+  "path": "interface/buttons/ui-debuff-border.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-buttons-ui-microbutton-guild-banner.png",
+  "kind": "ornament",
+  "path": "interface/buttons/ui-microbutton-guild-banner.blp",
+  "w": 32,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-buttons-ui-sliderbar-border.png",
+  "kind": "divider",
+  "path": "interface/buttons/ui-sliderbar-border.blp",
+  "w": 64,
+  "h": 8,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-buttons-ui-tempenchant-border.png",
+  "kind": "ornament",
+  "path": "interface/buttons/ui-tempenchant-border.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-buttons-uiframesliderbar.png",
+  "kind": "ornament",
+  "path": "interface/buttons/uiframesliderbar.blp",
+  "w": 16,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-calendar-buttonframe.png",
+  "kind": "divider",
+  "path": "interface/calendar/buttonframe.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-calendar-calendarframe-sides.png",
+  "kind": "ornament",
+  "path": "interface/calendar/calendarframe_sides.blp",
+  "w": 128,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-calendar-calendarframe-topandbottom.png",
+  "kind": "ornament",
+  "path": "interface/calendar/calendarframe_topandbottom.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-castingbar-ui-castingbar-border-small.png",
+  "kind": "divider",
+  "path": "interface/castingbar/ui-castingbar-border-small.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-castingbar-ui-castingbar-border.png",
+  "kind": "divider",
+  "path": "interface/castingbar/ui-castingbar-border.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-castingbar-ui-castingbar-flash-small.png",
+  "kind": "divider",
+  "path": "interface/castingbar/ui-castingbar-flash-small.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-castingbar-ui-castingbar-flash.png",
+  "kind": "divider",
+  "path": "interface/castingbar/ui-castingbar-flash.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-castingbar-ui-castingbar-small-focusshield.png",
+  "kind": "divider",
+  "path": "interface/castingbar/ui-castingbar-small-focusshield.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-castingbar-ui-castingbar-small-shield.png",
+  "kind": "divider",
+  "path": "interface/castingbar/ui-castingbar-small-shield.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-challenges-challenges-minimap-banner.png",
+  "kind": "ornament",
+  "path": "interface/challenges/challenges-minimap-banner.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-characterframe-totemborder.png",
+  "kind": "ornament",
+  "path": "interface/characterframe/totemborder.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-characterframe-ui-characterframe-groupindicator.png",
+  "kind": "divider",
+  "path": "interface/characterframe/ui-characterframe-groupindicator.blp",
+  "w": 128,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-characterframe-ui-deathknightframe.png",
+  "kind": "ornament",
+  "path": "interface/characterframe/ui-deathknightframe.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-characterframe-ui-party-border.png",
+  "kind": "backdrop",
+  "path": "interface/characterframe/ui-party-border.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframe.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframe.blp",
+  "w": 128,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframeborder.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframeborder.blp",
+  "w": 64,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframecolorswatch.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframecolorswatch.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframeexpandarrow.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframeexpandarrow.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframeinnerborder.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframeinnerborder.blp",
+  "w": 64,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframetab-bgleft-min.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframetab-bgleft-min.blp",
+  "w": 16,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframetab-bgleft.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframetab-bgleft.blp",
+  "w": 16,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframetab-bgmid-min.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframetab-bgmid-min.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframetab-bgright-min.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframetab-bgright-min.blp",
+  "w": 16,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframetab.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframetab.blp",
+  "w": 64,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframetabunsel-bgleft.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframetabunsel-bgleft.blp",
+  "w": 16,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframetabunsel-highlightmid.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframetabunsel-highlightmid.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-chatframetabunsel-selectedleft.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/chatframetabunsel-selectedleft.blp",
+  "w": 16,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-ui-chatframe-borderleft.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/ui-chatframe-borderleft.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-ui-chatframe-lockicon.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/ui-chatframe-lockicon.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-ui-chaticon-scrolldown-disabled.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/ui-chaticon-scrolldown-disabled.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-chatframe-ui-chaticon-scrollend-disabled.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/ui-chaticon-scrollend-disabled.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-chatframe-ui-chatinputborder-left.png",
+  "kind": "backdrop",
+  "path": "interface/chatframe/ui-chatinputborder-left.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "ornament-interface-chatframe-ui-chatinputborder-left2.png",
+  "kind": "ornament",
+  "path": "interface/chatframe/ui-chatinputborder-left2.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-classtrainerframe-ui-classtrainer-detailheaderleft.png",
+  "kind": "divider",
+  "path": "interface/classtrainerframe/ui-classtrainer-detailheaderleft.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-classtrainerframe-ui-classtrainer-detailheaderright.png",
+  "kind": "ornament",
+  "path": "interface/classtrainerframe/ui-classtrainer-detailheaderright.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-classtrainerframe-ui-classtrainer-horizontalbar.png",
+  "kind": "divider",
+  "path": "interface/classtrainerframe/ui-classtrainer-horizontalbar.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-classtrainerframe-ui-classtrainer-scrollbar.png",
+  "kind": "ornament",
+  "path": "interface/classtrainerframe/ui-classtrainer-scrollbar.blp",
+  "w": 64,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-comboframe-comboframebackground.png",
+  "kind": "divider",
+  "path": "interface/comboframe/comboframebackground.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-common-bluemenu-goldborder-horiz.png",
+  "kind": "ornament",
+  "path": "interface/common/bluemenu-goldborder-horiz.blp",
+  "w": 64,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-common-common-input-border.png",
+  "kind": "divider",
+  "path": "interface/common/common-input-border.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-common-dark-goldframe-button-pressed.png",
+  "kind": "divider",
+  "path": "interface/common/dark-goldframe-button-pressed.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-common-dark-goldframe-button.png",
+  "kind": "divider",
+  "path": "interface/common/dark-goldframe-button.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-common-greyborder64-left.png",
+  "kind": "ornament",
+  "path": "interface/common/greyborder64-left.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-common-moneyframe.png",
+  "kind": "ornament",
+  "path": "interface/common/moneyframe.blp",
+  "w": 128,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-common-ringborder.png",
+  "kind": "ornament",
+  "path": "interface/common/ringborder.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-common-thinborder-bottom.png",
+  "kind": "ornament",
+  "path": "interface/common/thinborder-bottom.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-common-ui-goldborder-tile.png",
+  "kind": "ornament",
+  "path": "interface/common/ui-goldborder-!tile.blp",
+  "w": 128,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-common-ui-goldborder-tile.png",
+  "kind": "divider",
+  "path": "interface/common/ui-goldborder-_tile.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-common-ui-goldborder.png",
+  "kind": "ornament",
+  "path": "interface/common/ui-goldborder.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-common-whiteiconframe.png",
+  "kind": "ornament",
+  "path": "interface/common/whiteiconframe.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-containerframe-ui-backpack-tokenframe.png",
+  "kind": "divider",
+  "path": "interface/containerframe/ui-backpack-tokenframe.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-containerframe-ui-icon-questborder.png",
+  "kind": "ornament",
+  "path": "interface/containerframe/ui-icon-questborder.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-cooldown-loc-redline.png",
+  "kind": "divider",
+  "path": "interface/cooldown/loc-redline.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-dialogframe-dialogframe-bot.png",
+  "kind": "ornament",
+  "path": "interface/dialogframe/dialogframe-bot.blp",
+  "w": 32,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-dialogframe-dialogframe-corners.png",
+  "kind": "ornament",
+  "path": "interface/dialogframe/dialogframe-corners.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-dialogframe-ui-dialogbox-border.png",
+  "kind": "backdrop",
+  "path": "interface/dialogframe/ui-dialogbox-border.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "ornament-interface-dialogframe-ui-dialogbox-corner.png",
+  "kind": "ornament",
+  "path": "interface/dialogframe/ui-dialogbox-corner.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-dialogframe-ui-dialogbox-divider.png",
+  "kind": "divider",
+  "path": "interface/dialogframe/ui-dialogbox-divider.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-dialogframe-ui-dialogbox-gold-border.png",
+  "kind": "backdrop",
+  "path": "interface/dialogframe/ui-dialogbox-gold-border.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "ornament-interface-dialogframe-ui-dialogbox-gold-corner.png",
+  "kind": "ornament",
+  "path": "interface/dialogframe/ui-dialogbox-gold-corner.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-dialogframe-ui-dialogbox-gold-header.png",
+  "kind": "divider",
+  "path": "interface/dialogframe/ui-dialogbox-gold-header.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-dialogframe-ui-dialogbox-header.png",
+  "kind": "divider",
+  "path": "interface/dialogframe/ui-dialogbox-header.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-dialogframe-ui-dialogbox-testwatermark-border.png",
+  "kind": "backdrop",
+  "path": "interface/dialogframe/ui-dialogbox-testwatermark-border.blp",
+  "w": 48,
+  "h": 48,
+  "slice": 16
+ },
+ {
+  "file": "ornament-interface-dialogframe-uiframediamondmetalborder.png",
+  "kind": "ornament",
+  "path": "interface/dialogframe/uiframediamondmetalborder.blp",
+  "w": 128,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-dialogframe-uiframediamondmetalborder2x.png",
+  "kind": "ornament",
+  "path": "interface/dialogframe/uiframediamondmetalborder2x.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-dialogframe-uiframediamondmetalclassicborder.png",
+  "kind": "ornament",
+  "path": "interface/dialogframe/uiframediamondmetalclassicborder.blp",
+  "w": 128,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-encounterjournal-ui-ej-background-sunwellplateau.png",
+  "kind": "ornament",
+  "path": "interface/encounterjournal/ui-ej-background-sunwellplateau.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-encounterjournal-ui-ej-bossmodelpaperframe.png",
+  "kind": "ornament",
+  "path": "interface/encounterjournal/ui-ej-bossmodelpaperframe.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-encounterjournal-ui-ej-dungeonbutton-sunwellplateau.png",
+  "kind": "ornament",
+  "path": "interface/encounterjournal/ui-ej-dungeonbutton-sunwellplateau.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-encounterjournal-ui-ej-dungeonmapframe-cata.png",
+  "kind": "ornament",
+  "path": "interface/encounterjournal/ui-ej-dungeonmapframe-cata.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-encounterjournal-ui-ej-lorebg-sunwellplateau.png",
+  "kind": "ornament",
+  "path": "interface/encounterjournal/ui-ej-lorebg-sunwellplateau.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-encounterjournal-ui-ej-mapframe-cata-left.png",
+  "kind": "ornament",
+  "path": "interface/encounterjournal/ui-ej-mapframe-cata-left.blp",
+  "w": 256,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-ui-frame.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/!ui-frame.blp",
+  "w": 64,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-ui-frame.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/_ui-frame.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-generalframeinsetborders.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/generalframeinsetborders.blp",
+  "w": 64,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-generalframeinsetbordershorizontal.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/generalframeinsetbordershorizontal.blp",
+  "w": 64,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-ui-frame.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/ui-frame.blp",
+  "w": 128,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-uiframediamondmetal.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/uiframediamondmetal.blp",
+  "w": 64,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-uiframediamondmetalheader2x.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/uiframediamondmetalheader2x.blp",
+  "w": 256,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-framegeneral-uiframediamondmetalvertical.png",
+  "kind": "divider",
+  "path": "interface/framegeneral/uiframediamondmetalvertical.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-uiframehorizontal.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/uiframehorizontal.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-uiframeneutral.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/uiframeneutral.blp",
+  "w": 1024,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-uiframetabs.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/uiframetabs.blp",
+  "w": 64,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-framegeneral-uiframevertical.png",
+  "kind": "ornament",
+  "path": "interface/framegeneral/uiframevertical.blp",
+  "w": 64,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-battlenet-status-offline.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/battlenet-status-offline.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-friendsframescrollicon.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/friendsframescrollicon.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-guildframe-botleft.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/guildframe-botleft.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ignoreframe-botleft.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ignoreframe-botleft.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-statusicon-offline.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/statusicon-offline.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-statusicon-online.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/statusicon-online.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-channelframe-botleft.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-channelframe-botleft.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-friendsframe-ui-channelframe-titlebar.png",
+  "kind": "divider",
+  "path": "interface/friendsframe/ui-channelframe-titlebar.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-channelframe-verticalbar.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-channelframe-verticalbar.blp",
+  "w": 64,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframe-botleft-bnet.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframe-botleft-bnet.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframe-botleft.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframe-botleft.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframe-botright-bnet.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframe-botright-bnet.blp",
+  "w": 128,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-friendsframe-ui-friendsframe-buttonspatch.png",
+  "kind": "divider",
+  "path": "interface/friendsframe/ui-friendsframe-buttonspatch.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframe-link.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframe-link.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframe-pending-botleft.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframe-pending-botleft.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframe-topright-bnet.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframe-topright-bnet.blp",
+  "w": 128,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframemute-botleft-bnet.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframemute-botleft-bnet.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframemute-botright-bnet.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframemute-botright-bnet.blp",
+  "w": 128,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframetab-inactivetab.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframetab-inactivetab.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframetab.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframetab.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframethree-botleft-bnet.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframethree-botleft-bnet.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-friendsframethree-botright-bnet.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-friendsframethree-botright-bnet.blp",
+  "w": 128,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-ignoreframe-botleft.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-ignoreframe-botleft.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-friendsframe-ui-toast-border.png",
+  "kind": "backdrop",
+  "path": "interface/friendsframe/ui-toast-border.blp",
+  "w": 48,
+  "h": 48,
+  "slice": 16
+ },
+ {
+  "file": "ornament-interface-friendsframe-ui-toast-friendonlineicon.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/ui-toast-friendonlineicon.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-whoframe-botleft.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/whoframe-botleft.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-friendsframe-whoframe-columntabs.png",
+  "kind": "ornament",
+  "path": "interface/friendsframe/whoframe-columntabs.blp",
+  "w": 64,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-garrison-classhallframe.png",
+  "kind": "ornament",
+  "path": "interface/garrison/classhallframe.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-accountupgrade-accountupgradebanners.png",
+  "kind": "ornament",
+  "path": "interface/glues/accountupgrade/accountupgradebanners.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-accountupgrade-banners.png",
+  "kind": "ornament",
+  "path": "interface/glues/accountupgrade/banners.blp",
+  "w": 256,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-accountupgrade-classtrialthanksframe.png",
+  "kind": "ornament",
+  "path": "interface/glues/accountupgrade/classtrialthanksframe.blp",
+  "w": 1024,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-alliedracesallianceandhordebanner.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/alliedracesallianceandhordebanner.blp",
+  "w": 256,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-buttonframe-mid.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/buttonframe-mid.blp",
+  "w": 16,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-charactercreate-labelframe.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/charactercreate-labelframe.blp",
+  "w": 128,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-glues-charactercreate-charactercreatemetalframehorizontal.png",
+  "kind": "divider",
+  "path": "interface/glues/charactercreate/charactercreatemetalframehorizontal.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-charactercreatemetalframevertical.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/charactercreatemetalframevertical.blp",
+  "w": 32,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-frame-sides.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/frame-sides.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-pandaren-faction-bannercover.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/pandaren-faction-bannercover.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-race-change-bannercover.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/race-change-bannercover.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-ui-charactercreate-banner.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/ui-charactercreate-banner.blp",
+  "w": 256,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-ui-charactercreate-banners.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/ui-charactercreate-banners.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-ui-charactercreate-outerborder-classic-anniversary-hardcore.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/ui-charactercreate-outerborder-classic-anniversary-hardcore.blp",
+  "w": 512,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-ui-charactercreate-outerborder-classic-anniversary.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/ui-charactercreate-outerborder-classic-anniversary.blp",
+  "w": 512,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-ui-charactercreate-outerborder-classic-hardcore.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/ui-charactercreate-outerborder-classic-hardcore.blp",
+  "w": 512,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-ui-charactercreate-outerborder-classic-sod.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/ui-charactercreate-outerborder-classic-sod.blp",
+  "w": 512,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-ui-charactercreate-outerborder-classic.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/ui-charactercreate-outerborder-classic.blp",
+  "w": 512,
+  "h": 1024,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-charactercreate-ui-charactercreate-outerborder.png",
+  "kind": "ornament",
+  "path": "interface/glues/charactercreate/ui-charactercreate-outerborder.blp",
+  "w": 256,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-glues-common-glue-tooltip-border.png",
+  "kind": "backdrop",
+  "path": "interface/glues/common/glue-tooltip-border.blp",
+  "w": 48,
+  "h": 48,
+  "slice": 16
+ },
+ {
+  "file": "backdrop-interface-glues-common-textpanel-border.png",
+  "kind": "backdrop",
+  "path": "interface/glues/common/textpanel-border.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "ornament-interface-glues-common-uiframetooltipglues.png",
+  "kind": "ornament",
+  "path": "interface/glues/common/uiframetooltipglues.blp",
+  "w": 32,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-common-uiframetooltipgluesvertical.png",
+  "kind": "ornament",
+  "path": "interface/glues/common/uiframetooltipgluesvertical.blp",
+  "w": 32,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-glues-loadingbar-loading-barborder-background-v2.png",
+  "kind": "divider",
+  "path": "interface/glues/loadingbar/loading-barborder-background-v2.blp",
+  "w": 1024,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-glues-loadingbar-loading-barborder-frame-v2.png",
+  "kind": "divider",
+  "path": "interface/glues/loadingbar/loading-barborder-frame-v2.blp",
+  "w": 1024,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-login-glues-accountloginframe.png",
+  "kind": "ornament",
+  "path": "interface/glues/login/glues-accountloginframe.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-glues-login-glues-loginprogressframe.png",
+  "kind": "ornament",
+  "path": "interface/glues/login/glues-loginprogressframe.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-gmchat-uiframegmchat.png",
+  "kind": "ornament",
+  "path": "interface/gmchat/uiframegmchat.blp",
+  "w": 512,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-gmchatframe-ui-gmstatusframe-pulse.png",
+  "kind": "ornament",
+  "path": "interface/gmchatframe/ui-gmstatusframe-pulse.blp",
+  "w": 256,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-gossipframe-tabardgossipicon.png",
+  "kind": "ornament",
+  "path": "interface/gossipframe/tabardgossipicon.blp",
+  "w": 16,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-guildbankframe-corners.png",
+  "kind": "ornament",
+  "path": "interface/guildbankframe/corners.blp",
+  "w": 64,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-guildbankframe-ui-guildbankframe-emblemborder.png",
+  "kind": "ornament",
+  "path": "interface/guildbankframe/ui-guildbankframe-emblemborder.blp",
+  "w": 512,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-guildbankframe-ui-guildbankframe-left.png",
+  "kind": "ornament",
+  "path": "interface/guildbankframe/ui-guildbankframe-left.blp",
+  "w": 512,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-guildbankframe-ui-guildbankframe-slots.png",
+  "kind": "ornament",
+  "path": "interface/guildbankframe/ui-guildbankframe-slots.blp",
+  "w": 128,
+  "h": 512,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-guildbankframe-ui-guildbankframe-tab.png",
+  "kind": "ornament",
+  "path": "interface/guildbankframe/ui-guildbankframe-tab.blp",
+  "w": 64,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-guildbankframe-ui-guildframe-permissiontab.png",
+  "kind": "ornament",
+  "path": "interface/guildbankframe/ui-guildframe-permissiontab.blp",
+  "w": 32,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-guildbankframe-ui-tabnameborder.png",
+  "kind": "divider",
+  "path": "interface/guildbankframe/ui-tabnameborder.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "ornament-interface-helpframe-helpframe-botright.png",
+  "kind": "ornament",
+  "path": "interface/helpframe/helpframe-botright.blp",
+  "w": 128,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-helpframe-helpframedivider.png",
+  "kind": "divider",
+  "path": "interface/helpframe/helpframedivider.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-helpframe-knowledgebasebuttton.png",
+  "kind": "divider",
+  "path": "interface/helpframe/knowledgebasebuttton.blp",
+  "w": 512,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-helpframe-tileable-parchmentedge-bottom.png",
+  "kind": "divider",
+  "path": "interface/helpframe/tileable-parchmentedge-bottom.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-hud-uiactionbarvertical.png",
+  "kind": "divider",
+  "path": "interface/hud/uiactionbarvertical.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-hud-uiactionbarvertical2x.png",
+  "kind": "divider",
+  "path": "interface/hud/uiactionbarvertical2x.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-hud-uinameplates.png",
+  "kind": "divider",
+  "path": "interface/hud/uinameplates.blp",
+  "w": 512,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-lfgframe-lfgborder.png",
+  "kind": "backdrop",
+  "path": "interface/lfgframe/lfgborder.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "divider-interface-lfgframe-ui-lfg-filigree.png",
+  "kind": "divider",
+  "path": "interface/lfgframe/ui-lfg-filigree.blp",
+  "w": 512,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-lfgframe-uilfgprogressbar.png",
+  "kind": "divider",
+  "path": "interface/lfgframe/uilfgprogressbar.blp",
+  "w": 512,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-mailframe-mailitemborder.png",
+  "kind": "divider",
+  "path": "interface/mailframe/mailitemborder.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-mailframe-mailpopup-divider.png",
+  "kind": "divider",
+  "path": "interface/mailframe/mailpopup-divider.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-mailframe-ui-mailframe-invoiceline.png",
+  "kind": "divider",
+  "path": "interface/mailframe/ui-mailframe-invoiceline.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-mainmenubar-mainmenubar.png",
+  "kind": "divider",
+  "path": "interface/mainmenubar/mainmenubar.blp",
+  "w": 1024,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-moneyframe-ui-moneyframe-border.png",
+  "kind": "divider",
+  "path": "interface/moneyframe/ui-moneyframe-border.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-optionsframe-ui-optionsframe-activetab.png",
+  "kind": "divider",
+  "path": "interface/optionsframe/ui-optionsframe-activetab.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-optionsframe-ui-optionsframe-inactivetab.png",
+  "kind": "divider",
+  "path": "interface/optionsframe/ui-optionsframe-inactivetab.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-paperdollinfoframe-ui-character-reputationbar.png",
+  "kind": "divider",
+  "path": "interface/paperdollinfoframe/ui-character-reputationbar.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-paperdollinfoframe-ui-character-skills-barborder.png",
+  "kind": "divider",
+  "path": "interface/paperdollinfoframe/ui-character-skills-barborder.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-paperdollinfoframe-ui-gearmanager-border.png",
+  "kind": "backdrop",
+  "path": "interface/paperdollinfoframe/ui-gearmanager-border.blp",
+  "w": 192,
+  "h": 192,
+  "slice": 64
+ },
+ {
+  "file": "divider-interface-paperdollinfoframe-ui-reputationwatchbar.png",
+  "kind": "divider",
+  "path": "interface/paperdollinfoframe/ui-reputationwatchbar.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-petbattles-passbuttonframe.png",
+  "kind": "divider",
+  "path": "interface/petbattles/passbuttonframe.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-petpaperdollframe-ui-petframe-slots.png",
+  "kind": "divider",
+  "path": "interface/petpaperdollframe/ui-petframe-slots.blp",
+  "w": 512,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-playerframe-demonhunterbarhorizontal.png",
+  "kind": "divider",
+  "path": "interface/playerframe/demonhunterbarhorizontal.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-playerframe-druidlunarbarhorizontal.png",
+  "kind": "divider",
+  "path": "interface/playerframe/druidlunarbarhorizontal.blp",
+  "w": 128,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-playerframe-monkmanabar.png",
+  "kind": "divider",
+  "path": "interface/playerframe/monkmanabar.blp",
+  "w": 128,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-playerframe-shamanmaelstrombarhorizontal.png",
+  "kind": "divider",
+  "path": "interface/playerframe/shamanmaelstrombarhorizontal.blp",
+  "w": 128,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-questframe-ui-horizontalbreak.png",
+  "kind": "divider",
+  "path": "interface/questframe/ui-horizontalbreak.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-questionframe-titlebanner.png",
+  "kind": "divider",
+  "path": "interface/questionframe/titlebanner.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-raidframe-ui-raidframe-groupbutton.png",
+  "kind": "divider",
+  "path": "interface/raidframe/ui-raidframe-groupbutton.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-raidframe-ui-raidinfo-header.png",
+  "kind": "divider",
+  "path": "interface/raidframe/ui-raidinfo-header.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-raidframe-ui-readycheckframe.png",
+  "kind": "divider",
+  "path": "interface/raidframe/ui-readycheckframe.blp",
+  "w": 512,
+  "h": 128,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-scenarios-objective-lineglow.png",
+  "kind": "divider",
+  "path": "interface/scenarios/objective-lineglow.blp",
+  "w": 128,
+  "h": 16,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-talentframe-talentframe-vertical2.png",
+  "kind": "divider",
+  "path": "interface/talentframe/talentframe-vertical2.blp",
+  "w": 256,
+  "h": 32,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-talentframe-ui-talentframe-active.png",
+  "kind": "divider",
+  "path": "interface/talentframe/ui-talentframe-active.blp",
+  "w": 64,
+  "h": 8,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-titlecards-6hu-title-garrison-barn.png",
+  "kind": "divider",
+  "path": "interface/titlecards/6hu_title_garrison_barn.blp",
+  "w": 1024,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-titlecards-6hu-title-garrison-barracks.png",
+  "kind": "divider",
+  "path": "interface/titlecards/6hu_title_garrison_barracks.blp",
+  "w": 1024,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-titlecards-6or-title-garrison-barn.png",
+  "kind": "divider",
+  "path": "interface/titlecards/6or_title_garrison_barn.blp",
+  "w": 1024,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-titlecards-6or-title-garrison-barracks.png",
+  "kind": "divider",
+  "path": "interface/titlecards/6or_title_garrison_barracks.blp",
+  "w": 1024,
+  "h": 256,
+  "slice": null
+ },
+ {
+  "file": "divider-interface-tokenframe-ui-tokenframe-categorybutton.png",
+  "kind": "divider",
+  "path": "interface/tokenframe/ui-tokenframe-categorybutton.blp",
+  "w": 256,
+  "h": 64,
+  "slice": null
+ },
+ {
+  "file": "backdrop-interface-tooltips-ui-tooltip-border.png",
+  "kind": "backdrop",
+  "path": "interface/tooltips/ui-tooltip-border.blp",
+  "w": 48,
+  "h": 48,
+  "slice": 16
+ },
+ {
+  "file": "backdrop-interface-tradeskillframe-ui-tradeskill-skillborder.png",
+  "kind": "backdrop",
+  "path": "interface/tradeskillframe/ui-tradeskill-skillborder.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "backdrop-interface-tutorialframe-tutorialframeborder.png",
+  "kind": "backdrop",
+  "path": "interface/tutorialframe/tutorialframeborder.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ },
+ {
+  "file": "backdrop-interface-vehicles-ui-vehicles-frame-border-nature.png",
+  "kind": "backdrop",
+  "path": "interface/vehicles/ui-vehicles-frame-border-nature.blp",
+  "w": 96,
+  "h": 96,
+  "slice": 32
+ }
+]
