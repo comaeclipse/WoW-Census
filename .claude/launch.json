@@ -4,14 +4,133 @@
     {
       "name": "mockups",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8791", "--bind", "127.0.0.1"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "--bind",
+        "127.0.0.1"
+      ],
       "port": 8791
     },
     {
       "name": "pages-dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["wrangler", "pages", "dev", "static", "--port", "8788"],
+      "runtimeArgs": [
+        "wrangler",
+        "pages",
+        "dev",
+        "static",
+        "--port",
+        "8788"
+      ],
       "port": 8788
+    },
+    {
+      "name": "static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8792",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "static"
+      ],
+      "port": 8792
+    },
+    {
+      "name": "mockups-alt",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8796",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8796
+    },
+    {
+      "name": "wow-2008-mockup",
+      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
+      "runtimeArgs": [
+        "-S",
+        "127.0.0.1:8797",
+        "-t",
+        "C:/Users/skarz/Documents/Projects/Mockups/wow-2008",
+        "C:/Users/skarz/Documents/Projects/Mockups/wow-2008/router.php"
+      ],
+      "port": 8797
+    },
+    {
+      "name": "origin-preview",
+      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
+      "runtimeArgs": [
+        "-S",
+        "127.0.0.1:8798",
+        "-t",
+        "C:/Users/skarz/Documents/Projects/MarketLens/laragon-php/public",
+        "C:/Users/skarz/AppData/Local/Temp/claude/C--Users-skarz-Documents-Projects-MarketLens/12c11f4e-6900-494d-ab2f-c806325d499d/scratchpad/preview-router.php"
+      ],
+      "port": 8798
+    },
+    {
+      "name": "origin-localdb",
+      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
+      "runtimeArgs": [
+        "-d",
+        "memory_limit=2G",
+        "-S",
+        "127.0.0.1:8799",
+        "-t",
+        "C:/Users/skarz/Documents/Projects/MarketLens/laragon-php/public",
+        "C:/Users/skarz/Documents/Projects/MarketLens/scratch/preview-router-localdb.php"
+      ],
+      "port": 8799
+    },
+    {
+      "name": "origin-snapshot-1028",
+      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
+      "runtimeArgs": [
+        "-d",
+        "memory_limit=2G",
+        "-S",
+        "127.0.0.1:8801",
+        "-t",
+        "C:/Users/skarz/Documents/Projects/MarketLens/laragon-php/public",
+        "C:/Users/skarz/AppData/Local/Temp/claude/C--Users-skarz-Documents-Projects-MarketLens/c08d7fdd-8de7-4cb2-b637-525eca25b044/scratchpad/router-home.php"
+      ],
+      "port": 8801
+    },
+    {
+      "name": "origin-pg",
+      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
+      "runtimeArgs": [
+        "-d",
+        "memory_limit=2G",
+        "-S",
+        "127.0.0.1:8800",
+        "-t",
+        "C:/Users/skarz/Documents/Projects/MarketLens/laragon-php/public",
+        "C:/Users/skarz/Documents/Projects/MarketLens/scratch/preview-router-pg.php"
+      ],
+      "port": 8800
+    },
+    {
+      "name": "banner-lab",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8802",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "scratch/banner-lab"
+      ],
+      "port": 8802
     }
   ]
 }

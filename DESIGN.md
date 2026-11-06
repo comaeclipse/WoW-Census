@@ -1,9 +1,10 @@
 # WoWCensus design principles
 
-The governing rules for the static website generated into `static/` for
-wowcensus.io. Change a rule here first, then the code.
-`node --test tools/test-design.mjs` enforces the mechanical parts against the
-built bundle; the checklist at the end covers what a test cannot see.
+The governing rules for the wowcensus.io pages the PHP site renders
+(`laragon-php/`). Change a rule here first, then the code.
+`node --test tools/test-design.mjs` enforces the mechanical parts against pages
+rendered by `laragon-php/render-routes.php`; the checklist at the end covers what
+a test cannot see.
 
 The in-game addon follows a different rule: **native Blizzard look**
 (FrameXML templates, GameFont, item icons, GameTooltip). Nothing below applies
@@ -74,14 +75,21 @@ Four faces, each with one job. Never swap their roles.
 In this order:
 
 1. `header.ihead` containing `.page-heading`: the `h1.iname` "WoWCensus" with
-   the page topic in `.itopic` underneath, and the **game nav** (one button per
-   edition, the current one `aria-current="true"`).
+   the page topic in `.itopic` underneath, and a right-aligned `.site-nav-stack`.
+   Its first row is the **game nav** (one button per edition, the current one
+   `aria-current="true"`); the second row is the **page nav**.
 2. **Breadcrumbs**: `WoWCensus / <Game> / <Page>`, last crumb `aria-current="page"`.
-3. `.page-controls`: the **page nav** (Census, Auction House, Guilds,
-   Geography, Talents; exactly one current) and, where the page slices data,
-   the realm/faction chip rows (`.vchips`).
+3. `.page-controls`, where the page slices data, holds the realm/faction chip
+   rows (`.vchips`). The page nav offers Census, Auction House, Guilds,
+   Geography, Talents, and Gear, with exactly one current page.
 4. Content: census combo cards or a concise market analysis, then panels/tables.
    Every TBC auction view has an analysis tied to its selected realm and faction.
+5. A compact gold footer bar with the site brand, working links for the current
+   edition, and square shortcuts to Guilds, Geography, and Gear.
+
+Talent overviews and class profiles share justified `.class-chip-links` with
+20px class icons. Class profiles mark the current class with a gold chip; on
+overviews, classes without profile routes use filter buttons.
 
 Every edition gets every page, even with no data. An empty page says so plainly
 in the normal layout; it never disappears or breaks the nav. Navigation is
@@ -114,7 +122,7 @@ prefix (`/forever/troll/`, `/tbc/paladin/`), configured in
 
 - `site/src/*.mjs` renderers are shared across all six editions. Base styles
   live in `site/public/style.css`; census, chart, and combo styles shared by
-  page types live in `site/public/census.css`. Never hand-edit generated `static/` files.
+  page types live in `site/public/census.css`. Pages are rendered on request; change the renderers, not their output.
 - The static stylesheet is content-hashed (`style.<sha256:12>.css`) and served
   immutable on interior pages. Static landing pages inline it to remove the
   render-blocking stylesheet request on a cold visit. Rebuild every edition
@@ -137,7 +145,7 @@ Automated (run after any renderer, CSS, or rebuild change):
 node --test tools/test-design.mjs tools/test-inspects.mjs
 ```
 
-`test-design.mjs` checks the built `static/` bundle: tokens unchanged; every
+`test-design.mjs` checks the rendered pages: tokens unchanged; every
 edition has every page; each page has the shared head (doctype, lang, viewport,
 current hashed stylesheet, font preloads), the anatomy from section 5 with one
 current game and one current page; every referenced `/fonts/` file exists; no

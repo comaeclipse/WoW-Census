@@ -10,9 +10,10 @@ halves:
   **Opportunity** — a "Bloomberg terminal" style view of the economy. It also
   samples the online population via `/who` (class, race, an inferred profession
   demand ranking, and unique/returning-character metrics).
-- **The companion website** (`static/`) — pre-rendered pages built from local
-  SQLite snapshots and published to Cloudflare Pages. Collection comes from
-  the addon's SavedVariables files.
+- **The companion website** (wowcensus.io) — PHP pages (`laragon-php/`)
+  rendered from the collected data. Saves are imported into a local PostgreSQL
+  database; the DigitalOcean droplet serves a SQLite snapshot of the published
+  query results.
 
 Everything is collected from the game's own APIs. WoW-Census is rigorous about
 never claiming data it cannot observe — see *What it measures* below.
@@ -30,10 +31,10 @@ MarketLens/   the in-game addon — drop this folder into Interface/AddOns
   Utils/      Tables (stats), Money (copper formatting)
   Libs/       embedded LibStub + LibAHTab (native AH tab on modern clients)
 site/src/     shared page renderers and inspect/census model code
-site/public/  stylesheet, fonts, and favicons for the static build
-tools/        local snapshot import, site builders, and verification
-static/       generated static site served at wowcensus.io (gitignored)
-assets/       mirrored site images used by the static builder
+laragon-php/  the website: PHP renderer, 2008/Retail/Pixel skins, origin packaging
+site/public/  stylesheet, fonts, and favicons the PHP site serves
+tools/        SavedVariables import into PostgreSQL, icon and catalog updaters
+assets/       mirrored site images (icons) the PHP site serves
 archive/      early prototypes
 ```
 
@@ -74,7 +75,7 @@ addon by matching the folder name to the `.toc` filename.
 | `/ml census profile` | Show the detected scan profile, its level backbone, and learned splits |
 | `/ml census cap <n>` / `auto` | Forever beta: pin the census level cap (default: the level the population has piled up at) |
 | `/ml census chat on` / `off` | Chat mode: the census types each `/ml who <filter>` into chat for you to send with Enter. Turns on automatically if the client blocks the census's own `/who` (the Forever beta does) |
-| `/ml census fixed on` / `off` | Fixed list: plan every query when the census starts and never add more; a query still over 50 is recorded as 50+ (and split up front next time). Not used by the Forever beta census |
+| `/ml census fixed on` / `off` | Fixed list for supported modes: plan every query when the census starts and never add more; a query still over 50 is recorded as 50+. TBC Anniversary always starts broad and splits capped queries; Forever beta uses its own plan. |
 | Forever beta census | One plan, no budget: levels 20 to the cap as level x class x race (pairs too rare to fill a level run as one range query), levels below 20 one query per level. A capped class+race cell adds name-letter queries chosen to stay under 50; nothing is dug into by zone. Every query, including added ones, lands at a random spot in the queue |
 | Retail census | Fixed refresh list: levels 1-20, then each faction race, then each class; capped queries remain 50+ |
 | `/ml census forget` | Drop learned splits so the next census starts from the plain backbone |
@@ -142,7 +143,7 @@ or for the Auction House to close; it does not invent a client-side timeout.
 ### Retail data workflow
 
 `/reload`, open the Retail Auction House, run `/ml scan`, and wait for the
-summary scan to complete. Run `/reload` again to flush the export to disk. To update the companion site, follow `upload.md`: capture the SavedVariables into a local SQLite snapshot, rebuild `static/`, verify it, then deploy the static directory.
+summary scan to complete. Run `/reload` again to flush the export to disk. To update the companion site, follow `upload.md`: import the save into PostgreSQL, check the pages on the local PHP site, then publish a new SQLite snapshot to the droplet.
 
 The first scan immediately supplies market, minimum buyout, quantity, and
 saturation. Demand, local supply, and price trends become meaningful after
@@ -184,10 +185,13 @@ Blizzard's rules shape how this works, and MarketLens respects them:
 
 Sample repeatedly — and with filters (`/ml who z-"Hellfire Peninsula"`,
 `/ml who c-"Paladin" 60-70`, `/ml who r-"Blood Elf"`) — to build a picture over
-time. `first_seen`, `last_seen`, lifetime sighting count, and a rolling 35-day
-daily observation history accumulate independently for Classic Era,
-TBC Anniversary, and Retail. This supports unique-today/7-day/30-day, new,
-returning, 3+-active-day, and returning-character-rate metrics.
+time. `first_seen`, `last_seen`, lifetime sighting count, and daily observation
+history accumulate independently for Classic Era, TBC Anniversary, and Retail in
+PostgreSQL. This supports unique-today/7-day/30-day, new, returning,
+3+-active-day, and returning-character-rate metrics. The save itself only keeps
+the last 14 days (characters, daily observations, sweeps and AH history, on
+every realm bucket); the importer merges each save, so older rows stay in
+PostgreSQL after the addon forgets them.
 
 For comparable geography collection, wrap a deliberate set of `/who` queries in
 an explicit sweep:
@@ -268,31 +272,13 @@ to keep `SavedVariables` small.
 
 ## Companion website
 
-The website is generated locally from a verified SQLite snapshot. New data is
-collected in WoW and saved to `MarketLens.lua` and `NameplateInspect.lua`.
-`tools/refresh-local-static.py` merges those files with the historical D1
-snapshot, then renders all seven editions. `tools/local-site-data.mjs` runs
-read-only SQLite queries during the build; no site Worker or live API is used.
-
-### Static site (`static/` -> wowcensus.io)
-
-**https://wowcensus.io** serves `static/`, a pure static build with no Pages
-Function, KV, or database behind it. `tools/refresh-local-static.py` builds it
-from a local SQLite snapshot via `tools/build-static-site.mjs`; see
-`tools/LOCAL_STATIC.md` for the capture, build, and deploy steps. The root
-`wrangler.toml` points the `wowcensus` Pages project at `./static`.
-
-The build writes `static/_headers`: each HTML page gets its own
-`Cache-Control: public, max-age=300` rule (Pages serves pages at extensionless
-URLs that a `/*.html` rule would not match), fingerprinted CSS and fonts are
-immutable, and JSON is cached for five minutes.
-
-### Retired paths
-
-The retired `pages/` output is removed from the checkout. The previous D1
-import API, KV publisher, and Pages Function have been removed from the build.
-The `www` hostname still needs a Cloudflare Redirect Rule before its existing
-redirect Worker can be retired in Cloudflare.
+The website is the PHP site in `laragon-php/`. WoW saves (`MarketLens.lua` and
+`NameplateInspect.lua`, or `WoWCensus.lua`) are imported into the local
+PostgreSQL database, which is the source of truth; `http://127.0.0.1:8081/`
+renders every page from it on request. wowcensus.io is a DigitalOcean droplet
+running the same PHP against a SQLite snapshot of only the query results the
+published pages need. `upload.md` has the import and publishing steps, and
+`laragon-php/README.md` the snapshot capture and the origin's setup.
 
 Inspection records retain verified same-realm context (otherwise unknown), observer
 context, locale and client build. Existing schema v1 cache records remain usable; missing realm/faction is not
@@ -327,5 +313,4 @@ updates navigation/sitemap/discovery, and adds inspect coverage to census pages.
 Talent popularity uses unique players with readable node data within each filtered
 class; string-only builds are explicitly excluded. These nearby samples are not
 population-wide spec shares. Run `node --test tools/test-inspects.mjs` for identity,
-classification, validation, replay/history and HTML escaping checks. Rebuild all seven
-editions and deploy the verified `static/` directory.
+classification, validation, replay/history and HTML escaping checks.

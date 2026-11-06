@@ -59,6 +59,26 @@ characters in the 2026-10-05 snapshot:
 | MoP Classic | Pagle, Galakras, Lei Shen, Nazgrim, Raden, Immerseus |
 | Retail | Illidan, Stormrage, Vek'nilash, Nazgrel, Nesingwary |
 
+## MoP Classic connected realms
+
+MoP Classic realms are connected: a /who scan from any member returns characters from every member, so the realm
+explorer (`/mop/realms`) shows one row per group, with the home realms as a breakdown. The groups live in
+`MOP_CONNECTED_REALMS` in `laragon-php/src/Realms.php`. Confirmed from scans on 2026-10-27:
+
+| Region | Group | Member realms |
+|---|---|---|
+| US | Pagle group | Pagle, Galakras, Nazgrim, Lei Shen, Ra-den, Immerseus |
+| US | Bloodsail Buccaneers | Bloodsail Buccaneers (one scan, 143 characters, all its own) |
+| EU | Shek'zeer group | Shek'zeer, Mirage Raceway, Hoptallus, Garalon, Norushen |
+
+Scanning one member per faction covers the whole group. A home realm missing from the map shows as its own row.
+
+Retail groups come from Blizzard's API instead: `python -B tools/update-retail-connected-realms.py` (credentials from
+`.env`) writes `laragon-php/src/retail-connected-realms.json` with every US and EU connected realm. Rerun it when
+Blizzard connects more realms. Retail groups are named after the member with the most characters seen. A Retail scan
+with no recorded region gets one from its home realms: a realm name found in one region only, or else the region whose
+group around the scanned realm explains most of its characters (smaller group on a tie).
+
 ## Data windows
 
 - Census race/class shares: 14 days, ending at the dataset's newest census sighting (`CENSUS_WINDOW_DAYS`).
