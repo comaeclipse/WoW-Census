@@ -3,8 +3,6 @@ tools/.mltoken
 .mltoken
 
 # Wrangler local state / build cache
-.wrangler/
-site/.wrangler/
 
 # Secrets / local env
 .env
@@ -20,7 +18,6 @@ __pycache__/
 *.pyc
 
 # Locally rendered Pages output; private SQLite data stays outside the repo.
-static/
 pages/
 
 # OS / editor junk
@@ -32,3 +29,22 @@ Thumbs.db
 upload.md
 
 .playwright-mcp/
+
+# Local scratch work, site copies and build output
+scratch/
+capture-compatible-*/
+dist/
+*.zip
+.wrangler/
+/*.png
+/stress-test/
+/social/
+
+# Mockups stay local, apart from the few already committed
+mockups/*
+!mockups/dwarf-render-check.html
+!mockups/forever-dwarf.html
+!mockups/forever-dwarf-real-*.png
+!mockups/forever-dwarf-specs*
+!mockups/paladin-card-tweaks.html
+!mockups/talents-class-row.html

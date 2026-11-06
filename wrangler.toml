@@ -1,7 +1,0 @@
-# Cloudflare Pages project for wowcensus.io (the pure static bundle in ./static,
-# built by tools/build-static-site.mjs). `wrangler pages deploy` reads this from
-# the repo root; the MarketLens Worker and its D1 database have their own config
-# in site/wrangler.toml.
-name = "wowcensus"
-pages_build_output_dir = "./static"
-compatibility_date = "2026-09-21"

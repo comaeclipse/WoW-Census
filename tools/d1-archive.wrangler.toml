@@ -1,7 +1,0 @@
-name = "marketlens-history-export"
-compatibility_date = "2026-10-05"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "marketlens"
-database_id = "72f2d530-b4a7-4b99-b8bb-6d3ccec39ae2"
