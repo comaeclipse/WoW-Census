@@ -69,10 +69,9 @@ def load(path):
         key = (region, name.casefold())
         if key in names:
             raise RuntimeError(f"line {n}: duplicate name {key}")
-        if r["blizzard_character_id"] in ids:
-            raise RuntimeError(f"line {n}: duplicate Blizzard character id {r['blizzard_character_id']}")
+        # Names are unique per region; Blizzard character ids are not (two different characters
+        # in one region can share an id, presumably one per hidden server), so ids are not checked.
         names.add(key)
-        ids.add(r["blizzard_character_id"])
         rows.append((region, name, r["ruleset"], r["faction"], r["race"], r["class"], r["level"],
                      r["guild"], r["guild_id"], r["blizzard_character_id"], utc(r["last_login_utc"]),
                      int(r["realm_id_observed"]), r["forever_pulse_id"], utc(r["verified_at_utc"])))
@@ -137,7 +136,12 @@ def main():
             # Tables created before guildless rows were allowed had these NOT NULL.
             cur.execute("""ALTER TABLE marketlens_import.external_verified_characters
                 ALTER COLUMN guild DROP NOT NULL, ALTER COLUMN guild_id DROP NOT NULL""")
-            cur.execute("""CREATE UNIQUE INDEX IF NOT EXISTS external_verified_characters_blizzard_id
+            # Blizzard ids repeat within a region, so this index is for lookups only (it was unique once).
+            cur.execute("""SELECT indisunique FROM pg_index WHERE indexrelid =
+                to_regclass('marketlens_import.external_verified_characters_blizzard_id')""")
+            if (cur.fetchone() or (False,))[0]:
+                cur.execute("DROP INDEX marketlens_import.external_verified_characters_blizzard_id")
+            cur.execute("""CREATE INDEX IF NOT EXISTS external_verified_characters_blizzard_id
                 ON marketlens_import.external_verified_characters (region, blizzard_character_id)""")
             cur.execute("SELECT row_count FROM marketlens_import.external_verified_sources WHERE sha256=%s", (digest,))
             if cur.fetchone():
