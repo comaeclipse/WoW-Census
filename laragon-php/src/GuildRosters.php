@@ -9,12 +9,73 @@
 
 declare(strict_types=1);
 
-/** A stable twelve-digit id for a realm guild. */
+/**
+ * The collection a guild belongs to. Usually its realm and faction (the census game). Forever has no
+ * player-facing realms: the game places players on hidden servers behind each ruleset, and Blizzard
+ * keys guilds by region and name, so one Forever guild is seen on several collector realms. There
+ * the scope is region, realm type and faction ("forever:us:RP PvP:Alliance").
+ */
+function guild_scope(string $source, string $game): string {
+  if ($source !== 'forever') return $game;
+  ['name' => $realm, 'fac' => $faction] = split_realm(str_starts_with($game, 'realm:') ? substr($game, 6) : $game);
+  $group = forever_realm_group($realm);
+  return $group ? "forever:{$group['key']}:$faction" : $game;
+}
+
+/** A stable twelve-digit id for a guild in its scope (see guild_scope()). */
 function guild_id(string $source, string $game, string $guild): string {
-  return (string)(100000000000 + hexdec(substr(hash('sha256', "$source\n$game\n$guild"), 0, 13)) % 900000000000);
+  return guild_hash_id($source, guild_scope($source, $game), $guild);
+}
+
+/** The id a guild had before Forever guilds were merged across collector realms; old links still resolve. */
+function guild_legacy_id(string $source, string $game, string $guild): string {
+  return guild_hash_id($source, $game, $guild);
+}
+
+function guild_hash_id(string $source, string $scope, string $guild): string {
+  return (string)(100000000000 + hexdec(substr(hash('sha256', "$source\n$scope\n$guild"), 0, 13)) % 900000000000);
 }
 
 function guild_path(string $source, string $id): string { return page_path($source, 'guilds') . '/' . $id . '/'; }
+
+/** Distinct members per guild id, counting a character seen on several of a merged guild's realms once. */
+function guild_member_counts(string $source): array {
+  static $cache = [];
+  if (isset($cache[$source])) return $cache[$source];
+  $chars = census_characters_sql($source);
+  $names = []; $ids = [];
+  $rows = Db::all("SELECT c.cgame game, c.guild guild, lower(c.name) name FROM $chars c
+    WHERE c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''", []);
+  foreach ($rows as $r) {
+    $id = $ids[$r['game'] . "\n" . $r['guild']] ??= guild_id($source, $r['game'], $r['guild']);
+    $names[$id][$r['name']] = true;
+  }
+  return $cache[$source] = array_map('count', $names);
+}
+
+/**
+ * One list entry per guild id: a Forever guild seen on several collector realms is one guild
+ * (see guild_scope()). Other editions' guild ids are per realm, so their lists are unchanged.
+ */
+function merge_guild_list(string $source, array $guilds): array {
+  if ($source !== 'forever') return $guilds;
+  $merged = [];
+  foreach ($guilds as $g) {
+    $id = guild_id($source, $g['game'], $g['name']);
+    if (!isset($merged[$id])) { $merged[$id] = $g; continue; }
+    $merged[$id]['members'] += $g['members'];
+    $merged[$id]['realms'] = true;
+  }
+  $counts = null;
+  foreach ($merged as $id => &$g) {
+    if (empty($g['realms'])) continue;
+    $counts ??= guild_member_counts($source);
+    $g['members'] = $counts[$id] ?? $g['members'];
+    unset($g['realms']);
+  }
+  unset($g);
+  return array_values($merged);
+}
 
 /** "eu:sod:Wild Growth" -> "Wild Growth (EU)", "us:classic-era:Mankrik" -> "Mankrik" (see realm_name()). */
 function guild_realm_label(string $realm): string { return realm_name($realm); }
@@ -55,20 +116,34 @@ function guild_rosters_from_rows(string $source, array $rows, bool $connected, b
   }
 
   $rosters = [];
+  $memberAt = [];
   foreach ($rows as $c) {
     $id = guild_id($source, $c['game'], $c['guild']);
+    $scope = guild_scope($source, $c['game']);
     if (!isset($rosters[$id])) {
       ['name' => $realm, 'fac' => $faction] = split_realm(str_starts_with($c['game'], 'realm:') ? substr($c['game'], 6) : $c['game']);
-      $rosters[$id] = ['source' => $source, 'id' => $id, 'game' => $c['game'], 'name' => $c['guild'], 'realm' => $realm,
+      // A merged Forever guild is labelled with its region and realm type ("US RP PvP").
+      if ($scope !== $c['game'] && ($group = forever_realm_group($realm))) $realm = $group['label'];
+      $rosters[$id] = ['source' => $source, 'id' => $id, 'game' => $c['game'], 'scope' => $scope, 'name' => $c['guild'], 'realm' => $realm,
         'faction' => $faction !== '' ? $faction : 'Unknown', 'firstT' => PHP_INT_MAX, 'lastT' => 0, 'members' => [], 'specs' => []];
-    } elseif ($rosters[$id]['name'] !== $c['guild'] || $rosters[$id]['game'] !== $c['game']) {
+    } elseif ($rosters[$id]['name'] !== $c['guild'] || $rosters[$id]['scope'] !== $scope) {
       throw new RuntimeException("Guild id $id is shared by two guilds");
     }
     $g = &$rosters[$id];
     $g['firstT'] = min($g['firstT'], $c['first_seen'] ?: PHP_INT_MAX);
     $g['lastT'] = max($g['lastT'], $c['last_seen'] ?: 0);
-    // name, level, race, class file, zone, last seen
-    $g['members'][] = [$c['name'], $c['level'], $c['race'], $c['cf'], $c['zone'], $c['last_seen']];
+    // name, level, race, class file, zone, last seen. A character seen on two collector realms of a
+    // merged guild is one member (names are unique per region): keep the newest sighting.
+    $member = [$c['name'], $c['level'], $c['race'], $c['cf'], $c['zone'], $c['last_seen']];
+    $nameKey = mb_strtolower((string)$c['name']);
+    if (isset($memberAt[$id][$nameKey])) {
+      $at = $memberAt[$id][$nameKey];
+      if (($c['last_seen'] ?? 0) > ($g['members'][$at][5] ?? 0)) $g['members'][$at] = $member;
+      unset($g);
+      continue;
+    }
+    $memberAt[$id][$nameKey] = count($g['members']);
+    $g['members'][] = $member;
     $spec = $specOf[($connected ? '' : $c['game']) . "\t" . $c['ckey']] ?? null;
     if ($spec !== null && $c['cf'] !== null) {
       $k = $c['cf'] . "\t" . $spec;
@@ -78,6 +153,8 @@ function guild_rosters_from_rows(string $source, array $rows, bool $connected, b
   }
   foreach ($rosters as &$g) {
     if ($g['firstT'] === PHP_INT_MAX) $g['firstT'] = 0;
+    // Merged rosters arrive realm by realm; keep the page order (level, then name).
+    usort($g['members'], fn($a, $b) => ($b[1] ?? -1) <=> ($a[1] ?? -1) ?: strcmp((string)$a[0], (string)$b[0]));
     arsort($g['specs']);
     // class file, spec, characters
     $g['specs'] = array_map(fn($k, $n) => [...explode("\t", (string)$k), $n], array_keys($g['specs']), $g['specs']);
@@ -122,33 +199,42 @@ function guild_roster(string $source, string $id): ?array {
   if (getenv('ML_QUERY_CACHE') !== '1') {
     // Resolve the stable public id from distinct guild names, then fetch only
     // this guild's members. The old path loaded every member of the edition.
+    // A guild can span several census games (a merged Forever guild), and an old
+    // (pre-merge) id still resolves: find the current id, then every game it covers.
     $chars = census_characters_sql($source);
-    $match = null;
-    $indexed = false;
+    $matches = null;
     if (census_cache_fresh()) {
       try {
-        $match = Db::first('SELECT cgame game, guild FROM census_guilds WHERE source_game=? AND id=?', [$source, $id]);
-        $indexed = true;
+        $matches = Db::all("SELECT cgame game, guild, id FROM census_guilds WHERE source_game=? AND id =
+            (SELECT id FROM census_guilds WHERE source_game=? AND (id=? OR legacy_id=?) ORDER BY (id=?) DESC LIMIT 1)",
+          [$source, $source, $id, $id, $id]);
       } catch (PDOException $e) {
-        if ($e->getCode() !== '42P01') throw $e; // Older cache, before the guild index was built.
+        // Older cache: no guild index (42P01) or no legacy_id column (42703). Use the scan below.
+        if (!in_array($e->getCode(), ['42P01', '42703'], true)) throw $e;
       }
     }
-    if (!$indexed) {
+    if ($matches === null) {
       $guilds = Db::all("SELECT DISTINCT c.cgame game, c.guild guild FROM $chars c
         WHERE c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''", []);
+      $current = null;
       foreach ($guilds as $g) {
-        if (guild_id($source, $g['game'], $g['guild']) !== $id) continue;
-        if ($match !== null) throw new RuntimeException("Guild id $id is shared by two guilds");
-        $match = $g;
+        if (guild_id($source, $g['game'], $g['guild']) === $id) { $current = $id; break; }
+        if (guild_legacy_id($source, $g['game'], $g['guild']) === $id) $current ??= guild_id($source, $g['game'], $g['guild']);
       }
+      $matches = $current === null ? [] : array_values(array_map(fn($g) => $g + ['id' => $current],
+        array_filter($guilds, fn($g) => guild_id($source, $g['game'], $g['guild']) === $current)));
     }
-    if ($match === null) return $cache["$source-$id"] = null;
+    if (!$matches) return $cache["$source-$id"] = null;
+    $current = $matches[0]['id'];
+    if (count(array_unique(array_column($matches, 'guild'))) > 1) throw new RuntimeException("Guild id $current is shared by two guilds");
+    $games = array_values(array_unique(array_column($matches, 'game')));
+    $marks = implode(',', array_fill(0, count($games), '?'));
     $rows = Db::all("SELECT c.cgame game, c.guild guild, c.character_key ckey, c.name name, c.level level,
         c.race race, c.class_file cf, c.zone zone, c.first_seen first_seen, c.last_seen last_seen
-      FROM $chars c WHERE c.rn=1 AND c.cgame=? AND c.guild=?
-      ORDER BY c.level DESC NULLS LAST, c.name COLLATE \"C\"", [$match['game'], $match['guild']]);
+      FROM $chars c WHERE c.rn=1 AND c.cgame IN ($marks) AND c.guild=?
+      ORDER BY c.level DESC NULLS LAST, c.name COLLATE \"C\"", [...$games, $matches[0]['guild']]);
     $connected = $source === 'mop-classic';
-    return $cache["$source-$id"] = guild_rosters_from_rows($source, $rows, $connected, false, guild_member_specs($source, $rows, $connected))[$id] ?? null;
+    return $cache["$source-$id"] = guild_rosters_from_rows($source, $rows, $connected, false, guild_member_specs($source, $rows, $connected))[$current] ?? null;
   }
   try {
     return $cache["$source-$id"] = Db::model("guild:$source-$id");

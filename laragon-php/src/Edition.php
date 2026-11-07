@@ -225,6 +225,7 @@ function model_guilds_geography(string $source, string $page): array {
         $guilds = [];
         foreach ($from as $u) foreach ($u['guilds'] as $g)
           $guilds[] = ['name' => $g['name'], 'members' => $g['members'], 'realm' => $u['realm'], 'faction' => $u['faction'], 'game' => $u['game']];
+        $guilds = merge_guild_list($source, $guilds);
         $guilds = js_sort($guilds, fn($a, $b) => js_or($b['members'] - $a['members'], fn() => js_cmp($a['name'], $b['name'])));
         $views[] = ['realm' => $r['key'], 'faction' => $f['key'], 'snapshot' => [
           'guilds' => $guilds,

@@ -53,15 +53,20 @@ $build('census_characters', implode("\nUNION ALL\n", array_map(
   'source_game, rn; source_game, cgame');
 $t = microtime(true);
 $pdo->exec('DROP TABLE IF EXISTS census_guilds_next');
-$pdo->exec('CREATE TABLE census_guilds_next (source_game text NOT NULL, id text NOT NULL, cgame text NOT NULL, guild text NOT NULL)');
-$insertGuild = $pdo->prepare('INSERT INTO census_guilds_next VALUES (?, ?, ?, ?)');
+// One row per census game and guild name. A merged Forever guild has a row per collector realm, all
+// with the same id; legacy_id is the pre-merge per-realm id, so old links still resolve.
+$pdo->exec('CREATE TABLE census_guilds_next (source_game text NOT NULL, id text NOT NULL, cgame text NOT NULL, guild text NOT NULL, legacy_id text NOT NULL)');
+$insertGuild = $pdo->prepare('INSERT INTO census_guilds_next VALUES (?, ?, ?, ?, ?)');
 $guildRows = $pdo->query("SELECT DISTINCT source_game, cgame, guild FROM census_characters_next WHERE rn=1 AND TRIM(COALESCE(guild, '')) <> ''");
 $guildCount = 0;
 while ($guild = $guildRows->fetch(PDO::FETCH_ASSOC)) {
-  $insertGuild->execute([$guild['source_game'], guild_id($guild['source_game'], $guild['cgame'], $guild['guild']), $guild['cgame'], $guild['guild']]);
+  $insertGuild->execute([$guild['source_game'], guild_id($guild['source_game'], $guild['cgame'], $guild['guild']), $guild['cgame'], $guild['guild'],
+    guild_legacy_id($guild['source_game'], $guild['cgame'], $guild['guild'])]);
   $guildCount++;
 }
-$pdo->exec('CREATE UNIQUE INDEX census_guilds_next_i0 ON census_guilds_next (source_game, id)');
+$pdo->exec('CREATE UNIQUE INDEX census_guilds_next_i0 ON census_guilds_next (source_game, cgame, guild)');
+$pdo->exec('CREATE INDEX census_guilds_next_i1 ON census_guilds_next (source_game, id)');
+$pdo->exec('CREATE INDEX census_guilds_next_i2 ON census_guilds_next (source_game, legacy_id)');
 printf("%-18s %9s rows %6.1fs\n", 'census_guilds', number_format($guildCount), microtime(true) - $t);
 $build('census_latest', 'SELECT ' . canonical_game_sql('game') . ' game, MAX(last_seen) latest FROM characters GROUP BY 1',
   'game');
