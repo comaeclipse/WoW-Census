@@ -18,7 +18,7 @@ __pycache__/
 *.pyc
 
 # Locally rendered Pages output; private SQLite data stays outside the repo.
-pages/
+/pages/
 
 # OS / editor junk
 .DS_Store

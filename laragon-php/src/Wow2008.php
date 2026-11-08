@@ -323,7 +323,7 @@ function home_page(): string {
     $editions[] = ['source' => $source, 'name' => HOME_NAMES[$source] ?? edition_name($source), 'href' => url('census', $source),
       'color' => EDITION_COLORS[$source] ?? '#c9a050', 'n7' => $r['n'], 'prev7' => $r['prev'], 'delta' => $delta,
       'total' => $seen['all']['n'], 'realms' => count($census['realms']), 'lastT' => (int)$census['lastT'],
-      'week' => $r['running']];
+      'week' => $r['running'], 'lastDay' => (int)$seen['lastDay']];
   }
   usort($editions, fn($a, $b) => $b['n7'] <=> $a['n7']);
 
@@ -336,12 +336,15 @@ function home_page(): string {
     $news[] = ['id' => $id, 'title' => $p['title'], 'date' => $p['date'], 'excerpt' => $text];
   }
 
-  $prev = array_sum(array_map(fn($e) => $e['delta'] === null ? 0 : $e['prev7'], $editions));
-  $cur = array_sum(array_map(fn($e) => $e['delta'] === null ? 0 : $e['n7'], $editions));
+  // "Seen last 7 days" counts only editions with data in the newest week: an edition whose collection
+  // stopped (the Forever beta) would otherwise add its final week. No overall week-over-week change: the
+  // editions scanned in both weeks get uneven effort, so the sum reflects scanning, not players.
+  $latestDay = $editions ? max(array_column($editions, 'lastDay')) : 0;
+  $current = array_filter($editions, fn($e) => $e['lastDay'] >= $latestDay - 6);
   $newest = $editions ? array_reduce($editions, fn($m, $e) => $m === null || $e['lastT'] > $m['lastT'] ? $e : $m) : null;
   $totals = [
-    'tracked' => array_sum(array_column($editions, 'total')), 'seen7' => array_sum(array_column($editions, 'n7')),
-    'change' => $prev ? 100 * ($cur - $prev) / $prev : null, 'realms' => array_sum(array_column($editions, 'realms')),
+    'tracked' => array_sum(array_column($editions, 'total')), 'seen7' => array_sum(array_column($current, 'n7')),
+    'seen7Editions' => count($current), 'change' => null, 'realms' => array_sum(array_column($editions, 'realms')),
     'newestT' => $newest['lastT'] ?? 0, 'newestName' => $newest['name'] ?? '',
   ];
 
