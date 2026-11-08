@@ -162,6 +162,15 @@ retire every page on purpose. The same file sends the per-visitor routes
 PHP-FPM pool (`pool.d/wowcensus-live.conf`, 2 workers), so they never queue
 behind page renders.
 
+New data goes live through `/usr/local/bin/wowcensus-data-refresh` (copy:
+`laragon-php/wowcensus-data-refresh`; cron `/etc/cron.d/wowcensus-data`, every 5
+minutes, log `/var/log/wowcensus-data-refresh.log`). At most once an hour it
+rebuilds the census tables at low priority, pre-renders the 72 main pages, then
+switches nginx to the new version. The pools set `ML_CENSUS_PUBLISHED=1`, so until
+then pages keep using the previous census tables instead of the slow live SQL. A
+failure leaves the old data up and is retried after 30 minutes. `FORCE=1` publishes
+now; run it after a code release to re-render the main pages.
+
 ## Contact form
 
 `/contact` is handled by `src/contact.php` (`public/index.php` hands the path

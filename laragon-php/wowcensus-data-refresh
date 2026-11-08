@@ -1,0 +1,76 @@
+#!/bin/sh
+# Publishes new data on wowcensus.io in one controlled pass, at most once per
+# PUBLISH_INTERVAL_MINUTES, one step at a time so the small box never runs two heavy jobs:
+#   1. rebuild the census tables (build-census-cache.php) at low CPU and disk priority;
+#      the site keeps showing the previous tables until they are swapped in
+#      (ML_CENSUS_PUBLISHED=1 in the PHP-FPM pools), so pages stay fast;
+#   2. pre-render the main pages under the new version (visitors keep the old copies);
+#   3. switch nginx to the new version in one reload.
+# Cached pages are keyed by the data version (census_cache_meta.version once built).
+# Runs from /etc/cron.d/wowcensus-data every 5 minutes; safe to run by hand.
+#   FORCE=1   publish now: skip the interval and re-render even without new data
+set -eu
+exec 9>/run/wowcensus-data-refresh.lock
+flock -n 9 || exit 0
+STATE=/var/lib/wowcensus/data-version
+FAILED=/var/lib/wowcensus/data-refresh.failed
+CONF=/etc/nginx/conf.d/wowcensus-data-version.conf
+INTERVAL=${PUBLISH_INTERVAL_MINUTES:-60}
+RETRY=${FAILED_RETRY_MINUTES:-30}
+SITE=/srv/wowcensus/current
+mkdir -p "$(dirname "$STATE")"
+q() { sudo -u postgres psql -d marketlens -Atc "$1"; }
+valid() { case "$1" in ''|*[!0-9TZ:.+-]*) return 1 ;; esac; }
+log() { echo "$(date -u +%FT%TZ) $*"; }
+
+V=$(q "select max(imported_at_utc) from marketlens_import.local_imports")
+valid "$V" || { echo "unexpected data version: '$V'" >&2; exit 1; }
+CUR=$(cat "$STATE" 2>/dev/null || true)
+if [ "${FORCE:-0}" != 1 ]; then
+  [ "$V" = "$CUR" ] && exit 0
+  # Space publishes out: uploads arriving in a burst go live together.
+  [ -f "$STATE" ] && [ -n "$(find "$STATE" -mmin -"$INTERVAL")" ] && exit 0
+  # After a failure, wait before trying again instead of retrying every 5 minutes.
+  [ -f "$FAILED" ] && [ -n "$(find "$FAILED" -mmin -"$RETRY")" ] && exit 0
+fi
+
+fail() { log "$*" >&2; touch "$FAILED"; exit 1; }
+
+P=$(q "select version from marketlens_import.census_cache_meta limit 1" 2>/dev/null || true)
+if [ "$P" != "$V" ]; then
+  log "new data $V (census tables are for '${P:-none}'): rebuilding census tables"
+  started=$(date +%s)
+  ( cd "$SITE" && ML_DB_HOST=127.0.0.1 ML_DB_PORT=5432 ML_DB_NAME=marketlens ML_DB_USER=wowcensus \
+      ML_DB_SCHEMA=marketlens_import ML_DB_PASSWORD="$(cat /etc/wowcensus/pg-password)" \
+      nice -n 19 ionice -c 3 php -d memory_limit=1024M build-census-cache.php ) \
+    || fail "census rebuild failed; the site keeps the previous data"
+  log "census tables rebuilt in $(( $(date +%s) - started ))s"
+  P=$(q "select version from marketlens_import.census_cache_meta limit 1")
+fi
+valid "$P" || fail "unexpected census version: '$P'"
+V=$P   # Publish exactly what the tables hold (an upload during the rebuild waits for the next pass).
+
+# Let PHP's 60-second APCu data-version check notice the new tables before rendering.
+sleep 65
+log "warming the main pages for $V"
+HOST=wowcensus.io DATA_VERSION="$V" nice -n 10 /root/warm-cache.sh || fail "warming failed; the site keeps the previous data"
+TMP=$(mktemp)
+cat > "$TMP" <<CONF
+# Written by /usr/local/bin/wowcensus-data-refresh. The page cache key includes
+# \$wowcensus_data, so a new value retires every cached page at once. Requests
+# from this machine may name the next version (X-WoWCensus-Data) to pre-render.
+map "\$remote_addr:\$http_x_wowcensus_data" \$wowcensus_data {
+    default "$V";
+    "~^127\.0\.0\.1:(?<wcv>[0-9TZ:.+-]+)\$" \$wcv;
+}
+CONF
+cp "$CONF" "$CONF.prev" 2>/dev/null || true
+install -m 644 "$TMP" "$CONF"; rm -f "$TMP"
+if nginx -t 2>/dev/null; then
+  systemctl reload nginx
+  echo "$V" > "$STATE"; rm -f "$FAILED"
+  log "switched to $V"
+else
+  [ -f "$CONF.prev" ] && cp "$CONF.prev" "$CONF"
+  fail "nginx rejected the new version; kept the old one"
+fi

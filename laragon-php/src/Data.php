@@ -97,11 +97,16 @@ function canonical_game_sql(string $column): string {
  * fragments below compute on every page, built once per import. Used only while
  * census_cache_meta.version names the latest import; otherwise (no tables, data
  * imported since, ML_NO_CENSUS_CACHE=1) pages run the live SQL, unchanged.
+ *
+ * With ML_CENSUS_PUBLISHED=1 (production) the tables are used whatever their
+ * version: an upload changes nothing on the site until wowcensus-data-refresh has
+ * rebuilt them, so pages never fall back to the slow live SQL in between.
  */
 function census_cache_fresh(): bool {
   static $fresh = null;
   if ($fresh !== null) return $fresh;
   if (getenv('ML_NO_CENSUS_CACHE') === '1') return $fresh = false;
+  if (getenv('ML_CENSUS_PUBLISHED') === '1') return $fresh = Db::publishedVersion() !== null;
   try {
     $row = Db::uncached("SELECT (SELECT version FROM census_cache_meta) = (SELECT max(imported_at_utc) FROM local_imports) fresh")[0] ?? [];
     return $fresh = !empty($row['fresh']);

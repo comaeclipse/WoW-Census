@@ -64,10 +64,27 @@ final class Db {
     return $on ??= getenv('ML_APCU_CACHE') === '1' && function_exists('apcu_enabled') && apcu_enabled();
   }
 
+  /**
+   * The import the census tables were built for (census_cache_meta.version), or
+   * null without them. With ML_CENSUS_PUBLISHED=1 this, not the newest import,
+   * is the data version the site shows.
+   */
+  public static function publishedVersion(): ?string {
+    static $version = false;
+    if ($version !== false) return $version;
+    try {
+      $row = self::run('SELECT version FROM census_cache_meta LIMIT 1', [], null)[0] ?? null;
+      return $version = $row ? (string)$row['version'] : null;
+    } catch (Throwable $e) {
+      return $version = null;
+    }
+  }
+
   private static function dataVersion(): string {
     $version = apcu_fetch('ml:data-version', $ok);
     if ($ok) return $version;
-    $row = self::run('SELECT max(imported_at_utc) v FROM local_imports', [], null)[0] ?? [];
+    $published = getenv('ML_CENSUS_PUBLISHED') === '1' ? self::publishedVersion() : null;
+    $row = $published === null ? self::run('SELECT max(imported_at_utc) v FROM local_imports', [], null)[0] ?? [] : ['v' => $published];
     $version = (string)($row['v'] ?? '0');
     apcu_store('ml:data-version', $version, 60);
     return $version;
