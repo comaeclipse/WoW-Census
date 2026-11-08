@@ -152,6 +152,16 @@ replacing origin tables without a new release, clear
 `/shoutbox` and `/skin` bypass the cache, as does any response that sets a
 cookie. The `X-Cache` response header shows `HIT`, `MISS` or `BYPASS`.
 
+On the PostgreSQL production server (162.243.9.180) cached pages never expire; a
+new data version retires them (`wowcensus-data-refresh`). Since 2026-11-08 the
+key holds a fixed code version from `/etc/nginx/conf.d/wowcensus-code-version.conf`
+instead of the release directory, because a release that emptied the cache left
+3 PHP workers re-rendering cold pages for over an hour. Change that string only to
+retire every page on purpose. The same file sends the per-visitor routes
+(`/shoutbox`, `/poll`, `/contact`, `/admin`, `/upload`, `/skin`) to their own
+PHP-FPM pool (`pool.d/wowcensus-live.conf`, 2 workers), so they never queue
+behind page renders.
+
 ## Contact form
 
 `/contact` is handled by `src/contact.php` (`public/index.php` hands the path
