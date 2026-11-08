@@ -10,7 +10,7 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '56';
+const ASSET_VERSION = '57';
 
 // ---------------------------------------------------------------- helpers (the mockup's bootstrap)
 

@@ -29,9 +29,10 @@ $day = intdiv(time(), 86400);
 $rotation = [1, 2, 3, 4, 6, 7, 8, 9];
 foreach ($slides as $i => &$slide) $slide[0] = 'home-' . $rotation[($day + $i) % count($rotation)];
 unset($slide);
-// Fixed slides first. The Discord banner carries its own text, so it shows without a caption and links as a whole.
+// Fixed slides first. The Discord banner carries its own text, so it shows whole ("plain": not cropped),
+// sitting above the caption bar, and the whole picture links to the invite as well.
 $discord = 'https://discord.gg/Dzw8H3QZX';
-$fixed = [['discord', 'Volunteers needed! Join the Discord', '', $discord, '', true]];
+$fixed = [['discord', 'Volunteers needed!', 'Help us scan realms and grow the census. Everyone is welcome.', $discord, 'Join the Discord »', true]];
 if ($totals['tracked'] >= 1000000)
   $fixed[] = ['home-5', 'Over ' . fmt((int)(floor($totals['tracked'] / 1000000) * 1000000)) . ' characters in our database',
     fmt($totals['tracked']) . ' characters tracked across ' . count($editions) . ' editions, and counting.', $top['href'] ?? '/realms', 'See the census »'];
@@ -43,16 +44,15 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
 
     <div class="hero" id="hero">
 <?php foreach ($slides as $i => $slide): [$art, $title, $text, $href, $more] = $slide; $plain = $slide[5] ?? false; ?>
+<?php $ext = str_starts_with($href, 'http') ? ' target="_blank" rel="noopener"' : ''; ?>
+      <div class="slide<?= $plain ? ' plain' : '' ?><?= $i ? '' : ' on' ?>">
 <?php if ($plain): ?>
-      <a class="slide plain<?= $i ? '' : ' on' ?>" href="<?= e($href) ?>" target="_blank" rel="noopener">
-        <img src="<?= e(asset("banner-$art.webp")) ?>" alt="<?= e($title) ?>" width="639" height="246">
-      </a>
+        <a href="<?= e($href) ?>"<?= $ext ?>><img src="<?= e(asset("banner-$art.webp")) ?>" alt="<?= e($title) ?>" width="639" height="246"></a>
 <?php else: ?>
-      <div class="slide<?= $i ? '' : ' on' ?>">
         <img src="<?= e(asset("banner-$art.webp")) ?>" alt="" width="880" height="150">
-        <div class="cap"><b><?= e($title) ?></b><?= e($text) ?> <a href="<?= e($href) ?>"><?= e($more) ?></a></div>
-      </div>
 <?php endif; ?>
+        <div class="cap"><b><?= e($title) ?></b><?= e($text) ?> <a href="<?= e($href) ?>"<?= $ext ?>><?= e($more) ?></a></div>
+      </div>
 <?php endforeach; ?>
       <div class="dots"><?php foreach ($slides as $i => $_): ?><button type="button"<?= $i ? '' : ' class="on"' ?> aria-label="Story <?= $i + 1 ?>"><?= $i + 1 ?></button><?php endforeach; ?></div>
     </div>

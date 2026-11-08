@@ -287,7 +287,7 @@ a.gname:hover b{text-decoration:underline}
 .home .slide .cap{z-index:1}
 .home .slide.plain{background:#090909}
 .home .slide.plain::after{content:none}
-.home .slide.plain img{object-fit:contain;object-position:center}
+.home .slide.plain img{object-fit:contain;object-position:center top}
 .home .slide .cap a{color:var(--gold-lt);font-weight:bold}
 .home .tiles .stat em.upt{color:#2c7a10;font-weight:bold}
 .home .tiles .stat em.dnt{color:#b0280a;font-weight:bold}
