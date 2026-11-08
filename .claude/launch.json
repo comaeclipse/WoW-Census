@@ -131,6 +131,20 @@
         "scratch/banner-lab"
       ],
       "port": 8802
+    },
+    {
+      "name": "site-repo",
+      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
+      "runtimeArgs": [
+        "-d",
+        "memory_limit=1G",
+        "-S",
+        "127.0.0.1:8082",
+        "-t",
+        "laragon-php/public",
+        "laragon-php/public/cli-router.php"
+      ],
+      "port": 8082
     }
   ]
 }

@@ -23,21 +23,36 @@ if ($top) $slides[] = ['lava-dragon', $top['name'] . ': ' . fmt($top['n7']) . ' 
 foreach (array_slice($news, 0, 2) as $i => $post)
   $slides[] = [$i ? 'moonbrook' : 'molten-core', $post['title'], mb_strimwidth($post['excerpt'], 0, 150, '…'), '/blog.php?id=' . $post['id'], 'Read more »'];
 $slides[] = ['realms', 'Every realm, side by side', 'Compare population and faction balance across the realms we scan.', '/realms', 'Open the Realm Viewer »'];
-// Slides take turns through the homepage screenshots (banner-home-1..9), moving on a step each day.
+// Slides take turns through the homepage screenshots, moving on a step each day; banner-home-5 is kept
+// for the milestone slide below so it never shows twice.
 $day = intdiv(time(), 86400);
-foreach ($slides as $i => &$slide) $slide[0] = 'home-' . (($day + $i) % 9 + 1);
+$rotation = [1, 2, 3, 4, 6, 7, 8, 9];
+foreach ($slides as $i => &$slide) $slide[0] = 'home-' . $rotation[($day + $i) % count($rotation)];
 unset($slide);
+// Fixed slides first. The Discord banner carries its own text, so it shows without a caption and links as a whole.
+$discord = 'https://discord.gg/Dzw8H3QZX';
+$fixed = [['discord', 'Volunteers needed! Join the Discord', '', $discord, '', true]];
+if ($totals['tracked'] >= 1000000)
+  $fixed[] = ['home-5', 'Over ' . fmt((int)(floor($totals['tracked'] / 1000000) * 1000000)) . ' characters in our database',
+    fmt($totals['tracked']) . ' characters tracked across ' . count($editions) . ' editions, and counting.', $top['href'] ?? '/realms', 'See the census »'];
+$slides = array_merge($fixed, $slides);
 $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
 ?>
   <main class="main home">
     <div class="crumb">» Home</div>
 
     <div class="hero" id="hero">
-<?php foreach ($slides as $i => [$art, $title, $text, $href, $more]): ?>
+<?php foreach ($slides as $i => $slide): [$art, $title, $text, $href, $more] = $slide; $plain = $slide[5] ?? false; ?>
+<?php if ($plain): ?>
+      <a class="slide plain<?= $i ? '' : ' on' ?>" href="<?= e($href) ?>" target="_blank" rel="noopener">
+        <img src="<?= e(asset("banner-$art.webp")) ?>" alt="<?= e($title) ?>" width="639" height="246">
+      </a>
+<?php else: ?>
       <div class="slide<?= $i ? '' : ' on' ?>">
         <img src="<?= e(asset("banner-$art.webp")) ?>" alt="" width="880" height="150">
         <div class="cap"><b><?= e($title) ?></b><?= e($text) ?> <a href="<?= e($href) ?>"><?= e($more) ?></a></div>
       </div>
+<?php endif; ?>
 <?php endforeach; ?>
       <div class="dots"><?php foreach ($slides as $i => $_): ?><button type="button"<?= $i ? '' : ' class="on"' ?> aria-label="Story <?= $i + 1 ?>"><?= $i + 1 ?></button><?php endforeach; ?></div>
     </div>
