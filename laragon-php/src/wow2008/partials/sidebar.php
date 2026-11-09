@@ -10,7 +10,7 @@ $requested = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
   <nav class="nav">
     <h3>Site <button class="nav-toggle" type="button" aria-label="Collapse Site" aria-controls="nav-site" aria-expanded="true"></button></h3>
     <ul class="cur" id="nav-site">
-<?php foreach ([['Home', '/'], ['Blog', '/blog.php'], ['Shoutbox', '/shoutbox/'], ['Contact', '/contact']] as [$label, $href]):
+<?php foreach ([['Home', '/'], ['Blog', '/blog.php'], ['FAQ', '/faq.php'], ['Shoutbox', '/shoutbox/'], ['Contact', '/contact']] as [$label, $href]):
         $active = $requested === $href; ?>
       <li><a href="<?= e($href) ?>"<?= $active ? ' style="color:#fff" aria-current="page"' : '' ?>><?= $active ? '» ' : '' ?><?= e($label) ?></a></li>
 <?php endforeach; ?>

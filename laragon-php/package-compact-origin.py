@@ -76,6 +76,7 @@ def main() -> None:
             (REPO / "laragon-php/src", "src"),
             (REPO / "laragon-php/public/index.php", "public/index.php"),
             (REPO / "laragon-php/public/blog.php", "public/blog.php"),
+            (REPO / "laragon-php/public/faq.php", "public/faq.php"),
             (REPO / "laragon-php/public/cobalt-skin.css", "public/cobalt-skin.css"),
             (REPO / "laragon-php/public/cobalt-skin.js", "public/cobalt-skin.js"),
             (REPO / "laragon-php/public/cobalt-character.webp", "public/cobalt-character.webp"),

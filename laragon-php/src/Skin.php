@@ -66,6 +66,7 @@ function render_skin(string $html, string $skin): string {
   $segments = array_values(array_filter(explode('/', trim($requestPath, '/'))));
   $pageKey = count($segments) === 0 ? 'census' : (count($segments) === 1 && in_array($segments[0], ['forever','tbc','classic','sod','hardcore','mop','retail'], true) ? 'census' : end($segments));
   if (str_starts_with($requestPath, '/retail/skin-colors') || str_starts_with($requestPath, '/forever/skin-colors')) $pageKey = 'skin-colors';
+  elseif ($requestPath === '/faq.php') $pageKey = 'faq';
   elseif (!in_array($pageKey, ['census','realms','auctionhouse','guilds','geography','talents','gear','combos'], true)) $pageKey = 'profile';
   $html = preg_replace('/<html\b/', '<html data-skin="' . $skin . '" data-cobalt-page="' . htmlspecialchars($pageKey, ENT_QUOTES) . '"', $html, 1);
   if ($skin === 'current') {
@@ -97,6 +98,7 @@ function render_skin(string $html, string $skin): string {
   preg_match('/<span\b[^>]*aria-current[^>]*>(.*?)<\/span>/s', skin_section($header, 'breadcrumbs'), $pageMatch);
   $edition = html_entity_decode(trim(strip_tags($editionMatch[1] ?? 'WoW Forever')), ENT_QUOTES | ENT_HTML5, 'UTF-8');
   $page = html_entity_decode(trim(strip_tags($pageMatch[1] ?? 'Census')), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+  if ($pageKey === 'faq') $edition = 'WoWCensus';
   $description = match ($pageKey) {
     'gear' => 'Explore equipment slots and the items seen most often on inspected characters.',
     'talents' => 'Explore classified builds and selected talents among nearby inspected characters.',
@@ -106,6 +108,7 @@ function render_skin(string $html, string $skin): string {
     'geography' => 'Explore where characters were seen in recent population samples.',
     'combos' => 'Compare race and class pairings among observed characters.',
     'skin-colors' => 'Compare the skin-color choices seen in sampled Retail character profiles, race by race.',
+    'faq' => 'Answers to common questions about WoWCensus: what it is, where the numbers come from and how to get involved.',
     'profile' => 'Explore the published character and inspection sample for this profile.',
     default => 'Explore the published WoWCensus snapshot. Counts describe observed characters, not unique players or a live online population.',
   };

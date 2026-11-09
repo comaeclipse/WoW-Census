@@ -14,6 +14,8 @@ Apache serves `C:\laragon\www\marketlens\public` on <http://127.0.0.1:8081/> (`C
 
 `http://127.0.0.1:8081/schedule.php` is the local-only `/who` scan calendar: which realm and faction to sweep at which time, US and EU, with each slot checked off against the sweeps in PostgreSQL. It also offers an `.ics` download for phone reminders. The plan (lanes, slot times, realm order, calibration days) is `src/scan-plan.php`. Like `stats.php`, it must never be published, so it is not in the origin package either.
 
+`/faq.php` (`public/faq.php`) is the visitor FAQ; edit its questions in that file.
+
 `/blog.php` is the public changelog index; `/blog.php?id=1234` displays post 1234. To publish an update, add a unique positive integer key with `date` (`YYYY-MM-DD`), `title`, and plain-text `body` to `src/blog-posts.php`. Separate body paragraphs with a blank line. The file is included in local and compact-origin packages. Deploy the updated PHP files to the origin and purge `/blog.php` and the changed post URL from Cloudflare so cached copies refresh.
 
 After changing `src/`, `site/src/` or `site/public/`, redeploy:
