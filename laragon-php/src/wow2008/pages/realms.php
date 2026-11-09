@@ -195,11 +195,11 @@ function rankList(list) {
       <span class="pct">${p}%</span></li>`;
   }).join('');
 }
-function pctBars(el, obj, color, scope = 'characters seen') {
+function pctBars(el, obj, color, scope = 'characters seen', label = shortRace) {
   if (!obj || !Object.keys(obj).length) { el.innerHTML = '<p class="pending">Not scanned yet</p>'; return; }
   const rows = Object.entries(obj), max = Math.max(...rows.map(r => r[1]));
-  el.innerHTML = rows.map(([n, p]) => `<div class="bar" data-tip="${esc(shortRace(n))}|${p}% of ${scope}">
-    <span class="lbl" style="color:${color(n)}">${esc(shortRace(n))}</span>
+  el.innerHTML = rows.map(([n, p]) => `<div class="bar" data-tip="${esc(label(n))}|${p}% of ${scope}">
+    <span class="lbl" style="color:${color(n)}">${esc(label(n))}</span>
     <div class="track"><div class="fill" data-w="${p/max*100}%" style="background:${color(n)}"></div></div>
     <span class="val">${p}%</span></div>`).join('');
   grow(el);
@@ -233,7 +233,7 @@ function select(id, scroll) {
   document.getElementById('dClassHCount').textContent = r.H == null ? 'not scanned' : `${fmt(r.H)} observed`;
   pctBars(document.getElementById('dClassA'), r.clsA, n => CLASS_COLOR[n], 'Alliance characters');
   pctBars(document.getElementById('dClassH'), r.clsH, n => CLASS_COLOR[n], 'Horde characters');
-  pctBars(document.getElementById('dRace'), r.race, n => ALLIANCE_RACES.includes(n) ? '#6fa8ff' : '#ff6a5a');
+  pctBars(document.getElementById('dRace'), r.race, n => ALLIANCE_RACES.includes(n) ? '#6fa8ff' : '#ff6a5a', undefined, mixedRace);
 
   // Connected realm groups (MoP): member realms and each home realm's share.
   const members = document.getElementById('dMembers');

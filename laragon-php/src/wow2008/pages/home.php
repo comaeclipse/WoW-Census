@@ -16,6 +16,8 @@ $spark = function (array $vals): string {
   foreach ($vals as $i => $v) $pts[] = sprintf('%.1f,%.1f', $n > 1 ? $i * 208 / ($n - 1) : 208, 33 - ($hi > $lo ? ($v - $lo) / ($hi - $lo) : 1) * 28);
   return implode(' ', $pts);
 };
+// The Forever beta archive still counts toward the totals, but isn't offered in the edition lists.
+$listed = array_values(array_filter($editions, fn($ed) => $ed['source'] !== 'classic-beta'));
 $top = $editions[0] ?? null;
 $slides = [];
 if ($top) $slides[] = ['lava-dragon', $top['name'] . ': ' . fmt($top['n7']) . ' characters seen this week',
@@ -68,7 +70,7 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
         <table class="dir">
           <thead><tr><th colspan="2">Edition</th><th>Seen 7d</th><th>This week</th><th class="r">Tracked</th><th>Last scan</th></tr></thead>
           <tbody>
-<?php foreach ($editions as $ed): $pts = $spark($ed['week']); ?>
+<?php foreach ($listed as $ed): $pts = $spark($ed['week']); ?>
             <tr>
               <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,<?= e($ed['color']) ?> 55%,#000 95%)"></span></td>
               <td class="nm"><a href="<?= e($ed['href']) ?>"><?= e($ed['name']) ?></a></td>
@@ -111,7 +113,7 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
     <div class="box">
       <h4><i></i>Edition Status</h4>
       <div class="realm">
-<?php foreach ($editions as $ed): ?>
+<?php foreach ($listed as $ed): ?>
         <div class="row"><a href="<?= e($ed['href']) ?>"><?= e($ed['name']) ?></a><b><?= e(fmt($ed['n7'])) ?></b><?= $trend($ed['delta'], 'st') ?></div>
 <?php endforeach; ?>
       </div>

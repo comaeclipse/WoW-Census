@@ -15,9 +15,13 @@ $requested = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
       <li><a href="<?= e($href) ?>"<?= $active ? ' style="color:#fff" aria-current="page"' : '' ?>><?= $active ? '» ' : '' ?><?= e($label) ?></a></li>
 <?php endforeach; ?>
     </ul>
-<?php foreach (\EDITIONS as $key => $ed): ?>
-    <h3><?= e(edition_name($key)) ?> <button class="nav-toggle" type="button" aria-label="Collapse <?= e(edition_name($key)) ?>" aria-controls="nav-<?= e($key) ?>" aria-expanded="true"></button></h3>
-    <ul id="nav-<?= e($key) ?>"<?= $key === $source ? ' class="cur"' : '' ?>>
+<?php foreach (\EDITIONS as $key => $ed):
+    // The Forever beta archive is only listed while you're on one of its pages.
+    if ($key === 'classic-beta' && $source !== $key) continue;
+    // WoW: Forever and the edition you're browsing start open; the rest start collapsed.
+    $open = $key === 'forever' || $key === $source; ?>
+    <h3><?= e(edition_name($key)) ?> <button class="nav-toggle" type="button" aria-label="<?= $open ? 'Collapse' : 'Expand' ?> <?= e(edition_name($key)) ?>" aria-controls="nav-<?= e($key) ?>" aria-expanded="<?= $open ? 'true' : 'false' ?>"></button></h3>
+    <ul id="nav-<?= e($key) ?>"<?= $key === $source ? ' class="cur"' : '' ?><?= $open ? '' : ' hidden' ?>>
 <?php foreach (edition_links($key) as [$label, $href, $sub, $pageKey]):
         $active = $key === $source && $pageKey === $page; ?>
       <li<?= $sub ? ' class="sub"' : '' ?>><a href="<?= e($href) ?>"<?= $active ? ' style="color:#fff" aria-current="page"' : '' ?>><?= $active ? '» ' : '' ?><?= e($label) ?></a></li>

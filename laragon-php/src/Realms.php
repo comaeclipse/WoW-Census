@@ -132,9 +132,10 @@ function connected_realm_index(array $groups): array {
 const RACE_FACTION = [
   'Human' => 'Alliance', 'Dwarf' => 'Alliance', 'Night Elf' => 'Alliance', 'Gnome' => 'Alliance', 'Draenei' => 'Alliance',
   'Worgen' => 'Alliance', 'Void Elf' => 'Alliance', 'Lightforged Draenei' => 'Alliance', 'Dark Iron Dwarf' => 'Alliance',
-  'Kul Tiran' => 'Alliance', 'Mechagnome' => 'Alliance',
+  'Kul Tiran' => 'Alliance', 'Mechagnome' => 'Alliance', 'High Order Skyborne' => 'Alliance',
   'Orc' => 'Horde', 'Undead' => 'Horde', 'Tauren' => 'Horde', 'Troll' => 'Horde', 'Blood Elf' => 'Horde', 'Goblin' => 'Horde',
   'Nightborne' => 'Horde', 'Highmountain Tauren' => 'Horde', "Mag'har Orc" => 'Horde', 'Zandalari Troll' => 'Horde', 'Vulpera' => 'Horde',
+  'Windshaper Skyborne' => 'Horde',
 ];
 
 // Groups characters by their own home realm (the realm in their name), not by the

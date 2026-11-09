@@ -18,6 +18,9 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 /** Short 2008-theme display name; the underlying race keys stay distinct. */
 const shortRace = name => String(name).replace(/\b(?:High Order|Windshaper) Skyborne\b/g, 'Skyborne');
 
+/** Race label for lists that mix both factions, where two plain "Skyborne" rows would be ambiguous. */
+const mixedRace = name => ({ 'High Order Skyborne': 'Alliance Skyborne', 'Windshaper Skyborne': 'Horde Skyborne' }[name] || shortRace(name));
+
 /** Lighten (f > 0) or darken (f < 0) a #rrggbb color; returns an rgb() string. */
 function shade(hex, f) {
   const n = parseInt(hex.slice(1), 16);
