@@ -181,6 +181,14 @@ swap the names with PHP-FPM stopped (about a second), and the next pass publishe
 it. Check first that every `local_imports.source_sha256` on the server is also
 local, so no upload made on the live site is lost.
 
+Cloudflare caches pages for the default 2008 skin at the edge for 15 minutes: the
+origin sends `Cloudflare-CDN-Cache-Control: public, max-age=900` for that skin
+(browsers still get `private, no-store`, so a skin switch shows at once), and the
+zone's Cache Rule "Pages: default skin" makes HTML eligible except for
+`wowcensus_skin=current|cobalt` cookies, Accept headers naming Markdown or `text/*`,
+and the per-visitor routes. Those always reach the origin (`cf-cache-status: DYNAMIC`).
+New data therefore reaches visitors up to 15 minutes after the rollout re-renders a page.
+
 ## Contact form
 
 `/contact` is handled by `src/contact.php` (`public/index.php` hands the path
