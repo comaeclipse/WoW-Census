@@ -129,7 +129,6 @@ function url(?string $page = null, ?string $source = null): string {
     // Forever's census was the site root; the root is now the front page.
     null, 'census' => \edition_path($source),
     'realms' => \edition_path($source) . 'realms',
-    'race-to-60' => \edition_path($source) . 'race-to-60',
     'auction-house' => \page_path($source, 'auctionhouse'),
     'races' => (array_values(race_pages($source))[0][1] ?? \edition_path($source)),
     'classes' => (array_values(class_pages($source))[0][1] ?? \edition_path($source)),
@@ -146,7 +145,6 @@ function edition_links(string $source): array {
   if (race_pages($source)) $links[] = ['Races', url('races', $source), true, 'races'];
   if (class_pages($source)) $links[] = ['Classes', url('classes', $source), true, 'classes'];
   $links[] = ['Gear', url('gear', $source), false, 'gear'];
-  if (in_array($source, \RACE_TO_60_SOURCES, true)) $links[] = ['Race to 60', url('race-to-60', $source), false, 'race-to-60'];
   if (in_array($source, ['retail', 'forever'], true)) $links[] = ['Skin Colors', '/' . $source . '/skin-colors/', false, 'skin-colors'];
   return $links;
 }
@@ -221,11 +219,6 @@ function render_page(string $html, string $path): string {
       && ($source = \source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/')) && ($roster = \guild_roster($source, $m[2]))) {
     $GLOBALS['w8_source'] = $source;
     return guild_page($source, $roster, $html);
-  }
-  if (preg_match('#^/([a-z-]+)/race-to-60(?:\.html)?$#', $path, $m)
-      && in_array($source = \source_for_path('/' . $m[1] . '/'), \RACE_TO_60_SOURCES, true)) {
-    $GLOBALS['w8_source'] = $source;
-    return race_to_60_page($source, $html);
   }
   if (preg_match('#^/(?:([a-z-]+)/)?realms(?:\.html)?$#', $path, $m)
       && ($source = \source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/'))) {
@@ -782,18 +775,6 @@ function geography_page(string $source, string $html): string {
     'window' => !empty($snap['windowDays']) ? 'last ' . $snap['windowDays'] . ' days' : 'all time',
     'showMap' => $top50 && $placed / $top50 >= .5, 'tbcMap' => $source === 'classic-progression', 'classicMap' => in_array($source, ['classic-beta', 'forever', 'classic', 'sod', 'hardcore'], true), 'mopMap' => $source === 'mop-classic', 'retailMap' => $source === 'retail', 'foreverMap' => in_array($source, ['classic-beta', 'forever'], true),
     'updated' => !empty($snap['lastT']) ? substr(\js_iso($snap['lastT']), 0, 10) : '—', 'mixSum' => array_sum(array_column($mixRows, 1))], $html, 'geography');
-}
-
-/** Race to 60: the leaderboard model, packed for the page script. */
-function race_to_60_page(string $source, string $html): string {
-  $model = \race_to_60_model($source);
-  $rows = array_map(fn($r) => [$r['name'], $r['level'], $r['cf'], $r['race'], $r['faction'], $r['guild'], $r['realm'], $r['region'], $r['type'], $r['reached'], $r['seen'], $r['guildId'], $r['levelSource'], $r['api']], $model['racers']);
-  return page('race-to-60', common_vars($source) + [
-    'rows' => $rows, 'guildBase' => url('guilds', $source) . '/', 'tracked' => $model['tracked'], 'at60' => $model['at60'], 'top' => $model['top'],
-    'leadingClass' => $model['leadingClass'] ? class_name($model['leadingClass']) : '—', 'leadingClassFile' => $model['leadingClass'],
-    'leadingClassCount' => $model['leadingClassCount'], 'topCount' => $model['topCount'],
-    'updated' => $model['latest'] ? \utc_timestamp($model['latest']) : '—',
-  ], $html, 'race-to-60');
 }
 
 function realms_page(string $source, string $html): string {

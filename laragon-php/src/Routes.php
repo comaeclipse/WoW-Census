@@ -18,7 +18,6 @@ function published_routes(?array $sources = null, bool $shared = true): array {
     $dir = edition_path($source);
     foreach (PAGES as $page) { $routes[] = "{$dir}$page.html"; $routes[] = "{$dir}$page.md"; }
     $routes[] = "{$dir}realms.html";
-    if (in_array($source, RACE_TO_60_SOURCES, true)) $routes[] = "{$dir}race-to-60.html";
     // Filter data files are content-hashed, so their names come from the data.
     foreach (['talents', 'gear'] as $page)
       if ($data = render_edition_data($source, $page)) $routes[] = $dir . $data['file'];

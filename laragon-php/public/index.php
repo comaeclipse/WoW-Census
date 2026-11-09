@@ -19,6 +19,11 @@ if ($path === '/skin') {
   header('Location: ' . $back, true, 303);
   exit;
 }
+// Race to 60 was retired on 2026-11-09; its old URLs go to WoW: Forever's census.
+if (preg_match('#^/[a-z-]+/race-to-60(?:\.html)?$#', $path)) {
+  header('Location: /forever/', true, 301);
+  exit;
+}
 if ($path === '/contact') {
   require dirname(__DIR__) . '/src/contact.php';
   exit;

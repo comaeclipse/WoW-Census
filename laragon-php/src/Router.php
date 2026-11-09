@@ -40,11 +40,6 @@ function route_request(string $path): ?array {
     return [$html, localize_content(forever_skin_colors_page($cssName, $m[1] ?? null))];
   }
 
-  // Race to 60 leaderboard: /forever/race-to-60 (+ .html). It has no Markdown copy.
-  if (preg_match('#^/([a-z-]+)/race-to-60(\.html)?$#', $path, $m)) {
-    $source = source_for_path('/' . $m[1] . '/');
-    return $source && in_array($source, RACE_TO_60_SOURCES, true) ? [$html, race_to_60_html($source)] : null;
-  }
 
   // Realm explorer: /realms, /classic/realms (+ .html). It has no Markdown copy.
   if (preg_match('#^/(?:([a-z-]+)/)?realms(\.html)?$#', $path, $m)) {
