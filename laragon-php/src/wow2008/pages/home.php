@@ -101,6 +101,22 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
   </main>
 
   <aside class="side home-side">
+    <div class="box support-box">
+      <h4><i></i>Support WoWCensus</h4>
+      <div class="sup-body">
+        <p class="sup-lead">WoWCensus is run by volunteers and paid for out of pocket. If the census helps you, consider chipping in for server upkeep!</p>
+<?php $supPct = max(0, min(100, (int)round(SUPPORT_RAISED / SUPPORT_GOAL * 100))); ?>
+        <div class="sup-goal">
+          <div class="sup-goal-hd"><b>Monthly Upkeep</b><span>$<?= e(SUPPORT_RAISED) ?> / $<?= e(SUPPORT_GOAL) ?></span></div>
+          <div class="sup-bar" role="progressbar" aria-label="Monthly upkeep funded" aria-valuemin="0" aria-valuemax="<?= e(SUPPORT_GOAL) ?>" aria-valuenow="<?= e(SUPPORT_RAISED) ?>"><span style="width:<?= $supPct ?>%"></span></div>
+          <div class="sup-goal-ft">Server hosting, $<?= e(SUPPORT_GOAL) ?>/month</div>
+        </div>
+        <div class="sup-btns">
+<?= render('partials/support-buttons.php') ?>
+        </div>
+      </div>
+    </div>
+
     <div class="box">
       <h4><i></i>Shoutbox</h4>
       <div class="mini-sb">

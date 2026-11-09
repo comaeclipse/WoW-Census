@@ -10,7 +10,11 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '58';
+const ASSET_VERSION = '59';
+
+// Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
+const SUPPORT_RAISED = 0;
+const SUPPORT_GOAL = 20;
 
 // ---------------------------------------------------------------- helpers (the mockup's bootstrap)
 

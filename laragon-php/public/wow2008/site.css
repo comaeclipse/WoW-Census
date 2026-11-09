@@ -352,3 +352,27 @@ table.dir{width:100%;border-collapse:separate;border-spacing:0 1px;background:#6
 .home-side .poll-res .pr.mine span::after{content:" ✓";color:#7fe05a}
 .home-side .poll-res .pv{font-size:9px;color:#8a7650;text-align:center}
 .home-side .poll-res .pv a{margin:0}
+
+/* ===== Home page: Support WoWCensus box + 88x31 donation buttons ===== */
+.support-box .sup-body{padding:8px 9px 8px}
+.sup-lead{margin:0 0 8px;font-size:11px;line-height:1.45;color:#d8c9a8}
+.sup-goal{border:1px solid #000;background:#120c06;box-shadow:inset 0 0 0 1px #3a2a14;padding:5px 6px 4px;margin-bottom:9px}
+.sup-goal-hd{display:flex;justify-content:space-between;font-size:10px;color:#ffd100;margin-bottom:3px}
+.sup-goal-hd span{color:#fff}
+.sup-bar{height:11px;border:1px solid #000;background:linear-gradient(#1a1209,#2c2011);box-shadow:inset 0 1px 2px #000}
+.sup-bar span{display:block;height:100%;background:linear-gradient(#fff3a0,#f2b705 45%,#a86b00 55%,#d89a10);box-shadow:inset 0 -1px 0 #6a4200,inset 1px 0 0 #fff8c8}
+.sup-goal-ft{font-size:9px;color:#8f8063;margin-top:3px;text-align:right}
+.sup-btns,.footer-b88{display:flex;justify-content:center;flex-wrap:wrap;gap:6px}
+.footer-b88{justify-content:flex-start;margin:8px 0}
+.b88{width:88px;height:31px;box-sizing:border-box;display:flex;border:1px solid #000;text-decoration:none!important;font:bold 10px/1 Verdana,Tahoma,sans-serif;color:#fff;letter-spacing:.2px;box-shadow:inset 1px 1px 0 rgba(255,255,255,.55),inset -1px -1px 0 rgba(0,0,0,.45)}
+.b88:hover{filter:brightness(1.15)}
+.b88:active{box-shadow:inset -1px -1px 0 rgba(255,255,255,.4),inset 1px 1px 0 rgba(0,0,0,.5)}
+.b88-ico{width:29px;flex:none;display:flex;align-items:center;justify-content:center;border-right:1px solid #000;box-shadow:inset 1px 1px 0 rgba(255,255,255,.5)}
+.b88-ico svg{width:21px;height:16px}
+.b88-txt{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-shadow:1px 1px 0 #000}
+.b88-txt small{font:7px/1.2 Verdana,sans-serif;letter-spacing:.5px;opacity:.9;margin-bottom:1px}
+.b88.kofi{background:linear-gradient(#a6e4f7,#29abe0 50%,#1288bb 51%,#3fb8e8)}
+.kofi .b88-ico{background:linear-gradient(#7fd3f0,#1a95c9)}
+.b88.bmc{background:linear-gradient(#fff28a,#ffdd00 50%,#e5b800 51%,#ffe23a);color:#151414}
+.bmc .b88-txt{text-shadow:1px 1px 0 #fff6a8}
+.bmc .b88-ico{background:linear-gradient(#fff6a0,#f0c400)}
