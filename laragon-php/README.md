@@ -165,11 +165,21 @@ behind page renders.
 New data goes live through `/usr/local/bin/wowcensus-data-refresh` (copy:
 `laragon-php/wowcensus-data-refresh`; cron `/etc/cron.d/wowcensus-data`, every 5
 minutes, log `/var/log/wowcensus-data-refresh.log`). At most once an hour it
-rebuilds the census tables at low priority, pre-renders the 72 main pages, then
-switches nginx to the new version. The pools set `ML_CENSUS_PUBLISHED=1`, so until
-then pages keep using the previous census tables instead of the slow live SQL. A
-failure leaves the old data up and is retried after 30 minutes. `FORCE=1` publishes
-now; run it after a code release to re-render the main pages.
+rebuilds the census tables at low priority, then `wowcensus-rollout` (copy:
+`laragon-php/wowcensus-rollout`) re-renders every cached page in place, one at a
+time: the 72 main pages first, then by visits, pausing while the load average is
+above 1.5. The cache is never emptied (the data part of the key is fixed in
+`conf.d/wowcensus-data-version.conf`), so visitors get each page's saved copy until
+it is replaced. The pools set `ML_CENSUS_PUBLISHED=1`, so until the new tables are
+in, pages keep using the previous ones instead of the slow live SQL. A failure
+leaves the old data up and is retried after 30 minutes. `FORCE=1` publishes now;
+after a code release, run `wowcensus-rollout` (or `ROLLOUT_LIMIT=72` for just the
+main pages) to bring cached pages up to date.
+
+A database sync from local is safe at any time: restore into `marketlens_next`,
+swap the names with PHP-FPM stopped (about a second), and the next pass publishes
+it. Check first that every `local_imports.source_sha256` on the server is also
+local, so no upload made on the live site is lost.
 
 ## Contact form
 

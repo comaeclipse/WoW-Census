@@ -1,0 +1,56 @@
+#!/bin/bash
+# Re-renders every page in nginx's cache in place, one at a time, so new data reaches
+# visitors gradually without ever emptying the cache: each visitor keeps getting the
+# saved copy of a page until this replaces it (X-WoWCensus-Refresh: 1 from 127.0.0.1).
+# Order: the 72 main pages, then the rest by visits in the recent access logs.
+# Waits while the box is busy (1-minute load above ROLLOUT_MAX_LOAD) so visitors come first.
+# Called by wowcensus-data-refresh after new data is published; safe to run by hand.
+#   ROLLOUT_PAUSE_SECONDS (1)  pause between pages
+#   ROLLOUT_MAX_LOAD (1.5)     wait while the load average is above this
+#   ROLLOUT_LIMIT              only the first N pages (for testing)
+set -u
+CACHE=/var/cache/nginx/wowcensus
+HOST=wowcensus.io
+PAUSE=${ROLLOUT_PAUSE_SECONDS:-1}
+MAX_LOAD=${ROLLOUT_MAX_LOAD:-1.5}
+WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
+log() { echo "$(date -u +%FT%TZ) $*"; }
+
+# Cache keys look like GET|host|uri|skin|accept|code|data (snippets/wowcensus-cache.conf).
+find "$CACHE" -type f -print0 | xargs -0 -n 500 grep -a -h -m1 '^KEY: ' 2>/dev/null \
+  | sed 's/^KEY: //' | awk -F'|' -v h="$HOST" '$1=="GET" && $2==h {print $3"|"$4"|"$5}' | sort -u > "$WORK/cached"
+
+# Visits per path from the current and previous access logs.
+{ cat /var/log/nginx/access.log /var/log/nginx/access.log.1 2>/dev/null; zcat -f /var/log/nginx/access.log.[2-7].gz 2>/dev/null; } \
+  | awk '$6=="\"GET" {print $7}' | sort | uniq -c | awk '{print $2"\t"$1}' > "$WORK/hits"
+
+# The main pages (same list as warm-cache.sh) first.
+for d in "" forever/ tbc/ classic/ mop/ retail/ sod/ hardcore/ forever-beta/; do
+  for p in "" realms guilds auctionhouse geography talents gear combos; do
+    u="/$d$p"; [ "$d" = "" ] && [ "$p" != "" ] && u="/$p"; echo "$u"
+  done
+done | awk '{print $0"\t999999999"}' >> "$WORK/hits"
+
+awk -F'\t' 'NR==FNR {if ($2>h[$1]) h[$1]=$2; next} {split($0,k,"|"); print (h[k[1]]+0)"\t"$0}' "$WORK/hits" "$WORK/cached" \
+  | sort -t$'\t' -k1,1nr | cut -f2 | head -n "${ROLLOUT_LIMIT:-100000000}" > "$WORK/order"
+total=$(wc -l < "$WORK/order")
+log "rolling out $total cached pages"
+
+n=0; ok=0; failed=0; streak=0; started=$(date +%s)
+while IFS='|' read -r uri skin accept; do
+  n=$((n+1))
+  waited=0
+  while awk -v m="$MAX_LOAD" '{exit !($1>m)}' /proc/loadavg && [ $waited -lt 600 ]; do sleep 10; waited=$((waited+10)); done
+  hdr=(); [ "$accept" = md ] && hdr=(-H 'Accept: text/markdown')
+  cookie=(); [ "$skin" != wow2008 ] && cookie=(-H "Cookie: wowcensus_skin=$skin")
+  r=$(curl -sk -o /dev/null -m 300 -H "Host: $HOST" -H 'X-WoWCensus-Refresh: 1' "${hdr[@]}" "${cookie[@]}" \
+        -w '%{http_code} %{time_total}' "https://127.0.0.1$uri")
+  case "$r" in
+    "200 "*) ok=$((ok+1)); streak=0 ;;
+    *) failed=$((failed+1)); streak=$((streak+1)); log "failed: $uri ($skin $accept) $r"
+       [ $streak -ge 20 ] && { log "stopping: 20 failures in a row ($ok ok, $failed failed of $total)"; exit 1; } ;;
+  esac
+  [ $((n % 100)) -eq 0 ] && log "$n/$total pages ($ok ok, $failed failed, $(( $(date +%s) - started ))s)"
+  sleep "$PAUSE"
+done < "$WORK/order"
+log "rollout done: $ok ok, $failed failed of $total in $(( $(date +%s) - started ))s"
