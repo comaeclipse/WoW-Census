@@ -4,11 +4,20 @@
 # saved copy of a page until this replaces it (X-WoWCensus-Refresh: 1 from 127.0.0.1).
 # Order: the 72 main pages, then the rest by visits in the recent access logs.
 # Waits while the box is busy (1-minute load above ROLLOUT_MAX_LOAD) so visitors come first.
-# Called by wowcensus-data-refresh after new data is published; safe to run by hand.
+# After each default-skin HTML page is re-rendered, its URL is purged from Cloudflare (in
+# batches of 30), so the edge can keep pages for a long time and still show changes at once.
+# The purge needs CF_ZONE_ID and CF_API_TOKEN (Zone > Cache Purge) in /etc/wowcensus/cloudflare.env;
+# without that file pages are only re-rendered and the edge copy lasts its own TTL.
+# Called by wowcensus-data-refresh after new data is published and by wowcensus-release-rollout
+# after a code release; safe to run by hand.
 #   ROLLOUT_PAUSE_SECONDS (1)  pause between pages
 #   ROLLOUT_MAX_LOAD (1.5)     wait while the load average is above this
-#   ROLLOUT_LIMIT              only the first N pages (for testing)
+#   ROLLOUT_MAIN=1             only the main pages (every skin and Accept variant of them)
+#   ROLLOUT_LIMIT              only the first N cache entries (uri x skin x accept; for testing)
 set -u
+CF_ENV=/etc/wowcensus/cloudflare.env
+CF_ZONE_ID=; CF_API_TOKEN=
+[ -r "$CF_ENV" ] && . "$CF_ENV"
 CACHE=/var/cache/nginx/wowcensus
 HOST=wowcensus.io
 PAUSE=${ROLLOUT_PAUSE_SECONDS:-1}
@@ -18,7 +27,9 @@ log() { echo "$(date -u +%FT%TZ) $*"; }
 
 # Cache keys look like GET|host|uri|skin|accept|code|data (snippets/wowcensus-cache.conf).
 find "$CACHE" -type f -print0 | xargs -0 -n 500 grep -a -h -m1 '^KEY: ' 2>/dev/null \
-  | sed 's/^KEY: //' | awk -F'|' -v h="$HOST" '$1=="GET" && $2==h {print $3"|"$4"|"$5}' | sort -u > "$WORK/cached"
+  | sed 's/^KEY: //' | awk -F'|' -v h="$HOST" 'NF==7 && $1=="GET" && $2==h {print $3"|"$4"|"$5}' | sort -u > "$WORK/cached"
+# (NF==7 skips keys from before the Accept field was added: their 5th field is the old release
+# path, and nothing reads those entries any more.)
 
 # Visits per path from the current and previous access logs.
 { cat /var/log/nginx/access.log /var/log/nginx/access.log.1 2>/dev/null; zcat -f /var/log/nginx/access.log.[2-7].gz 2>/dev/null; } \
@@ -36,6 +47,22 @@ awk -F'\t' 'NR==FNR {if ($2>h[$1]) h[$1]=$2; next} {split($0,k,"|"); print (h[k[
 total=$(wc -l < "$WORK/order")
 log "rolling out $total cached pages"
 
+# Cloudflare purge, batched. Only default-skin HTML is cached at the edge (the Cache Rule
+# bypasses other skins and Markdown), and only the apex serves pages (www and d. redirect).
+: > "$WORK/purge"; purged=0
+purge() {
+  [ -n "$CF_ZONE_ID" ] && [ -n "$CF_API_TOKEN" ] && [ -s "$WORK/purge" ] || { : > "$WORK/purge"; return 0; }
+  body=$(sed 's/[\\"]/\\&/g; s#^#"https://'"$HOST"'#; s/$/"/' "$WORK/purge" | paste -sd, -)
+  out=$(curl -s -m 30 -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+          -H "Authorization: Bearer $CF_API_TOKEN" -H 'Content-Type: application/json' \
+          --data "{\"files\":[$body]}")
+  case "$out" in
+    *'"success":true'*) purged=$((purged + $(wc -l < "$WORK/purge"))) ;;
+    *) log "cloudflare purge failed: $(printf '%s' "$out" | head -c 300)" ;;
+  esac
+  : > "$WORK/purge"
+}
+
 n=0; ok=0; failed=0; streak=0; started=$(date +%s)
 while IFS='|' read -r uri skin accept; do
   n=$((n+1))
@@ -46,11 +73,15 @@ while IFS='|' read -r uri skin accept; do
   r=$(curl -sk -o /dev/null -m 300 -H "Host: $HOST" -H 'X-WoWCensus-Refresh: 1' "${hdr[@]}" "${cookie[@]}" \
         -w '%{http_code} %{time_total}' "https://127.0.0.1$uri")
   case "$r" in
-    "200 "*) ok=$((ok+1)); streak=0 ;;
+    "200 "*) ok=$((ok+1)); streak=0
+       if [ "$skin" = wow2008 ] && [ "$accept" != md ]; then
+         echo "$uri" >> "$WORK/purge"; [ "$(wc -l < "$WORK/purge")" -ge 30 ] && purge
+       fi ;;
     *) failed=$((failed+1)); streak=$((streak+1)); log "failed: $uri ($skin $accept) $r"
        [ $streak -ge 20 ] && { log "stopping: 20 failures in a row ($ok ok, $failed failed of $total)"; exit 1; } ;;
   esac
   [ $((n % 100)) -eq 0 ] && log "$n/$total pages ($ok ok, $failed failed, $(( $(date +%s) - started ))s)"
   sleep "$PAUSE"
 done < "$WORK/order"
-log "rollout done: $ok ok, $failed failed of $total in $(( $(date +%s) - started ))s"
+purge
+log "rollout done: $ok ok, $failed failed of $total, $purged purged at Cloudflare, in $(( $(date +%s) - started ))s"

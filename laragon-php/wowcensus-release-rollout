@@ -1,0 +1,20 @@
+#!/bin/sh
+# Brings cached pages up to date after a code release. Run it (in the background) right after
+# switching /srv/wowcensus/current; nginx's page cache is never emptied, so without this every
+# cached page keeps the old release's HTML until the next data publish.
+#   1. waits RELEASE_SETTLE_SECONDS (120) so PHP's realpath cache stops serving the old release
+#      (a rollout started sooner re-caches old HTML);
+#   2. takes the data-refresh lock, so it never runs alongside a data rollout (it waits for one);
+#   3. re-renders the main pages (every skin/Accept variant), then every other cached page.
+# wowcensus-rollout purges each re-rendered page from Cloudflare when cloudflare.env is set up.
+# Usage: nohup /usr/local/bin/wowcensus-release-rollout >> /var/log/wowcensus-data-refresh.log 2>&1 &
+set -eu
+log() { echo "$(date -u +%FT%TZ) $*"; }
+sleep "${RELEASE_SETTLE_SECONDS:-120}"
+exec 9>/run/wowcensus-data-refresh.lock
+log "code release $(readlink -f /srv/wowcensus/current): waiting for the data-refresh lock"
+flock 9
+log "release rollout: main pages"
+ROLLOUT_MAIN=1 nice -n 10 /usr/local/bin/wowcensus-rollout || log "main-page rollout stopped early"
+log "release rollout: every cached page"
+nice -n 10 /usr/local/bin/wowcensus-rollout || log "full rollout stopped early; the next data publish rolls out again"

@@ -88,12 +88,15 @@ if ($negotiated) {
   header('Cloudflare-CDN-Cache-Control: public, max-age=3600');
 } else if (str_starts_with($type, 'text/html')) {
   // Browsers always ask again, so a skin switch shows at once. Cloudflare may keep the
-  // default (2008) skin for 15 minutes: its Cache Rule bypasses the edge for visitors whose
-  // wowcensus_skin cookie picks another skin and for Accept headers that may want Markdown.
+  // default (2008) skin for ML_EDGE_HTML_TTL seconds (15 minutes unless the pool sets it):
+  // its Cache Rule bypasses the edge for visitors whose wowcensus_skin cookie picks another
+  // skin and for Accept headers that may want Markdown. Raise the TTL only where
+  // wowcensus-rollout purges re-rendered pages from Cloudflare, or changes show late.
   $skinCookie = $_COOKIE['wowcensus_skin'] ?? '';
   $defaultSkin = !isset(SKIN_NAMES[$skinCookie]) || $skinCookie === 'wow2008';
+  $edgeTtl = max(0, (int) (getenv('ML_EDGE_HTML_TTL') ?: 900));
   header('Cache-Control: private, no-store');
-  header('Cloudflare-CDN-Cache-Control: ' . ($defaultSkin ? 'public, max-age=900' : 'no-store'));
+  header('Cloudflare-CDN-Cache-Control: ' . ($defaultSkin && $edgeTtl > 0 ? "public, max-age=$edgeTtl" : 'no-store'));
 } else {
   header('Cache-Control: public, max-age=60');
   header('Cloudflare-CDN-Cache-Control: public, max-age=300');

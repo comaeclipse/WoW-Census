@@ -191,6 +191,56 @@ zone's Cache Rule "Pages: default skin" makes HTML eligible except for
 and the per-visitor routes. Those always reach the origin (`cf-cache-status: DYNAMIC`).
 New data therefore reaches visitors up to 15 minutes after the rollout re-renders a page.
 
+### Cache strategy (target)
+
+Each page should be rendered about once per change; caches serve everyone else, and no step
+ever empties a cache.
+
+1. **Every change re-renders in place.** Data publishes already run `wowcensus-rollout`. After a
+   code release, start `wowcensus-release-rollout` (copy: `laragon-php/wowcensus-release-rollout`,
+   install to `/usr/local/bin/`):
+
+   ```sh
+   nohup /usr/local/bin/wowcensus-release-rollout >> /var/log/wowcensus-data-refresh.log 2>&1 &
+   ```
+
+   It waits 2 minutes for PHP's realpath cache to drop the old release, takes the data-refresh
+   lock (so two rollouts never overlap), re-renders the main pages (`ROLLOUT_MAIN=1`: every skin
+   and Accept variant of them, unlike `ROLLOUT_LIMIT`, which counts cache entries), then the rest.
+2. **A 24-hour safety net in nginx.** Pages go stale after 24 hours instead of never, but are
+   never thrown away and never make a visitor wait: nginx serves the saved copy and one
+   background request re-renders it. In `snippets/wowcensus-cache.conf`, replace the
+   `fastcgi_cache_valid` line with these (keep `inactive=3650d` on `fastcgi_cache_path`):
+
+   ```nginx
+   fastcgi_cache_valid 200 301 302 404 24h;
+   fastcgi_cache_use_stale updating error timeout http_500 http_503;
+   fastcgi_cache_background_update on;
+   fastcgi_cache_lock on;
+   fastcgi_cache_lock_timeout 10s;
+   ```
+
+   `nginx -t && systemctl reload nginx`. The lock means one render per page at a time; a failed
+   render keeps serving the old copy. nginx stores each page's expiry when it saves it, so pages
+   saved before this change keep their 10-year expiry until the next full rollout re-saves them.
+3. **Cloudflare serves most traffic.** Turn on Tiered Cache (Caching > Tiered Cache > Smart
+   Tiered Caching), so a miss at one location asks a large Cloudflare location before the
+   origin. Then let pages live at the edge for a day and purge them when they change:
+   `wowcensus-rollout` purges each re-rendered default-skin HTML page (30 URLs per API call)
+   when `/etc/wowcensus/cloudflare.env` (root:root 600) holds
+
+   ```sh
+   CF_ZONE_ID=<wowcensus.io zone id>
+   CF_API_TOKEN=<token with Zone > Cache Purge on wowcensus.io only>
+   ```
+
+   Once a rollout log shows `N purged at Cloudflare`, add `env[ML_EDGE_HTML_TTL] = 86400` to both
+   PHP-FPM pools and restart PHP-FPM; the next rollout re-saves pages with the longer edge TTL.
+   Leave the TTL at its 900-second default wherever purging is not set up.
+4. **Load guards stay.** One page at a time, the load-average pause, and the separate
+   `wowcensus-live` pool. A bigger VPS changes settings only: more `pm.max_children`, a higher
+   `ROLLOUT_MAX_LOAD`, a shorter `ROLLOUT_PAUSE_SECONDS`.
+
 ## Contact form
 
 `/contact` is handled by `src/contact.php` (`public/index.php` hands the path
