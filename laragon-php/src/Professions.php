@@ -174,7 +174,7 @@ function professions_html(?string $slug, string $stylesheet): string {
     $branch = EDITIONS[PROFESSION_SOURCE]['branch'];
     $row = fn($r) => ['id' => $r[1], 'name' => $r[0], 'q' => $r[3], 'asp' => $r[4], 'mv' => $r[5]];
     $cols = [
-      ['label' => 'Item', 'left' => true, 'cell' => fn($it, $b) => item_link($it, $b)],
+      ['label' => 'Item', 'left' => true, 'cell' => fn($it) => '<a href="' . esc(forever_item_path($it['id'])) . '">' . esc(item_label($it)) . '</a>'],
       ['label' => 'Qty', 'cell' => fn($it) => js_locale($it['q'])],
       ['label' => 'Unit', 'cell' => fn($it) => esc(money($it['asp']))],
     ];
@@ -206,6 +206,88 @@ $style
   </header>
   <div class="page-controls"></div>
   $body
+</div>
+</body></html>
+HTML;
+}
+
+// ---------------------------------------------------------------- item pages
+
+function forever_item_path(int|string $id): string { return edition_path(PROFESSION_SOURCE) . 'item/' . $id; }
+
+/**
+ * One WoW: Forever item's auction history, or null when no Forever scan has seen it.
+ * scans[] = [realm key, faction, captured_at unix, qty, lowest cu, median cu, average cu], oldest first.
+ */
+function forever_item_model(int $id): ?array {
+  $rows = Db::all("SELECT game, captured_at, name, category, crafter, quantity, lowest, median, weighted_average
+    FROM local_auction_snapshots WHERE source_game=? AND item_id=? ORDER BY captured_at, game", [PROFESSION_SOURCE, $id]);
+  if (!$rows) return null;
+  $name = null; $cat = null; $crafter = null; $scans = []; $seen = [];
+  foreach ($rows as $r) {
+    if (($r['name'] ?? '') !== '' && !preg_match('/^item:\d+$/', (string)$r['name'])) $name = (string)$r['name'];
+    if (($r['category'] ?? '') !== '') $cat = $r['category'];
+    if (($r['crafter'] ?? '') !== '') $crafter = $r['crafter'];
+    // An old collection's scans count as its labelled twin's: keep each capture once.
+    $game = preg_replace('/^realm:/', '', canonical_game($r['game']));
+    if (isset($seen[$game . '|' . $r['captured_at']])) continue;
+    $seen[$game . '|' . $r['captured_at']] = true;
+    $faction = preg_match('/-(Alliance|Horde)$/', $game, $m) ? $m[1] : 'Neutral';
+    $scans[] = [preg_replace('/-(Alliance|Horde)$/', '', $game), $faction, (int)$r['captured_at'], (int)$r['quantity'],
+      (int)$r['lowest'], (int)$r['median'], (int)$r['weighted_average']];
+  }
+  $branch = EDITIONS[PROFESSION_SOURCE]['branch'];
+  $name ??= (item_cache('item-names', $branch)[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: 'Item ' . $id);
+  $icon = ((array)item_cache('item-icons', $branch) + (array)item_cache('item-icons', 'classic'))[$id] ?? null;
+
+  // The trades it belongs to, and for a recipe the item it teaches.
+  $taught = null; $craftedBy = [];
+  if ($cat === 'Recipes' && preg_match('/^(?:Pattern|Recipe|Plans|Formula|Schematic|Manual): (.+)$/', $name, $m)) {
+    $hit = Db::first('SELECT item_id, crafter FROM local_auction_snapshots WHERE source_game=? AND name=? ORDER BY captured_at DESC LIMIT 1', [PROFESSION_SOURCE, $m[1]]);
+    if ($hit) {
+      $taught = ['id' => (int)$hit['item_id'], 'name' => $m[1]];
+      foreach (PROFESSIONS as $slug => $p) if ($p['crafter'] !== null && $p['crafter'] === $hit['crafter']) $craftedBy[$m[1]] = $slug;
+    }
+  }
+  $roles = profession_roles(['name' => $name, 'cat' => $cat], $crafter, $craftedBy);
+  return ['id' => $id, 'name' => $name, 'icon' => $icon, 'cat' => $cat, 'crafter' => $crafter, 'roles' => $roles, 'taught' => $taught, 'scans' => $scans];
+}
+
+/** The plain page every skin starts from; the 2008 skin rebuilds it from the model. */
+function forever_item_html(array $item, string $stylesheet): string {
+  $label = seo_label(EDITIONS[PROFESSION_SOURCE]['label']);
+  $navigation = edition_nav(PROFESSION_SOURCE, 'auctionhouse.html');
+  $title = $item['name'] . ' – ' . $label . ' Auction Price History';
+  $seo = seo_head($title . ' – WoWCensus', $label . ' auction house prices for ' . $item['name'] . ': current listings per realm, price and supply history from in-game scans.', SITE_ORIGIN . forever_item_path($item['id']));
+  $rows = '';
+  foreach (array_reverse($item['scans']) as $s)
+    $rows .= '<tr><td class="l">' . esc(gmdate('Y-m-d H:i', $s[2])) . '</td><td class="l">' . esc(realm_name($s[0]) . ' ' . $s[1]) . '</td><td class="r">' . js_locale($s[3]) . '</td><td class="r">' . esc(money($s[4])) . '</td><td class="r">' . esc(money($s[5])) . '</td></tr>';
+  $heading = page_heading('WoWCensus', $navigation, $item['name']);
+  $style = js_template_const('market.mjs', 'MARKET_STYLE');
+  $css = esc($stylesheet);
+  $census_css = CENSUS_STYLESHEET;
+  $name = esc($item['name']);
+  $wowhead = esc('https://www.wowhead.com/' . EDITIONS[PROFESSION_SOURCE]['branch'] . '/item=' . $item['id']);
+  return <<<HTML
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+$seo
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="stylesheet" href="$css">
+$census_css<style>
+$style
+</style>
+</head><body>
+<div class="crt" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="ihead">
+    <div class="page-heading">$heading{$navigation['games']}</div>
+    {$navigation['breadcrumbs']}
+  </header>
+  <div class="page-controls"></div>
+  <div class="panel census mkt"><div class="ptitle">$name &mdash; scan history</div>
+  <p class="hint" style="margin-top:0"><a href="$wowhead" target="_blank" rel="noopener">View on Wowhead</a></p>
+  <table class="mkttable"><thead><tr><th class="l">Scanned (UTC)</th><th class="l">Realm</th><th class="r">Qty</th><th class="r">Lowest</th><th class="r">Median</th></tr></thead><tbody>$rows</tbody></table></div>
 </div>
 </body></html>
 HTML;

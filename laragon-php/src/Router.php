@@ -40,6 +40,11 @@ function route_request(string $path): ?array {
     return [$html, localize_content(forever_skin_colors_page($cssName, $m[1] ?? null))];
   }
 
+  // WoW: Forever item pages: /forever/item/765 (+ trailing slash).
+  if (preg_match('#^/forever/item/(\d{1,7})/?$#', $path, $m)) {
+    $item = forever_item_model((int)$m[1]);
+    return $item ? [$html, localize_content(forever_item_html($item, edition_path(PROFESSION_SOURCE) . $cssName))] : null;
+  }
   // WoW: Forever professions: /forever/professions and /forever/professions/tailoring (+ trailing slash or index.html).
   if (preg_match('#^/forever/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
     $slug = ($m[1] ?? '') !== '' ? $m[1] : null;

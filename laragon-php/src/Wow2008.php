@@ -230,6 +230,10 @@ function render_page(string $html, string $path): string {
     foreach (race_pages($source) as $slug => [$label, $route]) if ($route === $path) { $GLOBALS['w8_source'] = $source; return races_page($source, $html, $slug); }
     foreach (class_pages($source) as $slug => [$label, $route]) if ($route === $path) { $GLOBALS['w8_source'] = $source; return classes_page($source, $html, $slug); }
   }
+  if (preg_match('#^/forever/item/(\d{1,7})/?$#', $path, $m) && ($item = \forever_item_model((int)$m[1]))) {
+    $GLOBALS['w8_source'] = \PROFESSION_SOURCE;
+    return item_page($item, $html);
+  }
   if (preg_match('#^/forever/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
     $GLOBALS['w8_source'] = \PROFESSION_SOURCE;
     return ($m[1] ?? '') !== '' ? profession_page($m[1], $html) : professions_page($html);
@@ -860,7 +864,9 @@ function auction_page(string $source, string $html): string {
   $realms = array_map(fn($r) => [$r['key'], $r['key'] === 'all' ? $r['label'] : ($realmLabels[$r['key']] ?? $r['label'])], $model['dims']['realm']);
   $factions = array_map(fn($f) => [$f['key'], $f['key'] === 'all' ? ($f['label'] === 'Cross-faction' ? 'Cross-faction' : 'Both') : $f['label']], $model['dims']['faction']);
   return page('auction-house', common_vars($source) + ['data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
-    'realms' => $realms, 'factions' => $factions, 'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item='], $html, 'auction-house');
+    'realms' => $realms, 'factions' => $factions, 'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=',
+    // Forever items have pages of their own; other editions still link to Wowhead.
+    'itemBase' => $source === \PROFESSION_SOURCE ? \forever_item_path('') : null], $html, 'auction-house');
 }
 
 /** Realm and faction filter rows for the professions pages, as on the auction house. */
@@ -897,6 +903,21 @@ function profession_page(string $slug, string $html): string {
   return page('profession', common_vars(\PROFESSION_SOURCE) + ['slug' => $slug, 'prof' => \PROFESSIONS[$slug], 'cards' => profession_cards(),
     'data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views], 'realms' => $realms, 'factions' => $factions,
     'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item='], $html, 'professions');
+}
+
+function item_page(array $item, string $html): string {
+  $keys = array_values(array_unique(array_map(fn($s) => $s[0], $item['scans'])));
+  $labels = realm_label_map($keys);
+  $realms = [];
+  foreach ($keys as $k) $realms[$k] = $labels[$k] ?? \realm_name($k);
+  $gathering = ['herbalism', 'mining', 'skinning', 'fishing'];
+  $roleLabel = ['mats' => 'Material', 'crafted' => 'Crafted', 'recipes' => 'Recipe'];
+  $trades = array_map(fn($r) => ['name' => \PROFESSIONS[$r[0]]['name'], 'icon' => \PROFESSIONS[$r[0]]['icon'], 'url' => \profession_path($r[0]),
+    'role' => $r[1] === 'mats' && in_array($r[0], $gathering, true) ? 'Gathered' : $roleLabel[$r[1]]], $item['roles']);
+  $branch = \EDITIONS[\PROFESSION_SOURCE]['branch'];
+  return page('item', common_vars(\PROFESSION_SOURCE) + ['item' => $item, 'trades' => $trades,
+    'data' => ['generated' => \utc_timestamp(\generated_at()), 'realms' => $realms, 'scans' => $item['scans']],
+    'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=' . $item['id']], $html, 'auction-house');
 }
 
 /** Talent points available at the edition's level cap, for the "avg points per tree" bars. */

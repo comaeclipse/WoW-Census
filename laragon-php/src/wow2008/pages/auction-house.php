@@ -19,7 +19,7 @@ namespace Wow2008;
 
     <div id="ahBody"></div>
 
-    <div class="source">Auction data from in-game scans · asking prices on listed auctions, not completed sales · item names link to Wowhead</div>
+    <div class="source">Auction data from in-game scans · asking prices on listed auctions, not completed sales · <?= !empty($itemBase) ? 'click an item for its price history' : 'item names link to Wowhead' ?></div>
   </main>
 
 <?php start_section('scripts') ?>
@@ -53,7 +53,7 @@ function badge(name, icon) {
   return `<span class="ic">${wowIcon(icon || 'inv_misc_questionmark', esc(name[0]))}</span>`;
 }
 const itemLink = it => it.id
-  ? `${badge(it.name, it.icon)}<a href="<?= e($wowhead) ?>${it.id}" target="_blank" rel="noopener">${esc(it.name)}</a>`
+  ? <?php if (!empty($itemBase)): ?>`${badge(it.name, it.icon)}<a href="<?= e($itemBase) ?>${it.id}" title="Price history for ${esc(it.name)}">${esc(it.name)}</a>`<?php else: ?>`${badge(it.name, it.icon)}<a href="<?= e($wowhead) ?>${it.id}" target="_blank" rel="noopener">${esc(it.name)}</a>`<?php endif ?>
   : `${badge(it.name, it.icon)}${esc(it.name)}`;
 const titleCase = s => s.toLowerCase().replace(/(^|[\s&])\w/g, m => m.toUpperCase());
 

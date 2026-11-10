@@ -61,7 +61,7 @@ $gathering = $prof['role'] === 'Gathering';
 
     <div id="pfBody"></div>
 
-    <div class="source">Auction data from in-game scans · asking prices on listed auctions, not completed sales · crafted goods are items the scan saw as made by <?= e($prof['name']) ?><?= $gathering ? '' : '; recipes are sorted by their name' ?> · item names link to Wowhead</div>
+    <div class="source">Auction data from in-game scans · asking prices on listed auctions, not completed sales · crafted goods are items the scan saw as made by <?= e($prof['name']) ?><?= $gathering ? '' : '; recipes are sorted by their name' ?> · click an item for its price history</div>
   </main>
 
 <?php start_section('scripts') ?>
@@ -93,7 +93,7 @@ function chg(p) {
   return `<span class="chg ${p > 0 ? 'up' : 'dn'}">${p > 0 ? '+' : ''}${p}%</span>`;
 }
 const itemLink = r => `<span class="ic">${wowIcon(r[2] || 'inv_misc_questionmark', esc(r[0][0]))}</span>` +
-  (r[1] ? `<a href="<?= e($wowhead) ?>${r[1]}" target="_blank" rel="noopener">${esc(r[0])}</a>` : esc(r[0]));
+  (r[1] ? `<a href="<?= e(\forever_item_path('')) ?>${r[1]}" title="Price history for ${esc(r[0])}">${esc(r[0])}</a>` : esc(r[0]));
 
 const params = new URLSearchParams(location.search);
 let realm = REALMS.some(r => r[0] === params.get('realm')) ? params.get('realm') : REALMS[0][0];
