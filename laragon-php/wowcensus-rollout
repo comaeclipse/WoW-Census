@@ -12,8 +12,11 @@
 # after a code release; safe to run by hand.
 #   ROLLOUT_PAUSE_SECONDS (1)  pause between pages
 #   ROLLOUT_MAX_LOAD (1.5)     wait while the load average is above this
+#   ROLLOUT_SOURCES="a b"      only these editions' pages plus the home page (wowcensus-data-refresh
+#                              passes the editions whose data changed); empty = every page
 #   ROLLOUT_MAIN=1             only the main pages (every skin and Accept variant of them)
 #   ROLLOUT_LIMIT              only the first N cache entries (uri x skin x accept; for testing)
+#   ROLLOUT_DRY_RUN=1          list how many entries per top-level path it would re-render, then stop
 set -u
 CF_ENV=/etc/wowcensus/cloudflare.env
 CF_ZONE_ID=; CF_API_TOKEN=
@@ -40,12 +43,50 @@ for d in "" forever/ tbc/ classic/ mop/ retail/ sod/ hardcore/ forever-beta/; do
   for p in "" realms guilds auctionhouse geography talents gear combos; do
     u="/$d$p"; [ "$d" = "" ] && [ "$p" != "" ] && u="/$p"; echo "$u"
   done
-done | awk '{print $0"\t999999999"}' >> "$WORK/hits"
+done > "$WORK/main"
+awk '{print $0"\t999999999"}' "$WORK/main" >> "$WORK/hits"
+
+# ROLLOUT_SOURCES: only the pages of these editions (importer source keys, as in
+# local_imports.source_game), plus the pages that show every edition (home page, sitemap,
+# llms.txt). The site root is Forever, so its top-level pages (/realms, /guilds, ...) go
+# with forever. Keys without pages (forever-unmapped) select nothing else.
+dirs=; top=0
+for s in ${ROLLOUT_SOURCES:-}; do
+  case "$s" in
+    forever) dirs="$dirs forever"; top=1 ;;
+    classic-beta) dirs="$dirs forever-beta" ;;
+    classic-progression) dirs="$dirs tbc" ;;
+    mop-classic) dirs="$dirs mop" ;;
+    classic|sod|hardcore|retail) dirs="$dirs $s" ;;
+  esac
+done
 
 awk -F'\t' 'NR==FNR {if ($2>h[$1]) h[$1]=$2; next} {split($0,k,"|"); print (h[k[1]]+0)"\t"$0}' "$WORK/hits" "$WORK/cached" \
-  | sort -t$'\t' -k1,1nr | cut -f2 | head -n "${ROLLOUT_LIMIT:-100000000}" > "$WORK/order"
+  | sort -t$'\t' -k1,1nr | cut -f2 \
+  | awk -v main_only="${ROLLOUT_MAIN:-0}" -v sources="${ROLLOUT_SOURCES:-}" -v dirs="$dirs" -v top="$top" -v mainf="$WORK/main" '
+      BEGIN {
+        while ((getline m < mainf) > 0) main[m] = 1
+        n = split(dirs, d, " "); for (i = 1; i <= n; i++) want[d[i]] = 1
+        split("forever forever-beta tbc classic mop retail sod hardcore", e, " "); for (i in e) edition[e[i]] = 1
+      }
+      {
+        split($0, k, "|"); uri = k[1]; path = uri; sub(/\?.*/, "", path)
+        if (main_only == 1 && !(uri in main)) next
+        if (sources == "") { print; next }
+        seg = path; sub(/^\//, "", seg); sub(/\/.*/, "", seg)
+        # The home page itself always; its query variants (/?fbclid=...) are top-level pages
+        # and go with forever (each home render takes ~20 s, and there are dozens of them).
+        if (uri == "/" || uri ~ /^\/(index\.(html|md)|sitemap\.xml|llms\.txt)$/) { print; next }
+        if (seg in want || (top && !(seg in edition))) print
+      }' \
+  | head -n "${ROLLOUT_LIMIT:-100000000}" > "$WORK/order"
 total=$(wc -l < "$WORK/order")
-log "rolling out $total cached pages"
+note=; [ "${ROLLOUT_MAIN:-0}" = 1 ] && note=" (main pages only)"
+log "rolling out $total cached pages${ROLLOUT_SOURCES:+ (editions: $ROLLOUT_SOURCES)}$note"
+if [ "${ROLLOUT_DRY_RUN:-0}" = 1 ]; then
+  cut -d'|' -f1 "$WORK/order" | sed -E 's#\?.*##; s#^/([^/]*).*#\1#' | sort | uniq -c | sort -rn | head -20
+  exit 0
+fi
 
 # Cloudflare purge, batched. Only default-skin HTML is cached at the edge (the Cache Rule
 # bypasses other skins and Markdown), and only the apex serves pages (www and d. redirect).

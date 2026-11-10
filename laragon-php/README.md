@@ -166,17 +166,24 @@ behind page renders.
 
 New data goes live through `/usr/local/bin/wowcensus-data-refresh` (copy:
 `laragon-php/wowcensus-data-refresh`; cron `/etc/cron.d/wowcensus-data`, every 5
-minutes, log `/var/log/wowcensus-data-refresh.log`). At most once an hour it
-rebuilds the census tables at low priority, then `wowcensus-rollout` (copy:
-`laragon-php/wowcensus-rollout`) re-renders every cached page in place, one at a
-time: the 72 main pages first, then by visits, pausing while the load average is
-above 1.5. The cache is never emptied (the data part of the key is fixed in
+minutes, log `/var/log/wowcensus-data-refresh.log`). At most every 15 minutes
+(`PUBLISH_INTERVAL_MINUTES`) it rebuilds the census tables at low priority (about 5
+minutes), then `wowcensus-rollout` (copy: `laragon-php/wowcensus-rollout`) re-renders
+in place, one at a time, only the pages of the editions whose `local_imports` rows are
+newer than the last publish (`ROLLOUT_SOURCES`), plus the home page, `index.*`,
+`sitemap.xml` and `llms.txt`. The site root is Forever, so top-level pages (`/realms`,
+`/guilds`, `/?fbclid=…` variants of the home page) go with Forever. Measured
+2026-11-10 on the live cache of 2,490 entries: Forever 928, TBC 226, Classic + SoD
+406, an unmapped AH house 12. Main pages go first, then by visits, pausing while the
+load average is above 1.5. `ROLLOUT_DRY_RUN=1 wowcensus-rollout` (with
+`ROLLOUT_SOURCES` or `ROLLOUT_MAIN=1`) lists what a pass would re-render without
+rendering anything. The cache is never emptied (the data part of the key is fixed in
 `conf.d/wowcensus-data-version.conf`), so visitors get each page's saved copy until
 it is replaced. The pools set `ML_CENSUS_PUBLISHED=1`, so until the new tables are
 in, pages keep using the previous ones instead of the slow live SQL. A failure
-leaves the old data up and is retried after 30 minutes. `FORCE=1` publishes now;
-after a code release, run `wowcensus-rollout` (or `ROLLOUT_LIMIT=72` for just the
-main pages) to bring cached pages up to date.
+leaves the old data up and is retried after 30 minutes. `FORCE=1` publishes now
+(with no new data it re-renders everything); `REFRESH_FULL=1` re-renders every page.
+After a code release run `wowcensus-release-rollout` (below).
 
 New data normally reaches the live database without a sync: `tools/import-live.py`
 runs an importer (`saves` or `csv`) against local PostgreSQL and then, through one SSH
@@ -223,9 +230,14 @@ ever empties a cache.
    nohup /usr/local/bin/wowcensus-release-rollout >> /var/log/wowcensus-data-refresh.log 2>&1 &
    ```
 
-   It waits 2 minutes for PHP's realpath cache to drop the old release, takes the data-refresh
-   lock (so two rollouts never overlap), re-renders the main pages (`ROLLOUT_MAIN=1`: every skin
-   and Accept variant of them, unlike `ROLLOUT_LIMIT`, which counts cache entries), then the rest.
+   It waits 2 minutes for PHP's realpath cache to drop the old release, then runs one
+   `wowcensus-data-refresh` pass with `FORCE=1 REFRESH_FULL=1 REFRESH_WAIT=1`: it waits for the
+   lock (so two rollouts never overlap), publishes any data waiting to go live, and re-renders
+   every cached page once, main pages first. A release whose code an earlier full pass already
+   rendered (`/var/lib/wowcensus/code-rollout`) is skipped when no new data arrived meanwhile,
+   so releases queued behind one rollout don't each re-render the whole site again. (Until
+   2026-11-10 a release ran two full passes: `ROLLOUT_MAIN=1` was documented but not
+   implemented, so its "main pages" pass re-rendered every page.)
 2. **A 24-hour safety net in nginx.** Pages go stale after 24 hours instead of never, but are
    never thrown away and never make a visitor wait: nginx serves the saved copy and one
    background request re-renders it. In `snippets/wowcensus-cache.conf`, replace the

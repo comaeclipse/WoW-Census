@@ -1,22 +1,29 @@
 #!/bin/sh
-# Publishes new data on wowcensus.io gradually, at most once per PUBLISH_INTERVAL_MINUTES,
-# one step at a time so the small box never runs two heavy jobs:
+# Publishes new data on wowcensus.io, at most once per PUBLISH_INTERVAL_MINUTES, one step at
+# a time so the small box never runs two heavy jobs:
 #   1. rebuild the census tables (build-census-cache.php) at low CPU and disk priority;
 #      until they are swapped in the site keeps using the previous ones
 #      (ML_CENSUS_PUBLISHED=1 in the PHP-FPM pools), so pages stay fast;
-#   2. re-render the cached pages in place, main pages first, then by visits
-#      (wowcensus-rollout). The cache is never emptied: visitors get each page's saved
-#      copy until it is replaced, and pages nobody has cached render on first visit.
-# The page cache key no longer changes with the data (conf.d/wowcensus-data-version.conf
-# is fixed). Runs from /etc/cron.d/wowcensus-data every 5 minutes; safe to run by hand.
-# The lock is held through the rollout, so a newer upload waits for the next pass.
-#   FORCE=1   publish now: skip the interval and roll out even without new data
+#   2. re-render the cached pages in place (wowcensus-rollout), main pages first, then by
+#      visits. Only the editions whose data changed since the last publish are re-rendered
+#      (plus the home page, which shows every edition): a Forever AH import re-renders the
+#      Forever pages, not all ~2,500. The cache is never emptied: visitors get each page's
+#      saved copy until it is replaced, and pages nobody has cached render on first visit.
+# Runs from /etc/cron.d/wowcensus-data every 5 minutes; safe to run by hand. The lock is held
+# through the rollout, so a newer upload waits for the next pass.
+#   FORCE=1          publish now: skip the interval (and with no new data, re-render everything)
+#   REFRESH_FULL=1   re-render every cached page, not just the changed editions (code releases)
+#   REFRESH_WAIT=1   wait for the lock instead of exiting when another pass holds it
+#   RELEASE=<path>   set by wowcensus-release-rollout: skip the pass when a full rollout already
+#                    rendered this release and there is no new data
 set -eu
 exec 9>/run/wowcensus-data-refresh.lock
-flock -n 9 || exit 0
+if [ "${REFRESH_WAIT:-0}" = 1 ]; then flock 9; else flock -n 9 || exit 0; fi
 STATE=/var/lib/wowcensus/data-version
+# The release the last complete full rollout rendered with.
+CODE_STATE=/var/lib/wowcensus/code-rollout
 FAILED=/var/lib/wowcensus/data-refresh.failed
-INTERVAL=${PUBLISH_INTERVAL_MINUTES:-60}
+INTERVAL=${PUBLISH_INTERVAL_MINUTES:-15}
 RETRY=${FAILED_RETRY_MINUTES:-30}
 SITE=/srv/wowcensus/current
 mkdir -p "$(dirname "$STATE")"
@@ -27,6 +34,10 @@ log() { echo "$(date -u +%FT%TZ) $*"; }
 V=$(q "select max(imported_at_utc) from marketlens_import.local_imports")
 valid "$V" || { echo "unexpected data version: '$V'" >&2; exit 1; }
 CUR=$(cat "$STATE" 2>/dev/null || true)
+if [ -n "${RELEASE:-}" ] && [ "$V" = "$CUR" ] && [ "$(cat "$CODE_STATE" 2>/dev/null || true)" = "$RELEASE" ]; then
+  log "release $RELEASE: already rolled out by an earlier pass; nothing to do"
+  exit 0
+fi
 if [ "${FORCE:-0}" != 1 ]; then
   [ "$V" = "$CUR" ] && exit 0
   # Space publishes out: uploads arriving in a burst go live together.
@@ -50,8 +61,21 @@ if [ "$P" != "$V" ]; then
 fi
 valid "$P" || fail "unexpected census version: '$P'"
 
+# Which editions changed since the last publish. Everything when there is no previous
+# publish, for code releases, or for a forced pass without new data.
+SOURCES=
+if [ "${REFRESH_FULL:-0}" != 1 ] && valid "$CUR" && [ "$CUR" != "$P" ]; then
+  SOURCES=$(q "select coalesce(string_agg(distinct source_game, ' '), '-')
+               from marketlens_import.local_imports where imported_at_utc > '$CUR'")
+fi
+RELEASE_NOW=$(readlink -f "$SITE")
+
 # From here new renders use the new tables (PHP rechecks the version within 60 s).
 echo "$P" > "$STATE"; rm -f "$FAILED"
-log "published $P; rolling out cached pages"
+log "published $P; rolling out ${SOURCES:+the pages of: $SOURCES}${SOURCES:-every cached page}"
 sleep 65
-nice -n 10 /usr/local/bin/wowcensus-rollout || log "rollout stopped early; the next publish rolls out again"
+if ROLLOUT_SOURCES="$SOURCES" nice -n 10 /usr/local/bin/wowcensus-rollout; then
+  [ -z "$SOURCES" ] && echo "$RELEASE_NOW" > "$CODE_STATE"
+else
+  log "rollout stopped early; the next publish rolls out again"
+fi
