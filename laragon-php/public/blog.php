@@ -103,7 +103,7 @@ ob_start();
 ?><!doctype html>
 <html lang="en"><head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title><?= blog_escape($title) ?> | WoWCensus</title>
+  <title><?= blog_escape($title) ?> – WoWCensus</title>
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="/<?= blog_escape($cssName) ?>">
 </head><body class="blog-page">
@@ -117,8 +117,13 @@ ob_start();
       <section class="panel"><div class="ptitle">Updates</div><h2><?= blog_escape($error) ?></h2><p><a href="/blog.php">Back to updates</a></p></section>
     <?php elseif ($single): $post = $posts[(int)$id]; ?>
       <p><a href="/blog.php">← All updates</a></p>
+      <?php if (isset($post['html_file'])): ?>
+      <article class="blog-econ-post"><header class="blog-head"><time datetime="<?= blog_escape($post['date']) ?>"><?= blog_escape($post['date']) ?></time>
+        <h2><?= blog_escape($post['title']) ?></h2></header><?= file_get_contents(dirname(__DIR__) . '/src/' . basename($post['html_file'])) ?></article>
+      <?php else: ?>
       <article class="panel blog-post"><div class="ptitle"><time datetime="<?= blog_escape($post['date']) ?>"><?= blog_escape($post['date']) ?></time></div>
-        <h2><?= blog_escape($post['title']) ?></h2><?php if (isset($post['html_file'])): ?><div class="blog-feature"><?= file_get_contents(dirname(__DIR__) . '/src/' . basename($post['html_file'])) ?></div><?php else: ?><?= blog_body($post['body'], $post['table'] ?? []) ?><?php endif; ?></article>
+        <h2><?= blog_escape($post['title']) ?></h2><?= blog_body($post['body'], $post['table'] ?? []) ?></article>
+      <?php endif; ?>
       <section class="panel blog-comments" id="comments"><div class="ptitle">Comments (<?= count($comments) ?>)</div>
         <?php if (isset($_GET['posted']) && $commentError === null): ?><p class="blog-comment-ok">Thanks, your comment was posted.</p><?php endif; ?>
         <?php if ($comments): ?><ol class="blog-comment-list"><?= implode('', array_map('blog_comment_html', $comments)) ?></ol>

@@ -1,0 +1,47 @@
+/* Feature posts (blog.php html_file): the Auction House page's look, parchment
+   sections with dark auction windows. Self-contained so every skin shows the same. */
+.blog-econ{font:12px/1.6 Verdana,Tahoma,Arial,sans-serif;color:#2a1a08}
+.blog-econ .section{margin:0 0 16px;border:1px solid #9c7c42;background:#f6ead0;box-shadow:0 1px 3px rgba(60,30,0,.5);color:#2a1a08}
+.blog-econ .post-hd{display:flex;align-items:center;gap:8px;padding:5px 8px 4px 6px;background:linear-gradient(#f8e7b5,#e3c682 70%,#cfae64);border-bottom:1px solid #9c7c42}
+.blog-econ .post-hd h2{margin:0;padding:0;border:0;font:700 15px/1.15 'Cinzel',Georgia,serif;font-variant:small-caps;letter-spacing:.2px;color:#5a2a00;text-shadow:none}
+.blog-econ .post-hd .sub{margin-left:auto;font-size:10px;color:#6a4a20;text-align:right}
+.blog-econ .post-hd .ico{width:22px;height:22px;flex:none;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff6c0,#c89010 50%,#3a2400 85%);border:1px solid #2a1a00;box-shadow:0 0 0 1px #c9a050}
+.blog-econ .econ-ico{width:24px;height:24px;flex:none;overflow:hidden;border:1px solid #000;outline:1px solid #8a7040;border-radius:3px;background:#111}
+.blog-econ .econ-ico img{display:block;width:100%;height:100%}
+.blog-econ .section-bd{padding:12px 14px}
+.blog-econ p{margin:0 0 10px;color:#2a1a08}
+.blog-econ p:last-child{margin-bottom:0}
+.blog-econ strong,.blog-econ b{color:#5a2a00}
+.blog-econ em{color:#5a3a10}
+.blog-econ h3{margin:16px 0 8px;font:700 13px Tahoma,Arial,sans-serif;color:#5a2a00}
+.blog-econ ul{margin:0 0 10px;padding-left:22px}.blog-econ li{margin:3px 0}
+.blog-econ a{color:#7a2a00;font-weight:bold}
+/* coins: dark on parchment, white in the auction windows */
+.blog-econ .money{white-space:nowrap;font-weight:bold;color:#3a1a00}
+.blog-econ .money span{margin-left:4px}.blog-econ .money span:first-child{margin-left:0}
+.blog-econ .money i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:2px;vertical-align:-1px;border:1px solid rgba(0,0,0,.6)}
+.blog-econ .money .g{background:radial-gradient(circle at 35% 30%,#fff6b0,#e0a810 55%,#7a5000)}
+.blog-econ .money .s{background:radial-gradient(circle at 35% 30%,#fff,#b0b8c4 55%,#5a606a)}
+.blog-econ .money .c{background:radial-gradient(circle at 35% 30%,#ffd0a0,#c06a2a 55%,#5a2a00)}
+/* auction windows */
+.blog-econ .ahwin{margin:10px 0 14px;border:2px solid #000;outline:1px solid #8a7040;border-radius:4px;overflow:hidden;background:linear-gradient(#1c1810,#0e0c08);box-shadow:inset 0 0 20px #000}
+.blog-econ .ahwin .wt{padding:6px 10px;background:linear-gradient(#5a1a10,#2a0806);border-bottom:2px solid #000;font:700 13px Tahoma,Arial,sans-serif;color:#ffd75a;text-shadow:0 1px 2px #000}
+.blog-econ .ahscroll{overflow-x:auto}
+.blog-econ .ahtable{width:100%;min-width:0;max-width:none;margin:0;border-collapse:collapse;font-size:11px;line-height:1.4;background:transparent}
+.blog-econ .ahtable th{padding:5px 8px;text-align:left;font:700 10px Tahoma,Arial,sans-serif;color:#ffd75a;background:linear-gradient(#3a3020,#1a160c);border:0;border-bottom:1px solid #000;border-right:1px solid #000;white-space:nowrap}
+.blog-econ .ahtable td{padding:4px 8px;border:0;border-bottom:1px solid #2a2418;color:#e8dcc0;background:transparent}
+.blog-econ .ahtable th,.blog-econ .ahtable td{text-align:left;text-transform:none;letter-spacing:0;min-width:0;width:auto;white-space:normal;overflow:visible;text-overflow:clip}
+.blog-econ .ahtable th.num,.blog-econ .ahtable td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.blog-econ .ahtable tbody tr:nth-child(odd){background:rgba(255,255,255,.025)}
+.blog-econ .ahtable tbody tr:hover{background:rgba(255,215,90,.10)}
+.blog-econ .ahtable td:first-child{font-weight:bold;color:#fff}
+.blog-econ .ahtable .money{color:#fff;text-shadow:0 1px 1px #000}
+.blog-econ .ahtable .ic{display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-5px;overflow:hidden;border:1px solid #000;outline:1px solid #6a6050;border-radius:2px;background:#111}
+.blog-econ .ahtable .ic img{display:block;width:100%;height:100%}
+/* callouts and methodology */
+.blog-econ .econ-signal{margin:12px 0 0;padding:9px 12px;background:linear-gradient(#fbe9b6,#e8d098);border:1px solid #9c7c42;border-left:4px solid #8a5a10;color:#2a1a08}
+.blog-econ .method{display:block;margin-top:12px;padding:10px 12px;border:1px dashed #9c7c42;font-size:10px;color:#5a3a10}
+.blog-head{margin:0 0 16px;padding:10px 14px;border:1px solid #9c7c42;background:linear-gradient(#f8e7b5,#e3c682);box-shadow:0 1px 3px rgba(60,30,0,.5)}
+.blog-head time{font:700 10px Tahoma,Arial,sans-serif;letter-spacing:.5px;text-transform:uppercase;color:#6a4a20}
+.blog-head h2{margin:2px 0 0;font:700 20px/1.25 'Cinzel',Georgia,serif;font-variant:small-caps;color:#5a2a00}
+@media(max-width:600px){.blog-econ .post-hd{flex-wrap:wrap}.blog-econ .post-hd .sub{margin-left:30px;text-align:left}.blog-econ .section-bd{padding:10px}}

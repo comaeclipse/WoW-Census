@@ -376,3 +376,6 @@ table.dir{width:100%;border-collapse:separate;border-spacing:0 1px;background:#6
 .b88.bmc{background:linear-gradient(#fff28a,#ffdd00 50%,#e5b800 51%,#ffe23a);color:#151414}
 .bmc .b88-txt{text-shadow:1px 1px 0 #fff6a8}
 .bmc .b88-ico{background:linear-gradient(#fff6a0,#f0c400)}
+
+/* Auction tables: numbers stay on one line (a six-digit Qty plus its bar wrapped). */
+.ahtable td.num{white-space:nowrap}

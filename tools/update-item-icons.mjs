@@ -7,7 +7,8 @@
 // The cache was a one-off snapshot until this existed, so every item first
 // seen after it showed "?"; the watcher now runs this after each import.
 //
-// Usage: node tools/update-item-icons.mjs [--sources=sod,classic,...] [--pages=<dir>] [--live-auctions]
+// Usage: node tools/update-item-icons.mjs [--sources=sod,classic,...] [--pages=<dir>] [--live-auctions] [--ids-from=<file>]
+// --ids-from adds item ids listed in a file (e.g. php laragon-php/auction-item-ids.php forever).
 // Reads pages from laragon-php/render-routes.php. --live-auctions also reads the current
 // wowcensus.io AH pages. Prints "ADDED icons=<n>"; the PHP site picks new icons up on request.
 import fs from "node:fs";
@@ -30,6 +31,8 @@ const EDITIONS = {
 const arg = process.argv.find(a => a.startsWith("--sources="));
 const sources = arg ? arg.slice(10).split(",").filter(s => EDITIONS[s]) : Object.keys(EDITIONS);
 const liveAuctions = process.argv.includes("--live-auctions");
+const idsArg = process.argv.find(a => a.startsWith("--ids-from="));
+const idsFrom = idsArg ? idsArg.slice(11) : null;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 // Windows can briefly lock the file (virus scan, editor): retry rather than lose the run.
 async function save(file, cache) {
@@ -84,6 +87,11 @@ for (const branch of new Set(sources.map(s => EDITIONS[s].branch))) {
       for (const match of html.matchAll(/wowhead\.com\/(?:[^"<>\s]+\/)?item=(\d+)/g))
         if (!cache[match[1]]) missing.add(Number(match[1]));
     }
+    // Every id in the edition's auction scans (laragon-php/auction-item-ids.php), so items
+    // that join a top list after a data refresh already have an icon.
+    if (idsFrom)
+      for (const id of fs.readFileSync(idsFrom, "utf8").split(/\s+/).filter(x => /^\d+$/.test(x)))
+        if (!cache[id]) missing.add(Number(id));
     if (liveAuctions) {
       const url = `https://wowcensus.io/${EDITIONS[s].dir ? EDITIONS[s].dir + "/" : ""}auctionhouse`;
       const response = await fetch(url);

@@ -42,4 +42,36 @@ The biggest story is the new races. High Order Skyborne made up 16.6% of the All
 Classes are spread far more evenly than races. Every class is between 9% and 14% of its faction. Hunters (13.9%) and Druids (13.5%) are the most popular Alliance picks. On the Horde side, Shamans lead at 13.7%, against just 10.0% on the Alliance. Alliance players lean toward Mages and Paladins, while the Horde has more Warlocks, Rogues and Warriors. We'll keep scanning as people level up and settle on their mains. Follow along at wowcensus.io/forever to see whether the Skyborne novelty holds up and how the class mix shifts once people start reaching max level.
 TEXT,
     ],
+    5 => [
+        'date' => '2026-11-09',
+        'title' => "WoW: Forever's First-Week Economy: Which Professions Are Already Oversaturated?",
+        'body' => 'An early Auction House market analysis reveals mountains of cheap materials, unprofitable crafted goods, and surprising processing opportunities. We sampled 27 items across all 12 professions, comparing asking prices, available quantities, and theoretical crafting margins.',
+        'html_file' => 'blog-forever-economy.html',
+    ],
+    4 => [
+        'date' => '2026-11-09',
+        'title' => 'Will WoW: Forever Kill Off Classic WoW?',
+        'body' => <<<'TEXT'
+That is the question after Forever's first weekend. Our scans saw a steep drop in characters online across Classic Era and TBC Anniversary compared with scans before Forever launched on Wednesday, November 4.
+
+On Classic Era, our scans saw about 80% fewer characters on Westfall, averaging observations from its connected realms, and 89% fewer on Nethergarde Keep. Westfall's Auction House had 42% fewer active listings on November 8 than on November 3.
+
+TBC Anniversary showed a similar pattern. Our scans saw 84% fewer characters on Dreamscythe and 86% fewer on Thunderstrike. Dreamscythe's Auction House listings fell 43% between November 4 and November 5.
+
+Elsewhere, our scans saw 73% fewer characters on MoP Classic's Pagle and 79% fewer on Shek'zeer. Season of Discovery's Wild Growth was down roughly 95% in both the US and EU.
+
+These are snapshots of characters seen online at different hours, not a count of subscriptions or a prediction of what happens next. This is week one, and Forever is included in the existing subscription. Naturally, many players are trying it out. Time will tell whether these numbers sustain once the launch rush settles.
+TEXT,
+        'table' => [
+            ['Edition', 'Realm', 'Before', 'After', 'Change'],
+            ['Classic Era', 'Westfall', '4,054', '809', '−80%'],
+            ['Classic Era', 'Nethergarde Keep', '4,713', '516', '−89%'],
+            ['TBC Anniversary', 'Dreamscythe', '8,933', '1,459', '−84%'],
+            ['TBC Anniversary', 'Thunderstrike', '8,473', '1,196', '−86%'],
+            ['MoP Classic', 'Pagle', '4,270', '1,161', '−73%'],
+            ['MoP Classic', "Shek'zeer", '2,718', '576', '−79%'],
+            ['Season of Discovery', 'Wild Growth US', '869', '42', '−95%'],
+            ['Season of Discovery', 'Wild Growth EU', '1,008', '37', '−96%'],
+        ],
+    ],
 ];

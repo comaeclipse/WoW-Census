@@ -10,7 +10,7 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '59';
+const ASSET_VERSION = '60';
 
 // Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
 const SUPPORT_RAISED = 0;
@@ -232,13 +232,15 @@ function render_page(string $html, string $path): string {
   if (preg_match('#^/(retail|forever)/skin-colors(?:/([a-z0-9-]+))?/?(index\.html)?$#', $path, $m)) { $GLOBALS['w8_source'] = $m[1]; return skin_colors_page($html, $m[2] ?? null, $m[1]); }
   // The current skin's race switcher fetches these fragments; they stay as they are.
   if (str_starts_with($path, '/retail/skin-colors') || str_starts_with($path, '/forever/skin-colors')) return $html;
+  // Blog posts have long titles: the banner and breadcrumb just say "Blog"; the post shows its own title.
+  if ($path === '/blog.php') return framed_page(null, $html, 'blog', 'census', 'Blog', 'WOWCENSUS · NEWS & ANALYSIS');
   return framed_page(null, $html, null, $path === '/contact' ? 'contact' : 'census');
 }
 
 // ---------------------------------------------------------------- pages
 
 /** A page without a 2008 design of its own: its content, inside the 2008 frame. */
-function framed_page(?string $source, string $html, ?string $page, string $art = 'census'): string {
+function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null): string {
   $body = '';
   $start = strpos($html, '<div class="wrap">');
   if ($start !== false) {
@@ -257,9 +259,10 @@ function framed_page(?string $source, string $html, ?string $page, string $art =
   $title = trim(preg_replace('/\s+[–-]\s+WoWCensus$/u', '', html_entity_decode($t[1] ?? 'WoWCensus', ENT_QUOTES | ENT_HTML5, 'UTF-8')));
   // The banner and breadcrumb already name the edition.
   if ($source !== null) $title = preg_replace('/^' . preg_quote(\seo_label(\EDITIONS[$source]['label']), '/') . '\s+/u', '', $title);
+  if ($bannerTitle !== null) $title = $bannerTitle;
   $styles = '';
   if (preg_match_all('/<style\b[^>]*>.*?<\/style>/is', substr($html, 0, stripos($html, '</head>') ?: 0), $m)) $styles = implode("\n", $m[0]);
-  return page('framed', ['title' => $title, 'body' => $body, 'styles' => $styles, 'source' => $source, 'art' => $art], $html, $page);
+  return page('framed', ['title' => $title, 'body' => $body, 'styles' => $styles, 'source' => $source, 'art' => $art, 'subtitle' => $subtitle], $html, $page);
 }
 
 function census_page(string $source, string $html): string {
@@ -830,6 +833,8 @@ function auction_page(string $source, string $html): string {
   $realmLabels = realm_label_map(array_values(array_filter(array_column($model['dims']['realm'], 'key'), fn($k) => $k !== 'all')));
   $branch = \EDITIONS[$source]['branch'];
   $icons = (array)\item_cache('item-icons', $branch);
+  // Forever reuses Classic items: Classic's cache fills ids the Forever one has not reached yet.
+  if ($branch === 'forever') $icons += (array)\item_cache('item-icons', 'classic');
   $item = function (array $it) use ($icons): array {
     $change = null;
     if ($it['pq'] !== null) $change = $it['pq'] === 0 ? (($it['q'] ?: 0) > 0 ? 'NEW' : 0) : (int)\js_round((($it['q'] ?: 0) - $it['pq']) / $it['pq'] * 100);
