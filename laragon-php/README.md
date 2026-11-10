@@ -178,7 +178,21 @@ leaves the old data up and is retried after 30 minutes. `FORCE=1` publishes now;
 after a code release, run `wowcensus-rollout` (or `ROLLOUT_LIMIT=72` for just the
 main pages) to bring cached pages up to date.
 
-A database sync from local is safe at any time: restore into `marketlens_next`,
+New data normally reaches the live database without a sync: `tools/import-live.py`
+runs an importer (`saves` or `csv`) against local PostgreSQL and then, through one SSH
+tunnel to the server's PostgreSQL (127.0.0.1:5432, db `marketlens`, role `wowcensus`,
+password read from `/etc/wowcensus/pg-password` into memory only), against the live
+database. Parsing stays on the PC; only SQL crosses the wire, and the importers'
+SHA-256 ledger makes a repeat a no-op on either side. The live run skips the local
+census-cache rebuild; the next `wowcensus-data-refresh` publishes the change.
+`--publish-now` starts that refresh with `FORCE=1`, but it exits at once while a
+rollout holds `/run/wowcensus-data-refresh.lock`, and the cron then publishes it.
+Statements that ran once per item are batched (`import_market` in
+`tools/build-local-database.py`), since each round trip over the tunnel costs ~40 ms:
+two CSV snapshots took 36 s live instead of about 30 minutes. See `upload.md` step 5.
+
+A database sync from local is still safe at any time and is the path for rebuilds
+(schema changes, local-only repairs): restore into `marketlens_next`,
 swap the names with PHP-FPM stopped (about a second), and the next pass publishes
 it. Check first that every `local_imports.source_sha256` on the server is also
 local, so no upload made on the live site is lost.

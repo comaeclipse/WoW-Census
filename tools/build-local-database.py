@@ -187,6 +187,7 @@ def import_market(db, body, digest, source):
     snapshot_sql = """INSERT OR IGNORE INTO local_auction_snapshots VALUES
       (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     snapshot_batch = []
+    history_newer, history_older, item_rows = [], [], []
     for raw_id, rec in item_data.items():
         item_id = int(raw_id)
         snapshots = rec.get("s") or []
@@ -217,13 +218,7 @@ def import_market(db, body, digest, source):
             unit = int(point[5] or point[6] or 0)
             row = (game, item_id, day, int(point[1] or 0) * unit,
                    unit, int(point[1] or 0))
-            if not prior or t > unix(prior[0]):
-                db.execute("""INSERT INTO history (game,id,ts,mv,asp,q)
-                  VALUES (?,?,?,?,?,?) ON CONFLICT(game,id,ts) DO UPDATE SET
-                  mv=excluded.mv,asp=excluded.asp,q=excluded.q""", row)
-            else:
-                db.execute("""INSERT OR IGNORE INTO history (game,id,ts,mv,asp,q)
-                  VALUES (?,?,?,?,?,?)""", row)
+            (history_newer if not prior or t > unix(prior[0]) else history_older).append(row)
             history += 1
         last = list(snapshots[-1]) + [0] * (8 - len(snapshots[-1]))
         t = int(last[0] or 0)
@@ -237,19 +232,28 @@ def import_market(db, body, digest, source):
         pq = int(snapshots[-2][1] or 0) if len(snapshots) > 1 else (prior[2] if prior else None)
         sellers = int(last[3] or 0) if body.get("capabilities", {}).get("sellers") is not False else None
         top = int(last[7] or 0) if sellers is not None else None
-        db.execute("""INSERT INTO items
-          (game,id,name,slug,mv,asp,updated_at,q,pq,sc,tc,cat,src,crafter)
-          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-          ON CONFLICT(game,id) DO UPDATE SET
-          name=excluded.name,slug=excluded.slug,mv=excluded.mv,asp=excluded.asp,
-          updated_at=excluded.updated_at,q=excluded.q,pq=excluded.pq,
-          sc=excluded.sc,tc=excluded.tc,cat=excluded.cat,src=excluded.src,
-          crafter=excluded.crafter""", (
+        item_rows.append((
             game, item_id, name, slug(name), quantity * unit, unit, iso(t),
             quantity, pq, sellers, top, category, item_source, crafter))
         current += 1
     if snapshot_batch:
         db.executemany(snapshot_sql, snapshot_batch)
+    # Batched rather than one statement per item, so a remote database (the live
+    # import over an SSH tunnel) costs a few round trips, not thousands. Every
+    # (game,id,ts) and (game,id) row is unique within one scan, so order is irrelevant.
+    db.executemany("""INSERT INTO history (game,id,ts,mv,asp,q)
+      VALUES (?,?,?,?,?,?) ON CONFLICT(game,id,ts) DO UPDATE SET
+      mv=excluded.mv,asp=excluded.asp,q=excluded.q""", history_newer)
+    db.executemany("""INSERT OR IGNORE INTO history (game,id,ts,mv,asp,q)
+      VALUES (?,?,?,?,?,?)""", history_older)
+    db.executemany("""INSERT INTO items
+      (game,id,name,slug,mv,asp,updated_at,q,pq,sc,tc,cat,src,crafter)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ON CONFLICT(game,id) DO UPDATE SET
+      name=excluded.name,slug=excluded.slug,mv=excluded.mv,asp=excluded.asp,
+      updated_at=excluded.updated_at,q=excluded.q,pq=excluded.pq,
+      sc=excluded.sc,tc=excluded.tc,cat=excluded.cat,src=excluded.src,
+      crafter=excluded.crafter""", item_rows)
     stale_current_removed = 0
     if current:
         # A fresh AH import supersedes current rows left by older scans. Keep
