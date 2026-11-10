@@ -187,9 +187,14 @@ SHA-256 ledger makes a repeat a no-op on either side. The live run skips the loc
 census-cache rebuild; the next `wowcensus-data-refresh` publishes the change.
 `--publish-now` starts that refresh with `FORCE=1`, but it exits at once while a
 rollout holds `/run/wowcensus-data-refresh.lock`, and the cron then publishes it.
-Statements that ran once per item are batched (`import_market` in
-`tools/build-local-database.py`), since each round trip over the tunnel costs ~40 ms:
-two CSV snapshots took 36 s live instead of about 30 minutes. See `upload.md` step 5.
+Each round trip over the tunnel costs ~40 ms, so the import functions in
+`tools/build-local-database.py` batch their writes (AH items and history, sellers,
+inspects): two CSV snapshots took 36 s live instead of about 30 minutes. On
+PostgreSQL (`PgDb.narrow_reads`) `import_inspects` reads only the characters and
+stored talents its records name, and skips an edition with no records; it used
+to download every character of Classic, SoD and Hardcore for each Era save. After a
+changed import only the tables the importer writes are `ANALYZE`d. Live runs keep
+their report and file copies in `MarketLensData\imports-live\`. See `upload.md` step 5.
 
 A database sync from local is still safe at any time and is the path for rebuilds
 (schema changes, local-only repairs): restore into `marketlens_next`,

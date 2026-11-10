@@ -363,6 +363,7 @@ def import_sellers(db, body, source):
                        if source == "retail" else realm)
     count = listings = 0
     latest = 0
+    seller_rows, listing_rows = [], []
     for seller in body.get("sellers", []):
         owner = seller.get("o")
         points = seller.get("L") or []
@@ -372,7 +373,15 @@ def import_sellers(db, body, source):
         latest = max(latest, last)
         qty = sum(int(p[1] or 0) for p in points)
         value = sum(int(p[1] or 0) * int(p[2] or 0) for p in points)
-        db.execute("""INSERT INTO sellers
+        seller_rows.append((game, owner, slug(owner), first, last, seller.get("sc") or 0,
+                            len(points), qty, value, encode(seller.get("h") or [])))
+        count += 1
+        for item_id, amount, price in points:
+            listing_rows.append((game, owner, item_id, amount, price, last or body.get("exportedAt") or 0))
+            listings += 1
+    # Batched: executemany runs the statements in order, so the upserts behave as
+    # one statement per row did, but a remote database costs a few round trips.
+    db.executemany("""INSERT INTO sellers
           (game,owner,slug,first_seen,last_seen,seen_count,items,qty,value,hist)
           VALUES (?,?,?,?,?,?,?,?,?,?)
           ON CONFLICT(game,owner) DO UPDATE SET
@@ -383,17 +392,12 @@ def import_sellers(db, body, source):
           qty=CASE WHEN excluded.last_seen>sellers.last_seen THEN excluded.qty ELSE sellers.qty END,
           value=CASE WHEN excluded.last_seen>sellers.last_seen THEN excluded.value ELSE sellers.value END,
           hist=CASE WHEN excluded.last_seen>sellers.last_seen THEN excluded.hist ELSE sellers.hist END""",
-                   (game, owner, slug(owner), first, last, seller.get("sc") or 0,
-                    len(points), qty, value, encode(seller.get("h") or [])))
-        count += 1
-        for item_id, amount, price in points:
-            db.execute("""INSERT INTO seller_listings (game,owner,id,q,l,last_seen)
-              VALUES (?,?,?,?,?,?) ON CONFLICT(game,owner,id) DO UPDATE SET
-              q=CASE WHEN excluded.last_seen>COALESCE(seller_listings.last_seen,0) THEN excluded.q ELSE seller_listings.q END,
-              l=CASE WHEN excluded.last_seen>COALESCE(seller_listings.last_seen,0) THEN excluded.l ELSE seller_listings.l END,
-              last_seen=MAX(COALESCE(seller_listings.last_seen,0),excluded.last_seen)""",
-                       (game, owner, item_id, amount, price, last or body.get("exportedAt") or 0))
-            listings += 1
+                   seller_rows)
+    db.executemany("""INSERT INTO seller_listings (game,owner,id,q,l,last_seen)
+          VALUES (?,?,?,?,?,?) ON CONFLICT(game,owner,id) DO UPDATE SET
+          q=CASE WHEN excluded.last_seen>COALESCE(seller_listings.last_seen,0) THEN excluded.q ELSE seller_listings.q END,
+          l=CASE WHEN excluded.last_seen>COALESCE(seller_listings.last_seen,0) THEN excluded.l ELSE seller_listings.l END,
+          last_seen=MAX(COALESCE(seller_listings.last_seen,0),excluded.last_seen)""", listing_rows)
     previous = db.execute("SELECT seller_updated_at FROM datasets WHERE game=?", (game,)).fetchone()
     if count and (not previous or latest > unix(previous[0])):
         db.execute("""INSERT INTO datasets (game,source_game,seller_updated_at,seller_meta)
@@ -463,9 +467,17 @@ def repair_realm_names(db):
     return changed
 
 
-def inspect_candidates(db, source):
+def inspect_candidates(db, source, names=None):
+    """Census characters by (normalized name, class). A database that sets
+    narrow_reads (PostgreSQL, possibly over a tunnel) reads only the characters
+    whose lower-cased name is one of the inspects', not the whole edition."""
     by_name_class = {}
-    for row in db.execute("SELECT game,character_key,name,realm,race,class_file,last_seen FROM characters WHERE source_game=?", (source,)):
+    sql, params = "SELECT game,character_key,name,realm,race,class_file,last_seen FROM characters WHERE source_game=?", (source,)
+    if names is not None and getattr(db, "narrow_reads", False):
+        # A superset of what match_inspect() keeps, which compares norm() (casefold).
+        keys = sorted({k for n in names for k in (n.lower(), norm(n))})
+        sql, params = sql + " AND lower(name) = ANY(?)", (source, keys)
+    for row in db.execute(sql, params):
         by_name_class.setdefault((norm(row[2]), row[5]), []).append(row)
     return by_name_class
 
@@ -485,11 +497,20 @@ def match_inspect(by_name_class, name, class_file, race, realm, faction, region)
 
 
 def import_inspects(db, body, source):
-    by_name_class = inspect_candidates(db, source)
     added = nodes = linked = unmatched = ambiguous = 0
+    if not body["records"]:
+        # Nothing to link or store: skip reading the edition's characters and inspects.
+        return {"selected": body["selected"], "rejected": body["rejected"], "valid": 0, "talentNodes": 0,
+                "linked": 0, "unmatched": 0, "ambiguous": 0}
+    by_name_class = inspect_candidates(db, source, [p["normalized"]["name"] for p in body["records"]])
     known = known_realms(db)
+    nodes_sql, nodes_params = "SELECT guid,captured_at,nodes_json FROM character_inspects WHERE source_game=?", (source,)
+    if getattr(db, "narrow_reads", False):
+        nodes_sql, nodes_params = nodes_sql + " AND guid = ANY(?)", (
+            source, sorted({p["normalized"]["guid"] for p in body["records"]}))
     existing_nodes = {(guid, captured_at): nodes_json for guid, captured_at, nodes_json in db.execute(
-        "SELECT guid,captured_at,nodes_json FROM character_inspects WHERE source_game=?", (source,))}
+        nodes_sql, nodes_params)}
+    inspect_rows = []
     talent_sql = """INSERT OR IGNORE INTO inspect_talents
       (source_game,guid,captured_at,node_id,tree_id,spell_id,name,rank,max_rank,
        x,y,entry_id,definition_id,groups_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
@@ -516,17 +537,7 @@ def import_inspects(db, body, source):
                   e.get("talents"), e["schemaVersion"], e.get("clientBuild"),
                   e.get("locale"), match_game, match_key, status, "NameplateInspect",
                   nodes_json, encode(raw), encode(e["gear"]) if e["gear"] else None)
-        db.execute("""INSERT INTO character_inspects
-          (source_game,guid,captured_at,raw_name,name,realm,faction,observer_realm,
-           observer_faction,observer_zone,class_file,race,level,guild,raw_spec_id,
-           raw_role,import_string,schema_version,client_build,locale,game,
-           character_key,match_status,collector,nodes_json,raw_json,gear_json)
-          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-          ON CONFLICT(source_game,guid,captured_at) DO UPDATE SET
-          raw_name=excluded.raw_name,name=excluded.name,game=excluded.game,
-          character_key=excluded.character_key,match_status=excluded.match_status,
-          gear_json=COALESCE(excluded.gear_json,character_inspects.gear_json)
-          WHERE excluded.schema_version>=character_inspects.schema_version""", values)
+        inspect_rows.append(values)
         added += 1
         nodes += len(e["list"])
         if existing_nodes.get((e["guid"], e["time"])) == nodes_json:
@@ -536,11 +547,19 @@ def import_inspects(db, body, source):
                                  talent.get("spell"), talent["name"], talent["rank"], talent["max"],
                                  talent.get("x"), talent.get("y"), talent.get("entry"),
                                  talent.get("definition"), encode(talent.get("groups") or [])))
-            if len(talent_batch) >= 2000:
-                db.executemany(talent_sql, talent_batch)
-                talent_batch.clear()
-    if talent_batch:
-        db.executemany(talent_sql, talent_batch)
+    # Inspects first, in record order as before, then their talents.
+    db.executemany("""INSERT INTO character_inspects
+          (source_game,guid,captured_at,raw_name,name,realm,faction,observer_realm,
+           observer_faction,observer_zone,class_file,race,level,guild,raw_spec_id,
+           raw_role,import_string,schema_version,client_build,locale,game,
+           character_key,match_status,collector,nodes_json,raw_json,gear_json)
+          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+          ON CONFLICT(source_game,guid,captured_at) DO UPDATE SET
+          raw_name=excluded.raw_name,name=excluded.name,game=excluded.game,
+          character_key=excluded.character_key,match_status=excluded.match_status,
+          gear_json=COALESCE(excluded.gear_json,character_inspects.gear_json)
+          WHERE excluded.schema_version>=character_inspects.schema_version""", inspect_rows)
+    db.executemany(talent_sql, talent_batch)
     return {"selected": body["selected"], "rejected": body["rejected"],
             "valid": added, "talentNodes": nodes, "linked": linked,
             "unmatched": unmatched, "ambiguous": ambiguous}

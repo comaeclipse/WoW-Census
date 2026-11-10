@@ -19,8 +19,10 @@ them.
 The live side uses exactly one SSH connection: it forwards a local port to the
 server's PostgreSQL, reads the database password from /etc/wowcensus/pg-password
 (kept in memory, passed to the importer as PGPASSWORD, never printed), and stays
-open until the import ends. The local archive already holds the files, so the
-live run archives into a temporary folder that is deleted afterwards.
+open until the import ends. The live run archives into
+MarketLensData/imports-live/<UTC time>/: its import-report.json (with timings) and
+a copy of each file it imported, so a live-only run can be replayed locally later
+(--target local --game-root pointing at that folder, or the CSVs in it).
 
 New data goes live on the site through the hourly wowcensus-data-refresh cron
 (census rebuild, then the page rollout). --publish-now starts that refresh with
@@ -34,17 +36,16 @@ Options for this wrapper (everything else goes to the importer):
 
 import argparse
 import os
-import shutil
 import socket
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 IMPORTERS = {"csv": REPO / "tools" / "import-forever-ah-csv-pg.py",
              "saves": REPO / "tools" / "import-savedvariables-pg.py"}
 LIVE_DB = "dbname=marketlens user=wowcensus"
+LIVE_ARCHIVE = Path(os.environ.get("MARKETLENS_DATA_ROOT", Path.home() / "Documents" / "MarketLensData")) / "imports-live"
 LIVE_PG_PORT = 5432
 # Runs on the server: print the password and a marker, then wait for one line on
 # stdin ("publish" or "done"), so the tunnel lives exactly as long as the import.
@@ -99,7 +100,10 @@ def main():
                             "-o", "ServerAliveInterval=30", "-L", f"127.0.0.1:{port}:127.0.0.1:{LIVE_PG_PORT}",
                             args.host, REMOTE],
                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, encoding="utf-8")
-    archive = Path(tempfile.mkdtemp(prefix="import-live-"))
+    # Kept, not deleted: the live run's import report (with timings) and a copy of
+    # every file it imported, so a live-only import can be replayed locally later.
+    archive = LIVE_ARCHIVE
+    archive.mkdir(parents=True, exist_ok=True)
     try:
         password = ssh.stdout.readline().strip()
         if ssh.stdout.readline().strip() != "READY" or not password:
@@ -109,7 +113,9 @@ def main():
         code, last = run_importer(args.kind, [*rest, f"--dsn={dsn}", f"--archive={archive}"], env)
         # Any committed run ends with a CHANGED line (unmapped AH houses print it empty but
         # still add local_imports rows, which is what the refresh watches).
-        changed = code == 0 and not dry and last.startswith("CHANGED")
+        # The save importer prints an empty CHANGED line when nothing was new.
+        changed = code == 0 and not dry and last.startswith("CHANGED") and (
+            args.kind == "csv" or last != "CHANGED sources=")
         publish = changed and args.publish_now
         ssh.stdin.write("publish\n" if publish else "done\n")
         ssh.stdin.flush()
@@ -123,7 +129,6 @@ def main():
     finally:
         if ssh.poll() is None:
             ssh.kill()
-        shutil.rmtree(archive, ignore_errors=True)
 
 
 if __name__ == "__main__":

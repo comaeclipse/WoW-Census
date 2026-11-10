@@ -77,6 +77,10 @@ def translate(sql):
 class PgDb:
     """The slice of sqlite3.Connection the import functions use."""
 
+    # The import functions may then read only the rows a file can touch (see
+    # inspect_candidates); the SQLite builder keeps reading whole tables.
+    narrow_reads = True
+
     def __init__(self, conn):
         self.conn = conn
         self.cache = {}
@@ -129,6 +133,11 @@ def run_node(*args):
 
 
 REGIONS = ("us", "eu", "kr", "tw", "cn")
+# Every table the import functions write (ANALYZEd after a changed import).
+IMPORT_TABLES = ("census_collection_realms", "character_inspects", "character_location_observations",
+                 "character_observations", "characters", "collection_key_regions", "datasets", "history",
+                 "inspect_talents", "items", "local_auction_snapshots", "local_imports", "local_source_files",
+                 "pop_samples", "population_sweep_queries", "population_sweeps", "seller_listings", "sellers")
 
 
 def population_times(body):
@@ -525,7 +534,10 @@ def main():
     if changed_sources:
         conn.autocommit = True
         phase_started = time.perf_counter()
-        db.execute("ANALYZE")
+        # Only the tables an import writes; a whole-database ANALYZE also rescans the
+        # big census_* cache tables, which took most of a live import's time.
+        for table in IMPORT_TABLES:
+            db.execute(f"ANALYZE {table}")
         report["timingSeconds"]["analyze"] += time.perf_counter() - phase_started
         # Rebuild the pre-computed census tables for this import. Until it succeeds the
         # pages run the live census SQL (census_cache_fresh()), so a failure only costs speed.
