@@ -195,6 +195,34 @@ def record_key_region(db, game, source, identity):
     return None
 
 
+def region_route(db, bucket, source, path, flavor):
+    """The region-qualified bucket for a region-less MarketLens bucket recorded in a
+    region other than the one its key is already pinned to; None otherwise."""
+    if re.match(r"^(us|eu|kr|tw|cn):", bucket):
+        return None
+    row = db.execute("SELECT region FROM collection_key_regions WHERE game=? AND source_game=?",
+                     ("realm:" + bucket, source)).fetchone()
+    if not row:
+        return None
+    try:
+        body = run_node(legacy.EXPORT_REALM, path, f"--realm={bucket}", "--population", f"--flavor={flavor}")
+    except RuntimeError:
+        return None
+    identity = body.get("identity") or {}
+    region, game = identity.get("region"), identity.get("game")
+    if region not in REGIONS or region == row[0] or not game:
+        return None
+    # The qualified key uses WoWCensus's game names (classic-era, tbc-anniversary, ...).
+    # MarketLens records Season of Discovery and Hardcore realms as "classic-era";
+    # those take the game the importer routed the bucket to (sod, hardcore).
+    if game == "classic-era" and source in ("sod", "hardcore"):
+        game = source
+    expected = {"classic": "classic-era", "classic-progression": "tbc-anniversary"}.get(source, source)
+    if game != expected:
+        raise RuntimeError(f"Refusing {bucket}: recorded game {identity.get('game')} conflicts with import source {source}")
+    return f"{region}:{game}:{bucket}"
+
+
 def write_key_region_function(db):
     """Regenerate collection_key_region() as a constant CASE from collection_key_regions."""
     groups = {}
@@ -328,12 +356,21 @@ def main():
             relabel_log = re.sub(r"^(us|eu|kr|tw|cn):classic-beta:", r"\1:forever:", bucket) + " [recorded classic-beta]"
             result = {"flavor": flavor, "source": source, "bucket": bucket}
             combined = market["relative"].endswith("/WoWCensus.lua")
+            # MarketLens names buckets without a region ("Wild Growth-Alliance"), so the
+            # same name from US and EU would share one key. Once a key is pinned to one
+            # region, a bucket recorded in another region goes to the region-qualified
+            # key WoWCensus uses ("eu:sod:Wild Growth-Alliance") instead of merging.
+            routed = None if combined else region_route(db, bucket, source, market["path"], flavor)
+            if routed:
+                db_bucket = log_bucket = routed
+                result.update(bucket=routed, recordedBucket=bucket)
+                print(f"{flavor:18} {bucket}: key is pinned to another region; importing as {routed}", flush=True)
             for kind, extra, importer in (
                 ("market", [], lambda body: legacy.import_market(db, body, market["sha256"], source)),
                 ("population", ["--population", f"--flavor={flavor}"], lambda body: legacy.import_population(db, body, source)),
                 ("sellers", ["--sellers"], lambda body: legacy.import_sellers(db, body, source)),
             ):
-                if legacy.already(db, market["sha256"], kind, bucket) or (
+                if legacy.already(db, market["sha256"], kind, routed or bucket) or (
                         client["flavor"] == "_forever_" and legacy.already(db, market["sha256"], kind, relabel_log)):
                     result[kind] = "already imported"
                     continue
@@ -374,7 +411,21 @@ def main():
                             print(f"{flavor:18} {bucket}: live Forever data recorded as beta; importing as {db_bucket}", flush=True)
                         elif times and max(times) >= launch:
                             raise RuntimeError(f"Refusing {bucket}: beta-labelled data spans the Forever launch; split it by hand")
-                if kind == "population" and combined:
+                # Companion copies are named MarketLens.lua, so `combined` is false.
+                # A relabelled live Forever bucket still has to be stored under the
+                # new game key; this block compares the save's original bucket.
+                if routed:
+                    body["realm"] = routed
+                    if kind == "population":
+                        identity = body.get("identity") or {}
+                        body["game"] = "realm:" + routed
+                        db.execute("""INSERT INTO census_collection_realms
+                          (game,source_game,region,region_id,realm_id,realm_name,realm_normalized,faction)
+                          VALUES (?,?,?,?,?,?,?,?) ON CONFLICT (game) DO UPDATE SET
+                          region_id=excluded.region_id,realm_id=excluded.realm_id""",
+                          (body["game"], source, identity["region"], identity.get("regionID"), identity.get("realmID"),
+                           identity.get("realmName"), None, identity.get("faction")))
+                elif kind == "population" and (combined or db_bucket != bucket):
                     identity = body.get("identity") or {}
                     region = identity.get("region")
                     if region not in ("us", "eu", "kr", "tw", "cn"):
@@ -402,7 +453,7 @@ def main():
                 phase_started = time.perf_counter()
                 details = importer(body)
                 report["timingSeconds"][kind] += time.perf_counter() - phase_started
-                if not combined and details.get("game"):
+                if not combined and not routed and details.get("game"):
                     note = record_key_region(db, details["game"], source, body.get("identity"))
                     if note:
                         report["errors"].append(note)
