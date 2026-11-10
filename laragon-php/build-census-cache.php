@@ -11,6 +11,7 @@
 //   census_seen_rows   seen_activity()'s two results per edition, from census_seen
 //   census_aliases     collection_aliases()'s answer
 //   census_guilds      public guild id to canonical collection and guild name
+//   census_item_wear   forever_item_wearers()'s answer per worn Forever item (item pages)
 //
 // Each table is built from the same SQL the pages run live, in one snapshot of
 // the database, then swapped in together with census_cache_meta.version = the
@@ -102,7 +103,24 @@ foreach (collection_aliases() as $old => $alias) $st->execute([++$seq, $old, $al
 $pdo->exec('CREATE INDEX census_aliases_next_i0 ON census_aliases_next (seq)');
 printf("%-18s %9s rows %6.1fs\n", 'census_aliases', number_format($seq), microtime(true) - $t);
 
-foreach (['census_characters', 'census_guilds', 'census_latest', 'census_sightings', 'census_seen', 'census_seen_rows', 'census_aliases'] as $table) {
+// forever_item_wearers()'s answer for every item an inspected Forever character wore, so an item
+// page reads one row instead of walking all the inspections (about a second, more on production).
+$t = microtime(true);
+$pdo->exec('DROP TABLE IF EXISTS census_item_wear_next');
+$pdo->exec('CREATE TABLE census_item_wear_next (item_id integer NOT NULL, data text NOT NULL)');
+$st = $pdo->prepare('INSERT INTO census_item_wear_next VALUES (?, ?)');
+$seq = 0;
+foreach (array_keys(forever_wear_index()) as $id)
+  if (is_int($id) && ($wearers = forever_item_wearers_live($id))) {
+    $st->execute([$id, json_encode($wearers, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR)]);
+    $seq++;
+  }
+$pdo->exec('CREATE INDEX census_item_wear_next_i0 ON census_item_wear_next (item_id)');
+printf("%-18s %9s rows %6.1fs\n", 'census_item_wear', number_format($seq), microtime(true) - $t);
+// Item pages look up one item's auction scans; the primary key leads with game, so it can't serve that.
+$pdo->exec('CREATE INDEX IF NOT EXISTS local_auction_snapshots_item ON local_auction_snapshots (source_game, item_id)');
+
+foreach (['census_characters', 'census_guilds', 'census_latest', 'census_sightings', 'census_seen', 'census_seen_rows', 'census_aliases', 'census_item_wear'] as $table) {
   $pdo->exec("DROP TABLE IF EXISTS $table");
   $pdo->exec("ALTER TABLE {$table}_next RENAME TO $table");
   foreach ($pdo->query("SELECT indexname FROM pg_indexes WHERE tablename = " . $quote($table) . " AND indexname LIKE " . $quote("{$table}_next_i%"))->fetchAll(PDO::FETCH_COLUMN) as $index)

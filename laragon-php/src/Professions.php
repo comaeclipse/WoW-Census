@@ -252,8 +252,25 @@ function forever_wear_index(): array {
   return $index;
 }
 
-/** One item's wearers for its page, or null when no inspected character wore it. */
+/**
+ * One item's wearers for its page, or null when no inspected character wore it. Reads the row
+ * build-census-cache.php precomputed into census_item_wear (one indexed lookup); only while those
+ * tables are missing or behind does it fall back to scanning every inspection.
+ */
 function forever_item_wearers(int $id): ?array {
+  if (census_cache_fresh()) {
+    try {
+      $row = Db::first('SELECT data FROM census_item_wear WHERE item_id = ?', [$id]);
+      return $row ? json_decode((string)$row['data'], true, 512, JSON_THROW_ON_ERROR) : null;
+    } catch (PDOException) {
+      // Published before census_item_wear existed: build it live until the next publish.
+    }
+  }
+  return forever_item_wearers_live($id);
+}
+
+/** forever_item_wearers() from the inspections themselves (about a second for Forever's 10,000). */
+function forever_item_wearers_live(int $id): ?array {
   $index = forever_wear_index();
   $e = $index[$id] ?? null;
   if ($e === null) return null;
@@ -277,6 +294,13 @@ function forever_item_wearers(int $id): ?array {
  * scans[] = [realm key, faction, captured_at unix, qty, lowest cu, median cu, average cu], oldest first.
  */
 function forever_item_model(int $id): ?array {
+  // The plain page and the 2008 skin both ask for it in one request.
+  static $memo = [];
+  if (array_key_exists($id, $memo)) return $memo[$id];
+  return $memo[$id] = forever_item_model_build($id);
+}
+
+function forever_item_model_build(int $id): ?array {
   $rows = Db::all("SELECT game, captured_at, name, category, crafter, quantity, lowest, median, weighted_average
     FROM local_auction_snapshots WHERE source_game=? AND item_id=? ORDER BY captured_at, game", [PROFESSION_SOURCE, $id]);
   // Gear seen on inspected characters has a page even if it was never listed.
@@ -287,8 +311,10 @@ function forever_item_model(int $id): ?array {
     if (($r['name'] ?? '') !== '' && !preg_match('/^item:\d+$/', (string)$r['name'])) $name = (string)$r['name'];
     if (($r['category'] ?? '') !== '') $cat = $r['category'];
     if (($r['crafter'] ?? '') !== '') $crafter = $r['crafter'];
-    // An old collection's scans count as its labelled twin's: keep each capture once.
-    $game = preg_replace('/^realm:/', '', canonical_game($r['game']));
+    // An old collection's scans count as its labelled twin's: keep each capture once. Forever's twins
+    // differ only by the "us:forever:" label, so stripping it matches canonical_game() without
+    // building the alias map (a census-wide query whenever the census tables are behind).
+    $game = preg_replace('/^realm:(?:(?:us|eu|kr|tw|cn):[a-z-]+:)?/', '', $r['game']);
     if (isset($seen[$game . '|' . $r['captured_at']])) continue;
     $seen[$game . '|' . $r['captured_at']] = true;
     $faction = preg_match('/-(Alliance|Horde)$/', $game, $m) ? $m[1] : 'Neutral';
