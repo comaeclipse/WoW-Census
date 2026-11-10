@@ -6,6 +6,10 @@ namespace Wow2008;
  *       $data (generated + forever_item_markets(): markets key => [label, faction], points, log), $wowhead, $subtitle
  */
 $icon = $item['icon'] ?: 'inv_misc_questionmark';
+$w = $item['wearers'];
+$listed = (bool)$item['scans'];
+$QCOL = [0 => '#9d9d9d', 1 => '#ffffff', 2 => '#1eff00', 3 => '#0070dd', 4 => '#a335ee', 5 => '#ff8000', 6 => '#e6cc80', 7 => '#00ccff'];
+$nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') : '#ffffff';
 ?>
   <style>
     .it-hero{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;margin-bottom:14px;padding:14px 16px;
@@ -38,6 +42,17 @@ $icon = $item['icon'] ?: 'inv_misc_questionmark';
     .it-charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .it-one{padding:14px;color:#c8b898;font-size:11px;text-align:center}
     .report .money,.tiles .money{color:#3a1a00;text-shadow:none}
+    .it-wear{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
+    .it-bars{background:linear-gradient(#1c1810,#0e0c08);border:2px solid #000;outline:1px solid #8a7040;border-radius:4px;padding:8px 10px}
+    .it-bars h3{margin:0 0 6px;font:700 11px Tahoma,Arial,sans-serif;color:#ffd75a}
+    .it-bar{display:grid;grid-template-columns:96px 1fr 60px;gap:8px;align-items:center;font:11px Tahoma,Arial,sans-serif;color:#e8dcc0;padding:2px 0}
+    .it-bar .tr{display:block;height:10px;background:#000;border:1px solid #3a3020}
+    .it-bar .tr i{display:block;height:100%;width:0;transition:width .8s}
+    .it-bar .v{text-align:right;color:#d8c8a0}
+    .it-fac{display:flex;height:14px;border:1px solid #000;margin:4px 0 8px}
+    .it-fac i{display:block}
+    .it-nomkt{padding:10px 12px;background:linear-gradient(#fbe9b6,#e8d098);border:1px solid #9c7c42;font-size:12px;color:#3a1a00}
+    @media (max-width:760px){.it-wear{grid-template-columns:1fr}}
     @media (max-width:760px){.it-charts{grid-template-columns:1fr}}
     @media (max-width:600px){.it-hero{grid-template-columns:auto 1fr}.it-wh{grid-column:1 / -1;justify-self:start}.it-hero h1{font-size:21px}.it-hero .emb{width:52px;height:52px}}
   </style>
@@ -48,7 +63,7 @@ $icon = $item['icon'] ?: 'inv_misc_questionmark';
       <div class="emb"><img src="/assets/images/wow/icons/large/<?= e($icon) ?>.jpg" alt="" width="64" height="64"></div>
       <div>
         <div class="kick"><?= e($item['cat'] ?: 'Item') ?> · <?= e($subtitle) ?></div>
-        <h1><?= e($item['name']) ?></h1>
+        <h1 style="color:<?= e($nameColor) ?>"><?= e($item['name']) ?></h1>
         <div class="meta">
           <?php if ($item['crafter']): ?><span>Crafted by <?= e($item['crafter']) ?></span><?php endif ?>
           <?php if ($item['taught']): ?><span>Teaches <a href="<?= e(\forever_item_path($item['taught']['id'])) ?>"><?= e($item['taught']['name']) ?></a></span><?php endif ?>
@@ -58,6 +73,38 @@ $icon = $item['icon'] ?: 'inv_misc_questionmark';
       <a class="it-wh" href="<?= e($wowhead) ?>" target="_blank" rel="noopener">Wowhead »</a>
     </div>
 
+<?php if ($w): $maxClass = max(array_column($w['classes'], 2)); $fa = $w['factions']['Alliance'] ?? 0; $fh = $w['factions']['Horde'] ?? 0; ?>
+    <?php component_start('section', ['title' => 'Who Wears It', 'icon' => 'p', 'sub' => 'from ' . fmt($w['inspected']) . ' inspected characters']) ?>
+        <div class="tiles">
+          <div class="stat"><span>Worn by</span><b><?= fmt($w['players']) ?></b><em>inspected characters</em></div>
+          <div class="stat"><span><?= e($w['slot']) ?> share</span><b><?= $w['slotShare'] !== null ? e((string)$w['slotShare']) . '%' : '—' ?></b><em>of characters with that slot filled</em></div>
+          <div class="stat"><span>Enchanted</span><b><?= (int)$w['enchanted'] ?>%</b><em>of the copies worn</em></div>
+          <div class="stat"><span>Wearer level</span><b><?= $w['levels'] ? e((string)$w['levels']['avg']) : '—' ?></b><em><?= $w['levels'] ? 'average · ' . (int)$w['levels']['min'] . '–' . (int)$w['levels']['max'] : 'unknown' ?></em></div>
+        </div>
+        <div class="it-wear">
+          <div class="it-bars"><h3>By class</h3>
+<?php foreach ($w['classes'] as [$cname, $ccol, $n]): ?>
+            <div class="it-bar" data-tip="<?= e($cname) ?>|<?= fmt($n) ?> wearing it|<?= round(100 * $n / $w['players'], 1) ?>% of wearers"><span style="color:<?= e($ccol) ?>"><?= e($cname) ?></span><span class="tr"><i data-w="<?= round(100 * $n / $maxClass, 1) ?>%" style="background:<?= e($ccol) ?>"></i></span><span class="v"><?= round(100 * $n / $w['players']) ?>%</span></div>
+<?php endforeach ?>
+          </div>
+          <div class="it-bars"><h3>By faction</h3>
+            <div class="it-fac" data-tip="Faction|Alliance <?= fmt($fa) ?>|Horde <?= fmt($fh) ?>"><i style="flex:<?= $fa ?>;background:linear-gradient(#5aa0ff,#2f6ad0)"></i><i style="flex:<?= $fh ?>;background:linear-gradient(#ff5a4a,#a01a10)"></i></div>
+            <div class="it-bar" style="grid-template-columns:1fr auto"><span style="color:#9cc8ff">Alliance <?= $w['players'] ? round(100 * $fa / $w['players']) : 0 ?>%</span><span style="color:#ffa090">Horde <?= $w['players'] ? round(100 * $fh / $w['players']) : 0 ?>%</span></div>
+            <h3 style="margin-top:8px">By race</h3>
+<?php $maxRace = $w['races'] ? $w['races'][0][1] : 1; foreach (array_slice($w['races'], 0, 6) as [$race, $n]): ?>
+            <div class="it-bar"><span><?= e(str_replace(['High Order Skyborne', 'Windshaper Skyborne'], ['Skyborne (A)', 'Skyborne (H)'], $race)) ?></span><span class="tr"><i data-w="<?= round(100 * $n / $maxRace, 1) ?>%" style="background:linear-gradient(#ffd75a,#b07a00)"></i></span><span class="v"><?= round(100 * $n / $w['players']) ?>%</span></div>
+<?php endforeach ?>
+          </div>
+        </div>
+        <p class="tfoot">Counts each inspected character once, from the same inspections as the <a href="<?= e(url('gear')) ?>">Gear</a> page. Characters aren't named here.</p>
+    <?php component_end() ?>
+<?php endif ?>
+
+<?php if (!$listed): ?>
+    <?php component_start('section', ['title' => 'Auction House', 'icon' => 'g']) ?>
+        <div class="it-nomkt">No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.</div>
+    <?php component_end() ?>
+<?php else: ?>
     <div class="tiles" id="itTiles"></div>
 
     <section class="section">
@@ -79,6 +126,7 @@ $icon = $item['icon'] ?: 'inv_misc_questionmark';
       <div class="wide" id="itNow"></div>
       <div class="wide" id="itLog"></div>
     </div>
+<?php endif ?>
 
 <?php if ($trades): ?>
     <?php component_start('section', ['title' => 'Used in Professions', 'icon' => 'p', 'sub' => 'open a trade to see its whole market', 'style' => 'margin-top:16px']) ?>
@@ -200,6 +248,8 @@ function render() {
     [...LOG].sort((a, b) => b.t - a.t).map(s => `<tr><td>${stamp(s.t)}</td><td>${sw(series[key(s)].color)}${esc(label(s))}</td><td class="num">${fmt(s.qty)}</td>
       <td class="num">${money(s.lo)}</td><td class="num">${money(s.med)}</td></tr>`).join(''));
 }
-render();
+if (SC.length) render();
+// The worn-by bars grow in like the other charts.
+grow(document.querySelector('.main'));
 </script>
 <?php end_section() ?>

@@ -678,7 +678,9 @@ function gear_page(string $source, string $html): string {
     $slots[] = ['slot' => $label, 'filled' => $filled, 'of' => count($records), 'ench' => (int)round(100 * $enchanted / $filled), 'distinct' => count($items), 'items' => $top];
   }
   return page('gear', common_vars($source) + ['data' => ['latest' => \inspect_time($model['lastT']), 'generated' => \utc_timestamp(\generated_at()), 'slots' => $slots,
-    'wowhead' => $packed['wowhead']]], $html, 'gear');
+    'wowhead' => $packed['wowhead'],
+    // Forever items have pages of their own (price history and who wears them); other editions link to Wowhead.
+    'itemBase' => $source === \PROFESSION_SOURCE ? \forever_item_path('') : null]], $html, 'gear');
 }
 
 /** Short realm labels for a list of the site's realm keys. */

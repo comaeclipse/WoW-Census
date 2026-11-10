@@ -2,7 +2,7 @@
 namespace Wow2008;
 /**
  * Page: Gear
- * Vars: $data (array, GEAR_DATA: latest, generated, slots, wowhead), $subtitle (string)
+ * Vars: $data (array, GEAR_DATA: latest, generated, slots, wowhead, itemBase: Forever item page prefix or null), $subtitle (string)
  */
 ?>
   <main class="main">
@@ -137,7 +137,8 @@ function selectSlot(name, scroll) {
   document.getElementById('sdRows').innerHTML = s.items.map((it, i) => `<tr data-tip="${esc(itemTip(s, it))}">
     <td class="rk" style="text-align:center">${i < 3 ? `<span class="medal m${i + 1}" style="width:22px;height:22px;margin:0 auto;font-size:11px">${i + 1}</span>` : i + 1}</td>
     <td><div class="ib"><span class="mini-ic" style="outline:1px solid ${QCOL[it[1]]}">${wowIcon(it[5], glyph(name, QCOL[it[1]]))}</span>
-      <a class="iname" style="color:${QCOL[it[1]]}" href="${G.wowhead}${it[2]}" target="_blank" rel="noopener">${esc(it[0])}</a></div></td>
+      ${G.itemBase ? `<a class="iname" style="color:${QCOL[it[1]]}" href="${G.itemBase}${it[2]}" title="Prices and who wears ${esc(it[0])}">${esc(it[0])}</a>`
+        : `<a class="iname" style="color:${QCOL[it[1]]}" href="${G.wowhead}${it[2]}" target="_blank" rel="noopener">${esc(it[0])}</a>`}</div></td>
     <td class="num" style="color:#ffd75a;font-weight:bold">${fmt(it[3])}</td>
     <td class="num"><div class="gbar"><div class="track" style="background:#000;border-color:#3a3020"><div class="fill" data-w="${it[4] / max * 100}%" style="background:${QCOL[it[1]]}"></div></div>
       <span style="color:#d8c8a0">${it[4]}%</span></div></td></tr>`).join('');
@@ -162,7 +163,8 @@ function renderOverview() {
     <td class="num">${bar(s.fillPct, 'linear-gradient(#ffd75a,#b07a00)')}</td>
     <td class="num">${s.ench ? bar(s.ench, 'linear-gradient(#9cff6a,#2a8a10)') : '<span style="color:#9a7a4a">—</span>'}</td>
     <td class="num"><b>${fmt(s.distinct)}</b></td>
-    <td><span style="font-weight:bold;color:${s.items[0][1] >= 2 ? ['', '', '#138a00', '#0058b0', '#7a1ab8'][s.items[0][1]] : '#3a1a00'}">${esc(s.items[0][0])}</span>
+    <td>${G.itemBase ? `<a href="${G.itemBase}${s.items[0][2]}" style="font-weight:bold;text-decoration:none;color:${s.items[0][1] >= 2 ? ['', '', '#138a00', '#0058b0', '#7a1ab8'][s.items[0][1]] : '#3a1a00'}">${esc(s.items[0][0])}</a>`
+      : `<span style="font-weight:bold;color:${s.items[0][1] >= 2 ? ['', '', '#138a00', '#0058b0', '#7a1ab8'][s.items[0][1]] : '#3a1a00'}">${esc(s.items[0][0])}</span>`}
       <span style="font-size:9px;color:#6a4a20">· ${s.items[0][4]}%</span></td></tr>`).join('');
   grow(tb);
 }
