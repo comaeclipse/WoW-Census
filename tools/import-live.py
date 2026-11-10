@@ -4,8 +4,9 @@
     python -B tools/import-live.py csv FILE.csv [FILE.csv ...] --map "us:111=CAMWOW US2 Realm 5 PvE-Alliance" [--dry-run]
     python -B tools/import-live.py saves --game-root <stage>\\game [--allow-beta-import]
 
-`csv` runs tools/import-forever-ah-csv-pg.py and `saves` runs
-tools/import-savedvariables-pg.py; every argument after the kind is passed to
+`csv` runs tools/import-forever-ah-csv-pg.py, `saves` runs
+tools/import-savedvariables-pg.py and `map-house` runs
+tools/map-forever-house-pg.py (publish a verified Forever auction house); every argument after the kind is passed to
 that importer unchanged. The importer runs locally first (local PostgreSQL stays
 the full copy and the source of truth). Only if that succeeds does it run again,
 on this PC, against the live database through an SSH tunnel: the Lua/CSV
@@ -43,7 +44,8 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 IMPORTERS = {"csv": REPO / "tools" / "import-forever-ah-csv-pg.py",
-             "saves": REPO / "tools" / "import-savedvariables-pg.py"}
+             "saves": REPO / "tools" / "import-savedvariables-pg.py",
+             "map-house": REPO / "tools" / "map-forever-house-pg.py"}
 LIVE_DB = "dbname=marketlens user=wowcensus"
 LIVE_ARCHIVE = Path(os.environ.get("MARKETLENS_DATA_ROOT", Path.home() / "Documents" / "MarketLensData")) / "imports-live"
 LIVE_PG_PORT = 5432
@@ -115,7 +117,7 @@ def main():
         # still add local_imports rows, which is what the refresh watches).
         # The save importer prints an empty CHANGED line when nothing was new.
         changed = code == 0 and not dry and last.startswith("CHANGED") and (
-            args.kind == "csv" or last != "CHANGED sources=")
+            args.kind != "saves" or last != "CHANGED sources=")
         publish = changed and args.publish_now
         ssh.stdin.write("publish\n" if publish else "done\n")
         ssh.stdin.flush()

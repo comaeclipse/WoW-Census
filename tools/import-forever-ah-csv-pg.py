@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Import WoW: Forever auction-house summary CSVs into PostgreSQL.
 
-    python -B tools/import-forever-ah-csv-pg.py FILE.csv [FILE.csv ...] \
-        --map "us:111=CAMWOW US2 Realm 5 PvE-Alliance" [--dry-run]
+    python -B tools/import-forever-ah-csv-pg.py FILE.csv [FILE.csv ...] [--map "us:ID=REALM-FACTION"] [--dry-run]
 
 Each CSV is one snapshot of several auction houses, with one row per house,
 item and listing type: snapshot_time_central, house_id, item_id, item_name,
@@ -10,8 +9,9 @@ listing_type, listings, total_quantity and min/median/mean unit buyout in gold.
 
 Forever's auction houses are ruleset economies (one Alliance, Horde and Neutral
 house per ruleset), and the API does not say which ruleset a house id serves.
-A house mapped with --map, after checking it (for example by matching rare
-listings against an in-game addon scan), is imported into that market's
+A verified house (VERIFIED_HOUSES below, or one passed with --map after
+checking it by matching rare listings against an in-game addon scan;
+tools/map-forever-house-pg.py then publishes its earlier snapshots) is imported into that market's
 existing key exactly like an addon scan: snapshots, daily history and current
 items. Every other house is kept as raw snapshots under source_game
 'forever-unmapped' and game 'house:<region>:<id>-<faction>'. No page reads
@@ -47,6 +47,12 @@ CENTRAL = ZoneInfo("America/Chicago")
 HOUSE_FACTION = {**{h: "Alliance" for h in (110, 111, 112, 119, 123)},
                  **{h: "Horde" for h in (113, 114, 115, 120, 124)},
                  **{h: "Neutral" for h in (116, 117, 118, 121, 125)}}
+# Houses checked against an addon scan from that ruleset and faction (exact rare
+# listings: 1-2 units, >= 1g). Mapped by default; --map adds or overrides.
+#   us:111  2026-11-10: 42 exact matches vs CAMWOW US2 Realm 5 PvE-Alliance; others <= 3
+#   us:114  2026-11-10: 294 of 502 vs CAMWOW US2 Realm 5 PvE-Horde (21:23 UTC); others <= 5
+VERIFIED_HOUSES = {("us", 111): "CAMWOW US2 Realm 5 PvE-Alliance",
+                   ("us", 114): "CAMWOW US2 Realm 5 PvE-Horde"}
 COLUMNS = ["snapshot_time_central", "house_id", "item_id", "item_name", "listing_type", "listings",
            "total_quantity", "min_unit_buyout_gold", "median_unit_buyout_gold", "mean_unit_buyout_gold"]
 
@@ -108,7 +114,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    mapping = {}
+    mapping = dict(VERIFIED_HOUSES)
     for m in args.map:
         match = re.fullmatch(r"(us|eu):(\d+)=(.+-(Alliance|Horde|Neutral))", m)
         if not match:
