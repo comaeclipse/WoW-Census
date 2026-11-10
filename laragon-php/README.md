@@ -249,3 +249,13 @@ by `poster_hash` (an HMAC of their address), so the tools act on that: time
 out for 1 hour, 24 hours or 7 days (`shoutbox_timeouts`), ban until lifted
 (`shoutbox_bans`, with an optional reason), or hide all their shouts. Bans and
 timeouts only stop new shouts; someone on a new network gets a new hash.
+
+Blog posts (`/blog.php?id=N`) take comments (`src/blog-comments.php`). They
+are stored in the same SQLite file as the shoutbox (table `blog_comments`, with
+a `hidden_at` column for hiding one), filtered by the shoutbox word list, and
+blocked for shoutbox-banned posters. The human check is a 5-character PNG drawn
+with GD (`/blog.php?id=N&captcha=…`), or a math question when GD is missing;
+there is also a honeypot field, a CSRF token and a 60-second cooldown. Every
+post page re-sends its session cookie so nginx's page cache skips it. There is
+no admin view yet: hide a comment with
+`UPDATE blog_comments SET hidden_at = strftime('%s','now') WHERE id = …`.
