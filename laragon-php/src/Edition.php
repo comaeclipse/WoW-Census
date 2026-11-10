@@ -212,12 +212,24 @@ function item_cache(string $kind, string $branch): array {
   return json_decode(file_get_contents($file), true);
 }
 
-function model_guilds_geography(string $source, string $page): array {
+/** One realm x faction pane of the guilds or geography page (view_panes loads them lazily); null if unknown. */
+function edition_pane_html(string $source, string $page, string $realm, string $faction, string $view): ?string {
+  foreach (model_guilds_geography($source, $page, [$realm, $faction])['views'] as $v) {
+    if (!$v || $v['realm'] !== $realm || $v['faction'] !== $faction) continue;
+    if ($page === 'guilds') return render_guild_view($v['snapshot']);
+    return $view === 'aero' ? render_geography_aero_view($v['snapshot']) : render_geography_view($v['snapshot']);
+  }
+  return null;
+}
+
+/** $only = [realm key, faction key] builds just that view (a lazily loaded pane). */
+function model_guilds_geography(string $source, string $page, ?array $only = null): array {
   $census = load_census($source);
   ['dims' => $dims] = edition_dims($source);
   $views = [];
   foreach ($dims['realm'] as $r) {
     foreach ($dims['faction'] as $f) {
+      if ($only !== null && [$r['key'], $f['key']] !== $only) continue;
       $from = array_values(array_filter($census['units'], fn($u) =>
         ($r['key'] === 'all' || $u['realm'] === $r['key']) && ($f['key'] === 'all' || $u['faction'] === $f['key'])));
       $realms = array_values(array_unique(array_map(fn($u) => $u['realm'], $from)));

@@ -42,14 +42,31 @@ function render_guild_view(array $snapshot): string {
   return '<section class="tiles">' . $tiles . '</section>' . $body;
 }
 
-function view_panes(array $views, string $activeRealm, string $activeFaction, callable $render): string {
+// From this many realm x faction panes on, only the selected one is in the page; the others
+// are empty and load from $paneUrl when picked (retail's ~140 panes made 2-3 MB pages).
+const LAZY_PANES_FROM = 12;
+
+function view_panes(array $views, string $activeRealm, string $activeFaction, callable $render, ?string $paneUrl = null): string {
+  $lazy = $paneUrl !== null && count($views) >= LAZY_PANES_FROM;
   $out = '';
   foreach ($views as $v) {
     $on = $v['realm'] === $activeRealm && $v['faction'] === $activeFaction;
-    $out .= '<div class="vpane" data-realm="' . esc($v['realm']) . '" data-faction="' . esc($v['faction']) . '"' .
-      ($on ? '' : ' hidden') . '>' . $render($v['snapshot']) . '</div>';
+    $attrs = 'class="vpane" data-realm="' . esc($v['realm']) . '" data-faction="' . esc($v['faction']) . '"' . ($on ? '' : ' hidden');
+    if ($lazy && !$on) {
+      $src = $paneUrl . (str_contains($paneUrl, '?') ? '&' : '?') . 'realm=' . rawurlencode($v['realm']) . '&faction=' . rawurlencode($v['faction']);
+      $out .= '<div ' . $attrs . ' data-pane="' . esc($src) . '"></div>';
+    } else {
+      $out .= '<div ' . $attrs . '>' . $render($v['snapshot']) . '</div>';
+    }
   }
   return $out;
+}
+
+/** Where this page's lazy panes load from: /retail/geography -> /retail/geography.pane; null outside a request. */
+function pane_url(string $page, string $query = ''): ?string {
+  $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+  if (!is_string($path) || !preg_match('#^(/(?:[a-z-]+/)?)' . $page . '(?:\.html)?$#', $path, $m)) return null;
+  return $m[1] . $page . '.pane' . ($query !== '' ? '?' . $query : '');
 }
 
 function render_guild_html(array $views, array $dims, array $opts): string {
@@ -58,7 +75,7 @@ function render_guild_html(array $views, array $dims, array $opts): string {
   $activeRealm = $realms ? $realms[0]['key'] : 'all';
   $activeFaction = $factions ? $factions[0]['key'] : 'all';
   $chips = chip_row('realm', $realms, $activeRealm) . chip_row('faction', $factions, $activeFaction);
-  $panes = view_panes($list, $activeRealm, $activeFaction, 'render_guild_view');
+  $panes = view_panes($list, $activeRealm, $activeFaction, 'render_guild_view', pane_url('guilds'));
   $gameLabel = $opts['gameLabel'] ?? 'WoW Forever';
   $navigation = $opts['nav'];
   $heading = ($navigation['games'] ?? '') !== '' ? 'WoWCensus' : $gameLabel . ' — Guilds';
@@ -206,7 +223,8 @@ function render_geography_html(array $views, array $dims, array $opts): string {
   $activeFaction = $factions ? $factions[0]['key'] : 'all';
   $chips = chip_row('realm', $realms, $activeRealm) . chip_row('faction', $factions, $activeFaction);
   $renderer = ($_COOKIE['wowcensus_skin'] ?? '') === 'cobalt' ? 'render_geography_aero_view' : 'render_geography_view';
-  $panes = view_panes($views, $activeRealm, $activeFaction, $renderer);
+  $panes = view_panes($views, $activeRealm, $activeFaction, $renderer,
+    pane_url('geography', $renderer === 'render_geography_aero_view' ? 'view=aero' : ''));
   $gameLabel = $opts['gameLabel'] ?? 'WoW Forever';
   $navigation = $opts['nav'];
   $heading = ($navigation['games'] ?? '') !== '' ? 'WoWCensus' : $gameLabel . ' — Geography';

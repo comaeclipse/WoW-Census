@@ -177,7 +177,8 @@ newer than the last publish (`ROLLOUT_SOURCES`), plus the home page, `index.*`,
 406, an unmapped AH house 12. Main pages go first, then by visits, pausing while the
 load average is above 1.5. `ROLLOUT_DRY_RUN=1 wowcensus-rollout` (with
 `ROLLOUT_SOURCES` or `ROLLOUT_MAIN=1`) lists what a pass would re-render without
-rendering anything. The cache is never emptied (the data part of the key is fixed in
+rendering anything. `ROLLOUT_PATHS='/(guilds|geography)$'` limits a pass to matching paths (for a
+release that changed only some page types). The cache is never emptied (the data part of the key is fixed in
 `conf.d/wowcensus-data-version.conf`), so visitors get each page's saved copy until
 it is replaced. The pools set `ML_CENSUS_PUBLISHED=1`, so until the new tables are
 in, pages keep using the previous ones instead of the slow live SQL. A failure

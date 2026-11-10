@@ -386,7 +386,14 @@ export const TOGGLE_SCRIPT = `<script>
         if(has!==null&&has!==want) show=false;
       }
       p.hidden=!show;
+      if(show&&p.dataset.pane&&!p.dataset.loaded) load(p);
     });
+  }
+  function load(p){
+    p.dataset.loaded="1"; p.innerHTML='<div class="panel"><p class="hint">Loading&hellip;</p></div>';
+    fetch(p.dataset.pane,{credentials:"same-origin"}).then(function(r){if(!r.ok) throw new Error(r.status); return r.text();})
+      .then(function(t){p.innerHTML=t;})
+      .catch(function(){p.dataset.loaded=""; p.innerHTML='<div class="panel"><p class="hint">This selection could not be loaded. Pick it again to retry.</p></div>';});
   }
   rows.forEach(function(r){
     r.addEventListener("click", function(e){

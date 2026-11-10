@@ -66,6 +66,14 @@ function route_request(string $path): ?array {
     return $roster ? [$html, guild_page_html($source, $roster)] : null;
   }
 
+  // One realm x faction pane of a guilds or geography page, fetched when a visitor picks it.
+  // Not text/html, so no skin wraps it; the skin's variant is in the query (view=aero).
+  if (preg_match('#^/(?:([a-z-]+)/)?(guilds|geography)\.pane$#', $path, $m)) {
+    $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
+    $pane = $source ? edition_pane_html($source, $m[2], (string)($_GET['realm'] ?? ''), (string)($_GET['faction'] ?? ''), (string)($_GET['view'] ?? '')) : null;
+    return $pane === null ? null : ['text/x-wowcensus-pane; charset=utf-8', $pane];
+  }
+
   // Edition pages: /, /combos, /classic/, /classic/combos (+ .html and .md copies).
   if (preg_match('#^/(?:([a-z-]+)/)?(?:(index|combos|auctionhouse|guilds|geography|talents|gear)(\.html|\.md)?)?$#', $path, $m)) {
     $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
