@@ -253,15 +253,51 @@ function forever_item_model(int $id): ?array {
   return ['id' => $id, 'name' => $name, 'icon' => $icon, 'cat' => $cat, 'crafter' => $crafter, 'roles' => $roles, 'taught' => $taught, 'scans' => $scans];
 }
 
+/**
+ * An item's scans as players see the market: Forever's collector realms are hidden servers behind a region and
+ * ruleset, so scans group into markets like "US PvE · Alliance". Each scanned day gets one point per market: every
+ * server's latest scan up to that day (carried forward), quantities summed, lowest the minimum and the median
+ * weighted by quantity.
+ * Returns markets (key => [label, faction]), points [key, day noon unix, qty, lowest, median] and log [key, unix, qty, lowest, median].
+ */
+function forever_item_markets(array $scans): array {
+  $markets = []; $byMarket = []; $log = [];
+  foreach ($scans as [$realm, $faction, $t, $qty, $lo, $med]) {
+    $group = forever_realm_group($realm) ?? ['key' => $realm, 'label' => realm_name($realm)];
+    $key = $group['key'] . '|' . $faction;
+    $markets[$key] = [$group['label'] . ($faction === 'Neutral' ? '' : ' · ' . $faction), $faction];
+    $byMarket[$key][] = [$realm, $t, $qty, $lo, $med];
+    $log[] = [$key, $t, $qty, $lo, $med];
+  }
+  $points = [];
+  foreach ($byMarket as $key => $rows) {
+    $days = array_values(array_unique(array_map(fn($r) => gmdate('Y-m-d', $r[1]), $rows)));
+    sort($days);
+    foreach ($days as $day) {
+      $end = strtotime($day . ' 23:59:59 UTC');
+      $latest = [];
+      foreach ($rows as $r) if ($r[1] <= $end && (!isset($latest[$r[0]]) || $r[1] > $latest[$r[0]][1])) $latest[$r[0]] = $r;
+      $qty = array_sum(array_column($latest, 2));
+      $lo = min(array_column($latest, 3));
+      usort($latest, fn($a, $b) => $a[4] <=> $b[4]);
+      $med = end($latest)[4]; $acc = 0;
+      foreach ($latest as $r) if (($acc += $r[2]) * 2 >= $qty) { $med = $r[4]; break; }
+      $points[] = [$key, strtotime($day . ' 12:00:00 UTC'), $qty, $lo, $med];
+    }
+  }
+  return ['markets' => $markets, 'points' => $points, 'log' => $log];
+}
+
 /** The plain page every skin starts from; the 2008 skin rebuilds it from the model. */
 function forever_item_html(array $item, string $stylesheet): string {
   $label = seo_label(EDITIONS[PROFESSION_SOURCE]['label']);
   $navigation = edition_nav(PROFESSION_SOURCE, 'auctionhouse.html');
   $title = $item['name'] . ' – ' . $label . ' Auction Price History';
   $seo = seo_head($title . ' – WoWCensus', $label . ' auction house prices for ' . $item['name'] . ': current listings per realm, price and supply history from in-game scans.', SITE_ORIGIN . forever_item_path($item['id']));
+  $m = forever_item_markets($item['scans']);
   $rows = '';
-  foreach (array_reverse($item['scans']) as $s)
-    $rows .= '<tr><td class="l">' . esc(gmdate('Y-m-d H:i', $s[2])) . '</td><td class="l">' . esc(realm_name($s[0]) . ' ' . $s[1]) . '</td><td class="r">' . js_locale($s[3]) . '</td><td class="r">' . esc(money($s[4])) . '</td><td class="r">' . esc(money($s[5])) . '</td></tr>';
+  foreach (array_reverse($m['log']) as [$key, $t, $qty, $lo, $med])
+    $rows .= '<tr><td class="l">' . esc(gmdate('Y-m-d H:i', $t)) . '</td><td class="l">' . esc($m['markets'][$key][0]) . '</td><td class="r">' . js_locale($qty) . '</td><td class="r">' . esc(money($lo)) . '</td><td class="r">' . esc(money($med)) . '</td></tr>';
   $heading = page_heading('WoWCensus', $navigation, $item['name']);
   $style = js_template_const('market.mjs', 'MARKET_STYLE');
   $css = esc($stylesheet);

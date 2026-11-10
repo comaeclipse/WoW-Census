@@ -906,17 +906,13 @@ function profession_page(string $slug, string $html): string {
 }
 
 function item_page(array $item, string $html): string {
-  $keys = array_values(array_unique(array_map(fn($s) => $s[0], $item['scans'])));
-  $labels = realm_label_map($keys);
-  $realms = [];
-  foreach ($keys as $k) $realms[$k] = $labels[$k] ?? \realm_name($k);
   $gathering = ['herbalism', 'mining', 'skinning', 'fishing'];
   $roleLabel = ['mats' => 'Material', 'crafted' => 'Crafted', 'recipes' => 'Recipe'];
   $trades = array_map(fn($r) => ['name' => \PROFESSIONS[$r[0]]['name'], 'icon' => \PROFESSIONS[$r[0]]['icon'], 'url' => \profession_path($r[0]),
     'role' => $r[1] === 'mats' && in_array($r[0], $gathering, true) ? 'Gathered' : $roleLabel[$r[1]]], $item['roles']);
   $branch = \EDITIONS[\PROFESSION_SOURCE]['branch'];
   return page('item', common_vars(\PROFESSION_SOURCE) + ['item' => $item, 'trades' => $trades,
-    'data' => ['generated' => \utc_timestamp(\generated_at()), 'realms' => $realms, 'scans' => $item['scans']],
+    'data' => ['generated' => \utc_timestamp(\generated_at())] + \forever_item_markets($item['scans']),
     'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=' . $item['id']], $html, 'auction-house');
 }
 

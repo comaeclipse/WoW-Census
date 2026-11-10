@@ -3,7 +3,7 @@ namespace Wow2008;
 /**
  * Page: one WoW: Forever item's auction overview and history.
  * Vars: $item (forever_item_model: id, name, icon, cat, crafter, taught), $trades (list of name, icon, url, role),
- *       $data (generated, realms: key => label, scans: [realm, faction, unix, qty, lowest, median, average]), $wowhead, $subtitle
+ *       $data (generated + forever_item_markets(): markets key => [label, faction], points, log), $wowhead, $subtitle
  */
 $icon = $item['icon'] ?: 'inv_misc_questionmark';
 ?>
@@ -61,12 +61,12 @@ $icon = $item['icon'] ?: 'inv_misc_questionmark';
     <div class="tiles" id="itTiles"></div>
 
     <section class="section">
-      <div class="post-hd"><span class="ico g"></span><h2>Market Report</h2><div class="sub">all realms and factions</div></div>
+      <div class="post-hd"><span class="ico g"></span><h2>Market Report</h2><div class="sub">every region, ruleset and faction</div></div>
       <div class="section-bd"><div class="report" id="itReport"></div></div>
     </section>
 
     <section class="section">
-      <div class="post-hd"><span class="ico"></span><h2>Price &amp; Supply History</h2><div class="sub">one line per realm and faction · hover a point for details</div></div>
+      <div class="post-hd"><span class="ico"></span><h2>Price &amp; Supply History</h2><div class="sub">one line per region, ruleset and faction · one point per scanned day</div></div>
       <div class="section-bd">
         <div class="it-charts">
           <div class="it-chart" id="itPrice"></div>
@@ -97,9 +97,11 @@ $icon = $item['icon'] ?: 'inv_misc_questionmark';
 <script>
 const IT = <?= js($data) ?>;
 const NAME = <?= js($item['name']) ?>;
-const SC = IT.scans.map(s => ({ realm: s[0], fac: s[1], t: s[2], qty: s[3], lo: s[4], med: s[5], avg: s[6] }));
-const label = s => `${IT.realms[s.realm] || s.realm}${s.fac === 'Neutral' ? '' : ' · ' + s.fac}`;
-const key = s => s.realm + '|' + s.fac;
+// One point per market and scanned day; markets are region + ruleset + faction ("US PvE · Alliance").
+const SC = IT.points.map(p => ({ k: p[0], fac: IT.markets[p[0]][1], t: p[1], qty: p[2], lo: p[3], med: p[4] }));
+const LOG = IT.log.map(p => ({ k: p[0], t: p[1], qty: p[2], lo: p[3], med: p[4] }));
+const label = s => IT.markets[s.k][0];
+const key = s => s.k;
 
 function money(cu) {
   const g = Math.floor(cu / 10000), s = Math.floor(cu / 100) % 100, c = cu % 100;
@@ -122,9 +124,10 @@ function chg(now, prev) {
   return p === 0 ? '<span class="chg flat">0%</span>' : `<span class="chg ${p > 0 ? 'up' : 'dn'}">${p > 0 ? '+' : ''}${p}%</span>`;
 }
 
-// One series per realm and faction, in faction colours.
+// One series per market, in faction colours.
 const series = {};
-SC.forEach(s => (series[key(s)] ||= { realm: s.realm, fac: s.fac, pts: [] }).pts.push(s));
+SC.forEach(s => (series[key(s)] ||= { k: s.k, fac: s.fac, pts: [] }).pts.push(s));
+const lastScan = k => Math.max(...LOG.filter(l => l.k === k).map(l => l.t));
 const PAL = { Alliance: ['#5aa0ff', '#9cc8ff', '#2f6ad0'], Horde: ['#ff5a4a', '#ffa090', '#c02a18'], Neutral: ['#ffd75a', '#e0b040', '#fff0a0'] };
 const used = {};
 Object.values(series).forEach(sr => { const i = used[sr.fac] = (used[sr.fac] ?? -1) + 1; sr.color = PAL[sr.fac][i % 3]; });
@@ -150,29 +153,29 @@ function chart(el, title, field, fmtAxis, fmtTip, withLow) {
     if (withLow && p.length > 1) g += `<polyline fill="none" stroke="${sr.color}" stroke-width="1.5" stroke-dasharray="4 3" opacity=".55" points="${p.map(s => `${x(s.t)},${y(s.lo)}`).join(' ')}"/>`;
     if (p.length > 1) g += `<polyline fill="none" stroke="${sr.color}" stroke-width="2.5" points="${p.map(s => `${x(s.t)},${y(s[field])}`).join(' ')}"/>`;
     p.forEach(s => g += `<circle cx="${x(s.t)}" cy="${y(s[field])}" r="4.5" fill="${sr.color}" stroke="#000" stroke-width="1.5" style="cursor:pointer"
-      data-tip="${esc(label(s))}|${stamp(s.t)} UTC|${fmtTip(s)}"/>`);
+      data-tip="${esc(label(s))}|${day(s.t)}|${fmtTip(s)}"/>`);
   });
   const legend = Object.values(series).map(sr => `<span><i style="background:${sr.color}"></i>${esc(label(sr))}</span>`).join('') +
     (withLow ? '<span><span class="lo"></span>lowest listing</span>' : '');
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">${g}</svg><div class="it-legend">${legend}</div>` +
-    (SC.length < 2 ? '<div class="it-one">Only one scan so far — the lines appear once this item is seen again.</div>' : '');
+    (Object.values(series).every(sr => sr.pts.length < 2) ? '<div class="it-one">One day of scans so far — the lines appear once this item is seen on another day.</div>' : '');
 }
 
 function render() {
   const listed = latest.reduce((a, s) => a + s.qty, 0);
   const cheapest = latest.reduce((a, s) => !a || s.lo < a.lo ? s : a, null);
-  const meds = SC.map(s => s.med), lastT = Math.max(...SC.map(s => s.t));
+  const meds = SC.map(s => s.med), lastT = Math.max(...LOG.map(s => s.t));
   document.getElementById('itTiles').innerHTML = `
     <div class="stat"><span>Lowest price now</span><b style="font-size:17px;line-height:26px">${money(cheapest.lo)}</b><em>${esc(label(cheapest))}</em></div>
-    <div class="stat"><span>Listed now</span><b>${fmt(listed)}</b><em>units, latest scan per realm</em></div>
-    <div class="stat"><span>Median range</span><b style="font-size:15px;line-height:26px">${money(Math.min(...meds))} – ${money(Math.max(...meds))}</b><em>across every scan</em></div>
-    <div class="stat"><span>Scans</span><b>${fmt(SC.length)}</b><em>last ${day(lastT)}</em></div>`;
+    <div class="stat"><span>Listed now</span><b>${fmt(listed)}</b><em>units across ${fmt(latest.length)} market${latest.length === 1 ? '' : 's'}</em></div>
+    <div class="stat"><span>Median range</span><b style="font-size:15px;line-height:26px">${money(Math.min(...meds))} – ${money(Math.max(...meds))}</b><em>across every scanned day</em></div>
+    <div class="stat"><span>Scans</span><b>${fmt(LOG.length)}</b><em>last ${day(lastT)}</em></div>`;
 
-  // Report: compare the newest scan with the one before it on the same realm and faction.
+  // Report: compare each market's newest day with its previous one.
   const moved = latest.filter(s => s.prev).map(s => ({ s, dp: s.prev.med ? Math.round((s.med - s.prev.med) / s.prev.med * 100) : 0, dq: s.prev.qty ? Math.round((s.qty - s.prev.qty) / s.prev.qty * 100) : 0 }));
-  const lines = [`<b>${esc(NAME)}</b> has been seen in <b>${fmt(SC.length)}</b> auction scan${SC.length === 1 ? '' : 's'} across ${fmt(latest.length)} realm and faction market${latest.length === 1 ? '' : 's'}, most recently on <b>${day(lastT)}</b>.`,
+  const lines = [`<b>${esc(NAME)}</b> has been seen in <b>${fmt(LOG.length)}</b> auction scan${LOG.length === 1 ? '' : 's'} across ${fmt(latest.length)} market${latest.length === 1 ? '' : 's'} (${latest.map(s => esc(label(s))).join(', ')}), most recently on <b>${day(lastT)}</b>.`,
     `Right now <b>${fmt(listed)}</b> ${listed === 1 ? 'is' : 'are'} listed; the cheapest is ${money(cheapest.lo)} each on ${esc(label(cheapest))}.`];
-  moved.forEach(({ s, dp, dq }) => lines.push(`On ${esc(label(s))} the median price ${dp === 0 ? 'held at' : dp > 0 ? `rose <span class="up-t">${dp}%</span> to` : `fell ${-dp}% to`} ${money(s.med)} and supply ${dq === 0 ? 'was unchanged' : dq > 0 ? `grew ${dq}%` : `shrank ${-dq}%`} since the scan on ${day(s.prev.t)}.`));
+  moved.forEach(({ s, dp, dq }) => lines.push(`On ${esc(label(s))} the median price ${dp === 0 ? 'held at' : dp > 0 ? `rose <span class="up-t">${dp}%</span> to` : `fell ${-dp}% to`} ${money(s.med)} and supply ${dq === 0 ? 'was unchanged' : dq > 0 ? `grew ${dq}%` : `shrank ${-dq}%`} since ${day(s.prev.t)}.`));
   document.getElementById('itReport').innerHTML = `
     <svg viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="it-c" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff6b0"/><stop offset=".55" stop-color="#e0a810"/><stop offset="1" stop-color="#6a4400"/></radialGradient></defs>
       <rect x="8" y="6" width="40" height="52" rx="2" fill="#f8ecc8" stroke="#7a5a20" stroke-width="2"/>
@@ -188,13 +191,13 @@ function render() {
   const tbl = (title, sub, head, rows) => `<div class="ahwin"><div class="wt">${title}<small>${sub}</small></div>
     <table class="ahtable"><thead><tr>${head.map(([h, n]) => `<th class="${n ? 'num' : ''}">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
   const sw = c => `<i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:${c};border:1px solid #000"></i>`;
-  document.getElementById('itNow').innerHTML = tbl('Current Listings', 'latest scan on each realm and faction',
+  document.getElementById('itNow').innerHTML = tbl('Current Listings', 'latest scans per region, ruleset and faction',
     [['Market'], ['Qty', 1], ['Change', 1], ['Lowest', 1], ['Median', 1], ['Scanned', 1]],
     [...latest].sort((a, b) => b.qty - a.qty).map(s => `<tr><td>${sw(s.color)}${esc(label(s))}</td><td class="num">${fmt(s.qty)}</td>
-      <td class="num">${chg(s.qty, s.prev ? s.prev.qty : null)}</td><td class="num">${money(s.lo)}</td><td class="num">${money(s.med)}</td><td class="num">${day(s.t)}</td></tr>`).join(''));
+      <td class="num">${chg(s.qty, s.prev ? s.prev.qty : null)}</td><td class="num">${money(s.lo)}</td><td class="num">${money(s.med)}</td><td class="num">${day(lastScan(s.k))}</td></tr>`).join(''));
   document.getElementById('itLog').innerHTML = tbl('Scan Log', 'every scan that saw this item, newest first',
     [['Scanned (UTC)'], ['Market'], ['Qty', 1], ['Lowest', 1], ['Median', 1]],
-    [...SC].reverse().map(s => `<tr><td>${stamp(s.t)}</td><td>${sw(series[key(s)].color)}${esc(label(s))}</td><td class="num">${fmt(s.qty)}</td>
+    [...LOG].sort((a, b) => b.t - a.t).map(s => `<tr><td>${stamp(s.t)}</td><td>${sw(series[key(s)].color)}${esc(label(s))}</td><td class="num">${fmt(s.qty)}</td>
       <td class="num">${money(s.lo)}</td><td class="num">${money(s.med)}</td></tr>`).join(''));
 }
 render();
