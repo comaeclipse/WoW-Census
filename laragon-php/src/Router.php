@@ -40,6 +40,13 @@ function route_request(string $path): ?array {
     return [$html, localize_content(forever_skin_colors_page($cssName, $m[1] ?? null))];
   }
 
+  // WoW: Forever professions: /forever/professions and /forever/professions/tailoring (+ trailing slash or index.html).
+  if (preg_match('#^/forever/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
+    $slug = ($m[1] ?? '') !== '' ? $m[1] : null;
+    if ($slug !== null && !isset(PROFESSIONS[$slug])) return null;
+    return [$html, localize_content(professions_html($slug, edition_path(PROFESSION_SOURCE) . $cssName))];
+  }
+
 
   // Realm explorer: /realms, /classic/realms (+ .html). It has no Markdown copy.
   if (preg_match('#^/(?:([a-z-]+)/)?realms(\.html)?$#', $path, $m)) {

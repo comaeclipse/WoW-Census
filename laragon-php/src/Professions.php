@@ -1,0 +1,212 @@
+<?php
+// WoW: Forever professions: which auction-house items belong to each trade
+// (the materials it uses or gathers, the goods it crafts, the recipes that
+// teach it) and what is listed for them right now.
+//
+// Crafted goods come from the scans' own crafter field. Materials are picked by
+// auction category plus a few named reagents. Recipes are sorted by their name
+// prefix (Plans:, Formula:, ...); "Pattern:" and "Recipe:" are shared by two
+// trades each, so those go to the trade that crafts the taught item, or by its
+// wording when the item itself has not been seen.
+
+declare(strict_types=1);
+
+const PROFESSION_SOURCE = 'forever';
+
+const PROFESSIONS = [
+  'alchemy' => ['name' => 'Alchemy', 'kind' => 'primary', 'role' => 'Crafting', 'icon' => 'trade_alchemy', 'crafter' => 'Alchemy',
+    'blurb' => 'Brews potions, elixirs and transmutes from herbs gathered in the wild.',
+    'cats' => ['Herbs'], 'names' => '/^(Empty|Leaded|Crystal|Imbued) Vial$/'],
+  'blacksmithing' => ['name' => 'Blacksmithing', 'kind' => 'primary', 'role' => 'Crafting', 'icon' => 'inv_hammer_20', 'crafter' => 'Blacksmithing',
+    'blurb' => 'Hammers bars and stone into mail, plate, weapons and sharpening stones.',
+    'cats' => ['Ore & Bars'], 'names' => '/(Flux|^Elemental (Earth|Fire))$/'],
+  'enchanting' => ['name' => 'Enchanting', 'kind' => 'primary', 'role' => 'Crafting', 'icon' => 'inv_enchant_dustarcane', 'crafter' => 'Enchanting',
+    'blurb' => 'Disenchants magic gear into dust and essences, then binds them onto armor and weapons.',
+    'cats' => ['Enchanting Mats'], 'names' => '/^(Simple Wood|Star Wood)$/'],
+  'engineering' => ['name' => 'Engineering', 'kind' => 'primary', 'role' => 'Crafting', 'icon' => 'trade_engineering', 'crafter' => 'Engineering',
+    'blurb' => 'Builds bombs, scopes, gadgets and goggles out of metal parts and blasting powder.',
+    'cats' => ['Engineering Supplies', 'Ore & Bars'], 'names' => null],
+  'leatherworking' => ['name' => 'Leatherworking', 'kind' => 'primary', 'role' => 'Crafting', 'icon' => 'inv_misc_armorkit_17', 'crafter' => 'Leatherworking',
+    'blurb' => 'Cures hides into leather and mail armor, armor kits and bags.',
+    'cats' => ['Leather & Hides'], 'names' => '/(Thread|Dye|^Salt)$/'],
+  'tailoring' => ['name' => 'Tailoring', 'kind' => 'primary', 'role' => 'Crafting', 'icon' => 'inv_fabric_silk_02', 'crafter' => 'Tailoring',
+    'blurb' => 'Weaves cloth dropped by humanoids into robes, cloth armor, shirts and bags.',
+    'cats' => ['Cloth'], 'names' => '/(Dye|^Bleach)$/'],
+  'herbalism' => ['name' => 'Herbalism', 'kind' => 'primary', 'role' => 'Gathering', 'icon' => 'inv_misc_flower_02', 'crafter' => null,
+    'blurb' => 'Picks herbs from the world for alchemists and scribes.',
+    'cats' => ['Herbs'], 'names' => null],
+  'mining' => ['name' => 'Mining', 'kind' => 'primary', 'role' => 'Gathering', 'icon' => 'inv_pick_02', 'crafter' => 'Mining',
+    'blurb' => 'Digs ore and gems from mineral veins and smelts ore into bars.',
+    'cats' => ['Ore & Bars'], 'names' => '/^(Aquamarine|Jade|Malachite|Moss Agate|Tigerseye|Shadowgem|Lesser Moonstone|Citrine|Star Ruby|Azerothian Diamond|Blue Sapphire|Large Opal|Huge Emerald|Arcane Crystal|Elemental Earth)$/'],
+  'skinning' => ['name' => 'Skinning', 'kind' => 'primary', 'role' => 'Gathering', 'icon' => 'inv_misc_pelt_wolf_01', 'crafter' => null,
+    'blurb' => 'Strips leather, hides and scales from slain beasts.',
+    'cats' => ['Leather & Hides'], 'names' => null],
+  'cooking' => ['name' => 'Cooking', 'kind' => 'secondary', 'role' => 'Secondary', 'icon' => 'inv_misc_food_14', 'crafter' => 'Cooking',
+    'blurb' => 'Turns meat, fish and spices into food that restores health and grants buffs.',
+    'cats' => ['Cooking Ingredients'], 'names' => '/(Spices|^Simple Flour|^Small Egg)$/'],
+  'first-aid' => ['name' => 'First Aid', 'kind' => 'secondary', 'role' => 'Secondary', 'icon' => 'spell_holy_sealofsacrifice', 'crafter' => 'First Aid',
+    'blurb' => 'Sews cloth into bandages and makes anti-venoms.',
+    'cats' => [], 'names' => '/^(Linen Cloth|Wool Cloth|Silk Cloth|Mageweave Cloth|Runecloth|Felcloth|Small Venom Sac|Large Venom Sac)$/'],
+  'fishing' => ['name' => 'Fishing', 'kind' => 'secondary', 'role' => 'Secondary', 'icon' => 'trade_fishing', 'crafter' => null,
+    'blurb' => 'Reels in fish for cooks and alchemists, plus the odd clam and trophy catch.',
+    'cats' => [], 'names' => '/^(Raw .+|Oily Blackmouth|Firefin Snapper|Stonescale Eel|Whimsyfin|Deviate Fish|Sickly Looking Fish|\d+ Pound .+)$/'],
+];
+
+// Recipe name prefixes that belong to one trade.
+const PROFESSION_RECIPE_PREFIX = [
+  'Plans' => 'blacksmithing', 'Formula' => 'enchanting', 'Schematic' => 'engineering', 'Manual' => 'first-aid',
+  'Expert Cookbook' => 'cooking', 'Expert First Aid' => 'first-aid', 'Expert Fishing' => 'fishing',
+];
+
+/** The trade a recipe teaches, or null. $craftedBy maps a crafted item's name to its trade slug. */
+function profession_for_recipe(string $name, array $craftedBy): ?string {
+  foreach (PROFESSION_RECIPE_PREFIX as $prefix => $slug) if (str_starts_with($name, $prefix)) return $slug;
+  if (!preg_match('/^(Pattern|Recipe): (.+)$/', $name, $m)) return null;
+  [$prefix, $taught] = [$m[1], $m[2]];
+  $pair = $prefix === 'Pattern' ? ['tailoring', 'leatherworking'] : ['alchemy', 'cooking'];
+  if (in_array($craftedBy[$taught] ?? null, $pair, true)) return $craftedBy[$taught];
+  if ($prefix === 'Pattern')
+    return preg_match('/Leather|Scorpid|Whelp|Suede|Hide|Armor Kit|Mail|Kilt|Barbaric|Voodoo|Overalls|Deviate|Chimeric|Dusky|Raptor|Harness|Murloc|Bandit|Living|Wildthorn|Swift Boots|Herbalist|Pilferer|Heavy Earthen|Shadowskin|Guardian|Gem-studded|Hillman|Moonglow|Ball|Quiver|Ammo Pouch/', $taught)
+      ? 'leatherworking' : 'tailoring';
+  return preg_match('/Potion|Elixir|Flask|Transmute|Philosopher|Gift of Arthas|Draught|Rocket Fuel|Oil\b|Elemental/', $taught) ? 'alchemy' : 'cooking';
+}
+
+/** Which lists of which trades an item appears in: [[slug, 'mats'|'crafted'|'recipes'], ...]. */
+function profession_roles(array $it, ?string $crafter, array $craftedBy): array {
+  $out = [];
+  $name = (string)$it['name'];
+  if (($it['cat'] ?? '') === 'Recipes') {
+    if (($slug = profession_for_recipe($name, $craftedBy)) !== null) $out[] = [$slug, 'recipes'];
+    return $out;
+  }
+  foreach (PROFESSIONS as $slug => $p) {
+    if ($crafter !== null && $p['crafter'] === $crafter) $out[] = [$slug, 'crafted'];
+    elseif (in_array($it['cat'] ?? '', $p['cats'], true) || ($p['names'] !== null && preg_match($p['names'], $name))) $out[] = [$slug, 'mats'];
+  }
+  return $out;
+}
+
+/**
+ * Every view's listings per trade: views[] = {realm, faction, scanned, professions: {slug: {mats, crafted, recipes, units, value, items}}}.
+ * Rows are [name, id, icon, qty, unit copper, listed value copper, change].
+ */
+function professions_page_model(): array {
+  return published_page_model('professions:' . PROFESSION_SOURCE, function () {
+    $source = PROFESSION_SOURCE;
+    $model = model_auctionhouse($source);
+    // The crafter field rides on the realm snapshots; merge_items() leaves it out.
+    $crafter = [];
+    foreach (edition_snaps($source) as $snap) {
+      $iId = array_search('id', $snap['columns'], true); $iCr = array_search('crafter', $snap['columns'], true);
+      if ($iCr === false) continue;
+      foreach ($snap['items'] as $row) if (($row[$iCr] ?? null) !== null && $row[$iCr] !== '') $crafter[$row[$iId]] = $row[$iCr];
+    }
+    $slugOf = [];
+    foreach (PROFESSIONS as $slug => $p) if ($p['crafter'] !== null) $slugOf[$p['crafter']] = $slug;
+    $widest = ['items' => []];
+    foreach ($model['views'] as $v) if (count($v['snapshot']['items']) > count($widest['items'])) $widest = $v['snapshot'];
+    $craftedBy = [];
+    foreach ($widest['items'] as $it) if (isset($crafter[$it['id']], $slugOf[$crafter[$it['id']]])) $craftedBy[(string)$it['name']] = $slugOf[$crafter[$it['id']]];
+    $joke = joke_price_threshold($widest['items']);
+    $branch = EDITIONS[$source]['branch'];
+    $icons = (array)item_cache('item-icons', $branch) + (array)item_cache('item-icons', 'classic');
+
+    $views = [];
+    foreach ($model['views'] as $v) {
+      $lists = [];
+      foreach (PROFESSIONS as $slug => $_) $lists[$slug] = ['mats' => [], 'crafted' => [], 'recipes' => []];
+      foreach ($v['snapshot']['items'] as $it) {
+        if (($it['q'] ?: 0) <= 0 || ($it['asp'] ?: 0) > $joke || preg_match('/^item:\d+$/', (string)$it['name'])) continue;
+        $roles = profession_roles($it, $crafter[$it['id']] ?? null, $craftedBy);
+        if (!$roles) continue;
+        $change = $it['pq'] === null ? null : ($it['pq'] === 0 ? 'NEW' : (int)js_round(($it['q'] - $it['pq']) / $it['pq'] * 100));
+        $row = [(string)$it['name'], $it['id'], $icons[$it['id']] ?? null, (int)$it['q'], (int)js_round($it['asp'] ?: 0), (int)($it['mv'] ?: 0), $change];
+        foreach ($roles as [$slug, $role]) $lists[$slug][$role][] = $row;
+      }
+      $profs = [];
+      foreach ($lists as $slug => $roles) {
+        $units = 0; $value = 0; $items = 0;
+        foreach ($roles as $role => $rows) {
+          usort($rows, fn($a, $b) => $b[3] <=> $a[3] ?: strcmp($a[0], $b[0]));
+          foreach ($rows as $r) { $units += $r[3]; $value += $r[5]; }
+          $items += count($rows);
+          $roles[$role] = array_slice($rows, 0, 60);
+          $roles[$role . 'Count'] = count($rows);
+        }
+        $profs[$slug] = $roles + ['units' => $units, 'value' => $value, 'items' => $items];
+      }
+      $s = $v['snapshot'];
+      $views[] = ['realm' => $v['realm'], 'faction' => $v['faction'], 'scanned' => $s['updatedAt'] ? substr((string)$s['updatedAt'], 0, 10) : null,
+        'empty' => !$s['items'], 'professions' => $profs];
+    }
+    return ['views' => $views, 'dims' => $model['dims']];
+  });
+}
+
+function profession_path(?string $slug = null): string {
+  return edition_path(PROFESSION_SOURCE) . 'professions' . ($slug !== null ? '/' . $slug : '');
+}
+
+/**
+ * The plain page every skin starts from (the 2008 skin rebuilds it from the model).
+ * $slug null is the list of trades.
+ */
+function professions_html(?string $slug, string $stylesheet): string {
+  $model = professions_page_model();
+  $all = $model['views'][0] ?? ['professions' => []];
+  $label = EDITIONS[PROFESSION_SOURCE]['label'];
+  $seoLabel = seo_label($label);
+  $navigation = edition_nav(PROFESSION_SOURCE, 'auctionhouse.html');
+  if ($slug === null) {
+    $title = $seoLabel . ' Professions';
+    $desc = $seoLabel . ' professions: auction house supply and asking prices for each trade\'s materials, crafted goods and recipes.';
+    $body = '<div class="panel census"><div class="ptitle">Professions</div><p class="hint" style="margin-top:0">Pick a trade to see what its materials, crafted goods and recipes list for on the auction house.</p><table class="mkttable"><thead><tr><th class="l">Profession</th><th class="r">Items listed</th><th class="r">Units</th><th class="r">Listed value</th></tr></thead><tbody>';
+    foreach (PROFESSIONS as $s => $p) {
+      $d = $all['professions'][$s] ?? ['items' => 0, 'units' => 0, 'value' => 0];
+      $body .= '<tr><td class="l"><a href="' . esc(profession_path($s)) . '">' . esc($p['name']) . '</a> <span class="mu">' . esc($p['role']) . '</span></td><td class="r">' . js_locale($d['items']) . '</td><td class="r">' . js_locale($d['units']) . '</td><td class="r">' . esc(big_gold($d['value'])) . '</td></tr>';
+    }
+    $body .= '</tbody></table></div>';
+  } else {
+    $p = PROFESSIONS[$slug];
+    $d = $all['professions'][$slug];
+    $title = $seoLabel . ' ' . $p['name'] . ' Auction Prices';
+    $desc = $seoLabel . ' ' . $p['name'] . ': auction house supply and asking prices for its materials, crafted goods and recipes.';
+    $branch = EDITIONS[PROFESSION_SOURCE]['branch'];
+    $row = fn($r) => ['id' => $r[1], 'name' => $r[0], 'q' => $r[3], 'asp' => $r[4], 'mv' => $r[5]];
+    $cols = [
+      ['label' => 'Item', 'left' => true, 'cell' => fn($it, $b) => item_link($it, $b)],
+      ['label' => 'Qty', 'cell' => fn($it) => js_locale($it['q'])],
+      ['label' => 'Unit', 'cell' => fn($it) => esc(money($it['asp']))],
+    ];
+    $body = '<p class="hint"><a href="' . esc(profession_path()) . '">&larr; All professions</a> &middot; ' . esc($p['blurb']) . '</p>';
+    foreach (['mats' => $p['role'] === 'Gathering' ? 'Gathered goods' : 'Materials', 'crafted' => 'Crafted goods', 'recipes' => 'Recipes'] as $role => $heading)
+      if ($d[$role]) $body .= top_table($heading, js_locale($d[$role . 'Count']) . ' items listed, by quantity.', array_map($row, $d[$role]), $branch, $cols);
+  }
+  $canonical = SITE_ORIGIN . profession_path($slug);
+  $seo = seo_head($title . ' – WoWCensus', $desc, $canonical);
+  $heading = page_heading('WoWCensus', $navigation, $title);
+  $style = js_template_const('market.mjs', 'MARKET_STYLE');
+  $css = esc($stylesheet);
+  $census_css = CENSUS_STYLESHEET;
+  return <<<HTML
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+$seo
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="stylesheet" href="$css">
+$census_css<style>
+$style
+</style>
+</head><body>
+<div class="crt" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="ihead">
+    <div class="page-heading">$heading{$navigation['games']}</div>
+    {$navigation['breadcrumbs']}
+  </header>
+  <div class="page-controls"></div>
+  $body
+</div>
+</body></html>
+HTML;
+}

@@ -150,6 +150,7 @@ function sitemap_xml(): string {
   $routes = [];
   foreach (EDITIONS as $source => $_) foreach ([...PAGES, 'realms'] as $page) $routes[] = page_path($source, $page);
   $routes = array_merge($routes, race_routes(), class_routes());
+  foreach (array_merge([null], array_keys(PROFESSIONS)) as $slug) $routes[] = profession_path($slug);
   return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n" .
     implode("\n", array_map(fn($r) => '  <url><loc>' . SITE_ORIGIN . $r . '</loc></url>', $routes)) .
