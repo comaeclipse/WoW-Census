@@ -124,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if (!$authed) {
+  admin_trace(['uri' => $_SERVER['REQUEST_URI'] ?? '', 'authed' => false]);
   echo admin_page('Admin sign in · WoWCensus',
     '<form method="post" action="/admin/"><h1>WoWCensus admin</h1>'
     . ($error ? '<p class="error" role="alert">' . cs_h($error) . '</p>' : '')
@@ -211,8 +212,16 @@ function admin_build_model(): array {
   if (file_put_contents($tmp, serialize($model)) === false || !rename($tmp, $file)) {
     @unlink($tmp);
     error_log('admin: could not write ' . $file);
+    admin_trace(['error' => 'could not write ' . $file, 'last' => error_get_last()['message'] ?? null]);
   }
   return $model;
+}
+
+/** One line per admin data request in the temp dir, for diagnosing slow loads (PHP errors go nowhere here). */
+function admin_trace(array $fields): void {
+  $fields = ['at' => gmdate('H:i:s'), 'pid' => getmypid(), 'code' => realpath(__FILE__)] + $fields;
+  @file_put_contents(sys_get_temp_dir() . '/wowcensus-admin-trace.log', json_encode($fields) . "
+", FILE_APPEND | LOCK_EX);
 }
 
 $started = microtime(true);
@@ -227,6 +236,7 @@ if ($snapshot === null) {
   } catch (Throwable $e) {
     http_response_code(500);
     error_log((string)$e);
+    admin_trace(['error' => $e->getMessage()]);
     exit('Collection status could not be read from the database.');
   }
 }
@@ -254,6 +264,8 @@ if (($_GET['view'] ?? '') === 'who-hours') {
     . '<a href="/admin/?view=who-hours&amp;region=' . rawurlencode($region) . '">/who time heatmap</a>' . $shoutLink . '</nav>';
   echo render_collection_stats($snapshot, $region, '/admin/', $nav, $note);
 }
+admin_trace(['uri' => $_SERVER['REQUEST_URI'] ?? '', 'source' => $source, 'data_ms' => $loadMs,
+  'total_ms' => (int)round((microtime(true) - $started) * 1000), 'age_s' => $age, 'file' => is_file(admin_model_file())]);
 
 // A stale model: finish the response, then rebuild it once (the lock stops parallel rebuilds).
 if ($age >= ADMIN_MODEL_FRESH && ($lock = fopen(admin_model_file() . '.lock', 'c')) && flock($lock, LOCK_EX | LOCK_NB)) {
@@ -263,6 +275,7 @@ if ($age >= ADMIN_MODEL_FRESH && ($lock = fopen(admin_model_file() . '.lock', 'c
     if ((int)(admin_model_read()['generated_at'] ?? 0) <= (int)$snapshot['generated_at']) admin_build_model();
   } catch (Throwable $e) {
     error_log('admin background refresh: ' . $e);
+    admin_trace(['error' => 'background: ' . $e->getMessage()]);
   }
   flock($lock, LOCK_UN);
 }
