@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realm Population Drop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0a09;
+    --card: #14120f;
+    --border: #2a2620;
+    --fg: #f3efe6;
+    --muted: #8f877a;
+    --grid: #26221c;
+    --before: #4a443b;
+    --after: #d9a441;
+    --drop: #e8836b;
+    --drop-soft: rgba(232,131,107,.13);
+    --name-w: 190px;
+    --pill-w: 84px;
+    --col-gap: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    font-family: "Inter", system-ui, sans-serif;
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 1080 × 1080 square for social */
+  .frame {
+    width: 1080px;
+    height: 1080px;
+    padding: 40px;
+    background:
+      radial-gradient(900px 500px at 50% -10%, rgba(217,164,65,.07), transparent 70%),
+      var(--bg);
+    display: flex;
+  }
+  .card {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px 28px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 20px 60px rgba(0,0,0,.45);
+  }
+
+  .stats { display: flex; gap: 14px; }
+  .stat {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .stat .k { font-size: 15px; color: var(--muted); font-weight: 500; }
+  .stat .v {
+    font-family: "Cinzel", serif;
+    font-size: 40px;
+    font-weight: 700;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .v.after { color: var(--after); }
+  .stat .v.drop  { color: var(--drop); }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin: 22px 0 6px calc(var(--name-w) + var(--col-gap));
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 9px; }
+  .legend i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+  /* chart */
+  .chart {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 26px; /* room for x-axis labels */
+  }
+  .grid {
+    position: absolute;
+    top: 0;
+    bottom: 26px;
+    left: calc(var(--name-w) + var(--col-gap));
+    right: calc(var(--pill-w) + var(--col-gap));
+    pointer-events: none;
+  }
+  .grid div {
+    position: absolute;
+    top: 0; bottom: 0;
+    border-left: 1px dashed var(--grid);
+  }
+  .grid div:first-child { border-left: 1px solid #3a352d; }
+  .grid span {
+    position: absolute;
+    bottom: -24px;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ed {
+    position: relative;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--after);
+    opacity: .85;
+    padding-top: 4px;
+  }
+  .ed:not(:first-child) { margin-top: 6px; }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--name-w) 1fr var(--pill-w);
+    column-gap: var(--col-gap);
+    align-items: center;
+  }
+  .name {
+    font-size: 19px;
+    font-weight: 600;
+    text-align: left;
+    line-height: 1.15;
+  }
+  .bars { display: flex; flex-direction: column; gap: 4px; }
+  .bar {
+    position: relative;
+    height: 25px;
+    width: calc(var(--v) / 10000 * 100%);
+    min-width: 3px;
+    border-radius: 0 5px 5px 0;
+  }
+  .bar.before { background: var(--before); }
+  .bar.after  { background: var(--after); }
+  .bar b {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .bar.before b { color: var(--muted); }
+  .bar.after b  { color: var(--after); }
+
+  .pill {
+    justify-self: start;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--drop);
+    background: var(--drop-soft);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .foot {
+    margin-top: 18px;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="card">
+    <div class="stats">
+      <div class="stat"><div class="k">Before (all eight)</div><div class="v">35,038</div></div>
+      <div class="stat"><div class="k">After (all eight)</div><div class="v after">5,796</div></div>
+      <div class="stat"><div class="k">Overall change</div><div class="v drop">−83%</div></div>
+    </div>
+
+    <div class="legend">
+      <span><i style="background:var(--before)"></i>Before</span>
+      <span><i style="background:var(--after)"></i>After</span>
+    </div>
+
+    <div class="chart">
+      <div class="grid">
+        <div style="left:0%"><span>0</span></div>
+        <div style="left:25%"><span>2.5k</span></div>
+        <div style="left:50%"><span>5k</span></div>
+        <div style="left:75%"><span>7.5k</span></div>
+        <div style="left:100%"><span>10k</span></div>
+      </div>
+
+      <div class="ed">Classic Era</div>
+      <div class="row">
+        <div class="name">Westfall</div>
+        <div class="bars">
+          <div class="bar before" style="--v:4054"><b>4,054</b></div>
+          <div class="bar after"  style="--v:809"><b>809</b></div>
+        </div>
+        <span class="pill">−80%</span>
+      </div>
+      <div class="row">
+        <div class="name">Nethergarde Keep</div>
+        <div class="bars">
+          <div class="bar before" style="--v:4713"><b>4,713</b></div>
+          <div class="bar after"  style="--v:516"><b>516</b></div>
+        </div>
+        <span class="pill">−89%</span>
+      </div>
+
+      <div class="ed">TBC Anniversary</div>
+      <div class="row">
+        <div class="name">Dreamscythe</div>
+        <div class="bars">
+          <div class="bar before" style="--v:8933"><b>8,933</b></div>
+          <div class="bar after"  style="--v:1459"><b>1,459</b></div>
+        </div>
+        <span class="pill">−84%</span>
+      </div>
+      <div class="row">
+        <div class="name">Thunderstrike</div>
+        <div class="bars">
+          <div class="bar before" style="--v:8473"><b>8,473</b></div>
+          <div class="bar after"  style="--v:1196"><b>1,196</b></div>
+        </div>
+        <span class="pill">−86%</span>
+      </div>
+
+      <div class="ed">MoP Classic</div>
+      <div class="row">
+        <div class="name">Pagle</div>
+        <div class="bars">
+          <div class="bar before" style="--v:4270"><b>4,270</b></div>
+          <div class="bar after"  style="--v:1161"><b>1,161</b></div>
+        </div>
+        <span class="pill">−73%</span>
+      </div>
+      <div class="row">
+        <div class="name">Shek'zeer</div>
+        <div class="bars">
+          <div class="bar before" style="--v:2718"><b>2,718</b></div>
+          <div class="bar after"  style="--v:576"><b>576</b></div>
+        </div>
+        <span class="pill">−79%</span>
+      </div>
+
+      <div class="ed">Season of Discovery</div>
+      <div class="row">
+        <div class="name">Wild Growth US</div>
+        <div class="bars">
+          <div class="bar before" style="--v:869"><b>869</b></div>
+          <div class="bar after"  style="--v:42"><b>42</b></div>
+        </div>
+        <span class="pill">−95%</span>
+      </div>
+      <div class="row">
+        <div class="name">Wild Growth EU</div>
+        <div class="bars">
+          <div class="bar before" style="--v:1008"><b>1,008</b></div>
+          <div class="bar after"  style="--v:37"><b>37</b></div>
+        </div>
+        <span class="pill">−96%</span>
+      </div>
+    </div>
+
+    <div class="foot">wowcensus.io</div>
+  </div>
+</div>
+</body>
+</html>

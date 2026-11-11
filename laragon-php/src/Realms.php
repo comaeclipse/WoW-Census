@@ -49,7 +49,7 @@ function realm_match_slug(string $name): string {
 
 /** Short public label and realm type for Forever's collector names. */
 function forever_realm_display(string $name): array {
-  if (!preg_match('/^CAMWOW\s+(US|EU)(\d+)\s+Realm\s+(\d+)\s+(RP PvP|PvP|PvE|RP)$/i', $name, $m))
+  if (!preg_match('/^CAMWOW\s+(US|EU|KR)(\d*)\s+(?:Realm|서버)\s+(\d+)\s+(RP PvP|PvP|PvE|RP)$/iu', $name, $m))
     return ['displayName' => $name, 'realmType' => 'Other', 'cluster' => ''];
   $types = ['rp pvp' => 'RP-PvP', 'pvp' => 'PvP', 'pve' => 'PvE', 'rp' => 'RP'];
   return ['displayName' => 'Realm ' . $m[3], 'realmType' => $types[strtolower($m[4])],
@@ -58,7 +58,7 @@ function forever_realm_display(string $name): array {
 
 /** A Forever realm key's region/type group, as the realms page names it ("us:PvE", "US PvE"); null for other names. */
 function forever_realm_group(string $realm): ?array {
-  if (!preg_match('/CAMWOW\s+(US|EU)\d+\s+Realm\s+\d+\s+(RP PvP|PvP|PvE|RP)(?:-(?:Alliance|Horde))?$/i', $realm, $m)) return null;
+  if (!preg_match('/CAMWOW\s+(US|EU|KR)\d*\s+(?:Realm|서버)\s+\d+\s+(RP PvP|PvP|PvE|RP)(?:-(?:Alliance|Horde))?$/iu', $realm, $m)) return null;
   $type = forever_realm_display('CAMWOW ' . $m[1] . '1 Realm 1 ' . $m[2])['realmType'];
   return ['key' => strtolower($m[1]) . ':' . $type, 'label' => strtoupper($m[1]) . ' ' . $type];
 }
@@ -69,7 +69,7 @@ function forever_realm_groups(array $realms): array {
   foreach ($realms as $realm) {
     $meta = forever_realm_display($realm['name']);
     $region = $realm['region'];
-    if (!$region && preg_match('/^CAMWOW\s+(US|EU)\d+/i', $realm['name'], $m)) $region = strtolower($m[1]);
+    if (!$region && preg_match('/^CAMWOW\s+(US|EU|KR)\d*\s/i', $realm['name'], $m)) $region = strtolower($m[1]);
     $type = $meta['realmType'];
     $key = ($region ?? 'unknown') . ':' . $type;
     $group = &$groups[$key];
@@ -95,7 +95,7 @@ function forever_realm_groups(array $realms): array {
   }
   unset($group);
   $list = array_values($groups);
-  $regions = ['us' => 0, 'eu' => 1]; $types = ['PvE' => 0, 'PvP' => 1, 'RP' => 2, 'RP-PvP' => 3];
+  $regions = ['us' => 0, 'eu' => 1, 'kr' => 2]; $types = ['PvE' => 0, 'PvP' => 1, 'RP' => 2, 'RP-PvP' => 3];
   usort($list, fn($a, $b) => (($regions[$a['region'] ?? ''] ?? 9) <=> ($regions[$b['region'] ?? ''] ?? 9))
     ?: (($types[$a['realmType']] ?? 9) <=> ($types[$b['realmType']] ?? 9)));
   return $list;

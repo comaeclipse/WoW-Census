@@ -44,6 +44,8 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 IMPORTERS = {"csv": REPO / "tools" / "import-forever-ah-csv-pg.py",
+             "classicplus": REPO / "tools" / "import-classicplus-pg.py",
+             "classicplus-merge": REPO / "tools" / "merge-classicplus-pg.py",
              "saves": REPO / "tools" / "import-savedvariables-pg.py",
              "map-house": REPO / "tools" / "map-forever-house-pg.py"}
 LIVE_DB = "dbname=marketlens user=wowcensus"
@@ -58,6 +60,10 @@ REMOTE = ("printf '%s\\nREADY\\n' \"$(cat /etc/wowcensus/pg-password)\" && read 
 
 def run_importer(kind, args, env=None):
     """Run the importer, streaming its output; return (exit code, last line)."""
+    # The child must write UTF-8 (Windows pipes default to cp1252, which cannot encode
+    # Korean realm names and garbles accented guilds); our own console may not take UTF-8.
+    env = {**(env or os.environ), "PYTHONIOENCODING": "utf-8"}
+    sys.stdout.reconfigure(errors="backslashreplace")
     proc = subprocess.Popen([sys.executable, "-B", str(IMPORTERS[kind]), *args], cwd=REPO, env=env,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
                             errors="backslashreplace")
@@ -117,7 +123,7 @@ def main():
         # still add local_imports rows, which is what the refresh watches).
         # The save importer prints an empty CHANGED line when nothing was new.
         changed = code == 0 and not dry and last.startswith("CHANGED") and (
-            args.kind != "saves" or last != "CHANGED sources=")
+            args.kind not in ("saves", "classicplus") or last != "CHANGED sources=")
         publish = changed and args.publish_now
         ssh.stdin.write("publish\n" if publish else "done\n")
         ssh.stdin.flush()

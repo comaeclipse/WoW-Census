@@ -204,7 +204,7 @@ function forever_skin_colors_page(string $cssName, ?string $forcedSlug = null, b
 <header class="ihead"><div class="page-heading"><h1 class="iname">WoWCensus<span class="itopic">WoW: Forever Skin Colors</span></h1>$nav</div>
 <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="/forever/">WoW: Forever</a><span aria-hidden="true">/</span><span aria-current="page">Skin colors</span></nav></header>
 <h2 class="skin-heading">WoW: Forever skin colors</h2>
-<p class="lede">Skin-color choices observed in $requestedCount randomly selected US Forever character profiles ($successCount returned appearance data; $notFoundCount returned 404).</p>
+<p class="lede">Skin-color choices observed in $requestedCount US Forever character profiles, including a Skyborne-focused follow-up ($successCount returned appearance data; $notFoundCount returned 404).</p>
 <div class="skin-layout"><aside class="race-rail" aria-label="Races">$rail</aside>
 $detail
 </div>

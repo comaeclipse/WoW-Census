@@ -38,6 +38,23 @@ function up_files(string $dir): array {
   return $files;
 }
 
+// Files players sent with the Discord /submit command (src/discord-interactions.php),
+// newest first, from its submissions.jsonl. Deleting a file keeps its index line,
+// so the same save sent again is still recognised as a duplicate.
+function up_discord_store(): string { return rtrim((string)(getenv('DISCORD_SUBMIT_DIR') ?: dirname(__DIR__, 2) . '/discord-submissions'), '/\\'); }
+function up_discord_files(string $dir): array {
+  $index = $dir . '/submissions.jsonl';
+  if (!is_file($index)) return [];
+  $files = [];
+  foreach (file($index, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
+    $row = json_decode($line, true);
+    $name = (string)($row['file'] ?? '');
+    if (!is_array($row) || !up_name($name) || !is_file("$dir/$name") || is_link("$dir/$name")) continue;
+    $files[] = $row;
+  }
+  return array_reverse($files);
+}
+
 $hash = (string)getenv('UPLOAD_PASSWORD_HASH');
 if ($hash === '' && ($file = getenv('UPLOAD_PASSWORD_HASH_FILE')) && is_readable($file)) $hash = trim((string)file_get_contents($file));
 if ($hash === '') $hash = (string)getenv('ADMIN_PASSWORD_HASH');
@@ -74,10 +91,11 @@ $dir = up_store();
 if ($method === 'POST' && !$error) {
   $action = (string)($_POST['action'] ?? '');
   if ($action === 'logout') { $_SESSION = []; session_regenerate_id(true); header('Location: /upload', true, 303); exit; }
-  if ($action === 'delete') {
+  if ($action === 'delete' || $action === 'delete-discord') {
     $name = (string)($_POST['name'] ?? '');
-    if (!up_name($name) || !is_file($dir . '/' . $name) || is_link($dir . '/' . $name)) { http_response_code(404); $error = 'File not found.'; }
-    elseif (!unlink($dir . '/' . $name)) { http_response_code(500); $error = 'Could not delete the file.'; }
+    $from = $action === 'delete' ? $dir : up_discord_store();
+    if (!up_name($name) || !is_file($from . '/' . $name) || is_link($from . '/' . $name)) { http_response_code(404); $error = 'File not found.'; }
+    elseif (!unlink($from . '/' . $name)) { http_response_code(500); $error = 'Could not delete the file.'; }
     else { header('Location: /upload?deleted=1', true, 303); exit; }
   } elseif ($action === 'upload') {
     $uploads = $_FILES['files'] ?? null;
@@ -105,9 +123,9 @@ if ($method === 'POST' && !$error) {
     }
   }
 }
-if ($method === 'GET' && isset($_GET['download'])) {
-  $name = (string)$_GET['download'];
-  $file = $dir . '/' . $name;
+if ($method === 'GET' && (isset($_GET['download']) || isset($_GET['discord']))) {
+  $name = (string)($_GET['download'] ?? $_GET['discord']);
+  $file = (isset($_GET['download']) ? $dir : up_discord_store()) . '/' . $name;
   if (!up_name($name) || !is_file($file) || is_link($file)) { http_response_code(404); exit('File not found'); }
   header('Content-Type: application/octet-stream');
   header('Content-Disposition: attachment; filename="' . $name . '"');
@@ -124,6 +142,16 @@ if (!$files) $body .= '<li>No files uploaded yet.</li>';
 foreach ($files as $file) {
   $name = up_h($file['name']);
   $body .= '<li><div class="file"><a href="/upload?download=' . rawurlencode($file['name']) . '">' . $name . '</a><span class="meta">' . number_format($file['size'] / 1024, 1) . ' KB · MD5 ' . $file['md5'] . ' · ' . gmdate('Y-m-d H:i', $file['time']) . ' UTC</span></div><form method="post" action="/upload" onsubmit="return confirm(\'Delete this file?\')"><input type="hidden" name="action" value="delete"><input type="hidden" name="csrf" value="' . up_csrf() . '"><input type="hidden" name="name" value="' . $name . '"><button class="delete" aria-label="Delete ' . $name . '" title="Delete">X</button></form></li>';
+}
+$body .= '</ul><h2>Discord submissions</h2><p>Sent by players with <code>/submit</code>. Unverified: check before importing.</p><ul class="list">';
+$discord = up_discord_files(up_discord_store());
+if (!$discord) $body .= '<li>No submissions yet.</li>';
+foreach ($discord as $row) {
+  $name = up_h($row['file']);
+  $sent = up_h((string)($row['original'] ?? '')) . (isset($row['archive']) ? ' in ' . up_h((string)$row['archive']) : '');
+  $body .= '<li><div class="file"><a href="/upload?discord=' . rawurlencode($row['file']) . '">' . $name . '</a><span class="meta">'
+    . number_format((int)($row['bytes'] ?? 0) / 1024, 1) . ' KB · MD5 ' . up_h((string)($row['md5'] ?? '')) . ' · ' . gmdate('Y-m-d H:i', (int)($row['time'] ?? 0)) . ' UTC · from '
+    . up_h((string)($row['username'] ?? '?')) . ' · sent as ' . $sent . '</span></div><form method="post" action="/upload" onsubmit="return confirm(\'Delete this file?\')"><input type="hidden" name="action" value="delete-discord"><input type="hidden" name="csrf" value="' . up_csrf() . '"><input type="hidden" name="name" value="' . $name . '"><button class="delete" aria-label="Delete ' . $name . '" title="Delete">X</button></form></li>';
 }
 $body .= '</ul><script>const drop=document.getElementById("drop"),input=document.getElementById("files"),status=document.getElementById("progress");for(const event of ["dragenter","dragover"]){drop.addEventListener(event,e=>{e.preventDefault();drop.classList.add("drag")})}for(const event of ["dragleave","drop"]){drop.addEventListener(event,e=>{e.preventDefault();drop.classList.remove("drag")})}drop.addEventListener("drop",e=>{input.files=e.dataTransfer.files;status.textContent=input.files.length+" file(s) selected"});input.addEventListener("change",()=>status.textContent=input.files.length+" file(s) selected");document.getElementById("upload-form").addEventListener("submit",()=>status.textContent="Uploading…");</script>';
 up_page($body);

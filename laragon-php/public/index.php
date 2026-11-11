@@ -36,6 +36,10 @@ if ($path === '/upload' || $path === '/upload/') {
   require dirname(__DIR__) . '/src/upload.php';
   exit;
 }
+if ($path === '/discord/interactions') {
+  require dirname(__DIR__) . '/src/discord-interactions.php';
+  exit;
+}
 if ($path === '/poll') {
   require dirname(__DIR__) . '/src/poll.php';
   exit;

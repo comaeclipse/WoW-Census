@@ -1,7 +1,7 @@
 const REALMS = __DATA__;
 const EDITION = __EDITION__;
 const GROUP_FOREVER = EDITION === "forever";
-const REGION_ORDER = {us: 0, eu: 1};
+const REGION_ORDER = {us: 0, eu: 1, kr: 2};
 const TYPE_ORDER = {"PvE": 0, "PvP": 1, "RP": 2, "RP-PvP": 3};
 const PVP_REALMS = {
   "classic-progression": ["Nightslayer"],

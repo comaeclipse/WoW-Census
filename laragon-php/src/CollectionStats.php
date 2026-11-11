@@ -23,7 +23,7 @@ function cs_h(mixed $value): string { return htmlspecialchars((string)$value, EN
 function cs_realm_name(string $game, string $edition = ''): string {
   $name = preg_replace('/^realm:(?:(?:eu|us|kr|tw|cn):[^:]+:)?/', '', $game);
   $name = preg_replace('/-(?:Alliance|Horde)$/', '', $name);
-  if ($edition === 'forever' && preg_match('/^CAMWOW\s+(?:US|EU)\d+\s+Realm\s+\d+\s+(RP PvP|PvP|PvE|RP)$/i', $name, $m)) {
+  if ($edition === 'forever' && preg_match('/^CAMWOW\s+(?:US|EU|KR)\d*\s+(?:Realm|서버)\s+\d+\s+(RP PvP|PvP|PvE|RP)$/iu', $name, $m)) {
     return strcasecmp($m[1], 'RP PvP') === 0 ? 'RP-PvP' : (strcasecmp($m[1], 'PvE') === 0 ? 'PvE' : (strcasecmp($m[1], 'PvP') === 0 ? 'PvP' : 'RP'));
   }
   return in_array($edition, ['forever', 'classic-beta'], true)
@@ -235,7 +235,7 @@ h1{font-size:clamp(1.8rem,4vw,2.8rem);margin:0 0 8px;letter-spacing:-.035em}
   $realms = $groups[$edition] ?? [];
   $byName = $edition === 'forever'
     ? function ($a, $b) {
-        $regions = ['us' => 0, 'eu' => 1]; $types = ['PvE' => 0, 'PvP' => 1, 'RP' => 2, 'RP-PvP' => 3];
+        $regions = ['us' => 0, 'eu' => 1, 'kr' => 2]; $types = ['PvE' => 0, 'PvP' => 1, 'RP' => 2, 'RP-PvP' => 3];
         return [($regions[$a['region']] ?? 9), ($types[$a['realm']] ?? 9), $a['realm']]
           <=> [($regions[$b['region']] ?? 9), ($types[$b['realm']] ?? 9), $b['realm']];
       }

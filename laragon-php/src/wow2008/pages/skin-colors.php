@@ -27,7 +27,7 @@ namespace Wow2008;
         <p class="note" style="margin-top:8px">Each square is one distinct UI swatch, placed by its lightness and sized by its share of that race's sampled characters. The gold line marks the race median. Lightness comes from Blizzard's customization colors, not rendered skin.</p>
     <?php component_end() ?>
 
-    <div class="source">Skin colors from sampled <?= $route['edition'] === 'forever' ? 'WoW: Forever' : 'Retail' ?> character profiles<?php if ($sampleInfo): ?> · <?= (int)$sampleInfo['requested'] ?> random US names queried; <?= (int)($sampleInfo['statuses']['200'] ?? 0) ?> appearance responses; <?= (int)($sampleInfo['statuses']['404'] ?? 0) ?> returned 404<?php endif ?> · an API-visible sample, not a population estimate</div>
+    <div class="source">Skin colors from sampled <?= $route['edition'] === 'forever' ? 'WoW: Forever' : 'Retail' ?> character profiles<?php if ($sampleInfo): ?> · <?= (int)$sampleInfo['requested'] ?> US names queried, including a Skyborne-focused follow-up; <?= (int)($sampleInfo['statuses']['200'] ?? 0) ?> appearance responses; <?= (int)($sampleInfo['statuses']['404'] ?? 0) ?> returned 404<?php endif ?> · an API-visible sample, not a population estimate</div>
   </main>
 
 <?php start_section('scripts') ?>

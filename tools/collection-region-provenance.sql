@@ -17,6 +17,16 @@ CREATE TABLE IF NOT EXISTS marketlens_import.collection_key_regions (
   PRIMARY KEY (game, source_game)
 );
 
+-- Illidan's legacy region-less keys contain one EU sweep per faction on
+-- 2026-11-04. Blizzard profiles for sampled names resolve on EU realm 541;
+-- samples from surrounding sweeps resolve on US realm 57. Keep the legacy
+-- key pinned to US for future routing; the exact EU sweep windows are below.
+UPDATE marketlens_import.collection_key_regions
+SET region = 'us', region_id = 1, realm_id = 57, conflicts = NULL
+WHERE source_game = 'retail'
+  AND game IN ('realm:Illidan-Alliance', 'realm:Illidan-Horde')
+  AND region = 'eu' AND conflicts = 'us';
+
 -- Placeholder until the importer regenerates it; this file may be re-applied.
 CREATE OR REPLACE FUNCTION marketlens_import.collection_key_region(
   collection_game text, observed_at bigint
@@ -28,6 +38,12 @@ CREATE OR REPLACE FUNCTION marketlens_import.collection_region_at(
   SELECT CASE
     WHEN collection_game ~ '^realm:(us|eu|kr|tw|cn):'
       THEN split_part(collection_game, ':', 2)
+    WHEN collection_game ~ '^house:(us|eu|kr|tw|cn):'
+      THEN split_part(collection_game, ':', 2)
+    WHEN collection_game = 'realm:Illidan-Alliance'
+      AND observed_at BETWEEN 1793814297 AND 1793814552 THEN 'eu'
+    WHEN collection_game = 'realm:Illidan-Horde'
+      AND observed_at BETWEEN 1793813250 AND 1793814072 THEN 'eu'
     WHEN marketlens_import.collection_key_region(collection_game, observed_at) IS NOT NULL
       THEN marketlens_import.collection_key_region(collection_game, observed_at)
     -- User-confirmed US reporting convention includes Oceanic Frostmourne and Remulos.
@@ -76,7 +92,8 @@ CREATE OR REPLACE FUNCTION marketlens_import.collection_region_at(
                              'realm:Nazgrim-Alliance', 'realm:Nazgrim-Horde',
                              -- CAMWOW realm labels identify their collection region.
                              'realm:CAMWOW US2 Realm 7 PvE-Horde',
-                             'realm:CAMWOW US2 Realm 11 RP-Horde')
+                             'realm:CAMWOW US2 Realm 11 RP-Horde',
+                             'realm:CAMWOW US2 Realm 3 PvE-Alliance')
       THEN 'us'
     WHEN collection_game IN ('realm:Draenor-Alliance', 'realm:Draenor-Horde',
                              'realm:Lordaeron-Alliance', 'realm:Kilrogg-Horde',
@@ -92,7 +109,8 @@ CREATE OR REPLACE FUNCTION marketlens_import.collection_region_at(
                              'realm:Nethergarde Keep-Alliance', 'realm:Nethergarde Keep-Horde',
                              'realm:Spineshatter-Horde',
                              'realm:Soulseeker-Alliance', 'realm:Soulseeker-Horde',
-                             'realm:CAMWOW EU4 Realm 3 PvE-Horde')
+                             'realm:CAMWOW EU4 Realm 3 PvE-Horde',
+                             'realm:CAMWOW EU5 Realm 1 PvE-Alliance')
       THEN 'eu'
     WHEN collection_game = 'realm:語風-Horde' THEN 'tw'
     WHEN observed_at > 0 AND observed_at < 1792213200 THEN 'us'
