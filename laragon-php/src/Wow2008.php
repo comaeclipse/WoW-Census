@@ -338,7 +338,7 @@ function home_page(): string {
     $editions[] = ['source' => $source, 'name' => HOME_NAMES[$source] ?? edition_name($source), 'href' => url('census', $source),
       'color' => EDITION_COLORS[$source] ?? '#c9a050', 'n7' => $r['n'], 'prev7' => $r['prev'], 'delta' => $delta,
       'total' => $seen['all']['n'], 'realms' => count($census['realms']), 'lastT' => (int)$census['lastT'],
-      'week' => $r['running'], 'lastDay' => (int)$seen['lastDay']];
+      'week' => $seen['daily'] ?? $r['running'], 'lastDay' => (int)$seen['lastDay']];
   }
   usort($editions, fn($a, $b) => $b['n7'] <=> $a['n7']);
 

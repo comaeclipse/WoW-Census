@@ -416,7 +416,8 @@ function census_sightings_live_sql(string $sourceGame): string {
 }
 
 // Distinct characters seen in the last 7 and 30 days and overall, each as a
-// running total by UTC day (the banner's "seen recently" chart) and with the
+// running total by UTC day (the banner's "seen recently" chart), per-day distinct
+// counts for the last 14 days ('daily', the front page's trend), and with the
 // count for the same span just before it, for a change figure. A sighting is a
 // /who observation or a character's first or last sighting. Days count back
 // from the newest sighting, not from today. Null when published query data
@@ -445,8 +446,12 @@ function seen_activity(string $source): ?array {
     foreach (range($from, $last) as $d) $running[] = $total += $new[$key][$d] ?? 0;
     return ['n' => $spans[$n], 'prev' => $spans[$p], 'firstDay' => $from, 'running' => $running];
   };
+  // Distinct characters seen on each of the last 14 days (the front page's trend line);
+  // null when the cache predates the 'day' span.
+  $daily = isset($new['day']) ? array_map(fn($d) => $new['day'][$d] ?? 0, range($last - 13, $last)) : null;
   return [
     'lastDay' => $last,
+    'daily' => $daily,
     'all' => $span('all', $first, 'nall', 'pall'),
     '30' => $span('30', max($first, $last - 29), 'n30', 'p30'),
     '7' => $span('7', max($first, $last - 6), 'n7', 'p7'),
@@ -465,6 +470,7 @@ function seen_activity_rows(string $sightings, array $params): array {
       SELECT 'all' span, a dy, COUNT(*) n FROM f GROUP BY a
       UNION ALL SELECT '30', m30, COUNT(*) FROM f WHERE m30 IS NOT NULL GROUP BY m30
       UNION ALL SELECT '7', m7, COUNT(*) FROM f WHERE m7 IS NOT NULL GROUP BY m7
+      UNION ALL SELECT 'day', s.dy, COUNT(DISTINCT (s.g, s.k)) FROM s, l WHERE s.dy > l.dy - 14 GROUP BY s.dy
       ORDER BY 1, 2", $params);
     $spans = Db::first("WITH s AS ($sightings), l AS (SELECT MAX(dy) dy FROM s)
       SELECT COUNT(DISTINCT (s.g, s.k)) FILTER (WHERE s.dy > l.dy - 7) n7,

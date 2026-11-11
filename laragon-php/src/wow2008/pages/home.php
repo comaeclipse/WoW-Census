@@ -9,7 +9,7 @@ $pct = fn(float $p) => (abs($p) < 10 ? number_format(abs($p), 1) : (string)round
 $trend = fn(?float $d, string $cls = 'tr') => $d === null
   ? '<span class="' . $cls . ' new">new</span>'
   : '<span class="' . $cls . ' ' . ($d < 0 ? 'dn' : 'up') . '">' . ($d < 0 ? '▼' : '▲') . ' ' . $pct($d) . '</span>';
-/** A 7-day running-total line, in the banner's 208 x 38 box. */
+/** Characters seen per day over the last 14 days (last week, then this week), in the banner's 208 x 38 box. */
 $spark = function (array $vals): string {
   $lo = min($vals); $hi = max($vals); $n = count($vals);
   $pts = [];
