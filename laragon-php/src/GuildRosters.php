@@ -43,14 +43,22 @@ function guild_member_counts(string $source): array {
   static $cache = [];
   if (isset($cache[$source])) return $cache[$source];
   $chars = census_characters_sql($source);
-  $names = []; $ids = [];
-  $rows = Db::all("SELECT c.cgame game, c.guild guild, lower(c.name) name FROM $chars c
-    WHERE c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''", []);
+  // Counted in SQL, one row per (scope, guild): reading one row per character (528k for
+  // Forever) ran PHP out of its 512 MB on the guilds page.
+  $games = array_column(Db::all("SELECT DISTINCT c.cgame game FROM $chars c
+    WHERE c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''", []), 'game');
+  if (!$games) return $cache[$source] = [];
+  $values = []; $params = [];
+  foreach ($games as $game) { $values[] = '(?, ?)'; $params[] = $game; $params[] = guild_scope($source, $game); }
+  $rows = Db::all("SELECT m.scope scope, c.guild guild, COUNT(DISTINCT lower(c.name)) n FROM $chars c
+    JOIN (VALUES " . implode(', ', $values) . ") m(game, scope) ON m.game = c.cgame
+    WHERE c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> '' GROUP BY 1, 2", $params);
+  $counts = [];
   foreach ($rows as $r) {
-    $id = $ids[$r['game'] . "\n" . $r['guild']] ??= guild_id($source, $r['game'], $r['guild']);
-    $names[$id][$r['name']] = true;
+    $id = guild_hash_id($source, $r['scope'], $r['guild']);
+    $counts[$id] = ($counts[$id] ?? 0) + (int)$r['n'];
   }
-  return $cache[$source] = array_map('count', $names);
+  return $cache[$source] = $counts;
 }
 
 /**
