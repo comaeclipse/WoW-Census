@@ -188,14 +188,39 @@ if (($_GET['view'] ?? '') === 'shoutbox') {
   exit;
 }
 
-try {
-  $snapshot = collection_activity_model();
-} catch (Throwable $e) {
-  http_response_code(500);
-  error_log((string)$e);
-  exit('Collection status could not be read from the database.');
+// The activity model takes seconds to build and does not need to be live:
+// keep it in APCu for ADMIN_MODEL_TTL; ?refresh=1 rebuilds it now.
+const ADMIN_MODEL_TTL = 900;
+const ADMIN_MODEL_KEY = 'ml:admin:activity-model';
+$snapshot = null;
+$refresh = isset($_GET['refresh']);
+if (!$refresh && ac_apcu_on()) {
+  $hit = apcu_fetch(ADMIN_MODEL_KEY, $ok);
+  if ($ok && is_array($hit)) $snapshot = $hit;
 }
-$note = 'Live from PostgreSQL.';
+if ($snapshot === null) {
+  session_write_close();  // building the model can take seconds; do not hold the session lock
+  try {
+    $snapshot = collection_activity_model();
+  } catch (Throwable $e) {
+    http_response_code(500);
+    error_log((string)$e);
+    exit('Collection status could not be read from the database.');
+  }
+  if (ac_apcu_on()) apcu_store(ADMIN_MODEL_KEY, $snapshot, ADMIN_MODEL_TTL);
+}
+if ($refresh) {
+  $q = $_GET;
+  unset($q['refresh']);
+  header('Location: /admin/' . ($q ? '?' . http_build_query($q) : ''), true, 303);
+  exit;
+}
+$age = max(0, time() - (int)$snapshot['generated_at']);
+$note = $age < 60 ? 'Read from PostgreSQL just now.'
+  : 'Cached ' . intdiv($age, 60) . ' min ago (refreshes every ' . intdiv(ADMIN_MODEL_TTL, 60) . ' min).';
+$refreshQuery = $_GET;
+$refreshQuery['refresh'] = '1';
+$shoutLink .= '<a href="/admin/?' . cs_h(http_build_query($refreshQuery)) . '">Refresh data</a>';
 $region = (string)($_GET['region'] ?? 'both');
 if (($_GET['view'] ?? '') === 'who-hours') {
   echo render_collection_heatmap_page($snapshot, $region, (string)($_GET['time'] ?? 'local'), '/admin/', $chrome, $note, $shoutLink);
