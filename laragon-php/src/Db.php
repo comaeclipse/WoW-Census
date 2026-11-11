@@ -1,6 +1,6 @@
 <?php
-// PostgreSQL access. Rows come back with JavaScript-like types, the way
-// node:sqlite returned them to the original generator.
+// PostgreSQL access. Rows come back with JavaScript-like types (integers and
+// floats, not strings), which the page code and its embedded scripts expect.
 
 declare(strict_types=1);
 
@@ -9,13 +9,6 @@ final class Db {
 
   public static function pdo(): PDO {
     if (!self::$pdo) {
-      if (getenv('ML_QUERY_CACHE') === '1' && ($snapshot = getenv('ML_SQLITE_PATH'))) {
-        self::$pdo = new PDO('sqlite:file:' . $snapshot . '?mode=ro', null, null, [
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-        return self::$pdo;
-      }
       $cfg = ML_CONFIG['db'];
       self::$pdo = new PDO("pgsql:host={$cfg['host']};port={$cfg['port']};dbname={$cfg['name']}",
         $cfg['user'], $cfg['password'], [
@@ -34,20 +27,12 @@ final class Db {
   /** @return list<array<string, mixed>> */
   public static function all(string $sql, array $params = []): array {
     $key = hash('sha256', json_encode([$sql, array_values($params)], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
-    if (getenv('ML_QUERY_CACHE') === '1') {
-      $st = self::pdo()->prepare('SELECT rows FROM query_results WHERE key = ?');
-      $st->execute([$key]);
-      $value = $st->fetchColumn();
-      if ($value === false) throw new RuntimeException('Missing published page data for query ' . $key);
-      return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-    }
     if (self::apcuEnabled()) return self::cached($key, fn() => self::run($sql, $params, $key));
     return self::run($sql, $params, $key);
   }
 
   /** Like all(), but never from APCu: for checks that must see the database as it is now. */
   public static function uncached(string $sql, array $params = []): array {
-    if (getenv('ML_QUERY_CACHE') === '1') return self::all($sql, $params);
     return self::run($sql, $params, hash('sha256', json_encode([$sql, array_values($params)], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)));
   }
 
@@ -105,16 +90,24 @@ final class Db {
       }
     }
     try {
+      $started = microtime(true);
       $rows = $compute();
       apcu_store($entry, $rows, 12 * 3600);  // Too large for the cache: still returned.
+      // What the entry holds and what it cost, for the admin cache page (src/AdminCache.php).
+      apcu_store('ml:qm:' . $key, ['sql' => self::$lastSql, 'ms' => (int)round((microtime(true) - $started) * 1000),
+        'rows' => count($rows), 'at' => time()], 12 * 3600);
       return $rows;
     } finally {
       apcu_delete($lock);
     }
   }
 
+  /** The start of the last query run, kept with its APCu entry. */
+  private static string $lastSql = '';
+
   private static function run(string $sql, array $params, ?string $key): array {
     $started = microtime(true);
+    self::$lastSql = substr(preg_replace('/\s+/', ' ', trim($sql)), 0, 400);
     $st = self::pdo()->prepare($sql);
     foreach (array_values($params) as $i => $v)
       $st->bindValue($i + 1, $v, is_int($v) ? PDO::PARAM_INT : (is_null($v) ? PDO::PARAM_NULL : PDO::PARAM_STR));
@@ -131,29 +124,17 @@ final class Db {
         switch ($types[$k]) {
           case 'int2': case 'int4': case 'int8': $row[$k] = (int)$v; break;
           case 'float4': case 'float8': $row[$k] = (float)$v; break;
-          // SUM over bigint and AVG are numeric; SQLite gave integers when exact.
+          // SUM over bigint and AVG are numeric: an integer when exact, else a float.
           case 'numeric': $row[$k] = preg_match('/^-?\d+$/', (string)$v) ? (int)$v : (float)$v; break;
         }
       }
       $rows[] = $row;
     }
     if (getenv('ML_PROFILE')) self::$profile[] = [round(microtime(true) - $started, 3), preg_replace('/\s+/', ' ', substr($sql, 0, 160)), $params];
-    if ($key !== null && ($dir = getenv('ML_CAPTURE_DIR'))) {
-      $path = $dir . '/' . $key . '.json';
-      if (!is_file($path)) file_put_contents($path, json_encode(['key' => $key, 'sql' => $sql, 'params' => array_values($params), 'rows' => $rows], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR));
-    }
     return $rows;
   }
 
   public static function first(string $sql, array $params = []): ?array {
     return self::all($sql, $params)[0] ?? null;
-  }
-
-  public static function model(string $key): array {
-    $st = self::pdo()->prepare('SELECT data FROM published_models WHERE key = ?');
-    $st->execute([$key]);
-    $value = $st->fetchColumn();
-    if ($value === false) throw new RuntimeException('Missing published model ' . $key);
-    return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
   }
 }

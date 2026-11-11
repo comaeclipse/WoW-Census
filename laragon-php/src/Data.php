@@ -1,9 +1,8 @@
 <?php
 // Census and inspect data for the pages (once a port of the retired Node generator's queries
 // and the read side of site/src/inspects.mjs).
-// Each query mirrors the SQLite original. SQLite's LIKE ignores ASCII case
-// (ILIKE here), and its GROUP BY returns groups in binary key order, which the
-// pages depend on, so those queries order explicitly with COLLATE "C".
+// The pages depend on groups arriving in binary key order, so grouped queries
+// order explicitly with COLLATE "C"; name matching ignores ASCII case (ILIKE).
 
 declare(strict_types=1);
 
@@ -111,7 +110,7 @@ function census_cache_fresh(): bool {
     $row = Db::uncached("SELECT (SELECT version FROM census_cache_meta) = (SELECT max(imported_at_utc) FROM local_imports) fresh")[0] ?? [];
     return $fresh = !empty($row['fresh']);
   } catch (Throwable $e) {
-    return $fresh = false;  // No tables yet, or published data without them.
+    return $fresh = false;  // No tables yet.
   }
 }
 
@@ -131,6 +130,66 @@ function census_latest_sql(): string {
   return '(SELECT ' . canonical_game_sql('game') . ' game, MAX(last_seen) latest FROM characters GROUP BY 1)';
 }
 
+/** Editions whose census counts every character ever seen, not only the last CENSUS_WINDOW_DAYS. */
+const CENSUS_ALL_OBSERVED = ['classic-beta', 'forever'];
+
+/**
+ * load_census()'s four aggregates over an edition's characters, for every edition
+ * at once: table name => SELECT. build-census-cache.php stores each as a table, so a
+ * page reads a few thousand rows instead of grouping every character (1.2 million
+ * on WoW: Forever). $chars and $latest are the census_characters and census_latest
+ * tables of the same build. The datasets join keeps out the other editions'
+ * collections that connected MoP rows carry, as the live queries do.
+ */
+function census_rollup_selects(string $chars, string $latest): array {
+  $from = "FROM $chars c JOIN datasets d ON d.game = c.game AND d.source_game = c.source_game";
+  $all = "'" . implode("','", CENSUS_ALL_OBSERVED) . "'";
+  $censusWindow = CENSUS_WINDOW_DAYS * 86400;
+  $zoneWindow = ZONE_WINDOW_DAYS * 86400;
+  $zone = "COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown')";
+  return [
+    'census_combos' =>
+      "SELECT c.source_game, c.cgame, c.race, c.class_file cf, COUNT(*)::int n
+       $from LEFT JOIN $latest m ON m.game = c.cgame
+       WHERE c.rn = 1 AND (c.source_game IN ($all) OR c.last_seen >= m.latest - $censusWindow)
+       GROUP BY c.source_game, c.cgame, c.race, c.class_file",
+    'census_race_windows' =>
+      "SELECT c.source_game, c.cgame, c.race, COUNT(*)::int all_count,
+         SUM(CASE WHEN c.last_seen >= m.latest - 604800 THEN 1 ELSE 0 END)::int week_count,
+         SUM(CASE WHEN c.last_seen >= m.latest - 86400 THEN 1 ELSE 0 END)::int day_count
+       $from JOIN $latest m ON m.game = c.cgame
+       WHERE c.rn = 1 AND c.race IS NOT NULL
+       GROUP BY c.source_game, c.cgame, c.race",
+    'census_guild_counts' =>
+      "SELECT c.source_game, c.cgame, c.guild, COUNT(*)::int members
+       $from
+       WHERE c.rn = 1 AND TRIM(COALESCE(c.guild, '')) <> ''
+       GROUP BY c.source_game, c.cgame, c.guild",
+    'census_zones' =>
+      "SELECT c.source_game, c.cgame, $zone zone, COUNT(*)::int characters,
+         CAST(ROUND(AVG(c.level)) AS INT) avg_level, MAX(c.level) max_level
+       $from JOIN $latest m ON m.game = c.cgame
+       WHERE c.rn = 1 AND c.last_seen >= m.latest - $zoneWindow
+       GROUP BY c.source_game, c.cgame, $zone",
+  ];
+}
+
+/**
+ * One edition's rows of a census_rollup_selects() table while the census tables
+ * are in use, else (or when the tables were built before the rollups existed)
+ * the same rows from $live.
+ */
+function census_rollup(string $sql, string $sourceGame, callable $live): array {
+  if (census_cache_fresh()) {
+    try {
+      return Db::all($sql, [$sourceGame]);
+    } catch (PDOException $e) {
+      if ($e->getCode() !== '42P01') throw $e;  // undefined_table: older census build
+    }
+  }
+  return $live();
+}
+
 function census_characters_live_sql(string $sourceGame): string {
   $cg = canonical_game_sql('c0.game');
   $partition = $sourceGame === 'mop-classic' ? 'c0.character_key' : "$cg, c0.character_key";
@@ -142,8 +201,8 @@ const INSPECT_WINDOW_DAYS = 14;
 function api_items(string $game): array {
   if (!str_starts_with($game, 'realm:'))
     return ['game' => $game, 'sourceGame' => $game, 'region' => REGION, 'count' => 0, 'updatedAt' => null, 'days' => 0, 'columns' => ITEM_COLUMNS, 'items' => []];
-  // SQLite returned equal quantities in rowid (insertion) order. items.seq keeps
-  // that order: it was numbered in SQLite's order on migration, and new rows
+  // Equal quantities stay in insertion order. items.seq keeps that order: it
+  // was numbered when the data first moved to PostgreSQL, and new rows
   // take the next number while updated rows keep theirs.
   $results = Db::all('SELECT id,name,slug,mv,asp,q,pq,sc,tc,cat,src,crafter FROM items WHERE game=? ORDER BY q DESC NULLS LAST, seq', [$game]);
   $rows = array_map(fn($r) => [$r['id'], $r['name'], $r['slug'], $r['mv'], $r['asp'], $r['q'], $r['pq'], $r['sc'], $r['tc'], $r['cat'], $r['src'], $r['crafter']], $results);
@@ -210,15 +269,14 @@ function merge_census_units(array $units): array {
 function load_census(string $sourceGame): array {
   static $cache = [];
   if (isset($cache[$sourceGame])) return $cache[$sourceGame];
-  $allObserved = in_array($sourceGame, ['classic-beta', 'forever'], true);
+  $allObserved = in_array($sourceGame, CENSUS_ALL_OBSERVED, true);
   $connected = $sourceGame === 'mop-classic';
   $og = canonical_game_sql('o.game');
   $partition = $connected ? 'o.character_key' : "$og, o.character_key";
   $chars = census_characters_sql($sourceGame);
   $latestByGame = census_latest_sql();
   $censusWindow = CENSUS_WINDOW_DAYS * 86400;
-  // The census-sweep sightings, ranked per character (both queries below). The
-  // live bodies are kept byte for byte: published query keys hash the SQL text.
+  // The census-sweep sightings, ranked per character (both queries below).
   $cached = census_cache_fresh();
   $sightings = "SELECT game, race, cf, t, rn FROM census_sightings WHERE source_game = ?";
   $censusRows = $allObserved ? [] : Db::all(
@@ -241,14 +299,18 @@ function load_census(string $sourceGame): array {
      ORDER BY obs.game COLLATE \"C\", obs.race COLLATE \"C\" NULLS FIRST, obs.cf COLLATE \"C\" NULLS FIRST", [$sourceGame, $censusWindow]);
   $censused = [];
   foreach ($censusRows as $r) $censused[$r['game']] = true;
-  $sightingRows = array_values(array_filter(Db::all(
+  // The four aggregates over the edition's characters come from the census build's
+  // rollup tables (census_rollup_selects()); the live SQL beside each is the fallback.
+  $sightingRows = array_values(array_filter(census_rollup(
+    'SELECT cgame game, race, cf, n FROM census_combos WHERE source_game = ?
+     ORDER BY cgame COLLATE "C", race COLLATE "C" NULLS FIRST, cf COLLATE "C" NULLS FIRST', $sourceGame, fn() => Db::all(
     "SELECT c.cgame game, c.race race, c.class_file cf, COUNT(*) n
      FROM $chars c JOIN datasets d ON d.game = c.game
      " . ($allObserved ? '' : "JOIN $latestByGame m ON m.game = c.cgame") . "
      WHERE d.source_game = ? AND c.rn = 1 " . ($allObserved ? '' : 'AND c.last_seen >= m.latest - ?') . "
      GROUP BY c.cgame, c.race, c.class_file
      ORDER BY c.cgame COLLATE \"C\", c.race COLLATE \"C\" NULLS FIRST, c.class_file COLLATE \"C\" NULLS FIRST",
-    $allObserved ? [$sourceGame] : [$sourceGame, $censusWindow]), fn($r) => !isset($censused[$r['game']])));
+    $allObserved ? [$sourceGame] : [$sourceGame, $censusWindow])), fn($r) => !isset($censused[$r['game']])));
   $rows = array_merge($censusRows, $sightingRows);
   $raceCensusRows = $allObserved ? [] : Db::all(
     "WITH obs AS (" . ($cached ? $sightings : "
@@ -267,7 +329,9 @@ function load_census(string $sourceGame): array {
      WHERE o.rn=1 AND o.race IS NOT NULL
      GROUP BY o.game,o.race
      ORDER BY o.game COLLATE \"C\", o.race COLLATE \"C\"", [$sourceGame]);
-  $raceSightingRows = array_values(array_filter(Db::all(
+  $raceSightingRows = array_values(array_filter(census_rollup(
+    'SELECT cgame game, race, all_count, week_count, day_count FROM census_race_windows WHERE source_game = ?
+     ORDER BY cgame COLLATE "C", race COLLATE "C"', $sourceGame, fn() => Db::all(
     "SELECT c.cgame game, c.race, COUNT(*) all_count,
        SUM(CASE WHEN c.last_seen>=m.latest-604800 THEN 1 ELSE 0 END) week_count,
        SUM(CASE WHEN c.last_seen>=m.latest-86400 THEN 1 ELSE 0 END) day_count
@@ -275,27 +339,31 @@ function load_census(string $sourceGame): array {
      JOIN $latestByGame m ON m.game=c.cgame
      WHERE d.source_game=? AND c.rn=1 AND c.race IS NOT NULL
      GROUP BY c.cgame,c.race
-     ORDER BY c.cgame COLLATE \"C\", c.race COLLATE \"C\"", [$sourceGame]), fn($r) => !isset($censused[$r['game']])));
+     ORDER BY c.cgame COLLATE \"C\", c.race COLLATE \"C\"", [$sourceGame])), fn($r) => !isset($censused[$r['game']])));
   $raceWindowRows = array_merge($raceCensusRows, $raceSightingRows);
   $scans = Db::all(
     'SELECT ' . canonical_game_sql('p.game') . ' game, COUNT(*) samples, SUM(p.observed) observed, MAX(p.t) "lastT"
      FROM pop_samples p JOIN datasets d ON d.game = p.game
      WHERE d.source_game = ? GROUP BY ' . canonical_game_sql('p.game') . ' ORDER BY ' . canonical_game_sql('p.game') . ' COLLATE "C"', [$sourceGame]);
-  $guilds = Db::all(
+  $guilds = census_rollup(
+    'SELECT cgame game, guild, members FROM census_guild_counts WHERE source_game = ?
+     ORDER BY cgame COLLATE "C", guild COLLATE "C"', $sourceGame, fn() => Db::all(
     "SELECT c.cgame game, c.guild guild, COUNT(*) members
      FROM $chars c
      JOIN datasets d ON d.game = c.game
      WHERE d.source_game = ? AND c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''
      GROUP BY c.cgame, c.guild
-     ORDER BY c.cgame COLLATE \"C\", c.guild COLLATE \"C\"", [$sourceGame]);
-  $zones = Db::all(
+     ORDER BY c.cgame COLLATE \"C\", c.guild COLLATE \"C\"", [$sourceGame]));
+  $zones = census_rollup(
+    'SELECT cgame game, zone, characters, avg_level "avgLevel", max_level "maxLevel" FROM census_zones WHERE source_game = ?
+     ORDER BY cgame COLLATE "C", zone COLLATE "C"', $sourceGame, fn() => Db::all(
     "SELECT c.cgame game, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') zone,
        COUNT(*) characters, CAST(ROUND(AVG(c.level)) AS INT) \"avgLevel\", MAX(c.level) \"maxLevel\"
      FROM $chars c JOIN datasets d ON d.game = c.game
      JOIN $latestByGame m ON m.game = c.cgame
      WHERE d.source_game = ? AND c.rn=1 AND c.last_seen >= m.latest - ?
      GROUP BY c.cgame, COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown')
-     ORDER BY c.cgame COLLATE \"C\", COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') COLLATE \"C\"", [$sourceGame, ZONE_WINDOW_DAYS * 86400]);
+     ORDER BY c.cgame COLLATE \"C\", COALESCE(NULLIF(TRIM(c.zone), ''), 'Unknown') COLLATE \"C\"", [$sourceGame, ZONE_WINDOW_DAYS * 86400]));
 
   $units = [];
   $realms = [];
@@ -486,7 +554,6 @@ function seen_activity_rows(string $sightings, array $params): array {
 function load_inspects(string $source): array {
   static $cache = [];
   if (isset($cache[$source])) return $cache[$source];
-  if (getenv('ML_QUERY_CACHE') === '1') return $cache[$source] = Db::model('inspects:' . $source);
   $latest = Db::first('SELECT MAX(captured_at) latest FROM character_inspects WHERE source_game=?', [$source]);
   $end = $latest['latest'] ?? 0;
   $end = $end ?: 0;
@@ -528,12 +595,5 @@ function load_inspects(string $source): array {
     'coverage' => ['inspected' => count($records), 'withSelectedTalents' => $count(fn($r) => count($r['talents']) > 0),
       'withGear' => $count(fn($r) => count($r['gear']) > 0), 'linked' => count($linkedKeys), 'unmatched' => $count(fn($r) => ($r['game'] ?? '') === ''),
       'ambiguous' => $count(fn($r) => $r['matchStatus'] === 'ambiguous'), 'retainedCensusCharacters' => $retained ?: 0, 'history' => $history ?: 0]];
-  if ($dir = getenv('ML_CAPTURE_DIR')) {
-    $keep = array_fill_keys(['classFile', 'race', 'realm', 'faction', 'classification', 'level', 'hybrid', 'orderedPoints', 'talents', 'gear'], true);
-    $published = $model;
-    $published['records'] = array_map(fn($r) => array_intersect_key($r, $keep), $records);
-    if (!is_dir($dir . '/models')) mkdir($dir . '/models', 0700, true);
-    file_put_contents($dir . '/models/inspects-' . $source . '.json', json_encode($published, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR));
-  }
   return $cache[$source] = $model;
 }

@@ -4,7 +4,7 @@
     python -B tools/repair-character-keys-pg.py            # dry run: counts, then roll back
     python -B tools/repair-character-keys-pg.py --apply
 
-Two importer bugs, fixed in tools/build-local-database.py character_key():
+Two importer bugs, fixed in tools/import-functions.py character_key():
 - WoWCensus keys start with the region ("us:mop-classic:galakras:name"). The
   importer replaced only the first segment, storing
   "mop-classic:mop-classic:galakras:name" beside the older

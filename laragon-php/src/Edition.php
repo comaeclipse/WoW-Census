@@ -181,7 +181,7 @@ function model_auctionhouse(string $source): array {
       : $dims);
   $names = item_cache('item-names', $edition['branch']);
   $savedNames = [];
-  // SQLite's bare `name` under GROUP BY item_id came from the first row in its
+  // The original query's bare `name` under GROUP BY item_id came from the first row in its
   // index order (game, newest capture first).
   foreach (Db::all("SELECT DISTINCT ON (item_id) item_id, name FROM local_auction_snapshots
       WHERE source_game=? AND name!='' AND name NOT ILIKE 'item:%' ORDER BY item_id, game COLLATE \"C\", captured_at DESC", [$source]) as $row)
@@ -338,24 +338,10 @@ function inspects_with_icons(string $source): array {
   return $inspects;
 }
 
-// A page's share of the inspection or auction data, which the compact origin
-// publishes on its own: decoding the whole data per request took more memory
-// than the origin droplet has. Built from it when the snapshot predates it.
+// A page's share of the inspection or auction data, built once per request.
 function published_page_model(string $key, callable $build): array {
   static $cache = [];
-  if (isset($cache[$key])) return $cache[$key];
-  if (getenv('ML_QUERY_CACHE') === '1') {
-    try {
-      return $cache[$key] = Db::model($key);
-    } catch (RuntimeException $e) {
-    }
-  }
-  $model = $build();
-  if ($dir = getenv('ML_CAPTURE_DIR')) {
-    if (!is_dir($dir . '/models')) mkdir($dir . '/models', 0700, true);
-    file_put_contents($dir . '/models/' . str_replace(':', '-', $key) . '.json', json_encode($model, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR));
-  }
-  return $cache[$key] = $model;
+  return $cache[$key] ??= $build();
 }
 
 // Coverage, window and role split: everything but the records.

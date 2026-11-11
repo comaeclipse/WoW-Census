@@ -17,8 +17,8 @@ define('ML_CONFIG', [
   'resources' => getenv('ML_RESOURCES') ?: dirname(__DIR__) . '/resources',
 ]);
 
-// A generator resource: from the deployed resources/ folder, or straight from
-// the repository when running from laragon-php/ (the static generator does).
+// A renderer resource: from the deployed resources/ folder (Laragon copy and
+// production releases), or straight from the repository when running from laragon-php/.
 function resource_path(string $relative): string {
   $deployed = ML_CONFIG['resources'] . '/' . $relative;
   if (is_file($deployed)) return $deployed;

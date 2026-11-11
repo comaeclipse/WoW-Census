@@ -6,6 +6,8 @@
 //                      character and collection, with its canonical collection
 //                      (cgame) and latest-sighting rank (rn)
 //   census_latest      newest sighting per canonical collection
+//   census_combos, census_race_windows, census_guild_counts, census_zones
+//                      load_census()'s aggregates per edition (census_rollup_selects())
 //   census_sightings   census-sweep sightings, ranked per character
 //   census_seen        every sighting day of every character (seen_activity())
 //   census_seen_rows   seen_activity()'s two results per edition, from census_seen
@@ -71,6 +73,15 @@ $pdo->exec('CREATE INDEX census_guilds_next_i2 ON census_guilds_next (source_gam
 printf("%-18s %9s rows %6.1fs\n", 'census_guilds', number_format($guildCount), microtime(true) - $t);
 $build('census_latest', 'SELECT ' . canonical_game_sql('game') . ' game, MAX(last_seen) latest FROM characters GROUP BY 1',
   'game');
+// load_census()'s aggregates, from the two tables just built. The sorts are large
+// (every current character); keep them in memory instead of temp files. The new
+// tables have no statistics yet, and without them the planner picks plans many times slower.
+$pdo->exec('ANALYZE census_characters_next');
+$pdo->exec('ANALYZE census_latest_next');
+$pdo->exec("SET LOCAL work_mem = '32MB'");
+$rollups = census_rollup_selects('census_characters_next', 'census_latest_next');
+foreach ($rollups as $table => $select) $build($table, $select, 'source_game');
+$pdo->exec('RESET work_mem');
 $build('census_sightings', implode("\nUNION ALL\n", array_map(
     fn($s) => "SELECT {$quote($s)}::text source_game, x.* FROM (" . str_replace('d.source_game = ?', "d.source_game = {$quote($s)}",
       census_sightings_live_sql($s)) . ') x', $sources)),
@@ -120,7 +131,7 @@ printf("%-18s %9s rows %6.1fs\n", 'census_item_wear', number_format($seq), micro
 // Item pages look up one item's auction scans; the primary key leads with game, so it can't serve that.
 $pdo->exec('CREATE INDEX IF NOT EXISTS local_auction_snapshots_item ON local_auction_snapshots (source_game, item_id)');
 
-foreach (['census_characters', 'census_guilds', 'census_latest', 'census_sightings', 'census_seen', 'census_seen_rows', 'census_aliases', 'census_item_wear'] as $table) {
+foreach (['census_characters', 'census_guilds', 'census_latest', ...array_keys($rollups), 'census_sightings', 'census_seen', 'census_seen_rows', 'census_aliases', 'census_item_wear'] as $table) {
   $pdo->exec("DROP TABLE IF EXISTS $table");
   $pdo->exec("ALTER TABLE {$table}_next RENAME TO $table");
   foreach ($pdo->query("SELECT indexname FROM pg_indexes WHERE tablename = " . $quote($table) . " AND indexname LIKE " . $quote("{$table}_next_i%"))->fetchAll(PDO::FETCH_COLUMN) as $index)

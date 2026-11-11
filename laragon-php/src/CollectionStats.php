@@ -123,23 +123,17 @@ SQL;
 
 function cs_sort_choices(): array { return ['name'=>'Realm', 'population'=>'Observed population', 'commands'=>'/who per sweep']; }
 
-/** The published copy on the origin, live data locally. A capture writes it out. */
+/** Collection activity and the /who heatmap hours, live from PostgreSQL. */
 function collection_activity_model(): array {
-  if (getenv('ML_QUERY_CACHE') === '1') return Db::model('admin:collection-activity');
   $model = collection_activity_query();
   $model['who_hours'] = who_heatmap_query();
-  if ($dir = getenv('ML_CAPTURE_DIR')) {
-    if (!is_dir($dir . '/models')) mkdir($dir . '/models', 0700, true);
-    file_put_contents($dir . '/models/admin-collection-activity.json', json_encode($model, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR));
-  }
   return $model;
 }
 
 /**
  * The full status page. $self is the page's own path (region links append
  * ?region=); $chrome is extra HTML placed above the heading (nav, logout).
- * The 30-day window ends on the snapshot's day, so an older published
- * snapshot still lines up with its own data.
+ * The 30-day window ends on the day the data was read ($snapshot['generated_at']).
  */
 function render_collection_stats(array $snapshot, string $region, string $self, string $chrome, string $note): string {
   if (!isset(cs_region_choices()[$region])) $region = 'both';

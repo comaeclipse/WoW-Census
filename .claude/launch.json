@@ -14,33 +14,6 @@
       "port": 8791
     },
     {
-      "name": "pages-dev",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": [
-        "wrangler",
-        "pages",
-        "dev",
-        "static",
-        "--port",
-        "8788"
-      ],
-      "port": 8788
-    },
-    {
-      "name": "static",
-      "runtimeExecutable": "python",
-      "runtimeArgs": [
-        "-m",
-        "http.server",
-        "8792",
-        "--bind",
-        "127.0.0.1",
-        "--directory",
-        "static"
-      ],
-      "port": 8792
-    },
-    {
       "name": "mockups-alt",
       "runtimeExecutable": "python",
       "runtimeArgs": [
@@ -91,20 +64,6 @@
       "port": 8799
     },
     {
-      "name": "origin-snapshot-1028",
-      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
-      "runtimeArgs": [
-        "-d",
-        "memory_limit=2G",
-        "-S",
-        "127.0.0.1:8801",
-        "-t",
-        "C:/Users/skarz/Documents/Projects/MarketLens/laragon-php/public",
-        "C:/Users/skarz/AppData/Local/Temp/claude/C--Users-skarz-Documents-Projects-MarketLens/c08d7fdd-8de7-4cb2-b637-525eca25b044/scratchpad/router-home.php"
-      ],
-      "port": 8801
-    },
-    {
       "name": "origin-pg",
       "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
       "runtimeArgs": [
@@ -145,6 +104,20 @@
         "laragon-php/public/cli-router.php"
       ],
       "port": 8082
+    },
+    {
+      "name": "public-static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8803",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "laragon-php/public"
+      ],
+      "port": 8803
     }
   ]
 }

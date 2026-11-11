@@ -2,10 +2,8 @@
 // Guild rosters: one page per realm guild at /guilds/<id>/ (/classic/guilds/<id>/, ...),
 // listing every character whose latest recorded guild is that guild.
 //
-// The compact origin cannot query characters, so the capture publishes each
-// roster as its own model ("guild:<source>-<id>") and a page decodes only its
-// own guild. Specs are counted from inspections but never tied to a name: the
-// origin carries no inspection identities.
+// A page reads only its own guild's members from PostgreSQL. Specs are counted
+// from inspections but never tied to a name on the page.
 
 declare(strict_types=1);
 
@@ -94,35 +92,8 @@ function guild_display_name(string $guild): string {
   return $name !== '' ? $name : $guild;
 }
 
-/** Every roster of an edition, keyed by guild id. Built from the full database only. */
-function guild_rosters(string $source): array {
-  static $cache = [];
-  if (isset($cache[$source])) return $cache[$source];
-  // Same characters as the guild list's member counts (see load_census()).
-  $connected = $source === 'mop-classic';
-  $chars = census_characters_sql($source);
-  // The marker keeps these rows out of the published query results: the rosters go out as models.
-  $rows = Db::all("/* guild rosters */ SELECT c.cgame game, c.guild guild, c.character_key ckey, c.name name, c.level level, c.race race,
-       c.class_file cf, c.zone zone, c.first_seen first_seen, c.last_seen last_seen
-     FROM $chars c JOIN datasets d ON d.game = c.game
-     WHERE d.source_game = ? AND c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''
-     ORDER BY c.cgame COLLATE \"C\", c.guild COLLATE \"C\", c.level DESC NULLS LAST, c.name COLLATE \"C\"", [$source]);
-
-  return $cache[$source] = guild_rosters_from_rows($source, $rows, $connected, true);
-}
-
-/** Assemble the same roster shape for a full capture or one requested guild. */
-function guild_rosters_from_rows(string $source, array $rows, bool $connected, bool $publish = false, ?array $specOf = null): array {
-  if ($specOf === null) {
-    $specOf = [];
-    foreach (load_inspects($source)['records'] as $r) {
-      if (($r['game'] ?? '') === '' || $r['characterKey'] === null || $r['classification'] === 'Unknown build') continue;
-      $key = ($connected ? '' : canonical_game($r['game'])) . "\t" . $r['characterKey'];
-      // Records come newest first.
-      $specOf[$key] ??= $r['classification'] . ($r['hybrid'] ? ' Hybrid' : '');
-    }
-  }
-
+/** Assemble rosters, keyed by guild id, from member rows and their specs (guild_member_specs()). */
+function guild_rosters_from_rows(string $source, array $rows, bool $connected, array $specOf): array {
   $rosters = [];
   $memberAt = [];
   foreach ($rows as $c) {
@@ -169,11 +140,6 @@ function guild_rosters_from_rows(string $source, array $rows, bool $connected, b
   }
   unset($g);
 
-  if ($publish && ($dir = getenv('ML_CAPTURE_DIR'))) {
-    if (!is_dir($dir . '/models')) mkdir($dir . '/models', 0700, true);
-    foreach ($rosters as $id => $g)
-      file_put_contents("$dir/models/guild-$source-$id.json", json_encode($g, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR));
-  }
   return $rosters;
 }
 
@@ -204,52 +170,44 @@ function guild_member_specs(string $source, array $rows, bool $connected): array
 function guild_roster(string $source, string $id): ?array {
   static $cache = [];
   if (array_key_exists("$source-$id", $cache)) return $cache["$source-$id"];
-  if (getenv('ML_QUERY_CACHE') !== '1') {
-    // Resolve the stable public id from distinct guild names, then fetch only
-    // this guild's members. The old path loaded every member of the edition.
-    // A guild can span several census games (a merged Forever guild), and an old
-    // (pre-merge) id still resolves: find the current id, then every game it covers.
-    $chars = census_characters_sql($source);
-    $matches = null;
-    if (census_cache_fresh()) {
-      try {
-        $matches = Db::all("SELECT cgame game, guild, id FROM census_guilds WHERE source_game=? AND id =
-            (SELECT id FROM census_guilds WHERE source_game=? AND (id=? OR legacy_id=?) ORDER BY (id=?) DESC LIMIT 1)",
-          [$source, $source, $id, $id, $id]);
-      } catch (PDOException $e) {
-        // Older cache: no guild index (42P01) or no legacy_id column (42703). Use the scan below.
-        if (!in_array($e->getCode(), ['42P01', '42703'], true)) throw $e;
-      }
+  // Resolve the stable public id from distinct guild names, then fetch only
+  // this guild's members. The old path loaded every member of the edition.
+  // A guild can span several census games (a merged Forever guild), and an old
+  // (pre-merge) id still resolves: find the current id, then every game it covers.
+  $chars = census_characters_sql($source);
+  $matches = null;
+  if (census_cache_fresh()) {
+    try {
+      $matches = Db::all("SELECT cgame game, guild, id FROM census_guilds WHERE source_game=? AND id =
+          (SELECT id FROM census_guilds WHERE source_game=? AND (id=? OR legacy_id=?) ORDER BY (id=?) DESC LIMIT 1)",
+        [$source, $source, $id, $id, $id]);
+    } catch (PDOException $e) {
+      // Older cache: no guild index (42P01) or no legacy_id column (42703). Use the scan below.
+      if (!in_array($e->getCode(), ['42P01', '42703'], true)) throw $e;
     }
-    if ($matches === null) {
-      $guilds = Db::all("SELECT DISTINCT c.cgame game, c.guild guild FROM $chars c
-        WHERE c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''", []);
-      $current = null;
-      foreach ($guilds as $g) {
-        if (guild_id($source, $g['game'], $g['guild']) === $id) { $current = $id; break; }
-        if (guild_legacy_id($source, $g['game'], $g['guild']) === $id) $current ??= guild_id($source, $g['game'], $g['guild']);
-      }
-      $matches = $current === null ? [] : array_values(array_map(fn($g) => $g + ['id' => $current],
-        array_filter($guilds, fn($g) => guild_id($source, $g['game'], $g['guild']) === $current)));
+  }
+  if ($matches === null) {
+    $guilds = Db::all("SELECT DISTINCT c.cgame game, c.guild guild FROM $chars c
+      WHERE c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''", []);
+    $current = null;
+    foreach ($guilds as $g) {
+      if (guild_id($source, $g['game'], $g['guild']) === $id) { $current = $id; break; }
+      if (guild_legacy_id($source, $g['game'], $g['guild']) === $id) $current ??= guild_id($source, $g['game'], $g['guild']);
     }
-    if (!$matches) return $cache["$source-$id"] = null;
-    $current = $matches[0]['id'];
-    if (count(array_unique(array_column($matches, 'guild'))) > 1) throw new RuntimeException("Guild id $current is shared by two guilds");
-    $games = array_values(array_unique(array_column($matches, 'game')));
-    $marks = implode(',', array_fill(0, count($games), '?'));
-    $rows = Db::all("SELECT c.cgame game, c.guild guild, c.character_key ckey, c.name name, c.level level,
-        c.race race, c.class_file cf, c.zone zone, c.first_seen first_seen, c.last_seen last_seen
-      FROM $chars c WHERE c.rn=1 AND c.cgame IN ($marks) AND c.guild=?
-      ORDER BY c.level DESC NULLS LAST, c.name COLLATE \"C\"", [...$games, $matches[0]['guild']]);
-    $connected = $source === 'mop-classic';
-    return $cache["$source-$id"] = guild_rosters_from_rows($source, $rows, $connected, false, guild_member_specs($source, $rows, $connected))[$current] ?? null;
+    $matches = $current === null ? [] : array_values(array_map(fn($g) => $g + ['id' => $current],
+      array_filter($guilds, fn($g) => guild_id($source, $g['game'], $g['guild']) === $current)));
   }
-  try {
-    return $cache["$source-$id"] = Db::model("guild:$source-$id");
-  } catch (RuntimeException $e) {
-    if (!str_starts_with($e->getMessage(), 'Missing published model')) throw $e;
-    return $cache["$source-$id"] = null;
-  }
+  if (!$matches) return $cache["$source-$id"] = null;
+  $current = $matches[0]['id'];
+  if (count(array_unique(array_column($matches, 'guild'))) > 1) throw new RuntimeException("Guild id $current is shared by two guilds");
+  $games = array_values(array_unique(array_column($matches, 'game')));
+  $marks = implode(',', array_fill(0, count($games), '?'));
+  $rows = Db::all("SELECT c.cgame game, c.guild guild, c.character_key ckey, c.name name, c.level level,
+      c.race race, c.class_file cf, c.zone zone, c.first_seen first_seen, c.last_seen last_seen
+    FROM $chars c WHERE c.rn=1 AND c.cgame IN ($marks) AND c.guild=?
+    ORDER BY c.level DESC NULLS LAST, c.name COLLATE \"C\"", [...$games, $matches[0]['guild']]);
+  $connected = $source === 'mop-classic';
+  return $cache["$source-$id"] = guild_rosters_from_rows($source, $rows, $connected, guild_member_specs($source, $rows, $connected))[$current] ?? null;
 }
 
 /** The plain roster page. The 2008 skin draws its own; Retail and Pixel designs are still to come. */

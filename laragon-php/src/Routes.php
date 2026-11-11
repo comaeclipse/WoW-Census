@@ -1,7 +1,6 @@
 <?php
 // The published route set: every page, Markdown copy, data file and stylesheet
-// the site serves, as request paths. capture-page-data.php renders these to
-// collect the origin's query results, and render-routes.php writes them out for
+// the site serves, as request paths. render-routes.php writes them out for
 // tools that read rendered pages (the icon mirrors).
 
 declare(strict_types=1);

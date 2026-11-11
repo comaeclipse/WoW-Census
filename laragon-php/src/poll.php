@@ -10,7 +10,7 @@ header('Cache-Control: private, no-store');
 header('Cloudflare-CDN-Cache-Control: no-store');
 
 function poll_db(): PDO {
-  // Writable, like the shoutbox's store: the origin's page snapshot is read-only.
+  // A small SQLite file beside the shoutbox's store, apart from the PostgreSQL census data.
   $shoutbox = getenv('SHOUTBOX_DB_PATH');
   $path = getenv('POLL_DB_PATH') ?: ($shoutbox ? dirname($shoutbox) . '/poll.sqlite' : sys_get_temp_dir() . '/marketlens-poll.sqlite');
   $db = new PDO('sqlite:' . $path, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);

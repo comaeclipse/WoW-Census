@@ -66,8 +66,7 @@ function sort_desc_by(array $items, string $field): array {
 }
 
 // What one auction view shows: totals, the leading markets and the few items
-// its tables list. The compact origin publishes these rather than every item
-// of every view, which took more memory than the origin droplet has.
+// its tables list, so a page does not carry every item of every view.
 function market_view_summary(?array $snapshot, int|float $threshold): array {
   $all = $snapshot['items'] ?? [];
   $aggregateOnly = !empty($snapshot['aggregateOnly']);

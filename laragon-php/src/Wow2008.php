@@ -638,7 +638,7 @@ function talents_page(string $source, string $html): string {
     $builds[$k]["$cls|$spec"] = ($builds[$k]["$cls|$spec"] ?? 0) + 1;
   }
   // Class profiles omit unclassified builds and branches outside known specs.
-  // This compact snapshot fills those gaps without loading full inspections
+  // This small icon table fills those gaps without loading full inspections
   // into the memory-limited web worker.
   if (array_filter($picks, fn($pick) => !$pick[3])) {
     $fallback = json_decode(file_get_contents(TEMPLATE_DIR . '/talent-icon-fallback.json'), true)[$source] ?? [];

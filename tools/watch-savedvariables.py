@@ -13,8 +13,8 @@ written to PostgreSQL.
 
 --import-pg runs tools/import-savedvariables-pg.py into local PostgreSQL
 instead (the old behavior). With it, optional --check-icons renders local pages
-and checks their icons for a later manual site release. Publishing to the
-droplet is a separate step (upload.md).
+and checks their icons for a later manual site release. Publishing to
+wowcensus.io is a separate step (upload.md).
 Output goes to the console and to MarketLensData/imports/watch.log. Stop it with Ctrl+C.
 """
 
@@ -195,7 +195,7 @@ def main():
                 sources = [s for s in (match.group(1) if match else "").split(",") if s]
                 names = ", ".join(EDITION_NAMES.get(s, s) for s in sources)
                 if sources:
-                    notify("Imported into PostgreSQL", f"New {names} data is in local PostgreSQL. The droplet updates only when published.")
+                    notify("Imported into PostgreSQL", f"New {names} data is in local PostgreSQL. The live site updates only when published.")
                 elif not startup:
                     notify("WoW save checked", "Nothing new to import; that save was already in PostgreSQL.")
                 startup = False

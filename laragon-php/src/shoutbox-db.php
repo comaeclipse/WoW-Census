@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 function shout_db(): PDO {
-  // Separate writable store: the origin's published page snapshot is read-only.
+  // A small SQLite file of its own, apart from the PostgreSQL census data.
   $path = getenv('SHOUTBOX_DB_PATH') ?: sys_get_temp_dir() . '/marketlens-shoutbox.sqlite';
   $db = new PDO('sqlite:' . $path, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 5]);
   $db->exec('PRAGMA busy_timeout = 5000');

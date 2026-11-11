@@ -1,6 +1,6 @@
 <?php
 // Contact form at /contact. index.php hands the request here; nginx refuses
-// every other *.php path. The droplet cannot reach SMTP (DigitalOcean blocks
+// every other *.php path. The server cannot reach SMTP (DigitalOcean blocks
 // it), so mail goes out through Resend's HTTPS API.
 //
 // Settings come from the PHP-FPM pool (env[...] in pool.d/wowcensus.conf):

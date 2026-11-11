@@ -1,6 +1,6 @@
 <?php
-// Password-protected admin portal: the collection status page, read from the
-// origin's published snapshot. The password_hash() output comes from
+// Password-protected admin portal: the collection status page, read live from
+// PostgreSQL. The password_hash() output comes from
 // ADMIN_PASSWORD_HASH or the file ADMIN_PASSWORD_HASH_FILE names; without
 // either the portal does not exist.
 declare(strict_types=1);
@@ -8,6 +8,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/CollectionStats.php';
 require_once __DIR__ . '/CollectionWhoHeatmapPage.php';
 require_once __DIR__ . '/AdminShoutbox.php';
+require_once __DIR__ . '/AdminCache.php';
 require_once __DIR__ . '/visitor-ip.php';
 
 const ADMIN_IDLE = 43200;       // a session ends after 12 idle hours
@@ -136,7 +137,7 @@ $_SESSION['seen'] = time();
 $chrome = '<div class="chrome"><a class="back" href="/">← WoWCensus</a>'
   . '<form method="post" action="/admin/"><input type="hidden" name="action" value="logout">'
   . '<input type="hidden" name="csrf" value="' . cs_h(admin_csrf()) . '"><button type="submit">Sign out</button></form></div>';
-$shoutLink = '<a href="/admin/?view=shoutbox">Shoutbox</a>';
+$shoutLink = '<a href="/admin/?view=shoutbox">Shoutbox</a><a href="/admin/?view=cache">Cache stats</a>';
 
 // Shoutbox moderation: POST, act, then redirect back (post/redirect/get) with a one-time message.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && preg_match('/^(shout|poster)-/', (string)($_POST['action'] ?? ''))) {
@@ -153,12 +154,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && preg_match('/^(shout|poster)-/', (s
   header('Location: ' . $return, true, 303);
   exit;
 }
+// Cache stats: one clean-up action, then back to the page (post/redirect/get).
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && str_starts_with((string)($_POST['action'] ?? ''), 'cache-')) {
+  $_SESSION['flash'] = !admin_csrf_ok() ? 'Your session expired. Try again.'
+    : ($_POST['action'] === 'cache-apcu-drop-old' ? ac_apcu_drop_old() : 'Unknown action.');
+  header('Location: /admin/?view=cache', true, 303);
+  exit;
+}
+if (($_GET['view'] ?? '') === 'cache') {
+  $flash = (string)($_SESSION['flash'] ?? '');
+  unset($_SESSION['flash']);
+  session_write_close();  // the page-cache scan can take seconds; do not hold the session lock
+  set_time_limit(120);
+  $nav = $chrome . '<nav class="view-nav" aria-label="Admin view">'
+    . '<a href="/admin/">Daily history</a><a href="/admin/?view=who-hours">/who time heatmap</a>'
+    . '<a href="/admin/?view=shoutbox">Shoutbox</a><a href="/admin/?view=cache" aria-current="page">Cache stats</a></nav>';
+  echo render_admin_cache($nav, admin_csrf(), $flash);
+  exit;
+}
 if (($_GET['view'] ?? '') === 'shoutbox') {
   $flash = (string)($_SESSION['flash'] ?? '');
   unset($_SESSION['flash']);
   $nav = $chrome . '<nav class="view-nav" aria-label="Admin view">'
     . '<a href="/admin/">Daily history</a><a href="/admin/?view=who-hours">/who time heatmap</a>'
-    . '<a href="/admin/?view=shoutbox" aria-current="page">Shoutbox</a></nav>';
+    . '<a href="/admin/?view=shoutbox" aria-current="page">Shoutbox</a><a href="/admin/?view=cache">Cache stats</a></nav>';
   try {
     echo render_admin_shoutbox(shout_db(), $nav, admin_csrf(), $flash);
   } catch (Throwable $e) {
@@ -174,9 +193,9 @@ try {
 } catch (Throwable $e) {
   http_response_code(500);
   error_log((string)$e);
-  exit('Collection status is not in the published snapshot. Publish a fresh capture.');
+  exit('Collection status could not be read from the database.');
 }
-$note = getenv('ML_QUERY_CACHE') === '1' ? 'From the published snapshot; refreshes with each data deploy.' : 'Live from PostgreSQL.';
+$note = 'Live from PostgreSQL.';
 $region = (string)($_GET['region'] ?? 'both');
 if (($_GET['view'] ?? '') === 'who-hours') {
   echo render_collection_heatmap_page($snapshot, $region, (string)($_GET['time'] ?? 'local'), '/admin/', $chrome, $note, $shoutLink);

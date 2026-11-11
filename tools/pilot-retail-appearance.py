@@ -1,16 +1,15 @@
 """Sample local Retail characters against Blizzard's appearance API.
 
 Set BLIZZARD_CLIENT_ID and BLIZZARD_CLIENT_SECRET in the process environment.
-Usage: python tools/pilot-retail-appearance.py DB_PATH [--limit 100] [--output PATH]
-       python tools/pilot-retail-appearance.py --candidates-json PATH --profile-race --limit 500 --output PATH
-The output is local JSON; this command never changes the source database.
+Usage: python tools/pilot-retail-appearance.py --candidates-json PATH --profile-race --limit 500 --output PATH
+The candidates file lists name, realm, race, level and region rows selected from
+PostgreSQL. The output is local JSON; this command never changes a database.
 """
 
 import argparse
 import base64
 import json
 import os
-import sqlite3
 import time
 import urllib.error
 import urllib.parse
@@ -46,8 +45,7 @@ def request_json(url, *, token=None, auth=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("database", nargs="?", type=Path)
-    parser.add_argument("--candidates-json", type=Path, help="Preselected name, realm, race, level rows")
+    parser.add_argument("--candidates-json", type=Path, required=True, help="Preselected name, realm, race, level rows")
     parser.add_argument("--profile-race", action="store_true", help="Verify the current race from the character profile")
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--per-race", type=int, help="Select this many new characters per Retail race")
@@ -55,8 +53,6 @@ def main():
                         help="Skip names and realms in an earlier pilot report; repeat as needed")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    if (args.database is None) == (args.candidates_json is None):
-        parser.error("provide either a database or --candidates-json")
     if not 1 <= args.limit <= 500:
         parser.error("--limit must be between 1 and 500")
     if args.per_race is not None and not 1 <= args.per_race <= 100:
@@ -65,18 +61,10 @@ def main():
     client_secret = os.getenv("BLIZZARD_CLIENT_SECRET")
     if not client_id or not client_secret:
         parser.error("set BLIZZARD_CLIENT_ID and BLIZZARD_CLIENT_SECRET")
-    if args.candidates_json:
-        document = json.loads(args.candidates_json.read_text(encoding="utf-8-sig"))
-        source_rows = document["candidates"] if isinstance(document, dict) else document
-        candidates = [(x["name"], x["realm"], x["race"], x.get("level"), x.get("region", "us"))
-                      for x in source_rows]
-    else:
-        db = sqlite3.connect(f"file:{args.database.resolve().as_posix()}?mode=ro", uri=True)
-        # One deterministic, recent sample across the available Retail realms.
-        candidates = [(*row, "us") for row in db.execute("""SELECT name, realm, race, level FROM characters
-            WHERE source_game='retail' AND level>=10 AND name<>'' AND realm<>''
-            GROUP BY lower(name), lower(realm)
-            ORDER BY MAX(last_seen) DESC""").fetchall()]
+    document = json.loads(args.candidates_json.read_text(encoding="utf-8-sig"))
+    source_rows = document["candidates"] if isinstance(document, dict) else document
+    candidates = [(x["name"], x["realm"], x["race"], x.get("level"), x.get("region", "us"))
+                  for x in source_rows]
     excluded = set()
     for report in args.exclude_report:
         prior = json.loads(report.read_text(encoding="utf-8"))

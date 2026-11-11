@@ -2,8 +2,6 @@
 tools/.mltoken
 .mltoken
 
-# Wrangler local state / build cache
-
 # Secrets / local env
 .env
 *.env
@@ -16,9 +14,6 @@ node_modules/
 # Python tooling
 __pycache__/
 *.pyc
-
-# Locally rendered Pages output; private SQLite data stays outside the repo.
-/pages/
 
 # OS / editor junk
 .DS_Store
@@ -35,7 +30,6 @@ scratch/
 capture-compatible-*/
 dist/
 *.zip
-.wrangler/
 /*.png
 /stress-test/
 /social/

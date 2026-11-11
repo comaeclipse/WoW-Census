@@ -2,7 +2,7 @@
 
 How the six WoWCensus editions map to internal keys, WoW install folders, site paths and the realms
 we collect from. The internal keys (`source_game`) date from before the editions were renamed. They are
-still used in D1/SQLite rows, SavedVariables buckets and tool flags, but the UI shows only the edition names.
+still used in database rows, SavedVariables buckets and tool flags, but the UI shows only the edition names.
 The definitions are in `site/src/edition.mjs` (`EDITIONS`).
 
 ## Editions

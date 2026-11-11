@@ -1,5 +1,5 @@
 <?php
-// Render one route from CLI for full-versus-compact output comparison.
+// Render one route from the command line, e.g. to diff a page before and after a change.
 declare(strict_types=1);
 if ($argc !== 2) {
   fwrite(STDERR, "Usage: php render-route.php <route>\n");

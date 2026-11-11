@@ -11,9 +11,9 @@ halves:
   samples the online population via `/who` (class, race, an inferred profession
   demand ranking, and unique/returning-character metrics).
 - **The companion website** (wowcensus.io) — PHP pages (`laragon-php/`)
-  rendered from the collected data. Saves are imported into a local PostgreSQL
-  database; the DigitalOcean droplet serves a SQLite snapshot of the published
-  query results.
+  rendered on request from PostgreSQL. Saves are imported into the local
+  PostgreSQL database and, to publish, into the production server's own
+  PostgreSQL database.
 
 Everything is collected from the game's own APIs. WoW-Census is rigorous about
 never claiming data it cannot observe — see *What it measures* below.
@@ -30,13 +30,26 @@ MarketLens/   the in-game addon — drop this folder into Interface/AddOns
   UI/         MainFrame (drill-down engine), tables, Population, Tooltips, Minimap
   Utils/      Tables (stats), Money (copper formatting)
   Libs/       embedded LibStub + LibAHTab (native AH tab on modern clients)
-site/src/     shared page renderers and inspect/census model code
-laragon-php/  the website: PHP renderer, 2008/Retail/Pixel skins, origin packaging
+WoWCensus/    the census-only addon (see WoWCensus/README.md)
+laragon-php/  the website: PHP renderer, skins, release packaging, server script copies
+site/src/     browser scripts, templates and talent catalogs the PHP site reads
 site/public/  stylesheet, fonts, and favicons the PHP site serves
 tools/        SavedVariables import into PostgreSQL, icon and catalog updaters
 assets/       mirrored site images (icons) the PHP site serves
 archive/      early prototypes
 ```
+
+## Documentation
+
+| File | What it covers |
+| --- | --- |
+| `README.md` (this file) | The addon: install, commands, what it measures |
+| `laragon-php/README.md` | The website: where it lives locally and in production, releases, caches, admin, shoutbox |
+| `ingest.md` | Runbook: validate collected saves and import them into local PostgreSQL |
+| `upload.md` | Runbook: publish data and code to wowcensus.io (kept local, not committed) |
+| `servermap.md` | Edition names, internal keys, install folders, site paths and realms |
+| `DESIGN.md` | Visual design rules for the site |
+| `tools/CHARACTER_APPEARANCE.md` | Retail appearance sampling and its tables |
 
 ## Install (addon)
 
@@ -143,7 +156,7 @@ or for the Auction House to close; it does not invent a client-side timeout.
 ### Retail data workflow
 
 `/reload`, open the Retail Auction House, run `/ml scan`, and wait for the
-summary scan to complete. Run `/reload` again to flush the export to disk. To update the companion site, follow `upload.md`: import the save into PostgreSQL, check the pages on the local PHP site, then publish a new SQLite snapshot to the droplet.
+summary scan to complete. Run `/reload` again to flush the export to disk. To update the companion site, follow `ingest.md` and `upload.md`: import the save into local PostgreSQL, check the pages on the local PHP site, then run the same import against the live database.
 
 The first scan immediately supplies market, minimum buyout, quantity, and
 saturation. Demand, local supply, and price trends become meaningful after
@@ -275,15 +288,16 @@ to keep `SavedVariables` small.
 The website is the PHP site in `laragon-php/`. WoW saves (`MarketLens.lua` and
 `NameplateInspect.lua`, or `WoWCensus.lua`) are imported into the local
 PostgreSQL database, which is the source of truth; `http://127.0.0.1:8081/`
-renders every page from it on request. wowcensus.io is a DigitalOcean droplet
-running the same PHP against a SQLite snapshot of only the query results the
-published pages need. `upload.md` has the import and publishing steps, and
-`laragon-php/README.md` the snapshot capture and the origin's setup.
+renders every page from it on request. wowcensus.io is a server running the
+same PHP against its own PostgreSQL database, which the same importers write
+to over an SSH tunnel. `ingest.md` and `upload.md` have the import and
+publishing steps, and `laragon-php/README.md` says where everything lives
+locally and on the server.
 
 Inspection records retain verified same-realm context (otherwise unknown), observer
 context, locale and client build. Existing schema v1 cache records remain usable; missing realm/faction is not
 inferred from the observer. MarketLens copies contextual builds into its realm store.
-The local snapshot importer reads the companion SavedVariables file directly,
+The importer reads the companion SavedVariables file directly,
 preserving legacy records too. It does not import the old `specSamples`
 placeholder classifications.
 

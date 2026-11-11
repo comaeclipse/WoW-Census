@@ -6,8 +6,7 @@
 
 PostgreSQL is the source of truth: each run adds only what is new. A save file
 whose SHA-256 was already imported is skipped, and changed files go through the
-same import functions as tools/build-local-database.py (loaded from that file,
-so both importers stay one implementation). Every changed file is archived
+import functions in tools/import-functions.py. Every changed file is archived
 under MarketLensData/imports/<UTC time>/; local_source_files records its
 hash, path and size (the contents live only in that archive).
 
@@ -46,17 +45,17 @@ DEFAULT_DSN = os.environ.get("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbna
 FLAVORS = ("_anniversary_", "_classic_", "_classic_beta_", "_classic_era_", "_forever_", "_retail_")
 FOREVER_LAUNCH_UTC = datetime(2026, 11, 4, 23, 0, tzinfo=timezone.utc)
 
-spec = importlib.util.spec_from_file_location("build_local_database", REPO / "tools" / "build-local-database.py")
+spec = importlib.util.spec_from_file_location("import_functions", REPO / "tools" / "import-functions.py")
 legacy = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(legacy)
 
 
 def translate(sql):
-    """Rewrite the SQLite importer's statements for PostgreSQL."""
+    """Rewrite the import functions' statements (tools/import-functions.py) for PostgreSQL."""
     sql = sql.replace("%", "%%").replace("?", "%s")
     if re.search(r"INSERT\s+OR\s+IGNORE\s+INTO", sql):
         sql = re.sub(r"INSERT\s+OR\s+IGNORE\s+INTO", "INSERT INTO", sql).rstrip() + " ON CONFLICT DO NOTHING"
-    # SQLite's two-argument MIN()/MAX() are PostgreSQL's LEAST()/GREATEST().
+    # Two-argument MIN()/MAX() are PostgreSQL's LEAST()/GREATEST().
     out, i = [], 0
     for m in re.finditer(r"\b(MIN|MAX)\(", sql):
         start = m.end()
@@ -75,10 +74,10 @@ def translate(sql):
 
 
 class PgDb:
-    """The slice of sqlite3.Connection the import functions use."""
+    """The connection interface the import functions use (execute, executemany, fetch)."""
 
-    # The import functions may then read only the rows a file can touch (see
-    # inspect_candidates); the SQLite builder keeps reading whole tables.
+    # The import functions read only the rows a file can touch (see
+    # inspect_candidates) instead of whole tables.
     narrow_reads = True
 
     def __init__(self, conn):
@@ -349,7 +348,7 @@ def main():
     if not clients:
         raise SystemExit(f"No MarketLens or WoWCensus SavedVariables found in {args.game_root}")
 
-    # 2. Realm buckets from each new MarketLens.lua (same steps as build-local-database.py).
+    # 2. Realm buckets from each new MarketLens.lua (the functions in import-functions.py).
     for client in clients:
         market = client["market"]
         if not market["new"]:

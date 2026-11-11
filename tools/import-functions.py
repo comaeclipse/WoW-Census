@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""Merge an archived D1 snapshot and WoW SavedVariables into local SQLite.
+"""Import functions shared by the PostgreSQL importers. Not a command.
 
-Usage: python tools/build-local-database.py <phase-one snapshot directory>
-The original D1 SQLite file and Lua copies are never modified. Reruns skip
-already imported source hashes and preserve older observations.
+tools/import-savedvariables-pg.py, tools/import-forever-ah-csv-pg.py and the
+repair scripts load this file and call its functions with a database adapter
+(PgDb in import-savedvariables-pg.py). The statements here use `?` placeholders,
+INSERT OR IGNORE and two-argument MIN()/MAX(); the adapter's translate()
+rewrites those for PostgreSQL.
 """
 
 import hashlib
 import json
 import re
-import shutil
-import sqlite3
 import subprocess
-import sys
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
@@ -116,45 +115,6 @@ def source_for(flavor, bucket):
             return game, SOURCES[game]
     normalized = FLAVORS[flavor]
     return normalized, SOURCES[normalized]
-
-
-def setup(db):
-    db.executescript("""
-    CREATE TABLE IF NOT EXISTS local_source_files (
-      sha256 TEXT PRIMARY KEY, relative_path TEXT NOT NULL,
-      source_modified_utc TEXT NOT NULL, bytes INTEGER NOT NULL,
-      content BLOB NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS local_imports (
-      source_sha256 TEXT NOT NULL, kind TEXT NOT NULL, bucket TEXT NOT NULL,
-      source_game TEXT NOT NULL, imported_at_utc TEXT NOT NULL,
-      details_json TEXT NOT NULL,
-      PRIMARY KEY (source_sha256, kind, bucket)
-    );
-    CREATE TABLE IF NOT EXISTS local_auction_snapshots (
-      source_game TEXT NOT NULL, game TEXT NOT NULL, item_id INTEGER NOT NULL,
-      captured_at INTEGER NOT NULL, name TEXT, category TEXT, item_source TEXT,
-      crafter TEXT, quantity INTEGER, auctions INTEGER, sellers INTEGER,
-      lowest INTEGER, median INTEGER, weighted_average INTEGER,
-      top_seller_concentration INTEGER, source_sha256 TEXT NOT NULL,
-      PRIMARY KEY (source_game, game, item_id, captured_at)
-    );
-    CREATE INDEX IF NOT EXISTS idx_local_auction_game_time
-      ON local_auction_snapshots(source_game, game, captured_at DESC);
-    """)
-
-
-def record_source(db, root, path, manifest):
-    relative = path.relative_to(root / "savedvariables").as_posix()
-    expected = manifest[relative.replace("/", "\\")]
-    digest = sha256(path)
-    if digest != expected["sha256"].lower() or path.stat().st_size != expected["bytes"]:
-        raise RuntimeError(f"SavedVariables copy changed: {relative}")
-    if not db.execute("SELECT 1 FROM local_source_files WHERE sha256=?", (digest,)).fetchone():
-        db.execute("INSERT INTO local_source_files VALUES (?,?,?,?,?)", (
-            digest, relative, expected["sourceLastWriteUtc"],
-            expected["bytes"], sqlite3.Binary(path.read_bytes())))
-    return digest
 
 
 def already(db, digest, kind, bucket):
@@ -563,97 +523,3 @@ def import_inspects(db, body, source):
     return {"selected": body["selected"], "rejected": body["rejected"],
             "valid": added, "talentNodes": nodes, "linked": linked,
             "unmatched": unmatched, "ambiguous": ambiguous}
-
-
-def main():
-    if len(sys.argv) != 2:
-        raise SystemExit(__doc__)
-    root = Path(sys.argv[1]).resolve()
-    base = root / "d1" / "marketlens.sqlite"
-    target = root / "marketlens-unified.sqlite"
-    if not base.is_file():
-        raise SystemExit(f"Missing verified D1 SQLite snapshot: {base}")
-    if not target.exists():
-        shutil.copy2(base, target)
-    db = sqlite3.connect(target)
-    db.execute("PRAGMA journal_mode=WAL")
-    setup(db)
-    files = json.loads((root / "savedvariables-manifest.json").read_text(encoding="utf-8-sig"))
-    manifest = {item["relativePath"]: item for item in files}
-    realm_inventory = json.loads((root / "savedvariables-realms.json").read_text(encoding="utf-8-sig"))
-    report = {"database": str(target), "sources": [], "buckets": [], "inspections": [],
-              "errors": []}
-    for item in files:
-        path = root / "savedvariables" / item["relativePath"]
-        with db:
-            digest = record_source(db, root, path, manifest)
-        report["sources"].append({"file": item["relativePath"], "sha256": digest})
-    for entry in realm_inventory:
-        path = root / "savedvariables" / entry["file"]
-        digest = sha256(path)
-        for bucket in entry["realms"]:
-            flavor, source = source_for(entry["flavor"], bucket)
-            result = {"flavor": flavor, "source": source, "bucket": bucket}
-            for kind, extra, importer in (
-                ("market", [], lambda body: import_market(db, body, digest, source)),
-                ("population", ["--population", f"--flavor={flavor}"],
-                 lambda body: import_population(db, body, source)),
-                ("sellers", ["--sellers"], lambda body: import_sellers(db, body, source)),
-            ):
-                if already(db, digest, kind, bucket):
-                    result[kind] = "already imported"
-                    continue
-                try:
-                    body = run_node(EXPORT_REALM, path, f"--realm={bucket}", *extra)
-                    with db:
-                        details = importer(body)
-                        log_import(db, digest, kind, bucket, source, details)
-                    result[kind] = details
-                except RuntimeError as exc:
-                    # The source helper uses nonzero exit for empty AH/seller/pop data.
-                    if "zero items" in str(exc) or "no seller data" in str(exc) or "zero data" in str(exc):
-                        result[kind] = "no captured data"
-                    else:
-                        report["errors"].append({"bucket": bucket, "kind": kind, "error": str(exc)})
-                        result[kind] = "ERROR"
-                except Exception as exc:
-                    report["errors"].append({"bucket": bucket, "kind": kind, "error": str(exc)})
-                    result[kind] = "ERROR"
-            report["buckets"].append(result)
-            print(f"{flavor:18} {bucket}: market={result['market'] != 'ERROR'} "
-                  f"population={result['population'] != 'ERROR'} sellers={result['sellers'] != 'ERROR'}",
-                  flush=True)
-    for entry in realm_inventory:
-        flavor = entry["flavor"]
-        sources = ["classic", "sod", "hardcore"] if flavor == "_classic_era_" else [SOURCES[FLAVORS[flavor]]]
-        path = (root / "savedvariables" / entry["file"]).with_name("NameplateInspect.lua")
-        digest = sha256(path)
-        for source in sources:
-            if already(db, digest, "inspections", source):
-                continue
-            try:
-                body = run_node(EXPORT_INSPECTS, path, source)
-                with db:
-                    details = import_inspects(db, body, source)
-                    log_import(db, digest, "inspections", source, source, details)
-                report["inspections"].append({"source": source, **details})
-                print(f"inspections {source}: {details}", flush=True)
-            except Exception as exc:
-                report["errors"].append({"source": source, "kind": "inspections", "error": str(exc)})
-    with db:
-        report["realmNamesRepaired"] = repair_realm_names(db)
-    for change, count in report["realmNamesRepaired"].items():
-        print(f"realm repaired {change} ({count} rows)", flush=True)
-    report["integrityCheck"] = db.execute("PRAGMA integrity_check").fetchone()[0]
-    report["tables"] = {name: db.execute(f'SELECT COUNT(*) FROM "{name}"').fetchone()[0]
-                        for (name,) in db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")}
-    db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
-    db.close()
-    (root / "phase-two-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"integrity={report['integrityCheck']} errors={len(report['errors'])} db={target}")
-    if report["errors"] or report["integrityCheck"] != "ok":
-        raise SystemExit(1)
-
-
-if __name__ == "__main__":
-    main()

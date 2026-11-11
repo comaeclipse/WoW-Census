@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Repair two importer bugs in PostgreSQL, fixed in tools/build-local-database.py.
+"""Repair two importer bugs in PostgreSQL, fixed in tools/import-functions.py.
 
     python -B tools/repair-era-editions-and-inspects-pg.py            # dry run: counts, then roll back
     python -B tools/repair-era-editions-and-inspects-pg.py --apply
@@ -25,7 +25,7 @@ import psycopg2
 DEFAULT_DSN = os.environ.get("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbname=marketlens_local user=skarz")
 REPO = Path(__file__).resolve().parent.parent
 
-spec = importlib.util.spec_from_file_location("build_local_database", REPO / "tools" / "build-local-database.py")
+spec = importlib.util.spec_from_file_location("import_functions", REPO / "tools" / "import-functions.py")
 legacy = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(legacy)
 
