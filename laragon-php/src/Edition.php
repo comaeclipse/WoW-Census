@@ -224,6 +224,43 @@ function edition_pane_html(string $source, string $page, string $realm, string $
 
 /** $only = [realm key, faction key] builds just that view (a lazily loaded pane). */
 function model_guilds_geography(string $source, string $page, ?array $only = null): array {
+  // Memoized: a page render and its skin (the 2008 skin rebuilds the first view) share one
+  // build; Forever's full guilds model costs ~7 s of PHP.
+  static $memo = [];
+  $memoKey = $source . "
+" . $page . "
+" . ($only === null ? '*' : implode("
+", $only));
+  if (isset($memo[$memoKey])) return $memo[$memoKey];
+  return $memo[$memoKey] = build_guilds_geography($source, $page, $only);
+}
+
+/**
+ * The model a guilds or geography page renders. With lazy panes (view_panes) only the view on
+ * show (first realm, first faction) is built; the others are stubs whose panes load on demand.
+ */
+function guilds_geography_page_model(string $source, string $page): array {
+  ['dims' => $dims] = edition_dims($source);
+  $realms = $dims['realm'] ?? []; $factions = $dims['faction'] ?? [];
+  if (!$realms || !$factions || count($realms) * count($factions) < LAZY_PANES_FROM || pane_url($page) === null)
+    return model_guilds_geography($source, $page);
+  $first = [$realms[0]['key'], $factions[0]['key']];
+  $model = model_guilds_geography($source, $page, $first);
+  $built = $model['views'][0] ?? null;
+  $views = [];
+  foreach ($realms as $r) foreach ($factions as $f)
+    $views[] = $built && [$r['key'], $f['key']] === $first ? $built : ['realm' => $r['key'], 'faction' => $f['key'], 'snapshot' => null];
+  return ['views' => $views] + $model;
+}
+
+/** The first view (first realm, first faction) only: what the 2008 skin shows. */
+function guilds_geography_first_view(string $source, string $page): ?array {
+  ['dims' => $dims] = edition_dims($source);
+  $first = [($dims['realm'][0]['key'] ?? 'all'), ($dims['faction'][0]['key'] ?? 'all')];
+  return model_guilds_geography($source, $page, $first)['views'][0] ?? null;
+}
+
+function build_guilds_geography(string $source, string $page, ?array $only): array {
   $census = load_census($source);
   ['dims' => $dims] = edition_dims($source);
   $views = [];
@@ -418,10 +455,10 @@ function render_edition_page(string $source, string $page, string $stylesheet, s
         'tbcAnalysis' => $source === 'classic-progression',
       ]);
     case 'guilds':
-      $model = model_guilds_geography($source, 'guilds');
+      $model = guilds_geography_page_model($source, 'guilds');
       return render_guild_html($model['views'], $model['dims'], $common + ['notes' => ['Latest census observation: ' . utc_timestamp($model['lastT'])]]);
     case 'geography':
-      $model = model_guilds_geography($source, 'geography');
+      $model = guilds_geography_page_model($source, 'geography');
       return render_geography_html($model['views'], $model['dims'], $common + ['notes' => ['Latest location observation: ' . utc_timestamp($model['lastT'])]]);
     case 'talents':
       $packed = talent_page_model($source);

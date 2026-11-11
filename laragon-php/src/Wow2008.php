@@ -692,7 +692,7 @@ function realm_label_map(array $realms): array {
 const REALM_PALETTE = ['#c9a050', '#8a5ac8', '#3aa060', '#4a8ad0', '#d0603a', '#3ab0b0', '#b04a8a', '#8aa030', '#a07050', '#6a6ad0'];
 
 function guilds_page(string $source, string $html): string {
-  $snap = \model_guilds_geography($source, 'guilds')['views'][0]['snapshot'];
+  $snap = \guilds_geography_first_view($source, 'guilds')['snapshot'] ?? [];
   // Forever's collector realm numbers are meaningless to players: group them by
   // region and type, the way the realms page does ("US PvE").
   $groupLabels = [];
@@ -750,7 +750,7 @@ function guild_page(string $source, array $g, string $html): string {
 }
 
 function geography_page(string $source, string $html): string {
-  $snap = \model_guilds_geography($source, 'geography')['views'][0]['snapshot'];
+  $snap = \guilds_geography_first_view($source, 'geography')['snapshot'] ?? [];
   $zones = array_values(array_filter($snap['zones'] ?? [], fn($z) => $z['name'] !== 'Unknown'));
   $total = ($snap['characters'] ?? 0) ?: array_sum(array_column($zones, 'characters'));
   $observedMax = 0;
