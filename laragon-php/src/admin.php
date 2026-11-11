@@ -188,28 +188,40 @@ if (($_GET['view'] ?? '') === 'shoutbox') {
   exit;
 }
 
-// The activity model takes ~9 s to build and does not need to be live. APCu
-// keeps the last build for a day; every load is served from it, and one older
-// than ADMIN_MODEL_FRESH is rebuilt after the page has been sent, so only the
-// first load after a PHP-FPM restart waits. ?refresh=1 rebuilds it now.
+// The activity model takes ~9 s to build and does not need to be live. The last
+// build is kept in a file (not APCu, which clears everything when it fills up);
+// every load is served from it, and one older than ADMIN_MODEL_FRESH is rebuilt
+// after the page has been sent. ?refresh=1 rebuilds it now.
 const ADMIN_MODEL_FRESH = 900;
-const ADMIN_MODEL_KEEP = 86400;
-const ADMIN_MODEL_KEY = 'ml:admin:activity-model';
+
+function admin_model_file(): string {
+  return sys_get_temp_dir() . '/wowcensus-admin-model.ser';
+}
+
+function admin_model_read(): ?array {
+  $raw = @file_get_contents(admin_model_file());
+  $model = $raw === false ? false : @unserialize($raw, ['allowed_classes' => false]);
+  return is_array($model) && isset($model['generated_at'], $model['rows']) ? $model : null;
+}
 
 function admin_build_model(): array {
   $model = collection_activity_model();
-  if (ac_apcu_on() && !apcu_store(ADMIN_MODEL_KEY, $model, ADMIN_MODEL_KEEP)) error_log('admin: APCu would not store the activity model');
+  $file = admin_model_file();
+  $tmp = $file . '.' . getmypid() . '.tmp';
+  if (file_put_contents($tmp, serialize($model)) === false || !rename($tmp, $file)) {
+    @unlink($tmp);
+    error_log('admin: could not write ' . $file);
+  }
   return $model;
 }
 
-$snapshot = null;
+$started = microtime(true);
 $refresh = isset($_GET['refresh']);
-if (!$refresh && ac_apcu_on()) {
-  $hit = apcu_fetch(ADMIN_MODEL_KEY, $ok);
-  if ($ok && is_array($hit)) $snapshot = $hit;
-}
+$snapshot = $refresh ? null : admin_model_read();
+$source = 'file';
 if ($snapshot === null) {
   session_write_close();  // building the model can take seconds; do not hold the session lock
+  $source = 'PostgreSQL';
   try {
     $snapshot = admin_build_model();
   } catch (Throwable $e) {
@@ -224,9 +236,12 @@ if ($refresh) {
   header('Location: /admin/' . ($q ? '?' . http_build_query($q) : ''), true, 303);
   exit;
 }
+$loadMs = (int)round((microtime(true) - $started) * 1000);
+header('Server-Timing: model;desc="' . $source . '";dur=' . $loadMs);
 $age = max(0, time() - (int)$snapshot['generated_at']);
-$note = $age < 60 ? 'Read from PostgreSQL just now.'
-  : 'Cached ' . intdiv($age, 60) . ' min ago' . ($age >= ADMIN_MODEL_FRESH ? '; refreshing in the background, reload in ~10 s.' : '.');
+$note = ($age < 60 ? 'Read from PostgreSQL just now' : 'Cached ' . intdiv($age, 60) . ' min ago')
+  . ' (data loaded from ' . $source . ' in ' . number_format($loadMs) . ' ms)'
+  . ($age >= ADMIN_MODEL_FRESH ? '; refreshing in the background, reload in ~10 s.' : '.');
 $refreshQuery = $_GET;
 $refreshQuery['refresh'] = '1';
 $shoutLink .= '<a href="/admin/?' . cs_h(http_build_query($refreshQuery)) . '">Refresh data</a>';
@@ -241,13 +256,13 @@ if (($_GET['view'] ?? '') === 'who-hours') {
 }
 
 // A stale model: finish the response, then rebuild it once (the lock stops parallel rebuilds).
-if ($age >= ADMIN_MODEL_FRESH && ac_apcu_on() && apcu_add(ADMIN_MODEL_KEY . ':lock', 1, 120)) {
+if ($age >= ADMIN_MODEL_FRESH && ($lock = fopen(admin_model_file() . '.lock', 'c')) && flock($lock, LOCK_EX | LOCK_NB)) {
   session_write_close();
   if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
   try {
-    admin_build_model();
+    if ((int)(admin_model_read()['generated_at'] ?? 0) <= (int)$snapshot['generated_at']) admin_build_model();
   } catch (Throwable $e) {
     error_log('admin background refresh: ' . $e);
   }
-  apcu_delete(ADMIN_MODEL_KEY . ':lock');
+  flock($lock, LOCK_UN);
 }
