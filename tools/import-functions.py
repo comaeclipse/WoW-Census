@@ -189,7 +189,8 @@ def import_market(db, body, digest, source):
             continue
         unit = int(last[5] or last[6] or 0)
         quantity = int(last[1] or 0)
-        pq = int(snapshots[-2][1] or 0) if len(snapshots) > 1 else (prior[2] if prior else None)
+        # prior is (updated_at, q, pq): a one-point scan (every Forever AH CSV) compares with the row's q.
+        pq = int(snapshots[-2][1] or 0) if len(snapshots) > 1 else (prior[1] if prior else None)
         sellers = int(last[3] or 0) if body.get("capabilities", {}).get("sellers") is not False else None
         top = int(last[7] or 0) if sellers is not None else None
         item_rows.append((

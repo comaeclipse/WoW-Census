@@ -88,10 +88,11 @@ function merge_items(array $perRealm): array {
     foreach ($snap['items'] as $row) {
       $id = $row[$iId];
       $cur = $byId[$id] ?? ['id' => $id, 'name' => $row[$iName], 'cat' => $row[$iCat], 'q' => 0, 'pq' => 0,
-        'hasPreviousQty' => true, 'mv' => 0, 'asp' => 0];
+        'hasPreviousQty' => false, 'mv' => 0, 'asp' => 0];
       $cur['q'] += $row[$iQ] ?: 0;
-      if ($iPq < 0 || $row[$iPq] === null) $cur['hasPreviousQty'] = false;
-      else $cur['pq'] += $row[$iPq] ?: 0;
+      // A realm with no earlier scan counts as unchanged, so one new realm doesn't blank the merged change.
+      if ($iPq < 0 || $row[$iPq] === null) $cur['pq'] += $row[$iQ] ?: 0;
+      else { $cur['pq'] += $row[$iPq] ?: 0; $cur['hasPreviousQty'] = true; }
       $cur['mv'] += $row[$iMv] ?: 0;
       if (preg_match('/^item:\d+$/', (string)$cur['name']) && !preg_match('/^item:\d+$/', (string)$row[$iName])) $cur['name'] = $row[$iName];
       if (!$cur['cat']) $cur['cat'] = $row[$iCat];
