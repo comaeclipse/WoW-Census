@@ -13,6 +13,7 @@
 .realm-table tbody tr[aria-selected="true"] .rname{color:var(--gold)}
 .realm-table tbody tr:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
 .rname{color:var(--ink)}
+a.rname{text-decoration:none}a.rname:hover{text-decoration:underline}
 .rtag{display:block;font-family:var(--pixel);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:4px}
 .split{display:flex;height:12px;border:2px solid var(--line);background:var(--panel2);padding:1px;gap:1px}
 .split i{display:block;height:100%}

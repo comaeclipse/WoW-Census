@@ -336,9 +336,38 @@ function connected_groups(array $realms, array $groups, bool $nameByLargest): ar
   return $named;
 }
 
-function render_realms_html(string $source, string $stylesheet, string $generatedAt): string {
+/** URL slug of a realm name: "Argent Dawn" -> "argent-dawn", "Ra-den" -> "ra-den". */
+function realm_url_slug(string $name): string {
+  return trim(mb_strtolower(preg_replace('/[^\p{L}\p{N}]+/u', '-', $name)), '-');
+}
+
+/** A realm explorer row's own page: /retail/realms/us/stormrage (from its "region:Name" key). */
+function realm_page_path(string $source, string $key): string {
+  [$region, $name] = explode(':', $key, 2) + [1 => ''];
+  return page_path($source, 'realms') . '/' . rawurlencode($region) . '/' . rawurlencode(realm_url_slug($name));
+}
+
+/**
+ * The realm explorer row a /<edition>/realms/<region>/<slug> request names, or null.
+ * A member realm of a connected group, or another spelling ("raden"), opens its row.
+ */
+function find_explorer_realm(array $realms, string $region, string $slug): ?array {
+  $want = realm_match_slug($slug);
+  $nameOf = fn(string $key) => explode(':', $key, 2)[1] ?? '';
+  $regionOf = fn(string $key) => explode(':', $key, 2)[0];
+  foreach ($realms as $r)
+    if ($regionOf($r['key']) === $region && realm_match_slug($nameOf($r['key'])) === $want) return $r;
+  foreach ($realms as $r)
+    foreach ($r['aliases'] ?? [] as $alias)
+      if ($regionOf($alias) === $region && realm_match_slug($nameOf($alias)) === $want) return $r;
+  return null;
+}
+
+function render_realms_html(string $source, string $stylesheet, string $generatedAt, ?array $only = null): string {
   $edition = EDITIONS[$source];
   ['realms' => $realms, 'lastT' => $lastT] = realm_explorer_data($source);
+  foreach ($realms as &$r) $r['path'] = realm_page_path($source, $r['key']);
+  unset($r);
   $scanned = $lastT ? gmdate('M j, Y', $lastT) : 'not yet';
   $races = []; $classes = [];
   foreach ($realms as $r) foreach ($r['factions'] as $f) {
@@ -360,11 +389,15 @@ function render_realms_html(string $source, string $stylesheet, string $generate
   $navigation = edition_nav($source, 'realms.html');
   $label = $edition['label'];
   $topic = seo_label($label) . ' Realm Explorer';
-  $seo = seo_head($topic . ' – WoWCensus', seo_label($label) . ' realms compared: characters seen, faction balance, race and class mix and top race and class pairs per realm, from /who scans.',
+  $seo = $only
+    ? seo_head(explorer_realm_title($only) . ' – ' . seo_label($label) . ' Realm Census – WoWCensus',
+      explorer_realm_title($only) . ' (' . seo_label($label) . '): characters seen, Alliance / Horde balance, class and race mix and top race and class pairs, from /who scans.',
+      SITE_ORIGIN . realm_page_path($source, $only['key']))
+    : seo_head($topic . ' – WoWCensus', seo_label($label) . ' realms compared: characters seen, faction balance, race and class mix and top race and class pairs per realm, from /who scans.',
     SITE_ORIGIN . page_path($source, 'realms'));
   $json = fn($v) => str_replace('</', '<\/', js_json($v));
   $script = strtr(file_get_contents(__DIR__ . '/realms/realms.js'), [
-    '__DATA__' => $json($realms), '__EDITION__' => $json($source), '__RACE_ICONS__' => $json((object)$raceIcons), '__CLASS_ICONS__' => $json((object)$classIcons),
+    '__DATA__' => $json($realms), '__EDITION__' => $json($source), '__SELECTED__' => $json($only['key'] ?? null), '__RACE_ICONS__' => $json((object)$raceIcons), '__CLASS_ICONS__' => $json((object)$classIcons),
     '__CLASSES__' => $json((object)$classMeta), '__RACE_PATHS__' => $json((object)$racePaths), '__CLASS_PATHS__' => $json((object)$classPaths),
     '__COMBOS_HREF__' => $json(page_path($source, 'combos')), '__SCANNED__' => $scanned,
   ]);
@@ -445,8 +478,14 @@ $scriptTag
 HTML;
 }
 
-function realms_page_html(string $source): string {
-  $html = render_realms_html($source, stylesheet()['name'], generated_at());
+/** "Stormrage (US)", "Pagle group (US)", "US PvE". */
+function explorer_realm_title(array $r): string {
+  if (isset($r['displayName'])) return $r['displayName'];
+  return $r['name'] . ($r['region'] ? ' (' . strtoupper($r['region']) . ')' : '');
+}
+
+function realms_page_html(string $source, ?array $only = null): string {
+  $html = render_realms_html($source, stylesheet()['name'], generated_at(), $only);
   $html = str_replace('href="/census.css"', 'href="/census.css?v=' . census_css_version() . '"', $html);
   return localize_content($html);
 }

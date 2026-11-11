@@ -29,7 +29,9 @@ const pct = (a,b) => b ? Math.round(a*1000/b)/10 : 0;
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 const params = new URLSearchParams(location.search);
-const requestedRealm = params.get("realm");
+// A realm's own page (/retail/realms/us/stormrage) names its realm; the explorer reads ?realm=.
+const PAGE_REALM = __SELECTED__;
+const requestedRealm = PAGE_REALM || params.get("realm");
 const selectedRealm = REALMS.find(r => r.key === requestedRealm || r.aliases?.includes(requestedRealm)) || REALMS.find(r => r.name === requestedRealm) || REALMS[0];
 const state = {faction: params.get("faction") || "all", realm: selectedRealm.key, sort: "chars", dir: -1, q: ""};
 
@@ -92,7 +94,7 @@ function renderRows(){
     const chars = sum(r,"chars"), thin = chars < MIN, tc = topClass(r);
     const tag = r.name.includes("(AU)") ? "Oceanic" : Object.keys(r.factions).length === 1 ? "" : "";
     return `<tr tabindex="0" data-realm="${esc(r.key)}" aria-selected="${r.key===state.realm}" class="${thin?"thin":""}">
-      <td class="l"><span class="rname">${esc(realmLabel(r))}</span>${thin?'<span class="rtag">Not enough data</span>':tag?`<span class="rtag">${tag}</span>`:""}</td>
+      <td class="l"><a class="rname" href="${esc(r.path)}">${esc(realmLabel(r))}</a>${thin?'<span class="rtag">Not enough data</span>':tag?`<span class="rtag">${tag}</span>`:""}</td>
       <td>${n(chars)}</td>
       <td class="bal">${splitBar(r)}</td>
       <td>${n(sum(r,"week"))}</td>
@@ -166,15 +168,16 @@ function renderDetail(){
 
 function syncUrl(){
   const p = new URLSearchParams();
-  if (state.realm !== REALMS[0].key) p.set("realm", state.realm);
+  const base = PAGE_REALM ? REALMS.find(r => r.key === state.realm).path : location.pathname;
+  if (!PAGE_REALM && state.realm !== REALMS[0].key) p.set("realm", state.realm);
   if (state.faction !== "all") p.set("faction", state.faction);
   // Realm keys are "region:Name"; a bare colon is valid in a query and reads better than %3A.
   const qs = p.toString().replace(/%3A/gi, ":");
-  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+  history.replaceState(null, "", base + (qs ? "?" + qs : ""));
 }
 function render(){ renderTiles(); renderRows(); renderDetail(); }
 
-document.getElementById("rows").addEventListener("click", e => { const tr = e.target.closest("tr[data-realm]"); if (tr) { state.realm = tr.dataset.realm; renderRows(); renderDetail(); syncUrl(); } });
+document.getElementById("rows").addEventListener("click", e => { if (e.target.closest("a")) return; const tr = e.target.closest("tr[data-realm]"); if (tr) { state.realm = tr.dataset.realm; renderRows(); renderDetail(); syncUrl(); } });
 document.getElementById("rows").addEventListener("keydown", e => { if ((e.key==="Enter"||e.key===" ") && e.target.dataset.realm) { e.preventDefault(); e.target.click(); } });
 document.getElementById("fchips").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;

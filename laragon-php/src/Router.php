@@ -59,7 +59,14 @@ function route_request(string $path): ?array {
     return $source ? [$html, realms_page_html($source)] : null;
   }
 
-  // Guild rosters: /guilds/<id>/, /classic/guilds/<id>/. Served by the origin only; the static site has none.
+  // One realm's page: /retail/realms/us/stormrage (+ trailing slash). Like the explorer, no Markdown copy.
+  if (preg_match('#^/(?:([a-z-]+)/)?realms/([a-z]+)/([^/]+)/?$#', $path, $m)) {
+    $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
+    $realm = $source ? find_explorer_realm(realm_explorer_data($source)['realms'], $m[2], $m[3]) : null;
+    return $realm ? [$html, realms_page_html($source, $realm)] : null;
+  }
+
+  // Guild rosters:/guilds/<id>/, /classic/guilds/<id>/. Served by the origin only; the static site has none.
   if (preg_match('#^/(?:([a-z-]+)/)?guilds/(\d{12})/(?:index\.html)?$#', $path, $m)) {
     $source = source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/');
     $roster = $source ? guild_roster($source, $m[2]) : null;

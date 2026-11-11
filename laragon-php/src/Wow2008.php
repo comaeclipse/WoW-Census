@@ -221,6 +221,12 @@ function render_page(string $html, string $path): string {
     $GLOBALS['w8_source'] = $source;
     return guild_page($source, $roster, $html);
   }
+  if (preg_match('#^/(?:([a-z-]+)/)?realms/([a-z]+)/([^/]+)/?$#', $path, $m)
+      && ($source = \source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/'))
+      && ($realm = \find_explorer_realm(\realm_explorer_data($source)['realms'], $m[2], rawurldecode($m[3])))) {
+    $GLOBALS['w8_source'] = $source;
+    return realms_page($source, $html, $realm['key']);
+  }
   if (preg_match('#^/(?:([a-z-]+)/)?realms(?:\.html)?$#', $path, $m)
       && ($source = \source_for_path(($m[1] ?? '') !== '' ? '/' . $m[1] . '/' : '/'))) {
     $GLOBALS['w8_source'] = $source;
@@ -791,7 +797,7 @@ function geography_page(string $source, string $html): string {
     'updated' => !empty($snap['lastT']) ? substr(\js_iso($snap['lastT']), 0, 10) : '—', 'mixSum' => array_sum(array_column($mixRows, 1))], $html, 'geography');
 }
 
-function realms_page(string $source, string $html): string {
+function realms_page(string $source, string $html, ?string $only = null): string {
   $data = \realm_explorer_data($source);
   $realms = [];
   $topList = function (array $f): array {
@@ -825,7 +831,8 @@ function realms_page(string $source, string $html): string {
       'seen' => $seen, 'd7' => $week, 'd24' => $day, 'A' => $a['chars'] ?? 0, 'H' => $h ? $h['chars'] : null,
       'top' => (string)array_key_first($classes), 'topA' => $a ? $topList($a) : [], 'topH' => $h ? $topList($h) : null,
       'cls' => $pct($classes), 'clsA' => $factionClasses($a), 'clsH' => $factionClasses($h), 'race' => $pct($races),
-      'homes' => $r['homes'] ?? null, 'members' => $r['members'] ?? null, 'aliases' => $r['aliases'] ?? []];
+      'homes' => $r['homes'] ?? null, 'members' => $r['members'] ?? null, 'aliases' => $r['aliases'] ?? [],
+      'path' => \realm_page_path($source, $r['key'])];
     $seenAll += $seen; $weekAll += $week; if ($seen >= 20) $enough++;
   }
   $busiest = $source === 'forever' ? array_reduce($realms, fn($best, $r) => !$best || $r['seen'] > $best['seen'] ? $r : $best) : ($realms[0] ?? null);
@@ -836,7 +843,7 @@ function realms_page(string $source, string $html): string {
       ? $busiest['displayName']
       : $busiest['name'] . ($busiest['region'] ? ' (' . $busiest['region'] . ')' : '')) : '—',
     'busiestPct' => $busiest && $seenAll ? round(100 * $busiest['seen'] / $seenAll, 1) : 0,
-    'scanned' => !empty($data['lastT']) ? gmdate('M j, Y', (int)$data['lastT']) : '—'], $html, 'realms');
+    'scanned' => !empty($data['lastT']) ? gmdate('M j, Y', (int)$data['lastT']) : '—', 'only' => $only], $html, 'realms');
 }
 
 function auction_page(string $source, string $html): string {

@@ -5,14 +5,25 @@ namespace Wow2008;
  * Vars: $data (list of realms), $allianceRaces (list), $count, $enough, $seen, $week (ints), $busiest, $scanned, $generated,
  *       $subtitle (strings), $busiestPct (float), $connected (bool: rows are connected realm groups),
  *       $mixed (bool: some rows are realms connected to nothing, Retail)
+ *       $only (?string: key of the one realm a /<edition>/realms/<region>/<slug> page shows)
  */
 $unit = !$connected ? 'Realm' : ($mixed ? 'Realm or group' : 'Realm group');
+$one = $only !== null ? current(array_filter($data, fn($r) => $r['id'] === $only)) : null;
+$oneName = $one ? ($groupForever ? $one['displayName'] : $one['name'] . ($one['region'] ? ' (' . $one['region'] . ')' : '')) : null;
 ?>
   <main class="main">
-    <?= component('crumb', ['trail' => [['label' => 'Realm Census', 'url' => url('census')], ['label' => 'Realm Viewer']]]) ?>
+    <?= component('crumb', ['trail' => $one
+      ? [['label' => 'Realm Census', 'url' => url('census')], ['label' => 'Realm Viewer', 'url' => url('realms')], ['label' => $oneName]]
+      : [['label' => 'Realm Census', 'url' => url('census')], ['label' => 'Realm Viewer']]]) ?>
 
+<?php if ($one): ?>
+    <?= component('banner', ['art' => 'realms', 'title' => $oneName, 'subtitle' => $subtitle . ($groupForever ? ' · REGION / TYPE GROUP' : (count($one['members'] ?? []) > 1 ? ' · CONNECTED REALM GROUP' : ' · REALM POPULATION')), 'subtitle_color' => '#e0c0ff', 'stamp' => 'Scanned: ' . $scanned . ' · Page generated: ' . $generated]) ?>
+<?php else: ?>
     <?= component('banner', ['art' => 'realms', 'title' => 'Realm Viewer', 'subtitle' => $subtitle . ($groupForever ? ' · POPULATION BY REGION AND TYPE' : ($connected ? ' · POPULATION BY CONNECTED REALM' : ' · POPULATION BY REALM')), 'subtitle_color' => '#e0c0ff', 'stamp' => 'Scanned: ' . $scanned . ' · Page generated: ' . $generated]) ?>
 
+<?php endif ?>
+
+<?php if (!$one): ?>
     <div class="tiles">
       <?= component('stat', ['label' => $groupForever ? 'Region / type groups' : (!$connected ? 'Realms scanned' : ($mixed ? 'Realms & groups' : 'Realm groups')), 'value' => fmt($count), 'note' => fmt($enough) . ' with enough data']) ?>
       <?= component('stat', ['label' => 'Characters seen', 'value' => fmt($seen), 'note' => fmt($week) . ' in the last 7 days']) ?>
@@ -50,6 +61,7 @@ $unit = !$connected ? 'Realm' : ($mixed ? 'Realm or group' : 'Realm group');
 <?php endif ?>
         </p>
     <?php component_end() ?>
+<?php endif ?>
 
     <!-- Realm detail -->
     <?php component_start('section', ['title' => $groupForever || $connected ? 'Group Details' : 'Realm Details', 'icon' => 'p', 'sub_html' => '<select class="realm-pick" id="pick" aria-label="Choose ' . ($groupForever || $connected ? 'group' : 'realm') . '"></select>', 'id' => 'detail']) ?>
@@ -81,6 +93,9 @@ $unit = !$connected ? 'Realm' : ($mixed ? 'Realm or group' : 'Realm group');
           <div class="panel ally"><h5 class="ally-c">Alliance Classes <small id="dClassACount"></small></h5><div class="bars" id="dClassA"></div></div>
           <div class="panel horde"><h5 class="horde-c">Horde Classes <small id="dClassHCount"></small></h5><div class="bars" id="dClassH"></div></div>
         </div>
+<?php if ($one): ?>
+        <div class="panel" style="margin-bottom:14px"><h5 style="color:#ffd75a">Class Mix <small>% of characters seen, both factions</small></h5><div class="bars wide" id="dClass"></div></div>
+<?php endif ?>
         <p class="source">Class percentages are within each faction on this realm. Counts are observed characters, not players online.</p>
         <div class="panel"><h5 style="color:#ffd75a">Race Mix <small>% of characters seen</small></h5><div class="bars wide" id="dRace"></div></div>
 <?php if ($connected): ?>
@@ -93,6 +108,9 @@ $unit = !$connected ? 'Realm' : ($mixed ? 'Realm or group' : 'Realm group');
           </table>
         </div>
 <?php endif ?>
+<?php if ($one): ?>
+        <p class="source"><a href="<?= e(url('realms')) ?>">← All realms</a></p>
+<?php endif ?>
     <?php component_end() ?>
 
     <div class="source">Realm data from in-game /who samples · scanned <?= e($scanned) ?></div>
@@ -104,6 +122,7 @@ const ALLIANCE_RACES = <?= js($allianceRaces) ?>;
 
 const REALMS = <?= js($data) ?>;
 const GROUP_FOREVER = <?= $groupForever ? 'true' : 'false' ?>;
+const ONLY = <?= js($only) ?>;
 const REGION_ORDER = {US: 0, EU: 1};
 const TYPE_ORDER = {'PvE': 0, 'PvP': 1, 'RP': 2, 'RP-PvP': 3};
 
@@ -155,7 +174,7 @@ function renderTable() {
     const a = allianceShare(r), c = charsFor(r);
     const balTxt = r.H == null ? 'Alliance only' : `${Math.round(a*100)}% / ${Math.round((1-a)*100)}%`;
     return `<tr data-id="${esc(r.id)}" class="${r.id === selected ? 'sel' : ''}">
-      <td><span class="rn">${esc(shortLabel(r))}</span>${GROUP_FOREVER ? '' : badges(r)}</td>
+      <td><a class="rn" href="${esc(r.path)}">${esc(shortLabel(r))}</a>${GROUP_FOREVER ? '' : badges(r)}</td>
       <td class="num">${c == null ? '<span style="color:#9a7a4a">not scanned</span>' : fmt(c)}</td>
       <td><div class="mini" data-tip="${label(r)}|${balTxt}|Alliance ${fmt(r.A)}${r.H == null ? '' : ' · Horde ' + fmt(r.H)}">
         <i style="width:${a*100}%;background:#3a6ad0"></i><i style="width:${(1-a)*100}%;background:#c0281a"></i></div>
@@ -166,16 +185,18 @@ function renderTable() {
   }).join('');
 }
 
-document.querySelector('.rtable thead').addEventListener('click', e => {
+if (!ONLY) document.querySelector('.rtable thead').addEventListener('click', e => {
   const k = e.target.closest('th')?.dataset.s; if (!k) return;
   if (k === sortKey) sortDir *= -1; else { sortKey = k; sortDir = k === 'name' || k === 'top' ? 1 : -1; }
   renderTable();
 });
-document.getElementById('rows').addEventListener('click', e => {
+const rowsEl = document.getElementById('rows');
+if (rowsEl) rowsEl.addEventListener('click', e => {
+  if (e.target.closest('a')) return;
   const tr = e.target.closest('tr[data-id]'); if (tr) select(tr.dataset.id, true);
 });
-document.getElementById('q').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); renderTable(); });
-document.getElementById('fac').addEventListener('click', e => {
+if (!ONLY) document.getElementById('q').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); renderTable(); });
+if (!ONLY) document.getElementById('fac').addEventListener('click', e => {
   const f = e.target.dataset.f; if (!f) return;
   faction = f;
   document.querySelectorAll('#fac button').forEach(b => b.classList.toggle('on', b.dataset.f === f));
@@ -185,7 +206,8 @@ document.getElementById('fac').addEventListener('click', e => {
 // ---------- Realm detail ----------
 const pick = document.getElementById('pick');
 pick.innerHTML = REALMS.map(r => `<option value="${r.id}">${label(r)}</option>`).join('');
-pick.addEventListener('change', () => select(pick.value, false));
+// On a realm's own page the picker opens the other realm's page.
+pick.addEventListener('change', () => ONLY ? location.assign(REALMS.find(r => r.id === pick.value).path) : select(pick.value, false));
 
 function rankList(list) {
   return list.map(([n, c, p], i) => {
@@ -205,11 +227,12 @@ function pctBars(el, obj, color, scope = 'characters seen', label = shortRace) {
   grow(el);
 }
 
-function select(id, scroll) {
+function select(id, scroll, initial = false) {
   const r = REALMS.find(x => x.id === id); if (!r) return;
-  selected = id; pick.value = id; renderTable();
+  selected = id; pick.value = id; if (!ONLY) renderTable();
   // Realm keys are "region:Name"; keep the colon bare and spaces as + so the URL stays readable.
-  history.replaceState(null, '', '?realm=' + encodeURIComponent(id).replace(/%3A/gi, ':').replace(/%20/g, '+'));
+  // The page as opened keeps its URL: /realms stays /realms until a visitor picks a realm.
+  if (!initial && !ONLY) history.replaceState(null, '', '?realm=' + encodeURIComponent(id).replace(/%3A/gi, ':').replace(/%20/g, '+'));
 
   document.getElementById('dName').textContent = shortLabel(r);
   document.getElementById('dBadges').innerHTML = badges(r);
@@ -233,6 +256,8 @@ function select(id, scroll) {
   document.getElementById('dClassHCount').textContent = r.H == null ? 'not scanned' : `${fmt(r.H)} observed`;
   pctBars(document.getElementById('dClassA'), r.clsA, n => CLASS_COLOR[n], 'Alliance characters');
   pctBars(document.getElementById('dClassH'), r.clsH, n => CLASS_COLOR[n], 'Horde characters');
+  const dClass = document.getElementById('dClass');
+  if (dClass) pctBars(dClass, r.cls, n => CLASS_COLOR[n]);
   pctBars(document.getElementById('dRace'), r.race, n => ALLIANCE_RACES.includes(n) ? '#6fa8ff' : '#ff6a5a', undefined, mixedRace);
 
   // Connected realm groups (MoP): member realms and each home realm's share.
@@ -253,10 +278,10 @@ function select(id, scroll) {
 }
 
 // initial realm from ?realm= (matches the source site's URL format)
-const fromUrl = new URLSearchParams(location.search).get('realm');
+const fromUrl = ONLY || new URLSearchParams(location.search).get('realm');
 // A member realm's old link (?realm=us:Galakras) opens its connected group.
 const fromRealm = REALMS.find(r => r.id === fromUrl || (r.aliases || []).includes(fromUrl));
-select(fromRealm ? fromRealm.id : REALMS[0].id, false);
+select(fromRealm ? fromRealm.id : REALMS[0].id, false, true);
 
 </script>
 <?php end_section() ?>
