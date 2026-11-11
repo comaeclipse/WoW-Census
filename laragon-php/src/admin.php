@@ -188,10 +188,20 @@ if (($_GET['view'] ?? '') === 'shoutbox') {
   exit;
 }
 
-// The activity model takes seconds to build and does not need to be live:
-// keep it in APCu for ADMIN_MODEL_TTL; ?refresh=1 rebuilds it now.
-const ADMIN_MODEL_TTL = 900;
+// The activity model takes ~9 s to build and does not need to be live. APCu
+// keeps the last build for a day; every load is served from it, and one older
+// than ADMIN_MODEL_FRESH is rebuilt after the page has been sent, so only the
+// first load after a PHP-FPM restart waits. ?refresh=1 rebuilds it now.
+const ADMIN_MODEL_FRESH = 900;
+const ADMIN_MODEL_KEEP = 86400;
 const ADMIN_MODEL_KEY = 'ml:admin:activity-model';
+
+function admin_build_model(): array {
+  $model = collection_activity_model();
+  if (ac_apcu_on() && !apcu_store(ADMIN_MODEL_KEY, $model, ADMIN_MODEL_KEEP)) error_log('admin: APCu would not store the activity model');
+  return $model;
+}
+
 $snapshot = null;
 $refresh = isset($_GET['refresh']);
 if (!$refresh && ac_apcu_on()) {
@@ -201,13 +211,12 @@ if (!$refresh && ac_apcu_on()) {
 if ($snapshot === null) {
   session_write_close();  // building the model can take seconds; do not hold the session lock
   try {
-    $snapshot = collection_activity_model();
+    $snapshot = admin_build_model();
   } catch (Throwable $e) {
     http_response_code(500);
     error_log((string)$e);
     exit('Collection status could not be read from the database.');
   }
-  if (ac_apcu_on()) apcu_store(ADMIN_MODEL_KEY, $snapshot, ADMIN_MODEL_TTL);
 }
 if ($refresh) {
   $q = $_GET;
@@ -217,7 +226,7 @@ if ($refresh) {
 }
 $age = max(0, time() - (int)$snapshot['generated_at']);
 $note = $age < 60 ? 'Read from PostgreSQL just now.'
-  : 'Cached ' . intdiv($age, 60) . ' min ago (refreshes every ' . intdiv(ADMIN_MODEL_TTL, 60) . ' min).';
+  : 'Cached ' . intdiv($age, 60) . ' min ago' . ($age >= ADMIN_MODEL_FRESH ? '; refreshing in the background, reload in ~10 s.' : '.');
 $refreshQuery = $_GET;
 $refreshQuery['refresh'] = '1';
 $shoutLink .= '<a href="/admin/?' . cs_h(http_build_query($refreshQuery)) . '">Refresh data</a>';
@@ -229,4 +238,16 @@ if (($_GET['view'] ?? '') === 'who-hours') {
     . '<a href="/admin/?region=' . rawurlencode($region) . '" aria-current="page">Daily history</a>'
     . '<a href="/admin/?view=who-hours&amp;region=' . rawurlencode($region) . '">/who time heatmap</a>' . $shoutLink . '</nav>';
   echo render_collection_stats($snapshot, $region, '/admin/', $nav, $note);
+}
+
+// A stale model: finish the response, then rebuild it once (the lock stops parallel rebuilds).
+if ($age >= ADMIN_MODEL_FRESH && ac_apcu_on() && apcu_add(ADMIN_MODEL_KEY . ':lock', 1, 120)) {
+  session_write_close();
+  if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
+  try {
+    admin_build_model();
+  } catch (Throwable $e) {
+    error_log('admin background refresh: ' . $e);
+  }
+  apcu_delete(ADMIN_MODEL_KEY . ':lock');
 }
