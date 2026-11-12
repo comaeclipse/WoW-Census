@@ -191,6 +191,11 @@ ever empties a cache.
    fastcgi_cache_lock_timeout 10s;
    ```
 
+   The snippet must also ignore `Vary` (`fastcgi_ignore_headers Cache-Control Expires Vary;`).
+   PHP sends `Vary: Accept`, and nginx honours it by keeping one copy per distinct `Accept`
+   string. Rollouts send curl's `*/*`, so until 2026-11-11 browsers kept getting copies from
+   days earlier. The cache key's `$wowcensus_accept` field already separates Markdown from HTML.
+
    `nginx -t && systemctl reload nginx`. The lock means one render per page at a time; a failed
    render keeps serving the old copy. nginx stores each page's expiry when it saves it, so pages
    saved before this change keep their 10-year expiry until the next full rollout re-saves them.

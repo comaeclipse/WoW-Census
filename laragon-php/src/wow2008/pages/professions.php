@@ -87,14 +87,6 @@ $groups = [
       .bb .bb-cnt{color:#9a8a6a}
       .bb b{color:#fff}
       .bb .bb-cols{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
-      .bb .bb-stats td.icon{width:46px;text-align:center}
-      .bb .bb-users{display:inline-block;width:30px;height:24px;position:relative}
-      .bb .bb-users::before,.bb .bb-users::after{content:'';position:absolute;bottom:0;width:15px;height:20px;border-radius:8px 8px 3px 3px;
-        background:radial-gradient(circle at 50% 28%,#ffd9b0 0 4px,transparent 4.5px),linear-gradient(transparent 45%,#8a5a20 45%);border:1px solid #000}
-      .bb .bb-users::before{left:1px}.bb .bb-users::after{right:1px;filter:hue-rotate(-30deg) brightness(.8)}
-      .bb .bb-legend b{padding:0 3px}
-      .bb .rs-pvp{color:#ff5a4a}.bb .rs-normal{color:#1eff00}.bb .rs-rp{color:#c890ff}.bb .rs-rppvp{color:#ffa040}
-      .bb-foot{display:flex;justify-content:space-between;gap:8px;margin:0 2px}
       @media (max-width:760px){.bb .bb-cols{grid-template-columns:1fr}.bb .hide-sm{display:none}.bb-top{flex-direction:column;align-items:flex-start}}
     </style>
     <div class="bb" id="census">
@@ -159,25 +151,6 @@ $groups = [
         </table>
       </div>
 
-      <table class="forumline bb-stats">
-        <tr><td class="catHead" colspan="2"><span class="cattitle">Census Statistics</span></td></tr>
-        <tr><td class="row1 icon" rowspan="3"><span class="bb-users"></span></td>
-          <td class="row1 bb-small">Our sampled characters have learned a total of <b><?= fmt($pc['learned']) ?></b> skills and <b><?= fmt($pc['recipes']) ?></b> recipes<br>
-            <b><?= fmt($pc['primaryCounts']['2'] ?? 0) ?></b> carry two primary professions, <b><?= fmt($pc['primaryCounts']['1'] ?? 0) ?></b> just one and <b><?= fmt($pc['primaryCounts']['0'] ?? 0) ?></b> none at all &middot;
-            <b><?= fmt($pc['capped']) ?></b> primaries are at their current bracket cap<br>
-            Average primary skill by level:
-<?php foreach ($pc['levels'] as $i => [$band, $k, $avg]): ?>
-            <?= $i ? '&middot; ' : '' ?><?= e($band) ?> <b><?= $avg ?></b> <span class="bb-cnt">(<?= fmt($k) ?>)</span>
-<?php endforeach; ?></td></tr>
-        <tr><td class="row1 bb-small">Characters by region:
-<?php foreach ($pc['regions'] as $reg => $k): ?> <b><?= e($reg) ?></b> <?= fmt($k) ?><?php endforeach; ?>
-            &middot; <?= fmt($pc['notFound']) ?> profiles could not be found on the armory</td></tr>
-        <tr><td class="row1 bb-small bb-legend">[ <?php $rc = ['PvP' => 'rs-pvp', 'Normal' => 'rs-normal', 'Roleplay' => 'rs-rp', 'Roleplay PvP' => 'rs-rppvp']; $first = true;
-            foreach ($pc['rulesets'] as $rs => $k): ?><?= $first ? '' : ' ] &nbsp; [ ' ?><b class="<?= $rc[$rs] ?? '' ?>"><?= e($rs) ?></b> <?= fmt($k) ?><?php $first = false; endforeach; ?> ]</td></tr>
-      </table>
-
-      <div class="bb-foot bb-small"><span>Skill is the character's current points; &ldquo;At Cap&rdquo; means maxed for the rank they have trained.</span>
-        <a href="#census">Back to top</a></div>
       </div>
     </div>
 

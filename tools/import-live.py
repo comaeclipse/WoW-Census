@@ -111,7 +111,7 @@ def fill_icons(dsn, password, ssh):
     import psycopg2
     with psycopg2.connect(dsn, password=password, connect_timeout=15) as conn, conn.cursor() as cur:
         cur.execute("SELECT source_game, array_agg(item_id ORDER BY item_id) FROM "
-                    "(SELECT DISTINCT source_game, item_id FROM local_auction_snapshots) s GROUP BY 1")
+                    "(SELECT DISTINCT source_game, item_id FROM marketlens_import.local_auction_snapshots) s GROUP BY 1")
         scanned = {source: ids for source, ids in cur.fetchall() if source in ICON_STEM}
     files = {stem: REPO / "tools" / "item-icons" / f"{stem}.json" for stem in set(ICON_STEM.values())}
     for source, ids in sorted(scanned.items()):
