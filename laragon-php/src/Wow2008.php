@@ -899,7 +899,8 @@ function professions_page(string $html): string {
   $views = array_map(fn($v) => ['realm' => $v['realm'], 'faction' => $v['faction'], 'scanned' => $v['scanned'], 'empty' => $v['empty'],
     'p' => array_map(fn($d) => [$d['items'], $d['units'], (int)floor($d['value'] / 10000), $d['matsCount'], $d['craftedCount'], $d['recipesCount']], $v['professions'])], $model['views']);
   return page('professions', common_vars(\PROFESSION_SOURCE) + ['cards' => profession_cards(), 'data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
-    'realms' => $realms, 'factions' => $factions], $html, 'professions');
+    'realms' => $realms, 'factions' => $factions,
+    'pcensus' => json_decode(file_get_contents(__DIR__ . '/forever-profession-census.json'), true, 512, JSON_THROW_ON_ERROR)], $html, 'professions');
 }
 
 function profession_page(string $slug, string $html): string {

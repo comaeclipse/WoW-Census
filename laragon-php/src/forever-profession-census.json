@@ -1,0 +1,466 @@
+{
+ "source": "combined_5000_20261112_092145.json",
+ "sampled": 5000,
+ "profiles": 4934,
+ "notFound": 66,
+ "fetchedFrom": "2026-11-12T08:08:56Z",
+ "fetchedTo": "2026-11-12T15:20:57Z",
+ "regions": {
+  "US": 3125,
+  "EU": 1704,
+  "KR": 105
+ },
+ "rulesets": {
+  "PvP": 2687,
+  "Normal": 1579,
+  "Roleplay": 347,
+  "Roleplay PvP": 321
+ },
+ "primaryCounts": {
+  "0": 15,
+  "1": 228,
+  "2": 4691
+ },
+ "primaries": [
+  {
+   "name": "Skinning",
+   "count": 1727,
+   "pct": 35.0,
+   "avg": 157.6,
+   "median": 155,
+   "top": 300,
+   "recipes": 2.0,
+   "maxed": 15.1,
+   "brackets": {
+    "Apprentice": 200,
+    "Journeyman": 534,
+    "Expert": 703,
+    "Artisan": 290
+   }
+  },
+  {
+   "name": "Mining",
+   "count": 1633,
+   "pct": 33.1,
+   "avg": 110.2,
+   "median": 107,
+   "top": 300,
+   "recipes": 5.9,
+   "maxed": 1.8,
+   "brackets": {
+    "Apprentice": 319,
+    "Journeyman": 825,
+    "Expert": 389,
+    "Artisan": 100
+   }
+  },
+  {
+   "name": "Leatherworking",
+   "count": 1254,
+   "pct": 25.4,
+   "avg": 96.8,
+   "median": 95.0,
+   "top": 261,
+   "recipes": 30.4,
+   "maxed": 2.7,
+   "brackets": {
+    "Apprentice": 304,
+    "Journeyman": 699,
+    "Expert": 236,
+    "Artisan": 15
+   }
+  },
+  {
+   "name": "Herbalism",
+   "count": 1063,
+   "pct": 21.5,
+   "avg": 110.3,
+   "median": 101,
+   "top": 300,
+   "recipes": 3.2,
+   "maxed": 3.4,
+   "brackets": {
+    "Apprentice": 315,
+    "Journeyman": 387,
+    "Expert": 281,
+    "Artisan": 80
+   }
+  },
+  {
+   "name": "Tailoring",
+   "count": 1047,
+   "pct": 21.2,
+   "avg": 98.9,
+   "median": 95,
+   "top": 231,
+   "recipes": 32.8,
+   "maxed": 2.5,
+   "brackets": {
+    "Apprentice": 207,
+    "Journeyman": 657,
+    "Expert": 171,
+    "Artisan": 12
+   }
+  },
+  {
+   "name": "Enchanting",
+   "count": 921,
+   "pct": 18.7,
+   "avg": 99.6,
+   "median": 99,
+   "top": 300,
+   "recipes": 20.8,
+   "maxed": 7.3,
+   "brackets": {
+    "Apprentice": 314,
+    "Journeyman": 381,
+    "Expert": 206,
+    "Artisan": 20
+   }
+  },
+  {
+   "name": "Blacksmithing",
+   "count": 871,
+   "pct": 17.7,
+   "avg": 97.3,
+   "median": 95,
+   "top": 252,
+   "recipes": 32.7,
+   "maxed": 1.4,
+   "brackets": {
+    "Apprentice": 190,
+    "Journeyman": 499,
+    "Expert": 163,
+    "Artisan": 19
+   }
+  },
+  {
+   "name": "Alchemy",
+   "count": 689,
+   "pct": 14.0,
+   "avg": 109.1,
+   "median": 95,
+   "top": 300,
+   "recipes": 16.9,
+   "maxed": 6.8,
+   "brackets": {
+    "Apprentice": 186,
+    "Journeyman": 289,
+    "Expert": 176,
+    "Artisan": 38
+   }
+  },
+  {
+   "name": "Engineering",
+   "count": 405,
+   "pct": 8.2,
+   "avg": 111.3,
+   "median": 107,
+   "top": 246,
+   "recipes": 21.0,
+   "maxed": 3.5,
+   "brackets": {
+    "Apprentice": 83,
+    "Journeyman": 193,
+    "Expert": 122,
+    "Artisan": 7
+   }
+  }
+ ],
+ "secondaries": [
+  {
+   "name": "Cooking",
+   "count": 4726,
+   "pct": 95.8,
+   "avg": 66.7,
+   "median": 45.0,
+   "top": 300,
+   "recipes": 10.1,
+   "maxed": 7.1,
+   "brackets": {
+    "Apprentice": 2717,
+    "Journeyman": 1363,
+    "Expert": 596,
+    "Artisan": 50
+   }
+  },
+  {
+   "name": "First Aid",
+   "count": 3623,
+   "pct": 73.4,
+   "avg": 92.6,
+   "median": 75,
+   "top": 300,
+   "recipes": 5.9,
+   "maxed": 8.2,
+   "brackets": {
+    "Apprentice": 1377,
+    "Journeyman": 1647,
+    "Expert": 455,
+    "Artisan": 144
+   }
+  },
+  {
+   "name": "Fishing",
+   "count": 3244,
+   "pct": 65.7,
+   "avg": 64.3,
+   "median": 39.0,
+   "top": 300,
+   "recipes": 1.6,
+   "maxed": 6.8,
+   "brackets": {
+    "Apprentice": 1794,
+    "Journeyman": 1017,
+    "Expert": 407,
+    "Artisan": 26
+   }
+  }
+ ],
+ "combos": [
+  [
+   "Leatherworking + Skinning",
+   1220,
+   24.7
+  ],
+  [
+   "Blacksmithing + Mining",
+   852,
+   17.3
+  ],
+  [
+   "Enchanting + Tailoring",
+   807,
+   16.4
+  ],
+  [
+   "Alchemy + Herbalism",
+   662,
+   13.4
+  ],
+  [
+   "Engineering + Mining",
+   369,
+   7.5
+  ],
+  [
+   "Mining + Skinning",
+   185,
+   3.7
+  ],
+  [
+   "Herbalism + Skinning",
+   128,
+   2.6
+  ],
+  [
+   "Herbalism + Tailoring",
+   92,
+   1.9
+  ],
+  [
+   "Skinning + Tailoring",
+   82,
+   1.7
+  ],
+  [
+   "Herbalism + Mining",
+   80,
+   1.6
+  ]
+ ],
+ "classes": [
+  {
+   "class": "Hunter",
+   "count": 730,
+   "top": [
+    [
+     "Skinning",
+     77.1
+    ],
+    [
+     "Leatherworking",
+     62.5
+    ],
+    [
+     "Mining",
+     22.9
+    ]
+   ]
+  },
+  {
+   "class": "Paladin",
+   "count": 682,
+   "top": [
+    [
+     "Mining",
+     85.6
+    ],
+    [
+     "Blacksmithing",
+     71.0
+    ],
+    [
+     "Herbalism",
+     10.0
+    ]
+   ]
+  },
+  {
+   "class": "Shaman",
+   "count": 606,
+   "top": [
+    [
+     "Skinning",
+     59.1
+    ],
+    [
+     "Leatherworking",
+     50.5
+    ],
+    [
+     "Herbalism",
+     31.7
+    ]
+   ]
+  },
+  {
+   "class": "Priest",
+   "count": 522,
+   "top": [
+    [
+     "Tailoring",
+     69.3
+    ],
+    [
+     "Enchanting",
+     59.4
+    ],
+    [
+     "Herbalism",
+     27.8
+    ]
+   ]
+  },
+  {
+   "class": "Mage",
+   "count": 511,
+   "top": [
+    [
+     "Tailoring",
+     63.6
+    ],
+    [
+     "Enchanting",
+     51.7
+    ],
+    [
+     "Herbalism",
+     29.0
+    ]
+   ]
+  },
+  {
+   "class": "Rogue",
+   "count": 475,
+   "top": [
+    [
+     "Skinning",
+     63.2
+    ],
+    [
+     "Leatherworking",
+     52.2
+    ],
+    [
+     "Mining",
+     31.6
+    ]
+   ]
+  },
+  {
+   "class": "Warrior",
+   "count": 474,
+   "top": [
+    [
+     "Mining",
+     91.1
+    ],
+    [
+     "Blacksmithing",
+     75.9
+    ],
+    [
+     "Engineering",
+     9.1
+    ]
+   ]
+  },
+  {
+   "class": "Warlock",
+   "count": 474,
+   "top": [
+    [
+     "Tailoring",
+     66.2
+    ],
+    [
+     "Enchanting",
+     53.2
+    ],
+    [
+     "Herbalism",
+     29.3
+    ]
+   ]
+  },
+  {
+   "class": "Druid",
+   "count": 460,
+   "top": [
+    [
+     "Skinning",
+     53.9
+    ],
+    [
+     "Leatherworking",
+     47.4
+    ],
+    [
+     "Herbalism",
+     43.9
+    ]
+   ]
+  }
+ ],
+ "levels": [
+  [
+   "10-19",
+   2404,
+   82.9
+  ],
+  [
+   "20-29",
+   1809,
+   125.9
+  ],
+  [
+   "30-39",
+   545,
+   165.0
+  ],
+  [
+   "40-49",
+   131,
+   200.9
+  ],
+  [
+   "50-60",
+   45,
+   200.3
+  ]
+ ],
+ "learned": 21203,
+ "recipes": 231097,
+ "capped": 526
+}
