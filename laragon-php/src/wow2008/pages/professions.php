@@ -49,7 +49,8 @@ $groups = [
   $pc = $pcensus;
   $slugOf = []; foreach ($cards as $s => $c) $slugOf[$c['name']] = $s;
   $bbDate = fn($iso) => gmdate('D M d, Y g:i a', strtotime($iso));
-  $bar = fn($pct) => '<span class="bb-vote"><i style="width:' . max(1, round($pct * 2)) . 'px"></i></span>';
+  $bar = fn($pct, $max) => '<span class="bb-vote"><i style="width:' . max(1, round($pct / $max * 100)) . '%"></i></span>';
+  $maxP = $pc['primaries'][0]['pct']; $maxS = $pc['secondaries'][0]['pct']; $maxC = $pc['combos'][0][2];
   $trade = function ($name) use ($slugOf, $cards) {
     $s = $slugOf[$name] ?? null;
     if (!$s) return '<span class="bb-forumlink">' . e($name) . '</span>';
@@ -60,39 +61,39 @@ $groups = [
   $prim = $pc['primaries'];
 ?>
     <style>
-      .bb{margin:0 0 16px;padding:8px;background:#e5e5e5;border:1px solid #a9b8c2;font:11px Verdana,Arial,Helvetica,sans-serif;color:#000;text-align:left}
-      .bb a{color:#006699;text-decoration:none}.bb a:hover{color:#dd6900;text-decoration:underline}
-      .bb-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:2px 2px 6px}
-      .bb-maintitle{font:bold 20px 'Trebuchet MS',Verdana,sans-serif;color:#000;letter-spacing:-.5px;line-height:1.1}
-      .bb-nav{font-weight:bold;font-size:11px}
-      .bb-small{font-size:10px;color:#000}
-      .bb table.forumline{width:100%;border-collapse:separate;border-spacing:1px;background:#fff;border:2px solid #006699;margin-bottom:8px}
-      .bb th{height:25px;padding:0 6px;color:#ffa34f;font-size:11px;font-weight:bold;white-space:nowrap;
-        background:linear-gradient(#3d82ab,#006699 45%,#005b88);border-top:1px solid #6aa4c8}
+      .bb{margin:0 0 16px;border:2px solid #000;outline:1px solid #8a7040;border-radius:4px;overflow:hidden;
+        background:linear-gradient(#1c1810,#0e0c08);box-shadow:inset 0 0 20px #000;font:11px Verdana,Arial,Helvetica,sans-serif;color:#e8dcc0;text-align:left}
+      .bb a{color:#fff;font-weight:bold;text-decoration:none}.bb a:hover{color:#ffd75a;text-decoration:underline}
+      .bb-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;
+        background:linear-gradient(#5a1a10,#2a0806);border-bottom:2px solid #000;text-shadow:0 1px 2px #000}
+      .bb-maintitle{font:700 13px Tahoma,Arial,sans-serif;color:#ffd75a}
+      .bb-nav{font-size:10px;color:#d8b8a0}.bb-nav a{font-weight:normal;color:#ffe8a0}
+      .bb-small{font-size:10px;color:#d8b8a0}
+      .bb-body{padding:8px}
+      .bb table.forumline{width:100%;border-collapse:separate;border-spacing:1px;background:#000;border:1px solid #3a3020;margin-bottom:8px}
+      .bb th{height:22px;padding:0 6px;text-align:left;font:700 10px Tahoma,Arial,sans-serif;color:#ffd75a;white-space:nowrap;
+        background:linear-gradient(#3a3020,#1a160c)}
       .bb td{padding:4px 6px;vertical-align:middle}
-      .bb td.row1{background:#efefef}.bb td.row2{background:#dee3e7}.bb td.row3{background:#d1d7dc}
-      .bb td.catHead{height:24px;padding:3px 6px;background:linear-gradient(#fdfdfd,#d9e1e6 60%,#c7d1d7);border-bottom:1px solid #a9b8c2}
-      .bb .cattitle{font:bold 12px Verdana,sans-serif;color:#000;letter-spacing:.5px}
-      .bb td.spaceRow{height:1px;padding:0;background:#d1d7dc}
-      .bb td.c{text-align:center}.bb td.n{text-align:right;white-space:nowrap}
-      .bb .bb-forumlink{font-weight:bold;font-size:12px}
-      .bb img.bb-fi{width:18px;height:18px;vertical-align:-4px;margin-right:6px;border:1px solid #6b7c88}
-      .bb .bb-desc{display:block;margin-top:2px;font-size:10px;color:#333}
-      .bb .bb-folder{display:inline-block;width:19px;height:15px;background:linear-gradient(#ffe8a4,#f2b84a);border:1px solid #b07a1c;border-radius:2px 5px 2px 2px;
-        box-shadow:inset 0 1px 0 #fff6d6;position:relative;vertical-align:middle}
-      .bb .bb-folder.new::after{content:'';position:absolute;right:-3px;top:-4px;width:7px;height:7px;border-radius:50%;background:#e06a00;border:1px solid #8a3a00}
-      .bb-vote{display:inline-block;height:13px;vertical-align:middle;padding:0 3px;border-radius:7px;background:#fff;border:1px solid #9aa9b4}
-      .bb-vote i{display:block;height:9px;margin-top:2px;border-radius:5px;background:linear-gradient(#ffd27a,#f08a00 55%,#c66400)}
-      .bb .bb-pct{display:inline-block;min-width:38px;margin-left:5px;font-weight:bold}
-      .bb .bb-cnt{color:#444}
+      .bb td.row1{background:#19150e}.bb td.row2{background:#14110b}.bb td.row3{background:#100e09}
+      .bb tr:hover td.row1,.bb tr:hover td.row2,.bb tr:hover td.row3{background:#2a2412}
+      .bb td.catHead{height:20px;padding:3px 6px;background:linear-gradient(#2e2618,#1e190f);border-top:1px solid #4a3e24}
+      .bb .cattitle{font:700 11px Tahoma,Arial,sans-serif;color:#ffe8a0;letter-spacing:.5px;text-shadow:0 1px 1px #000}
+      .bb td.c{text-align:center}
+      .bb .bb-forumlink{font-size:12px}
+      .bb img.bb-fi{width:18px;height:18px;vertical-align:-5px;margin-right:6px;border:1px solid #000;outline:1px solid #6a6050;border-radius:2px}
+      .bb-vote{display:inline-block;width:90px;height:8px;vertical-align:middle;background:#000;border:1px solid #3a3020}
+      .bb-vote i{display:block;height:100%;background:linear-gradient(#ffd75a,#b07a00)}
+      .bb .bb-pct{display:inline-block;min-width:38px;margin-left:6px;font-weight:bold;color:#fff}
+      .bb .bb-cnt{color:#9a8a6a}
+      .bb b{color:#fff}
       .bb .bb-cols{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
       .bb .bb-stats td.icon{width:46px;text-align:center}
       .bb .bb-users{display:inline-block;width:30px;height:24px;position:relative}
       .bb .bb-users::before,.bb .bb-users::after{content:'';position:absolute;bottom:0;width:15px;height:20px;border-radius:8px 8px 3px 3px;
-        background:radial-gradient(circle at 50% 28%,#ffd9b0 0 4px,transparent 4.5px),linear-gradient(transparent 45%,#3c7aa8 45%);border:1px solid #2a5a80}
-      .bb .bb-users::before{left:1px}.bb .bb-users::after{right:1px;filter:hue-rotate(160deg)}
+        background:radial-gradient(circle at 50% 28%,#ffd9b0 0 4px,transparent 4.5px),linear-gradient(transparent 45%,#8a5a20 45%);border:1px solid #000}
+      .bb .bb-users::before{left:1px}.bb .bb-users::after{right:1px;filter:hue-rotate(-30deg) brightness(.8)}
       .bb .bb-legend b{padding:0 3px}
-      .bb .rs-pvp{color:#aa0000}.bb .rs-normal{color:#006600}.bb .rs-rp{color:#6a3aa0}.bb .rs-rppvp{color:#cc6600}
+      .bb .rs-pvp{color:#ff5a4a}.bb .rs-normal{color:#1eff00}.bb .rs-rp{color:#c890ff}.bb .rs-rppvp{color:#ffa040}
       .bb-foot{display:flex;justify-content:space-between;gap:8px;margin:0 2px}
       @media (max-width:760px){.bb .bb-cols{grid-template-columns:1fr}.bb .hide-sm{display:none}.bb-top{flex-direction:column;align-items:flex-start}}
     </style>
@@ -105,39 +106,35 @@ $groups = [
         <div class="bb-small" style="text-align:right">Armory sample taken <?= e($bbDate($pc['fetchedFrom'])) ?> &ndash; <?= e(gmdate('g:i a', strtotime($pc['fetchedTo']))) ?> UTC<br>
           <b><?= fmt($pc['profiles']) ?></b> characters answered of <?= fmt($pc['sampled']) ?> looked up</div>
       </div>
+      <div class="bb-body">
 
       <table class="forumline">
-        <tr><th colspan="2">Profession</th><th>Characters</th><th class="hide-sm">Share of sample</th><th>Avg Skill</th><th class="hide-sm">Median</th><th class="hide-sm">Avg Recipes</th><th>At Cap</th></tr>
+        <tr><th>Profession</th><th>Characters</th><th class="hide-sm">Share of sample</th><th>Avg Skill</th><th class="hide-sm">Median</th><th class="hide-sm">Avg Recipes</th><th>At Cap</th></tr>
 <?php foreach ($groupsBB as $title => $role): ?>
-        <tr><td class="catHead" colspan="8"><span class="cattitle"><?= e($title) ?></span></td></tr>
-<?php foreach ($prim as $p): if (($cards[$slugOf[$p['name']] ?? '']['role'] ?? '') !== $role) continue; $b = $p['brackets']; ?>
+        <tr><td class="catHead" colspan="7"><span class="cattitle"><?= e($title) ?></span></td></tr>
+<?php foreach ($prim as $p): if (($cards[$slugOf[$p['name']] ?? '']['role'] ?? '') !== $role) continue ?>
         <tr>
-          <td class="row1 c hide-sm" width="30"><span class="bb-folder<?= $p === $prim[0] || $p === $prim[1] ? ' new' : '' ?>"></span></td>
-          <td class="row1"><?= $trade($p['name']) ?>
-            <span class="bb-desc">Apprentice <?= fmt($b['Apprentice'] ?? 0) ?> &middot; Journeyman <?= fmt($b['Journeyman'] ?? 0) ?> &middot; Expert <?= fmt($b['Expert'] ?? 0) ?> &middot; Artisan <b><?= fmt($b['Artisan'] ?? 0) ?></b> &middot; best seen <?= fmt($p['top']) ?></span></td>
+          <td class="row1"><?= $trade($p['name']) ?></td>
           <td class="row2 c"><?= fmt($p['count']) ?></td>
-          <td class="row2 hide-sm" nowrap><?= $bar($p['pct']) ?><span class="bb-pct"><?= $p['pct'] ?>%</span></td>
+          <td class="row2 hide-sm" nowrap><?= $bar($p['pct'], $maxP) ?><span class="bb-pct"><?= $p['pct'] ?>%</span></td>
           <td class="row2 c"><b><?= $p['avg'] ?></b></td>
           <td class="row2 c hide-sm"><?= $p['median'] + 0 ?></td>
           <td class="row2 c hide-sm"><?= $p['recipes'] ?></td>
           <td class="row3 c"><?= $p['maxed'] ?>%</td>
         </tr>
 <?php endforeach; endforeach; ?>
-        <tr><td class="catHead" colspan="8"><span class="cattitle">Secondary Skills</span></td></tr>
-<?php foreach ($pc['secondaries'] as $p): $b = $p['brackets']; ?>
+        <tr><td class="catHead" colspan="7"><span class="cattitle">Secondary Skills</span></td></tr>
+<?php foreach ($pc['secondaries'] as $p): ?>
         <tr>
-          <td class="row1 c hide-sm"><span class="bb-folder"></span></td>
-          <td class="row1"><?= $trade($p['name']) ?>
-            <span class="bb-desc">Apprentice <?= fmt($b['Apprentice'] ?? 0) ?> &middot; Journeyman <?= fmt($b['Journeyman'] ?? 0) ?> &middot; Expert <?= fmt($b['Expert'] ?? 0) ?> &middot; Artisan <b><?= fmt($b['Artisan'] ?? 0) ?></b></span></td>
+          <td class="row1"><?= $trade($p['name']) ?></td>
           <td class="row2 c"><?= fmt($p['count']) ?></td>
-          <td class="row2 hide-sm" nowrap><?= $bar($p['pct'] / 2) ?><span class="bb-pct"><?= $p['pct'] ?>%</span></td>
+          <td class="row2 hide-sm" nowrap><?= $bar($p['pct'], $maxS) ?><span class="bb-pct"><?= $p['pct'] ?>%</span></td>
           <td class="row2 c"><b><?= $p['avg'] ?></b></td>
           <td class="row2 c hide-sm"><?= $p['median'] + 0 ?></td>
           <td class="row2 c hide-sm"><?= $p['recipes'] ?></td>
           <td class="row3 c"><?= $p['maxed'] ?>%</td>
         </tr>
 <?php endforeach; ?>
-        <tr><td class="spaceRow" colspan="8"></td></tr>
       </table>
 
       <div class="bb-cols">
@@ -145,7 +142,7 @@ $groups = [
           <tr><th colspan="2">Poll :: What two trades did they pick?</th></tr>
 <?php foreach ($pc['combos'] as [$combo, $k, $pct]): ?>
           <tr><td class="row1"><span class="bb-small"><?= e($combo) ?></span></td>
-            <td class="row1" nowrap><?= $bar($pct * 3) ?><span class="bb-pct"><?= $pct ?>%</span> <span class="bb-small bb-cnt">[ <?= fmt($k) ?> ]</span></td></tr>
+            <td class="row1" nowrap><?= $bar($pct, $maxC) ?><span class="bb-pct"><?= $pct ?>%</span> <span class="bb-small bb-cnt">[ <?= fmt($k) ?> ]</span></td></tr>
 <?php endforeach; ?>
           <tr><td class="row2 c" colspan="2"><b class="bb-small">Total Votes : <?= fmt($pc['profiles']) ?></b></td></tr>
         </table>
@@ -181,6 +178,7 @@ $groups = [
 
       <div class="bb-foot bb-small"><span>Skill is the character's current points; &ldquo;At Cap&rdquo; means maxed for the rank they have trained.</span>
         <a href="#census">Back to top</a></div>
+      </div>
     </div>
 
     <div class="pf-intro">
