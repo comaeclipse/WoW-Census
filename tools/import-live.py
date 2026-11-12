@@ -33,6 +33,14 @@ Options for this wrapper (everything else goes to the importer):
   --target both|local|live   default both
   --host root@162.243.9.180  the production server
   --publish-now              start FORCE=1 wowcensus-data-refresh after a live change
+  --skip-icons               don't fill and ship item icons after the live import
+
+After every successful live import, the wrapper reads the item ids in live's AH
+scans through the tunnel and runs tools/update-item-icons.mjs for them. Any
+tools/item-icons/<stem>.json that differs from live's copy (by SHA-256) goes over the same SSH connection into the
+live release's resources/item-icons/, and the server re-renders that edition's AH
+page and purges it from Cloudflare. Missing icon images need no upload: nginx
+redirects them to wow.zamimg.com. Commit the updated JSON so the next release keeps it.
 """
 
 import argparse
@@ -51,11 +59,90 @@ IMPORTERS = {"csv": REPO / "tools" / "import-forever-ah-csv-pg.py",
 LIVE_DB = "dbname=marketlens user=wowcensus"
 LIVE_ARCHIVE = Path(os.environ.get("MARKETLENS_DATA_ROOT", Path.home() / "Documents" / "MarketLensData")) / "imports-live"
 LIVE_PG_PORT = 5432
-# Runs on the server: print the password and a marker, then wait for one line on
-# stdin ("publish" or "done"), so the tunnel lives exactly as long as the import.
-REMOTE = ("printf '%s\\nREADY\\n' \"$(cat /etc/wowcensus/pg-password)\" && read cmd; "
-          "if [ \"$cmd\" = publish ]; then FORCE=1 nohup /usr/local/bin/wowcensus-data-refresh "
-          ">> /var/log/wowcensus-data-refresh.log 2>&1 < /dev/null & echo PUBLISH STARTED; fi")
+# Runs on the server: print the password and a marker, then read commands on stdin
+# until "publish" or "done", so the tunnel lives exactly as long as the import.
+#   hashes: print "HASH <stem> <sha256>" for each live item-icons file, then "HASHES END"
+#   icons <stem>  + one base64 line: replace the live release's resources/item-icons/<stem>.json
+#   refresh <uri>: re-render that page in nginx's cache and purge it from Cloudflare
+# Python's text pipes on Windows send "\r\n": every read strips the "\r".
+REMOTE = r"""printf '%s\nREADY\n' "$(cat /etc/wowcensus/pg-password)" &&
+cr="$(printf '\r')"
+while read -r cmd arg; do
+  cmd="${cmd%"$cr"}"; arg="${arg%"$cr"}"
+  case "$cmd" in
+    hashes)
+      for s in forever classic tbc mop-classic retail; do
+        echo "HASH $s $(sha256sum "$(readlink -f /srv/wowcensus/current)/resources/item-icons/$s.json" 2>/dev/null | cut -c1-64)"
+      done; echo "HASHES END";;
+    icons) read -r data; data="${data%"$cr"}"
+      case "$arg" in forever|classic|tbc|mop-classic|retail) ;; *) echo "ICONS $arg REJECTED"; continue;; esac
+      f="$(readlink -f /srv/wowcensus/current)/resources/item-icons/$arg.json"
+      if printf '%s' "$data" | base64 -d > "$f.new" && php -r 'is_array(json_decode(file_get_contents($argv[1]), true)) or exit(1);' "$f.new"
+      then chmod 644 "$f.new"; mv "$f.new" "$f"; echo "ICONS $arg UPDATED"
+      else rm -f "$f.new"; echo "ICONS $arg FAILED"; fi;;
+    refresh)
+      case "$arg" in /*auctionhouse|/*auctionhouse.html) ;; *) echo "REFRESH $arg REJECTED"; continue;; esac
+      curl -sk -o /dev/null -w "REFRESH $arg %{http_code}\n" -H "Host: wowcensus.io" -H "X-WoWCensus-Refresh: 1" "https://127.0.0.1$arg"
+      (. /etc/wowcensus/cloudflare.env && curl -s -o /dev/null -w "PURGE $arg %{http_code}\n" -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data "{\"files\":[\"https://wowcensus.io$arg\"]}");;
+    *) break;;
+  esac
+done
+if [ "$cmd" = publish ]; then FORCE=1 nohup /usr/local/bin/wowcensus-data-refresh >> /var/log/wowcensus-data-refresh.log 2>&1 < /dev/null & echo PUBLISH STARTED; fi"""
+ICON_TOOL = REPO / "tools" / "update-item-icons.mjs"
+# Edition -> tools/item-icons/<stem>.json (update-item-icons.mjs EDITIONS) and its AH page.
+ICON_STEM = {"forever": "forever", "classic-beta": "forever", "classic-progression": "tbc", "classic": "classic",
+             "sod": "classic", "hardcore": "classic", "mop-classic": "mop-classic", "retail": "retail"}
+AH_PAGE = {"forever": "/forever/auctionhouse", "classic-beta": "/forever-beta/auctionhouse",
+           "classic-progression": "/tbc/auctionhouse", "classic": "/classic/auctionhouse", "sod": "/sod/auctionhouse",
+           "hardcore": "/hardcore/auctionhouse", "mop-classic": "/mop/auctionhouse", "retail": "/retail/auctionhouse"}
+
+
+def fill_icons(dsn, password, ssh):
+    """Cache icons for every item in the live AH scans; return the remote commands that ship them.
+
+    Before this, icons came from one-off fills of tools/item-icons/*.json, and prod's copy only
+    changed on a code release, so every item first seen in a live import showed "?" on the site.
+    A file is shipped whenever it differs from live's copy, so a fill made elsewhere (the local
+    watcher, a manual run) also reaches live on the next import.
+    """
+    import base64
+    import hashlib
+    import tempfile
+    import psycopg2
+    with psycopg2.connect(dsn, password=password, connect_timeout=15) as conn, conn.cursor() as cur:
+        cur.execute("SELECT source_game, array_agg(item_id ORDER BY item_id) FROM "
+                    "(SELECT DISTINCT source_game, item_id FROM local_auction_snapshots) s GROUP BY 1")
+        scanned = {source: ids for source, ids in cur.fetchall() if source in ICON_STEM}
+    files = {stem: REPO / "tools" / "item-icons" / f"{stem}.json" for stem in set(ICON_STEM.values())}
+    for source, ids in sorted(scanned.items()):
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as tmp:
+            tmp.write("\n".join(map(str, ids)))
+        try:
+            out = subprocess.run(["node", str(ICON_TOOL), f"--sources={source}", f"--ids-from={tmp.name}"], cwd=REPO,
+                                 capture_output=True, text=True, encoding="utf-8", errors="backslashreplace")
+        finally:
+            os.unlink(tmp.name)
+        for line in (out.stdout + out.stderr).splitlines():
+            if line.strip():
+                print(f"icons {source}: {line.strip()}")
+        if out.returncode:
+            print(f"icons {source}: update-item-icons.mjs failed (exit {out.returncode})")
+    ssh.stdin.write("hashes\n")
+    ssh.stdin.flush()
+    live = {}
+    while (line := ssh.stdout.readline().strip()) != "HASHES END":
+        if not line:
+            raise RuntimeError("the server did not answer the icon hash check")
+        parts = line.split()
+        if parts[0] == "HASH":
+            live[parts[1]] = parts[2] if len(parts) > 2 else ""
+    commands = []
+    for stem, f in sorted(files.items()):
+        if f.exists() and hashlib.sha256(f.read_bytes()).hexdigest() != live.get(stem):
+            commands.append(f"icons {stem}\n{base64.b64encode(f.read_bytes()).decode()}\n")
+            for source in sorted(s for s in scanned if ICON_STEM[s] == stem):
+                commands += [f"refresh {AH_PAGE[source]}\n", f"refresh {AH_PAGE[source]}.html\n"]
+    return commands
 
 
 def run_importer(kind, args, env=None):
@@ -87,6 +174,7 @@ def main():
     parser.add_argument("--target", choices=("both", "local", "live"), default="both")
     parser.add_argument("--host", default="root@162.243.9.180")
     parser.add_argument("--publish-now", action="store_true")
+    parser.add_argument("--skip-icons", action="store_true")
     args, rest = parser.parse_known_args()
     if any(a == "--dsn" or a.startswith("--dsn=") or a == "--archive" or a.startswith("--archive=") for a in rest):
         raise SystemExit("--dsn and --archive are set by this wrapper; leave them out")
@@ -125,6 +213,17 @@ def main():
         changed = code == 0 and not dry and last.startswith("CHANGED") and (
             args.kind not in ("saves", "classicplus") or last != "CHANGED sources=")
         publish = changed and args.publish_now
+        # Icons for new items, shipped over this connection. The import is already
+        # committed, so a failure here only warns.
+        if code == 0 and not dry and not args.skip_icons:
+            try:
+                commands = fill_icons(dsn, password, ssh)
+                for command in commands:
+                    ssh.stdin.write(command)
+                if not commands:
+                    print("icons: live already has every scanned item's icon")
+            except Exception as e:
+                print(f"icons: skipped ({type(e).__name__}: {e})")
         ssh.stdin.write("publish\n" if publish else "done\n")
         ssh.stdin.flush()
         tail = ssh.communicate(timeout=60)[0].strip()
