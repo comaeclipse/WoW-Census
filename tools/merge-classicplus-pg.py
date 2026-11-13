@@ -11,7 +11,7 @@ canonical rows the census pages read, the same way tools/merge-foreverpulse-veri
 - Every row's date is the day its file was imported (external_classicplus_sources.imported_at), not
   the packed ClassicPlus day: first_seen = last_seen = imported_at, seen_count 1, and one
   character_observations row on that day.
-- Race and class are stored localised by the client (enUS, esMX, koKR); they are mapped to the
+- Race and class are stored localised by the client (enUS, esMX, koKR, ruRU, deDE); they are mapped to the
   census's English names. An unknown value stops the merge instead of being guessed.
 - Game keys are realm:<region>:forever:<Realm>-<Faction> with the realm name as ClassicPlus recorded
   it. A realm id already in census_collection_realms keeps that name; a new one is added.
@@ -41,6 +41,12 @@ RACES = {
     # koKR
     "인간": "Human", "드워프": "Dwarf", "나이트 엘프": "Night Elf", "노움": "Gnome",
     "고등 마법원 스카이본": "High Order Skyborne",
+    # ruRU
+    "Человек": "Human", "Дворф": "Dwarf", "Ночной эльф": "Night Elf", "Гном": "Gnome",
+    "Небеснорожденный из Высшего ордена": "High Order Skyborne",
+    # deDE
+    "Mensch": "Human", "Zwerg": "Dwarf", "Nachtelf": "Night Elf", "Gnom": "Gnome",
+    "Himmelsgeborener des Hohen Ordens": "High Order Skyborne",
 }
 CLASSES = {
     **{c: c for c in ("Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Shaman", "Mage", "Warlock", "Druid")},
@@ -50,6 +56,12 @@ CLASSES = {
     # koKR
     "전사": "Warrior", "성기사": "Paladin", "사냥꾼": "Hunter", "도적": "Rogue", "사제": "Priest",
     "주술사": "Shaman", "마법사": "Mage", "흑마법사": "Warlock", "드루이드": "Druid",
+    # ruRU
+    "Воин": "Warrior", "Паладин": "Paladin", "Охотник": "Hunter", "Разбойник": "Rogue", "Жрец": "Priest",
+    "Шаман": "Shaman", "Маг": "Mage", "Чернокнижник": "Warlock", "Друид": "Druid",
+    # deDE ("Paladin" is the same word)
+    "Krieger": "Warrior", "Jäger": "Hunter", "Schurke": "Rogue", "Priester": "Priest",
+    "Schamane": "Shaman", "Magier": "Mage", "Hexenmeister": "Warlock", "Druide": "Druid",
 }
 
 

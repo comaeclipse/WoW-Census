@@ -19,9 +19,13 @@ if (!match || Number(match[1]) !== Number(realm.id) || match[2] !== realm.name |
   throw new Error(`inconsistent realm identity: ${realmKey}`);
 const packed = db.Packed.realms[realmKey];
 const factions = Object.keys(packed);
-if (factions.length !== 1 || !["Alliance", "Horde"].includes(factions[0]))
-  throw new Error(`expected one faction: ${factions}`);
-const faction = factions[0], rows = [], names = new Set();
+if (!factions.length || factions.some(f => !["Alliance", "Horde"].includes(f)))
+  throw new Error(`unexpected factions: ${factions}`);
+if (!Number.isInteger(info.SavedAt) || info.SavedAt <= 0) throw new Error("missing SavedAt");
+const savedDay = new Date(info.SavedAt * 1000).toISOString().slice(0, 10);
+// One body per faction: a save scanned on both sides packs Alliance and Horde under the same realm.
+process.stdout.write(JSON.stringify(factions.map(faction => {
+const rows = [], names = new Set();
 const days = [];
 for (const [race, classes] of Object.entries(packed[faction])) {
   for (const [characterClass, groups] of Object.entries(classes)) {
@@ -46,12 +50,11 @@ for (const [race, classes] of Object.entries(packed[faction])) {
     }
   }
 }
-if (!rows.length || !Number.isInteger(info.SavedAt) || info.SavedAt <= 0)
-  throw new Error("missing characters or SavedAt");
-const savedDay = new Date(info.SavedAt * 1000).toISOString().slice(0, 10);
+if (!rows.length) throw new Error(`no ${faction} characters`);
 if (days.some(day => day > savedDay)) throw new Error("character day is after SavedAt UTC day");
-process.stdout.write(JSON.stringify({source: "ClassicPlus", version: info.LogVer, dataFormat: info.DataFormat,
+return {source: "ClassicPlus", version: info.LogVer, dataFormat: info.DataFormat,
   savedAt: info.SavedAt, locale: info.ClientLocale, region, realmId: Number(realm.id), realmName: realm.name,
   ruleset: realm.ruleset, faction, scanPasses: Object.keys(info.Scanner?.Passes || {}).length,
   scanTimes: Object.keys(db.TimesPlus?.[realmKey]?.[faction] || {}).length,
-  firstDay: days.reduce((a, b) => a < b ? a : b), lastDay: days.reduce((a, b) => a > b ? a : b), rows}));
+  firstDay: days.reduce((a, b) => a < b ? a : b), lastDay: days.reduce((a, b) => a > b ? a : b), rows};
+})));

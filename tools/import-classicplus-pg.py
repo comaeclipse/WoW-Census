@@ -34,8 +34,7 @@ def main():
         digest = hashlib.sha256(raw).hexdigest()
         result = subprocess.run(["node", str(REPO / "tools" / "export-classicplus-savedvariables.js"), str(path)],
                                 capture_output=True, text=True, encoding="utf-8", check=True)
-        body = json.loads(result.stdout)
-        files.append((path, raw, digest, body))
+        files.append((path, raw, digest, json.loads(result.stdout)))  # one body per faction
     if len({x[2] for x in files}) != len(files):
         raise SystemExit("duplicate file content in this batch")
 
@@ -60,7 +59,7 @@ def main():
               level integer NOT NULL, guild text NOT NULL, last_seen_day date NOT NULL,
               source_character_id bigint NOT NULL, seen_count integer NOT NULL, surname text NOT NULL,
               PRIMARY KEY (source_sha256,name))""")
-            for path, raw, digest, body in files:
+            for path, raw, digest, bodies in files:
                 cur.execute("SELECT 1 FROM marketlens_import.local_source_files WHERE sha256=%s", (digest,))
                 if cur.fetchone():
                     print(f"ALREADY IMPORTED {path.name} sha256={digest}", flush=True)
@@ -70,28 +69,42 @@ def main():
                 target.write_bytes(raw)
                 if hashlib.sha256(target.read_bytes()).hexdigest() != digest:
                     raise RuntimeError(f"archive hash mismatch: {target}")
+                modified = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat()
                 cur.execute("""INSERT INTO marketlens_import.local_source_files
                   (sha256,relative_path,source_modified_utc,bytes,content) VALUES (%s,%s,%s,%s,NULL)""",
-                            (digest, f"external/classicplus/{path.name}",
-                             datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat(), len(raw)))
-                cur.execute("""INSERT INTO marketlens_import.external_classicplus_sources
-                  (sha256,version,data_format,saved_at,locale,region,realm_id,realm_name,ruleset,faction,
-                   character_rows,first_day,last_day,scan_passes,scan_times,archive_path)
-                  VALUES (%s,%s,%s,to_timestamp(%s),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                            (digest, body["version"], body["dataFormat"], body["savedAt"], body["locale"],
-                             body["region"], body["realmId"], body["realmName"], body["ruleset"],
-                             body["faction"], len(body["rows"]), body["firstDay"], body["lastDay"],
-                             body["scanPasses"], body["scanTimes"], str(target)))
-                execute_values(cur, """INSERT INTO marketlens_import.external_classicplus_characters
-                  (source_sha256,name,race_raw,class_raw,level,guild,last_seen_day,source_character_id,seen_count,surname)
-                  VALUES %s""", [(digest, *row) for row in body["rows"]], page_size=1000)
-                imported.append((digest, body))
-                print(f"IMPORTED {path.name} {body['region']}:{body['realmName']}:{body['faction']} "
-                      f"characters={len(body['rows'])} days={body['firstDay']}..{body['lastDay']}", flush=True)
-        print(f"IMPORTED sources={len(imported)} characters={sum(len(b['rows']) for _, b in imported)}", flush=True)
+                            (digest, f"external/classicplus/{path.name}", modified, len(raw)))
+                for body in bodies:
+                    import_faction(cur, path, raw, digest, body, target, modified, len(bodies) > 1)
+                    imported.append(body)
+        print(f"IMPORTED sources={len(imported)} characters={sum(len(b['rows']) for b in imported)}", flush=True)
         print("CHANGED sources=", flush=True)
     finally:
         conn.close()
+
+
+def import_faction(cur, path, raw, file_digest, body, target, modified, split):
+    """One source row per faction. A file holding both factions gets a per-faction id,
+    sha256("<file sha256>:<Faction>"), registered in local_source_files as <file>#<Faction>."""
+    digest = file_digest
+    if split:
+        digest = hashlib.sha256(f"{file_digest}:{body['faction']}".encode()).hexdigest()
+        cur.execute("""INSERT INTO marketlens_import.local_source_files
+          (sha256,relative_path,source_modified_utc,bytes,content) VALUES (%s,%s,%s,%s,NULL)""",
+                    (digest, f"external/classicplus/{path.name}#{body['faction']}", modified, len(raw)))
+    cur.execute("""INSERT INTO marketlens_import.external_classicplus_sources
+      (sha256,version,data_format,saved_at,locale,region,realm_id,realm_name,ruleset,faction,
+       character_rows,first_day,last_day,scan_passes,scan_times,archive_path)
+      VALUES (%s,%s,%s,to_timestamp(%s),%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (digest, body["version"], body["dataFormat"], body["savedAt"], body["locale"],
+                 body["region"], body["realmId"], body["realmName"], body["ruleset"],
+                 body["faction"], len(body["rows"]), body["firstDay"], body["lastDay"],
+                 body["scanPasses"], body["scanTimes"], str(target)))
+    execute_values(cur, """INSERT INTO marketlens_import.external_classicplus_characters
+      (source_sha256,name,race_raw,class_raw,level,guild,last_seen_day,source_character_id,seen_count,surname)
+      VALUES %s""", [(digest, *row) for row in body["rows"]], page_size=1000)
+    print(f"IMPORTED {path.name} {body['region']}:{body['realmName']}:{body['faction']} "
+          f"characters={len(body['rows'])} days={body['firstDay']}..{body['lastDay']} source={digest[:12]}",
+          flush=True)
 
 
 if __name__ == "__main__":
