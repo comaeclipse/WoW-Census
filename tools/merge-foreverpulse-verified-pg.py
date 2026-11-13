@@ -22,12 +22,16 @@ Afterwards rebuild the census cache (laragon-php/build-census-cache.php).
 """
 import argparse
 import os
+import sys
+
+# Realm names can be Korean; a cp1252 console must not abort the merge before it commits.
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 import psycopg2
 from psycopg2.extras import execute_values
 
 DSN = os.environ.get("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbname=marketlens_local user=skarz")
-REGION_ID = {"us": 1, "eu": 3}
+REGION_ID = {"us": 1, "kr": 2, "eu": 3}
 
 
 def main():

@@ -4,7 +4,7 @@ Usage: python -I tools/build-foreverpulse-verified.py <scrape.jsonl> <verified.j
 Needs BLIZZARD_CLIENT_ID / BLIZZARD_CLIENT_SECRET in the environment.
 
 A character is kept only when:
-  - the Forever profile exists in the scraped region (us/eu),
+  - the Forever profile exists in the scraped region (us/eu/kr),
   - the full name (name_search) and race, class and faction match the scrape,
   - the profile's own ruleset matches the scraped realm type.
 Guild (may be none), level and ruleset are taken from Blizzard. Candidates are level 10+ (the
@@ -23,7 +23,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-REGION = {"NA": "us", "EU": "eu"}
+REGION = {"NA": "us", "EU": "eu", "KR": "kr"}
 MODE_TO_RULESET = {"pve": "Normal", "pvp": "PvP", "rp": "Roleplay", "rp-pvp": "Roleplay PvP"}
 RACE = {"scourge": "undead", "nightelf": "night elf"}
 
@@ -97,7 +97,7 @@ def check(api, row):
     if (full.casefold() != name.casefold()
             or norm_race((p.get("race") or {}).get("name")) != norm_race(row["race"])
             or str((p.get("character_class") or {}).get("name", "")).casefold() != (row["class"] or "").casefold()
-            or str((p.get("faction") or {}).get("name", "")).casefold() != (row["faction"] or "").casefold()):
+            or str((p.get("faction") or {}).get("name", "")).casefold() != (row["faction"] or row.get("scopeFaction") or "").casefold()):
         return None, "identity_mismatch"
     ruleset = (p.get("ruleset") or {}).get("name")
     if ruleset != MODE_TO_RULESET.get(row["mode"]):

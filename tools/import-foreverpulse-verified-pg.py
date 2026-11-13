@@ -25,7 +25,7 @@ from pathlib import Path
 
 DATA = Path.home() / "Documents" / "MarketLensData"
 DSN = os.environ.get("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbname=marketlens_local user=skarz")
-REGIONS = {"US": "us", "EU": "eu"}
+REGIONS = {"US": "us", "EU": "eu", "KR": "kr"}
 RULESETS = {"Normal", "PvP", "Roleplay", "Roleplay PvP"}
 FACTIONS = {"Alliance", "Horde"}
 CLASSES = {"Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Shaman", "Mage", "Warlock", "Druid"}
@@ -124,7 +124,7 @@ def main():
                 row_count integer NOT NULL, verified_from timestamptz NOT NULL, verified_to timestamptz NOT NULL,
                 imported_at timestamptz NOT NULL DEFAULT now())""")
             cur.execute("""CREATE TABLE IF NOT EXISTS marketlens_import.external_verified_characters (
-                region text NOT NULL CHECK (region IN ('us','eu')),
+                region text NOT NULL CHECK (region IN ('us','eu','kr')),
                 name text NOT NULL,
                 ruleset text NOT NULL, faction text NOT NULL, race text NOT NULL, class text NOT NULL,
                 level integer NOT NULL, guild text, guild_id bigint,
@@ -136,6 +136,10 @@ def main():
             # Tables created before guildless rows were allowed had these NOT NULL.
             cur.execute("""ALTER TABLE marketlens_import.external_verified_characters
                 ALTER COLUMN guild DROP NOT NULL, ALTER COLUMN guild_id DROP NOT NULL""")
+            # Tables created before Korean realms were verified only allowed us/eu.
+            cur.execute("""ALTER TABLE marketlens_import.external_verified_characters
+                DROP CONSTRAINT IF EXISTS external_verified_characters_region_check,
+                ADD CONSTRAINT external_verified_characters_region_check CHECK (region IN ('us','eu','kr'))""")
             # Blizzard ids repeat within a region, so this index is for lookups only (it was unique once).
             cur.execute("""SELECT indisunique FROM pg_index WHERE indexrelid =
                 to_regclass('marketlens_import.external_verified_characters_blizzard_id')""")
