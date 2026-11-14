@@ -72,6 +72,13 @@ def schema(cur) -> None:
       next_attempt_at timestamptz, status text NOT NULL DEFAULT 'queued',
       attempts integer NOT NULL DEFAULT 0, last_http_status integer, last_error text,
       PRIMARY KEY(region,name))""")
+    # Older versions pre-seeded every known name here. The canonical and
+    # verified tables are already the inventory; retain only real queue state.
+    cur.execute("""DELETE FROM marketlens_import.forever_armory_candidates
+      WHERE attempts=0 AND status='queued' AND discovery_source IN
+        ('blizzard-verified-foreverpulse','wowcensus')""")
+    cur.execute("""CREATE INDEX IF NOT EXISTS forever_armory_candidates_due
+      ON marketlens_import.forever_armory_candidates(region,status,next_attempt_at,last_attempt_at)""")
     cur.execute("""CREATE TABLE IF NOT EXISTS marketlens_import.forever_armory_runs (
       run_id bigserial PRIMARY KEY, started_at timestamptz NOT NULL DEFAULT now(),
       finished_at timestamptz, requested integer NOT NULL, fetched integer NOT NULL DEFAULT 0,
@@ -183,47 +190,59 @@ class Blizzard:
         return 0, None, "retry exhausted"
 
 
-def queue_known(cur, recent_days: int) -> int:
+def select_due(cur, region: str, limit: int, max_age: int, name: str | None = None):
+    """Select a bounded batch without materializing the known-name inventory."""
+    if limit <= 0:
+        return []
+    name_sql, name_args = ("AND lower(c.name)=lower(%s)", [name]) if name else ("", [])
+    cur.execute(f"""SELECT c.region,c.name,c.slug FROM marketlens_import.forever_armory_candidates c
+      LEFT JOIN marketlens_import.forever_armory_profiles p
+        ON p.region=c.region AND lower(p.full_name)=lower(c.name)
+      WHERE c.region=%s {name_sql} AND (c.next_attempt_at IS NULL OR c.next_attempt_at<=now())
+        AND (p.fetched_at IS NULL OR p.fetched_at<now()-(%s||' hours')::interval)
+      ORDER BY c.status='queued' DESC,c.last_attempt_at NULLS FIRST,c.first_queued_at LIMIT %s""",
+                [region, *name_args, max_age, limit])
+    selected = cur.fetchall()
+    remaining = limit - len(selected)
+    if remaining <= 0 or name:
+        return selected
+
     cur.execute("SELECT to_regclass('marketlens_import.external_verified_characters')")
-    has_verified = cur.fetchone()[0] is not None
-    cur.execute("SELECT value::timestamptz FROM marketlens_import.forever_armory_state WHERE key='external_verified_through'")
-    row = cur.fetchone(); cutoff = row[0] if row else datetime.fromtimestamp(0, timezone.utc)
-    if has_verified:
-        cur.execute("""INSERT INTO marketlens_import.forever_armory_candidates
-      (region,name,slug,discovery_source,source_identity)
-      SELECT region,name,lower(replace(name,' ','-')),'blizzard-verified-foreverpulse',forever_pulse_id::text
-      FROM marketlens_import.external_verified_characters WHERE verified_at>%s
-      ON CONFLICT(region,name) DO NOTHING
-      RETURNING 1""", (cutoff,))
-        count = cur.rowcount
-        cur.execute("""INSERT INTO marketlens_import.forever_armory_state(key,value)
-      SELECT 'external_verified_through',max(verified_at)::text FROM marketlens_import.external_verified_characters
-      HAVING max(verified_at) IS NOT NULL ON CONFLICT(key) DO UPDATE SET
-      value=excluded.value,updated_at=now()""")
-    else:
-        count = 0
-    cur.execute("SELECT value::bigint FROM marketlens_import.forever_armory_state WHERE key='canonical_last_seen'")
-    state = cur.fetchone(); seen_cutoff = state[0] if state else 0
-    cur.execute("""SELECT name,realm,character_key FROM marketlens_import.characters
-      WHERE source_game='forever' AND level>=10 AND last_seen>%s
-        AND last_seen>=extract(epoch from now()-%s::interval)
-      ORDER BY last_seen DESC""", (seen_cutoff, f"{recent_days} days"))
-    candidates = {}
-    for name, realm, identity in cur.fetchall():
-        region = region_from_realm(realm)
-        if region and name and len(name.split()) >= 2:
-            candidates.setdefault((region, name.casefold()),
-                                  (region, name, slugify(name), "wowcensus", identity))
-    values = list(candidates.values())
-    if values:
+    if cur.fetchone()[0] is not None:
+        cur.execute("""SELECT v.region,v.name,lower(replace(v.name,' ','-'))
+          FROM marketlens_import.external_verified_characters v
+          WHERE v.region=%s
+            AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_profiles p
+              WHERE p.region=v.region AND lower(p.full_name)=lower(v.name))
+            AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_candidates c
+              WHERE c.region=v.region AND c.name=v.name)
+          ORDER BY v.name LIMIT %s""", (region, remaining))
+        verified = cur.fetchall()
+        if verified:
+            execute_values(cur, """INSERT INTO marketlens_import.forever_armory_candidates
+              (region,name,slug,discovery_source) VALUES %s ON CONFLICT(region,name) DO NOTHING""",
+                           [(r, n, s, "blizzard-verified-foreverpulse") for r, n, s in verified])
+            selected.extend(verified)
+            remaining -= len(verified)
+    if remaining <= 0:
+        return selected
+
+    realm_prefix = {"us": "CAMWOW US%", "eu": "CAMWOW EU%", "kr": "CAMWOW KR%", "tw": "CAMWOW TW%"}[region]
+    cur.execute("""SELECT DISTINCT ON (lower(ch.name)) %s,ch.name,lower(replace(ch.name,' ','-')),ch.character_key
+      FROM marketlens_import.characters ch
+      WHERE ch.source_game='forever' AND ch.level>=10 AND ch.realm LIKE %s AND ch.name LIKE '%% %%'
+        AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_profiles p
+          WHERE p.region=%s AND lower(p.full_name)=lower(ch.name))
+        AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_candidates c
+          WHERE c.region=%s AND lower(c.name)=lower(ch.name))
+      ORDER BY lower(ch.name),ch.last_seen DESC LIMIT %s""", (region, realm_prefix, region, region, remaining))
+    census = cur.fetchall()
+    if census:
         execute_values(cur, """INSERT INTO marketlens_import.forever_armory_candidates
-          (region,name,slug,discovery_source,source_identity) VALUES %s
-          ON CONFLICT(region,name) DO UPDATE SET slug=excluded.slug""", values, page_size=1000)
-    cur.execute("""INSERT INTO marketlens_import.forever_armory_state(key,value)
-      SELECT 'canonical_last_seen',max(last_seen)::text FROM marketlens_import.characters
-      WHERE source_game='forever' HAVING max(last_seen) IS NOT NULL ON CONFLICT(key) DO UPDATE SET
-      value=excluded.value,updated_at=now()""")
-    return count + len(values)
+          (region,name,slug,discovery_source,source_identity) VALUES %s ON CONFLICT(region,name) DO NOTHING""",
+                       [(r, n, s, "wowcensus", identity) for r, n, s, identity in census])
+        selected.extend([row[:3] for row in census])
+    return selected
 
 
 def specialization_rows(body: dict | None):
@@ -370,25 +389,13 @@ def main() -> None:
               (region,name,slug,discovery_source) VALUES (%s,%s,%s,'explicit')
               ON CONFLICT(region,name) DO UPDATE SET slug=excluded.slug,discovery_source='explicit',next_attempt_at=NULL""",
                         (args.region, args.name, slugify(args.name)))
-        else:
-            queue_known(cur, args.recent_days)
     with conn.cursor() as cur:
-        def due(region, limit):
-            where = ["(c.next_attempt_at IS NULL OR c.next_attempt_at<=now())", "c.region=%s"]
-            values = [region]
-            if args.name: where.append("lower(c.name)=lower(%s)"); values.append(args.name)
-            values.extend([args.max_age, limit])
-            cur.execute(f"""SELECT c.region,c.name,c.slug FROM marketlens_import.forever_armory_candidates c
-              LEFT JOIN marketlens_import.forever_armory_profiles p
-                ON p.region=c.region AND lower(p.full_name)=lower(c.name)
-              WHERE {' AND '.join(where)} AND (p.fetched_at IS NULL OR p.fetched_at<now()-(%s||' hours')::interval)
-              ORDER BY c.status='queued' DESC,c.last_attempt_at NULLS FIRST,c.first_queued_at LIMIT %s""", values)
-            return cur.fetchall()
         if args.region:
-            candidates = due(args.region, args.limit)
+            candidates = select_due(cur, args.region, args.limit, args.max_age, args.name)
         else:
             share = max(1, (args.limit + len(REGIONS) - 1) // len(REGIONS))
-            candidates = [row for region in REGIONS for row in due(region, share)][:args.limit]
+            candidates = [row for region in REGIONS
+                          for row in select_due(cur, region, share, args.max_age)][:args.limit]
         random.Random(args.seed).shuffle(candidates)
         cur.execute("INSERT INTO marketlens_import.forever_armory_runs(requested,options) VALUES(%s,%s) RETURNING run_id",
                     (len(candidates), Json(vars(args))))

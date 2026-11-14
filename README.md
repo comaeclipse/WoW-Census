@@ -347,6 +347,10 @@ table. Add `--include all guilds` to snapshot the discovered guild rosters and
 queue their two-part character names. Guild expansion is deliberately not
 population ingestion.
 
+Known names are selected directly from their indexed source tables in bounded
+batches. `forever_armory_candidates` stores only actual attempt/backoff state,
+explicit requests and guild discoveries; it does not duplicate the full census.
+
 `forever_armory_current_builds` exposes the latest API-reported specialization,
 spent points and normalized talents. Treat it as authoritative for that
 character's last-logout Armory snapshot; nearby `character_inspects` remain the
