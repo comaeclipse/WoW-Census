@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Cache Blizzard's WoW: Forever Armory for already-known census characters.
 
 This is enrichment, never census ingestion. It discovers no population on its
