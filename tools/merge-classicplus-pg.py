@@ -47,6 +47,7 @@ RACES = {
     # deDE
     "Mensch": "Human", "Zwerg": "Dwarf", "Nachtelf": "Night Elf", "Gnom": "Gnome",
     "Himmelsgeborener des Hohen Ordens": "High Order Skyborne",
+    "Untoter": "Undead", "Himmelsgeborener der Windformer": "Windshaper Skyborne",
 }
 CLASSES = {
     **{c: c for c in ("Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Shaman", "Mage", "Warlock", "Druid")},
