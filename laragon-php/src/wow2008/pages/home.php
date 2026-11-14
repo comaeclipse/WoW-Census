@@ -101,7 +101,7 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
   </main>
 
   <aside class="side home-side">
-    <div class="box support-box">
+    <div class="box support-box" id="support">
       <h4><i></i>Support WoWCensus</h4>
       <div class="sup-body">
         <p class="sup-lead">WoWCensus is run by volunteers and paid for out of pocket. If the census helps you, consider chipping in for server upkeep!</p>

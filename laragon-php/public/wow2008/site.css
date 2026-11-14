@@ -75,11 +75,16 @@
 .census-banner .seen svg{position:static;inset:auto;display:block;width:100%;height:38px;margin-top:2px}
 .seen .ax{display:flex;justify-content:space-between;font-size:7px;color:#8a7650;margin-top:1px}
 @media (max-width:700px){.census-banner .seen{display:none}}
-.topbar .w8-skins{margin-right:auto;padding-left:200px;color:#7f93b4;font:bold 10px Verdana, sans-serif;display:flex;align-items:center;gap:0}
-.topbar .w8-skins a{padding:0 9px;font-size:10px;font-weight:normal;color:#9fb3d4;border-left:1px solid #33496a}
-.topbar .w8-skins a:first-of-type{border-left:0;margin-left:6px}
-.topbar .w8-skins a[aria-current="true"]{color:var(--gold-lt);font-weight:bold}
-.topbar .w8-skins a:hover{color:#fff}
+/* Donation bar in the top bar: smooth frame, green fill. --h scales everything (frame art is 452x36). */
+.topbar .w8-fund{margin-right:auto;padding:0 0 0 200px;border:0;display:flex;align-items:center;gap:8px;text-decoration:none;text-shadow:none}
+.topbar .w8-fund .cap{font:bold 10px Verdana, sans-serif;color:#9fb3d4;text-shadow:0 1px 0 #000;white-space:nowrap}
+.topbar .w8-fund .amt{font:bold 10px Verdana, sans-serif;color:var(--gold-lt);text-shadow:0 1px 0 #000;white-space:nowrap;font-variant-numeric:tabular-nums}
+.topbar .w8-fund:hover .cap{color:#fff}
+.w8-gbar{--h:20px;--p:0;position:relative;isolation:isolate;flex:none;width:calc(var(--h) * 12.556);height:var(--h)}
+.w8-gbar::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border:calc(var(--h) / 2) solid transparent;border-image:url('donation-frame.png') 18 / 1 / 0 stretch}
+.w8-gbar .track{display:block;position:absolute;z-index:-1;inset:calc(var(--h) * .19) calc(var(--h) / 6);border-radius:calc(var(--h) * .2);overflow:hidden;background:url('donation-stone.png') center / 100% 100% no-repeat}
+.w8-gbar .fill{display:block;height:100%;width:calc(var(--p) * 100%);background:url('donation-fill.png') left center / calc(100% / max(var(--p), .001)) 100% no-repeat}
+.w8-gbar.empty .fill{display:none}
 
 /* ===== Edition picker (in the search box's place) ===== */
 /* The 2008 portal's search bar: slanted left cap, stone tile, right cap
@@ -133,7 +138,7 @@
   .topbar{height:auto}
   .topbar .inner,.header .inner,.page,.footer{width:auto}
   .topbar .inner{flex-wrap:wrap;justify-content:center;padding:3px 6px;row-gap:3px}
-  .topbar .w8-skins{margin:0;padding:0;width:100%;justify-content:center}
+  .topbar .w8-fund{margin:0;padding:0;width:100%;justify-content:center}
   .header{height:auto;padding:6px 6px 8px}
   .header .inner{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
   .logo{position:relative;left:0;top:0;width:153px;height:61px}

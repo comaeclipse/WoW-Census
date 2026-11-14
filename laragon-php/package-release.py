@@ -31,6 +31,7 @@ def main() -> None:
             (REPO / "laragon-php/public/blog-economy.css", "public/blog-economy.css"),
             (REPO / "laragon-php/public/blog", "public/blog"),
             (REPO / "laragon-php/public/faq.php", "public/faq.php"),
+            (REPO / "laragon-php/public/donate.php", "public/donate.php"),
             (REPO / "laragon-php/public/ads.txt", "public/ads.txt"),
             (REPO / "laragon-php/public/cobalt-skin.css", "public/cobalt-skin.css"),
             (REPO / "laragon-php/public/cobalt-skin.js", "public/cobalt-skin.js"),
