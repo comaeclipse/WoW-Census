@@ -347,6 +347,14 @@ table. Add `--include all guilds` to snapshot the discovered guild rosters and
 queue their two-part character names. Guild expansion is deliberately not
 population ingestion.
 
+`--min-level 60` limits the run to characters whose verified or last fetched
+level is at least 60 (run one `--region` at a time; without it the limit is
+split evenly over us/eu/kr/tw). The default rate is 5 requests/second so a
+ForeverPulse verify loop can share the same 36,000/hour credentials; a fully
+fetched character costs 13 requests (14 for hunters). Titles, mounts and hunter
+pets are stored too; raid encounters are skipped because Forever returns them
+empty.
+
 Known names are selected directly from their indexed source tables in bounded
 batches. `forever_armory_candidates` stores only actual attempt/backoff state,
 explicit requests and guild discoveries; it does not duplicate the full census.

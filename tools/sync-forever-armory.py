@@ -24,6 +24,7 @@ import json
 import os
 import random
 import re
+import sys
 import threading
 import time
 import urllib.error
@@ -37,7 +38,10 @@ from psycopg2.extras import Json, execute_values
 DEFAULT_DSN = os.getenv("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbname=marketlens_local user=skarz")
 REGIONS = ("us", "eu", "kr", "tw")
 ENDPOINTS = ("specializations", "equipment", "statistics", "professions", "achievements",
-             "reputations", "pvp-summary", "appearance", "character-media")
+             "reputations", "pvp-summary", "appearance", "character-media", "titles", "mounts",
+             "hunter-pets")
+ENDPOINT_PATHS = {"mounts": "collections/mounts"}
+HUNTER_ONLY = {"hunter-pets"}
 REGION_RE = re.compile(r"^CAMWOW (US|EU|KR|TW)", re.I)
 
 
@@ -117,6 +121,9 @@ def schema(cur) -> None:
       reputations_json jsonb, pvp_summary_json jsonb, appearance_json jsonb,
       character_media_json jsonb, endpoint_status_json jsonb NOT NULL,
       PRIMARY KEY(region,character_id,snapshot_at))""")
+    cur.execute("""ALTER TABLE marketlens_import.forever_armory_snapshots
+      ADD COLUMN IF NOT EXISTS titles_json jsonb, ADD COLUMN IF NOT EXISTS mounts_json jsonb,
+      ADD COLUMN IF NOT EXISTS hunter_pets_json jsonb""")
     cur.execute("""CREATE INDEX IF NOT EXISTS forever_armory_snapshots_login
       ON marketlens_import.forever_armory_snapshots(region,character_id,last_login_at DESC)""")
     cur.execute("""CREATE TABLE IF NOT EXISTS marketlens_import.forever_armory_talents (
@@ -190,11 +197,15 @@ class Blizzard:
         return 0, None, "retry exhausted"
 
 
-def select_due(cur, region: str, limit: int, max_age: int, name: str | None = None):
+def select_due(cur, region: str, limit: int, max_age: int, name: str | None = None, min_level: int = 0):
     """Select a bounded batch without materializing the known-name inventory."""
     if limit <= 0:
         return []
     name_sql, name_args = ("AND lower(c.name)=lower(%s)", [name]) if name else ("", [])
+    if min_level > 0 and not name:
+        name_sql += """ AND (p.level>=%s OR EXISTS (SELECT 1 FROM marketlens_import.external_verified_characters v
+          WHERE v.region=c.region AND v.name=c.name AND v.level>=%s))"""
+        name_args += [min_level, min_level]
     cur.execute(f"""SELECT c.region,c.name,c.slug FROM marketlens_import.forever_armory_candidates c
       LEFT JOIN marketlens_import.forever_armory_profiles p
         ON p.region=c.region AND lower(p.full_name)=lower(c.name)
@@ -211,12 +222,12 @@ def select_due(cur, region: str, limit: int, max_age: int, name: str | None = No
     if cur.fetchone()[0] is not None:
         cur.execute("""SELECT v.region,v.name,lower(replace(v.name,' ','-'))
           FROM marketlens_import.external_verified_characters v
-          WHERE v.region=%s
+          WHERE v.region=%s AND v.level>=%s
             AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_profiles p
               WHERE p.region=v.region AND lower(p.full_name)=lower(v.name))
             AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_candidates c
               WHERE c.region=v.region AND c.name=v.name)
-          ORDER BY v.name LIMIT %s""", (region, remaining))
+          ORDER BY v.name LIMIT %s""", (region, min_level, remaining))
         verified = cur.fetchall()
         if verified:
             execute_values(cur, """INSERT INTO marketlens_import.forever_armory_candidates
@@ -230,12 +241,12 @@ def select_due(cur, region: str, limit: int, max_age: int, name: str | None = No
     realm_prefix = {"us": "CAMWOW US%", "eu": "CAMWOW EU%", "kr": "CAMWOW KR%", "tw": "CAMWOW TW%"}[region]
     cur.execute("""SELECT DISTINCT ON (lower(ch.name)) %s,ch.name,lower(replace(ch.name,' ','-')),ch.character_key
       FROM marketlens_import.characters ch
-      WHERE ch.source_game='forever' AND ch.level>=10 AND ch.realm LIKE %s AND ch.name LIKE '%% %%'
+      WHERE ch.source_game='forever' AND ch.level>=%s AND ch.realm LIKE %s AND ch.name LIKE '%% %%'
         AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_profiles p
           WHERE p.region=%s AND lower(p.full_name)=lower(ch.name))
         AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_candidates c
           WHERE c.region=%s AND lower(c.name)=lower(ch.name))
-      ORDER BY lower(ch.name),ch.last_seen DESC LIMIT %s""", (region, realm_prefix, region, region, remaining))
+      ORDER BY lower(ch.name),ch.last_seen DESC LIMIT %s""", (region, max(10, min_level), realm_prefix, region, region, remaining))
     census = cur.fetchall()
     if census:
         execute_values(cur, """INSERT INTO marketlens_import.forever_armory_candidates
@@ -273,7 +284,9 @@ def fetch_character(api: Blizzard, candidate: tuple, include: set[str]) -> dict:
     for endpoint in ENDPOINTS:
         if "all" not in include and endpoint not in include:
             continue
-        code, body, err = api.get(api_url(region, slug, endpoint))
+        if endpoint in HUNTER_ONLY and (profile.get("character_class") or {}).get("id") != 3:
+            continue
+        code, body, err = api.get(api_url(region, slug, ENDPOINT_PATHS.get(endpoint, endpoint)))
         key = endpoint.replace("-", "_")
         result["endpoint_status"][endpoint] = {"status": code, "error": err}
         if code == 200:
@@ -319,15 +332,16 @@ def store_result(cur, run_id: int, result: dict, miss_age: int) -> tuple[str, in
        p.get("equipped_item_level"), p.get("achievement_points"), last_login, now, run_id, Json(p)))
     values = {key: Json(endpoints[key]) if key in endpoints else None for key in
               ("specializations", "equipment", "statistics", "professions", "achievements", "reputations",
-               "pvp_summary", "appearance", "character_media")}
+               "pvp_summary", "appearance", "character_media", "titles", "mounts", "hunter_pets")}
     cur.execute("""INSERT INTO marketlens_import.forever_armory_snapshots
       (region,character_id,snapshot_at,last_login_at,run_id,profile_json,specializations_json,equipment_json,
        statistics_json,professions_json,achievements_json,reputations_json,pvp_summary_json,appearance_json,
-       character_media_json,endpoint_status_json) VALUES
-      (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+       character_media_json,titles_json,mounts_json,hunter_pets_json,endpoint_status_json) VALUES
+      (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
       (region, character_id, snapshot_at, last_login, run_id, Json(p), values["specializations"], values["equipment"],
        values["statistics"], values["professions"], values["achievements"], values["reputations"],
-       values["pvp_summary"], values["appearance"], values["character_media"], Json(result["endpoint_status"])))
+       values["pvp_summary"], values["appearance"], values["character_media"], values["titles"], values["mounts"],
+       values["hunter_pets"], Json(result["endpoint_status"])))
     talents = specialization_rows(endpoints.get("specializations"))
     if talents:
         execute_values(cur, """INSERT INTO marketlens_import.forever_armory_talents
@@ -365,13 +379,16 @@ def store_guild(cur, api: Blizzard, run_id: int, region: str, guild_id: int, slu
 
 
 def main() -> None:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser()
     parser.add_argument("--dsn", default=DEFAULT_DSN)
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--region", choices=REGIONS)
     parser.add_argument("--name", help="exact two-part name; requires --region")
     parser.add_argument("--include", nargs="+", default=["all"], choices=("all", "guilds", *ENDPOINTS))
-    parser.add_argument("--rate", type=float, default=8.0, help="all HTTP requests per second")
+    parser.add_argument("--rate", type=float, default=5.0, help="all HTTP requests per second")
+    parser.add_argument("--min-level", type=int, default=0, help="only characters at or above this level")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--max-age", type=int, default=24, help="hours before refreshing a success")
     parser.add_argument("--miss-age", type=int, default=7, help="days before retrying a 404")
@@ -391,11 +408,11 @@ def main() -> None:
                         (args.region, args.name, slugify(args.name)))
     with conn.cursor() as cur:
         if args.region:
-            candidates = select_due(cur, args.region, args.limit, args.max_age, args.name)
+            candidates = select_due(cur, args.region, args.limit, args.max_age, args.name, args.min_level)
         else:
             share = max(1, (args.limit + len(REGIONS) - 1) // len(REGIONS))
             candidates = [row for region in REGIONS
-                          for row in select_due(cur, region, share, args.max_age)][:args.limit]
+                          for row in select_due(cur, region, share, args.max_age, min_level=args.min_level)][:args.limit]
         random.Random(args.seed).shuffle(candidates)
         cur.execute("INSERT INTO marketlens_import.forever_armory_runs(requested,options) VALUES(%s,%s) RETURNING run_id",
                     (len(candidates), Json(vars(args))))
