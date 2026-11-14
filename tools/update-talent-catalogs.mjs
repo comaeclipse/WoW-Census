@@ -15,7 +15,8 @@
 //
 // Nodes Wowhead dropped are kept so older inspections still resolve. A catalog
 // whose nodes did not change is left alone.
-// Usage: node tools/update-talent-catalogs.mjs [forever|tbc|classic ...]
+// Usage: node tools/update-talent-catalogs.mjs [--check] [forever|tbc|classic ...]
+// --check exits 1 when the live catalog differs, without rewriting files.
 import fs from "node:fs";
 import crypto from "node:crypto";
 
@@ -55,7 +56,9 @@ function pageData(text) {
   return JSON.parse(text.slice(start, end + 1));
 }
 
-const only = process.argv.slice(2);
+const check = process.argv.includes("--check");
+const only = process.argv.slice(2).filter((x) => x !== "--check");
+let drift = false;
 for (const catalog of CATALOGS.filter((c) => !only.length || only.includes(c.key))) {
   const file = new URL(`../site/src/${catalog.file}`, import.meta.url);
   const old = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : { nodes: [] };
@@ -74,9 +77,12 @@ for (const catalog of CATALOGS.filter((c) => !only.length || only.includes(c.key
   for (const n of kept) console.log("kept   ", label(n), "(no longer on Wowhead)");
   const all = [...nodes, ...kept];
   if (JSON.stringify(all) === JSON.stringify(old.nodes)) { console.log(`${catalog.file}: unchanged`); continue; }
+  drift = true;
+  if (check) { console.error(`${catalog.file}: live talent catalog drift detected`); continue; }
   const retrievedAt = new Date().toISOString();
   const hash = crypto.createHash("sha256").update(text).digest("hex").slice(0, 12);
   fs.writeFileSync(file, JSON.stringify({ version: `${catalog.key}-${Math.floor(Date.parse(retrievedAt) / 1000)}-${hash}`,
     source: catalog.source, retrievedAt, nodes: all }, null, 2) + "\n");
   console.log(`${catalog.file}: ${nodes.length} current + ${kept.length} kept nodes`);
 }
+if (check && drift) process.exitCode = 1;

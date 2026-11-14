@@ -328,3 +328,32 @@ Talent popularity uses unique players with readable node data within each filter
 class; string-only builds are explicitly excluded. These nearby samples are not
 population-wide spec shares. Run `node --test tools/test-inspects.mjs` for identity,
 classification, validation, replay/history and HTML escaping checks.
+
+### Forever Armory enrichment
+
+Forever's public Battle.net profile is a separate logout snapshot, not a census
+sighting. `tools/sync-forever-armory.py` queues already-known level-10+ Forever
+names, reads the undocumented `profile-forever-{region}` endpoints, and stores
+profiles, specialization/talent groups, gear, statistics, professions,
+achievements, reputations, PvP, appearance and media in `forever_armory_*`
+PostgreSQL tables. It never merges those rows into canonical census counts.
+
+Set `BLIZZARD_CLIENT_ID` and `BLIZZARD_CLIENT_SECRET`, then run a bounded,
+resumable refresh such as `python tools/sync-forever-armory.py --limit 500`.
+Successful characters wait 24 hours by default; 404s wait seven days. Use
+`--region us --name "First Surname"` for one character. Blizzard provides no
+name search, so candidates come from WoWCensus and the API-verified ForeverPulse
+table. Add `--include all guilds` to snapshot the discovered guild rosters and
+queue their two-part character names. Guild expansion is deliberately not
+population ingestion.
+
+`forever_armory_current_builds` exposes the latest API-reported specialization,
+spent points and normalized talents. Treat it as authoritative for that
+character's last-logout Armory snapshot; nearby `character_inspects` remain the
+authority for the build actually observed at their inspection time. Raw endpoint
+JSON and endpoint-specific statuses remain in `forever_armory_snapshots` for
+reprocessing when Blizzard changes this currently undocumented API.
+
+Forever talent mappings must be checked after patches. Run
+`node tools/update-talent-catalogs.mjs --check forever` for a read-only drift
+check, or omit `--check` to refresh the catalog while retaining historical nodes.
