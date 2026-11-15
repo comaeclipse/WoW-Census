@@ -15,6 +15,7 @@ namespace Wow2008;
 
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= e(asset('css/style.css')) ?>">

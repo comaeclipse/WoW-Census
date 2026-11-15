@@ -8,6 +8,20 @@ namespace Wow2008;
 $icon = $item['icon'] ?: 'inv_misc_questionmark';
 $w = $item['wearers'];
 $listed = (bool)$item['scans'];
+$tip = $item['tip'] ?? null;
+$aw = $item['armoryWearers'] ?? null;
+$onlyFaction = $aw && count($aw['factions']) === 1 ? (string)array_key_first($aw['factions']) : null;
+$lvTop = $aw ? array_key_first($aw['levels']) : null;
+// Not tradeable and never listed: say so beside the tooltip instead of an empty market section.
+$bopNote = $tip && $tip['bop'] && !$listed;
+$money = function (int $cu): string {
+  $g = intdiv($cu, 10000); $s = intdiv($cu, 100) % 100; $c = $cu % 100; $out = '';
+  if ($g) $out .= '<span>' . fmt($g) . '<i class="g"></i></span>';
+  if ($s || ($g && $c)) $out .= '<span>' . $s . '<i class="s"></i></span>';
+  if ($c && !$g) $out .= '<span>' . $c . '<i class="c"></i></span>';
+  return '<span class="money">' . ($out ?: '<span>0<i class="c"></i></span>') . '</span>';
+};
+$pct = fn($n, $d) => $d ? (int)round(100 * $n / $d) : 0;
 $QCOL = [0 => '#9d9d9d', 1 => '#ffffff', 2 => '#1eff00', 3 => '#0070dd', 4 => '#a335ee', 5 => '#ff8000', 6 => '#e6cc80', 7 => '#00ccff'];
 $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') : '#ffffff';
 ?>
@@ -52,6 +66,47 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     .it-fac{display:flex;height:14px;border:1px solid #000;margin:4px 0 8px}
     .it-fac i{display:block}
     .it-nomkt{padding:10px 12px;background:linear-gradient(#fbe9b6,#e8d098);border:1px solid #9c7c42;font-size:12px;color:#3a1a00}
+    .it-hero .meta .chip{font:700 9px Tahoma,Arial,sans-serif;letter-spacing:.6px;text-transform:uppercase;padding:3px 7px;border:1px solid #6a4a18;border-radius:2px;color:#f0d8a0;background:rgba(0,0,0,.45)}
+    .it-hero .meta .chip.red{color:#ffb0a0;border-color:#7a2a18}
+    .it-top{display:grid;grid-template-columns:270px 1fr;gap:14px;align-items:start}
+    .it-top.solo{grid-template-columns:minmax(0,320px)}
+    .it-tt{background:rgba(8,10,28,.94);border:1px solid #8a8a9a;border-radius:4px;box-shadow:0 0 0 1px #000,0 4px 14px #000;padding:9px 11px;font:12px/1.45 Tahoma,Arial,sans-serif;color:#fff}
+    .it-tt .n{font-size:14px;font-weight:700}
+    .it-tt .y{color:#ffd100}
+    .it-tt .g{color:#1eff00}
+    .it-tt .r{display:flex;justify-content:space-between;gap:10px}
+    .it-tt .money{text-shadow:none}
+    .it-top .tiles{margin:0;grid-template-columns:repeat(2,1fr)}
+    .it-why{margin-top:10px;padding:9px 12px;background:linear-gradient(#fbe9b6,#e8d098);border:1px solid #9c7c42;font-size:12px;color:#3a1a00}
+    .it-why b{color:#7a1a00}
+    .it-why .money{color:#3a1a00;text-shadow:none}
+    .it-why.sum{background:linear-gradient(#f4ecd8,#dccfa8)}
+    .it-bar.cls{grid-template-columns:20px 70px 1fr 48px 52px}
+    .it-bar.cls img{width:18px;height:18px;border:1px solid #000}
+    .it-bar .ad{text-align:right;color:#9c8c6c;font-size:10px}
+    .it-bars .hd{display:grid;grid-template-columns:20px 70px 1fr 48px 52px;gap:8px;font:700 9px Tahoma,Arial,sans-serif;color:#8a7a5a;text-transform:uppercase;letter-spacing:.5px;padding-bottom:3px;border-bottom:1px solid #2e2818;margin-bottom:3px}
+    .it-bars .hd span:nth-child(n+4){text-align:right}
+    .it-bars .note{margin:8px 0 0;font:10px Tahoma,Arial,sans-serif;color:#b8a888}
+    .it-bars .note b{color:#ffd75a}
+    .it-three{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+    .it-hist{display:flex;align-items:flex-end;gap:3px;height:96px;padding-top:4px;border-bottom:1px solid #3a3020}
+    .it-hist div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+    .it-hist i{display:block;background:linear-gradient(#ffd75a,#b07a00);border:1px solid #000;border-bottom:0}
+    .it-hist div.me i{background:linear-gradient(#7aff5a,#1e8a00)}
+    .it-hx{display:flex;gap:3px;font:9px Tahoma,Arial,sans-serif;color:#9c8c6c;margin-top:3px}
+    .it-hx span{flex:1;text-align:center}
+    .it-hx span.me{color:#7aff5a}
+    .it-split{display:flex;height:22px;border:1px solid #000;margin:6px 0 4px;font:700 10px/22px Tahoma,Arial,sans-serif;color:#000;text-align:center;overflow:hidden;white-space:nowrap}
+    .it-big{font:900 26px 'Cinzel',serif;color:#ffd75a;text-shadow:0 2px 2px #000}
+    .it-big small{font:11px Tahoma,Arial,sans-serif;color:#b8a888;margin-left:6px}
+    .it-pairs{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+    .it-pair{display:grid;grid-template-columns:1fr 120px 40px;gap:8px;align-items:center;padding:6px 8px;background:linear-gradient(#fff6d8,#ecd59c);border:1px solid #8a6a2a;font-size:12px}
+    .it-pair a{font-weight:700;text-decoration:none}
+    .it-pair .tr{display:block;height:9px;background:#3a2a10;border:1px solid #000}
+    .it-pair .tr i{display:block;height:100%;width:0;background:linear-gradient(#ffd75a,#b07a00);transition:width .8s}
+    .it-pair .v{text-align:right;font-weight:700;color:#5a2a00}
+    .it-pair .q0{color:#6a6a6a}.it-pair .q1{color:#444}.it-pair .q2{color:#1a8a00}.it-pair .q3{color:#0058b0}.it-pair .q4{color:#8a2ad0}.it-pair .q5{color:#c86000}
+    @media (max-width:860px){.it-top{grid-template-columns:1fr}.it-pairs{grid-template-columns:1fr}}
     @media (max-width:760px){.it-wear{grid-template-columns:1fr}}
     @media (max-width:760px){.it-charts{grid-template-columns:1fr}}
     @media (max-width:600px){.it-hero{grid-template-columns:auto 1fr}.it-wh{grid-column:1 / -1;justify-self:start}.it-hero h1{font-size:21px}.it-hero .emb{width:52px;height:52px}}
@@ -68,6 +123,13 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
           <?php if ($item['crafter']): ?><span>Crafted by <?= e($item['crafter']) ?></span><?php endif ?>
           <?php if ($item['taught']): ?><span>Teaches <a href="<?= e(\forever_item_path($item['taught']['id'])) ?>"><?= e($item['taught']['name']) ?></a></span><?php endif ?>
           <span>Item ID <?= (int)$item['id'] ?></span>
+<?php if ($tip): ?>
+          <?php if ($tip['ilvl']): ?><span class="chip">Item Level <?= (int)$tip['ilvl'] ?></span><?php endif ?>
+          <?php if ($tip['binding']): ?><span class="chip<?= $tip['bop'] ? ' red' : '' ?>"><?= e($tip['binding']) ?></span><?php endif ?>
+          <?php if ($tip['unique']): ?><span class="chip"><?= e($tip['unique']) ?></span><?php endif ?>
+<?php endif ?>
+<?php if ($onlyFaction): ?>          <span class="chip red"><?= e($onlyFaction) ?> only (as seen)</span>
+<?php endif ?>
         </div>
       </div>
       <a class="it-wh" href="<?= e($wowhead) ?>" target="_blank" rel="noopener">Wowhead »</a>
@@ -100,11 +162,133 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     <?php component_end() ?>
 <?php endif ?>
 
-<?php if (!$listed): ?>
+<?php if ($tip): $qc = $nameColor; ?>
+    <?php component_start('section', ['title' => 'The Item', 'icon' => '', 'sub' => 'from a Battle.net Armory equipment snapshot']) ?>
+        <div class="it-top<?= $aw ? '' : ' solo' ?>">
+          <div>
+            <div class="it-tt">
+              <div class="n" style="color:<?= e($qc) ?>"><?= e($item['name']) ?></div>
+              <?php if ($tip['ilvl']): ?><div class="y">Item Level <?= (int)$tip['ilvl'] ?></div><?php endif ?>
+              <?php if ($tip['binding']): ?><div><?= e($tip['binding']) ?></div><?php endif ?>
+              <?php if ($tip['unique']): ?><div><?= e($tip['unique']) ?></div><?php endif ?>
+              <?php if ($tip['slot']): ?><div class="r"><span><?= e($tip['slot']) ?></span><span><?= e((string)$tip['type']) ?></span></div><?php endif ?>
+              <?php if ($tip['weapon']): ?><div class="r"><span><?= e($tip['weapon'][0]) ?></span><span><?= e($tip['weapon'][1]) ?></span></div><div><?= e($tip['weapon'][2]) ?></div><?php endif ?>
+              <?php if ($tip['armor']): ?><div><?= e($tip['armor']) ?></div><?php endif ?>
+              <?php foreach ($tip['stats'] as [$line, $bonus]): ?><div<?= $bonus ? ' class="g"' : '' ?>><?= e($line) ?></div><?php endforeach ?>
+              <?php if ($tip['classes']): ?><div><?= e($tip['classes']) ?></div><?php endif ?>
+              <?php if ($tip['requires']): ?><div><?= e($tip['requires']) ?></div><?php endif ?>
+              <?php foreach ($tip['spells'] as $line): ?><div class="g"><?= e($line) ?></div><?php endforeach ?>
+              <?php if ($tip['sell']): ?><div style="margin-top:4px">Sell Price: <?= $money($tip['sell']) ?></div><?php endif ?>
+            </div>
+<?php if ($bopNote): ?>
+            <div class="it-why"><b>Not on the Auction House.</b> It binds when picked up, so it can't be traded or listed.<?php if ($tip['sell']): ?> A vendor buys it for <?= $money($tip['sell']) ?>.<?php endif ?></div>
+<?php endif ?>
+          </div>
+<?php if ($aw):
+  $top3 = array_slice($aw['classes'], 0, 3);
+  $top3n = array_sum(array_column($top3, 'n'));
+  $names = array_map(fn($c) => '<b>' . e($c['name']) . 's</b>', $top3);
+  $list = count($names) > 1 ? implode(', ', array_slice($names, 0, -1)) . ' and ' . end($names) : ($names[0] ?? '');
+?>
+          <div>
+            <div class="tiles">
+              <div class="stat"><span>Worn by</span><b><?= fmt($aw['players']) ?></b><em>Armory character<?= $aw['players'] === 1 ? '' : 's' ?></em></div>
+              <div class="stat"><span><?= $onlyFaction ? e($onlyFaction) . ' adoption' : 'Adoption' ?></span><b><?= $aw['pool'] ? e((string)round(100 * $aw['players'] / $aw['pool'], $aw['players'] * 100 < $aw['pool'] ? 1 : 0)) : 0 ?>%</b><em>of <?= fmt($aw['pool']) ?> <?= $onlyFaction ? e($onlyFaction) . ' ' : '' ?>characters on file</em></div>
+<?php if ($aw['top']): ?>
+              <div class="stat"><span>Top class</span><b style="color:<?= e($aw['top']['color']) ?>"><?= e($aw['top']['name']) ?></b><em><?= (int)$aw['top']['of'] ?>% of <?= $onlyFaction ? e($onlyFaction) . ' ' : '' ?><?= e($aw['top']['name']) ?>s wear one</em></div>
+<?php endif ?>
+<?php if ($aw['hist']): ?>
+              <div class="stat"><span>Wearer gear</span><b><?= (int)$aw['hist']['avg'] ?></b><em>avg equipped item level · <?= (int)$aw['hist']['min'] ?>–<?= (int)$aw['hist']['max'] ?></em></div>
+<?php endif ?>
+            </div>
+            <div class="it-why sum">
+<?php if (count($aw['classes']) > 1): ?>
+              Most worn by <?= $list ?>, together <?= $pct($top3n, $aw['players']) ?>% of wearers.
+<?php else: ?>
+              Only <?= $list ?> are seen wearing it.
+<?php endif ?>
+<?php if ($onlyFaction): ?> Every wearer seen is <?= e($onlyFaction) ?>.<?php endif ?>
+<?php if ($lvTop !== null): ?> <?= $pct($aw['levels'][$lvTop], $aw['players']) ?>% are level <?= (int)$lvTop ?>.<?php endif ?>
+            </div>
+          </div>
+<?php endif ?>
+        </div>
+    <?php component_end() ?>
+<?php endif ?>
+
+<?php if ($aw): $maxClass = max(array_column($aw['classes'], 'n')); ?>
+    <?php component_start('section', ['title' => 'Who Wears It', 'icon' => 'p', 'sub' => fmt($aw['players']) . ' of ' . fmt($aw['chars']) . ' Armory characters with gear on file']) ?>
+        <div class="it-wear">
+          <div class="it-bars"><h3>By class</h3>
+            <div class="hd"><span></span><span>Class</span><span></span><span>Wearers</span><span>Of class</span></div>
+<?php foreach ($aw['classes'] as $c): ?>
+            <div class="it-bar cls" data-tip="<?= e($c['name']) ?>|<?= fmt($c['n']) ?> wearing it|<?= $pct($c['n'], $aw['players']) ?>% of wearers<?= $c['of'] !== null ? '|' . $c['of'] . '% of ' . fmt($c['pool']) . ' ' . e($c['name']) . 's on file' : '' ?>"><?php if ($c['file']): ?><img src="/wow2008/class-icons/<?= e(str_replace('deathknight', 'death-knight', $c['file'])) ?>.png" alt=""><?php else: ?><span></span><?php endif ?><span style="color:<?= e($c['color']) ?>"><?= e($c['name']) ?></span><span class="tr"><i data-w="<?= round(100 * $c['n'] / $maxClass, 1) ?>%" style="background:<?= e($c['color']) ?>"></i></span><span class="v"><?= $pct($c['n'], $aw['players']) ?>%</span><span class="ad"<?= $aw['top'] && $aw['top']['name'] === $c['name'] ? ' style="color:#ffd75a"' : '' ?>><?= $c['of'] !== null ? $c['of'] . '%' : '—' ?></span></div>
+<?php endforeach ?>
+            <p class="note"><b>Of class</b> = share of that class's <?= $onlyFaction ? e($onlyFaction) . ' ' : '' ?>Armory characters wearing it, so big classes don't win by size alone.</p>
+          </div>
+<?php $fa = $aw['factions']['Alliance'] ?? 0; $fh = $aw['factions']['Horde'] ?? 0; ?>
+          <div class="it-bars"><h3>By faction</h3>
+            <div class="it-fac" data-tip="Faction|Alliance <?= fmt($fa) ?>|Horde <?= fmt($fh) ?>"><i style="flex:<?= $fa ?>;background:linear-gradient(#5aa0ff,#2f6ad0)"></i><i style="flex:<?= $fh ?>;background:linear-gradient(#ff5a4a,#a01a10)"></i></div>
+            <div class="it-bar" style="grid-template-columns:1fr auto"><span style="color:#9cc8ff">Alliance <?= $pct($fa, $aw['players']) ?>%</span><span style="color:#ffa090">Horde <?= $pct($fh, $aw['players']) ?>%</span></div>
+            <h3 style="margin-top:8px">By race</h3>
+<?php $maxRace = $aw['races'][0][1] ?? 1; foreach (array_slice($aw['races'], 0, 6) as [$race, $n]): ?>
+            <div class="it-bar"><span><?= e(str_replace(['High Order Skyborne', 'Windshaper Skyborne'], ['Skyborne (A)', 'Skyborne (H)'], (string)$race)) ?></span><span class="tr"><i data-w="<?= round(100 * $n / $maxRace, 1) ?>%" style="background:linear-gradient(#ffd75a,#b07a00)"></i></span><span class="v"><?= $pct($n, $aw['players']) ?>%</span></div>
+<?php endforeach ?>
+            <h3 style="margin-top:8px">By region</h3>
+<?php $maxReg = $aw['regions'][0][1] ?? 1; foreach ($aw['regions'] as [$reg, $n]): ?>
+            <div class="it-bar"><span><?= e($reg) ?></span><span class="tr"><i data-w="<?= round(100 * $n / $maxReg, 1) ?>%" style="background:linear-gradient(#9cc8ff,#2f6ad0)"></i></span><span class="v"><?= $pct($n, $aw['players']) ?>%</span></div>
+<?php endforeach ?>
+          </div>
+        </div>
+
+        <div class="it-three">
+<?php if ($h = $aw['hist']): $hmax = max($h['buckets']) ?: 1; ?>
+          <div class="it-bars"><h3>Wearers' equipped item level</h3>
+            <div class="it-hist">
+<?php foreach ($h['buckets'] as $b => $n): $me = $h['own'] !== null && $h['own'] >= $b && $h['own'] < $b + $h['w']; ?>
+              <div<?= $me ? ' class="me"' : '' ?> data-tip="Item level <?= $h['w'] > 1 ? $b . '–' . ($b + $h['w'] - 1) : $b ?>|<?= fmt($n) ?> wearer<?= $n === 1 ? '' : 's' ?><?= $me ? '|This item is ' . (int)$h['own'] : '' ?>"><i style="height:<?= round(100 * $n / $hmax, 1) ?>%"></i></div>
+<?php endforeach ?>
+            </div>
+            <div class="it-hx"><?php foreach (array_keys($h['buckets']) as $b): $me = $h['own'] !== null && $h['own'] >= $b && $h['own'] < $b + $h['w']; ?><span<?= $me ? ' class="me"' : '' ?>><?= $b ?></span><?php endforeach ?></div>
+<?php if ($h['own'] !== null && $h['above'] !== null): ?>
+            <p class="note"><b><?= $pct($h['above'], $aw['players']) ?>%</b> of wearers have an equipped item level above this item's own <?= (int)$h['own'] ?>.</p>
+<?php endif ?>
+          </div>
+<?php endif ?>
+<?php if ($aw['levels']): ?>
+          <div class="it-bars"><h3>Character level</h3>
+            <div class="it-big"><?= $pct($aw['levels'][$lvTop], $aw['players']) ?>%<small>at level <?= (int)$lvTop ?></small></div>
+<?php foreach ($aw['levels'] as $lv => $n): ?>
+            <div class="it-bar" style="grid-template-columns:1fr auto"><span>Level <?= (int)$lv ?></span><span class="v"><?= fmt($n) ?></span></div>
+<?php endforeach ?>
+          </div>
+<?php endif ?>
+<?php if (count($aw['slots']) === 2): $st = array_sum($aw['slots']); [$s1, $s2] = array_keys($aw['slots']); ?>
+          <div class="it-bars"><h3>Slot</h3>
+            <div class="it-split"><span style="flex:<?= (int)$aw['slots'][$s1] ?>;background:linear-gradient(#ffd75a,#b07a00)"><?= e($s1) ?> <?= $pct($aw['slots'][$s1], $st) ?>%</span><span style="flex:<?= (int)$aw['slots'][$s2] ?>;background:linear-gradient(#c8a050,#7a5a20)"><?= e($s2) ?> <?= $pct($aw['slots'][$s2], $st) ?>%</span></div>
+            <p class="note">Worn in the <?= e(strtolower($s1)) ?> slot <?= fmt($aw['slots'][$s1]) ?> times and the <?= e(strtolower($s2)) ?> slot <?= fmt($aw['slots'][$s2]) ?> times.</p>
+          </div>
+<?php endif ?>
+        </div>
+    <?php component_end() ?>
+
+<?php if ($aw['pairs']): $maxPair = $aw['pairs'][0]['n']; ?>
+    <?php component_start('section', ['title' => 'Often Worn With', 'icon' => '', 'sub' => 'the item in the matching ' . (str_contains(strtolower((string)($tip['slot'] ?? '')), 'finger') ? 'ring' : 'other') . ' slot on the same characters']) ?>
+        <div class="it-pairs">
+<?php foreach ($aw['pairs'] as $p): ?>
+          <div class="it-pair" data-tip="<?= e($p['name']) ?>|<?= fmt($p['n']) ?> of <?= fmt($aw['players']) ?> wearers"><a class="q<?= (int)$p['quality'] ?>" href="<?= e(\forever_item_path($p['id'])) ?>"><?= e($p['name']) ?></a><span class="tr"><i data-w="<?= round(100 * $p['n'] / $maxPair, 1) ?>%"></i></span><span class="v"><?= $pct($p['n'], $aw['players']) ?>%</span></div>
+<?php endforeach ?>
+        </div>
+        <p class="tfoot">From each character's latest Armory snapshot. Characters aren't named here.</p>
+    <?php component_end() ?>
+<?php endif ?>
+<?php endif ?>
+
+<?php if (!$listed && !$bopNote): ?>
     <?php component_start('section', ['title' => 'Auction House', 'icon' => 'g']) ?>
         <div class="it-nomkt"><?php if (!empty($item['armoryOnly'])): ?>Seen equipped on characters from the Battle.net Armory. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php elseif (!empty($item['localOnly'])): ?>This local item page was created from equipment observed on an enriched character. Auction history for this edition is not connected to the item page yet.<?php else: ?>No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.<?php endif ?></div>
     <?php component_end() ?>
-<?php else: ?>
+<?php elseif ($listed): ?>
     <div class="tiles" id="itTiles"></div>
 
     <section class="section">

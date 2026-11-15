@@ -93,9 +93,126 @@ function forever_armory_item(int $id): ?array {
   if (!$row) return null;
   $it = forever_json($row['item_json']);
   $media = (array)item_cache('item-icons', 'forever-media');
+  $sub = $it['item_subclass']['name'] ?? '';
+  $tip = ['ilvl' => ($it['level']['value'] ?? 0) > 1 ? (int)$it['level']['value'] : null,
+    'binding' => $it['binding']['name'] ?? null, 'bop' => ($it['binding']['type'] ?? '') === 'ON_ACQUIRE',
+    'unique' => $it['unique_equipped'] ?? null, 'slot' => $it['inventory_type']['name'] ?? null,
+    'type' => $sub !== '' && empty($it['is_subclass_hidden']) && $sub !== 'Miscellaneous' ? $sub : null,
+    'armor' => $it['armor']['display']['display_string'] ?? null,
+    'weapon' => isset($it['weapon']['damage']['display_string']) ? [$it['weapon']['damage']['display_string'], $it['weapon']['attack_speed']['display_string'] ?? '', $it['weapon']['dps']['display_string'] ?? ''] : null,
+    'stats' => [], 'spells' => [], 'requires' => $it['requirements']['level']['display_string'] ?? null,
+    'classes' => $it['requirements']['playable_classes']['display_string'] ?? null,
+    'sell' => ($it['sell_price']['value'] ?? 0) > 0 ? (int)$it['sell_price']['value'] : null];
+  foreach ($it['stats'] ?? [] as $st) if (!empty($st['display']['display_string'])) $tip['stats'][] = [$st['display']['display_string'], !empty($st['is_equip_bonus'])];
+  foreach ($it['spells'] ?? [] as $sp) if (!empty($sp['description'])) $tip['spells'][] = $sp['description'];
   return ['name' => $it['name'] ?? ('Item ' . $id), 'quality' => FOREVER_QUALITY[$it['quality']['type'] ?? ''] ?? 1,
-    'cat' => $it['inventory_type']['name'] ?? ($it['item_subclass']['name'] ?? null),
+    'cat' => $it['inventory_type']['name'] ?? ($it['item_subclass']['name'] ?? null), 'tip' => $tip,
     'iconUrl' => isset($media[(string)$id]) ? 'https://render.worldofwarcraft.com/forever-eu/icons/56/' . $media[(string)$id] . '.jpg' : null];
+}
+
+/**
+ * Who wears each item on the Armory characters' newest snapshots, built in one pass and cached in APCu until a new
+ * profile is fetched: '_chars' => n, '_class' => [faction => [class_id => n]], and per item id
+ * [characters, classes, races, factions, regions, levels, item levels, slots, paired item ids (rings and trinkets)].
+ */
+function forever_armory_wear_index(): array {
+  static $index = null;
+  if ($index !== null) return $index;
+  try {
+    $ver = (string)(Db::uncached('SELECT max(fetched_at) v FROM forever_armory_profiles')[0]['v'] ?? '');
+  } catch (PDOException $e) {
+    if ($e->getCode() === '42P01') return $index = [];
+    throw $e;
+  }
+  $key = 'ml:forever-armory-wear:' . $ver;
+  $apcu = getenv('ML_APCU_CACHE') === '1' && function_exists('apcu_enabled') && apcu_enabled();
+  if ($apcu) { $hit = apcu_fetch($key, $ok); if ($ok) return $index = $hit; }
+  $rows = Db::uncached("WITH latest AS (SELECT DISTINCT ON (region, character_id) region, character_id, equipment_json
+        FROM forever_armory_snapshots WHERE equipment_json IS NOT NULL ORDER BY region, character_id, snapshot_at DESC)
+      SELECT l.region, l.character_id ch, p.class_id, p.race_name, p.faction, p.level, p.equipped_item_level ilvl,
+        (e->'item'->>'id')::int item, e->'slot'->>'type' slot
+      FROM latest l JOIN forever_armory_profiles p USING (region, character_id)
+      CROSS JOIN LATERAL jsonb_array_elements(l.equipment_json->'equipped_items') e
+      ORDER BY l.region, l.character_id");
+  $index = ['_chars' => 0, '_class' => []];
+  $pairOf = ['FINGER_1' => 'FINGER_2', 'FINGER_2' => 'FINGER_1', 'TRINKET_1' => 'TRINKET_2', 'TRINKET_2' => 'TRINKET_1'];
+  $flush = function (array $ch) use (&$index, $pairOf) {
+    if (!$ch) return;
+    $p = $ch['p'];
+    $index['_chars']++;
+    $index['_class'][$p['faction']][(int)$p['class_id']] = ($index['_class'][$p['faction']][(int)$p['class_id']] ?? 0) + 1;
+    $seen = [];
+    foreach ($ch['slots'] as $slot => $item) {
+      $e = &$index[$item];
+      $e ??= [0, [], [], [], [], [], [], [], []];
+      $e[7][$slot] = ($e[7][$slot] ?? 0) + 1;
+      if (isset($pairOf[$slot]) && ($other = $ch['slots'][$pairOf[$slot]] ?? null) !== null && $other !== $item) $e[8][$other] = ($e[8][$other] ?? 0) + 1;
+      if (isset($seen[$item])) { unset($e); continue; }
+      $seen[$item] = true;
+      $e[0]++;
+      foreach ([1 => (int)$p['class_id'], 2 => $p['race_name'], 3 => $p['faction'], 4 => $p['region'], 5 => (int)$p['level'], 6 => $p['ilvl'] === null ? null : (int)$p['ilvl']] as $k => $v)
+        if ($v !== null && $v !== '') $e[$k][$v] = ($e[$k][$v] ?? 0) + 1;
+      unset($e);
+    }
+  };
+  $cur = null; $ch = [];
+  foreach ($rows as $r) {
+    $id = $r['region'] . ':' . $r['ch'];
+    if ($id !== $cur) { $flush($ch); $cur = $id; $ch = ['p' => $r, 'slots' => []]; }
+    if ($r['item']) $ch['slots'][$r['slot']] = (int)$r['item'];
+  }
+  $flush($ch);
+  if ($apcu) apcu_store($key, $index, 24 * 3600);
+  return $index;
+}
+
+/** One item's Armory wearers for its page (forever_armory_wear_index()), or null when no Armory character wears it. */
+function forever_armory_wearers(int $id, ?int $itemLevel): ?array {
+  $index = forever_armory_wear_index();
+  $e = $index[$id] ?? null;
+  if ($e === null) return null;
+  [$n, $classes, $races, $factions, $regions, $levels, $ilvls, $slots, $pairs] = $e;
+  arsort($classes); arsort($races); arsort($factions); arsort($regions); arsort($levels); arsort($pairs);
+  // "Of class" compares with every Armory character of that class in the factions that wear it.
+  $pool = [];
+  foreach (array_keys($factions) as $f) foreach ($index['_class'][$f] ?? [] as $cid => $c) $pool[$cid] = ($pool[$cid] ?? 0) + $c;
+  $classRows = [];
+  foreach ($classes as $cid => $c) {
+    $cf = FOREVER_CLASS_FILES[$cid] ?? null;
+    $classRows[] = ['name' => CLASS_META[$cf][0] ?? ('Class ' . $cid), 'file' => strtolower((string)$cf), 'color' => '#' . (CLASS_META[$cf][1] ?? 'c8b898'),
+      'n' => $c, 'of' => !empty($pool[$cid]) ? round(100 * $c / $pool[$cid]) : null, 'pool' => $pool[$cid] ?? 0];
+  }
+  $top = null;
+  foreach ($classRows as $c) if ($c['of'] !== null && $c['n'] >= max(5, $n * .05) && (!$top || $c['of'] > $top['of'])) $top = $c;
+  // Item-level histogram: up to 10 buckets over the wearers' equipped item levels.
+  $hist = null;
+  if ($ilvls) {
+    $lo = min(array_keys($ilvls)); $hi = max(array_keys($ilvls));
+    $w = max(1, (int)ceil(($hi - $lo + 1) / 10));
+    $buckets = [];
+    for ($b = $lo; $b <= $hi; $b += $w) $buckets[$b] = 0;
+    $sum = 0;
+    foreach ($ilvls as $lv => $c) { $buckets[$lo + intdiv($lv - $lo, $w) * $w] += $c; $sum += $lv * $c; }
+    $hist = ['w' => $w, 'buckets' => $buckets, 'min' => $lo, 'max' => $hi, 'avg' => round($sum / array_sum($ilvls)), 'own' => $itemLevel,
+      'above' => $itemLevel !== null ? array_sum(array_filter($ilvls, fn($lv) => $lv > $itemLevel, ARRAY_FILTER_USE_KEY)) : null];
+  }
+  $names = [];
+  $pairs = array_slice($pairs, 0, 8, true);
+  if ($pairs) {
+    $marks = implode(',', array_fill(0, count($pairs), '?'));
+    foreach (Db::all("SELECT item_id, item_json->>'name' n, item_json->'quality'->>'type' q FROM forever_armory_items WHERE item_id IN ($marks)", array_keys($pairs)) as $r)
+      $names[(int)$r['item_id']] = [$r['n'], FOREVER_QUALITY[$r['q'] ?? ''] ?? 1];
+  }
+  $regionNames = ['eu' => 'Europe', 'us' => 'Americas', 'kr' => 'Korea', 'tw' => 'Taiwan'];
+  $poolChars = 0;
+  foreach (array_keys($factions) as $f) $poolChars += array_sum($index['_class'][$f] ?? []);
+  return ['players' => $n, 'chars' => $index['_chars'], 'pool' => $poolChars, 'classes' => $classRows, 'top' => $top,
+    'races' => array_map(null, array_keys($races), array_values($races)), 'factions' => $factions,
+    'regions' => array_map(fn($r, $c) => [$regionNames[$r] ?? strtoupper((string)$r), $c], array_keys($regions), array_values($regions)),
+    'levels' => array_slice($levels, 0, 3, true), 'hist' => $hist,
+    'slots' => array_filter(['Top' => ($slots['TRINKET_1'] ?? 0) + ($slots['FINGER_1'] ?? 0), 'Bottom' => ($slots['TRINKET_2'] ?? 0) + ($slots['FINGER_2'] ?? 0)])
+      ?: array_filter(['Main hand' => $slots['MAIN_HAND'] ?? 0, 'Off hand' => $slots['OFF_HAND'] ?? 0]),
+    'pairs' => array_map(fn($id, $c) => ['id' => $id, 'name' => $names[$id][0] ?? ('Item ' . $id), 'quality' => $names[$id][1] ?? 1, 'n' => $c], array_keys($pairs), array_values($pairs))];
 }
 
 function forever_character_model(string $id): ?array {
