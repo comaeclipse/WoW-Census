@@ -50,6 +50,12 @@ function route_request(string $path): ?array {
     $c = forever_character_model($m[1], rawurldecode($m[2]));
     return $c ? [$html, forever_character_html($c)] : null;
   }
+  // Realm-free public ids: /retail/character/123456789012/.
+  if (preg_match('#^/([a-z-]+)/character/(\d{12})/(?:index\.html)?$#', $path, $m)) {
+    $source = source_for_path('/' . $m[1] . '/');
+    $c = $source ? armory_character_model($source, $m[2]) : null;
+    return $c ? [$html, armory_character_html($c)] : null;
+  }
   // WoW: Forever professions: /forever/professions and /forever/professions/tailoring (+ trailing slash or index.html).
   if (preg_match('#^/forever/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
     $slug = ($m[1] ?? '') !== '' ? $m[1] : null;

@@ -20,7 +20,7 @@ $slot = function (string $name) use ($bySlot, $QCLS): string {
   $img = $g['iconUrl'] ? '<img src="' . e($g['iconUrl']) . '" alt="" loading="lazy">' : '';
   $sub = ($g['ilvl'] ? '<span class="cp-ilvl">Item Level ' . e($g['ilvl']) . '</span> · ' : '') . e($name);
   $ench = $g['enchants'] ? '<em>' . e(str_replace('Enchanted: ', '', $g['enchants'][0])) . '</em>' : '';
-  return '<a class="cp-slot ' . ($QCLS[$g['quality']] ?? 'q1') . '" href="' . e(\forever_item_path($g['id'])) . '" data-tip="' . e($tip) . '">' .
+  return '<a class="cp-slot ' . ($QCLS[$g['quality']] ?? 'q1') . '" href="' . e($g['url'] ?? \forever_item_path($g['id'])) . '" data-tip="' . e($tip) . '">' .
     '<span class="cp-icon">' . $img . '</span><span><b>' . e($g['name']) . '</b><small>' . $sub . '</small>' . $ench . '</span></a>';
 };
 $st = $c['stats']; $base = $st['Base'] ?? [];
@@ -99,7 +99,7 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
     <?= component('crumb', ['trail' => array_values(array_filter([['label' => 'Realm Census', 'url' => url('census')], ['label' => 'Guilds', 'url' => url('guilds')],
       $c['guildUrl'] ? ['label' => '<' . $c['guild'] . '>', 'url' => $c['guildUrl']] : null, ['label' => $c['name']]]))]) ?>
 
-    <?= component('banner', ['art' => 'gear', 'title' => 'Character Profile', 'subtitle' => 'WOW: FOREVER · ' . strtoupper($c['region'] . ' ' . $c['ruleset'] . ' · ' . $c['faction']), 'subtitle_color' => '#ffd0a0',
+    <?= component('banner', ['art' => 'gear', 'title' => 'Character Profile', 'subtitle' => strtoupper(($c['edition'] ?? 'WoW: Forever') . ' · ' . $c['region'] . ' · ' . $c['faction']), 'subtitle_color' => '#ffd0a0',
       'stamp' => 'Last login: ' . $ago($c['lastLogin'])]) ?>
 
     <div class="cp-tabs" role="tablist">
@@ -139,7 +139,7 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
       <div><h4>Professions</h4>
         <table class="cp-list"><tr><th>Profession</th><th>Skill</th><th class="num">Recipes</th></tr>
           <?php foreach ($c['professions'] as $p): $pslug = strtolower(str_replace(' ', '-', $p['name'])); ?>
-          <tr><td><?= isset(\PROFESSIONS[$pslug]) ? '<a href="' . e(\profession_path($pslug)) . '">' . e($p['name']) . '</a>' : e($p['name']) ?> <small><?= e($p['kind']) ?></small></td>
+          <tr><td><?= ($c['source'] ?? 'forever') === 'forever' && isset(\PROFESSIONS[$pslug]) ? '<a href="' . e(\profession_path($pslug)) . '">' . e($p['name']) . '</a>' : e($p['name']) ?> <small><?= e($p['kind']) ?></small></td>
             <td><span class="cp-meter"><i style="width:<?= $p['max'] ? round($p['skill'] / $p['max'] * 100) : 0 ?>%"></i><em><?= e($p['skill']) ?> / <?= e($p['max']) ?></em></span></td>
             <td class="num"><?= $p['recipes'] ? fmt($p['recipes']) : '' ?></td></tr>
           <?php endforeach; ?>

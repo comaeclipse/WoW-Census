@@ -245,6 +245,11 @@ function render_page(string $html, string $path): string {
     $GLOBALS['w8_source'] = 'forever';
     return character_page($c, $html);
   }
+  if (preg_match('#^/([a-z-]+)/character/(\d{12})/(?:index\.html)?$#', $path, $m)
+      && ($source = \source_for_path('/' . $m[1] . '/')) && ($c = \armory_character_model($source, $m[2]))) {
+    $GLOBALS['w8_source'] = $source;
+    return character_page($c, $html);
+  }
   if (preg_match('#^/forever/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
     $GLOBALS['w8_source'] = \PROFESSION_SOURCE;
     return ($m[1] ?? '') !== '' ? profession_page($m[1], $html) : professions_page($html);
@@ -753,8 +758,10 @@ function guild_page(string $source, array $g, string $html): string {
   // WoW: Forever members with a stored Armory snapshot link to their character page.
   $region = $source === 'forever' && preg_match('/CAMWOW\s+(US|EU|KR)/i', $g['game'], $rm) ? strtolower($rm[1]) : null;
   $slugs = $region ? \forever_character_slugs($region, array_column($g['members'], 0)) : [];
+  $characterIds = $source !== 'forever' ? \armory_character_ids($source, $realm, array_column($g['members'], 0)) : [];
   $members = array_map(fn($m) => [$m[0], $m[1], $m[2], $m[3] !== null ? class_name($m[3]) : null, $m[4], $m[5] ? gmdate('Y-m-d', (int)$m[5]) : null,
-    isset($slugs[mb_strtolower((string)$m[0])]) ? \forever_character_path($region, $slugs[mb_strtolower((string)$m[0])]) : null], $g['members']);
+    isset($slugs[mb_strtolower((string)$m[0])]) ? \forever_character_path($region, $slugs[mb_strtolower((string)$m[0])])
+      : (isset($characterIds[mb_strtolower((string)$m[0])]) ? \armory_character_path($source, $characterIds[mb_strtolower((string)$m[0])]) : null)], $g['members']);
   $specs = array_map(fn($s) => [class_name($s[0]), $s[1], $s[2]], $g['specs']);
   foreach ($g['specs'] as $s) $classColor[class_name($s[0])] = '#' . (\CLASS_META[$s[0]][1] ?? 'C0C0C0');
   return page('guild', common_vars($source) + ['name' => \guild_display_name($g['name']), 'realm' => $realm, 'faction' => $g['faction'], 'members' => $members,
@@ -936,8 +943,9 @@ function item_page(array $item, string $html): string {
 }
 
 function character_page(array $c, string $html): string {
-  $branch = \EDITIONS['forever']['branch'];
-  return page('character', common_vars('forever') + ['c' => $c, 'classColor' => '#' . (\CLASS_META[$c['cf']][1] ?? 'C0C0C0'),
+  $source = $c['source'] ?? 'forever';
+  $branch = \EDITIONS[$source]['branch'];
+  return page('character', common_vars($source) + ['c' => $c, 'classColor' => '#' . (\CLASS_META[$c['cf']][1] ?? 'C0C0C0'),
     'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item='], $html, 'guilds');
 }
 
