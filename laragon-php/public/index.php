@@ -24,6 +24,12 @@ if (preg_match('#^/[a-z-]+/race-to-60(?:\.html)?$#', $path)) {
   header('Location: /forever/', true, 301);
   exit;
 }
+// WoW: Forever character pages moved from /forever/characters/<region>/<slug>/ to /forever/character/<id>/ on 2026-11-15.
+if (preg_match('#^/forever/characters/(us|eu|kr)/([^/]+)/(?:index\.html)?$#', $path, $m)
+    && ($id = forever_character_id_for_slug($m[1], $m[2])) !== null) {
+  header('Location: ' . forever_character_path($id), true, 301);
+  exit;
+}
 if ($path === '/contact') {
   require dirname(__DIR__) . '/src/contact.php';
   exit;

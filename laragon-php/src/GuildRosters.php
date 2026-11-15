@@ -149,7 +149,7 @@ function guild_member_character_urls(string $source, array $g): array {
   if ($source === 'forever') {
     if (!preg_match('/CAMWOW\s+(US|EU|KR)/i', (string)$g['game'], $match)) return [];
     $region = strtolower($match[1]);
-    return array_map(fn($slug) => forever_character_path($region, $slug), forever_character_slugs($region, $names));
+    return array_map(fn($id) => forever_character_path($id), forever_character_ids($region, $names));
   }
   $region = preg_match('/^(us|eu|kr|tw):/i', (string)$g['realm'], $match) ? strtolower($match[1]) : null;
   $realm = preg_replace('/ \([A-Z]{2}\)$/', '', realm_name((string)$g['realm']));

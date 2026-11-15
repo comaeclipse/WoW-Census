@@ -43,6 +43,10 @@ ENDPOINTS = ("specializations", "equipment", "statistics", "professions", "achie
              "hunter-pets")
 ENDPOINT_PATHS = {"mounts": "collections/mounts"}
 HUNTER_ONLY = {"hunter-pets"}
+# The site's realm-free page id (/forever/character/<id>/): guild_hash_id('forever', region, lowercase full
+# name) in laragon-php/src/GuildRosters.php, computed the same way in SQL.
+PUBLIC_ID_SQL = ("(100000000000 + (('x' || substr(encode(sha256(convert_to('forever' || E'\n' || region || E'\n' || "
+                 "lower(full_name), 'UTF8')), 'hex'), 1, 13))::bit(52)::bigint % 900000000000))::text")
 REGION_RE = re.compile(r"^CAMWOW (US|EU|KR|TW)", re.I)
 
 
@@ -112,6 +116,9 @@ def schema(cur) -> None:
       last_login_at timestamptz, fetched_at timestamptz NOT NULL, run_id bigint NOT NULL,
       profile_json jsonb NOT NULL,
       PRIMARY KEY(region,character_id))""")
+    cur.execute("ALTER TABLE marketlens_import.forever_armory_profiles ADD COLUMN IF NOT EXISTS public_id text")
+    cur.execute(f"UPDATE marketlens_import.forever_armory_profiles SET public_id={PUBLIC_ID_SQL} WHERE public_id IS DISTINCT FROM {PUBLIC_ID_SQL}")
+    cur.execute("CREATE INDEX IF NOT EXISTS forever_armory_profiles_public_id ON marketlens_import.forever_armory_profiles(public_id)")
     cur.execute("""CREATE UNIQUE INDEX IF NOT EXISTS forever_armory_profiles_name
       ON marketlens_import.forever_armory_profiles(region,lower(full_name))""")
     cur.execute("""CREATE TABLE IF NOT EXISTS marketlens_import.forever_armory_snapshots (
@@ -331,6 +338,8 @@ def store_result(cur, run_id: int, result: dict, miss_age: int) -> tuple[str, in
        race.get("id"), race.get("name"), (p.get("faction") or {}).get("name"), (p.get("gender") or {}).get("name"),
        guild.get("id"), guild.get("name"), guild.get("slug"), p.get("average_item_level"),
        p.get("equipped_item_level"), p.get("achievement_points"), last_login, now, run_id, Json(p)))
+    cur.execute(f"""UPDATE marketlens_import.forever_armory_profiles SET public_id={PUBLIC_ID_SQL.replace('%', '%%')}
+      WHERE region=%s AND character_id=%s AND public_id IS DISTINCT FROM {PUBLIC_ID_SQL.replace('%', '%%')}""", (region, character_id))
     values = {key: Json(endpoints[key]) if key in endpoints else None for key in
               ("specializations", "equipment", "statistics", "professions", "achievements", "reputations",
                "pvp_summary", "appearance", "character_media", "titles", "mounts", "hunter_pets")}

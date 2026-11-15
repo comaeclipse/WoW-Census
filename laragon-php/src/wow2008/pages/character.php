@@ -25,8 +25,8 @@ $slot = function (string $name) use ($bySlot, $QCLS): string {
 };
 $st = $c['stats']; $base = $st['Base'] ?? [];
 $strip = array_filter([
-  'Avg. item level' => $c['ilvl'], 'Health' => $base['Health'] ?? null, ($c['cf'] === 'WARRIOR' ? 'Rage' : ($c['cf'] === 'ROGUE' ? 'Energy' : 'Mana')) => $base['Mana'] ?? $base['Rage'] ?? $base['Energy'] ?? null,
-  'Attack power' => $st['Melee & Ranged']['Attack power'] ?? null, 'Armor' => $base['Armor'] ?? null, 'Honorable kills' => $c['pvp']['hks'],
+  'Health' => $base['Health'] ?? null, ($c['cf'] === 'WARRIOR' ? 'Rage' : ($c['cf'] === 'ROGUE' ? 'Energy' : 'Mana')) => $base['Mana'] ?? $base['Rage'] ?? $base['Energy'] ?? null,
+  'Attack power' => $st['Melee & Ranged']['Attack power'] ?? null, 'Armor' => $base['Armor'] ?? null,
 ], fn($v) => $v !== null);
 $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#00b800', 5 => '#00b880', 6 => '#00b8b8', 7 => '#00a0ff'];
 ?>
@@ -36,15 +36,17 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
     .cp-tabs button.on{background:linear-gradient(#67491f,#271a09);color:#ffda73}
     .cp-pane{display:none;padding:12px;border:3px ridge #81602e;background:linear-gradient(#1e1a12,#0f0d09);color:#e3d3b0}
     .cp-pane.on{display:block}
-    .cp-doll{position:relative;min-height:800px;padding:0;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#526955 0,#27362f 27%,#111711 62%,#060805 100%);box-shadow:inset 0 0 55px #000}
+    .cp-doll{position:relative;min-height:680px;padding:0;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#526955 0,#27362f 27%,#111711 62%,#060805 100%);box-shadow:inset 0 0 55px #000}
     .cp-doll:before{content:"";position:absolute;inset:9px;border:1px solid #6d5732;box-shadow:inset 0 0 0 2px #171109;pointer-events:none}
-    .cp-head{position:absolute;z-index:3;top:18px;left:50%;transform:translateX(-50%);width:420px;max-width:90%;text-align:center;text-shadow:0 2px 3px #000}
-    .cp-head h1{margin:0;color:#fff2b4;font:900 27px Cinzel,serif}
-    .cp-head .cp-title{color:#e6c26a;font-style:italic}
-    .cp-head .cp-guild{color:#7fd04f;font-weight:bold}.cp-head .cp-guild a{color:#7fd04f;text-decoration:none}.cp-head .cp-guild a:hover{text-decoration:underline}
-    .cp-head .cp-meta{margin-top:3px;color:#d0c4aa}
-    .cp-model{position:absolute;z-index:1;left:50%;top:40px;height:720px;transform:translateX(-50%);filter:drop-shadow(0 8px 8px #000);pointer-events:none}
-    .cp-gear{position:absolute;z-index:4;top:100px;width:29%;display:flex;flex-direction:column;gap:6px}
+    .cp-hero{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin-bottom:14px;padding:14px 16px;
+      background:radial-gradient(ellipse at 20% 0%,rgba(255,190,80,.22),transparent 60%),linear-gradient(#2c1c0c,#0e0904);border:2px solid #3a2608;outline:1px solid #b08a40}
+    .cp-emb{width:84px;height:84px;border:3px ridge #b08a40;box-shadow:0 3px 12px #000;background:#000}
+    .cp-emb img{display:block;width:100%;height:100%;object-fit:cover}
+    .cp-hero h1{margin:0;font:900 28px/1.1 'Cinzel',serif;color:#fff;text-shadow:0 3px 3px #000}
+    .cp-kick{font:700 11px Tahoma,Arial,sans-serif;letter-spacing:2px;color:#e8c070;text-transform:uppercase;text-shadow:0 1px 2px #000}
+    .cp-meta{margin-top:6px;font-size:12px;color:#eee}.cp-meta a{color:#ffd75a}
+    .cp-model{position:absolute;z-index:1;left:50%;top:-30px;height:700px;transform:translateX(-50%);filter:drop-shadow(0 8px 8px #000);pointer-events:none}
+    .cp-gear{position:absolute;z-index:4;top:22px;width:29%;display:flex;flex-direction:column;gap:6px}
     .cp-gear.l{left:23px}.cp-gear.r{right:23px}
     .cp-slot{position:relative;display:flex;align-items:center;gap:9px;min-height:54px;padding:5px 7px;text-decoration:none;background:linear-gradient(90deg,#0a0b08e8,#202219e8);border:1px solid #756033;box-shadow:inset 0 0 0 1px #252012,0 2px 4px #000}
     .cp-gear.r .cp-slot{flex-direction:row-reverse;text-align:right;background:linear-gradient(270deg,#0a0b08e8,#202219e8)}
@@ -82,14 +84,15 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
     #cp-tt{position:fixed;z-index:99;display:none;max-width:300px;padding:8px 10px;border:1px solid #9aa4b8;border-radius:4px;background:rgba(8,12,28,.95);box-shadow:0 0 0 1px #000,0 4px 14px #000;color:#fff;font:12px/1.45 Verdana,Arial,sans-serif;pointer-events:none}
     #cp-tt b{display:block;font-size:13px}#cp-tt .y{color:#ffd100}#cp-tt .g{color:#1eff00}
     @media (max-width:820px){
-      .cp-doll{min-height:1180px}.cp-model{top:70px;height:440px}
-      .cp-gear{top:520px;width:calc(50% - 30px)}.cp-gear.l{left:20px}.cp-gear.r{right:20px}
+      .cp-doll{min-height:1110px}.cp-model{top:-10px;height:440px}
+      .cp-gear{top:450px;width:calc(50% - 30px)}.cp-gear.l{left:20px}.cp-gear.r{right:20px}
       .cp-weapons{bottom:16px;width:calc(100% - 40px)}
+      .cp-hero{grid-template-columns:1fr}
       .cp-trees,.cp-two,.cp-stats{grid-template-columns:1fr}.cp-reps{columns:1}.cp-strip{grid-template-columns:repeat(3,1fr)}
     }
     @media (max-width:560px){
-      .cp-doll{min-height:1720px}
-      .cp-gear{width:calc(100% - 34px)}.cp-gear.l,.cp-gear.r{left:17px;right:auto}.cp-gear.r{top:980px}
+      .cp-doll{min-height:1650px}
+      .cp-gear{width:calc(100% - 34px)}.cp-gear.l,.cp-gear.r{left:17px;right:auto}.cp-gear.r{top:910px}
       .cp-gear.r .cp-slot{flex-direction:row;text-align:left}
       .cp-weapons{flex-direction:column;left:17px;transform:none;width:calc(100% - 34px)}.cp-weapons .cp-slot{flex-direction:row;text-align:left}
       .cp-strip{grid-template-columns:repeat(2,1fr)}
@@ -99,8 +102,25 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
     <?= component('crumb', ['trail' => array_values(array_filter([['label' => 'Realm Census', 'url' => url('census')], ['label' => 'Guilds', 'url' => url('guilds')],
       $c['guildUrl'] ? ['label' => '<' . $c['guild'] . '>', 'url' => $c['guildUrl']] : null, ['label' => $c['name']]]))]) ?>
 
-    <?= component('banner', ['art' => 'gear', 'title' => 'Character Profile', 'subtitle' => strtoupper(($c['edition'] ?? 'WoW: Forever') . ' · ' . $c['region'] . ' · ' . $c['faction']), 'subtitle_color' => '#ffd0a0',
-      'stamp' => 'Last login: ' . $ago($c['lastLogin'])]) ?>
+    <div class="cp-hero">
+      <?php if ($c['avatar']): ?><div class="cp-emb"><img src="<?= e($c['avatar']) ?>" alt=""></div><?php endif; ?>
+      <div>
+        <div class="cp-kick"><?= e(implode(' · ', array_filter([$c['edition'] ?? 'WoW: Forever', trim(strtoupper((string)$c['region']) . ' ' . ($c['ruleset'] ?? '')), $c['faction']]))) ?></div>
+        <h1><?= e($c['name']) ?></h1>
+        <div class="cp-meta">
+          <?php if ($c['title']): ?><i><?= e(str_replace('{name}', $c['first'], $c['title'])) ?></i> · <?php endif; ?>
+          Level <?= e($c['level']) ?> <?= e($c['race']) ?> <span style="color:<?= e($classColor) ?>;font-weight:700"><?= e($c['class']) ?></span>
+          <?php if ($c['guild']): ?> · <?= $c['guildUrl'] ? '<a href="' . e($c['guildUrl']) . '">&lt;' . e($c['guild']) . '&gt;</a>' : '&lt;' . e($c['guild']) . '&gt;' ?><?php endif; ?>
+        </div>
+      </div>
+    </div>
+
+    <div class="tiles">
+      <?= component('stat', ['label' => 'Item level', 'value' => (string)($c['ilvl'] ?? '—'), 'note' => 'equipped average']) ?>
+      <?= component('stat', ['label' => 'Talents', 'value' => $c['build'] ?: '—', 'note' => $c['mainTree'] ? 'mostly ' . $c['mainTree'] : 'no points spent']) ?>
+      <?= component('stat', ['label' => 'Honorable kills', 'value' => fmt($c['pvp']['hks']), 'note' => $c['pvp']['rank'] ? 'PvP rank ' . $c['pvp']['rank'] : 'lifetime']) ?>
+      <?= component('stat', ['label' => 'Last login', 'value' => $c['lastLogin'] ? gmdate('M j, Y', $c['lastLogin']) : '—', 'value_style' => 'font-size:15px;line-height:26px', 'note' => 'Armory read ' . gmdate('M j, Y', $c['fetched'])]) ?>
+    </div>
 
     <div class="cp-tabs" role="tablist">
       <button class="on" data-pane="cp-equip">Equipment</button>
@@ -111,12 +131,6 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
     </div>
 
     <section class="cp-pane cp-doll on" id="cp-equip" aria-label="<?= e($c['name']) ?>'s equipped gear">
-      <div class="cp-head">
-        <h1><?= e($c['name']) ?></h1>
-        <?php if ($c['title']): ?><div class="cp-title"><?= e(str_replace('{name}', $c['first'], $c['title'])) ?></div><?php endif; ?>
-        <?php if ($c['guild']): ?><div class="cp-guild"><?= $c['guildUrl'] ? '<a href="' . e($c['guildUrl']) . '">&lt;' . e($c['guild']) . '&gt;</a>' : '&lt;' . e($c['guild']) . '&gt;' ?></div><?php endif; ?>
-        <div class="cp-meta">Level <?= e($c['level']) ?> <?= e($c['race']) ?> <span style="color:<?= e($classColor) ?>;font-weight:bold"><?= e($c['class']) ?></span><?= $c['build'] ? ' · ' . e($c['build']) . ($c['mainTree'] ? ' ' . e($c['mainTree']) : '') : '' ?></div>
-      </div>
       <?php if ($c['render']): ?><img class="cp-model" src="<?= e($c['render']) ?>" alt="<?= e($c['name']) ?>"><?php endif; ?>
       <div class="cp-gear l"><?php foreach (['Head', 'Neck', 'Shoulders', 'Back', 'Chest', 'Shirt', 'Tabard', 'Wrist'] as $s) echo $slot($s); ?></div>
       <div class="cp-gear r"><?php foreach (['Hands', 'Waist', 'Legs', 'Feet', 'Ring 1', 'Ring 2', 'Trinket 1', 'Trinket 2'] as $s) echo $slot($s); ?></div>

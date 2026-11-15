@@ -245,13 +245,8 @@ function render_page(string $html, string $path): string {
     $GLOBALS['w8_source'] = $source;
     return item_page($item, $html);
   }
-  if (preg_match('#^/forever/characters/([a-z]{2})/([^/]+)/(?:index\.html)?$#', $path, $m)
-      && ($c = \forever_character_model($m[1], rawurldecode($m[2])))) {
-    $GLOBALS['w8_source'] = 'forever';
-    return character_page($c, $html);
-  }
   if (preg_match('#^/([a-z-]+)/character/(\d{12})/(?:index\.html)?$#', $path, $m)
-      && ($source = \source_for_path('/' . $m[1] . '/')) && ($c = \armory_character_model($source, $m[2]))) {
+      && ($source = \source_for_path('/' . $m[1] . '/')) && ($c = \edition_character_model($source, $m[2]))) {
     $GLOBALS['w8_source'] = $source;
     return character_page($c, $html);
   }

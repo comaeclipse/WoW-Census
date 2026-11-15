@@ -1,5 +1,5 @@
 <?php
-// WoW: Forever character pages: /forever/characters/<region>/<slug>/.
+// WoW: Forever character pages: /forever/character/<12-digit id>/ (the other editions use the same form).
 //
 // Each page shows one character's Battle.net Armory snapshot (gear, talents, professions,
 // PvP, stats, reputations) as stored by tools/sync-forever-armory.py in forever_armory_*.
@@ -15,39 +15,64 @@ const FOREVER_GEAR_SLOTS = ['HEAD', 'NECK', 'SHOULDER', 'BACK', 'CHEST', 'SHIRT'
   'FINGER_1', 'FINGER_2', 'TRINKET_1', 'TRINKET_2', 'MAIN_HAND', 'OFF_HAND', 'RANGED'];
 const FOREVER_QUALITY = ['POOR' => 0, 'COMMON' => 1, 'UNCOMMON' => 2, 'RARE' => 3, 'EPIC' => 4, 'LEGENDARY' => 5, 'ARTIFACT' => 6, 'HEIRLOOM' => 7];
 
-function forever_character_path(string $region, string $slug): string {
-  return '/forever/characters/' . $region . '/' . rawurlencode($slug) . '/';
+function forever_character_path(string $id): string {
+  return '/forever/character/' . $id . '/';
 }
 
-/** The stored profile row and its newest snapshot, or null (unknown character, or no Armory tables here). */
-function forever_character_rows(string $region, string $slug): ?array {
+/**
+ * The stored profile row and its newest snapshot, or null (unknown character, or no Armory tables here).
+ * public_id is the realm-free page id of /<edition>/character/<id>/: guild_hash_id('forever', region,
+ * lowercase full name), stored by tools/sync-forever-armory.py.
+ */
+function forever_character_rows(string $id): ?array {
   try {
-    $p = Db::first('SELECT * FROM forever_armory_profiles WHERE region=? AND lower(slug)=lower(?) ORDER BY fetched_at DESC LIMIT 1', [$region, $slug]);
+    $p = Db::first('SELECT * FROM forever_armory_profiles WHERE public_id=? ORDER BY fetched_at DESC LIMIT 1', [$id]);
     if (!$p) return null;
     $s = Db::first('SELECT * FROM forever_armory_snapshots WHERE region=? AND character_id=? ORDER BY snapshot_at DESC LIMIT 1',
-      [$region, $p['character_id']]);
+      [$p['region'], $p['character_id']]);
   } catch (PDOException $e) {
-    if ($e->getCode() === '42P01') return null;
+    if (in_array($e->getCode(), ['42P01', '42703'], true)) return null;
     throw $e;
   }
   return $s ? ['profile' => $p, 'snapshot' => $s] : null;
 }
 
-/** Characters with an Armory page, keyed "region\tlowercase full name" => slug, for linking rosters. */
-function forever_character_slugs(string $region, array $names): array {
+/** The page id of an old /forever/characters/<region>/<slug>/ link, for its redirect. */
+function forever_character_id_for_slug(string $region, string $slug): ?string {
+  try {
+    $r = Db::first('SELECT public_id FROM forever_armory_profiles WHERE region=? AND lower(slug)=lower(?) ORDER BY fetched_at DESC LIMIT 1', [$region, $slug]);
+  } catch (PDOException $e) {
+    if (in_array($e->getCode(), ['42P01', '42703'], true)) return null;
+    throw $e;
+  }
+  return $r['public_id'] ?? null;
+}
+
+/** Page ids of the characters with an Armory page, keyed by lowercase full name, for linking rosters. */
+function forever_character_ids(string $region, array $names): array {
   $names = array_values(array_unique(array_filter(array_map(fn($n) => mb_strtolower((string)$n), $names))));
   if (!$names) return [];
   $out = [];
   try {
     foreach (array_chunk($names, 500) as $chunk) {
       $marks = implode(',', array_fill(0, count($chunk), '?'));
-      foreach (Db::all("SELECT lower(full_name) n, slug FROM forever_armory_profiles WHERE region=? AND lower(full_name) IN ($marks)", [$region, ...$chunk]) as $r)
-        $out[$r['n']] = $r['slug'];
+      foreach (Db::all("SELECT lower(full_name) n, public_id FROM forever_armory_profiles
+          WHERE region=? AND public_id IS NOT NULL AND lower(full_name) IN ($marks)", [$region, ...$chunk]) as $r)
+        $out[$r['n']] = $r['public_id'];
     }
   } catch (PDOException $e) {
-    if ($e->getCode() !== '42P01') throw $e;
+    if (!in_array($e->getCode(), ['42P01', '42703'], true)) throw $e;
   }
   return $out;
+}
+
+/** Any edition's character page model by page id: WoW: Forever's own, or the other editions' (ArmoryCharacters.php). */
+function edition_character_model(string $source, string $id): ?array {
+  return $source === 'forever' ? forever_character_model($id) : armory_character_model($source, $id);
+}
+
+function edition_character_html(array $c): string {
+  return ($c['source'] ?? 'forever') === 'forever' ? forever_character_html($c) : armory_character_html($c);
 }
 
 function forever_json(?string $raw): array {
@@ -57,11 +82,12 @@ function forever_json(?string $raw): array {
 }
 
 /** The page model for one character, or null. */
-function forever_character_model(string $region, string $slug): ?array {
-  if (!in_array($region, FOREVER_CHARACTER_REGIONS, true)) return null;
-  $rows = forever_character_rows($region, $slug);
+function forever_character_model(string $id): ?array {
+  if (!preg_match('/^\d{12}$/', $id)) return null;
+  $rows = forever_character_rows($id);
   if (!$rows) return null;
   ['profile' => $p, 'snapshot' => $s] = $rows;
+  $region = $p['region'];
   $profile = forever_json($s['profile_json']);
   $cf = FOREVER_CLASS_FILES[(int)$p['class_id']] ?? null;
 
@@ -165,7 +191,7 @@ function forever_character_model(string $region, string $slug): ?array {
 
   $ilvls = array_filter(array_map(fn($g) => $g['ilvl'], array_filter($ordered, fn($g) => !in_array($g['slot'], ['Shirt', 'Tabard'], true))));
   return [
-    'region' => $region, 'slug' => $p['slug'], 'name' => $p['full_name'], 'first' => $p['name'], 'level' => $p['level'] !== null ? (int)$p['level'] : null,
+    'source' => 'forever', 'id' => $p['public_id'], 'region' => $region, 'slug' => $p['slug'], 'name' => $p['full_name'], 'first' => $p['name'], 'level' => $p['level'] !== null ? (int)$p['level'] : null,
     'race' => $p['race_name'], 'class' => $p['class_name'], 'cf' => $cf, 'faction' => $p['faction'], 'gender' => $p['gender'],
     'guild' => $p['guild_name'], 'guildUrl' => $guildUrl, 'ruleset' => FOREVER_RULESET_TYPES[$p['ruleset_name'] ?? ''] ?? $p['ruleset_name'],
     'ilvl' => $p['equipped_item_level'] !== null ? (int)$p['equipped_item_level'] : ($ilvls ? (int)round(array_sum($ilvls) / count($ilvls)) : null),
@@ -200,7 +226,7 @@ function forever_character_html(array $c): string {
   foreach ($c['professions'] as $p) $profs .= '<li>' . esc($p['name']) . ' ' . esc($p['skill']) . '/' . esc($p['max']) . '</li>';
   return localize_content('<!doctype html><html lang="en"><head><meta charset="utf-8">' .
     '<meta name="viewport" content="width=device-width,initial-scale=1">' .
-    seo_head($title . ' – WoWCensus', forever_character_description($c), SITE_ORIGIN . forever_character_path($c['region'], $c['slug'])) .
+    seo_head($title . ' – WoWCensus', forever_character_description($c), SITE_ORIGIN . forever_character_path($c['id'])) .
     '<link rel="stylesheet" href="/' . stylesheet()['name'] . '"></head><body><main class="wrap">' .
     '<h1 class="iname">' . esc($c['name']) . '</h1><p>' . esc(forever_character_description($c)) . '</p>' .
     '<h2>Gear</h2><table><thead><tr><th>Slot</th><th>Item</th><th>Item level</th></tr></thead><tbody>' . $gear . '</tbody></table>' .
