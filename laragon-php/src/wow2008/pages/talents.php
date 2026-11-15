@@ -50,7 +50,7 @@ namespace Wow2008;
         <p class="tfoot">Shares count only sampled characters whose talent picks could be read, within each class. These observed builds do not represent the full character population.</p>
     <?php component_end() ?>
 
-    <div class="source">Talent data from <?= n($inspectBuilds) ?> in-game inspections and <?= n($armoryBuilds) ?> last-logout Armory profiles after character-level deduplication · latest source record <?= e($inspectedAt) ?> · page generated <?= e($generated) ?></div>
+    <div class="source">Talent data from <?= number_format($inspectBuilds) ?> in-game inspections and <?= number_format($armoryBuilds) ?> last-logout Armory profiles after character-level deduplication · latest source record <?= e($inspectedAt) ?> · page generated <?= e($generated) ?></div>
   </main>
 
 <?php start_section('scripts') ?>
