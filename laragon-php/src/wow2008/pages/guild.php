@@ -3,7 +3,7 @@ namespace Wow2008;
 /**
  * Page: one guild's roster
  * Vars: $name, $realm, $faction, $firstSeen, $lastSeen, $generated, $subtitle (strings),
- *       $members (list of [name, level, race, class name, zone, last seen date]),
+ *       $members (list of [name, level, race, class name, zone, last seen date, Armory page URL or null]),
  *       $classes, $races, $bands (objects: label => characters), $specs (list of [class name, spec, characters]),
  *       $classColor (object: class name => color), $inspected (int), $avgLevel (float), $maxLevel (int), $allianceRaces (list)
  */
@@ -102,8 +102,8 @@ function render() {
     th.innerHTML = th.textContent.replace(/[▲▼]/g, '').trim() + (+th.dataset.s === sortKey ? `<span class="arr">${sortDir < 0 ? '▼' : '▲'}</span>` : '');
   });
   const tb = document.getElementById('mrows');
-  tb.innerHTML = list.length ? list.slice(page * PER, page * PER + PER).map(([n, lvl, race, c, zone, seen]) => `<tr>
-      <td><span class="rn">${esc(n)}</span></td>
+  tb.innerHTML = list.length ? list.slice(page * PER, page * PER + PER).map(([n, lvl, race, c, zone, seen, href]) => `<tr>
+      <td><span class="rn">${href ? `<a href="${esc(href)}">${esc(n)}</a>` : esc(n)}</span></td>
       <td class="num">${lvl ?? '—'}</td>
       <td>${race ? esc(shortRace(race)) : '—'}</td>
       <td><span class="tc" style="color:${COLOR[c] ?? '#5a2a00'}">${c ? esc(c) : '—'}</span></td>

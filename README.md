@@ -355,6 +355,11 @@ fetched character costs 13 requests (14 for hunters). Titles, mounts and hunter
 pets are stored too; raid encounters are skipped because Forever returns them
 empty.
 
+The site serves each stored character at `/forever/characters/<region>/<slug>/`
+(origin only, from `laragon-php/src/ForeverCharacters.php`), and WoW: Forever
+guild rosters link members that have one. Without the `forever_armory_*`
+tables the route is a 404, so the live site needs those tables synced first.
+
 Known names are selected directly from their indexed source tables in bounded
 batches. `forever_armory_candidates` stores only actual attempt/backoff state,
 explicit requests and guild discoveries; it does not duplicate the full census.

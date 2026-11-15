@@ -45,6 +45,11 @@ function route_request(string $path): ?array {
     $item = forever_item_model((int)$m[1]);
     return $item ? [$html, localize_content(forever_item_html($item, edition_path(PROFESSION_SOURCE) . $cssName))] : null;
   }
+  // WoW: Forever character pages: /forever/characters/eu/vitam-lock/ (+ index.html). Served by the origin only.
+  if (preg_match('#^/forever/characters/([a-z]{2})/([^/]+)/(?:index\.html)?$#', $path, $m)) {
+    $c = forever_character_model($m[1], rawurldecode($m[2]));
+    return $c ? [$html, forever_character_html($c)] : null;
+  }
   // WoW: Forever professions: /forever/professions and /forever/professions/tailoring (+ trailing slash or index.html).
   if (preg_match('#^/forever/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
     $slug = ($m[1] ?? '') !== '' ? $m[1] : null;
