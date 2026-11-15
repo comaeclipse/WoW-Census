@@ -20,7 +20,7 @@ $slot = function (string $name) use ($bySlot, $QCLS): string {
   $img = $g['iconUrl'] ? '<img src="' . e($g['iconUrl']) . '" alt="" loading="lazy">' : '';
   $sub = ($g['ilvl'] ? '<span class="cp-ilvl">Item Level ' . e($g['ilvl']) . '</span> · ' : '') . e($name);
   $ench = $g['enchants'] ? '<em>' . e(str_replace('Enchanted: ', '', $g['enchants'][0])) . '</em>' : '';
-  return '<a class="cp-slot ' . ($QCLS[$g['quality']] ?? 'q1') . '" href="' . e($g['url'] ?? \forever_item_path($g['id'])) . '" data-tip="' . e($tip) . '">' .
+  return '<a class="cp-slot ' . ($QCLS[$g['quality']] ?? 'q1') . '" href="' . e($g['url'] ?? \forever_item_path($g['id'])) . '" data-item="' . e($tip) . '">' .
     '<span class="cp-icon">' . $img . '</span><span><b>' . e($g['name']) . '</b><small>' . $sub . '</small>' . $ench . '</span></a>';
 };
 $st = $c['stats']; $base = $st['Base'] ?? [];
@@ -206,9 +206,9 @@ document.querySelectorAll('.cp-tabs button').forEach(b => b.addEventListener('cl
 (() => {
   const tt = document.getElementById('cp-tt'), QC = ['#9d9d9d', '#fff', '#1eff00', '#0070dd', '#a335ee', '#ff8000', '#e6cc80', '#00ccff'];
   const h = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
-  document.querySelectorAll('.cp-slot[data-tip]').forEach(el => {
+  document.querySelectorAll('.cp-slot[data-item]').forEach(el => {
     el.addEventListener('mouseenter', () => {
-      const d = JSON.parse(el.dataset.tip);
+      const d = JSON.parse(el.dataset.item);
       tt.innerHTML = `<b style="color:${QC[d.q] || '#fff'}">${h(d.n)}</b>` + (d.i ? `<div class="y">Item Level ${d.i}</div>` : '') +
         (d.t ? `<div>${h(d.t)}</div>` : '') + d.l.map(l => `<div class="${/^(Use|Equip|Chance)/.test(l) ? 'g' : ''}">${h(l)}</div>`).join('') +
         d.x.map(x => `<div class="g">${h(x)}</div>`).join('');

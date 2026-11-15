@@ -154,6 +154,16 @@ def schema(cur) -> None:
       region text NOT NULL, guild_id bigint NOT NULL, guild_slug text NOT NULL,
       fetched_at timestamptz NOT NULL, run_id bigint NOT NULL, roster_json jsonb NOT NULL,
       PRIMARY KEY(region,guild_id,fetched_at))""")
+    # Newest Armory copy of every item seen equipped, so /forever/item/<id> pages exist for them.
+    cur.execute("""CREATE TABLE IF NOT EXISTS marketlens_import.forever_armory_items (
+      item_id integer PRIMARY KEY, seen_at timestamptz NOT NULL, item_json jsonb NOT NULL)""")
+    cur.execute("""INSERT INTO marketlens_import.forever_armory_items(item_id,seen_at,item_json)
+      SELECT DISTINCT ON ((e->'item'->>'id')::int) (e->'item'->>'id')::int, s.snapshot_at, e
+      FROM marketlens_import.forever_armory_snapshots s,
+        jsonb_array_elements(s.equipment_json->'equipped_items') e
+      WHERE NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_items LIMIT 1)
+        AND jsonb_typeof(s.equipment_json->'equipped_items')='array' AND (e->'item'->>'id') ~ '^[0-9]+$'
+      ORDER BY (e->'item'->>'id')::int, s.snapshot_at DESC""")
     cur.execute("""CREATE OR REPLACE VIEW marketlens_import.forever_armory_current_builds AS
       SELECT p.region,p.character_id,p.full_name,p.ruleset_name,p.class_name,p.level,
         p.last_login_at,p.fetched_at,t.group_index,t.specialization_index,t.is_active,
@@ -352,6 +362,13 @@ def store_result(cur, run_id: int, result: dict, miss_age: int) -> tuple[str, in
        values["statistics"], values["professions"], values["achievements"], values["reputations"],
        values["pvp_summary"], values["appearance"], values["character_media"], values["titles"], values["mounts"],
        values["hunter_pets"], Json(result["endpoint_status"])))
+    items = {int(it["item"]["id"]): it for it in (endpoints.get("equipment") or {}).get("equipped_items", [])
+             if str((it.get("item") or {}).get("id", "")).isdigit()}
+    if items:
+        execute_values(cur, """INSERT INTO marketlens_import.forever_armory_items(item_id,seen_at,item_json) VALUES %s
+          ON CONFLICT(item_id) DO UPDATE SET seen_at=excluded.seen_at,item_json=excluded.item_json
+          WHERE excluded.seen_at >= forever_armory_items.seen_at""",
+          [(item_id, snapshot_at, Json(it)) for item_id, it in items.items()])
     talents = specialization_rows(endpoints.get("specializations"))
     if talents:
         execute_values(cur, """INSERT INTO marketlens_import.forever_armory_talents

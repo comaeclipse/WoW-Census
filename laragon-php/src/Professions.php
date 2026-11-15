@@ -305,8 +305,10 @@ function forever_item_model_build(int $id): ?array {
     FROM local_auction_snapshots WHERE source_game=? AND item_id=? ORDER BY captured_at, game", [PROFESSION_SOURCE, $id]);
   // Gear seen on inspected characters has a page even if it was never listed.
   $wearers = forever_item_wearers($id);
-  if (!$rows && !$wearers) return null;
-  $name = null; $cat = null; $crafter = null; $scans = []; $seen = [];
+  // Gear only seen on Armory characters still gets a page.
+  $armory = !$rows && !$wearers ? forever_armory_item($id) : null;
+  if (!$rows && !$wearers && !$armory) return null;
+  $name = $armory['name'] ?? null; $cat = null; $crafter = null; $scans = []; $seen = [];
   foreach ($rows as $r) {
     if (($r['name'] ?? '') !== '' && !preg_match('/^item:\d+$/', (string)$r['name'])) $name = (string)$r['name'];
     if (($r['category'] ?? '') !== '') $cat = $r['category'];
@@ -325,6 +327,7 @@ function forever_item_model_build(int $id): ?array {
   $name ??= ($wearers['name'] ?? null) ?: ((item_cache('item-names', $branch)[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: 'Item ' . $id));
   $icon = ((array)item_cache('item-icons', $branch) + (array)item_cache('item-icons', 'classic'))[$id] ?? ($wearers['icon'] ?? null);
   if ($cat === null && $wearers) $cat = $wearers['slot'];
+  if ($cat === null && $armory) $cat = $armory['cat'];
 
   // The trades it belongs to, and for a recipe the item it teaches.
   $taught = null; $craftedBy = [];
@@ -337,7 +340,8 @@ function forever_item_model_build(int $id): ?array {
   }
   $roles = profession_roles(['name' => $name, 'cat' => $cat], $crafter, $craftedBy);
   return ['id' => $id, 'name' => $name, 'icon' => $icon, 'cat' => $cat, 'crafter' => $crafter, 'roles' => $roles, 'taught' => $taught, 'scans' => $scans,
-    'wearers' => $wearers, 'quality' => $wearers['quality'] ?? null];
+    'wearers' => $wearers, 'quality' => $wearers['quality'] ?? ($armory['quality'] ?? null), 'iconUrl' => $icon === null ? ($armory['iconUrl'] ?? null) : null,
+    'armoryOnly' => $armory !== null];
 }
 
 /**

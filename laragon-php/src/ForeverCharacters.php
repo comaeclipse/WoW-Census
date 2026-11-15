@@ -82,6 +82,22 @@ function forever_json(?string $raw): array {
 }
 
 /** The page model for one character, or null. */
+/** The newest Armory copy of an item seen equipped on a Forever character (tools/sync-forever-armory.py), or null. */
+function forever_armory_item(int $id): ?array {
+  try {
+    $row = Db::first('SELECT item_json FROM forever_armory_items WHERE item_id=?', [$id]);
+  } catch (PDOException $e) {
+    if ($e->getCode() === '42P01') return null;
+    throw $e;
+  }
+  if (!$row) return null;
+  $it = forever_json($row['item_json']);
+  $media = (array)item_cache('item-icons', 'forever-media');
+  return ['name' => $it['name'] ?? ('Item ' . $id), 'quality' => FOREVER_QUALITY[$it['quality']['type'] ?? ''] ?? 1,
+    'cat' => $it['inventory_type']['name'] ?? ($it['item_subclass']['name'] ?? null),
+    'iconUrl' => isset($media[(string)$id]) ? 'https://render.worldofwarcraft.com/forever-eu/icons/56/' . $media[(string)$id] . '.jpg' : null];
+}
+
 function forever_character_model(string $id): ?array {
   if (!preg_match('/^\d{12}$/', $id)) return null;
   $rows = forever_character_rows($id);
