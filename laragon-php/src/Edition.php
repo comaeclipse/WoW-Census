@@ -354,8 +354,16 @@ function inspect_summary(string $source): array {
   });
 }
 
+function talent_sample_summary(string $source): array {
+  return published_page_model('talent-summary:' . $source, function () use ($source) {
+    $samples = load_talent_samples($source);
+    return ['lastT' => $samples['lastT'], 'windowDays' => $samples['windowDays'], 'truncated' => $samples['truncated'],
+      'coverage' => $samples['coverage'], 'sources' => $samples['sources'] ?? ['inspect' => count($samples['records']), 'armory' => 0]];
+  });
+}
+
 function talent_page_model(string $source): array {
-  return published_page_model('talents:' . $source, fn() => pack_talent_records(load_inspects($source)['records']));
+  return published_page_model('talents:' . $source, fn() => pack_talent_records(load_talent_samples($source)['records']));
 }
 
 // The gear page's packed records and inspection time.
@@ -370,7 +378,7 @@ function gear_page_model(string $source): array {
 function class_profiles_model(string $source): array {
   return published_page_model('class-profiles:' . $source, function () use ($source) {
     $out = [];
-    foreach (class_profiles()[$source]['classes'] ?? [] as $cf) $out[$cf] = class_profile(load_inspects($source), $cf, $source);
+    foreach (class_profiles()[$source]['classes'] ?? [] as $cf) $out[$cf] = class_profile(load_talent_samples($source), $cf, $source);
     return $out;
   });
 }
@@ -379,7 +387,7 @@ function class_profiles_model(string $source): array {
 function race_profiles_model(string $source): array {
   return published_page_model('race-profiles:' . $source, function () use ($source) {
     $out = [];
-    foreach (array_keys(race_profiles()[$source] ?? []) as $race) $out[$race] = race_profile_data(load_inspects($source), (string)$race, $source);
+    foreach (array_keys(race_profiles()[$source] ?? []) as $race) $out[$race] = race_profile_data(load_talent_samples($source), (string)$race, $source);
     return $out;
   });
 }
@@ -455,7 +463,7 @@ function render_edition_page(string $source, string $page, string $stylesheet, s
       $classes = $profileClasses ?? array_values(array_filter(
         array_merge($classicOrder, array_values(array_filter(array_keys(CLASS_META), fn($cf) => !in_array($cf, $classicOrder, true)))),
         fn($cf) => isset($observed[$cf])));
-      return render_talents_html(inspect_summary($source), $packed, $common + [
+      return render_talents_html(talent_sample_summary($source), $packed, $common + [
         'classTiles' => array_map(fn($cf) => ['classFile' => $cf, 'label' => CLASS_META[$cf][0] ?? $cf,
           'path' => $profileClasses ? class_route($source, $cf) : null,
           'color' => '#' . (CLASS_META[$cf][1] ?? 'ffce43'), 'icon' => 'classicon_' . js_lower($cf)], $classes)]);

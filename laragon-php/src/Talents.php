@@ -25,7 +25,7 @@ function render_inspect_coverage(array $data, string $href): string {
     <p class="hint">Latest inspection: ' . esc(inspect_time($data['lastT'])) . '</p><a class="game" href="' . esc($href) . '">Explore talents</a></section>';
 }
 
-const TALENT_PACKED_FIELDS = ['classFile', 'race', 'realm', 'faction', 'classification'];
+const TALENT_PACKED_FIELDS = ['classFile', 'race', 'realm', 'faction', 'classification', 'provenance'];
 
 function pack_ref(array &$values, array &$index, string $f, mixed $v): int {
   if ($v === null || $v === '') return -1;
@@ -163,7 +163,7 @@ function render_talents_html(array $data, array $packed, array $opts): string {
   $records = talent_rows($packed);
   $classPaths = [];
   foreach ($opts['classTiles'] ?? [] as $p) if (!empty($p['path'])) $classPaths[$p['classFile']] = $p['path'];
-  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' talent builds from inspected players: the most common builds per class, tree point totals and how often each talent is picked.', $opts['canonical'] ?? null);
+  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' talent builds from in-game inspections and last-logout Armory profiles: common builds per class and talent popularity.', $opts['canonical'] ?? null);
   $stylesheet = esc($opts['stylesheet'] ?? '/style.css');
   $census_css = CENSUS_STYLESHEET;
   $headingHtml = page_heading('WoWCensus', $nav, $topic);
@@ -180,9 +180,11 @@ function render_talents_html(array $data, array $packed, array $opts): string {
       "\n      " . '<img src="https://wow.zamimg.com/images/wow/icons/large/' . esc($p['icon']) . '.jpg" alt="" width="20" height="20"><span>' . esc($p['label']) . '</span>' . (!empty($p['path']) ? '</a>' : '</button>');
   }
   $filters = talent_markup('filters', $records);
-  $summary = $anyFilterTile ? '<p class="hint talent-summary" style="margin:12px 0 0">' . js_locale($data['coverage']['inspected']) . ' nearby players inspected in the latest ' . $data['windowDays'] . ' days; ' .
-    js_locale($data['coverage']['withSelectedTalents']) . ' have readable talent selections. Build shares use only classified inspections and do not describe the full character population. Latest inspection: ' .
-    esc(inspect_time($data['lastT'])) . '.' . ($data['truncated'] ? ' Results are limited to the newest 10,000 inspected players.' : '') . '</p>' : '';
+  $summary = $anyFilterTile ? '<p class="hint talent-summary" style="margin:12px 0 0">' . js_locale($data['coverage']['combined'] ?? $data['coverage']['inspected']) . ' unique character builds: ' .
+    js_locale($data['coverage']['inspectUsed'] ?? $data['coverage']['inspected']) . ' from nearby in-game inspections and ' . js_locale($data['coverage']['armoryUsed'] ?? 0) .
+    ' from last-logout Armory profiles after character-level deduplication; ' . js_locale($data['coverage']['withSelectedTalents']) .
+    ' have readable talent selections. These are observed samples, not population-wide specialization shares. Latest source record: ' . esc(inspect_time($data['lastT'])) . '.' .
+    ($data['truncated'] ? ' Inspection input is limited to the newest 10,000 inspected players.' : '') . '</p>' : '';
   $dataSrc = esc($dataFile);
   $classPathsAttr = esc(js_json((object)$classPaths));
   $content = talent_markup('content', $records, $packed['names'], $classPaths);

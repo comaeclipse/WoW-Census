@@ -58,6 +58,98 @@ const PROFESSION_RECIPE_PREFIX = [
   'Expert Cookbook' => 'cooking', 'Expert First Aid' => 'first-aid', 'Expert Fishing' => 'fishing',
 ];
 
+/** Live profession census from every character's newest stored Forever Armory snapshot. */
+function armory_profession_census(): array {
+  return published_page_model('forever-armory-professions', function () {
+    $fallback = fn() => json_decode(file_get_contents(__DIR__ . '/forever-profession-census.json'), true, 512, JSON_THROW_ON_ERROR);
+    try {
+      $profiles = Db::all("WITH latest AS (
+          SELECT DISTINCT ON (region,character_id) region,character_id,snapshot_at,professions_json
+          FROM forever_armory_snapshots WHERE professions_json IS NOT NULL ORDER BY region,character_id,snapshot_at DESC)
+        SELECT p.region,p.character_id,p.ruleset_name,p.class_name,p.level,l.snapshot_at
+        FROM latest l JOIN forever_armory_profiles p USING(region,character_id)");
+      $trades = Db::all("WITH latest AS (
+          SELECT DISTINCT ON (region,character_id) region,character_id,snapshot_at,professions_json
+          FROM forever_armory_snapshots WHERE professions_json IS NOT NULL ORDER BY region,character_id,snapshot_at DESC), expanded AS (
+          SELECT l.region,l.character_id,x.kind,x.prof
+          FROM latest l CROSS JOIN LATERAL (
+            SELECT 'primary' kind,j prof FROM jsonb_array_elements(COALESCE(l.professions_json->'primaries','[]'::jsonb)) j
+            UNION ALL SELECT 'secondary',j FROM jsonb_array_elements(COALESCE(l.professions_json->'secondaries','[]'::jsonb)) j) x)
+        SELECT region,character_id,kind,
+          COALESCE(prof->'profession'->>'name',prof->'tiers'->0->'tier'->>'name') name,
+          COALESCE((prof->'tiers'->0->>'skill_points')::int,0) skill,
+          COALESCE((prof->'tiers'->0->>'max_skill_points')::int,0) max_skill,
+          jsonb_array_length(COALESCE(prof->'tiers'->0->'known_recipes','[]'::jsonb)) recipes
+        FROM expanded WHERE COALESCE(prof->'profession'->>'name',prof->'tiers'->0->'tier'->>'name') IS NOT NULL");
+    } catch (PDOException $e) {
+      if (in_array($e->getCode(), ['42P01', '42703'], true)) return $fallback();
+      throw $e;
+    }
+    if (!$profiles) return $fallback();
+    $meta = []; $regions = []; $rulesets = []; $classTotals = []; $levelTotals = []; $from = null; $to = null;
+    foreach ($profiles as $p) {
+      $key = $p['region'] . ':' . $p['character_id']; $meta[$key] = $p;
+      $regions[strtoupper($p['region'])] = ($regions[strtoupper($p['region'])] ?? 0) + 1;
+      $rulesets[$p['ruleset_name'] ?: 'Unknown'] = ($rulesets[$p['ruleset_name'] ?: 'Unknown'] ?? 0) + 1;
+      $classTotals[$p['class_name']] = ($classTotals[$p['class_name']] ?? 0) + 1;
+      $level = (int)$p['level']; $band = $level < 20 ? '10-19' : ($level < 30 ? '20-29' : ($level < 40 ? '30-39' : ($level < 50 ? '40-49' : '50-60')));
+      $levelTotals[$band] = ($levelTotals[$band] ?? 0) + 1;
+      $t = strtotime((string)$p['snapshot_at']); $from = $from === null ? $t : min($from, $t); $to = $to === null ? $t : max($to, $t);
+    }
+    $byChar = []; $stats = ['primary' => [], 'secondary' => []]; $classTrades = []; $levelSkills = [];
+    foreach ($trades as $t) {
+      $key = $t['region'] . ':' . $t['character_id']; if (!isset($meta[$key])) continue;
+      $kind = $t['kind']; $name = $t['name']; $skill = (int)$t['skill']; $max = (int)$t['max_skill'];
+      $byChar[$key][$kind][] = $name;
+      $stats[$kind][$name] ??= ['skills' => [], 'recipes' => 0, 'maxed' => 0, 'top' => 0];
+      $stats[$kind][$name]['skills'][] = $skill; $stats[$kind][$name]['recipes'] += (int)$t['recipes'];
+      $stats[$kind][$name]['top'] = max($stats[$kind][$name]['top'], $skill);
+      if ($max > 0 && $skill >= $max) $stats[$kind][$name]['maxed']++;
+      if ($kind === 'primary') {
+        $class = $meta[$key]['class_name']; $classTrades[$class][$name] = ($classTrades[$class][$name] ?? 0) + 1;
+        $level = (int)$meta[$key]['level']; $band = $level < 20 ? '10-19' : ($level < 30 ? '20-29' : ($level < 40 ? '30-39' : ($level < 50 ? '40-49' : '50-60')));
+        $levelSkills[$band][] = $skill;
+      }
+    }
+    $n = count($profiles); $primaryCounts = ['0' => 0, '1' => 0, '2' => 0]; $combos = [];
+    foreach (array_keys($meta) as $key) {
+      $p = array_values(array_unique($byChar[$key]['primary'] ?? [])); sort($p, SORT_STRING);
+      $primaryCounts[(string)min(2, count($p))]++;
+      if ($p) { $combo = implode(' + ', $p); $combos[$combo] = ($combos[$combo] ?? 0) + 1; }
+    }
+    arsort($combos);
+    $summaries = function (array $rows) use ($n): array {
+      $out = [];
+      foreach ($rows as $name => $s) {
+        sort($s['skills']); $count = count($s['skills']);
+        $out[] = ['name' => $name, 'count' => $count, 'pct' => round(100 * $count / $n, 1),
+          'avg' => round(array_sum($s['skills']) / max(1, $count), 1), 'median' => $s['skills'][(int)floor(($count - 1) / 2)] ?? 0,
+          'top' => $s['top'], 'recipes' => round($s['recipes'] / max(1, $count), 1), 'maxed' => round(100 * $s['maxed'] / max(1, $count), 1), 'brackets' => []];
+      }
+      usort($out, fn($a, $b) => $b['count'] <=> $a['count'] ?: strcmp($a['name'], $b['name']));
+      return $out;
+    };
+    $classes = [];
+    foreach ($classTotals as $class => $total) {
+      $top = [];
+      foreach ($classTrades[$class] ?? [] as $name => $count) $top[] = [$name, round(100 * $count / $total, 1)];
+      usort($top, fn($a, $b) => $b[1] <=> $a[1]); $classes[] = ['class' => $class, 'count' => $total, 'top' => $top];
+    }
+    usort($classes, fn($a, $b) => $b['count'] <=> $a['count']);
+    $levels = [];
+    foreach (['10-19','20-29','30-39','40-49','50-60'] as $band) if (isset($levelTotals[$band]))
+      $levels[] = [$band, $levelTotals[$band], round(array_sum($levelSkills[$band] ?? [0]) / max(1, count($levelSkills[$band] ?? [])), 1)];
+    $comboRows = [];
+    foreach (array_slice($combos, 0, 10, true) as $name => $count) $comboRows[] = [$name, $count, round(100 * $count / $n, 1)];
+    return ['source' => 'forever_armory_snapshots', 'sampled' => $n, 'profiles' => $n, 'notFound' => 0,
+      'fetchedFrom' => gmdate('c', $from), 'fetchedTo' => gmdate('c', $to), 'regions' => $regions, 'rulesets' => $rulesets,
+      'primaryCounts' => $primaryCounts, 'primaries' => $summaries($stats['primary']), 'secondaries' => $summaries($stats['secondary']),
+      'combos' => $comboRows, 'classes' => $classes, 'levels' => $levels,
+      'learned' => count($trades), 'recipes' => array_sum(array_map(fn($x) => $x['recipes'], [...$stats['primary'], ...$stats['secondary']])),
+      'capped' => array_sum(array_map(fn($x) => $x['maxed'], [...$stats['primary'], ...$stats['secondary']]))];
+  });
+}
+
 /** The trade a recipe teaches, or null. $craftedBy maps a crafted item's name to its trade slug. */
 function profession_for_recipe(string $name, array $craftedBy): ?string {
   foreach (PROFESSION_RECIPE_PREFIX as $prefix => $slug) if (str_starts_with($name, $prefix)) return $slug;
@@ -139,7 +231,7 @@ function professions_page_model(): array {
       $views[] = ['realm' => $v['realm'], 'faction' => $v['faction'], 'scanned' => $s['updatedAt'] ? substr((string)$s['updatedAt'], 0, 10) : null,
         'empty' => !$s['items'], 'professions' => $profs];
     }
-    return ['views' => $views, 'dims' => $model['dims']];
+    return ['views' => $views, 'dims' => $model['dims'], 'armory' => armory_profession_census()];
   });
 }
 
@@ -160,7 +252,11 @@ function professions_html(?string $slug, string $stylesheet): string {
   if ($slug === null) {
     $title = $seoLabel . ' Professions';
     $desc = $seoLabel . ' professions: auction house supply and asking prices for each trade\'s materials, crafted goods and recipes.';
-    $body = '<div class="panel census"><div class="ptitle">Professions</div><p class="hint" style="margin-top:0">Pick a trade to see what its materials, crafted goods and recipes list for on the auction house.</p><table class="mkttable"><thead><tr><th class="l">Profession</th><th class="r">Items listed</th><th class="r">Units</th><th class="r">Listed value</th></tr></thead><tbody>';
+    $pc = $model['armory'];
+    $pop = '<div class="panel census"><div class="ptitle">Armory profession popularity</div><p class="hint" style="margin-top:0">Newest last-logout Armory profile for ' . js_locale($pc['profiles']) . ' sampled characters through ' . esc(substr($pc['fetchedTo'], 0, 10)) . '. This is profile coverage, not a population census.</p><table class="mkttable"><thead><tr><th class="l">Primary profession</th><th class="r">Characters</th><th class="r">Share</th><th class="r">Average skill</th></tr></thead><tbody>';
+    foreach ($pc['primaries'] as $p) $pop .= '<tr><td class="l">' . esc($p['name']) . '</td><td class="r">' . js_locale($p['count']) . '</td><td class="r">' . esc($p['pct']) . '%</td><td class="r">' . esc($p['avg']) . '</td></tr>';
+    $pop .= '</tbody></table></div>';
+    $body = $pop . '<div class="panel census"><div class="ptitle">Profession markets</div><p class="hint" style="margin-top:0">Pick a trade to see what its materials, crafted goods and recipes list for on the auction house.</p><table class="mkttable"><thead><tr><th class="l">Profession</th><th class="r">Items listed</th><th class="r">Units</th><th class="r">Listed value</th></tr></thead><tbody>';
     foreach (PROFESSIONS as $s => $p) {
       $d = $all['professions'][$s] ?? ['items' => 0, 'units' => 0, 'value' => 0];
       $body .= '<tr><td class="l"><a href="' . esc(profession_path($s)) . '">' . esc($p['name']) . '</a> <span class="mu">' . esc($p['role']) . '</span></td><td class="r">' . js_locale($d['items']) . '</td><td class="r">' . js_locale($d['units']) . '</td><td class="r">' . esc(big_gold($d['value'])) . '</td></tr>';

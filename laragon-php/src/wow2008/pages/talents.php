@@ -2,7 +2,8 @@
 namespace Wow2008;
 /**
  * Page: Talents
- * Vars: $data (array, TALENT_DATA: builds, totals, talents), $classes (list), $subtitle, $generated, $inspectedAt (strings)
+ * Vars: $data (array, TALENT_DATA: builds, totals, talents), $classes (list), $subtitle, $generated, $inspectedAt,
+ * $inspectBuilds and $armoryBuilds
  */
 ?>
   <main class="main">
@@ -46,10 +47,10 @@ namespace Wow2008;
         <div class="toolbar"><input id="tq" type="text" placeholder="Find a talent…" aria-label="Find a talent"></div>
         <div class="panel"><div class="tlist" id="tlist"></div></div>
         <div class="pager" id="tpager"></div>
-        <p class="tfoot">Shares count only players whose talent picks could be read, within each class. No inspected players were left out for unreadable talents.</p>
+        <p class="tfoot">Shares count only sampled characters whose talent picks could be read, within each class. These observed builds do not represent the full character population.</p>
     <?php component_end() ?>
 
-    <div class="source">Talent data from inspected nearby players · latest inspection <?= e($inspectedAt) ?> · page generated <?= e($generated) ?></div>
+    <div class="source">Talent data from <?= n($inspectBuilds) ?> in-game inspections and <?= n($armoryBuilds) ?> last-logout Armory profiles after character-level deduplication · latest source record <?= e($inspectedAt) ?> · page generated <?= e($generated) ?></div>
   </main>
 
 <?php start_section('scripts') ?>

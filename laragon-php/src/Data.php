@@ -557,9 +557,9 @@ function load_inspects(string $source): array {
   $latest = Db::first('SELECT MAX(captured_at) latest FROM character_inspects WHERE source_game=?', [$source]);
   $end = $latest['latest'] ?? 0;
   $end = $end ?: 0;
-  $rows = Db::all('SELECT i.name, i.class_file, i.race, i.level, i.guild, i.captured_at, i.realm, i.faction, i.match_status,
-      i.game, i.character_key, i.import_string, i.raw_spec_id, i.raw_role, i.gear_json, i.nodes_json
-    FROM character_inspects i
+  $rows = Db::all('SELECT i.name, i.raw_name, i.class_file, i.race, i.level, i.guild, i.captured_at, i.realm, i.faction, i.match_status,
+      i.game, i.character_key, i.import_string, i.raw_spec_id, i.raw_role, i.gear_json, i.nodes_json, i.collection_region
+    FROM character_inspects_with_region i
     JOIN (SELECT guid,MAX(captured_at) t FROM character_inspects WHERE source_game=? GROUP BY guid) m
       ON m.guid=i.guid AND m.t=i.captured_at
     WHERE i.source_game=? AND i.captured_at>=? ORDER BY i.captured_at DESC,i.guid COLLATE "C" LIMIT 10001',
@@ -579,9 +579,9 @@ function load_inspects(string $source): array {
       foreach (json_decode($r['gear_json'], true) as $g)
         $gear[] = ['slot' => $g['slot'] ?? null, 'id' => $g['id'] ?? null, 'name' => $g['name'] ?? null, 'quality' => $g['quality'] ?? null, 'enchant' => $g['enchant'] ?? null,
           'rune' => $source === 'sod' ? gear_rune($g) : null];
-    $records[] = ['name' => $r['name'], 'classFile' => $r['class_file'], 'race' => $r['race'], 'level' => $r['level'],
+    $records[] = ['name' => $r['name'], 'rawName' => $r['raw_name'], 'classFile' => $r['class_file'], 'race' => $r['race'], 'level' => $r['level'],
       'guild' => ($r['guild'] ?? '') !== '' ? $r['guild'] : null, 'time' => $r['captured_at'],
-      'realm' => $realm, 'faction' => $faction,
+      'realm' => $realm, 'region' => $r['collection_region'], 'faction' => $faction,
       'matchStatus' => $r['match_status'], 'game' => $game, 'characterKey' => $r['character_key'],
       'importString' => $r['import_string'], 'rawSpecID' => $r['raw_spec_id'], 'rawRole' => $r['raw_role'],
       'gear' => $gear] + $build;
@@ -596,4 +596,101 @@ function load_inspects(string $source): array {
       'withGear' => $count(fn($r) => count($r['gear']) > 0), 'linked' => count($linkedKeys), 'unmatched' => $count(fn($r) => ($r['game'] ?? '') === ''),
       'ambiguous' => $count(fn($r) => $r['matchStatus'] === 'ambiguous'), 'retainedCensusCharacters' => $retained ?: 0, 'history' => $history ?: 0]];
   return $cache[$source] = $model;
+}
+
+/** Region/name identity shared by Forever inspections and realm-free Armory profiles. */
+function forever_talent_identity(array $r): ?string {
+  $name = trim((string)($r['name'] ?? ''));
+  if ($name === '') return null;
+  $rawName = trim((string)($r['rawName'] ?? ''));
+  $surname = trim((string)($r['realm'] ?? ''));
+  if ($rawName !== '' && $surname !== '' && js_lower($rawName) === js_lower($name . '-' . $surname))
+    $name .= ' ' . $surname;
+  $region = js_lower((string)($r['region'] ?? ''));
+  if ($region === '' && preg_match('/^CAMWOW\s+(US|EU|KR|TW)/i', (string)($r['realm'] ?? ''), $m)) $region = js_lower($m[1]);
+  if ($region === '' && preg_match('/^realm:(us|eu|kr|tw):/i', (string)($r['game'] ?? ''), $m)) $region = js_lower($m[1]);
+  return $region !== '' ? $region . '|' . js_lower($name) : null;
+}
+
+/** Latest active Armory talent build for each stored Forever character, normalized like character_inspects. */
+function forever_armory_talent_records(): array {
+  static $records = null;
+  if ($records !== null) return $records;
+  try {
+    $rows = Db::all("SELECT b.region,b.character_id,b.full_name,b.ruleset_name,b.class_name,b.level,b.last_login_at,b.fetched_at,
+        b.group_index,b.specialization_index,b.is_active,b.talents,p.race_name,p.faction,p.guild_name
+      FROM forever_armory_current_builds b JOIN forever_armory_profiles p USING(region,character_id)
+      ORDER BY b.region,b.character_id,b.is_active DESC,b.group_index,b.specialization_index");
+  } catch (PDOException $e) {
+    if (in_array($e->getCode(), ['42P01', '42703'], true)) return $records = [];
+    throw $e;
+  }
+  $classFiles = [];
+  foreach (CLASS_META as $file => $meta) $classFiles[js_lower($meta[0])] = $file;
+  $catalog = talent_catalogs()['forever'];
+  $definitions = []; $spells = [];
+  foreach ($catalog as $node => $t) {
+    if (isset($t['definition'])) $definitions[(string)$t['definition']] = $t;
+    if (isset($t['spell'])) $spells[(string)$t['spell']] = $t;
+  }
+  $chosen = []; $groups = [];
+  foreach ($rows as $r) {
+    $id = $r['region'] . ':' . $r['character_id'];
+    if (!isset($chosen[$id])) $chosen[$id] = (int)$r['group_index'];
+    if ((int)$r['group_index'] !== $chosen[$id]) continue;
+    $groups[$id] ??= ['row' => $r, 'list' => []];
+    foreach (json_decode($r['talents'] ?: '[]', true) ?: [] as $t) {
+      $mapped = $definitions[(string)($t['id'] ?? '')] ?? $spells[(string)($t['spell_id'] ?? '')] ?? null;
+      $groups[$id]['list'][] = [
+        'node' => $mapped['node'] ?? ('definition:' . js_string($t['id'] ?? 'unknown')),
+        'rank' => (int)($t['rank'] ?? 0), 'max' => (int)($mapped['max'] ?? max(1, (int)($t['rank'] ?? 1))),
+        'spell' => isset($t['spell_id']) ? (int)$t['spell_id'] : null,
+        'name' => $t['name'] ?? ($mapped['name'] ?? 'Unknown talent'),
+      ];
+    }
+  }
+  $records = [];
+  foreach ($groups as $id => $g) {
+    $r = $g['row']; $classFile = $classFiles[js_lower((string)$r['class_name'])] ?? null;
+    if ($classFile === null) continue;
+    $build = describe_build(['class' => $classFile, 'list' => $g['list']], 'forever');
+    $time = strtotime((string)($r['last_login_at'] ?: $r['fetched_at'])) ?: 0;
+    $records[] = ['name' => $r['full_name'], 'classFile' => $classFile, 'race' => $r['race_name'], 'level' => (int)$r['level'],
+      'guild' => $r['guild_name'] ?: null, 'time' => $time, 'region' => $r['region'], 'realm' => $r['ruleset_name'],
+      'faction' => $r['faction'], 'matchStatus' => 'armory', 'game' => null,
+      'characterKey' => 'armory:' . $r['region'] . ':' . $r['character_id'], 'importString' => null,
+      'rawSpecID' => null, 'rawRole' => null, 'gear' => [], 'provenance' => 'armory'] + $build;
+  }
+  return $records;
+}
+
+/** Talent records used by aggregate pages: newest valid record per Forever character across inspect and Armory. */
+function load_talent_samples(string $source): array {
+  static $cache = [];
+  if (isset($cache[$source])) return $cache[$source];
+  $inspects = load_inspects($source);
+  if ($source !== 'forever') return $cache[$source] = $inspects;
+  $combined = [];
+  $add = function (array $r) use (&$combined): void {
+    $r['provenance'] ??= 'inspect';
+    $identity = forever_talent_identity($r) ?? ($r['provenance'] . ':' . js_string($r['characterKey'] ?? count($combined)));
+    $valid = count($r['talents'] ?? []) > 0 && ($r['classification'] ?? '') !== 'Unknown build';
+    if (!isset($combined[$identity])) { $combined[$identity] = ['record' => $r, 'valid' => $valid]; return; }
+    $old = $combined[$identity];
+    if (($valid && !$old['valid']) || ($valid === $old['valid'] && ($r['time'] ?? 0) > ($old['record']['time'] ?? 0)))
+      $combined[$identity] = ['record' => $r, 'valid' => $valid];
+  };
+  foreach ($inspects['records'] as $r) $add($r);
+  foreach (forever_armory_talent_records() as $r) $add($r);
+  $records = array_values(array_map(fn($x) => $x['record'], $combined));
+  $sources = ['inspect' => 0, 'armory' => 0];
+  foreach ($records as $r) $sources[$r['provenance']] = ($sources[$r['provenance']] ?? 0) + 1;
+  $count = fn(callable $f) => count(array_filter($records, $f));
+  $coverage = $inspects['coverage'] + ['armory' => 0, 'combined' => 0, 'inspectUsed' => 0, 'armoryUsed' => 0];
+  $coverage['combined'] = count($records); $coverage['inspectUsed'] = $sources['inspect']; $coverage['armoryUsed'] = $sources['armory'];
+  $coverage['armory'] = count(forever_armory_talent_records());
+  $coverage['withSelectedTalents'] = $count(fn($r) => count($r['talents'] ?? []) > 0);
+  return $cache[$source] = array_merge($inspects, ['records' => $records,
+    'lastT' => max($inspects['lastT'], ...array_map(fn($r) => $r['time'] ?? 0, $records)),
+    'coverage' => $coverage, 'sources' => $sources]);
 }

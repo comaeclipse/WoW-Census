@@ -626,7 +626,7 @@ function common_vars(string $source): array {
 
 function talents_page(string $source, string $html): string {
   $packed = \talent_page_model($source);
-  $summary = \inspect_summary($source);
+  $summary = \talent_sample_summary($source);
   $talentIcons = [];
   foreach (\class_profiles_model($source) as $classFile => $profile)
     foreach ($profile['trees'] ?? [] as $tree)
@@ -664,7 +664,9 @@ function talents_page(string $source, string $html): string {
   $classes = array_values(array_filter(array_map('Wow2008\class_name', $order), fn($c) => isset($totals[$c])));
   foreach (array_keys($totals) as $c) if (!in_array($c, $classes, true)) $classes[] = $c;
   return page('talents', common_vars($source) + ['data' => ['builds' => $builds, 'totals' => (object)$totals, 'talents' => array_values($picks)],
-    'classes' => $classes, 'inspectedAt' => \inspect_time($summary['lastT'])], $html, 'talents');
+    'classes' => $classes, 'inspectedAt' => \inspect_time($summary['lastT']),
+    'inspectBuilds' => $summary['coverage']['inspectUsed'] ?? $summary['coverage']['inspected'],
+    'armoryBuilds' => $summary['coverage']['armoryUsed'] ?? 0], $html, 'talents');
 }
 
 function gear_page(string $source, string $html): string {
@@ -911,8 +913,7 @@ function professions_page(string $html): string {
   $views = array_map(fn($v) => ['realm' => $v['realm'], 'faction' => $v['faction'], 'scanned' => $v['scanned'], 'empty' => $v['empty'],
     'p' => array_map(fn($d) => [$d['items'], $d['units'], (int)floor($d['value'] / 10000), $d['matsCount'], $d['craftedCount'], $d['recipesCount']], $v['professions'])], $model['views']);
   return page('professions', common_vars(\PROFESSION_SOURCE) + ['cards' => profession_cards(), 'data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
-    'realms' => $realms, 'factions' => $factions,
-    'pcensus' => json_decode(file_get_contents(__DIR__ . '/forever-profession-census.json'), true, 512, JSON_THROW_ON_ERROR)], $html, 'professions');
+    'realms' => $realms, 'factions' => $factions, 'pcensus' => $model['armory']], $html, 'professions');
 }
 
 function profession_page(string $slug, string $html): string {

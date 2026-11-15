@@ -94,7 +94,9 @@ function race_profile_data(array $inspects, string $race, string $source): array
       'trees' => $trees,
       'medLv' => median(array_map(fn($r) => $r['level'], $members))];
   }
-  return ['n' => count($rows), 'classes' => $classes, 'medLv' => median(array_map(fn($r) => $r['level'], $rows))];
+  $sources = ['inspect' => 0, 'armory' => 0];
+  foreach ($rows as $r) $sources[$r['provenance'] ?? 'inspect']++;
+  return ['n' => count($rows), 'classes' => $classes, 'medLv' => median(array_map(fn($r) => $r['level'], $rows)), 'sources' => $sources];
 }
 
 // linkedom's serialization of text and attribute values.
@@ -131,7 +133,7 @@ function render_race_profile(array $D, string $game, string $race, string $style
   $title = $G['gameLabel'] . ' ' . $label . ' Specs & Talents – WoWCensus';
   $head = preg_replace_callback('/<title>[\s\S]*?<\/title>/', fn() => '<title>' . $title . '</title>', $head, 1);
   $head = str_replace('<style>', '<link rel="stylesheet" href="' . le_attr($prefix . $stylesheet) . '"><style>', $head);
-  $head .= '<meta name="description" content="' . le_attr($label . ' class builds in ' . $G['gameLabel'] . ': which classes ' . $plural . ' play, their most popular specs and most-picked talents, from player inspections.') . '">' .
+  $head .= '<meta name="description" content="' . le_attr($label . ' class builds in ' . $G['gameLabel'] . ': popular specs and talents from sampled in-game inspections and last-logout Armory profiles.') . '">' .
     '<link rel="canonical" href="' . le_attr($canonical) . '"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus">' .
     '<meta property="og:title" content="' . le_attr($G['gameLabel'] . ' ' . $label . ' Specs & Talents – WoWCensus') . '"><meta property="og:url" content="' . le_attr($canonical) . '">' .
     '<link rel="icon" href="' . le_attr($prefix . 'favicon.ico') . '">';
@@ -184,10 +186,11 @@ function render_race_profile(array $D, string $game, string $race, string $style
   $first = $specs[0] ?? null;
   $tankName = fn($x) => ($x['s'] === 'Protection' ? 'Prot ' : $x['s'] . ' ') . (CLASS_META[$x['cf']][0] ?? $x['cf']);
   if ($D['n']) {
-    $intro = le_text('Among ' . $plural . " we've inspected, ") . '<strong>' . le_text(CLASS_META[$top][0] ?? $top) . '</strong>' . le_text(' is the most common class');
+    $intro = le_text('Among sampled ' . $plural . ', ') . '<strong>' . le_text(CLASS_META[$top][0] ?? $top) . '</strong>' . le_text(' is the most common class');
     $intro .= $first ? le_text(', with ') . '<strong>' . le_text($first['s']) . '</strong>' . le_text(' leading among identified builds.')
       : le_text('. No identified builds are available in this sample.');
-  } else $intro = le_text('No ' . $label . ' inspections with readable talents are available in this snapshot.');
+    $intro .= le_text(' ' . js_locale($D['sources']['inspect'] ?? 0) . ' builds come from in-game inspections and ' . js_locale($D['sources']['armory'] ?? 0) . ' from last-logout Armory profiles.');
+  } else $intro = le_text('No ' . $label . ' sampled builds with readable talents are available in this snapshot.');
   $body = preg_replace('/(<section class="hero slab">[\s\S]*?<p>)[\s\S]*?(<\/p>)/', '${1}' .str_replace(['\\', '$'], ['\\\\', '\\$'], $intro) . '$2', $body, 1);
   $body = preg_replace('/(<div class="bignum"><b>)[^<]*(<\/b><small>)[^<]*(<\/small>)/',
     '${1}' .js_locale($D['n']) . '${2}' . str_replace(['\\', '$'], ['\\\\', '\\$'], le_text($plural . ($modern ? ' with a known spec' : ' with talents'))) . '$3', $body, 1);
@@ -206,7 +209,7 @@ function render_race_profile(array $D, string $game, string $race, string $style
         $v = le_text($first['s']); $s = le_text($first['n'] . ' players · ' . pct_round($first['n'], $D['n']) . '%');
       } elseif ($i === 2) {
         $v = le_text($tank ? $tankName($tank[0]) : 'None classified');
-        $s = le_text($tank ? $tank[0]['n'] . ' inspected' . (isset($tank[1]) ? ' · ahead of ' . $tank[1]['n'] . ' ' . ($modern ? $tankName($tank[1]) : (CLASS_META[$tank[1]['cf']][0] ?? $tank[1]['cf'])) : '')
+        $s = le_text($tank ? $tank[0]['n'] . ' sampled' . (isset($tank[1]) ? ' · ahead of ' . $tank[1]['n'] . ' ' . ($modern ? $tankName($tank[1]) : (CLASS_META[$tank[1]['cf']][0] ?? $tank[1]['cf'])) : '')
           : ($modern ? 'No tank spec observed' : 'No Protection build observed'));
       } elseif ($i === 3) {
         $v = le_text($D['medLv'] ?? '—');
@@ -276,7 +279,7 @@ function render_race_profile(array $D, string $game, string $race, string $style
     }
     $cards .= '<article class="card" data-class="' . le_attr($cf) . '" style="--c:' . le_attr($col) . '">' . "\n" .
       '    <div class="card-h"><img src="' . $prefix . 'assets/images/wow/icons/large/classicon_' . js_lower($cf) . '.jpg" alt="" width="40" height="40"><h4>' . le_text($cn) . '</h4>' . "\n" .
-      '      <div class="cn"><b>' . $c['n'] . '</b>inspected · ' . js_str($pct($c['n'], $D['n'])) . '%</div></div>' . "\n" .
+      '      <div class="cn"><b>' . $c['n'] . '</b>sampled · ' . js_str($pct($c['n'], $D['n'])) . '%</div></div>' . "\n" .
       '    <div class="card-b">' . "\n" .
       '      <p class="lbl">Spec split</p><div class="specbar">' . $seg . '</div><div class="speckey">' . $key . '</div>' . "\n" .
       '      ' . ($trees ? '<p class="lbl">Avg points per tree</p><div class="trees">' . $tr . '</div>' : '') . "\n" .

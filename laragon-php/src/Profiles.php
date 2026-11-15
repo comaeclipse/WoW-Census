@@ -134,7 +134,9 @@ function class_profile(array $inspects, string $classFile, string $source): arra
   }
   $hybrid = count(array_filter($rows, fn($r) => str_contains($r['classification'] ?? '', '/')));
   $unknown = count(array_filter($rows, fn($r) => !in_array($r['classification'], $known, true) && !str_contains($r['classification'] ?? '', '/')));
-  return ['n' => count($rows), 'trees' => $trees, 'hybrid' => $hybrid, 'unknown' => $unknown];
+  $sources = ['inspect' => 0, 'armory' => 0];
+  foreach ($rows as $r) $sources[$r['provenance'] ?? 'inspect']++;
+  return ['n' => count($rows), 'trees' => $trees, 'hybrid' => $hybrid, 'unknown' => $unknown, 'sources' => $sources];
 }
 
 // The race template owns the profile pages' look; reuse its stylesheet.
@@ -164,10 +166,11 @@ function render_class_profile(array $D, string $source, string $classFile, strin
   $ranked = js_sort($D['trees'], fn($a, $b) => $b['n'] - $a['n']);
   $named = fn($t) => '<strong>' . esc_profile($t['tree']) . '</strong> (' . pct_round($t['n'], $D['n']) . '%)';
   $modern = $source === 'retail' || $source === 'mop-classic';
-  if (!$D['n']) $intro = 'No ' . esc_profile($className) . ' inspections with ' . ($modern ? 'a recognized specialization' : 'readable talents') . ' are available in this snapshot.';
+  if (!$D['n']) $intro = 'No ' . esc_profile($className) . ' sampled builds with ' . ($modern ? 'a recognized specialization' : 'readable talents') . ' are available in this snapshot.';
   else {
     $others = implode(' and ', array_map($named, array_values(array_filter(array_slice($ranked, 1), fn($t) => $t['n']))));
-    $intro = 'Among ' . esc_profile($plural) . " we've inspected, " . $named($ranked[0]) . ' is the most common build, followed by ' . ($others !== '' ? $others : 'no other single-tree build') . '.';
+    $intro = 'Among sampled ' . esc_profile($plural) . ', ' . $named($ranked[0]) . ' is the most common build, followed by ' . ($others !== '' ? $others : 'no other single-tree build') . '. ' .
+      js_locale($D['sources']['inspect'] ?? 0) . ' come from in-game inspections and ' . js_locale($D['sources']['armory'] ?? 0) . ' from last-logout Armory profiles.';
   }
   $seg = '';
   foreach ($D['trees'] as $i => $t)
@@ -210,7 +213,7 @@ function render_class_profile(array $D, string $source, string $classFile, strin
   return <<<HTML
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>$eTitle</title>
-<meta name="description" content="$eClass talents in $eGame: which talents players pick in each spec, ranked by how often they appear in nearby-player inspections."><link rel="canonical" href="$eCanon"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="$eTitle"><meta property="og:url" content="$eCanon"><link rel="icon" href="{$prefix}favicon.ico">
+<meta name="description" content="$eClass talents in $eGame from sampled in-game inspections and last-logout Armory profiles, ranked by how often each build appears."><link rel="canonical" href="$eCanon"><meta property="og:type" content="website"><meta property="og:site_name" content="WoWCensus"><meta property="og:title" content="$eTitle"><meta property="og:url" content="$eCanon"><link rel="icon" href="{$prefix}favicon.ico">
 $fonts
 <link rel="stylesheet" href="$prefix$eSheet">
 <style>$style</style></head>
