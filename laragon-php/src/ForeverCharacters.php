@@ -66,6 +66,8 @@ function forever_character_model(string $region, string $slug): ?array {
   $cf = FOREVER_CLASS_FILES[(int)$p['class_id']] ?? null;
 
   $icons = (array)item_cache('item-icons', 'forever') + (array)item_cache('item-icons', 'classic');
+  // Blizzard icon file ids for items Wowhead's lists lack (tools/fetch-forever-item-media.py).
+  $media = (array)item_cache('item-icons', 'forever-media');
   $gear = [];
   foreach (forever_json($s['equipment_json'])['equipped_items'] ?? [] as $it) {
     $id = (int)($it['item']['id'] ?? 0);
@@ -77,7 +79,9 @@ function forever_character_model(string $region, string $slug): ?array {
       'slot' => $it['slot']['name'] ?? '', 'id' => $id, 'name' => $it['name'] ?? ('Item ' . $id),
       'quality' => FOREVER_QUALITY[$it['quality']['type'] ?? ''] ?? 1, 'ilvl' => ($it['level']['value'] ?? 0) > 1 ? (int)$it['level']['value'] : null,
       'type' => trim(($it['inventory_type']['name'] ?? '') . (isset($it['item_subclass']['name']) && $it['item_subclass']['name'] !== 'Miscellaneous' ? ' · ' . $it['item_subclass']['name'] : '')),
-      'icon' => $icons[$id] ?? $icons[(string)$id] ?? null, 'lines' => $lines,
+      'icon' => $icon = $icons[$id] ?? $icons[(string)$id] ?? null, 'lines' => $lines,
+      'iconUrl' => $icon !== null ? '/assets/images/wow/icons/large/' . $icon . '.jpg'
+        : (isset($media[(string)$id]) ? 'https://render.worldofwarcraft.com/forever-eu/icons/56/' . $media[(string)$id] . '.jpg' : null),
       'enchants' => array_values(array_filter(array_map(fn($e) => $e['display_string'] ?? null, $it['enchantments'] ?? []))),
     ];
   }
