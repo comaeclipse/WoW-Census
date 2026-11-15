@@ -530,6 +530,13 @@ def main():
         check = subprocess.run([sys.executable, "-B", str(REPO / "tools" / "check-collection-regions.py"), f"--dsn={args.dsn}"],
                                capture_output=True, text=True, encoding="utf-8")
         print(check.stdout.rstrip() or check.stderr.rstrip(), flush=True)
+    if args.schema == "marketlens_import" and "forever" in changed_sources:
+        # Newest guild and level from any source onto every row of each Forever character.
+        rec = subprocess.run([sys.executable, "-B", str(REPO / "tools" / "reconcile-forever-characters-pg.py"), f"--dsn={args.dsn}"],
+                             capture_output=True, text=True, encoding="utf-8")
+        print(rec.stdout.rstrip() or rec.stderr.rstrip()[-500:], flush=True)
+        if rec.returncode != 0:
+            report["errors"].append("forever reconcile failed: " + rec.stderr.strip()[-500:])
     if changed_sources:
         conn.autocommit = True
         phase_started = time.perf_counter()

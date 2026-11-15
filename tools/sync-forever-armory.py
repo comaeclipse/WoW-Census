@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import base64
 import concurrent.futures
+import importlib.util
 import json
 import os
 import random
@@ -389,6 +390,7 @@ def main() -> None:
     parser.add_argument("--include", nargs="+", default=["all"], choices=("all", "guilds", *ENDPOINTS))
     parser.add_argument("--rate", type=float, default=5.0, help="all HTTP requests per second")
     parser.add_argument("--min-level", type=int, default=0, help="only characters at or above this level")
+    parser.add_argument("--no-reconcile", action="store_true", help="skip updating census rows afterwards")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--max-age", type=int, default=24, help="hours before refreshing a success")
     parser.add_argument("--miss-age", type=int, default=7, help="days before retrying a 404")
@@ -445,6 +447,12 @@ def main() -> None:
         cur.execute("""UPDATE marketlens_import.forever_armory_runs SET finished_at=now(),fetched=%s,
           not_found=%s,failed=%s,endpoint_failures=%s WHERE run_id=%s""",
                     (stats["ok"], stats["not_found"], stats["failed"], stats["endpoint_failures"], run_id))
+    if stats["ok"] and not args.no_reconcile:
+        # Newer Armory guilds and levels update the census rows of the same characters.
+        spec = importlib.util.spec_from_file_location("reconcile", os.path.join(os.path.dirname(__file__), "reconcile-forever-characters-pg.py"))
+        rec = importlib.util.module_from_spec(spec); spec.loader.exec_module(rec)
+        with conn:
+            print("RECONCILED", rec.reconcile(conn), flush=True)
     conn.close()
     print(json.dumps({"run_id": run_id, "requested": len(candidates), **stats}))
 

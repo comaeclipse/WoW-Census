@@ -18,11 +18,14 @@ batches:
 - first_seen = last_seen = Blizzard last login (verification time if missing), seen_count 1, and one
   character_observations row on that day.
 - Each source file merges once (external_verified_canonical_imports). One transaction; --dry-run rolls back.
-Afterwards rebuild the census cache (laragon-php/build-census-cache.php).
+Then tools/reconcile-forever-characters-pg.py applies newer verified guilds and levels to characters the
+census already had. Afterwards rebuild the census cache (laragon-php/build-census-cache.php).
 """
 import argparse
+import importlib.util
 import os
 import sys
+from pathlib import Path
 
 # Realm names can be Korean; a cp1252 console must not abort the merge before it commits.
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -137,6 +140,11 @@ def main():
         if a.dry_run:
             conn.rollback()
         else:
+            conn.commit()
+            # Newer verified guilds and levels also update characters the census already had.
+            spec = importlib.util.spec_from_file_location("reconcile", Path(__file__).with_name("reconcile-forever-characters-pg.py"))
+            rec = importlib.util.module_from_spec(spec); spec.loader.exec_module(rec)
+            print("RECONCILED", rec.reconcile(conn))
             conn.commit()
     except Exception:
         conn.rollback()
