@@ -15,14 +15,16 @@ function armory_character_path(string $source, string $id): string {
 }
 
 /** Profile ids for names on one census realm. Ambiguous cross-region matches are left unlinked. */
-function armory_character_ids(string $source, string $realm, array $names): array {
+function armory_character_ids(string $source, string $realm, array $names, ?string $region = null): array {
   if (!in_array($source, ARMORY_SOURCES, true)) return [];
   $names = array_values(array_unique(array_filter(array_map(fn($n) => mb_strtolower((string)$n), $names))));
   if (!$names) return [];
   $marks = implode(',', array_fill(0, count($names), '?'));
   try {
+    $regionSql = $region !== null ? ' AND region=?' : '';
+    $args = [$source, $realm, ...($region !== null ? [$region] : []), ...$names];
     $rows = Db::all("SELECT lower(name) n,public_id FROM character_armory_profiles
-      WHERE source_game=? AND lower(realm_name)=lower(?) AND lower(name) IN ($marks)", [$source, $realm, ...$names]);
+      WHERE source_game=? AND lower(realm_name)=lower(?)$regionSql AND lower(name) IN ($marks)", $args);
   } catch (PDOException $e) {
     if ($e->getCode() === '42P01') return [];
     throw $e;

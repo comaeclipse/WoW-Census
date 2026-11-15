@@ -143,6 +143,20 @@ function guild_rosters_from_rows(string $source, array $rows, bool $connected, a
   return $rosters;
 }
 
+/** Character-page URLs for the members whose stored Armory identity matches this guild realm. */
+function guild_member_character_urls(string $source, array $g): array {
+  $names = array_column($g['members'], 0);
+  if ($source === 'forever') {
+    if (!preg_match('/CAMWOW\s+(US|EU|KR)/i', (string)$g['game'], $match)) return [];
+    $region = strtolower($match[1]);
+    return array_map(fn($slug) => forever_character_path($region, $slug), forever_character_slugs($region, $names));
+  }
+  $region = preg_match('/^(us|eu|kr|tw):/i', (string)$g['realm'], $match) ? strtolower($match[1]) : null;
+  $realm = preg_replace('/ \([A-Z]{2}\)$/', '', realm_name((string)$g['realm']));
+  $ids = armory_character_ids($source, $realm, $names, $region);
+  return array_map(fn($id) => armory_character_path($source, $id), $ids);
+}
+
 /** Classify recent inspections only for members of the requested guild. */
 function guild_member_specs(string $source, array $rows, bool $connected): array {
   $keys = array_values(array_unique(array_filter(array_column($rows, 'ckey'), fn($x) => $x !== null && $x !== '')));
@@ -216,9 +230,13 @@ function guild_page_html(string $source, array $g): string {
   $guild = guild_display_name($g['name']);
   $title = $guild . ' – ' . $g['faction'] . ' Guild Roster';
   $rows = '';
-  foreach ($g['members'] as [$name, $level, $race, $cf, $zone, $seen])
-    $rows .= '<tr><td>' . esc($name) . '</td><td>' . esc($level ?? '') . '</td><td>' . esc($race ?? '') . '</td><td>' . esc(CLASS_META[$cf][0] ?? $cf ?? '') .
+  $characterUrls = guild_member_character_urls($source, $g);
+  foreach ($g['members'] as [$name, $level, $race, $cf, $zone, $seen]) {
+    $url = $characterUrls[mb_strtolower((string)$name)] ?? null;
+    $shownName = $url ? '<a href="' . esc($url) . '">' . esc($name) . '</a>' : esc($name);
+    $rows .= '<tr><td>' . $shownName . '</td><td>' . esc($level ?? '') . '</td><td>' . esc($race ?? '') . '</td><td>' . esc(CLASS_META[$cf][0] ?? $cf ?? '') .
       '</td><td>' . esc($zone ?? '') . '</td><td>' . ($seen ? gmdate('Y-m-d', (int)$seen) : '') . '</td></tr>';
+  }
   return localize_content('<!doctype html><html lang="en"><head><meta charset="utf-8">' .
     '<meta name="viewport" content="width=device-width,initial-scale=1">' .
     seo_head($title . ' – WoWCensus', "Characters seen in the $edition guild <" . $guild . '> and their class, race and spec mix.', null) .
