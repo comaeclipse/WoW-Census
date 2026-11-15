@@ -14,6 +14,42 @@ function armory_character_path(string $source, string $id): string {
   return edition_path($source) . 'character/' . $id . '/';
 }
 
+function armory_item_path(string $source, int|string $id): string {
+  return edition_path($source) . 'item/' . $id;
+}
+
+/** A locally stored item observed on an enriched character in this edition. */
+function armory_item_model(string $source, int $id): ?array {
+  if (!in_array($source, ARMORY_SOURCES, true) || $id < 1) return null;
+  try {
+    $row = Db::first('SELECT item_json FROM character_armory_items WHERE source_game=? AND item_id=? ORDER BY snapshot_at DESC LIMIT 1', [$source, $id]);
+  } catch (PDOException $e) {
+    if ($e->getCode() === '42P01') return null;
+    throw $e;
+  }
+  if (!$row) return null;
+  $it = forever_json($row['item_json']);
+  $branch = EDITIONS[$source]['branch'] ?: 'retail';
+  $icons = (array)item_cache('item-icons', $source) + (array)item_cache('item-icons', $branch) + (array)item_cache('item-icons', 'classic');
+  $quality = FOREVER_QUALITY[$it['quality']['type'] ?? ''] ?? 1;
+  $name = $it['name'] ?? ('Item ' . $id);
+  return ['source' => $source, 'id' => $id, 'name' => $name, 'icon' => $icons[$id] ?? $icons[(string)$id] ?? null,
+    'cat' => $it['item_subclass']['name'] ?? ($it['inventory_type']['name'] ?? 'Item'), 'crafter' => null,
+    'roles' => [], 'taught' => null, 'scans' => [], 'wearers' => null, 'quality' => $quality, 'localOnly' => true];
+}
+
+function armory_item_html(string $source, array $item): string {
+  $label = seo_label(EDITIONS[$source]['label']);
+  $title = $item['name'] . ' – ' . $label . ' Item';
+  $canonical = SITE_ORIGIN . armory_item_path($source, $item['id']);
+  $icon = $item['icon'] ?: 'inv_misc_questionmark';
+  return localize_content('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' .
+    seo_head($title . ' – WoWCensus', $label . ' item profile for ' . $item['name'] . ', observed on an enriched character.', $canonical) .
+    '<link rel="stylesheet" href="/' . stylesheet()['name'] . '"></head><body><main class="wrap"><h1 class="iname">' . esc($item['name']) .
+    '</h1><p><img src="/assets/images/wow/icons/large/' . esc($icon) . '.jpg" width="56" height="56" alt=""> Item ID ' . $item['id'] .
+    '</p></main></body></html>\n');
+}
+
 /** Profile ids for names on one census realm. Ambiguous cross-region matches are left unlinked. */
 function armory_character_ids(string $source, string $realm, array $names, ?string $region = null): array {
   if (!in_array($source, ARMORY_SOURCES, true)) return [];
@@ -75,7 +111,7 @@ function armory_character_model(string $source, string $id): ?array {
       'type' => trim(($it['inventory_type']['name'] ?? '') . (!empty($it['item_subclass']['name']) ? ' · ' . $it['item_subclass']['name'] : '')),
       'lines' => $lines, 'iconUrl' => $icon ? '/assets/images/wow/icons/large/' . $icon . '.jpg' : null,
       'enchants' => array_values(array_filter(array_map(fn($e) => $e['display_string'] ?? null, $it['enchantments'] ?? []))),
-      'url' => 'https://www.wowhead.com/' . ($edition['branch'] ? $edition['branch'] . '/' : '') . 'item=' . $itemId];
+      'url' => armory_item_path($source, $itemId)];
   }
 
   $groups = $j($s['specializations_json'])['specialization_groups'] ?? [];

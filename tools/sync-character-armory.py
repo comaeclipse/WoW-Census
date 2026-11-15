@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 
 import psycopg2
 from psycopg2.extras import Json
+from psycopg2.extras import execute_values
 
 DSN = os.getenv("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbname=marketlens_local user=skarz")
 SOURCES = {
@@ -100,6 +101,11 @@ def schema(cur) -> None:
       endpoint_status_json jsonb NOT NULL,
       PRIMARY KEY(source_game,region,character_id,snapshot_at))""")
     cur.execute("CREATE INDEX IF NOT EXISTS character_armory_profiles_name ON marketlens_import.character_armory_profiles(source_game,region,lower(name))")
+    cur.execute("""CREATE TABLE IF NOT EXISTS marketlens_import.character_armory_items (
+      source_game text NOT NULL, region text NOT NULL, character_id bigint NOT NULL,
+      snapshot_at timestamptz NOT NULL, item_id integer NOT NULL, item_json jsonb NOT NULL,
+      PRIMARY KEY(source_game,region,character_id,snapshot_at,item_id))""")
+    cur.execute("CREATE INDEX IF NOT EXISTS character_armory_items_lookup ON marketlens_import.character_armory_items(source_game,item_id,snapshot_at DESC)")
 
 
 def candidates(cur, source: str, region: str | None, limit: int, min_level: int, name: str | None) -> list[dict]:
@@ -161,6 +167,13 @@ def save(cur, row: dict) -> None:
        appearance_json,character_media_json,endpoint_status_json)
       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
       (source,region,p["id"],now,Json(p),*[Json(e[x]) if x in e else None for x in ENDPOINTS],Json(row["endpoint_status"])))
+    equipped = e.get("equipment", {}).get("equipped_items", [])
+    item_rows = [(source, region, p["id"], now, int(it.get("item", {}).get("id", 0)), Json(it))
+                 for it in equipped if int(it.get("item", {}).get("id", 0))]
+    if item_rows:
+        execute_values(cur, """INSERT INTO marketlens_import.character_armory_items
+          (source_game,region,character_id,snapshot_at,item_id,item_json) VALUES %s
+          ON CONFLICT DO NOTHING""", item_rows)
 
 
 def main() -> None:

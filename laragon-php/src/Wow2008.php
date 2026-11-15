@@ -240,6 +240,11 @@ function render_page(string $html, string $path): string {
     $GLOBALS['w8_source'] = \PROFESSION_SOURCE;
     return item_page($item, $html);
   }
+  if (preg_match('#^/([a-z-]+)/item/(\d{1,10})/?$#', $path, $m)
+      && ($source = \source_for_path('/' . $m[1] . '/')) && ($item = \armory_item_model($source, (int)$m[2]))) {
+    $GLOBALS['w8_source'] = $source;
+    return item_page($item, $html);
+  }
   if (preg_match('#^/forever/characters/([a-z]{2})/([^/]+)/(?:index\.html)?$#', $path, $m)
       && ($c = \forever_character_model($m[1], rawurldecode($m[2])))) {
     $GLOBALS['w8_source'] = 'forever';
@@ -932,8 +937,9 @@ function item_page(array $item, string $html): string {
   $roleLabel = ['mats' => 'Material', 'crafted' => 'Crafted', 'recipes' => 'Recipe'];
   $trades = array_map(fn($r) => ['name' => \PROFESSIONS[$r[0]]['name'], 'icon' => \PROFESSIONS[$r[0]]['icon'], 'url' => \profession_path($r[0]),
     'role' => $r[1] === 'mats' && in_array($r[0], $gathering, true) ? 'Gathered' : $roleLabel[$r[1]]], $item['roles']);
-  $branch = \EDITIONS[\PROFESSION_SOURCE]['branch'];
-  return page('item', common_vars(\PROFESSION_SOURCE) + ['item' => $item, 'trades' => $trades,
+  $source = $item['source'] ?? \PROFESSION_SOURCE;
+  $branch = \EDITIONS[$source]['branch'];
+  return page('item', common_vars($source) + ['item' => $item, 'trades' => $trades,
     'data' => ['generated' => \utc_timestamp(\generated_at())] + \forever_item_markets($item['scans']),
     'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=' . $item['id']], $html, 'auction-house');
 }

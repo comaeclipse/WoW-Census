@@ -102,7 +102,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
 
 <?php if (!$listed): ?>
     <?php component_start('section', ['title' => 'Auction House', 'icon' => 'g']) ?>
-        <div class="it-nomkt">No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.</div>
+        <div class="it-nomkt"><?php if (!empty($item['localOnly'])): ?>This local item page was created from equipment observed on an enriched character. Auction history for this edition is not connected to the item page yet.<?php else: ?>No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.<?php endif ?></div>
     <?php component_end() ?>
 <?php else: ?>
     <div class="tiles" id="itTiles"></div>
@@ -138,7 +138,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     <?php component_end() ?>
 <?php endif ?>
 
-    <div class="source">Auction data from in-game scans · asking prices on listed auctions, not completed sales · "lowest" is the cheapest listing, "median" the middle unit price</div>
+    <div class="source"><?= !empty($item['localOnly']) ? 'Item details from a Battle.net Armory equipment snapshot' : 'Auction data from in-game scans · asking prices on listed auctions, not completed sales · "lowest" is the cheapest listing, "median" the middle unit price' ?></div>
   </main>
 
 <?php start_section('scripts') ?>

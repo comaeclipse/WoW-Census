@@ -45,6 +45,11 @@ function route_request(string $path): ?array {
     $item = forever_item_model((int)$m[1]);
     return $item ? [$html, localize_content(forever_item_html($item, edition_path(PROFESSION_SOURCE) . $cssName))] : null;
   }
+  if (preg_match('#^/([a-z-]+)/item/(\d{1,10})/?$#', $path, $m)) {
+    $source = source_for_path('/' . $m[1] . '/');
+    $item = $source ? armory_item_model($source, (int)$m[2]) : null;
+    return $item ? [$html, armory_item_html($source, $item)] : null;
+  }
   // WoW: Forever character pages: /forever/characters/eu/vitam-lock/ (+ index.html). Served by the origin only.
   if (preg_match('#^/forever/characters/([a-z]{2})/([^/]+)/(?:index\.html)?$#', $path, $m)) {
     $c = forever_character_model($m[1], rawurldecode($m[2]));
