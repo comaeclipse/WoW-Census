@@ -36,6 +36,13 @@ class ArmoryTests(unittest.TestCase):
         self.assertIn("/data/wow/guild/the-guild/roster", url)
         self.assertIn("namespace=profile-forever-eu", url)
 
+    def test_reconcile_keeps_one_player_sighting_per_day(self):
+        reconcile_path = pathlib.Path(__file__).with_name("reconcile-forever-characters-pg.py")
+        sql = reconcile_path.read_text(encoding="utf-8")
+        self.assertNotIn("sightings=character_observations.sightings+1", sql)
+        self.assertIn("sightings=GREATEST(character_observations.sightings, EXCLUDED.sightings)", sql)
+        self.assertIn("THEN 0 ELSE 1 END", sql)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -91,11 +91,17 @@ SELECT DISTINCT ON (i.region, i.lname) i.game, i.character_key, n.t
 FROM forever_ident i JOIN forever_newest n ON n.region=i.region AND n.lname=i.lname
 WHERE n.src <> 'census' AND n.t > (SELECT max(j.last_seen) FROM forever_ident j WHERE j.region=i.region AND j.lname=i.lname)
 ORDER BY i.region, i.lname, i.last_seen DESC;
-UPDATE characters c SET last_seen=s.t, seen_count=c.seen_count+1
+UPDATE characters c SET last_seen=GREATEST(c.last_seen,s.t),
+  seen_count=c.seen_count + CASE WHEN EXISTS (
+    SELECT 1 FROM character_observations o
+    WHERE o.game=s.game AND o.source_game='forever' AND o.character_key=s.character_key AND o.day=s.t/86400
+  ) THEN 0 ELSE 1 END
 FROM forever_seen s WHERE c.source_game='forever' AND c.game=s.game AND c.character_key=s.character_key;
 INSERT INTO character_observations (game,source_game,character_key,day,sightings,first_seen,last_seen)
 SELECT game,'forever',character_key,t/86400,1,t,t FROM forever_seen
-ON CONFLICT (game,source_game,character_key,day) DO UPDATE SET sightings=character_observations.sightings+1,
+ON CONFLICT (game,source_game,character_key,day) DO UPDATE SET
+  sightings=GREATEST(character_observations.sightings, EXCLUDED.sightings),
+  first_seen=LEAST(character_observations.first_seen, EXCLUDED.first_seen),
   last_seen=GREATEST(character_observations.last_seen, EXCLUDED.last_seen);
 """
 
