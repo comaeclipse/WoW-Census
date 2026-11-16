@@ -265,7 +265,50 @@ function guilds_geography_first_view(string $source, string $page): ?array {
   return model_guilds_geography($source, $page, $first)['views'][0] ?? null;
 }
 
+/**
+ * A guilds view as stored by build-guild-views.php: the guilds either renderer can show (the
+ * overall top 100, the Alliance/Horde top 100 the 2008 skin ranks, and every realm and faction's
+ * top 25) in their order, plus guildCount, the length of the full list.
+ */
+function trim_guild_view(array $snapshot): array {
+  $keep = []; $ranked = 0; $perRealm = [];
+  foreach ($snapshot['guilds'] as $i => $g) {
+    $sided = in_array($g['faction'], ['Alliance', 'Horde'], true);
+    $n = $perRealm[$g['realm'] . '|' . $g['faction']] = ($perRealm[$g['realm'] . '|' . $g['faction']] ?? 0) + 1;
+    // The 2008 skin numbers Alliance and Horde guilds by their place in the full list.
+    if ($i < 100 || ($sided && $ranked < 100) || $n <= 25) $keep[] = $sided ? $g + ['rank' => $ranked + 1] : $g;
+    if ($sided) $ranked++;
+  }
+  return ['guilds' => $keep, 'guildCount' => count($snapshot['guilds'])] + $snapshot;
+}
+
+/** The guilds page model from census_guild_views when they were built for the published census; else null. */
+function guild_views_precomputed(string $source, ?array $only): ?array {
+  if (getenv('ML_NO_GUILD_VIEWS') === '1' || !census_cache_fresh()) return null;
+  ['dims' => $dims] = edition_dims($source);
+  $wanted = [];
+  foreach ($dims['realm'] as $r) foreach ($dims['faction'] as $f)
+    if ($only === null || [$r['key'], $f['key']] === $only) $wanted[] = [$r['key'], $f['key']];
+  if (!$wanted) return null;
+  try {
+    $rows = Db::all('SELECT v.realm, v.faction, v.data FROM census_guild_views v JOIN census_cache_meta m ON m.version = v.version
+      WHERE v.source_game = ?' . ($only !== null ? ' AND v.realm = ? AND v.faction = ?' : ''), $only !== null ? [$source, ...$only] : [$source]);
+  } catch (PDOException $e) {
+    if ($e->getCode() === '42P01') return null;  // No guild views built yet.
+    throw $e;
+  }
+  $data = [];
+  foreach ($rows as $row) $data[$row['realm'] . "\n" . $row['faction']] = $row['data'];
+  $views = [];
+  foreach ($wanted as [$realm, $faction]) {
+    if (!isset($data["$realm\n$faction"])) return null;
+    $views[] = ['realm' => $realm, 'faction' => $faction, 'snapshot' => json_decode($data["$realm\n$faction"], true, 512, JSON_THROW_ON_ERROR)];
+  }
+  return ['views' => $views, 'dims' => $dims, 'lastT' => load_census($source)['lastT']];
+}
+
 function build_guilds_geography(string $source, string $page, ?array $only): array {
+  if ($page === 'guilds' && ($pre = guild_views_precomputed($source, $only)) !== null) return $pre;
   $census = load_census($source);
   ['dims' => $dims] = edition_dims($source);
   $views = [];
@@ -277,7 +320,8 @@ function build_guilds_geography(string $source, string $page, ?array $only): arr
       $realms = array_values(array_unique(array_map(fn($u) => $u['realm'], $from)));
       if ($page === 'guilds') {
         $guilds = [];
-        foreach ($from as $u) foreach ($u['guilds'] as $g)
+        $unitGuilds ??= census_unit_guilds($source);
+        foreach ($from as $u) foreach ($unitGuilds[$u['game']] ?? [] as $g)
           $guilds[] = ['name' => $g['name'], 'members' => $g['members'], 'realm' => $u['realm'], 'faction' => $u['faction'], 'game' => $u['game']];
         $guilds = merge_guild_list($source, $guilds);
         $guilds = js_sort($guilds, fn($a, $b) => js_or($b['members'] - $a['members'], fn() => js_cmp($a['name'], $b['name'])));

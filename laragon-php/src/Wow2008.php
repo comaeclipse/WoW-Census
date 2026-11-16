@@ -738,7 +738,7 @@ function guilds_page(string $source, string $html): string {
   foreach ($realms as $i => $r) { $realmNames[$keys[$r]] = $labels[$r]; $realmColors[$keys[$r]] = REALM_PALETTE[$i % count(REALM_PALETTE)]; }
   $guilded = $snap['guildedCharacters']; $surveyed = $snap['surveyedCharacters'];
   return page('guilds', common_vars($source) + ['raw' => $raw, 'guildBase' => url('guilds', $source) . '/', 'realmNames' => (object)$realmNames, 'realmColors' => (object)$realmColors,
-    'guildCount' => count($snap['guilds']), 'guilded' => $guilded, 'surveyed' => $surveyed, 'inGuild' => $surveyed ? round(100 * $guilded / $surveyed, 1) : 0,
+    'guildCount' => $snap['guildCount'] ?? count($snap['guilds']), 'guilded' => $guilded, 'surveyed' => $surveyed, 'inGuild' => $surveyed ? round(100 * $guilded / $surveyed, 1) : 0,
     'updated' => !empty($snap['lastT']) ? substr(\js_iso($snap['lastT']), 0, 10) : '—', 'realmList' => array_values($labels)], $html, 'guilds');
 }
 

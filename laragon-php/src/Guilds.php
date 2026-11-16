@@ -24,7 +24,7 @@ function render_guild_view(array $snapshot): string {
       '<td class="members">' . js_locale($g['members']) . '</td></tr>';
   $realmText = implode(' · ', array_map('realm_name', $realms));
   $tiles =
-    '<div class="tile"><div class="k">Guilds found</div><div class="v">' . js_locale(count($guilds)) .
+    '<div class="tile"><div class="k">Guilds found</div><div class="v">' . js_locale($snapshot['guildCount'] ?? count($guilds)) .
       '</div><div class="s">distinct realm guilds</div></div>' .
     '<div class="tile"><div class="k">Guilded characters</div><div class="v">' . js_locale($guilded) .
       '</div><div class="s">latest known guild</div></div>' .

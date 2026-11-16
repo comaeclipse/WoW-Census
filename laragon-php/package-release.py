@@ -26,6 +26,8 @@ def main() -> None:
     with tarfile.open(output / "site.tar.gz", "w:gz") as archive:
         for source, target in [
             (REPO / "laragon-php/src", "src"),
+            (REPO / "laragon-php/build-census-cache.php", "build-census-cache.php"),
+            (REPO / "laragon-php/build-guild-views.php", "build-guild-views.php"),
             (REPO / "laragon-php/public/index.php", "public/index.php"),
             (REPO / "laragon-php/public/blog.php", "public/blog.php"),
             (REPO / "laragon-php/public/blog-economy.css", "public/blog-economy.css"),

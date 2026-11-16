@@ -404,27 +404,59 @@ def canonical_realm(realm, known):
     return spaced
 
 
+def _rewrite_values(db, table, column, mapping):
+    """One UPDATE rewriting every old value of `column` in `mapping` to its new value.
+    A statement per value read the whole table each time (characters: 1.7 GB on live,
+    161 such scans in one afternoon of imports)."""
+    olds = sorted(mapping)
+    for i in range(0, len(olds), 500):
+        chunk = olds[i:i + 500]
+        cases = " ".join("WHEN ? THEN ?" for _ in chunk)
+        marks = ",".join("?" for _ in chunk)
+        params = [x for old in chunk for x in (old, mapping[old])] + chunk
+        db.execute(f"UPDATE {table} SET {column} = CASE {column} {cases} END WHERE {column} IN ({marks})", params)
+
+
 def repair_realm_names(db):
-    """Rewrite stored space-less realm names to their spaced display form."""
-    known = known_realms(db)
-    changed = {}
+    """Rewrite stored space-less realm names to their spaced display form.
+
+    Reads each table's distinct realms and guild names once (with row counts for
+    the report) and rewrites each table and column in a single statement."""
+    realms = {}  # (table, column) -> {value: rows}
     for table, column in (("characters", "realm"), ("character_inspects", "realm"),
                           ("character_inspects", "observer_realm")):
-        for (realm,) in db.execute(f"SELECT DISTINCT {column} FROM {table} WHERE {column} NOT LIKE '% %'").fetchall():
+        realms[(table, column)] = {value: n for value, n in db.execute(
+            f"SELECT {column}, COUNT(*) FROM {table} WHERE {column} IS NOT NULL GROUP BY {column}").fetchall()}
+    # Known spellings come from characters and character_inspects realms, as known_realms() reads them.
+    known = {}
+    for key in (("characters", "realm"), ("character_inspects", "realm")):
+        for value in sorted(realms[key]):
+            if " " in value:
+                known.setdefault(realm_key(value), value)
+    changed = {}
+    for (table, column), counts in realms.items():
+        mapping = {}
+        for realm in sorted(counts):
+            if " " in realm:
+                continue
             fixed = canonical_realm(realm, known)
             if fixed != realm:
-                count = db.execute(f"UPDATE {table} SET {column}=? WHERE {column}=?", (fixed, realm)).rowcount
-                changed[f"{table}.{column}: {realm} -> {fixed}"] = count
+                mapping[realm] = fixed
+                changed[f"{table}.{column}: {realm} -> {fixed}"] = counts[realm]
+        if mapping:
+            _rewrite_values(db, table, column, mapping)
     # Guilds are stored as "Guild-Realm". Only touch suffixes that are known realms.
     for table in ("characters", "character_inspects"):
-        for (guild,) in db.execute(f"SELECT DISTINCT guild FROM {table} WHERE guild LIKE '%-%'").fetchall():
+        mapping = {}
+        for guild, n in db.execute(f"SELECT guild, COUNT(*) FROM {table} WHERE guild LIKE '%-%' GROUP BY guild").fetchall():
             name, _, realm = guild.rpartition("-")
             fixed = known.get(realm_key(realm)) if " " not in realm else None
             if name and fixed and fixed != realm:
-                count = db.execute(f"UPDATE {table} SET guild=? WHERE guild=?",
-                                   (f"{name}-{fixed}", guild)).rowcount
-                changed[f"{table}.guild suffix: {realm} -> {fixed}"] = \
-                    changed.get(f"{table}.guild suffix: {realm} -> {fixed}", 0) + count
+                mapping[guild] = f"{name}-{fixed}"
+                label = f"{table}.guild suffix: {realm} -> {fixed}"
+                changed[label] = changed.get(label, 0) + n
+        if mapping:
+            _rewrite_values(db, table, "guild", mapping)
     return changed
 
 

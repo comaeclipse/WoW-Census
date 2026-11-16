@@ -143,6 +143,28 @@ const RACE_FACTION = [
 // counts once, from its latest sighting within the census window of its scan.
 function realm_explorer_data(string $source): array {
   $census = load_census($source);
+  $rows = realm_explorer_rows($source);
+  return realm_explorer_from_rows($source, $rows, $census['lastT']);
+}
+
+/**
+ * realm_explorer_data()'s grouped rows (realm, region, race, class: counts). The
+ * census build stores them per edition in census_realm_rows; the live query groups
+ * every character of the edition (~50 s on WoW: Forever).
+ */
+function realm_explorer_rows(string $source): array {
+  return census_rollup('SELECT game, realm, collection_region, race, cf, n, week_count, day_count
+      FROM census_realm_rows WHERE source_game = ? ' . REALM_ROWS_ORDER, $source, function () use ($source) {
+    [$sql, $params] = realm_explorer_rows_live_sql($source);
+    return Db::all($sql, $params);
+  });
+}
+
+const REALM_ROWS_ORDER = 'ORDER BY game COLLATE "C", realm COLLATE "C", collection_region COLLATE "C" NULLS FIRST,
+  race COLLATE "C" NULLS FIRST, cf COLLATE "C" NULLS FIRST';
+
+/** The live SQL of realm_explorer_rows() and its parameters. */
+function realm_explorer_rows_live_sql(string $source): array {
   $allObserved = in_array($source, ['classic-beta', 'forever'], true);
   $regionFallback = 'NULL';
   if ($source === 'retail') {
@@ -164,7 +186,7 @@ function realm_explorer_data(string $source): array {
     $byScan = scan_regions_from_homes($source, $groups);
     $regionFallback = 'COALESCE(' . ($regionFallback === 'NULL' ? '' : "$regionFallback, ") . "$byHome, $byScan)";
   }
-  $rows = Db::all(
+  return [
     "WITH m AS (SELECT game, MAX(last_seen) latest FROM characters GROUP BY game),
      base AS (
        SELECT c.*, COALESCE(c.collection_region, $regionFallback) resolved_region
@@ -172,7 +194,7 @@ function realm_explorer_data(string $source): array {
      ),
      c AS (
        SELECT c.game, c.realm, c.resolved_region, c.race, c.class_file cf, c.last_seen t, m.latest,
-         ROW_NUMBER() OVER (PARTITION BY c.resolved_region, c.character_key ORDER BY c.last_seen DESC) rn
+         ROW_NUMBER() OVER (PARTITION BY c.resolved_region, c.character_key ORDER BY c.last_seen DESC, c.game COLLATE \"C\") rn
        FROM base c JOIN datasets d ON d.game = c.game JOIN m ON m.game = c.game
        WHERE d.source_game = ? AND COALESCE(c.realm, '') <> ''" . ($allObserved ? '' : ' AND c.last_seen >= m.latest - ?') . "
      )
@@ -180,8 +202,13 @@ function realm_explorer_data(string $source): array {
        SUM(CASE WHEN t >= latest - 604800 THEN 1 ELSE 0 END) week_count,
        SUM(CASE WHEN t >= latest - 86400 THEN 1 ELSE 0 END) day_count
      FROM c WHERE rn = 1
-     GROUP BY game, realm, resolved_region, race, cf",
-    $allObserved ? [$source] : [$source, CENSUS_WINDOW_DAYS * 86400]);
+     GROUP BY game, realm, resolved_region, race, cf
+     " . str_replace('collection_region COLLATE', 'resolved_region COLLATE', REALM_ROWS_ORDER),
+    $allObserved ? [$source] : [$source, CENSUS_WINDOW_DAYS * 86400]];
+}
+
+function realm_explorer_from_rows(string $source, array $rows, $lastT): array {
+  $groups = connected_realm_groups($source);
   $realms = []; $spellings = [];
   foreach ($rows as $r) {
     if ($source === 'classic' && in_array($r['realm'], SOD_REALMS, true)) continue;
@@ -243,7 +270,7 @@ function realm_explorer_data(string $source): array {
   $list = array_values($realms);
   usort($list, fn($a, $b) => $total($b) <=> $total($a) ?: strcmp($a['name'], $b['name']));
   if ($source === 'forever') $list = forever_realm_groups($list);
-  return ['realms' => $list, 'lastT' => $census['lastT']];
+  return ['realms' => $list, 'lastT' => $lastT];
 }
 
 /**

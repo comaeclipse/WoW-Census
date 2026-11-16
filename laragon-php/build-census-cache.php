@@ -12,6 +12,7 @@
 //   census_seen        every sighting day of every character (seen_activity())
 //   census_seen_rows   seen_activity()'s two results per edition, from census_seen
 //   census_aliases     collection_aliases()'s answer
+//   census_realm_rows  realm_explorer_rows() per edition (the realm list)
 //   census_guilds      public guild id to canonical collection and guild name
 //   census_item_wear   forever_item_wearers()'s answer per worn Forever item (item pages)
 //
@@ -114,6 +115,22 @@ foreach (collection_aliases() as $old => $alias) $st->execute([++$seq, $old, $al
 $pdo->exec('CREATE INDEX census_aliases_next_i0 ON census_aliases_next (seq)');
 printf("%-18s %9s rows %6.1fs\n", 'census_aliases', number_format($seq), microtime(true) - $t);
 
+// realm_explorer_rows() per edition: the realm list groups every character of an edition by home
+// realm and region (~50 s live on WoW: Forever, with a 1 GB sort), so pages read these rows instead.
+$t = microtime(true);
+$pdo->exec('DROP TABLE IF EXISTS census_realm_rows_next');
+$pdo->exec('CREATE TABLE census_realm_rows_next (source_game text NOT NULL, game text NOT NULL, realm text, collection_region text,
+  race text, cf text, n bigint NOT NULL, week_count bigint NOT NULL, day_count bigint NOT NULL)');
+$pdo->exec("SET LOCAL work_mem = '64MB'");
+foreach ($sources as $s) {
+  [$sql, $params] = realm_explorer_rows_live_sql($s);
+  $st = $pdo->prepare("INSERT INTO census_realm_rows_next SELECT ?::text, x.* FROM ($sql) x");
+  $st->execute([$s, ...$params]);
+}
+$pdo->exec('RESET work_mem');
+$pdo->exec('CREATE INDEX census_realm_rows_next_i0 ON census_realm_rows_next (source_game)');
+printf("%-18s %9s rows %6.1fs\n", 'census_realm_rows', number_format((int)$pdo->query('SELECT count(*) FROM census_realm_rows_next')->fetchColumn()), microtime(true) - $t);
+
 // forever_item_wearers()'s answer for every item an inspected Forever character wore, so an item
 // page reads one row instead of walking all the inspections (about a second, more on production).
 $t = microtime(true);
@@ -131,7 +148,7 @@ printf("%-18s %9s rows %6.1fs\n", 'census_item_wear', number_format($seq), micro
 // Item pages look up one item's auction scans; the primary key leads with game, so it can't serve that.
 $pdo->exec('CREATE INDEX IF NOT EXISTS local_auction_snapshots_item ON local_auction_snapshots (source_game, item_id)');
 
-foreach (['census_characters', 'census_guilds', 'census_latest', ...array_keys($rollups), 'census_sightings', 'census_seen', 'census_seen_rows', 'census_aliases', 'census_item_wear'] as $table) {
+foreach (['census_characters', 'census_guilds', 'census_latest', ...array_keys($rollups), 'census_sightings', 'census_seen', 'census_seen_rows', 'census_aliases', 'census_realm_rows', 'census_item_wear'] as $table) {
   $pdo->exec("DROP TABLE IF EXISTS $table");
   $pdo->exec("ALTER TABLE {$table}_next RENAME TO $table");
   foreach ($pdo->query("SELECT indexname FROM pg_indexes WHERE tablename = " . $quote($table) . " AND indexname LIKE " . $quote("{$table}_next_i%"))->fetchAll(PDO::FETCH_COLUMN) as $index)
@@ -144,3 +161,9 @@ $st->execute([$version]);
 $pdo->commit();
 foreach (['census_characters', 'census_latest', 'census_sightings', 'census_seen'] as $table) $pdo->exec("ANALYZE $table");
 printf("census cache built for import %s in %.1fs\n", $version, microtime(true) - $started);
+
+// The guilds page views, from the tables just published (a fresh process: this one built live).
+$env = getenv(); unset($env['ML_NO_CENSUS_CACHE']);
+$proc = proc_open([PHP_BINARY, '-d', 'memory_limit=' . ini_get('memory_limit'), __DIR__ . '/build-guild-views.php'],
+  [STDIN, STDOUT, STDERR], $pipes, null, $env);
+if (!is_resource($proc) || proc_close($proc) !== 0) fwrite(STDERR, "warning: build-guild-views.php failed; the guilds page builds live\n");

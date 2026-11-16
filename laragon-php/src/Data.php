@@ -266,6 +266,28 @@ function merge_census_units(array $units): array {
   return js_sort(array_values($byFaction), fn($a, $b) => js_or($rank($a['faction']) - $rank($b['faction']), fn() => $b['characters'] - $a['characters']));
 }
 
+/** Guilds per census unit (collection game => [name, members], largest first), for the Guilds page. */
+function census_unit_guilds(string $sourceGame): array {
+  static $cache = [];
+  if (isset($cache[$sourceGame])) return $cache[$sourceGame];
+  $chars = census_characters_sql($sourceGame);
+  $rows = census_rollup(
+    'SELECT cgame game, guild, members FROM census_guild_counts WHERE source_game = ?
+     ORDER BY cgame COLLATE "C", guild COLLATE "C"', $sourceGame, fn() => Db::all(
+    "SELECT c.cgame game, c.guild guild, COUNT(*) members
+     FROM $chars c
+     JOIN datasets d ON d.game = c.game
+     WHERE d.source_game = ? AND c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''
+     GROUP BY c.cgame, c.guild
+     ORDER BY c.cgame COLLATE \"C\", c.guild COLLATE \"C\"", [$sourceGame]));
+  $byGame = [];
+  foreach ($rows as $g) $byGame[$g['game']][] = ['name' => $g['guild'], 'members' => $g['members'] ?: 0];
+  foreach ($byGame as &$list)
+    $list = js_sort($list, fn($a, $b) => js_or($b['members'] - $a['members'], fn() => js_cmp($a['name'], $b['name'])));
+  unset($list);
+  return $cache[$sourceGame] = $byGame;
+}
+
 function load_census(string $sourceGame): array {
   static $cache = [];
   if (isset($cache[$sourceGame])) return $cache[$sourceGame];
@@ -345,15 +367,13 @@ function load_census(string $sourceGame): array {
     'SELECT ' . canonical_game_sql('p.game') . ' game, COUNT(*) samples, SUM(p.observed) observed, MAX(p.t) "lastT"
      FROM pop_samples p JOIN datasets d ON d.game = p.game
      WHERE d.source_game = ? GROUP BY ' . canonical_game_sql('p.game') . ' ORDER BY ' . canonical_game_sql('p.game') . ' COLLATE "C"', [$sourceGame]);
-  $guilds = census_rollup(
-    'SELECT cgame game, guild, members FROM census_guild_counts WHERE source_game = ?
-     ORDER BY cgame COLLATE "C", guild COLLATE "C"', $sourceGame, fn() => Db::all(
-    "SELECT c.cgame game, c.guild guild, COUNT(*) members
-     FROM $chars c
-     JOIN datasets d ON d.game = c.game
-     WHERE d.source_game = ? AND c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> ''
-     GROUP BY c.cgame, c.guild
-     ORDER BY c.cgame COLLATE \"C\", c.guild COLLATE \"C\"", [$sourceGame]));
+  // Only the collections that have guilds: a collection seen only outside the census
+  // window still gets a unit from its guilds. The guild lists themselves (~400k rows on
+  // WoW: Forever) are loaded by census_unit_guilds() for the one page that shows them.
+  $guildGames = census_rollup(
+    'SELECT cgame game FROM census_guild_counts WHERE source_game = ? GROUP BY cgame ORDER BY cgame COLLATE "C"', $sourceGame,
+    fn() => Db::all("SELECT c.cgame game FROM $chars c JOIN datasets d ON d.game = c.game
+       WHERE d.source_game = ? AND c.rn=1 AND TRIM(COALESCE(c.guild, '')) <> '' GROUP BY c.cgame ORDER BY c.cgame COLLATE \"C\"", [$sourceGame]));
   $zones = census_rollup(
     'SELECT cgame game, zone, characters, avg_level "avgLevel", max_level "maxLevel" FROM census_zones WHERE source_game = ?
      ORDER BY cgame COLLATE "C", zone COLLATE "C"', $sourceGame, fn() => Db::all(
@@ -374,7 +394,7 @@ function load_census(string $sourceGame): array {
       ['name' => $name, 'fac' => $fac] = split_realm($label);
       $realms[$name] = true;
       $units[$game] = ['game' => $game, 'realm' => $name, 'faction' => $fac !== '' ? $fac : 'Unknown',
-        'races' => [], 'raceWindows' => ['all' => [], 'week' => [], 'day' => []], 'classes' => [], 'combos' => [], 'guilds' => [], 'zones' => [], 'zoneCharacters' => 0,
+        'races' => [], 'raceWindows' => ['all' => [], 'week' => [], 'day' => []], 'classes' => [], 'combos' => [], 'zones' => [], 'zoneCharacters' => 0,
         'characters' => 0, 'samples' => 0, 'observed' => 0];
     }
     return $game;
@@ -405,7 +425,7 @@ function load_census(string $sourceGame): array {
     if (($sc['lastT'] ?: 0) > $lastT) $lastT = $sc['lastT'];
     unset($u);
   }
-  foreach ($guilds as $g) $units[$unit($g['game'])]['guilds'][] = ['name' => $g['guild'], 'members' => $g['members'] ?: 0];
+  foreach ($guildGames as $g) $unit($g['game']);
   foreach ($zones as $z) {
     $game = $unit($z['game']);
     $units[$game]['zoneCharacters'] += $z['characters'] ?: 0;
@@ -413,7 +433,6 @@ function load_census(string $sourceGame): array {
       'avgLevel' => $z['avgLevel'] ?: 0, 'maxLevel' => $z['maxLevel'] ?: 0];
   }
   foreach ($units as &$u) {
-    $u['guilds'] = js_sort($u['guilds'], fn($a, $b) => js_or($b['members'] - $a['members'], fn() => js_cmp($a['name'], $b['name'])));
     $u['zones'] = js_sort($u['zones'], fn($a, $b) => js_or($b['characters'] - $a['characters'], fn() => js_cmp($a['name'], $b['name'])));
   }
   unset($u);
@@ -669,23 +688,32 @@ function character_armory_records(string $source): array {
   static $cache = [];
   if (isset($cache[$source])) return $cache[$source];
   if ($source !== 'retail') return $cache[$source] = [];
-  try {
-    $rows = Db::all("SELECT p.region,p.character_id,p.name,p.realm_name,p.class_id,p.class_name,p.race_name,p.level,
-        p.faction,p.guild_name,p.last_login_at,p.fetched_at,s.snapshot_at,s.specializations_json,s.equipment_json
-      FROM character_armory_profiles p JOIN LATERAL (
-        SELECT snapshot_at,specializations_json,equipment_json FROM character_armory_snapshots s
-        WHERE s.source_game=p.source_game AND s.region=p.region AND s.character_id=p.character_id
-        ORDER BY snapshot_at DESC LIMIT 1) s ON true WHERE p.source_game=?", [$source]);
-  } catch (PDOException $e) {
-    if (in_array($e->getCode(), ['42P01', '42703'], true)) return $cache[$source] = [];
-    throw $e;
-  }
   $classFiles = FOREVER_CLASS_FILES + [6 => 'DEATHKNIGHT', 10 => 'MONK', 12 => 'DEMONHUNTER', 13 => 'EVOKER'];
   $slots = ['HEAD'=>1,'NECK'=>2,'SHOULDER'=>3,'SHIRT'=>4,'CHEST'=>5,'WAIST'=>6,'LEGS'=>7,'FEET'=>8,'WRIST'=>9,
     'HANDS'=>10,'FINGER_1'=>11,'FINGER_2'=>12,'TRINKET_1'=>13,'TRINKET_2'=>14,'BACK'=>15,'MAIN_HAND'=>16,'OFF_HAND'=>17,
     'RANGED'=>18,'TABARD'=>19];
   $qualities = ['POOR'=>0,'COMMON'=>1,'UNCOMMON'=>2,'RARE'=>3,'EPIC'=>4,'LEGENDARY'=>5,'ARTIFACT'=>6,'HEIRLOOM'=>7];
   $records = [];
+  // Slim snapshot copies (tools/armory-slim-pg.sql), a page at a time: the raw
+  // Blizzard JSON is ~350 KB per Retail character and must never be loaded here.
+  $afterRegion = ''; $afterId = -1;
+  while (true) {
+  try {
+    $rows = Db::uncached("SELECT p.region,p.character_id,p.name,p.realm_name,p.class_id,p.class_name,p.race_name,p.level,
+        p.faction,p.guild_name,p.last_login_at,p.fetched_at,s.snapshot_at,
+        s.specializations specializations_json,s.equipment equipment_json
+      FROM character_armory_profiles p JOIN LATERAL (
+        SELECT snapshot_at,specializations,equipment FROM character_armory_slim s
+        WHERE s.source_game=p.source_game AND s.region=p.region AND s.character_id=p.character_id
+        ORDER BY snapshot_at DESC LIMIT 1) s ON true
+      WHERE p.source_game=? AND (p.region,p.character_id) > (?,?)
+      ORDER BY p.region,p.character_id LIMIT 500", [$source, $afterRegion, $afterId]);
+  } catch (PDOException $e) {
+    if (in_array($e->getCode(), ['42P01', '42703'], true)) return $cache[$source] = [];
+    throw $e;
+  }
+  if (!$rows) break;
+  $afterRegion = (string)$rows[count($rows) - 1]['region']; $afterId = (int)$rows[count($rows) - 1]['character_id'];
   foreach ($rows as $r) {
     $classFile = $classFiles[(int)$r['class_id']] ?? null;
     if ($classFile === null) continue;
@@ -722,6 +750,7 @@ function character_armory_records(string $source): array {
       'faction' => $r['faction'], 'matchStatus' => 'armory', 'game' => null,
       'characterKey' => 'armory:' . $source . ':' . $r['region'] . ':' . $r['character_id'], 'importString' => null,
       'rawSpecID' => $activeID ?: null, 'rawRole' => null, 'gear' => $gear, 'provenance' => 'armory'] + $build;
+  }
   }
   return $cache[$source] = $records;
 }
