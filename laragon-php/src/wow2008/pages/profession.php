@@ -34,7 +34,7 @@ $gathering = $prof['role'] === 'Gathering';
     @media (max-width:600px){.pf-hero{grid-template-columns:1fr}.pf-hero .emb{width:56px;height:56px}.pf-hero h1{font-size:24px}.ahwin .wt{flex-wrap:wrap}.ahwin .wt small{display:none}}
   </style>
   <main class="main">
-    <?= component('crumb', ['trail' => [['label' => 'Auction House', 'url' => url('auction-house')], ['label' => 'Professions', 'url' => \profession_path()], ['label' => $prof['name']]]]) ?>
+    <?= component('crumb', ['trail' => [['label' => 'Auction House', 'url' => url('auction-house')], ['label' => 'Professions', 'url' => \profession_path(null, $professionSource ?? 'forever')], ['label' => $prof['name']]]]) ?>
 
     <nav class="pf-bar" aria-label="Professions">
 <?php foreach ($cards as $s => $c): ?>
@@ -93,7 +93,7 @@ function chg(p) {
   return `<span class="chg ${p > 0 ? 'up' : 'dn'}">${p > 0 ? '+' : ''}${p}%</span>`;
 }
 const itemLink = r => `<span class="ic">${wowIcon(r[2] || 'inv_misc_questionmark', esc(r[0][0]))}</span>` +
-  (r[1] ? `<a href="<?= e(\forever_item_path('')) ?>${r[1]}" title="Price history for ${esc(r[0])}">${esc(r[0])}</a>` : esc(r[0]));
+  (r[1] ? `<a href="<?= e($itemBase) ?>${r[1]}" title="Price history for ${esc(r[0])}">${esc(r[0])}</a>` : esc(r[0]));
 
 const params = new URLSearchParams(location.search);
 let realm = REALMS.some(r => r[0] === params.get('realm')) ? params.get('realm') : REALMS[0][0];

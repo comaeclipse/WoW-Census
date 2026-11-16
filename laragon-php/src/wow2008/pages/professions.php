@@ -9,19 +9,22 @@ $pc = $pcensus;
 $n = $pc['profiles'];
 $prim = $pc['primaries'];
 $combos = $pc['combos'];
+$isRetail = ($professionSource ?? 'forever') === 'retail';
 $slugOf = [];
 foreach ($cards as $s => $c) $slugOf[$c['name']] = $s;
 $iconOf = fn($name) => $cards[$slugOf[$name] ?? '']['icon'] ?? 'inv_misc_questionmark';
 $ic = fn($name) => '<span class="ic"><img src="/assets/images/wow/icons/small/' . e($iconOf($name)) . '.jpg" alt=""></span>';
 $link = fn($name) => isset($slugOf[$name]) ? '<a href="' . e($cards[$slugOf[$name]]['url']) . '">' . e($name) . '</a>' : e($name);
-$bar = fn($pct, $max) => '<span class="qbar"><i style="width:' . round($pct / $max * 100) . '%"></i></span>';
+$bar = fn($pct, $max) => '<span class="qbar"><i style="width:' . round($pct / max(0.1, $max) * 100) . '%"></i></span>';
 $classic = ['Leatherworking + Skinning', 'Blacksmithing + Mining', 'Enchanting + Tailoring', 'Alchemy + Herbalism', 'Engineering + Mining'];
 $classicPct = round(array_sum(array_map(fn($c) => in_array($c[0], $classic, true) ? $c[2] : 0, $combos)));
-$avgPrimary = round(array_sum(array_map(fn($p) => $p['avg'] * $p['count'], $prim)) / array_sum(array_column($prim, 'count')));
+$avgPrimary = round(array_sum(array_map(fn($p) => $p['avg'] * $p['count'], $prim)) / max(1, array_sum(array_column($prim, 'count'))));
 $freeSlot = ($pc['primaryCounts']['1'] ?? 0) + ($pc['primaryCounts']['0'] ?? 0);
 $classColor = ['Hunter' => '#abd473', 'Paladin' => '#f58cba', 'Shaman' => '#0070de', 'Priest' => '#ffffff', 'Mage' => '#69ccf0',
-  'Rogue' => '#fff569', 'Warrior' => '#c79c6e', 'Warlock' => '#9482c9', 'Druid' => '#ff7d0a'];
-[$topA, $topB] = explode(' + ', $combos[0][0]);
+  'Rogue' => '#fff569', 'Warrior' => '#c79c6e', 'Warlock' => '#9482c9', 'Druid' => '#ff7d0a', 'Death Knight' => '#c41f3b',
+  'Monk' => '#00ff96', 'Demon Hunter' => '#a330c9', 'Evoker' => '#33937f'];
+$classIcon = fn($name) => strtolower(str_replace(' ', '', $name));
+[$topA, $topB] = array_pad(explode(' + ', $combos[0][0] ?? 'No pairing'), 2, '');
 $short = ['Leatherworking' => 'LW', 'Blacksmithing' => 'BS'];
 ?>
   <style>
@@ -69,14 +72,14 @@ $short = ['Leatherworking' => 'LW', 'Blacksmithing' => 'BS'];
     <?= component('banner', ['art' => 'auction-house', 'title' => 'Professions', 'subtitle' => $subtitle . ' · TRADE SKILLS', 'subtitle_color' => '#ffe8a0', 'stamp_id' => 'pfstamp']) ?>
 
     <?php component_start('section', ['title' => 'Profession Census', 'icon' => 'g',
-      'sub' => fmt($n) . ' characters looked up on the Forever armory · ' . gmdate('j M Y', strtotime($pc['fetchedTo']))]) ?>
+      'sub' => fmt($n) . ' characters sampled from the ' . ($isRetail ? 'Retail' : 'Forever') . ' armory' . (!empty($pc['fetchedTo']) ? ' · ' . gmdate('j M Y', strtotime($pc['fetchedTo'])) : '')]) ?>
         <div class="pc-tallies">
           <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/inv_misc_book_09.jpg" alt=""></span>
             <span class="v"><?= fmt($n) ?></span><span class="l">Characters sampled</span></div>
-          <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/<?= e($iconOf($prim[0]['name'])) ?>.jpg" alt=""></span>
-            <span class="v"><?= e($prim[0]['name']) ?> <small><?= round($prim[0]['pct']) ?>%</small></span><span class="l">Most learned trade</span></div>
+          <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/<?= e($iconOf($prim[0]['name'] ?? '')) ?>.jpg" alt=""></span>
+            <span class="v"><?= e($prim[0]['name'] ?? 'No data') ?> <small><?= round($prim[0]['pct'] ?? 0) ?>%</small></span><span class="l">Most learned trade</span></div>
           <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/<?= e($iconOf($topA)) ?>.jpg" alt=""></span>
-            <span class="v"><?= round($combos[0][2]) ?>% <small><?= e($short[$topA] ?? $topA) ?> &amp; <?= e($short[$topB] ?? $topB) ?></small></span><span class="l">Top pairing</span></div>
+            <span class="v"><?= round($combos[0][2] ?? 0) ?>% <small><?= e($short[$topA] ?? $topA) ?><?= $topB !== '' ? ' &amp; ' . e($short[$topB] ?? $topB) : '' ?></small></span><span class="l">Top pairing</span></div>
           <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/inv_misc_note_01.jpg" alt=""></span>
             <span class="v"><?= $avgPrimary ?> <small>skill</small></span><span class="l">Average primary</span></div>
         </div>
@@ -86,7 +89,7 @@ $short = ['Leatherworking' => 'LW', 'Blacksmithing' => 'BS'];
             <table class="ahtable"><thead><tr><th class="rk">#</th><th>Profession</th><th class="num">Learned by</th><th class="num">Avg Skill</th></tr></thead><tbody>
 <?php foreach ($prim as $i => $p): ?>
               <tr><td class="rk"><?= $i + 1 ?></td><td class="trade"><?= $ic($p['name']) . $link($p['name']) ?></td>
-                <td class="num"><b><?= number_format($p['pct'], 1) ?>%</b><?= $bar($p['pct'], $prim[0]['pct']) ?></td><td class="num"><?= round($p['avg']) ?></td></tr>
+                <td class="num"><b><?= number_format($p['pct'], 1) ?>%</b><?= $bar($p['pct'], $prim[0]['pct'] ?? 1) ?></td><td class="num"><?= round($p['avg']) ?></td></tr>
 <?php endforeach; ?>
             </tbody></table></div>
           <div class="ahwin"><div class="wt">Common Pairings<small>the two primaries together</small></div>
@@ -94,10 +97,10 @@ $short = ['Leatherworking' => 'LW', 'Blacksmithing' => 'BS'];
 <?php foreach (array_slice($combos, 0, 6) as $i => [$combo, $k, $pct]): $pair = explode(' + ', $combo); ?>
               <tr><td class="rk"><?= $i + 1 ?></td>
                 <td class="trade pair"><?= count($pair) === 2 ? $ic($pair[0]) . $ic($pair[1]) . '<span>' . e($pair[0]) . ' <em>&amp;</em> ' . e($pair[1]) . '</span>' : e($combo) ?></td>
-                <td class="num"><b><?= number_format($pct, 1) ?>%</b><?= $bar($pct, $combos[0][2]) ?></td></tr>
+                <td class="num"><b><?= number_format($pct, 1) ?>%</b><?= $bar($pct, $combos[0][2] ?? 1) ?></td></tr>
 <?php endforeach; ?>
             </tbody></table>
-            <div class="pc-note"><b><?= $classicPct ?>%</b> of characters run one of the five classic pairings. Only <?= fmt($freeSlot) ?> of <?= fmt($n) ?> have a free slot.</div></div>
+            <div class="pc-note"><?php if ($isRetail): ?><b><?= fmt($freeSlot) ?></b> of <?= fmt($n) ?> sampled characters have fewer than two recorded primary professions.<?php else: ?><b><?= $classicPct ?>%</b> of characters run one of the five classic pairings. Only <?= fmt($freeSlot) ?> of <?= fmt($n) ?> have a free slot.<?php endif ?></div></div>
         </div>
 
         <div class="pc-h">Secondary Skills</div>
@@ -111,7 +114,7 @@ $short = ['Leatherworking' => 'LW', 'Blacksmithing' => 'BS'];
         <div class="pc-h">Class Favourites</div>
         <div class="pc-classes">
 <?php foreach ($pc['classes'] as $c): ?>
-          <div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_<?= e(strtolower($c['class'])) ?>.jpg" alt="">
+          <div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_<?= e($classIcon($c['class'])) ?>.jpg" alt="">
             <b style="color:<?= $classColor[$c['class']] ?? '#fff' ?>"><?= e($c['class']) ?></b>
 <?php foreach (array_slice($c['top'], 0, 2) as [$t, $tp]): ?>
             <span><?= e($t) ?> <i><?= round($tp) ?>%</i></span>

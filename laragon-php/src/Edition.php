@@ -44,16 +44,20 @@ function utc_timestamp(mixed $value): string {
 function edition_nav(string $source, string $current): array {
   $edition = EDITIONS[$source];
   $currentPage = preg_replace('/\.html$/', '', $current);
-  $pageLabels = ['index' => 'Census', 'combos' => 'Race + Class', 'realms' => 'Realms', 'auctionhouse' => 'Auction House', 'guilds' => 'Guilds', 'geography' => 'Geography', 'talents' => 'Talents', 'gear' => 'Gear'];
+  $pageLabels = ['index' => 'Census', 'combos' => 'Race + Class', 'realms' => 'Realms', 'auctionhouse' => 'Auction House', 'professions' => 'Professions', 'guilds' => 'Guilds', 'geography' => 'Geography', 'talents' => 'Talents', 'gear' => 'Gear'];
   $item = fn(string $href, string $label, ?bool $active = null) =>
     '<a class="game"' . (($active ?? ($href === $currentPage)) ? ' aria-current="true"' : '') . ' href="' . $href . '">' . $label . '</a>';
   $games = '<nav class="games game-nav" aria-label="Game edition">';
-  foreach (EDITIONS as $s => $e) $games .= $item(page_path($s, $currentPage), $e['nav'], $s === $source);
+  foreach (EDITIONS as $s => $e) {
+    $gamePage = $currentPage === 'professions' && !in_array($s, [PROFESSION_SOURCE, 'retail'], true) ? 'auctionhouse' : $currentPage;
+    $games .= $item(page_path($s, $gamePage), $e['nav'], $s === $source);
+  }
   $games .= '</nav>';
   $pages = '<nav class="games page-nav" aria-label="Site pages">' .
     $item(page_path($source, 'index'), 'Census', $currentPage === 'index' || $currentPage === 'combos') .
     $item(page_path($source, 'realms'), 'Realms', $currentPage === 'realms') .
     $item(page_path($source, 'auctionhouse'), 'Auction House', $currentPage === 'auctionhouse') .
+    (in_array($source, [PROFESSION_SOURCE, 'retail'], true) ? $item(profession_path(null, $source), 'Professions', $currentPage === 'professions') : '') .
     $item(page_path($source, 'guilds'), 'Guilds', $currentPage === 'guilds') .
     $item(page_path($source, 'geography'), 'Geography', $currentPage === 'geography') .
     $item(page_path($source, 'talents'), 'Talents', $currentPage === 'talents') .
@@ -370,7 +374,7 @@ function talent_page_model(string $source): array {
 function gear_page_model(string $source): array {
   return published_page_model('gear:' . $source, function () use ($source) {
     $inspects = inspects_with_icons($source);
-    return ['lastT' => $inspects['lastT'], 'packed' => pack_gear_page($inspects, EDITIONS[$source]['branch']),
+    return ['lastT' => $inspects['lastT'], 'packed' => pack_gear_page($inspects, EDITIONS[$source]['branch'], $source),
       'coverage' => $inspects['coverage'], 'sources' => $inspects['sources'] ?? ['inspect' => count($inspects['records']), 'armory' => 0]];
   });
 }
@@ -417,7 +421,7 @@ function render_edition_page(string $source, string $page, string $stylesheet, s
   $navigation = edition_nav($source, $page . '.html');
   if (!empty($edition['connectedMarket'])) $navigation['breadcrumbs'] .=
     '<p class="hint">Galakras and Nazgrim tabs show scan origins within the Pagle connected group. Shared character identities count once; the auction overview uses the newest scan per faction.</p>';
-  $common = ['stylesheet' => $stylesheet, 'nav' => $navigation, 'generatedNote' => $generatedNote, 'gameLabel' => $edition['label'],
+  $common = ['stylesheet' => $stylesheet, 'nav' => $navigation, 'generatedNote' => $generatedNote, 'gameLabel' => $edition['label'], 'source' => $source,
     'canonical' => SITE_ORIGIN . page_path($source, $page)];
   switch ($page) {
     case 'index':

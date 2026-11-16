@@ -276,15 +276,17 @@ function unpack_gear_records(array $packed): array {
   return $out;
 }
 
-function pack_gear_page(array $data, string $branch): array {
+function pack_gear_page(array $data, string $branch, ?string $source = null): array {
   $packed = pack_gear_records($data['records']);
   $packed['wowhead'] = 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=';
+  $packed['itemBase'] = in_array($source, [PROFESSION_SOURCE, 'retail'], true) ? armory_item_path($source, '') : null;
   return $packed;
 }
 
 function gear_markup(string $part, array $records, array $packed, string $selected = '', bool $cobalt = false): string {
   if ($part === 'filters') return filter_selects($records);
   $wowhead = $packed['wowhead'];
+  $itemBase = $packed['itemBase'] ?? null;
   if (!$records) return $part === 'top' ? '<p class="hint">No inspected gear for these filters.</p>' : '<section class="panel"><p class="hint" style="margin:0">No inspected gear for these filters.</p></section>';
   $groups = [['Head', [1]], ['Neck', [2]], ['Shoulder', [3]], ['Back', [15]], ['Chest', [5]], ['Wrist', [9]], ['Hands', [10]], ['Waist', [6]], ['Legs', [7]], ['Feet', [8]],
     ['Rings', [11, 12]], ['Trinkets', [13, 14]], ['Main hand', [16]], ['Off hand', [17]], ['Ranged', [18]], ['Shirt', [4]], ['Tabard', [19]]];
@@ -317,8 +319,8 @@ function gear_markup(string $part, array $records, array $packed, string $select
     $top = array_slice(js_sort(array_values($items), fn($a, $b) => js_or($b['players'] - $a['players'], fn() => js_cmp(js_string($a['name']), js_string($b['name'])))), 0, 10);
     if ($part === 'top') {
       $it = $top[0];
-      $slotHref = $cobalt ? '?' . http_build_query(array_merge($_GET, ['slot' => $label])) : $wowhead . js_string($it['id']);
-      $external = $cobalt ? '' : ' target="_blank" rel="noopener"';
+      $slotHref = $cobalt ? '?' . http_build_query(array_merge($_GET, ['slot' => $label])) : ($itemBase ?: $wowhead) . js_string($it['id']);
+      $external = $cobalt || $itemBase ? '' : ' target="_blank" rel="noopener"';
       $tiles .= '<a class="gear-top-item" href="' . esc_markup($slotHref) . '"' . $external . '><span class="gear-top-slot">' . esc_markup($label) .
         '</span><img src="https://wow.zamimg.com/images/wow/icons/large/' . esc_markup($it['icon'] ?: 'inv_misc_questionmark') . '.jpg" alt="" width="40" height="40"><span class="gear-top-name iq' .
         js_string($it['quality'] ?? 1) . '">' . esc_markup($it['name']) . '</span><span class="gear-top-count">' . js_locale($it['players']) . ' players</span></a>';
@@ -326,7 +328,7 @@ function gear_markup(string $part, array $records, array $packed, string $select
     }
     $body = '';
     foreach ($top as $it)
-      $body .= '<tr><td class="l"><a class="iq' . js_string($it['quality'] ?? 1) . '" href="' . esc_markup($wowhead . js_string($it['id'])) . '" target="_blank" rel="noopener"><img src="' . $iconRoot .
+      $body .= '<tr><td class="l"><a class="iq' . js_string($it['quality'] ?? 1) . '" href="' . esc_markup(($itemBase ?: $wowhead) . js_string($it['id'])) . '"' . ($itemBase ? '' : ' target="_blank" rel="noopener"') . '><img src="' . $iconRoot .
         esc_markup($it['icon'] ?: 'inv_misc_questionmark') . '.jpg" alt="" width="20" height="20" loading="lazy"><span>' . esc_markup($it['name']) . '</span></a></td><td>' .
         js_locale($it['players']) . '</td><td>' . js_fixed(100 * $it['players'] / $filled, 1) . '%</td></tr>';
     // Shares are of players with a rune recorded here: older inspects carry none.

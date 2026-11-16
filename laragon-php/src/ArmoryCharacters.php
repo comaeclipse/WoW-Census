@@ -23,31 +23,52 @@ function armory_item_model(string $source, int $id): ?array {
   if (!in_array($source, ARMORY_SOURCES, true) || $id < 1) return null;
   try {
     $row = Db::first('SELECT item_json FROM character_armory_items WHERE source_game=? AND item_id=? ORDER BY snapshot_at DESC LIMIT 1', [$source, $id]);
+    $market = Db::all('SELECT game,captured_at,name,category,crafter,quantity,lowest,median,weighted_average
+      FROM local_auction_snapshots WHERE source_game=? AND item_id=? ORDER BY captured_at,game', [$source, $id]);
   } catch (PDOException $e) {
     if ($e->getCode() === '42P01') return null;
     throw $e;
   }
-  if (!$row) return null;
-  $it = forever_json($row['item_json']);
+  if (!$row && !$market) return null;
+  $it = $row ? forever_json($row['item_json']) : [];
   $branch = EDITIONS[$source]['branch'] ?: 'retail';
   $icons = (array)item_cache('item-icons', $source) + (array)item_cache('item-icons', $branch) + (array)item_cache('item-icons', 'classic');
   $quality = FOREVER_QUALITY[$it['quality']['type'] ?? ''] ?? 1;
-  $name = $it['name'] ?? ('Item ' . $id);
+  $latest = $market ? end($market) : null;
+  $name = $it['name'] ?? (($latest['name'] ?? '') !== '' && !preg_match('/^item:\d+$/', (string)$latest['name']) ? $latest['name'] : null)
+    ?? (item_cache('item-names', $branch)[$id] ?? ('Item ' . $id));
+  $scans = []; $seen = [];
+  foreach ($market as $m) {
+    $game = preg_replace('/^realm:(?:(?:us|eu|kr|tw|cn):[a-z-]+:)?/', '', (string)$m['game']);
+    $key = $game . '|' . $m['captured_at'];
+    if (isset($seen[$key])) continue;
+    $seen[$key] = true;
+    $faction = preg_match('/-(Alliance|Horde)$/', $game, $match) ? $match[1] : 'Neutral';
+    $scans[] = [preg_replace('/-(Alliance|Horde)$/', '', $game), $faction, (int)$m['captured_at'], (int)$m['quantity'],
+      (int)$m['lowest'], (int)$m['median'], (int)$m['weighted_average']];
+  }
   return ['source' => $source, 'id' => $id, 'name' => $name, 'icon' => $icons[$id] ?? $icons[(string)$id] ?? null,
-    'cat' => $it['item_subclass']['name'] ?? ($it['inventory_type']['name'] ?? 'Item'), 'crafter' => null,
-    'roles' => [], 'taught' => null, 'scans' => [], 'wearers' => null, 'quality' => $quality, 'localOnly' => true];
+    'cat' => $it['item_subclass']['name'] ?? ($it['inventory_type']['name'] ?? ($latest['category'] ?? 'Item')), 'crafter' => $latest['crafter'] ?? null,
+    'roles' => edition_profession_roles($source, ['name' => $name, 'cat' => $latest['category'] ?? null], $latest['crafter'] ?? null),
+    'taught' => null, 'scans' => $scans, 'wearers' => null, 'quality' => $quality, 'localOnly' => !$market,
+    'loot' => item_loot_sources($source, $id),
+    'vendor' => item_vendor_vs_ah(($it['sell_price']['value'] ?? 0) > 0 ? (int)$it['sell_price']['value'] : null, item_vendor_log($source, $id), $scans, null)];
 }
 
 function armory_item_html(string $source, array $item): string {
   $label = seo_label(EDITIONS[$source]['label']);
-  $title = $item['name'] . ' – ' . $label . ' Item';
+  $title = $item['name'] . ' – ' . $label . ($item['scans'] ? ' Auction Price History' : ' Item');
   $canonical = SITE_ORIGIN . armory_item_path($source, $item['id']);
   $icon = $item['icon'] ?: 'inv_misc_questionmark';
-  return localize_content('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' .
-    seo_head($title . ' – WoWCensus', $label . ' item profile for ' . $item['name'] . ', observed on an enriched character.', $canonical) .
-    '<link rel="stylesheet" href="/' . stylesheet()['name'] . '"></head><body><main class="wrap"><h1 class="iname">' . esc($item['name']) .
-    '</h1><p><img src="/assets/images/wow/icons/large/' . esc($icon) . '.jpg" width="56" height="56" alt=""> Item ID ' . $item['id'] .
-    '</p></main></body></html>\n');
+  $m = forever_item_markets($item['scans']); $newest = [];
+  foreach ($m['log'] as $row) if (!isset($newest[$row[0]]) || $row[1] > $newest[$row[0]][1]) $newest[$row[0]] = $row;
+  usort($newest, fn($a, $b) => $b[2] <=> $a[2]); $rows = '';
+  foreach ($newest as [$key, $t, $qty, $lo, $med]) $rows .= '<tr><td class="l">' . esc(gmdate('Y-m-d H:i', $t)) . '</td><td class="l">' . esc($m['markets'][$key][0]) . '</td><td class="r">' . js_locale($qty) . '</td><td class="r">' . esc(money($lo)) . '</td><td class="r">' . esc(money($med)) . '</td></tr>';
+  $nav = edition_nav($source, 'auctionhouse.html'); $heading = page_heading('WoWCensus', $nav, $title); $css = esc(edition_path($source) . stylesheet()['name']);
+  $desc = $item['scans'] ? $label . ' auction house prices and current listed supply for ' . $item['name'] . ' from in-game scans.' : $label . ' item profile for ' . $item['name'] . ', observed on an enriched character.';
+  $wowhead = 'https://www.wowhead.com/' . (EDITIONS[$source]['branch'] !== '' ? EDITIONS[$source]['branch'] . '/' : '') . 'item=' . $item['id'];
+  $market = $rows !== '' ? '<div class="panel census mkt"><div class="ptitle">Current listings</div><table class="mkttable"><thead><tr><th class="l">Scanned (UTC)</th><th class="l">Market</th><th class="r">Qty</th><th class="r">Lowest</th><th class="r">Median</th></tr></thead><tbody>' . $rows . '</tbody></table></div>' : '<div class="panel"><p class="hint">No auction listing has been observed for this item yet.</p></div>';
+  return localize_content('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' . seo_head($title . ' – WoWCensus', $desc, $canonical) . '<link rel="stylesheet" href="' . $css . '"></head><body><div class="wrap"><header class="ihead"><div class="page-heading">' . $heading . $nav['games'] . '</div>' . $nav['breadcrumbs'] . '</header><main><div class="panel census"><div class="ptitle"><img src="/assets/images/wow/icons/large/' . esc($icon) . '.jpg" width="40" height="40" alt=""> ' . esc($item['name']) . '</div><p class="hint">' . esc($item['cat'] ?: 'Item') . ' · Item ID ' . $item['id'] . ' · <a href="' . esc($wowhead) . '" target="_blank" rel="noopener">View on Wowhead</a></p></div>' . $market . '</main></div></body></html>\n');
 }
 
 /** Profile ids for names on one census realm. Ambiguous cross-region matches are left unlinked. */

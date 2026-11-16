@@ -82,7 +82,7 @@
 .topbar .w8-fund:hover .cap{color:#fff}
 .w8-gbar{--h:20px;--p:0;position:relative;isolation:isolate;flex:none;width:calc(var(--h) * 12.556);height:var(--h)}
 .w8-gbar::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border:calc(var(--h) / 2) solid transparent;border-image:url('donation-frame.png') 18 / 1 / 0 stretch}
-.w8-gbar .track{display:block;position:absolute;z-index:-1;inset:calc(var(--h) * .19) calc(var(--h) / 6);border-radius:calc(var(--h) * .2);overflow:hidden;background:url('donation-stone.png') center / 100% 100% no-repeat}
+.w8-gbar .track{display:block;position:absolute;z-index:-1;inset:calc(var(--h) * .19) calc(var(--h) / 6);border-radius:calc(var(--h) * .2);overflow:hidden;background:url('donation-stone.png') center / cover no-repeat}
 .w8-gbar .fill{display:block;height:100%;width:calc(var(--p) * 100%);background:url('donation-fill.png') left center / calc(100% / max(var(--p), .001)) 100% no-repeat}
 .w8-gbar.empty .fill{display:none}
 

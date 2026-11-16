@@ -56,11 +56,12 @@ function route_request(string $path): ?array {
     $c = $source ? edition_character_model($source, $m[2]) : null;
     return $c ? [$html, edition_character_html($c)] : null;
   }
-  // WoW: Forever professions: /forever/professions and /forever/professions/tailoring (+ trailing slash or index.html).
-  if (preg_match('#^/forever/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
-    $slug = ($m[1] ?? '') !== '' ? $m[1] : null;
-    if ($slug !== null && !isset(PROFESSIONS[$slug])) return null;
-    return [$html, localize_content(professions_html($slug, edition_path(PROFESSION_SOURCE) . $cssName))];
+  // Armory-backed profession census and AH trade pages for Forever and Retail.
+  if (preg_match('#^/(forever|retail)/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
+    $source = $m[1];
+    $slug = ($m[2] ?? '') !== '' ? $m[2] : null;
+    if ($slug !== null && !isset(profession_catalog($source)[$slug])) return null;
+    return [$html, localize_content(professions_html($slug, edition_path($source) . $cssName, $source))];
   }
 
 

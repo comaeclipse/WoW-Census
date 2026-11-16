@@ -3,7 +3,7 @@ namespace Wow2008;
 /**
  * Page: one WoW: Forever item's auction overview and history.
  * Vars: $item (forever_item_model: id, name, icon, cat, crafter, taught), $trades (list of name, icon, url, role),
- *       $data (generated + forever_item_markets(): markets key => [label, faction], points, log), $wowhead, $subtitle
+ *       $data (generated + forever_item_market_summary(): markets key => [label, faction], points, scans, lastScan), $wowhead, $subtitle
  */
 $icon = $item['icon'] ?: 'inv_misc_questionmark';
 $w = $item['wearers'];
@@ -22,6 +22,20 @@ $money = function (int $cu): string {
   return '<span class="money">' . ($out ?: '<span>0<i class="c"></i></span>') . '</span>';
 };
 $pct = fn($n, $d) => $d ? (int)round(100 * $n / $d) : 0;
+$sales = $item['sales'] ?? null;
+$loot = $item['loot'] ?? null;
+$vendor = $item['vendor'] ?? null;
+$whBase = preg_replace('/item=\d+$/', '', $wowhead);
+// 4500 -> "1h 15m"; 200000 -> "2d 7h"
+$dur = function (int $s): string {
+  if ($s < 3600) return max(1, intdiv($s, 60)) . 'm';
+  if ($s < 86400) return intdiv($s, 3600) . 'h' . (intdiv($s % 3600, 60) ? ' ' . intdiv($s % 3600, 60) . 'm' : '');
+  return intdiv($s, 86400) . 'd' . (intdiv($s % 86400, 3600) ? ' ' . intdiv($s % 86400, 3600) . 'h' : '');
+};
+$ago = function (int $t) use ($dur): string {
+  $s = time() - $t;
+  return $s < 60 ? 'just now' : $dur($s) . ' ago';
+};
 $QCOL = [0 => '#9d9d9d', 1 => '#ffffff', 2 => '#1eff00', 3 => '#0070dd', 4 => '#a335ee', 5 => '#ff8000', 6 => '#e6cc80', 7 => '#00ccff'];
 $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') : '#ffffff';
 ?>
@@ -47,6 +61,15 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     .it-trade small{font:700 9px Tahoma,Arial,sans-serif;text-transform:uppercase;letter-spacing:.6px;color:#8a5a10}
     .it-chart{background:linear-gradient(#1c1810,#0e0c08);border:2px solid #000;outline:1px solid #8a7040;border-radius:4px;padding:8px 8px 4px}
     .it-chart svg{display:block;width:100%;height:auto}
+    .it-verdict{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin-bottom:10px;padding:8px 12px;border:1px solid #8a6a2a;border-radius:3px;
+      background:linear-gradient(#fff6d8,#ecd59c);color:#3a1a00;font-size:12px}
+    .it-verdict b{font:700 15px 'Cinzel',serif;font-variant:small-caps;color:#5a2a00}
+    .it-verdict.auction{border-color:#2a7a2a;box-shadow:inset 3px 0 0 #2a8a2a}
+    .it-verdict.vendor{border-color:#8a5a10;box-shadow:inset 3px 0 0 #b07a00}
+    .it-rate{display:inline-block;position:relative;min-width:64px;padding:1px 4px;text-align:right;border:1px solid #6a5020;background:#1a140a;color:#fff;font-weight:700}
+    .it-rate i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#5a9a2a,#2a6a10)}
+    .it-rate b{position:relative}
+    .it-rate.early{opacity:.55}
     .it-chart text{font:10px Tahoma,Arial,sans-serif;fill:#b8a888}
     .it-chart .grid{stroke:#2e2818;stroke-width:1}
     .it-chart .ttl{font:700 11px Tahoma,Arial,sans-serif;fill:#ffd75a}
@@ -106,6 +129,18 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     .it-pair .tr i{display:block;height:100%;width:0;background:linear-gradient(#ffd75a,#b07a00);transition:width .8s}
     .it-pair .v{text-align:right;font-weight:700;color:#5a2a00}
     .it-pair .q0{color:#6a6a6a}.it-pair .q1{color:#444}.it-pair .q2{color:#1a8a00}.it-pair .q3{color:#0058b0}.it-pair .q4{color:#8a2ad0}.it-pair .q5{color:#c86000}
+    .it-loot{width:100%;background:linear-gradient(#1c1810,#0e0c08);border:2px solid #000;outline:1px solid #8a7040}
+    .it-loot td{color:#e8dcc0}
+    .it-loot td a{color:#ffd75a}
+    .it-loot .kind{color:#9c8c6c}
+    .it-verdict .money{color:#3a1a00;text-shadow:none}
+    @media (max-width:600px){.it-loot th:nth-child(2),.it-loot td:nth-child(2),.it-loot th:nth-child(6),.it-loot td:nth-child(6){display:none}}
+    .it-sales{width:100%;margin-top:10px;background:linear-gradient(#1c1810,#0e0c08);border:2px solid #000;outline:1px solid #8a7040}
+    .it-sales td{color:#e8dcc0}
+    .it-sales .fac-alliance{color:#7fb2ff}
+    .it-sales .fac-horde{color:#ff7a6a}
+    .it-sales .dim{color:#9c8c6c}
+    @media (max-width:600px){.it-sales th:nth-child(3),.it-sales td:nth-child(3){display:none}}
     @media (max-width:860px){.it-top{grid-template-columns:1fr}.it-pairs{grid-template-columns:1fr}}
     @media (max-width:760px){.it-wear{grid-template-columns:1fr}}
     @media (max-width:760px){.it-charts{grid-template-columns:1fr}}
@@ -308,8 +343,74 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
 
     <div class="ahgrid">
       <div class="wide" id="itNow"></div>
-      <div class="wide" id="itLog"></div>
     </div>
+<?php endif ?>
+
+<?php if ($sales): ?>
+    <?php component_start('section', ['title' => 'Recent Sales', 'icon' => 'g', 'sub' => 'completed auctions from players\' Journalator and TSM logs', 'style' => 'margin-top:16px']) ?>
+        <div class="tiles">
+          <div class="stat"><span>Sales recorded</span><b><?= fmt($sales['count']) ?></b><em>completed auctions</em></div>
+          <div class="stat"><span>Typical sale</span><b><?= $money($sales['median']) ?></b><em>median price per unit</em></div>
+          <div class="stat"><span>Time to sell</span><b><?= $sales['medianSecs'] !== null ? e($dur($sales['medianSecs'])) : '—' ?></b><em><?= $sales['timed'] ? 'median, from ' . fmt($sales['timed']) . ' sale' . ($sales['timed'] === 1 ? '' : 's') . ' with a logged listing' : 'listing time not logged' ?></em></div>
+          <div class="stat"><span>Last sale</span><b><?= e($ago($sales['last'])) ?></b><em><?= e(gmdate('M j, Y', $sales['last'])) ?></em></div>
+        </div>
+        <table class="ahtable it-sales">
+          <thead><tr><th>Sold</th><th>Market</th><th class="num">Qty</th><th class="num">Price each</th><th class="num">Sold after</th></tr></thead>
+          <tbody>
+<?php foreach ($sales['rows'] as [$t, $label, $fac, $qty, $unit, $secs]): ?>
+            <tr><td title="<?= e(gmdate('Y-m-d H:i', $t)) ?> UTC"><?= e($ago($t)) ?></td><td class="fac-<?= e(strtolower($fac)) ?>"><?= e($label) ?></td><td class="num"><?= fmt($qty) ?></td><td class="num"><?= $money($unit) ?></td><td class="num"><?= $secs !== null ? e($dur($secs)) : '<span class="dim" title="This listing wasn\'t in the seller\'s log">—</span>' ?></td></tr>
+<?php endforeach ?>
+          </tbody>
+        </table>
+        <p class="tfoot">Real sales, not asking prices: each row is an auction a player's Journalator or TradeSkillMaster recorded as sold. "Sold after" is the time from listing to sale, shown when the listing is in the same log. Sellers and buyers aren't named.<?= $sales['count'] > count($sales['rows']) ? ' Showing the latest ' . count($sales['rows']) . '.' : '' ?></p>
+    <?php component_end() ?>
+<?php endif ?>
+
+<?php if ($vendor): $vv = $vendor['verdict']; $ahp = $vendor['ah']; ?>
+    <?php component_start('section', ['title' => 'Vendor or Auction?', 'icon' => 'g', 'sub' => $vv ? 'what each would pay you for one' : 'vendor prices players were paid and charged', 'style' => 'margin-top:16px']) ?>
+<?php if ($vv): ?>
+        <div class="it-verdict <?= $vv['pick'] ?>"><b><?= $vv['pick'] === 'auction' ? 'Auction it' : 'Vendor it' ?></b>
+          <span><?= $vv['pick'] === 'auction'
+            ? 'The auction house pays about ' . $money($vv['gain']) . ' more per item after its 5% cut.'
+            : ($vv['gain'] === 0 ? 'Both pay about the same; the vendor is instant and costs no deposit.' : 'The vendor pays ' . $money(-$vv['gain']) . ' more than the auction house would after its 5% cut, and costs no deposit.') ?></span></div>
+<?php endif ?>
+        <div class="tiles">
+<?php if ($vendor['sell']): ?>
+          <div class="stat"><span>Vendor pays</span><b><?= $money($vendor['sell']) ?></b><em><?= $vendor['sellSource'] === 'armory' ? 'sell price, Battle.net item data' : 'from ' . fmt($vendor['sells']) . ' logged vendor sale' . ($vendor['sells'] === 1 ? '' : 's') ?></em></div>
+<?php endif ?>
+<?php if ($ahp): ?>
+          <div class="stat"><span>Auction house</span><b><?= $money($ahp['price']) ?></b><em><?= $ahp['basis'] === 'sales' ? 'typical completed sale, ' . fmt($ahp['n']) . ' sales' : 'median asking price, ' . fmt($ahp['n']) . ' market' . ($ahp['n'] === 1 ? '' : 's') . ' · ' . e($ago($ahp['when'])) ?></em></div>
+<?php endif ?>
+<?php if ($vv): ?>
+          <div class="stat"><span>You'd get</span><b><?= $money($vv['net']) ?></b><em>after the 5% auction cut</em></div>
+<?php endif ?>
+<?php if ($vendor['buy']): ?>
+          <div class="stat"><span>Vendors sell it for</span><b><?= $money($vendor['buy']) ?></b><em>from <?= fmt($vendor['buys']) ?> logged purchase<?= $vendor['buys'] === 1 ? '' : 's' ?></em></div>
+<?php endif ?>
+        </div>
+        <p class="tfoot"><?= $vv ? 'Per item, before the auction deposit. ' : '' ?><?= $ahp === null && $vendor['sell'] ? 'No auction price yet to compare against; this is the floor any listing should beat. ' : '' ?>Vendor prices come from players' Journalator logs<?= $vendor['sellSource'] === 'armory' ? ' and Battle.net item data' : '' ?>.</p>
+    <?php component_end() ?>
+<?php endif ?>
+
+<?php if ($loot):
+  $kinds = array_count_values(array_map(fn($r) => $r['kind'] === 'quest' ? 'quest' : 'loot', $loot['rows']));
+  $lootWhat = isset($kinds['loot'], $kinds['quest']) ? 'loots and quest rewards' : (isset($kinds['quest']) ? 'quest rewards' : 'loots'); ?>
+    <?php component_start('section', ['title' => 'Where It Drops', 'icon' => 'p', 'sub' => 'from ' . fmt($loot['drops']) . ' ' . $lootWhat . ' in players\' Journalator logs', 'style' => 'margin-top:16px']) ?>
+        <table class="ahtable it-loot">
+          <thead><tr><th>Source</th><th>Type</th><th class="num">Drop rate</th><th class="num">Dropped</th><th class="num">Looted</th><th class="num">Avg qty</th></tr></thead>
+          <tbody>
+<?php foreach ($loot['rows'] as $r): $small = $r['windows'] < LOOT_SMALL_SAMPLE; $kindLabel = ['npc' => 'Mob', 'world' => 'Object', 'quest' => 'Quest reward'][$r['kind']] ?? $r['kind']; ?>
+            <tr><td><a href="<?= e($whBase . ['npc' => 'npc', 'world' => 'object', 'quest' => 'quest'][$r['kind']] . '=' . $r['id']) ?>" rel="nofollow"><?= e($r['name']) ?></a></td>
+              <td class="kind"><?= e($kindLabel) ?></td>
+              <td class="num"><span class="it-rate<?= $small ? ' early' : '' ?>" title="<?= $small ? 'Early estimate: fewer than ' . LOOT_SMALL_SAMPLE . ' ' . ($r['kind'] === 'quest' ? 'turn-ins' : 'loots') . ' logged' : '' ?>"><i style="width:<?= max(2, (int)round(100 * $r['rate'])) ?>%"></i><b><?= $r['rate'] < 0.1 ? preg_replace('/\.0$/', '', number_format(100 * $r['rate'], 1)) : (int)round(100 * $r['rate']) ?>%</b></span></td>
+              <td class="num"><?= fmt($r['drops']) ?></td>
+              <td class="num"><?= fmt($r['windows']) ?></td>
+              <td class="num"><?= $r['drops'] ? preg_replace('/\.0$/', '', number_format($r['qty'] / $r['drops'], 1)) : '—' ?></td></tr>
+<?php endforeach ?>
+          </tbody>
+        </table>
+        <p class="tfoot">Drop rate is how often looting that mob or object gave this item, out of every time a player's Journalator logged looting it. For a quest, it's how often the turn-in rewarded it; with a choice of rewards, that's how often players picked it. Faded rates come from fewer than <?= LOOT_SMALL_SAMPLE ?> loots and will settle as more players upload. Mobs that left nothing to loot aren't logged, so rates run slightly high.</p>
+    <?php component_end() ?>
 <?php endif ?>
 
 <?php if ($trades): ?>
@@ -322,7 +423,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     <?php component_end() ?>
 <?php endif ?>
 
-    <div class="source"><?= !empty($item['localOnly']) || !empty($item['armoryOnly']) ? 'Item details from a Battle.net Armory equipment snapshot' : 'Auction data from in-game scans · asking prices on listed auctions, not completed sales · "lowest" is the cheapest listing, "median" the middle unit price' ?></div>
+    <div class="source"><?= !empty($item['localOnly']) || !empty($item['armoryOnly']) ? 'Item details from a Battle.net Armory equipment snapshot' : 'Auction data from in-game scans · asking prices on listed auctions, not completed sales · "lowest" is the cheapest listing, "median" the middle unit price' . ($sales ? ' · Recent Sales are completed auctions from players\' add-on logs' : '') ?></div>
   </main>
 
 <?php start_section('scripts') ?>
@@ -331,7 +432,6 @@ const IT = <?= js($data) ?>;
 const NAME = <?= js($item['name']) ?>;
 // One point per market and scanned day; markets are region + ruleset + faction ("US PvE · Alliance").
 const SC = IT.points.map(p => ({ k: p[0], fac: IT.markets[p[0]][1], t: p[1], qty: p[2], lo: p[3], med: p[4] }));
-const LOG = IT.log.map(p => ({ k: p[0], t: p[1], qty: p[2], lo: p[3], med: p[4] }));
 const label = s => IT.markets[s.k][0];
 const key = s => s.k;
 
@@ -359,7 +459,7 @@ function chg(now, prev) {
 // One series per market, in faction colours.
 const series = {};
 SC.forEach(s => (series[key(s)] ||= { k: s.k, fac: s.fac, pts: [] }).pts.push(s));
-const lastScan = k => Math.max(...LOG.filter(l => l.k === k).map(l => l.t));
+const lastScan = k => IT.lastScan[k];
 const PAL = { Alliance: ['#5aa0ff', '#9cc8ff', '#2f6ad0'], Horde: ['#ff5a4a', '#ffa090', '#c02a18'], Neutral: ['#ffd75a', '#e0b040', '#fff0a0'] };
 const used = {};
 Object.values(series).forEach(sr => { const i = used[sr.fac] = (used[sr.fac] ?? -1) + 1; sr.color = PAL[sr.fac][i % 3]; });
@@ -396,16 +496,16 @@ function chart(el, title, field, fmtAxis, fmtTip, withLow) {
 function render() {
   const listed = latest.reduce((a, s) => a + s.qty, 0);
   const cheapest = latest.reduce((a, s) => !a || s.lo < a.lo ? s : a, null);
-  const meds = SC.map(s => s.med), lastT = Math.max(...LOG.map(s => s.t));
+  const meds = SC.map(s => s.med), lastT = Math.max(...Object.values(IT.lastScan));
   document.getElementById('itTiles').innerHTML = `
     <div class="stat"><span>Lowest price now</span><b style="font-size:17px;line-height:26px">${money(cheapest.lo)}</b><em>${esc(label(cheapest))}</em></div>
     <div class="stat"><span>Listed now</span><b>${fmt(listed)}</b><em>units across ${fmt(latest.length)} market${latest.length === 1 ? '' : 's'}</em></div>
     <div class="stat"><span>Median range</span><b style="font-size:15px;line-height:26px">${money(Math.min(...meds))} – ${money(Math.max(...meds))}</b><em>across every scanned day</em></div>
-    <div class="stat"><span>Scans</span><b>${fmt(LOG.length)}</b><em>last ${day(lastT)}</em></div>`;
+    <div class="stat"><span>Scans</span><b>${fmt(IT.scans)}</b><em>last ${day(lastT)}</em></div>`;
 
   // Report: compare each market's newest day with its previous one.
   const moved = latest.filter(s => s.prev).map(s => ({ s, dp: s.prev.med ? Math.round((s.med - s.prev.med) / s.prev.med * 100) : 0, dq: s.prev.qty ? Math.round((s.qty - s.prev.qty) / s.prev.qty * 100) : 0 }));
-  const lines = [`<b>${esc(NAME)}</b> has been seen in <b>${fmt(LOG.length)}</b> auction scan${LOG.length === 1 ? '' : 's'} across ${fmt(latest.length)} market${latest.length === 1 ? '' : 's'} (${latest.map(s => esc(label(s))).join(', ')}), most recently on <b>${day(lastT)}</b>.`,
+  const lines = [`<b>${esc(NAME)}</b> has been seen in <b>${fmt(IT.scans)}</b> auction scan${IT.scans === 1 ? '' : 's'} across ${fmt(latest.length)} market${latest.length === 1 ? '' : 's'} (${latest.map(s => esc(label(s))).join(', ')}), most recently on <b>${day(lastT)}</b>.`,
     `Right now <b>${fmt(listed)}</b> ${listed === 1 ? 'is' : 'are'} listed; the cheapest is ${money(cheapest.lo)} each on ${esc(label(cheapest))}.`];
   moved.forEach(({ s, dp, dq }) => lines.push(`On ${esc(label(s))} the median price ${dp === 0 ? 'held at' : dp > 0 ? `rose <span class="up-t">${dp}%</span> to` : `fell ${-dp}% to`} ${money(s.med)} and supply ${dq === 0 ? 'was unchanged' : dq > 0 ? `grew ${dq}%` : `shrank ${-dq}%`} since ${day(s.prev.t)}.`));
   document.getElementById('itReport').innerHTML = `
@@ -427,10 +527,6 @@ function render() {
     [['Market'], ['Qty', 1], ['Change', 1], ['Lowest', 1], ['Median', 1], ['Scanned', 1]],
     [...latest].sort((a, b) => b.qty - a.qty).map(s => `<tr><td>${sw(s.color)}${esc(label(s))}</td><td class="num">${fmt(s.qty)}</td>
       <td class="num">${chg(s.qty, s.prev ? s.prev.qty : null)}</td><td class="num">${money(s.lo)}</td><td class="num">${money(s.med)}</td><td class="num">${day(lastScan(s.k))}</td></tr>`).join(''));
-  document.getElementById('itLog').innerHTML = tbl('Scan Log', 'every scan that saw this item, newest first',
-    [['Scanned (UTC)'], ['Market'], ['Qty', 1], ['Lowest', 1], ['Median', 1]],
-    [...LOG].sort((a, b) => b.t - a.t).map(s => `<tr><td>${stamp(s.t)}</td><td>${sw(series[key(s)].color)}${esc(label(s))}</td><td class="num">${fmt(s.qty)}</td>
-      <td class="num">${money(s.lo)}</td><td class="num">${money(s.med)}</td></tr>`).join(''));
 }
 if (SC.length) render();
 // The worn-by bars grow in like the other charts.

@@ -140,7 +140,7 @@ function url(?string $page = null, ?string $source = null): string {
 function edition_links(string $source): array {
   $links = [['Census', url('census', $source), false, 'census'], ['Race + Class', url('combos', $source), true, 'combos'],
     ['Realms', url('realms', $source), false, 'realms'], ['Auction House', url('auction-house', $source), false, 'auction-house'],
-    ...($source === \PROFESSION_SOURCE ? [['Professions', \profession_path(), true, 'professions']] : []),
+    ...(in_array($source, [\PROFESSION_SOURCE, 'retail'], true) ? [['Professions', \profession_path(null, $source), true, 'professions']] : []),
     ['Guilds', url('guilds', $source), false, 'guilds'], ['Geography', url('geography', $source), false, 'geography'],
     ['Talents', url('talents', $source), false, 'talents']];
   if (race_pages($source)) $links[] = ['Races', url('races', $source), true, 'races'];
@@ -250,9 +250,9 @@ function render_page(string $html, string $path): string {
     $GLOBALS['w8_source'] = $source;
     return character_page($c, $html);
   }
-  if (preg_match('#^/forever/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
-    $GLOBALS['w8_source'] = \PROFESSION_SOURCE;
-    return ($m[1] ?? '') !== '' ? profession_page($m[1], $html) : professions_page($html);
+  if (preg_match('#^/(forever|retail)/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
+    $GLOBALS['w8_source'] = $m[1];
+    return ($m[2] ?? '') !== '' ? profession_page($m[1], $m[2], $html) : professions_page($m[1], $html);
   }
   if (preg_match('#^/(retail|forever)/skin-colors(?:/([a-z0-9-]+))?/?(index\.html)?$#', $path, $m)) { $GLOBALS['w8_source'] = $m[1]; return skin_colors_page($html, $m[2] ?? null, $m[1]); }
   // The current skin's race switcher fetches these fragments; they stay as they are.
@@ -699,7 +699,7 @@ function gear_page(string $source, string $html): string {
     'inspectBuilds' => $model['sources']['inspect'] ?? count($records), 'armoryBuilds' => $model['sources']['armory'] ?? 0,
     'wowhead' => $packed['wowhead'],
     // Forever items have pages of their own (price history and who wears them); other editions link to Wowhead.
-    'itemBase' => $source === \PROFESSION_SOURCE ? \forever_item_path('') : null]], $html, 'gear');
+    'itemBase' => in_array($source, [\PROFESSION_SOURCE, 'retail'], true) ? \armory_item_path($source, '') : null]], $html, 'gear');
 }
 
 /** Short realm labels for a list of the site's realm keys. */
@@ -889,8 +889,8 @@ function auction_page(string $source, string $html): string {
   $factions = array_map(fn($f) => [$f['key'], $f['key'] === 'all' ? ($f['label'] === 'Cross-faction' ? 'Cross-faction' : 'Both') : $f['label']], $model['dims']['faction']);
   return page('auction-house', common_vars($source) + ['data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
     'realms' => $realms, 'factions' => $factions, 'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=',
-    // Forever items have pages of their own; other editions still link to Wowhead.
-    'itemBase' => $source === \PROFESSION_SOURCE ? \forever_item_path('') : null], $html, 'auction-house');
+    // Forever and Retail item observations have local price/profile pages.
+    'itemBase' => in_array($source, [\PROFESSION_SOURCE, 'retail'], true) ? \armory_item_path($source, '') : null], $html, 'auction-house');
 }
 
 /** Realm and faction filter rows for the professions pages, as on the auction house. */
@@ -902,42 +902,45 @@ function profession_filters(array $dims): array {
   ];
 }
 
-function profession_cards(): array {
+function profession_cards(string $source = \PROFESSION_SOURCE): array {
   $cards = [];
-  foreach (\PROFESSIONS as $slug => $p) $cards[$slug] = ['name' => $p['name'], 'role' => $p['role'], 'kind' => $p['kind'], 'icon' => $p['icon'], 'blurb' => $p['blurb'], 'url' => \profession_path($slug)];
+  foreach (\profession_catalog($source) as $slug => $p) $cards[$slug] = ['name' => $p['name'], 'role' => $p['role'], 'kind' => $p['kind'], 'icon' => $p['icon'], 'blurb' => $p['blurb'], 'url' => \profession_path($slug, $source)];
   return $cards;
 }
 
-function professions_page(string $html): string {
-  $model = \professions_page_model();
+function professions_page(string $source, string $html): string {
+  $model = \professions_page_model($source);
   [$realms, $factions] = profession_filters($model['dims']);
   $views = array_map(fn($v) => ['realm' => $v['realm'], 'faction' => $v['faction'], 'scanned' => $v['scanned'], 'empty' => $v['empty'],
     'p' => array_map(fn($d) => [$d['items'], $d['units'], (int)floor($d['value'] / 10000), $d['matsCount'], $d['craftedCount'], $d['recipesCount']], $v['professions'])], $model['views']);
-  return page('professions', common_vars(\PROFESSION_SOURCE) + ['cards' => profession_cards(), 'data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
-    'realms' => $realms, 'factions' => $factions, 'pcensus' => $model['armory']], $html, 'professions');
+  return page('professions', common_vars($source) + ['cards' => profession_cards($source), 'data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
+    'realms' => $realms, 'factions' => $factions, 'pcensus' => $model['armory'], 'professionSource' => $source], $html, 'professions');
 }
 
-function profession_page(string $slug, string $html): string {
-  if (!isset(\PROFESSIONS[$slug])) return page('404', ['requested' => \profession_path($slug)], $html, null);
-  $model = \professions_page_model();
+function profession_page(string $source, string $slug, string $html): string {
+  $catalog = \profession_catalog($source);
+  if (!isset($catalog[$slug])) return page('404', ['requested' => \profession_path($slug, $source)], $html, null);
+  $model = \professions_page_model($source);
   [$realms, $factions] = profession_filters($model['dims']);
   $views = array_map(fn($v) => ['realm' => $v['realm'], 'faction' => $v['faction'], 'scanned' => $v['scanned'], 'empty' => $v['empty'] || !$v['professions'][$slug]['items'],
     'p' => $v['professions'][$slug]], $model['views']);
-  $branch = \EDITIONS[\PROFESSION_SOURCE]['branch'];
-  return page('profession', common_vars(\PROFESSION_SOURCE) + ['slug' => $slug, 'prof' => \PROFESSIONS[$slug], 'cards' => profession_cards(),
+  $branch = \EDITIONS[$source]['branch'];
+  return page('profession', common_vars($source) + ['slug' => $slug, 'prof' => $catalog[$slug], 'cards' => profession_cards($source),
     'data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views], 'realms' => $realms, 'factions' => $factions,
-    'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item='], $html, 'professions');
+    'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=',
+    'itemBase' => \armory_item_path($source, ''), 'professionSource' => $source], $html, 'professions');
 }
 
 function item_page(array $item, string $html): string {
+  $source = $item['source'] ?? \PROFESSION_SOURCE;
+  $catalog = \profession_catalog($source);
   $gathering = ['herbalism', 'mining', 'skinning', 'fishing'];
   $roleLabel = ['mats' => 'Material', 'crafted' => 'Crafted', 'recipes' => 'Recipe'];
-  $trades = array_map(fn($r) => ['name' => \PROFESSIONS[$r[0]]['name'], 'icon' => \PROFESSIONS[$r[0]]['icon'], 'url' => \profession_path($r[0]),
-    'role' => $r[1] === 'mats' && in_array($r[0], $gathering, true) ? 'Gathered' : $roleLabel[$r[1]]], $item['roles']);
-  $source = $item['source'] ?? \PROFESSION_SOURCE;
+  $trades = array_values(array_map(fn($r) => ['name' => $catalog[$r[0]]['name'], 'icon' => $catalog[$r[0]]['icon'], 'url' => \profession_path($r[0], $source),
+    'role' => $r[1] === 'mats' && in_array($r[0], $gathering, true) ? 'Gathered' : $roleLabel[$r[1]]], $item['roles']));
   $branch = \EDITIONS[$source]['branch'];
   return page('item', common_vars($source) + ['item' => $item, 'trades' => $trades,
-    'data' => ['generated' => \utc_timestamp(\generated_at())] + \forever_item_markets($item['scans']),
+    'data' => ['generated' => \utc_timestamp(\generated_at())] + \forever_item_market_summary(\forever_item_markets($item['scans'])),
     'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=' . $item['id']], $html, 'auction-house');
 }
 

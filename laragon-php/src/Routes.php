@@ -40,8 +40,8 @@ function published_routes(?array $sources = null, bool $shared = true): array {
         $routes[] = "{$base}index.html";
         $routes[] = "{$base}detail.html";
       }
-    if ($source === PROFESSION_SOURCE)
-      foreach (array_merge([null], array_keys(PROFESSIONS)) as $slug) $routes[] = profession_path($slug) . '/index.html';
+    if (in_array($source, [PROFESSION_SOURCE, 'retail'], true))
+      foreach (array_merge([null], array_keys(profession_catalog($source))) as $slug) $routes[] = profession_path($slug, $source) . '/index.html';
   }
   if ($shared) array_push($routes, '/census.css', '/sitemap.xml', '/robots.txt', '/llms.txt', '/.well-known/ai-catalog.json');
   return $routes;

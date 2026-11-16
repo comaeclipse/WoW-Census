@@ -23,9 +23,10 @@ function item_label(array $it): string {
   return preg_match('/^item:(\d+)$/', (string)($it['name'] ?? ''), $m) ? 'Item ' . $m[1] : js_string($it['name']);
 }
 
-function item_link(array $it, string $branch): string {
-  $href = 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=' . js_string($it['id']);
-  return '<a href="' . esc($href) . '" target="_blank" rel="noopener">' . esc(item_label($it)) . '</a>';
+function item_link(array $it, string $branch, ?string $source = null): string {
+  $local = in_array($source, [PROFESSION_SOURCE, 'retail'], true);
+  $href = $local ? armory_item_path($source, $it['id']) : 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=' . js_string($it['id']);
+  return '<a href="' . esc($href) . '"' . ($local ? '' : ' target="_blank" rel="noopener"') . '>' . esc(item_label($it)) . '</a>';
 }
 
 function qty_change(array $it): string {
@@ -111,7 +112,7 @@ function market_view_summaries(array $views): array {
   return array_map(fn($v) => ['realm' => $v['realm'], 'faction' => $v['faction'], 'summary' => market_view_summary($v['snapshot'], $threshold)], $views);
 }
 
-function render_market_view(array $summary, string $analysisLabel = ''): string {
+function render_market_view(array $summary, string $analysisLabel = '', ?string $source = null): string {
   $aggregateOnly = $summary['aggregateOnly'];
   $joke = $summary['joke'];
   $realms = $summary['realms'];
@@ -149,7 +150,7 @@ function render_market_view(array $summary, string $analysisLabel = ''): string 
   $supplyBreakouts = $summary['breakouts'];
 
   $qtyCell = fn($it) => js_locale($it['q'] ?: 0);
-  $linkCell = fn($it, $b) => item_link($it, $b);
+  $linkCell = fn($it, $b) => item_link($it, $b, $source);
   $qtyTable = top_table('Most listed items', 'By quantity sitting on the auction house.', $byQty, $branch, [
     ['label' => 'Item', 'left' => true, 'cell' => $linkCell],
     ['label' => 'Qty', 'cell' => $qtyCell],
@@ -222,7 +223,7 @@ function render_market_html(array $views, array $dims, array $opts): string {
     $sections .= '<div class="vpane" data-realm="' . esc($v['realm']) . '" data-faction="' . esc($v['faction']) . '"' .
       ($on ? '' : ' hidden') . '>' . render_market_view($v['summary'],
         !empty($opts['tbcAnalysis']) ? ($v['realm'] === 'all' ? 'TBC' : $v['realm']) .
-          ($v['faction'] === 'all' ? ' combined' : ' ' . $v['faction']) : '') . '</div>';
+          ($v['faction'] === 'all' ? ' combined' : ' ' . $v['faction']) : '', $opts['source'] ?? null) . '</div>';
   }
   $script = $chips !== '' ? toggle_script() : '';
   $gameLabel = $opts['gameLabel'] ?? 'WoW Forever';
