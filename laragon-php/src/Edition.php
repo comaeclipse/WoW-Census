@@ -330,7 +330,7 @@ function census_views(string $source): array {
 
 // Inspect records with gear icons from the local cache, as the static build applied them.
 function inspects_with_icons(string $source): array {
-  $inspects = load_inspects($source);
+  $inspects = $source === 'retail' ? load_talent_samples($source) : load_inspects($source);
   $icons = item_cache('item-icons', EDITIONS[$source]['branch']);
   foreach ($inspects['records'] as &$record)
     foreach ($record['gear'] as &$item)
@@ -370,7 +370,8 @@ function talent_page_model(string $source): array {
 function gear_page_model(string $source): array {
   return published_page_model('gear:' . $source, function () use ($source) {
     $inspects = inspects_with_icons($source);
-    return ['lastT' => $inspects['lastT'], 'packed' => pack_gear_page($inspects, EDITIONS[$source]['branch'])];
+    return ['lastT' => $inspects['lastT'], 'packed' => pack_gear_page($inspects, EDITIONS[$source]['branch']),
+      'coverage' => $inspects['coverage'], 'sources' => $inspects['sources'] ?? ['inspect' => count($inspects['records']), 'armory' => 0]];
   });
 }
 

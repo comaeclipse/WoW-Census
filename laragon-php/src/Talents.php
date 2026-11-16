@@ -355,10 +355,11 @@ function render_gear_html(array $model, array $opts): string {
   $dataFile = filter_data('gear', $packed)['file'];
   $records = unpack_gear_records($packed);
   $withGear = count($records);
+  $inspectGear = (int)($model['sources']['inspect'] ?? $withGear); $armoryGear = (int)($model['sources']['armory'] ?? 0);
   $summary = $withGear
-    ? 'Latest inspection: ' . esc(inspect_time($model['lastT']))
+    ? js_locale($inspectGear) . ' in-game inspections and ' . js_locale($armoryGear) . ' last-logout Armory profiles after character-level deduplication · latest source record: ' . esc(inspect_time($model['lastT']))
     : 'No inspected gear for ' . esc($opts['gameLabel'] ?? 'this edition') . ' yet. Gear is collected during the same inspection as talents and will appear in a future snapshot when available.';
-  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' gear seen on inspected players: the most equipped items in every slot for each class and spec, and how often they are enchanted.', $opts['canonical'] ?? null);
+  $seo = seo_head($topic . ' – WoWCensus', $seoGameLabel . ' gear from in-game inspections and last-logout Armory profiles: the most equipped items in every slot for each class and spec.', $opts['canonical'] ?? null);
   $stylesheet = esc($opts['stylesheet'] ?? '/style.css');
   $census_css = CENSUS_STYLESHEET;
   $headingHtml = page_heading('WoWCensus', $nav, $topic);
@@ -377,7 +378,7 @@ function render_gear_html(array $model, array $opts): string {
     $labels = ['Head','Neck','Shoulder','Back','Chest','Wrist','Hands','Waist','Legs','Feet','Rings','Trinkets','Main hand','Off hand','Ranged','Shirt','Tabard'];
     if (!is_string($selected) || !in_array($selected, $labels, true)) $selected = 'Head';
     $filters = filter_selects($allRecords);
-    $panel = '<section class="panel gear-top-panel"><div class="ptitle">Character equipment <small>Most equipped items in the inspection sample</small></div><p class="gear-context">Each slot shows its most observed item across inspected characters. This is an aggregate view, not one character\'s equipment.</p><div id="gear-top">' . gear_markup('top', $records, $packed, '', true) . '</div><form class="gear-filters" id="gear-filters" method="get">' . $filters . '<input type="hidden" name="slot" value="' . esc_markup($selected) . '"><button type="submit">Apply filters</button></form><p class="hint gear-snapshot">' . $summary . ' · ' . js_locale(count($records)) . ' matching inspected characters</p></section>';
+    $panel = '<section class="panel gear-top-panel"><div class="ptitle">Character equipment <small>Most equipped items in the observed sample</small></div><p class="gear-context">Each slot shows its most observed item across sampled characters. This is an aggregate view, not one character\'s equipment.</p><div id="gear-top">' . gear_markup('top', $records, $packed, '', true) . '</div><form class="gear-filters" id="gear-filters" method="get">' . $filters . '<input type="hidden" name="slot" value="' . esc_markup($selected) . '"><button type="submit">Apply filters</button></form><p class="hint gear-snapshot">' . $summary . ' · ' . js_locale(count($records)) . ' matching sampled characters</p></section>';
     $content = '<div id="gear-content" class="gear-detail"><div class="gear-detail-heading"><h2>' . esc_markup($selected) . ' items</h2><p>Select another slot on the equipment sheet to see its leading items.</p></div>' . gear_markup('content', $records, $packed, $selected, true) . '</div>';
     $generated = !empty($opts['generatedNote']) ? '<div class="itag" style="margin-top:16px;line-height:1.6">' . esc($opts['generatedNote']) . '</div>' : '';
     $scripts = '<script>document.querySelectorAll("#gear-filters select").forEach(s=>{const v=new URLSearchParams(location.search).get(s.dataset.field);if(v!==null)s.value=v;});</script>';

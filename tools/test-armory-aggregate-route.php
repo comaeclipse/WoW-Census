@@ -5,8 +5,9 @@ require dirname(__DIR__) . '/laragon-php/src/bootstrap.php';
 require dirname(__DIR__) . '/laragon-php/src/Router.php';
 
 $path = $argv[1] ?? '';
-if (!in_array($path, ['/forever/talents', '/forever/paladin/', '/forever/human/', '/forever/professions/'], true))
-  throw new InvalidArgumentException('Expected one Forever aggregate route');
+if (!in_array($path, ['/forever/talents', '/forever/paladin/', '/forever/human/', '/forever/professions/',
+  '/retail/talents', '/retail/paladin/', '/retail/human/', '/retail/gear'], true))
+  throw new InvalidArgumentException('Expected one Armory-backed aggregate route');
 $result = route_request($path);
 if ($result === null || !str_starts_with($result[0], 'text/html') || strlen($result[1]) <= 1000)
   throw new RuntimeException("$path did not render a complete HTML page");

@@ -2,7 +2,7 @@
 namespace Wow2008;
 /**
  * Page: Gear
- * Vars: $data (array, GEAR_DATA: latest, generated, slots, wowhead, itemBase: Forever item page prefix or null), $subtitle (string)
+ * Vars: $data (array, GEAR_DATA: latest, generated, slots, wowhead, source counts, itemBase), $subtitle (string)
  */
 ?>
   <main class="main">
@@ -51,7 +51,7 @@ namespace Wow2008;
         </table>
     <?php component_end() ?>
 
-    <div class="source">Gear data from inspected nearby players · all classes, races, realms and factions · item names link to Wowhead</div>
+    <div class="source">Gear data from <?= number_format($data['inspectBuilds']) ?> in-game inspections and <?= number_format($data['armoryBuilds']) ?> last-logout Armory profiles after character-level deduplication · item names link to Wowhead</div>
   </main>
 
 <?php start_section('scripts') ?>
@@ -85,12 +85,12 @@ const glyph = (slot, col) => `<svg viewBox="0 0 24 24"><path d="${GLYPH[slot]}" 
 const itemTip = (s, it) => `${it[0]}|${s.slot} · ${QUALITY[it[1]]}|${fmt(it[3])} players · ${it[4]}% of filled ${s.slot.toLowerCase()} slots`;
 
 // ---------- Tiles ----------
-document.getElementById('gstamp').textContent = `Latest inspection: ${G.latest} · Page generated: ${G.generated}`;
+document.getElementById('gstamp').textContent = `Latest source record: ${G.latest} · Page generated: ${G.generated}`;
 const inspected = Math.max(...G.slots.map(s => s.of));
 const topAll = G.slots.flatMap(s => s.items.map(it => ({ s, it }))).sort((a, b) => b.it[3] - a.it[3])[0];
 const avgEnch = Math.round(G.slots.filter(s => s.ench > 0).reduce((a, s) => a + s.ench, 0) / G.slots.filter(s => s.ench > 0).length);
 document.getElementById('gtiles').innerHTML = `
-  <div class="stat"><span>Players inspected</span><b>${fmt(inspected)}</b><em>gear could be read</em></div>
+  <div class="stat"><span>Players sampled</span><b>${fmt(inspected)}</b><em>gear could be read</em></div>
   <div class="stat"><span>Slots tracked</span><b>${G.slots.length}</b><em>${fmt(G.slots.reduce((a, s) => a + s.distinct, 0))} slot-item pairs</em></div>
   <div class="stat"><span>Most equipped</span><b style="font-size:13px;line-height:26px;color:${QCOL[topAll.it[1]] === '#ffffff' ? '#5a2a00' : QCOL[topAll.it[1]]}">${esc(topAll.it[0])}</b><em>${fmt(topAll.it[3])} players · ${topAll.s.slot}</em></div>
   <div class="stat"><span>Enchanted</span><b>${avgEnch}%</b><em>average of enchantable slots</em></div>`;
