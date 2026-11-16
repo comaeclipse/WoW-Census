@@ -17,6 +17,9 @@ const RETAIL_VERIFIED_COLLECTION_REGIONS = [
   'realm:Draenor-Horde' => 'eu',
   'realm:Draenor-Alliance' => 'eu',
   'realm:Illidan-Alliance' => 'us',
+  // Cross-faction AH bucket; provenance reconciliation tied its scans to the
+  // same US Illidan sweeps (tools/collection-region-provenance.sql).
+  'realm:Illidan' => 'us',
   'realm:Lordaeron-Alliance' => 'eu',
   'realm:Kilrogg-Horde' => 'eu',
   'realm:Chants éternels-Horde' => 'eu',

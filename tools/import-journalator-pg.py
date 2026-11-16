@@ -8,7 +8,8 @@ PATH can be:
     encoded blob that tools/journalator_decode.py unpacks as data),
   * a WoWCensus.lua save written with "Collect other addon data" on (WoWCensusDB.market:
     Journalator sections, TSM sales/buys/expired/cancelled, Auctionator posting history),
-  * a folder, searched for both (companion upload stages included; a sibling
+  * a companion upload (JournalatorEntries = decoded logs, TSMAccounting = TSM rows),
+  * a folder, searched for all of these (companion upload stages included; a sibling
     <name>.json manifest supplies the edition).
 
 The edition comes from the install path (_forever_, _anniversary_, ...), the upload
@@ -191,9 +192,77 @@ def edition_from_path(path):
     return None
 
 
+def lua_var(path, name):
+    """One named SavedVariables table as JSON via the repository's reader (data only)."""
+    js = ("const {readSavedVariables}=require(process.argv[1]);"
+          "process.stdout.write(JSON.stringify(readSavedVariables(process.argv[2],process.argv[3])));")
+    out = subprocess.run(["node", "-e", js, str(REPO / "tools" / "savedvariables.js"), str(path), name],
+                         capture_output=True, check=True, timeout=600)
+    return json.loads(out.stdout)
+
+
+def tsm_rows(tsm):
+    rows = []
+    for r in (tsm.values() if isinstance(tsm, dict) else tsm):
+        if isinstance(r, dict) and r.get("kind"):
+            r = dict(r)
+            # TSM realm keys carry the faction ("Whitemane - Alliance"); keep the realm name.
+            realm = str(r.get("realm") or "")
+            fm = re.match(r"^(.*?)\s*-\s*(Alliance|Horde|Neutral)$", realm)
+            if fm:
+                r["realm"] = fm.group(1)
+                r.setdefault("faction", fm.group(2))
+            r.pop("player", None)
+            rows.append(("TSM:" + r.pop("kind"), r))
+    return rows
+
+
+TSM_KINDS = {"Sales": "sale", "Buys": "buy", "Expired": "expired", "Cancelled": "cancelled"}
+
+
+def tsm_num(v):
+    """Lua tonumber() for TSM's CSV fields: None when blank or not a number."""
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return None
+    return int(f) if f.is_integer() else f
+
+
+def tsm_raw_rows(db):
+    """TradeSkillMaster's own save (r@<realm>@internalData@csv<Kind> CSV strings) in the
+    shape WoWCensus's Market.lua CollectTSM copies, so both routes hash to the same events."""
+    rows = []
+    for key, value in (db or {}).items():
+        m = re.match(r"^r@(.*?)@internalData@csv([A-Za-z]+)$", str(key))
+        label = m and TSM_KINDS.get(m.group(2))
+        if not label or not isinstance(value, str):
+            continue
+        lines = [line for line in value.split("\n") if line]
+        if not lines:
+            continue
+        header = lines[0].split(",")
+        for line in lines[1:]:
+            rec = dict(zip(header, line.split(",")))
+            t = tsm_num(rec.get("time"))
+            if t is None:
+                continue
+            item = rec.get("itemString")
+            im = re.match(r"^i:(\d+)", item or "")
+            rows.append({"kind": label, "realm": m.group(1), "t": t, "item": item,
+                         "itemID": int(im.group(1)) if im else None,
+                         "stack": tsm_num(rec.get("stackSize")), "qty": tsm_num(rec.get("quantity")),
+                         "price": tsm_num(rec.get("price")), "char": rec.get("player"),
+                         "source": rec.get("source")})
+    return rows
+
+
 def rows_from_file(path):
     """(kind, edition or None, region or None, [(section, row)]) for one file."""
     head = Path(path).read_bytes()[:4096].lstrip()
+    # Watcher session saves open with "-- WoW Census session save: ..." comment lines.
+    while head.startswith(b"--"):
+        head = head.split(b"\n", 1)[1].lstrip() if b"\n" in head else b""
     if head.startswith(b"JOURNALATOR_") or b"\nJOURNALATOR_" in Path(path).read_bytes()[:200000]:
         rows = []
         for store in jdec.read_archive(path).values():
@@ -212,17 +281,7 @@ def rows_from_file(path):
             vals = entries.values() if isinstance(entries, dict) else entries
             rows += [(section, dict(r)) for r in vals if isinstance(r, dict)]
         tsm = m.get("tsm") or {}
-        for r in (tsm.values() if isinstance(tsm, dict) else tsm):
-            if isinstance(r, dict) and r.get("kind"):
-                r = dict(r)
-                # TSM realm keys carry the faction ("Whitemane - Alliance"); keep the realm name.
-                realm = str(r.get("realm") or "")
-                fm = re.match(r"^(.*?)\s*-\s*(Alliance|Horde|Neutral)$", realm)
-                if fm:
-                    r["realm"] = fm.group(1)
-                    r.setdefault("faction", fm.group(2))
-                r.pop("player", None)
-                rows.append(("TSM:" + r.pop("kind"), r))
+        rows += tsm_rows(tsm)
         auc = m.get("auctionator") or {}
         for r in (auc.values() if isinstance(auc, dict) else auc):
             if isinstance(r, dict):
@@ -232,6 +291,17 @@ def rows_from_file(path):
         edition = EDITIONS.get(m.get("game")) or edition_from_path(path)
         region = m.get("region") if m.get("region") in REGIONS else None
         return "wowcensus", edition, region, rows
+    # Companion uploads: Journalator logs already decoded, and TSM accounting rows.
+    if head.startswith(b"JournalatorEntries"):
+        rows = []
+        for section, entries in lua_var(path, "JournalatorEntries").items():
+            vals = entries.values() if isinstance(entries, dict) else entries
+            rows += [(section, journalator_row(e)) for e in vals if isinstance(e, dict)]
+        return "journalator", edition_from_path(path), None, rows
+    if head.startswith(b"TSMAccounting"):
+        return "tsm", edition_from_path(path), None, tsm_rows(lua_var(path, "TSMAccounting"))
+    if head.startswith(b"TradeSkillMasterDB"):
+        return "tsm", edition_from_path(path), None, tsm_rows(tsm_raw_rows(lua_var(path, "TradeSkillMasterDB")))
     return None, None, None, []
 
 
@@ -411,6 +481,17 @@ def rebuild_sales(cur, groups):
             WHERE edition=%s AND region=%s AND realm IS NOT DISTINCT FROM %s AND character IS NOT DISTINCT FROM %s
               AND section IN ('Invoices','Posting','TSM:sale') ORDER BY t""", (edition, region, realm, char))
         rows = cur.fetchall()
+        # A sale logged by both TSM and Journalator is kept once, as the Journalator invoice (it can
+        # carry posted_at). TSM files realms under its own key (Forever: the ruleset, "Normal"), so
+        # invoices are matched by character across realms. TSM's time is the sale; the invoice is
+        # stamped when the mail is taken, up to a day later.
+        invoices = defaultdict(list)    # (item_id, qty) -> [[t, used]]
+        if any(section == "TSM:sale" for _, _, _, section, *_ in rows):
+            cur.execute("""SELECT item_id, quantity, t FROM marketlens_import.addon_ledger_events
+                WHERE edition=%s AND region=%s AND character IS NOT DISTINCT FROM %s AND section='Invoices'
+                  AND row->>'invoiceType'='seller' AND item_id IS NOT NULL ORDER BY t""", (edition, region, char))
+            for item_id, qty, t in cur.fetchall():
+                invoices[(item_id, qty)].append([t, False])
         posts = defaultdict(list)       # (name, qty) -> [[t, buyout, bid, used]]; sale rows may lack an item id
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
             if section == "Posting":
@@ -420,6 +501,15 @@ def rebuild_sales(cur, groups):
                 continue
             if section == "Invoices" and row.get("invoiceType") != "seller":
                 continue
+            if section == "TSM:sale":
+                # TSM's "sale" also covers selling to a vendor; only Auction House sales count.
+                if row.get("source") != "Auction":
+                    continue
+                twin = next((inv for inv in invoices.get((item, qty), [])
+                             if not inv[1] and t - 60 <= inv[0] <= t + 86400), None)
+                if twin:
+                    twin[1] = True
+                    continue
             posted = None
             if section == "Invoices":
                 # Oldest unused posting of the same stack that this sale could have come from:
@@ -474,7 +564,7 @@ def find_files(paths):
     out = []
     for p in map(Path, paths):
         if p.is_dir():
-            out += sorted(x for x in p.rglob("*.lua") if x.name in ("Journalator.lua", "WoWCensus.lua")
+            out += sorted(x for x in p.rglob("*.lua") if x.name in ("Journalator.lua", "WoWCensus.lua", "TradeSkillMaster.lua")
                           or x.parent.name in ("journalator", "tsm", "auctionator"))
         else:
             out.append(p)
@@ -491,6 +581,8 @@ def main():
     ap.add_argument("--dsn", default=pg.DEFAULT_DSN)
     ap.add_argument("--archive", help="ignored (accepted so tools/import-live.py can run this)")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--rebuild-all-sales", action="store_true",
+                    help="rebuild addon_auction_sales for every character, not only the ones this run touched")
     args = ap.parse_args()
     if args.edition and args.edition not in EDITIONS:
         raise SystemExit(f"--edition {args.edition!r}: expected one of {sorted(set(EDITIONS.values()))}")
@@ -569,7 +661,14 @@ def main():
         entry.update(result="imported", newRows=new, newBySection=dict(sorted(per.items())))
 
     report["itemIdsFilled"] = fill_item_ids(cur)
-    report["salesRebuilt"] = rebuild_sales(cur, groups)
+    if args.rebuild_all_sales:
+        cur.execute("""SELECT DISTINCT edition, region, realm, character FROM marketlens_import.addon_ledger_events
+            WHERE section IN ('Invoices','Posting','TSM:sale')""")
+        report["salesRebuilt"] = rebuild_sales(cur, set(cur.fetchall()))
+        changed = True
+    else:
+        report["salesRebuilt"] = rebuild_sales(cur, groups)
+        changed = bool(groups)
     report["lootSources"], report["lootItems"] = rebuild_loot(cur)
     cur.execute("""SELECT count(*), count(seconds_to_sell) FROM marketlens_import.addon_auction_sales""")
     total, timed = cur.fetchone()
@@ -580,7 +679,7 @@ def main():
         print("DRY RUN: rolled back")
         return
     conn.commit()
-    print("CHANGED sources=addon-ledger" if groups else "Nothing new")
+    print("CHANGED sources=addon-ledger" if changed else "Nothing new")
 
 
 if __name__ == "__main__":

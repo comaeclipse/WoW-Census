@@ -10,6 +10,7 @@ import argparse
 import base64
 import concurrent.futures
 import hashlib
+import http.client
 import json
 import os
 import threading
@@ -59,26 +60,36 @@ class Blizzard:
         cid, secret = os.getenv("BLIZZARD_CLIENT_ID"), os.getenv("BLIZZARD_CLIENT_SECRET")
         if not cid or not secret:
             raise SystemExit("set BLIZZARD_CLIENT_ID and BLIZZARD_CLIENT_SECRET")
-        basic = base64.b64encode(f"{cid}:{secret}".encode()).decode()
-        req = urllib.request.Request("https://us.battle.net/oauth/token", data=b"grant_type=client_credentials",
-                                     headers={"Authorization": "Basic " + basic})
-        self.token = json.load(urllib.request.urlopen(req, timeout=25))["access_token"]
+        self.basic = base64.b64encode(f"{cid}:{secret}".encode()).decode()
+        self.token_lock = threading.Lock()
+        self.refresh()
         self.gap, self.next_at, self.lock = 1 / rate, 0.0, threading.Lock()
+
+    def refresh(self, stale: str | None = None) -> None:
+        with self.token_lock:
+            if stale is not None and getattr(self, "token", None) != stale:
+                return
+            req = urllib.request.Request("https://us.battle.net/oauth/token", data=b"grant_type=client_credentials",
+                                         headers={"Authorization": "Basic " + self.basic})
+            self.token = json.load(urllib.request.urlopen(req, timeout=25))["access_token"]
 
     def get(self, url: str) -> tuple[int, dict | None]:
         for attempt in range(5):
             with self.lock:
                 now = time.monotonic(); due = max(now, self.next_at); self.next_at = due + self.gap
             time.sleep(max(0, due - now))
+            token = self.token
             try:
-                req = urllib.request.Request(url, headers={"Authorization": "Bearer " + self.token})
+                req = urllib.request.Request(url, headers={"Authorization": "Bearer " + token})
                 with urllib.request.urlopen(req, timeout=30) as response:
                     return response.status, json.load(response)
             except urllib.error.HTTPError as error:
+                if error.code == 401:
+                    self.refresh(token); continue
                 if error.code == 429 or error.code >= 500:
                     time.sleep(min(16, 2 ** attempt)); continue
                 return error.code, None
-            except (TimeoutError, urllib.error.URLError):
+            except (TimeoutError, urllib.error.URLError, http.client.HTTPException, ConnectionError, json.JSONDecodeError):
                 time.sleep(min(16, 2 ** attempt))
         return 599, None
 
@@ -105,20 +116,42 @@ def schema(cur) -> None:
       source_game text NOT NULL, region text NOT NULL, character_id bigint NOT NULL,
       snapshot_at timestamptz NOT NULL, item_id integer NOT NULL, item_json jsonb NOT NULL,
       PRIMARY KEY(source_game,region,character_id,snapshot_at,item_id))""")
+    cur.execute("""CREATE TABLE IF NOT EXISTS marketlens_import.character_armory_misses (
+      source_game text NOT NULL, region text NOT NULL, realm text NOT NULL, name text NOT NULL,
+      status integer NOT NULL, checked_at timestamptz NOT NULL,
+      PRIMARY KEY(source_game,region,realm,name))""")
     cur.execute("CREATE INDEX IF NOT EXISTS character_armory_items_lookup ON marketlens_import.character_armory_items(source_game,item_id,snapshot_at DESC)")
 
 
-def candidates(cur, source: str, region: str | None, limit: int, min_level: int, name: str | None) -> list[dict]:
+def candidates(cur, source: str, region: str | None, limit: int, min_level: int, name: str | None,
+               realm: str | None = None, guild: str | None = None, guilded: bool = False,
+               skip_fetched: bool = False) -> list[dict]:
     where = ["c.source_game=%s", "c.collection_region IN ('us','eu','kr','tw')", "c.level >= %s"]
     args: list[object] = [source, min_level]
     if region: where.append("c.collection_region=%s"); args.append(region)
     if name: where.append("lower(c.name)=lower(%s)"); args.append(name)
-    args.append(limit)
-    cur.execute(f"""SELECT DISTINCT ON (c.collection_region,lower(c.realm),lower(c.name))
-      c.collection_region region,c.realm,c.name,c.level,c.last_seen
+    if realm: where.append("lower(c.realm)=lower(%s)"); args.append(realm)
+    if guild: where.append("c.guild=%s"); args.append(guild)
+    if guilded: where.append("TRIM(COALESCE(c.guild,'')) <> ''")
+    skip = ""
+    if skip_fetched:
+        # Already enriched, or already answered 403/404 by Blizzard (renamed, transferred, deleted).
+        skip = """WHERE NOT EXISTS (SELECT 1 FROM marketlens_import.character_armory_profiles p
+            WHERE p.source_game=%s AND p.region=x.region AND lower(p.name)=lower(x.name)
+              AND lower(p.realm_name)=lower(x.realm))
+          AND NOT EXISTS (SELECT 1 FROM marketlens_import.character_armory_misses m
+            WHERE m.source_game=%s AND m.region=x.region AND m.realm=x.realm AND m.name=x.name)"""
+    # Newest sighting per character; with --guilded the biggest guilds come first, so whole rosters link.
+    order = "guild_size DESC, region, guild, " if guilded else ""
+    cur.execute(f"""WITH x AS (SELECT DISTINCT ON (c.collection_region,lower(c.realm),lower(c.name))
+        c.collection_region region,c.realm,c.name,c.level,c.last_seen,c.guild
       FROM marketlens_import.characters_with_region c
       WHERE {' AND '.join(where)}
-      ORDER BY c.collection_region,lower(c.realm),lower(c.name),c.last_seen DESC LIMIT %s""", args)
+      ORDER BY c.collection_region,lower(c.realm),lower(c.name),c.last_seen DESC),
+    sized AS (SELECT x.*, count(*) OVER (PARTITION BY x.region,x.guild) guild_size FROM x)
+    SELECT region,realm,name,level,last_seen FROM sized x {skip}
+    ORDER BY {order}region,lower(realm),lower(name) LIMIT %s""",
+      args + ([source, source] if skip_fetched else []) + [limit])
     rows = []
     for region_value, realm, char_name, level, last_seen in cur.fetchall():
         rows.append({"source": source, "region": region_value, "realm": realm, "realm_slug": slugify(realm),
@@ -183,22 +216,45 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=100)
     ap.add_argument("--min-level", type=int, default=10)
     ap.add_argument("--name")
+    ap.add_argument("--realm")
+    ap.add_argument("--guild")
+    ap.add_argument("--guilded", action="store_true", help="only guild members, biggest guilds first")
+    ap.add_argument("--skip-fetched", action="store_true", help="skip characters already enriched or known missing")
+    ap.add_argument("--batch", type=int, default=50, help="commit every N results")
     ap.add_argument("--rate", type=float, default=5.0)
     ap.add_argument("--workers", type=int, default=4)
     args = ap.parse_args()
     conn = psycopg2.connect(DSN); conn.autocommit = False
     with conn:
-        with conn.cursor() as cur: schema(cur); rows = candidates(cur,args.source,args.region,args.limit,args.min_level,args.name)
-    api = Blizzard(args.rate); results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
-        for result in pool.map(lambda r: fetch_one(api,r), rows):
-            results.append(result); print(result["status"],result["region"],result["realm"],result["name"],flush=True)
-    with conn:
         with conn.cursor() as cur:
-            for result in results:
-                if result["status"] == 200: save(cur,result)
+            schema(cur)
+            rows = candidates(cur,args.source,args.region,args.limit,args.min_level,args.name,args.realm,args.guild,
+                              args.guilded,args.skip_fetched)
+    print(json.dumps({"source":args.source,"candidates":len(rows)}),flush=True)
+    api = Blizzard(args.rate); pending = []; saved = missed = 0
+
+    def flush() -> None:
+        with conn:
+            with conn.cursor() as cur:
+                for result in pending:
+                    if result["status"] == 200:
+                        save(cur,result)
+                    elif result["status"] in (403, 404):
+                        cur.execute("""INSERT INTO marketlens_import.character_armory_misses
+                          (source_game,region,realm,name,status,checked_at) VALUES (%s,%s,%s,%s,%s,now())
+                          ON CONFLICT (source_game,region,realm,name) DO UPDATE SET status=excluded.status,checked_at=excluded.checked_at""",
+                          (result["source"],result["region"],result["realm"],result["name"],result["status"]))
+        pending.clear()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
+        for i, result in enumerate(pool.map(lambda r: fetch_one(api,r), rows), 1):
+            pending.append(result); saved += result["status"] == 200; missed += result["status"] in (403, 404)
+            print(result["status"],result["region"],result["realm"],result["name"],flush=True)
+            if len(pending) >= args.batch:
+                flush(); print(json.dumps({"done":i,"of":len(rows),"saved":saved,"missed":missed}),flush=True)
+    flush()
     conn.close()
-    print(json.dumps({"source":args.source,"requested":len(rows),"saved":sum(r["status"]==200 for r in results)}))
+    print(json.dumps({"source":args.source,"requested":len(rows),"saved":saved,"missed":missed}))
 
 
 if __name__ == "__main__": main()

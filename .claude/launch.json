@@ -118,6 +118,45 @@
         "laragon-php/public"
       ],
       "port": 8803
+    },
+    {
+      "name": "companion-worker",
+      "runtimeExecutable": "C:/Users/skarz/Documents/Projects/wowcensus-companion/worker/node_modules/.bin/wrangler.cmd",
+      "runtimeArgs": [
+        "dev",
+        "--config",
+        "C:/Users/skarz/Documents/Projects/wowcensus-companion/worker/wrangler.toml",
+        "--persist-to",
+        "C:/Users/skarz/Documents/Projects/wowcensus-companion/worker/.wrangler/state",
+        "--port",
+        "8787",
+        "--ip",
+        "127.0.0.1"
+      ],
+      "port": 8787
+    },
+    {
+      "name": "companion-dev",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": [
+        "/c",
+        "C:/Users/skarz/AppData/Local/Temp/claude/ccdd2afad77166d5/70b830e4-7e5f-43f7-a7cf-1fdb885da06a/scratchpad/companion-dev.cmd"
+      ],
+      "port": 9245
+    },
+    {
+      "name": "armory-worktree",
+      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
+      "runtimeArgs": [
+        "-d",
+        "memory_limit=2G",
+        "-S",
+        "127.0.0.1:8804",
+        "-t",
+        "C:/Users/skarz/Documents/Projects/MarketLens/.claude/worktrees/eager-varahamihira-ef2f21/laragon-php/public",
+        "C:/Users/skarz/AppData/Local/Temp/claude/e5cb809b51646ae2/419d592f-d5f6-4d66-aae7-bc92a8267170/scratchpad/router-wt.php"
+      ],
+      "port": 8804
     }
   ]
 }

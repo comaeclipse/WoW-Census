@@ -63,10 +63,32 @@ Check exit code 0, `errors: []` when a report exists, the expected number of new
 
 The post-import `tools/check-collection-regions.py` check prints provenance warnings. It does not roll back a committed import. Review new warnings and distinguish them from known older issues; do not assume an EU/US conflict is harmless. A cache rebuild failure is recorded in the report after the database commit; rerun `laragon-php/build-census-cache.php` after resolving it.
 
+## ClassicPlus files are a separate import path
+
+`ClassicPlus*.lua` downloads (`ClassicPlus_Database`, from the ClassicPlus addon) are not session saves and are not staged. They are imported in two steps, each with `tools/import-live.py` (local first, then live over the same tunnel):
+
+```powershell
+python -B tools/import-live.py classicplus "C:\Users\skarz\Downloads\ClassicPlus (N).lua"
+python -B tools/import-live.py classicplus-merge --publish-now
+```
+
+- **Dedupe:** the ledger is `marketlens_import.external_classicplus_sources` (column `sha256`), not `local_source_files`. A single-faction file is recorded under its file SHA-256. A file packing both factions (the realm key appears as `<id>_<realm>|Alliance` / `|Horde`) gets one source per faction, with id `sha256("<file sha>:<Faction>")`. Check both forms before importing, and expect re-downloads (`(9)` = `(5)`, `(12)` = `(11)`) to be byte-identical. A file with the same name can hold different content later, so compare hashes, never names.
+- **Validate:** the realm key is `<realm id>_CAMWOW <region> Realm <n> <ruleset>`. The merge step stops with `no English name for [...]` when the client was not English. Add the localized race and class names to `RACES` / `CLASSES` in `tools/merge-classicplus-pg.py` (esMX, koKR, ruRU and deDE are covered; deDE gained `Untoter` and `Himmelsgeborener der Windformer` on 2026-11-14), then rerun the merge. Nothing is written when it stops.
+- **Merge:** `classicplus-merge` turns imported sources into canonical Forever characters (game `realm:<region>:forever:<Realm>-<Faction>`) and prints `merged`, `skipped_existing` and `guild_fills` per source. A new realm shows as `new_realm_rows=1`. Local and live must print identical numbers. `CHANGED sources=` on the import step is empty by design; the merge reports `CHANGED sources=forever`.
+- **Publish:** `--publish-now` starts the live refresh. A second `import-live.py` run is safe; nothing already imported is repeated.
+- `ForeverCore.lua` is UI settings only and has no data.
+
 ## ForeverPulse is a separate import path
 
 Do **not** stage `ForeverPulse.lua` as a MarketLens/WoWCensus session file. Its manual `/who` batches have a different schema. [tools/import-foreverpulse-who-pg.py](tools/import-foreverpulse-who-pg.py) documents the original, source-specific importer; its `SOURCE`, cleaned-output path, scope, realm, and version are hardcoded. Do not run it unchanged on a newer or different ForeverPulse file.
 
 For a new ForeverPulse source, first hash the file and check `local_source_files` and `external_who_sources`. Parse `ForeverPulseCensusDB`; validate the single intended scope (region, realm ID/name, faction, live environment), addon version, batch methods, field layouts, dictionary references, levels, timestamps, and unique `(scope_id, batch_id, name)` keys. Decode only supported `who_manual` rows. Compare overlapping batch IDs and sightings with `external_who_batches` and `external_who_sightings`; reject conflicting timestamps or character attributes. Archive and insert only new batch/name keys within a transaction, record the source hash, then merge verified observations into the canonical Forever census using the source-specific merge logic in [tools/merge-foreverpulse-who-pg.sql](tools/merge-foreverpulse-who-pg.sql), adapted and reviewed for the actual scope and counts. Rebuild the census cache and verify ledger, external, canonical, and cache results.
 
-Channel rosters, scan cells, and talent data have different semantics and are not covered by that `/who` import. Batch time bounds are known; exact per-character sighting times are not. Report total source rows, overlapping rows, newly inserted external rows, and net canonical changes separately. The current repository does **not** have a generic, parameterized ForeverPulse ingestion command for arbitrary snapshots.
+Channel rosters, scan cells, and talent data have different semantics and are not covered by that `/who` import. Batch time bounds are known; exact per-character sighting times are not. Report total source rows, overlapping rows, newly inserted external rows, and net canonical changes separately. The repository does **not** have a generic ForeverPulse ingestion command; the working scripts live outside it, in `Documents\MarketLensData\foreverpulse-<sha8>\` (latest: `foreverpulse-5e639b08`, copied from `foreverpulse-20261111b`):
+
+1. Copy the file to `<dir>\src\ForeverPulse.lua` and run `node prepare.js src\ForeverPulse.lua src <us|eu|kr>`, then move the CSVs and `summary.json` it writes into `src\prepared\`. `prepare.js` stops unless there is one scope (`<realm id>-<ruleset>-<faction>`), the region matches, the environment is `live`, the addon version is listed (5.0.0 and 5.1.0 are; the `who_manual` layout is identical), and every `who_manual` batch has the layout `name#|class_loc#|race_loc#|level|guild#|zone#`. Only `who_manual` batches are imported; `channel_roster` batches are ignored.
+2. `python -B import-who.py src\ForeverPulse.lua` inserts only new batch and name keys into `external_who_*` and records the hash (it refuses a source already in `external_who_sources`).
+3. `python -B merge-who.py <sha256> --dry-run`, check `before`/`after`/`net` and `newRealmRow`, then run it without `--dry-run`. It maps race and class names through `tools/merge-classicplus-pg.py`.
+4. For live, copy `push-live-fp.py` (from `foreverpulse-5e639b08`), set its `SHA` and realm game string, and run it. It opens one SSH tunnel, checks the hash is not already on live, runs steps 2 and 3 against live, prints before/after counts, and requests a forced data refresh. Local and live `net` must match.
+
+Never run the hardcoded `tools/import-foreverpulse-who-pg.py` on a newer file.

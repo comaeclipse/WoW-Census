@@ -113,6 +113,22 @@ function merge_items(array $perRealm): array {
   return $out;
 }
 
+/** A Retail API market is a region + connected realm, never a faction. */
+function retail_auction_group_label(string $realm): string {
+  if (preg_match('/^([a-z]{2}):[^:]+:(.+)$/i', $realm, $m)) {
+    $region = strtolower($m[1]); $name = $m[2];
+  } else {
+    $region = RETAIL_VERIFIED_COLLECTION_REGIONS['realm:' . $realm] ?? null;
+    if ($region === null) return $realm;
+    $name = $realm;
+  }
+  $name = preg_replace('/-(Alliance|Horde)$/', '', $name);
+  $index = connected_realm_index(connected_realm_groups('retail') ?? []);
+  $members = $index[$region][realm_match_slug($name)] ?? null;
+  $names = $members ? array_column($members, 'name') : [$name];
+  return strtoupper($region) . ' · ' . implode(' / ', $names);
+}
+
 function edition_snaps(string $source): array {
   static $cache = [];
   if (isset($cache[$source])) return $cache[$source];
@@ -123,6 +139,7 @@ function edition_snaps(string $source): array {
     // An old collection's scans count as its labelled twin's (collection_aliases()):
     // keep the newer of the two, not their sum.
     $realm = preg_replace('/^realm:/', '', canonical_game($g['game']));
+    if ($source === 'retail') $realm = retail_auction_group_label($realm);
     if (isset($snaps[$realm]) && strcmp((string)$snaps[$realm]['updatedAt'], (string)$snap['updatedAt']) >= 0) continue;
     $snaps[$realm] = ['realm' => $realm, 'faction' => preg_match('/-(Alliance|Horde)$/', $realm, $m) ? $m[1] : 'Neutral',
       'items' => $snap['items'] ?? [], 'columns' => $snap['columns'], 'updatedAt' => $snap['updatedAt']];
@@ -179,8 +196,16 @@ function model_auctionhouse(string $source): array {
       'aggregateOnly' => ($edition['marketMetric'] ?? null) === 'quantity',
     ];
   };
+  $retailRealms = [];
+  if ($source === 'retail') {
+    foreach ($snaps as $snap) $retailRealms[$snap['realm']] = true;
+    $retailRealms = array_keys($retailRealms); sort($retailRealms, SORT_STRING);
+  }
   $marketDims = !empty($edition['factionlessMarket'])
-    ? ['realm' => $dims['realm'], 'faction' => [['key' => 'all', 'label' => 'Cross-faction']]]
+    ? ['realm' => $source === 'retail'
+        ? array_merge([['key' => 'all', 'label' => 'Latest connected realm']], array_map(fn($r) => ['key' => $r, 'label' => $r], $retailRealms))
+        : $dims['realm'],
+      'faction' => [['key' => 'all', 'label' => 'Cross-faction']]]
     : (!empty($edition['connectedMarket'])
       ? ['realm' => array_merge([['key' => $dims['realm'][0]['key'], 'label' => 'Latest connected scan']], array_slice($dims['realm'], 1)), 'faction' => $dims['faction']]
       : $dims);

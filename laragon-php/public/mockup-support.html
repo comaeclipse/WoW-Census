@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="wow2008">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[MOCKUP] WoWCensus – World of Warcraft Population Census</title><meta name="description" content="WoWCensus tracks characters seen in game across WoW Forever, TBC Anniversary, Classic Era, Season of Discovery, Hardcore, MoP Classic and Retail: population, faction balance, race and class, auction prices and more."><link rel="canonical" href="https://wowcensus.io/"><script defer src="https://s.wowcensus.io/script.js" data-tag="2008" data-website-id="15776ba3-1f50-4da9-98d7-59b2fc4066f9" data-domains="wowcensus.io"></script>
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/wow2008/style.css?v=57">
+<link rel="stylesheet" href="/wow2008/site.css?v=57">
+<style>
+/* --- mockup: support box --- */
+.support-box .sup-body{padding:8px 9px 6px}
+.sup-lead{margin:0 0 8px;font-size:11px;line-height:1.45;color:#d8c9a8}
+.sup-goal{border:1px solid #000;background:#120c06;box-shadow:inset 0 0 0 1px #3a2a14;padding:5px 6px 4px;margin-bottom:9px}
+.sup-goal-hd{display:flex;justify-content:space-between;font-size:10px;color:#ffd100;margin-bottom:3px}
+.sup-goal-hd span{color:#fff}
+.sup-bar{height:11px;border:1px solid #000;background:linear-gradient(#1a1209,#2c2011);box-shadow:inset 0 1px 2px #000}
+.sup-bar span{display:block;height:100%;background:linear-gradient(#fff3a0,#f2b705 45%,#a86b00 55%,#d89a10);box-shadow:inset 0 -1px 0 #6a4200,inset 1px 0 0 #fff8c8}
+.sup-goal-ft{font-size:9px;color:#8f8063;margin-top:3px;text-align:right}
+.sup-btns{display:flex;justify-content:center;gap:6px}
+.b88{width:88px;height:31px;box-sizing:border-box;display:flex;border:1px solid #000;text-decoration:none!important;font:bold 10px/1 Verdana,Tahoma,sans-serif;color:#fff;letter-spacing:.2px;box-shadow:inset 1px 1px 0 rgba(255,255,255,.55),inset -1px -1px 0 rgba(0,0,0,.45);image-rendering:pixelated}
+.b88:hover{filter:brightness(1.15)}
+.b88:active{box-shadow:inset -1px -1px 0 rgba(255,255,255,.4),inset 1px 1px 0 rgba(0,0,0,.5)}
+.b88-ico{width:29px;flex:none;display:flex;align-items:center;justify-content:center;border-right:1px solid #000;box-shadow:inset 1px 1px 0 rgba(255,255,255,.5)}
+.b88-ico svg{width:21px;height:16px}
+.b88-txt{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-shadow:1px 1px 0 #000}
+.b88-txt small{font:7px/1.2 Verdana,sans-serif;letter-spacing:.5px;opacity:.9;margin-bottom:1px}
+.kofi{background:linear-gradient(#a6e4f7,#29abe0 50%,#1288bb 51%,#3fb8e8)}
+.kofi .b88-ico{background:linear-gradient(#7fd3f0,#1a95c9)}
+.bmc{background:linear-gradient(#fff28a,#ffdd00 50%,#e5b800 51%,#ffe23a);color:#151414}
+.bmc .b88-txt{text-shadow:1px 1px 0 #fff6a8}
+.bmc .b88-ico{background:linear-gradient(#fff6a0,#f0c400)}
+.footer-b88{display:flex;gap:6px;margin-top:8px}
+
+</style>
+</head>
+<body>
+
+<!-- ======= Backdrop scenery (original abstract artwork) ======= -->
+<div class="backdrop" aria-hidden="true">
+  <!-- Left: fel-fire / golden arcane storm -->
+  <svg class="left" width="900" viewBox="0 0 900 1300" preserveAspectRatio="xMaxYMin slice">
+    <defs>
+      <radialGradient id="lg1" cx="85%" cy="18%" r="70%">
+        <stop offset="0" stop-color="#d7ff6a"/>
+        <stop offset=".12" stop-color="#5fd400"/>
+        <stop offset=".35" stop-color="#1c4a06"/>
+        <stop offset=".7" stop-color="#071204"/>
+        <stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <radialGradient id="lg2" cx="70%" cy="22%" r="30%">
+        <stop offset="0" stop-color="#fff6c0" stop-opacity=".95"/>
+        <stop offset=".3" stop-color="#ffb000" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#ff6a00" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="fade" x1="0" x2="0" y1="0" y2="1">
+        <stop offset=".55" stop-color="#000" stop-opacity="0"/>
+        <stop offset="1" stop-color="#000"/>
+      </linearGradient>
+      <filter id="blur6"><feGaussianBlur stdDeviation="6"/></filter>
+      <filter id="blur2"><feGaussianBlur stdDeviation="2"/></filter>
+      <filter id="turb">
+        <feTurbulence type="fractalNoise" baseFrequency=".012 .03" numOctaves="4" seed="7"/>
+        <feColorMatrix values="0 0 0 0 .3  0 0 0 0 .9  0 0 0 0 .1  0 0 0 .9 -.35"/>
+      </filter>
+    </defs>
+    <rect width="900" height="1300" fill="url(#lg1)"/>
+    <rect width="900" height="900" filter="url(#turb)" opacity=".6"/>
+    <!-- swirling energy arcs -->
+    <g fill="none" stroke-linecap="round">
+      <path d="M900 150 C 700 120, 560 260, 640 380 S 860 470, 760 600" stroke="#ffcf3a" stroke-width="14" opacity=".35" filter="url(#blur6)"/>
+      <path d="M900 150 C 700 120, 560 260, 640 380 S 860 470, 760 600" stroke="#fff3b0" stroke-width="2.5" opacity=".9" filter="url(#blur2)"/>
+      <path d="M880 260 C 650 260, 520 420, 690 520 S 900 640, 820 820" stroke="#9cff3a" stroke-width="10" opacity=".35" filter="url(#blur6)"/>
+      <path d="M880 260 C 650 260, 520 420, 690 520 S 900 640, 820 820" stroke="#e5ffb0" stroke-width="2" opacity=".85"/>
+      <path d="M760 90 C 600 200, 700 300, 560 420" stroke="#ffd75a" stroke-width="1.5" opacity=".7"/>
+    </g>
+    <circle cx="720" cy="240" r="210" fill="url(#lg2)"/>
+    <!-- floating sparks -->
+    <g fill="#fff6c0">
+      <circle cx="640" cy="180" r="2.5"/><circle cx="700" cy="330" r="1.8"/><circle cx="790" cy="420" r="2.2"/>
+      <circle cx="610" cy="470" r="1.5"/><circle cx="830" cy="210" r="1.6"/><circle cx="560" cy="300" r="1.2"/>
+      <circle cx="745" cy="560" r="2"/><circle cx="680" cy="640" r="1.4"/>
+    </g>
+    <!-- silhouetted crags -->
+    <path d="M0 980 L120 860 L180 900 L260 790 L330 860 L420 760 L520 870 L600 820 L700 900 L780 850 L900 910 L900 1300 L0 1300Z" fill="#040703"/>
+    <path d="M300 1040 L420 930 L470 960 L560 880 L640 950 L740 900 L900 980 L900 1300 L300 1300Z" fill="#020302"/>
+    <rect width="900" height="1300" fill="url(#fade)"/>
+  </svg>
+
+  <!-- Right: twisting nether / violet storm with floating crystals -->
+  <svg class="right" width="900" viewBox="0 0 900 1300" preserveAspectRatio="xMinYMin slice">
+    <defs>
+      <radialGradient id="rg1" cx="20%" cy="20%" r="75%">
+        <stop offset="0" stop-color="#ffb3ff"/>
+        <stop offset=".1" stop-color="#c54bff"/>
+        <stop offset=".35" stop-color="#4a0a7a"/>
+        <stop offset=".7" stop-color="#10021c"/>
+        <stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <linearGradient id="crys" x1="0" x2="1">
+        <stop offset="0" stop-color="#2a0a40"/>
+        <stop offset=".5" stop-color="#e6a6ff"/>
+        <stop offset="1" stop-color="#3a0a5a"/>
+      </linearGradient>
+      <filter id="turb2">
+        <feTurbulence type="fractalNoise" baseFrequency=".008 .02" numOctaves="4" seed="3"/>
+        <feColorMatrix values="0 0 0 0 .8  0 0 0 0 .3  0 0 0 0 1  0 0 0 1 -.4"/>
+      </filter>
+      <filter id="glow"><feGaussianBlur stdDeviation="5"/></filter>
+    </defs>
+    <rect width="900" height="1300" fill="url(#rg1)"/>
+    <rect width="900" height="900" filter="url(#turb2)" opacity=".55"/>
+    <!-- lightning -->
+    <g fill="none" stroke="#f6d8ff" stroke-linejoin="round">
+      <path d="M40 0 L90 120 L60 140 L130 280 L110 300 L170 420" stroke-width="2.5"/>
+      <path d="M40 0 L90 120 L60 140 L130 280 L110 300 L170 420" stroke-width="12" opacity=".35" filter="url(#glow)"/>
+      <path d="M130 280 L200 320 L230 300" stroke-width="1.2" opacity=".8"/>
+    </g>
+    <!-- floating crystal spire -->
+    <g transform="translate(220 330)">
+      <ellipse cx="0" cy="40" rx="70" ry="16" fill="#d07aff" opacity=".35" filter="url(#glow)"/>
+      <path d="M0 -160 L26 -20 L0 70 L-26 -20Z" fill="url(#crys)"/>
+      <path d="M0 -160 L0 70" stroke="#fff" stroke-width=".8" opacity=".6"/>
+      <circle cx="0" cy="-60" r="58" fill="none" stroke="#9a5aca" stroke-width="3" opacity=".7"/>
+      <circle cx="0" cy="-60" r="70" fill="none" stroke="#6a2a9a" stroke-width="1.5" opacity=".6" stroke-dasharray="6 6"/>
+    </g>
+    <!-- floating rocks -->
+    <g fill="#120420">
+      <path d="M60 640 l60 -30 l80 10 l30 30 l-60 40 l-80 -10Z"/>
+      <path d="M260 560 l40 -18 l50 8 l14 22 l-40 26 l-50 -8Z"/>
+      <path d="M380 700 l30 -12 l40 6 l10 16 l-30 18 l-40 -6Z"/>
+    </g>
+    <path d="M0 920 L90 860 L160 900 L260 830 L360 890 L470 840 L600 900 L720 860 L900 920 L900 1300 L0 1300Z" fill="#06010a"/>
+    <rect width="900" height="1300" fill="url(#fade)"/>
+  </svg>
+</div>
+<!-- ======= Top utility bar ======= -->
+<div class="topbar">
+  <div class="inner">
+    <span class="w8-skins" aria-label="Site appearance">Skin:<a href="/skin?choice=cobalt&amp;return=%2F">Retail</a><a href="/skin?choice=wow2008&amp;return=%2F" aria-current="true">2008</a><a href="/skin?choice=current&amp;return=%2F">Pixel</a></span>    <a href="/">WoWCensus.io</a>
+    <a href="/forever/realms">Realms</a>
+    <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Discord</a>
+  </div>
+</div>
+<!-- ======= Header band ======= -->
+<div class="header">
+  <div class="inner">
+    <a class="logo" href="/" aria-label="WoWCensus home">
+      <img src="/wow2008/logo-wowcensus.png?v=57" alt="" width="480" height="191">
+    </a>
+    <form class="search" action="/" onsubmit="if(this.edition.value)location.href=this.edition.value;return false">
+      <label class="w8-pick" for="w8-edition">Edition</label>
+      <select id="w8-edition" name="edition" aria-label="Edition">
+        <option value="" selected disabled>Choose edition…</option>
+        <option value="/forever/">Forever</option>
+        <option value="/forever-beta/">Forever (Beta)</option>
+        <option value="/tbc/">TBC Anniversary</option>
+        <option value="/classic/">Classic Era</option>
+        <option value="/sod/">SoD</option>
+        <option value="/hardcore/">Hardcore</option>
+        <option value="/mop/">MoP Classic</option>
+        <option value="/retail/">Retail</option>
+      </select>
+      <button class="btn-red" type="submit">Go</button>
+    </form>
+  </div>
+</div>
+<!-- ======= Page ======= -->
+<div class="page">
+
+  <nav class="nav">
+    <h3>Site <button class="nav-toggle" type="button" aria-label="Collapse Site" aria-controls="nav-site" aria-expanded="true"></button></h3>
+    <ul class="cur" id="nav-site">
+      <li><a href="/" style="color:#fff" aria-current="page">» Home</a></li>
+      <li><a href="/blog.php">Blog</a></li>
+      <li><a href="/faq.php">FAQ</a></li>
+      <li><a href="/shoutbox/">Shoutbox</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+    <h3>Forever <button class="nav-toggle" type="button" aria-label="Collapse Forever" aria-controls="nav-forever" aria-expanded="true"></button></h3>
+    <ul id="nav-forever">
+      <li><a href="/forever/">Census</a></li>
+      <li class="sub"><a href="/forever/combos">Race + Class</a></li>
+      <li><a href="/forever/realms">Realms</a></li>
+      <li><a href="/forever/auctionhouse">Auction House</a></li>
+      <li><a href="/forever/guilds">Guilds</a></li>
+      <li><a href="/forever/geography">Geography</a></li>
+      <li><a href="/forever/talents">Talents</a></li>
+      <li class="sub"><a href="/forever/human/">Races</a></li>
+      <li class="sub"><a href="/forever/paladin/">Classes</a></li>
+      <li><a href="/forever/gear">Gear</a></li>
+      <li><a href="/forever/race-to-60">Race to 60</a></li>
+      <li><a href="/forever/skin-colors/">Skin Colors</a></li>
+    </ul>
+
+    <h3>Forever (Beta) <button class="nav-toggle" type="button" aria-label="Collapse Forever (Beta)" aria-controls="nav-classic-beta" aria-expanded="true"></button></h3>
+    <ul id="nav-classic-beta">
+      <li><a href="/forever-beta/">Census</a></li>
+      <li class="sub"><a href="/forever-beta/combos">Race + Class</a></li>
+      <li><a href="/forever-beta/realms">Realms</a></li>
+      <li><a href="/forever-beta/auctionhouse">Auction House</a></li>
+      <li><a href="/forever-beta/guilds">Guilds</a></li>
+      <li><a href="/forever-beta/geography">Geography</a></li>
+      <li><a href="/forever-beta/talents">Talents</a></li>
+      <li class="sub"><a href="/forever-beta/human/">Races</a></li>
+      <li class="sub"><a href="/forever-beta/paladin/">Classes</a></li>
+      <li><a href="/forever-beta/gear">Gear</a></li>
+    </ul>
+
+    <h3>TBC Anniversary <button class="nav-toggle" type="button" aria-label="Collapse TBC Anniversary" aria-controls="nav-classic-progression" aria-expanded="true"></button></h3>
+    <ul id="nav-classic-progression">
+      <li><a href="/tbc/">Census</a></li>
+      <li class="sub"><a href="/tbc/combos">Race + Class</a></li>
+      <li><a href="/tbc/realms">Realms</a></li>
+      <li><a href="/tbc/auctionhouse">Auction House</a></li>
+      <li><a href="/tbc/guilds">Guilds</a></li>
+      <li><a href="/tbc/geography">Geography</a></li>
+      <li><a href="/tbc/talents">Talents</a></li>
+      <li class="sub"><a href="/tbc/human/">Races</a></li>
+      <li class="sub"><a href="/tbc/paladin/">Classes</a></li>
+      <li><a href="/tbc/gear">Gear</a></li>
+    </ul>
+
+    <h3>Classic Era <button class="nav-toggle" type="button" aria-label="Collapse Classic Era" aria-controls="nav-classic" aria-expanded="true"></button></h3>
+    <ul id="nav-classic">
+      <li><a href="/classic/">Census</a></li>
+      <li class="sub"><a href="/classic/combos">Race + Class</a></li>
+      <li><a href="/classic/realms">Realms</a></li>
+      <li><a href="/classic/auctionhouse">Auction House</a></li>
+      <li><a href="/classic/guilds">Guilds</a></li>
+      <li><a href="/classic/geography">Geography</a></li>
+      <li><a href="/classic/talents">Talents</a></li>
+      <li class="sub"><a href="/classic/human/">Races</a></li>
+      <li class="sub"><a href="/classic/paladin/">Classes</a></li>
+      <li><a href="/classic/gear">Gear</a></li>
+    </ul>
+
+    <h3>SoD <button class="nav-toggle" type="button" aria-label="Collapse SoD" aria-controls="nav-sod" aria-expanded="true"></button></h3>
+    <ul id="nav-sod">
+      <li><a href="/sod/">Census</a></li>
+      <li class="sub"><a href="/sod/combos">Race + Class</a></li>
+      <li><a href="/sod/realms">Realms</a></li>
+      <li><a href="/sod/auctionhouse">Auction House</a></li>
+      <li><a href="/sod/guilds">Guilds</a></li>
+      <li><a href="/sod/geography">Geography</a></li>
+      <li><a href="/sod/talents">Talents</a></li>
+      <li class="sub"><a href="/sod/human/">Races</a></li>
+      <li class="sub"><a href="/sod/paladin/">Classes</a></li>
+      <li><a href="/sod/gear">Gear</a></li>
+    </ul>
+
+    <h3>Hardcore <button class="nav-toggle" type="button" aria-label="Collapse Hardcore" aria-controls="nav-hardcore" aria-expanded="true"></button></h3>
+    <ul id="nav-hardcore">
+      <li><a href="/hardcore/">Census</a></li>
+      <li class="sub"><a href="/hardcore/combos">Race + Class</a></li>
+      <li><a href="/hardcore/realms">Realms</a></li>
+      <li><a href="/hardcore/auctionhouse">Auction House</a></li>
+      <li><a href="/hardcore/guilds">Guilds</a></li>
+      <li><a href="/hardcore/geography">Geography</a></li>
+      <li><a href="/hardcore/talents">Talents</a></li>
+      <li class="sub"><a href="/hardcore/human/">Races</a></li>
+      <li class="sub"><a href="/hardcore/paladin/">Classes</a></li>
+      <li><a href="/hardcore/gear">Gear</a></li>
+    </ul>
+
+    <h3>MoP Classic <button class="nav-toggle" type="button" aria-label="Collapse MoP Classic" aria-controls="nav-mop-classic" aria-expanded="true"></button></h3>
+    <ul id="nav-mop-classic">
+      <li><a href="/mop/">Census</a></li>
+      <li class="sub"><a href="/mop/combos">Race + Class</a></li>
+      <li><a href="/mop/realms">Realms</a></li>
+      <li><a href="/mop/auctionhouse">Auction House</a></li>
+      <li><a href="/mop/guilds">Guilds</a></li>
+      <li><a href="/mop/geography">Geography</a></li>
+      <li><a href="/mop/talents">Talents</a></li>
+      <li class="sub"><a href="/mop/human/">Races</a></li>
+      <li class="sub"><a href="/mop/paladin/">Classes</a></li>
+      <li><a href="/mop/gear">Gear</a></li>
+    </ul>
+
+    <h3>Retail <button class="nav-toggle" type="button" aria-label="Collapse Retail" aria-controls="nav-retail" aria-expanded="true"></button></h3>
+    <ul id="nav-retail">
+      <li><a href="/retail/">Census</a></li>
+      <li class="sub"><a href="/retail/combos">Race + Class</a></li>
+      <li><a href="/retail/realms">Realms</a></li>
+      <li><a href="/retail/auctionhouse">Auction House</a></li>
+      <li><a href="/retail/guilds">Guilds</a></li>
+      <li><a href="/retail/geography">Geography</a></li>
+      <li><a href="/retail/talents">Talents</a></li>
+      <li class="sub"><a href="/retail/human/">Races</a></li>
+      <li class="sub"><a href="/retail/paladin/">Classes</a></li>
+      <li><a href="/retail/gear">Gear</a></li>
+      <li><a href="/retail/skin-colors/">Skin Colors</a></li>
+    </ul>
+    <div class="lamp-badges" aria-label="Retro web badges">
+      <img src="/wow2008/lamp-linux.png?v=57" width="88" height="31" alt="GNU/Linux badge">
+      <img src="/wow2008/lamp-apache.png?v=57" width="88" height="31" alt="Apache badge">
+      <img src="/wow2008/lamp-mysql.png?v=57" width="88" height="31" alt="MySQL badge">
+      <img src="/wow2008/lamp-php.png?v=57" width="88" height="31" alt="PHP badge">
+      <img src="/wow2008/badge-amd-k6.png?v=57" width="88" height="31" alt="AMD K6 Upgrade Now badge">
+      <img src="/wow2008/badge-take-back-the-web.png?v=57" width="88" height="31" alt="Take back the web badge">
+    </div>
+
+  </nav>
+
+  <main class="main home">
+    <div class="crumb">» Home</div>
+
+    <div class="hero" id="hero">
+      <div class="slide plain on">
+        <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener"><img src="/wow2008/banner-discord.webp?v=57" alt="Volunteers needed!" width="639" height="246"></a>
+        <div class="cap"><b>Volunteers needed!</b>Help us scan realms and grow the census. Everyone is welcome. <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Join the Discord »</a></div>
+      </div>
+      <div class="slide">
+        <img src="/wow2008/banner-home-5.webp?v=57" alt="" width="880" height="150">
+        <div class="cap"><b>Over 1,000,000 characters in our database</b>1,261,253 characters tracked across 8 editions, and counting. <a href="/forever/">See the census »</a></div>
+      </div>
+      <div class="slide">
+        <img src="/wow2008/banner-home-7.webp?v=57" alt="" width="880" height="150">
+        <div class="cap"><b>WoW: Forever: 642,692 characters seen this week</b>The busiest edition in our scans over the last seven days. <a href="/forever/">See the census »</a></div>
+      </div>
+      <div class="slide">
+        <img src="/wow2008/banner-home-8.webp?v=57" alt="" width="880" height="150">
+        <div class="cap"><b>WoW: Forever&#039;s first 24 hours, by the numbers</b>WoW: Forever went live at 23:00 UTC on November 4, and the WoW Census addon was scanning from the first minute. By the same time the next day, it had… <a href="/blog.php?id=3">Read more »</a></div>
+      </div>
+      <div class="slide">
+        <img src="/wow2008/banner-home-9.webp?v=57" alt="" width="880" height="150">
+        <div class="cap"><b>The shoutbox is here</b>In the spirit of the 2000s and to stay true to this theme, I&#039;ve added a shoutbox to the site so visitors can drop messages to other users. You know, … <a href="/blog.php?id=2">Read more »</a></div>
+      </div>
+      <div class="slide">
+        <img src="/wow2008/banner-home-1.webp?v=57" alt="" width="880" height="150">
+        <div class="cap"><b>Every realm, side by side</b>Compare population and faction balance across the realms we scan. <a href="/realms">Open the Realm Viewer »</a></div>
+      </div>
+      <div class="dots"><button type="button" class="on" aria-label="Story 1">1</button><button type="button" aria-label="Story 2">2</button><button type="button" aria-label="Story 3">3</button><button type="button" aria-label="Story 4">4</button><button type="button" aria-label="Story 5">5</button><button type="button" aria-label="Story 6">6</button></div>
+    </div>
+
+    <div class="tiles">
+      <div class="stat"><b>1,261,253</b><span>Characters tracked</span><em>across 8 editions</em></div>
+      <div class="stat"><b>752,496</b><span>Seen last 7 days</span><em>across 7 editions</em></div>
+      <div class="stat"><b>108</b><span>Realms surveyed</span><em>in the census sample</em></div>
+      <div class="stat"><b data-ago="1794154920" data-short>Nov 8</b><span>Since last scan</span><em>MoP Classic</em></div>
+    </div>
+
+    <section class="section">
+<div class="post-hd">
+<span class="ico"></span>
+<h2>Pick Your Edition</h2>
+<div class="sub">Sorted by characters seen this week</div>
+</div>
+<div class="section-bd flush">
+        <table class="dir">
+          <thead><tr><th colspan="2">Edition</th><th>Seen 7d</th><th>This week</th><th class="r">Tracked</th><th>Last scan</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,#007ea6 55%,#000 95%)"></span></td>
+              <td class="nm"><a href="/forever/">WoW: Forever</a></td>
+              <td><span class="n">642,692</span> <span class="tr new">new</span></td>
+              <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0,33.0 L34.7,33.0 L69.3,32.7 L104.0,24.7 L138.7,17.3 L173.3,9.2 L208.0,5.0 L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="0.0,33.0 34.7,33.0 69.3,32.7 104.0,24.7 138.7,17.3 173.3,9.2 208.0,5.0" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
+              <td class="r">659,797</td>
+              <td class="last" data-ago="1794150891">Nov 8</td>
+            </tr>
+            <tr>
+              <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,#715ce8 55%,#000 95%)"></span></td>
+              <td class="nm"><a href="/retail/">Retail</a></td>
+              <td><span class="n">42,696</span> <span class="tr dn">▼ 13%</span></td>
+              <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0,33.0 L34.7,22.1 L69.3,19.7 L104.0,17.7 L138.7,9.2 L173.3,7.6 L208.0,5.0 L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="0.0,33.0 34.7,22.1 69.3,19.7 104.0,17.7 138.7,9.2 173.3,7.6 208.0,5.0" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
+              <td class="r">120,439</td>
+              <td class="last" data-ago="1794107765">Nov 8</td>
+            </tr>
+            <tr>
+              <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,#4b8a9e 55%,#000 95%)"></span></td>
+              <td class="nm"><a href="/forever-beta/">WoW: Forever (Beta)</a></td>
+              <td><span class="n">32,927</span> <span class="tr up">▲ 10%</span></td>
+              <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0,33.0 L34.7,18.1 L69.3,18.1 L104.0,18.1 L138.7,18.1 L173.3,8.5 L208.0,5.0 L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="0.0,33.0 34.7,18.1 69.3,18.1 104.0,18.1 138.7,18.1 173.3,8.5 208.0,5.0" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
+              <td class="r">153,662</td>
+              <td class="last" data-ago="1792631020">Oct 22</td>
+            </tr>
+            <tr>
+              <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,#7db642 55%,#000 95%)"></span></td>
+              <td class="nm"><a href="/tbc/">TBC Anniversary</a></td>
+              <td><span class="n">32,867</span> <span class="tr dn">▼ 40%</span></td>
+              <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0,33.0 L34.7,27.9 L69.3,10.2 L104.0,8.9 L138.7,7.4 L173.3,6.4 L208.0,5.0 L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="0.0,33.0 34.7,27.9 69.3,10.2 104.0,8.9 138.7,7.4 173.3,6.4 208.0,5.0" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
+              <td class="r">130,069</td>
+              <td class="last" data-ago="1794154318">Nov 8</td>
+            </tr>
+            <tr>
+              <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,#f7b804 55%,#000 95%)"></span></td>
+              <td class="nm"><a href="/classic/">Classic Era</a></td>
+              <td><span class="n">17,084</span> <span class="tr dn">▼ 50%</span></td>
+              <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0,33.0 L34.7,13.1 L69.3,13.1 L104.0,11.6 L138.7,9.2 L173.3,7.1 L208.0,5.0 L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="0.0,33.0 34.7,13.1 69.3,13.1 104.0,11.6 138.7,9.2 173.3,7.1 208.0,5.0" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
+              <td class="r">94,873</td>
+              <td class="last" data-ago="1794152393">Nov 8</td>
+            </tr>
+            <tr>
+              <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,#4abe7f 55%,#000 95%)"></span></td>
+              <td class="nm"><a href="/mop/">MoP Classic</a></td>
+              <td><span class="n">13,153</span> <span class="tr dn">▼ 54%</span></td>
+              <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0,33.0 L34.7,20.5 L69.3,13.1 L104.0,11.0 L138.7,9.2 L173.3,8.5 L208.0,5.0 L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="0.0,33.0 34.7,20.5 69.3,13.1 104.0,11.0 138.7,9.2 173.3,8.5 208.0,5.0" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
+              <td class="r">78,051</td>
+              <td class="last" data-ago="1794154920">Nov 8</td>
+            </tr>
+            <tr>
+              <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,#ff4c02 55%,#000 95%)"></span></td>
+              <td class="nm"><a href="/hardcore/">Hardcore</a></td>
+              <td><span class="n">3,592</span> <span class="tr dn">▼ 56%</span></td>
+              <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0,33.0 L34.7,13.3 L69.3,13.3 L104.0,11.1 L138.7,10.0 L173.3,8.0 L208.0,5.0 L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="0.0,33.0 34.7,13.3 69.3,13.3 104.0,11.1 138.7,10.0 173.3,8.0 208.0,5.0" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
+              <td class="r">17,417</td>
+              <td class="last" data-ago="1794152911">Nov 8</td>
+            </tr>
+            <tr>
+              <td class="ic"><span class="crest" style="background:radial-gradient(circle at 40% 35%,#fff6,#00b1e1 55%,#000 95%)"></span></td>
+              <td class="nm"><a href="/sod/">Season of Discovery</a></td>
+              <td><span class="n">412</span> <span class="tr dn">▼ 87%</span></td>
+              <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0,33.0 L34.7,14.8 L69.3,14.8 L104.0,12.7 L138.7,10.4 L173.3,9.3 L208.0,5.0 L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="0.0,33.0 34.7,14.8 69.3,14.8 104.0,12.7 138.7,10.4 173.3,9.3 208.0,5.0" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
+              <td class="r">6,945</td>
+              <td class="last" data-ago="1794153556">Nov 8</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+</section>
+
+    <section class="section">
+<div class="post-hd">
+<span class="ico r"></span>
+<h2>Latest News</h2>
+<div class="sub"><a href="/blog.php">News archive »</a></div>
+</div>
+<div class="section-bd">
+        <article class="post">
+          <div class="post-hd"><span class="ico g"></span><div><h2><a href="/blog.php?id=3">WoW: Forever&#039;s first 24 hours, by the numbers</a></h2><div class="by">Posted by <b>WoWCensus</b> on Thursday, November 5, 2026</div></div></div>
+          <div class="post-bd">
+            <img class="thumb" src="/wow2008/shoutbox-stone.avif?v=57" alt="" width="96" height="64">
+            <p>WoW: Forever went live at 23:00 UTC on November 4, and the WoW Census addon was scanning from the first minute. By the same time the next day, it had recorded 153,980 unique characters across 11 realms in the US and EU, along with 7,343 guilds that already had at least one member. Most players were still in the starting zones: about 71% of the characters we saw were level 1–9…</p>
+            <div class="more"><a href="/blog.php?id=3">Read more »</a></div>
+          </div>
+        </article>
+        <article class="post">
+          <div class="post-hd"><span class="ico"></span><div><h2><a href="/blog.php?id=2">The shoutbox is here</a></h2><div class="by">Posted by <b>WoWCensus</b> on Sunday, October 25, 2026</div></div></div>
+          <div class="post-bd">
+            <img class="thumb" src="/wow2008/banner-census.webp?v=57" alt="" width="96" height="64">
+            <p>In the spirit of the 2000s and to stay true to this theme, I&#039;ve added a shoutbox to the site so visitors can drop messages to other users. You know, just like the guild site your buddy hosted on Angelfire in 2005. Have fun and be kind!</p>
+            <div class="more"><a href="/blog.php?id=2">Read more »</a></div>
+          </div>
+        </article>
+        <article class="post">
+          <div class="post-hd"><span class="ico"></span><div><h2><a href="/blog.php?id=1">Launching WoWCensus</a></h2><div class="by">Posted by <b>WoWCensus</b> on Monday, September 7, 2026</div></div></div>
+          <div class="post-bd">
+            <img class="thumb" src="/wow2008/banner-guilds.webp?v=57" alt="" width="96" height="64">
+            <p>Every realm has a story, and most of it goes unseen. This started with a question I couldn&#039;t shake: what does a world look like when you step back from your own corner of it? I play alongside thousands of people I&#039;ll never meet. I see a name in a city, a seller at the auction house, someone passing through a zone. Each one is a small piece of something bigger. Who is still…</p>
+            <div class="more"><a href="/blog.php?id=1">Read more »</a></div>
+          </div>
+        </article>
+    </div>
+</section>
+
+    <div class="source">Counts describe characters seen in in-game /who samples, not unique players or a live online population.</div>
+  </main>
+
+  <aside class="side home-side">
+    <div class="box support-box">
+      <h4><i></i>Support WoWCensus</h4>
+      <div class="sup-body">
+        <p class="sup-lead">WoWCensus is run by volunteers and paid for out of pocket. If the census helps you, consider chipping in for server upkeep!</p>
+        <div class="sup-goal">
+          <div class="sup-goal-hd"><b>Monthly Upkeep</b><span>$10 / $20</span></div>
+          <div class="sup-bar"><span style="width:50%"></span></div>
+          <div class="sup-goal-ft">Server hosting, $20/month</div>
+        </div>
+        <div class="sup-btns">
+          <a class="b88 kofi" href="https://ko-fi.com/wowcensus" target="_blank" rel="noopener noreferrer" title="Buy us a Ko-fi">
+            <span class="b88-ico"><svg viewBox="0 0 32 24" shape-rendering="crispEdges" aria-hidden="true"><path fill="#fff" d="M2 3h23v3H2zM0 6h28v12H0zM3 18h22v3H3zM7 21h15v2H7z"/><path fill="#f4f5f7" d="M4 5h19v12H4zM7 18h14v2H7z"/><path fill="#fff" d="M28 8h3v8h-3zM25 16h5v3h-5z"/><path fill="#ee5a73" d="M10 8h3v2h-3zM16 8h3v2h-3zM9 10h11v3H9zM11 13h7v2h-7zM13 15h3v2h-3z"/></svg></span>
+            <span class="b88-txt"><small>SUPPORT ON</small>KO-FI</span>
+          </a>
+          <a class="b88 bmc" href="https://buymeacoffee.com/wowcensus" target="_blank" rel="noopener noreferrer" title="Buy me a coffee">
+            <span class="b88-ico"><svg viewBox="0 0 32 24" shape-rendering="crispEdges" aria-hidden="true"><path fill="#151414" d="M8 5h3v4H8zM14 4h3v5h-3zM5 10h20v3H5zM5 13h3v6H5zM20 13h3v6h-3zM8 19h15v2H8zM25 13h4v3h-4zM23 16h4v3h-4z"/><path fill="#fff" d="M8 13h12v5H8z"/></svg></span>
+            <span class="b88-txt"><small>BUY ME A</small>COFFEE</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h4><i></i>Shoutbox</h4>
+      <div class="mini-sb">
+        <div class="sb-log" id="mini-sb" tabindex="0" aria-label="Recent shouts, newest last"><p class="sb-empty">Loading shouts…</p></div>
+        <form method="post" action="/shoutbox/"><input type="hidden" name="init" value="1"><button class="btn-red" type="submit">Post a shout »</button></form>
+        <div class="box-ft"><a href="/shoutbox/">Full shoutbox »</a> · Refreshes every 30s</div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h4><i></i>Edition Status</h4>
+      <div class="realm">
+        <div class="row"><a href="/forever/">WoW: Forever</a><b>642,692</b><span class="st new">new</span></div>
+        <div class="row"><a href="/retail/">Retail</a><b>42,696</b><span class="st dn">▼ 13%</span></div>
+        <div class="row"><a href="/forever-beta/">WoW: Forever (Beta)</a><b>32,927</b><span class="st up">▲ 10%</span></div>
+        <div class="row"><a href="/tbc/">TBC Anniversary</a><b>32,867</b><span class="st dn">▼ 40%</span></div>
+        <div class="row"><a href="/classic/">Classic Era</a><b>17,084</b><span class="st dn">▼ 50%</span></div>
+        <div class="row"><a href="/mop/">MoP Classic</a><b>13,153</b><span class="st dn">▼ 54%</span></div>
+        <div class="row"><a href="/hardcore/">Hardcore</a><b>3,592</b><span class="st dn">▼ 56%</span></div>
+        <div class="row"><a href="/sod/">Season of Discovery</a><b>412</b><span class="st dn">▼ 87%</span></div>
+      </div>
+      <div class="box-ft">Characters seen, last 7 days</div>
+    </div>
+
+    <div class="box">
+      <h4><i></i>Community Poll</h4>
+      <form class="poll" id="poll" method="post" action="/poll">
+        <div class="q">Which edition are you playing most right now?</div>
+        <label><input type="radio" name="option" value="tbc"> TBC Anniversary</label>
+        <label><input type="radio" name="option" value="classic"> Classic Era / Hardcore</label>
+        <label><input type="radio" name="option" value="forever"> WoW Forever</label>
+        <label><input type="radio" name="option" value="mop"> MoP Classic</label>
+        <label><input type="radio" name="option" value="retail"> Retail</label>
+        <label><input type="radio" name="option" value="reading"> I just read the census :)</label>
+        <button class="btn-red" type="submit">Vote</button> <a class="pl" href="#" id="poll-show">View results</a>
+        <div class="poll-err" id="poll-err" role="alert" hidden></div>
+      </form>
+      <div class="poll poll-res" id="poll-res" hidden></div>
+    </div>
+
+    <div class="box">
+      <h4><i></i>Quick Links</h4>
+      <ul class="ql">
+        <li><span class="qi y"></span><a href="/realms">Realm Viewer</a></li>
+        <li><span class="qi"></span><a href="/combos">Every Race &amp; Class</a></li>
+        <li><span class="qi g"></span><a href="/auctionhouse">Auction House Prices</a></li>
+        <li><span class="qi y"></span><a href="/blog.php">News &amp; Updates</a></li>
+        <li><span class="qi"></span><a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Join us on Discord</a></li>
+      </ul>
+    </div>
+  </aside>
+
+</div>
+
+<div id="tip"></div>
+
+<footer class="footer">
+  <div style="flex:1">
+    <div class="links"><a href="/">WoWCensus</a><a href="/realms">Realms</a><a href="/faq.php">FAQ</a><a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Discord</a><a href="/llms.txt">llms.txt</a></div>
+    <div class="footer-b88">
+          <a class="b88 kofi" href="https://ko-fi.com/wowcensus" target="_blank" rel="noopener noreferrer" title="Buy us a Ko-fi">
+            <span class="b88-ico"><svg viewBox="0 0 32 24" shape-rendering="crispEdges" aria-hidden="true"><path fill="#fff" d="M2 3h23v3H2zM0 6h28v12H0zM3 18h22v3H3zM7 21h15v2H7z"/><path fill="#f4f5f7" d="M4 5h19v12H4zM7 18h14v2H7z"/><path fill="#fff" d="M28 8h3v8h-3zM25 16h5v3h-5z"/><path fill="#ee5a73" d="M10 8h3v2h-3zM16 8h3v2h-3zM9 10h11v3H9zM11 13h7v2h-7zM13 15h3v2h-3z"/></svg></span>
+            <span class="b88-txt"><small>SUPPORT ON</small>KO-FI</span>
+          </a>
+          <a class="b88 bmc" href="https://buymeacoffee.com/wowcensus" target="_blank" rel="noopener noreferrer" title="Buy me a coffee">
+            <span class="b88-ico"><svg viewBox="0 0 32 24" shape-rendering="crispEdges" aria-hidden="true"><path fill="#151414" d="M8 5h3v4H8zM14 4h3v5h-3zM5 10h20v3H5zM5 13h3v6H5zM20 13h3v6h-3zM8 19h15v2H8zM25 13h4v3h-4zM23 16h4v3h-4z"/><path fill="#fff" d="M8 13h12v5H8z"/></svg></span>
+            <span class="b88-txt"><small>BUY ME A</small>COFFEE</span>
+          </a></div>
+    <p>WoWCensus samples characters seen in-game; counts describe observed characters, not unique players or a live online population. Not affiliated with or endorsed by Blizzard Entertainment.</p>
+  </div>
+</footer>
+
+<script src="/wow2008/common.js?v=57"></script>
+<script src="/wow2008/site.js?v=57"></script>
+<script>window.ROUTE ={"page":"home"};</script>
+<script>
+(function () {
+  var nf = function (n) { return n.toLocaleString('en-US'); };
+
+  // Times since each scan, worked out in the browser (pages are cached).
+  var now = Date.now() / 1000;
+  document.querySelectorAll('[data-ago]').forEach(function (el) {
+    var s = now - +el.dataset.ago, hrs = Math.floor(s / 3600), days = Math.floor(s / 86400);
+    if (!+el.dataset.ago || s < 0) return;
+    el.textContent = 'short' in el.dataset ? (s < 7200 ? Math.max(1, Math.floor(s / 60)) + ' min' : days < 2 ? hrs + ' hrs' : days + ' days')
+      : s < 3600 ? 'under an hour ago' : days < 1 ? hrs + (hrs === 1 ? ' hr' : ' hrs') + ' ago' : days + (days === 1 ? ' day' : ' days') + ' ago';
+    if (el.classList.contains('last')) el.classList.add(s < 86400 ? 'fresh' : s > 7 * 86400 ? 'stale' : 'ok');
+  });
+
+  // News rotator.
+  var slides = [].slice.call(document.querySelectorAll('#hero .slide')), dots = [].slice.call(document.querySelectorAll('#hero .dots button')), cur = 0, timer;
+  function go(i) { slides[cur].classList.remove('on'); dots[cur].classList.remove('on'); cur = i; slides[cur].classList.add('on'); dots[cur].classList.add('on'); }
+  function tick() { clearInterval(timer); timer = setInterval(function () { go((cur + 1) % slides.length); }, 6000); }
+  dots.forEach(function (d, i) { d.onclick = function () { go(i); tick(); }; });
+  if (slides.length > 1) tick();
+
+  // The newest shouts, fetched from the shoutbox page (this page is cached; the shoutbox is not).
+  var log = document.getElementById('mini-sb');
+  function shouts() {
+    fetch('/shoutbox/', {credentials: 'same-origin', cache: 'no-store'}).then(function (r) { if (!r.ok) throw r; return r.text(); }).then(function (html) {
+      var lines = new DOMParser().parseFromString(html, 'text/html').querySelectorAll('#shoutbox-recent .sb-line');
+      if (!lines.length) { log.innerHTML = '<p class="sb-empty">No shouts yet. Be the first!</p>'; return; }
+      var stick = log.scrollHeight - log.scrollTop - log.clientHeight < 20 || !log.querySelector('.sb-line');
+      log.innerHTML = '';
+      [].slice.call(lines, -15).forEach(function (l) {
+        var t = l.querySelector('.sb-time');
+        if (t && t.dateTime) t.textContent = '[' + new Date(t.dateTime).toTimeString().slice(0, 5) + ']';
+        log.appendChild(document.importNode(l, true));
+      });
+      if (stick) log.scrollTop = log.scrollHeight;
+    }).catch(function () { if (!log.querySelector('.sb-line')) log.innerHTML = '<p class="sb-empty">The shoutbox is unavailable right now.</p>'; });
+  }
+  shouts();
+  setInterval(function () { if (!document.hidden) shouts(); }, 30000);
+
+  // Community poll: the tally lives at /poll (this page is cached, so a vote never shows up in its HTML).
+  var form = document.getElementById('poll'), res = document.getElementById('poll-res'), err = document.getElementById('poll-err');
+  function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function results(p) {
+    var h = '<div class="q">' + esc(p.question) + '</div>';
+    p.options.forEach(function (o) {
+      var pc = p.total ? Math.round(100 * o.votes / p.total) : 0;
+      h += '<div class="pr' + (o.key === p.voted ? ' mine' : '') + '"><span>' + esc(o.label) + '</span><i style="width:' + pc + '%"></i><b>' + pc + '%</b></div>';
+    });
+    h += '<div class="pv">' + nf(p.total) + (p.total === 1 ? ' vote' : ' votes') + (p.voted ? ' · thanks for voting!' : ' · <a href="#" id="poll-back">Vote</a>') + '</div>';
+    res.innerHTML = h;
+    form.hidden = true; res.hidden = false;
+    var back = document.getElementById('poll-back');
+    if (back) back.onclick = function (e) { e.preventDefault(); res.hidden = true; form.hidden = false; };
+  }
+  function fail(text) { err.textContent = text; err.hidden = false; }
+  function poll(opts) {
+    return fetch('/poll', Object.assign({credentials: 'same-origin', cache: 'no-store'}, opts)).then(function (r) {
+      return r.json().then(function (body) { if (!r.ok) throw new Error(body.error || 'The poll is unavailable right now'); return body; });
+    });
+  }
+  poll().then(function (p) { if (p.voted) results(p); }).catch(function () {});
+  document.getElementById('poll-show').onclick = function (e) {
+    e.preventDefault();
+    poll().then(results).catch(function (x) { fail(x.message); });
+  };
+  form.onsubmit = function (e) {
+    e.preventDefault();
+    var pick = form.querySelector('input[name=option]:checked');
+    if (!pick) { fail('Pick an answer first.'); return; }
+    err.hidden = true;
+    form.querySelector('button').disabled = true;
+    poll({method: 'POST', body: new URLSearchParams({option: pick.value})}).then(results)
+      .catch(function (x) { fail(x.message); }).then(function () { form.querySelector('button').disabled = false; });
+  };
+})();
+</script>
+</body>
+</html>

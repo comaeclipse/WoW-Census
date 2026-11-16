@@ -1,6 +1,6 @@
 <?php
-// Discord interactions endpoint for /submit <file>: players send a WoW Census or
-// MarketLens SavedVariables file (or a .zip of them; each .lua inside is
+// Discord interactions endpoint for /submit <file>: players send a WoW Census,
+// MarketLens or ClassicPlus SavedVariables file (or a .zip of them; each .lua inside is
 // unzipped, hashed and stored on its own), which is stored as
 //   <original name>-<discord username>-<UTC timestamp>.lua
 // in DISCORD_SUBMIT_DIR with its MD5 recorded in submissions.jsonl.
@@ -18,7 +18,7 @@ const DS_MAX_UNZIPPED = 100 * 1024 * 1024;       // one .lua inside a zip
 const DS_MAX_UNZIPPED_TOTAL = 200 * 1024 * 1024; // everything taken from one zip
 const DS_ZIP_MAX_ENTRIES = 1000;                 // entries looked at in one zip
 const DS_PER_HOUR = 10;
-const DS_VARIABLES = ['WoWCensusDB', 'MarketLensDB'];
+const DS_VARIABLES = ['WoWCensusDB', 'MarketLensDB', 'ClassicPlus_Database'];
 
 header('Cache-Control: private, no-store');
 header('Cloudflare-CDN-Cache-Control: no-store');
@@ -96,7 +96,7 @@ function ds_reply(string $appId, string $token, string $message): void {
 }
 
 // Reads a file once: its MD5, or null when it is not a save (empty, binary, or no
-// WoWCensusDB/MarketLensDB line in the first 64 KB).
+// WoWCensusDB/MarketLensDB/ClassicPlus_Database line in the first 64 KB).
 function ds_scan(string $path): ?string {
   $in = fopen($path, 'rb');
   if (!$in) return null;
@@ -268,7 +268,7 @@ function ds_submit(array $interaction, ?callable $download = null, array &$kept 
   try {
     foreach ($files as [$name, $tmp]) {
       $md5 = ds_scan($tmp);
-      if ($md5 === null) { $notes[] = "`$name` does not look like a WoW Census save (no WoWCensusDB or MarketLensDB in it)."; continue; }
+      if ($md5 === null) { $notes[] = "`$name` does not look like a WoW Census save (no WoWCensusDB, MarketLensDB or ClassicPlus_Database in it)."; continue; }
       if ($stored >= $allowance) { $notes[] = "Skipped `$name`: hourly limit of " . DS_PER_HOUR . ' files reached.'; continue; }
       $line = ds_keep($dir, $tmp, $md5, $name, $row, $kept);
       if (str_starts_with($line, 'Received')) $stored++;

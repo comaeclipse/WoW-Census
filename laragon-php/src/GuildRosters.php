@@ -153,7 +153,7 @@ function guild_member_character_urls(string $source, array $g): array {
   }
   $region = preg_match('/^(us|eu|kr|tw):/i', (string)$g['realm'], $match) ? strtolower($match[1]) : null;
   $realm = preg_replace('/ \([A-Z]{2}\)$/', '', realm_name((string)$g['realm']));
-  $ids = armory_character_ids($source, $realm, $names, $region);
+  $ids = armory_character_ids($source, $realm, $names, $region, (string)$g['name']);
   return array_map(fn($id) => armory_character_path($source, $id), $ids);
 }
 

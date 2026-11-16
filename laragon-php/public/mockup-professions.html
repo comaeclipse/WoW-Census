@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="wow2008">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[MOCKUP] WoW: Forever Professions – WoWCensus</title>
+<meta name="description" content="WoW: Forever professions: auction house supply and asking prices for each trade's materials, crafted goods and recipes.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WoWCensus">
+<meta property="og:title" content="WoW: Forever Professions – WoWCensus">
+<meta property="og:description" content="WoW: Forever professions: auction house supply and asking prices for each trade's materials, crafted goods and recipes.">
+<meta property="og:url" content="https://wowcensus.io/forever/professions">
+<link rel="canonical" href="https://wowcensus.io/forever/professions">
+
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/wow2008/style.css?v=60">
+<link rel="stylesheet" href="/wow2008/site.css?v=60">
+</head>
+<body>
+
+<!-- ======= Backdrop scenery (original abstract artwork) ======= -->
+<div class="backdrop" aria-hidden="true">
+  <!-- Left: fel-fire / golden arcane storm -->
+  <svg class="left" width="900" viewBox="0 0 900 1300" preserveAspectRatio="xMaxYMin slice">
+    <defs>
+      <radialGradient id="lg1" cx="85%" cy="18%" r="70%">
+        <stop offset="0" stop-color="#d7ff6a"/>
+        <stop offset=".12" stop-color="#5fd400"/>
+        <stop offset=".35" stop-color="#1c4a06"/>
+        <stop offset=".7" stop-color="#071204"/>
+        <stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <radialGradient id="lg2" cx="70%" cy="22%" r="30%">
+        <stop offset="0" stop-color="#fff6c0" stop-opacity=".95"/>
+        <stop offset=".3" stop-color="#ffb000" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#ff6a00" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="fade" x1="0" x2="0" y1="0" y2="1">
+        <stop offset=".55" stop-color="#000" stop-opacity="0"/>
+        <stop offset="1" stop-color="#000"/>
+      </linearGradient>
+      <filter id="blur6"><feGaussianBlur stdDeviation="6"/></filter>
+      <filter id="blur2"><feGaussianBlur stdDeviation="2"/></filter>
+      <filter id="turb">
+        <feTurbulence type="fractalNoise" baseFrequency=".012 .03" numOctaves="4" seed="7"/>
+        <feColorMatrix values="0 0 0 0 .3  0 0 0 0 .9  0 0 0 0 .1  0 0 0 .9 -.35"/>
+      </filter>
+    </defs>
+    <rect width="900" height="1300" fill="url(#lg1)"/>
+    <rect width="900" height="900" filter="url(#turb)" opacity=".6"/>
+    <!-- swirling energy arcs -->
+    <g fill="none" stroke-linecap="round">
+      <path d="M900 150 C 700 120, 560 260, 640 380 S 860 470, 760 600" stroke="#ffcf3a" stroke-width="14" opacity=".35" filter="url(#blur6)"/>
+      <path d="M900 150 C 700 120, 560 260, 640 380 S 860 470, 760 600" stroke="#fff3b0" stroke-width="2.5" opacity=".9" filter="url(#blur2)"/>
+      <path d="M880 260 C 650 260, 520 420, 690 520 S 900 640, 820 820" stroke="#9cff3a" stroke-width="10" opacity=".35" filter="url(#blur6)"/>
+      <path d="M880 260 C 650 260, 520 420, 690 520 S 900 640, 820 820" stroke="#e5ffb0" stroke-width="2" opacity=".85"/>
+      <path d="M760 90 C 600 200, 700 300, 560 420" stroke="#ffd75a" stroke-width="1.5" opacity=".7"/>
+    </g>
+    <circle cx="720" cy="240" r="210" fill="url(#lg2)"/>
+    <!-- floating sparks -->
+    <g fill="#fff6c0">
+      <circle cx="640" cy="180" r="2.5"/><circle cx="700" cy="330" r="1.8"/><circle cx="790" cy="420" r="2.2"/>
+      <circle cx="610" cy="470" r="1.5"/><circle cx="830" cy="210" r="1.6"/><circle cx="560" cy="300" r="1.2"/>
+      <circle cx="745" cy="560" r="2"/><circle cx="680" cy="640" r="1.4"/>
+    </g>
+    <!-- silhouetted crags -->
+    <path d="M0 980 L120 860 L180 900 L260 790 L330 860 L420 760 L520 870 L600 820 L700 900 L780 850 L900 910 L900 1300 L0 1300Z" fill="#040703"/>
+    <path d="M300 1040 L420 930 L470 960 L560 880 L640 950 L740 900 L900 980 L900 1300 L300 1300Z" fill="#020302"/>
+    <rect width="900" height="1300" fill="url(#fade)"/>
+  </svg>
+
+  <!-- Right: twisting nether / violet storm with floating crystals -->
+  <svg class="right" width="900" viewBox="0 0 900 1300" preserveAspectRatio="xMinYMin slice">
+    <defs>
+      <radialGradient id="rg1" cx="20%" cy="20%" r="75%">
+        <stop offset="0" stop-color="#ffb3ff"/>
+        <stop offset=".1" stop-color="#c54bff"/>
+        <stop offset=".35" stop-color="#4a0a7a"/>
+        <stop offset=".7" stop-color="#10021c"/>
+        <stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <linearGradient id="crys" x1="0" x2="1">
+        <stop offset="0" stop-color="#2a0a40"/>
+        <stop offset=".5" stop-color="#e6a6ff"/>
+        <stop offset="1" stop-color="#3a0a5a"/>
+      </linearGradient>
+      <filter id="turb2">
+        <feTurbulence type="fractalNoise" baseFrequency=".008 .02" numOctaves="4" seed="3"/>
+        <feColorMatrix values="0 0 0 0 .8  0 0 0 0 .3  0 0 0 0 1  0 0 0 1 -.4"/>
+      </filter>
+      <filter id="glow"><feGaussianBlur stdDeviation="5"/></filter>
+    </defs>
+    <rect width="900" height="1300" fill="url(#rg1)"/>
+    <rect width="900" height="900" filter="url(#turb2)" opacity=".55"/>
+    <!-- lightning -->
+    <g fill="none" stroke="#f6d8ff" stroke-linejoin="round">
+      <path d="M40 0 L90 120 L60 140 L130 280 L110 300 L170 420" stroke-width="2.5"/>
+      <path d="M40 0 L90 120 L60 140 L130 280 L110 300 L170 420" stroke-width="12" opacity=".35" filter="url(#glow)"/>
+      <path d="M130 280 L200 320 L230 300" stroke-width="1.2" opacity=".8"/>
+    </g>
+    <!-- floating crystal spire -->
+    <g transform="translate(220 330)">
+      <ellipse cx="0" cy="40" rx="70" ry="16" fill="#d07aff" opacity=".35" filter="url(#glow)"/>
+      <path d="M0 -160 L26 -20 L0 70 L-26 -20Z" fill="url(#crys)"/>
+      <path d="M0 -160 L0 70" stroke="#fff" stroke-width=".8" opacity=".6"/>
+      <circle cx="0" cy="-60" r="58" fill="none" stroke="#9a5aca" stroke-width="3" opacity=".7"/>
+      <circle cx="0" cy="-60" r="70" fill="none" stroke="#6a2a9a" stroke-width="1.5" opacity=".6" stroke-dasharray="6 6"/>
+    </g>
+    <!-- floating rocks -->
+    <g fill="#120420">
+      <path d="M60 640 l60 -30 l80 10 l30 30 l-60 40 l-80 -10Z"/>
+      <path d="M260 560 l40 -18 l50 8 l14 22 l-40 26 l-50 -8Z"/>
+      <path d="M380 700 l30 -12 l40 6 l10 16 l-30 18 l-40 -6Z"/>
+    </g>
+    <path d="M0 920 L90 860 L160 900 L260 830 L360 890 L470 840 L600 900 L720 860 L900 920 L900 1300 L0 1300Z" fill="#06010a"/>
+    <rect width="900" height="1300" fill="url(#fade)"/>
+  </svg>
+</div>
+<!-- ======= Top utility bar ======= -->
+<div class="topbar">
+  <div class="inner">
+    <span class="w8-skins" aria-label="Site appearance">Skin:<a href="/skin?choice=cobalt&amp;return=%2Fforever%2Fprofessions">Retail</a><a href="/skin?choice=wow2008&amp;return=%2Fforever%2Fprofessions" aria-current="true">2008</a><a href="/skin?choice=current&amp;return=%2Fforever%2Fprofessions">Pixel</a></span>    <a href="/">WoWCensus.io</a>
+    <a href="/forever/realms">Realms</a>
+    <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Discord</a>
+  </div>
+</div>
+<!-- ======= Header band ======= -->
+<div class="header">
+  <div class="inner">
+    <a class="logo" href="/" aria-label="WoWCensus home">
+      <img src="/wow2008/logo-wowcensus.png?v=60" alt="" width="480" height="191">
+    </a>
+    <form class="search" action="/" onsubmit="if(this.edition.value)location.href=this.edition.value;return false">
+      <label class="w8-pick" for="w8-edition">Edition</label>
+      <select id="w8-edition" name="edition" aria-label="Edition">
+        <option value="/forever/" selected>Forever</option>
+        <option value="/forever-beta/">Forever (Beta)</option>
+        <option value="/tbc/">TBC Anniversary</option>
+        <option value="/classic/">Classic Era</option>
+        <option value="/sod/">SoD</option>
+        <option value="/hardcore/">Hardcore</option>
+        <option value="/mop/">MoP Classic</option>
+        <option value="/retail/">Retail</option>
+      </select>
+      <button class="btn-red" type="submit">Go</button>
+    </form>
+  </div>
+</div>
+<!-- ======= Page ======= -->
+<div class="page wide">
+
+  <nav class="nav">
+    <h3>Site <button class="nav-toggle" type="button" aria-label="Collapse Site" aria-controls="nav-site" aria-expanded="true"></button></h3>
+    <ul class="cur" id="nav-site">
+      <li><a href="/">Home</a></li>
+      <li><a href="/blog.php">Blog</a></li>
+      <li><a href="/faq.php">FAQ</a></li>
+      <li><a href="/shoutbox/">Shoutbox</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+    <h3>Forever <button class="nav-toggle" type="button" aria-label="Collapse Forever" aria-controls="nav-forever" aria-expanded="true"></button></h3>
+    <ul id="nav-forever" class="cur">
+      <li><a href="/forever/">Census</a></li>
+      <li class="sub"><a href="/forever/combos">Race + Class</a></li>
+      <li><a href="/forever/realms">Realms</a></li>
+      <li><a href="/forever/auctionhouse">Auction House</a></li>
+      <li class="sub"><a href="/forever/professions" style="color:#fff" aria-current="page">» Professions</a></li>
+      <li><a href="/forever/guilds">Guilds</a></li>
+      <li><a href="/forever/geography">Geography</a></li>
+      <li><a href="/forever/talents">Talents</a></li>
+      <li class="sub"><a href="/forever/human/">Races</a></li>
+      <li class="sub"><a href="/forever/paladin/">Classes</a></li>
+      <li><a href="/forever/gear">Gear</a></li>
+      <li><a href="/forever/skin-colors/">Skin Colors</a></li>
+    </ul>
+
+    <h3>TBC Anniversary <button class="nav-toggle" type="button" aria-label="Expand TBC Anniversary" aria-controls="nav-classic-progression" aria-expanded="false"></button></h3>
+    <ul id="nav-classic-progression" hidden>
+      <li><a href="/tbc/">Census</a></li>
+      <li class="sub"><a href="/tbc/combos">Race + Class</a></li>
+      <li><a href="/tbc/realms">Realms</a></li>
+      <li><a href="/tbc/auctionhouse">Auction House</a></li>
+      <li><a href="/tbc/guilds">Guilds</a></li>
+      <li><a href="/tbc/geography">Geography</a></li>
+      <li><a href="/tbc/talents">Talents</a></li>
+      <li class="sub"><a href="/tbc/human/">Races</a></li>
+      <li class="sub"><a href="/tbc/paladin/">Classes</a></li>
+      <li><a href="/tbc/gear">Gear</a></li>
+    </ul>
+
+    <h3>Classic Era <button class="nav-toggle" type="button" aria-label="Expand Classic Era" aria-controls="nav-classic" aria-expanded="false"></button></h3>
+    <ul id="nav-classic" hidden>
+      <li><a href="/classic/">Census</a></li>
+      <li class="sub"><a href="/classic/combos">Race + Class</a></li>
+      <li><a href="/classic/realms">Realms</a></li>
+      <li><a href="/classic/auctionhouse">Auction House</a></li>
+      <li><a href="/classic/guilds">Guilds</a></li>
+      <li><a href="/classic/geography">Geography</a></li>
+      <li><a href="/classic/talents">Talents</a></li>
+      <li class="sub"><a href="/classic/human/">Races</a></li>
+      <li class="sub"><a href="/classic/paladin/">Classes</a></li>
+      <li><a href="/classic/gear">Gear</a></li>
+    </ul>
+
+    <h3>SoD <button class="nav-toggle" type="button" aria-label="Expand SoD" aria-controls="nav-sod" aria-expanded="false"></button></h3>
+    <ul id="nav-sod" hidden>
+      <li><a href="/sod/">Census</a></li>
+      <li class="sub"><a href="/sod/combos">Race + Class</a></li>
+      <li><a href="/sod/realms">Realms</a></li>
+      <li><a href="/sod/auctionhouse">Auction House</a></li>
+      <li><a href="/sod/guilds">Guilds</a></li>
+      <li><a href="/sod/geography">Geography</a></li>
+      <li><a href="/sod/talents">Talents</a></li>
+      <li class="sub"><a href="/sod/human/">Races</a></li>
+      <li class="sub"><a href="/sod/paladin/">Classes</a></li>
+      <li><a href="/sod/gear">Gear</a></li>
+    </ul>
+
+    <h3>Hardcore <button class="nav-toggle" type="button" aria-label="Expand Hardcore" aria-controls="nav-hardcore" aria-expanded="false"></button></h3>
+    <ul id="nav-hardcore" hidden>
+      <li><a href="/hardcore/">Census</a></li>
+      <li class="sub"><a href="/hardcore/combos">Race + Class</a></li>
+      <li><a href="/hardcore/realms">Realms</a></li>
+      <li><a href="/hardcore/auctionhouse">Auction House</a></li>
+      <li><a href="/hardcore/guilds">Guilds</a></li>
+      <li><a href="/hardcore/geography">Geography</a></li>
+      <li><a href="/hardcore/talents">Talents</a></li>
+      <li class="sub"><a href="/hardcore/human/">Races</a></li>
+      <li class="sub"><a href="/hardcore/paladin/">Classes</a></li>
+      <li><a href="/hardcore/gear">Gear</a></li>
+    </ul>
+
+    <h3>MoP Classic <button class="nav-toggle" type="button" aria-label="Expand MoP Classic" aria-controls="nav-mop-classic" aria-expanded="false"></button></h3>
+    <ul id="nav-mop-classic" hidden>
+      <li><a href="/mop/">Census</a></li>
+      <li class="sub"><a href="/mop/combos">Race + Class</a></li>
+      <li><a href="/mop/realms">Realms</a></li>
+      <li><a href="/mop/auctionhouse">Auction House</a></li>
+      <li><a href="/mop/guilds">Guilds</a></li>
+      <li><a href="/mop/geography">Geography</a></li>
+      <li><a href="/mop/talents">Talents</a></li>
+      <li class="sub"><a href="/mop/human/">Races</a></li>
+      <li class="sub"><a href="/mop/paladin/">Classes</a></li>
+      <li><a href="/mop/gear">Gear</a></li>
+    </ul>
+
+    <h3>Retail <button class="nav-toggle" type="button" aria-label="Expand Retail" aria-controls="nav-retail" aria-expanded="false"></button></h3>
+    <ul id="nav-retail" hidden>
+      <li><a href="/retail/">Census</a></li>
+      <li class="sub"><a href="/retail/combos">Race + Class</a></li>
+      <li><a href="/retail/realms">Realms</a></li>
+      <li><a href="/retail/auctionhouse">Auction House</a></li>
+      <li><a href="/retail/guilds">Guilds</a></li>
+      <li><a href="/retail/geography">Geography</a></li>
+      <li><a href="/retail/talents">Talents</a></li>
+      <li class="sub"><a href="/retail/human/">Races</a></li>
+      <li class="sub"><a href="/retail/paladin/">Classes</a></li>
+      <li><a href="/retail/gear">Gear</a></li>
+      <li><a href="/retail/skin-colors/">Skin Colors</a></li>
+    </ul>
+    <div class="lamp-badges" aria-label="Retro web badges">
+      <img src="/wow2008/lamp-linux.png?v=60" width="88" height="31" alt="GNU/Linux badge">
+      <img src="/wow2008/lamp-apache.png?v=60" width="88" height="31" alt="Apache badge">
+      <img src="/wow2008/lamp-mysql.png?v=60" width="88" height="31" alt="MySQL badge">
+      <img src="/wow2008/lamp-php.png?v=60" width="88" height="31" alt="PHP badge">
+      <img src="/wow2008/badge-amd-k6.png?v=60" width="88" height="31" alt="AMD K6 Upgrade Now badge">
+      <img src="/wow2008/badge-take-back-the-web.png?v=60" width="88" height="31" alt="Take back the web badge">
+    </div>
+
+  </nav>
+
+  <style>
+    .pf-intro{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;padding:10px 14px;margin-bottom:14px;
+      background:linear-gradient(#fbe9b6,#e8d098);border:1px solid #9c7c42;box-shadow:inset 0 0 0 1px #fff3cc;font-size:12px;line-height:1.6;color:#3a1a00}
+    .pf-intro p{margin:0}
+    .pf-intro b{color:#5a2a00}
+    .pf-intro .book{width:72px;height:72px}
+    .pf-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .pf-card{position:relative;display:grid;grid-template-columns:52px 1fr;gap:4px 10px;padding:10px 10px 9px;text-decoration:none;color:#3a1a00;
+      background:linear-gradient(#fff6d8,#ecd59c);border:1px solid #8a6a2a;border-radius:3px;text-align:left;
+      box-shadow:inset 0 0 0 1px #fff7d8,0 1px 2px rgba(60,30,0,.35);transition:transform .12s,box-shadow .12s}
+    .pf-card:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px #fff7d8,0 0 0 2px #ffd75a,0 4px 10px rgba(60,30,0,.45)}
+    .pf-card:hover h3{color:#a03a00}
+    .pf-ic{grid-row:1 / span 3;width:52px;height:52px;border:2px solid #1a1206;outline:2px ridge #c8a050;border-radius:4px;overflow:hidden;background:#111;
+      box-shadow:0 2px 4px rgba(0,0,0,.5)}
+    .pf-ic img{display:block;width:100%;height:100%}
+    .pf-card h3{margin:0;font:700 15px/1.1 'Cinzel',serif;color:#5a2a00;font-variant:small-caps}
+    .pf-card .role{text-align:left;font:700 9px Tahoma,Arial,sans-serif;text-transform:uppercase;letter-spacing:.8px;color:#8a5a10}
+    .pf-card .blurb{font-size:11px;line-height:1.4;color:#4a2a08}
+    .pf-card .ledger{grid-column:1 / -1;display:flex;justify-content:space-between;gap:6px;margin-top:6px;padding-top:6px;border-top:1px dashed #b8955a;
+      font:10px Tahoma,Arial,sans-serif;color:#6a4a20}
+    .pf-card .ledger b{color:#3a1a00}
+    .pf-card .go{font-weight:700;color:#7a1a00;white-space:nowrap}
+    .pf-card.quiet .ledger b{color:#9a7a4a}
+    .pf-board .trade a{display:inline-flex;align-items:center;gap:6px}
+    .pf-board .trade img{width:18px;height:18px;border:1px solid #000;outline:1px solid #6a6050;border-radius:2px}
+    @media (max-width:900px){.pf-cards{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:560px){.pf-cards{grid-template-columns:1fr}.pf-intro{grid-template-columns:1fr}.pf-intro .book{display:none}.pf-board .qbar{display:none}}
+  </style>
+  <main class="main">
+    <div class="crumb"><a href="/">Home</a> » <a href="/forever/">Forever</a> » <a href="/forever/auctionhouse">Auction House</a> » Professions</div>
+
+    <div class="census-banner">
+<img class="banner-art" src="/wow2008/banner-gear.webp?v=60" alt="" width="880" height="150">
+<div class="stamp" id="pfstamp"></div>
+<div class="t">
+<h1>Professions</h1>
+<div style="color:#ffe8a0">WOW FOREVER · TRADE SKILLS</div>
+</div>
+</div>
+
+    <style>
+      .pc-tallies{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+      .pc-tally{display:grid;grid-template-columns:40px 1fr;gap:2px 9px;align-items:center;padding:8px 10px;
+        background:linear-gradient(#fff6d8,#ecd59c);border:1px solid #8a6a2a;border-radius:3px;box-shadow:inset 0 0 0 1px #fff7d8,0 1px 2px rgba(60,30,0,.35)}
+      .pc-tally .ti{grid-row:1 / span 2;width:40px;height:40px;border:2px solid #1a1206;outline:1px ridge #c8a050;border-radius:3px;overflow:hidden;background:#111}
+      .pc-tally .ti img{display:block;width:100%;height:100%}
+      .pc-tally .v{font:700 18px/1 'Cinzel',serif;color:#5a2a00}
+      .pc-tally .l{font:700 9px Tahoma,Arial,sans-serif;text-transform:uppercase;letter-spacing:.6px;color:#8a5a10}
+      .pc-tally .v small{font:700 11px Tahoma,Arial,sans-serif;color:#3a1a00}
+      .pc-cols{display:grid;grid-template-columns:1.1fr 1fr;gap:12px;margin-bottom:12px}
+      .pc-cols .ahwin{margin:0}
+      .ahtable .trade a,.ahtable .trade span{vertical-align:middle}
+      .ahtable .trade .ic{width:18px;height:18px}
+      .ahtable .pair .ic + .ic{margin-left:-3px}
+      .ahtable .pair em{font-style:normal;color:#9a8a6a;padding:0 2px}
+      .ahtable .num b{color:#fff}
+      .ahtable .qbar i{transition:none}
+      .pc-note{padding:6px 8px;font-size:10px;color:#d8b8a0;border-top:1px solid #2a2418;background:rgba(0,0,0,.25)}
+      .pc-note b{color:#ffd75a}
+      .pc-h{margin:2px 0 6px;font:700 12px 'Cinzel',serif;color:#5a2a00;font-variant:small-caps;letter-spacing:.5px;border-bottom:1px dashed #b8955a;padding-bottom:3px}
+      .pc-secs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+      .pc-sec{display:flex;gap:8px;align-items:center;padding:5px 8px;background:rgba(255,248,225,.7);border:1px solid #b8955a}
+      .pc-sec .pc-sic{width:26px;height:26px;border:1px solid #000;outline:1px solid #8a7040;border-radius:2px;overflow:hidden;flex:none}
+      .pc-sec .pc-sic img{display:block;width:100%;height:100%}
+      .pc-sec b{display:block;font:700 11px Tahoma,Arial,sans-serif;color:#3a1a00}
+      .pc-sec span{font-size:10px;color:#6a4a20}
+      .pc-classes{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
+      .pc-cls{padding:6px 5px;text-align:center;background:linear-gradient(#1c1810,#0e0c08);border:1px solid #000;outline:1px solid #8a7040;border-radius:3px}
+      .pc-cls img{width:30px;height:30px;border:1px solid #000;outline:1px solid #6a6050;border-radius:3px}
+      .pc-cls b{display:block;margin:3px 0 2px;font:700 10px Tahoma,Arial,sans-serif;text-shadow:0 1px 1px #000}
+      .pc-cls span{display:block;font-size:9px;color:#e8dcc0;white-space:nowrap}
+      .pc-cls span + span{color:#9a8a6a}
+      .pc-cls i{font-style:normal;color:#ffd75a}
+      .pc-cls span + span i{color:#b8a070}
+      @media (max-width:900px){.pc-tallies{grid-template-columns:1fr 1fr}.pc-cols{grid-template-columns:1fr}.pc-classes{grid-template-columns:repeat(3,1fr)}}
+      @media (max-width:560px){.pc-secs{grid-template-columns:1fr}}
+    </style>
+    <section class="section" id="census">
+      <div class="post-hd"><span class="ico g"></span><h2>Profession Census</h2>
+        <div class="sub">4,934 characters looked up on the Forever armory &middot; 12 Nov 2026</div></div>
+      <div class="section-bd">
+        <div class="pc-tallies">
+          <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/inv_misc_book_09.jpg" alt=""></span><span class="v">4,934</span><span class="l">Characters sampled</span></div>
+          <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/inv_misc_pelt_wolf_01.jpg" alt=""></span><span class="v">Skinning <small>35%</small></span><span class="l">Most learned trade</span></div>
+          <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/inv_misc_armorkit_17.jpg" alt=""></span><span class="v">25% <small>LW &amp; Skinning</small></span><span class="l">Top pairing</span></div>
+          <div class="pc-tally"><span class="ti"><img src="/assets/images/wow/icons/large/inv_misc_note_01.jpg" alt=""></span><span class="v">114 <small>skill</small></span><span class="l">Average primary</span></div>
+        </div>
+        <div class="pc-cols">
+          <div class="ahwin"><div class="wt">Most Learned<small>share of characters with each trade</small></div>
+            <table class="ahtable"><thead><tr><th class="rk">#</th><th>Profession</th><th class="num">Learned by</th><th class="num">Avg Skill</th></tr></thead><tbody><tr><td class="rk">1</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/inv_misc_pelt_wolf_01.jpg" alt=""></span><a href="/forever/professions/skinning">Skinning</a></td>
+  <td class="num"><b>35.0%</b><span class="qbar"><i style="width:100%"></i></span></td>
+  <td class="num">158</td></tr><tr><td class="rk">2</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/inv_pick_02.jpg" alt=""></span><a href="/forever/professions/mining">Mining</a></td>
+  <td class="num"><b>33.1%</b><span class="qbar"><i style="width:95%"></i></span></td>
+  <td class="num">110</td></tr><tr><td class="rk">3</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/inv_misc_armorkit_17.jpg" alt=""></span><a href="/forever/professions/leatherworking">Leatherworking</a></td>
+  <td class="num"><b>25.4%</b><span class="qbar"><i style="width:73%"></i></span></td>
+  <td class="num">97</td></tr><tr><td class="rk">4</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/inv_misc_flower_02.jpg" alt=""></span><a href="/forever/professions/herbalism">Herbalism</a></td>
+  <td class="num"><b>21.5%</b><span class="qbar"><i style="width:61%"></i></span></td>
+  <td class="num">110</td></tr><tr><td class="rk">5</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/inv_fabric_silk_02.jpg" alt=""></span><a href="/forever/professions/tailoring">Tailoring</a></td>
+  <td class="num"><b>21.2%</b><span class="qbar"><i style="width:61%"></i></span></td>
+  <td class="num">99</td></tr><tr><td class="rk">6</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/inv_enchant_dustarcane.jpg" alt=""></span><a href="/forever/professions/enchanting">Enchanting</a></td>
+  <td class="num"><b>18.7%</b><span class="qbar"><i style="width:53%"></i></span></td>
+  <td class="num">100</td></tr><tr><td class="rk">7</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/inv_hammer_20.jpg" alt=""></span><a href="/forever/professions/blacksmithing">Blacksmithing</a></td>
+  <td class="num"><b>17.7%</b><span class="qbar"><i style="width:51%"></i></span></td>
+  <td class="num">97</td></tr><tr><td class="rk">8</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/trade_alchemy.jpg" alt=""></span><a href="/forever/professions/alchemy">Alchemy</a></td>
+  <td class="num"><b>14.0%</b><span class="qbar"><i style="width:40%"></i></span></td>
+  <td class="num">109</td></tr><tr><td class="rk">9</td><td class="trade"><span class="ic"><img src="/assets/images/wow/icons/small/trade_engineering.jpg" alt=""></span><a href="/forever/professions/engineering">Engineering</a></td>
+  <td class="num"><b>8.2%</b><span class="qbar"><i style="width:23%"></i></span></td>
+  <td class="num">111</td></tr></tbody></table></div>
+          <div class="ahwin"><div class="wt">Common Pairings<small>the two primaries together</small></div>
+            <table class="ahtable"><thead><tr><th class="rk">#</th><th>Pairing</th><th class="num">Characters</th></tr></thead><tbody><tr><td class="rk">1</td><td class="trade pair"><span class="ic"><img src="/assets/images/wow/icons/small/inv_misc_armorkit_17.jpg" alt=""></span><span class="ic"><img src="/assets/images/wow/icons/small/inv_misc_pelt_wolf_01.jpg" alt=""></span><span>Leatherworking <em>&amp;</em> Skinning</span></td>
+  <td class="num"><b>24.7%</b><span class="qbar"><i style="width:100%"></i></span></td></tr><tr><td class="rk">2</td><td class="trade pair"><span class="ic"><img src="/assets/images/wow/icons/small/inv_hammer_20.jpg" alt=""></span><span class="ic"><img src="/assets/images/wow/icons/small/inv_pick_02.jpg" alt=""></span><span>Blacksmithing <em>&amp;</em> Mining</span></td>
+  <td class="num"><b>17.3%</b><span class="qbar"><i style="width:70%"></i></span></td></tr><tr><td class="rk">3</td><td class="trade pair"><span class="ic"><img src="/assets/images/wow/icons/small/inv_enchant_dustarcane.jpg" alt=""></span><span class="ic"><img src="/assets/images/wow/icons/small/inv_fabric_silk_02.jpg" alt=""></span><span>Enchanting <em>&amp;</em> Tailoring</span></td>
+  <td class="num"><b>16.4%</b><span class="qbar"><i style="width:66%"></i></span></td></tr><tr><td class="rk">4</td><td class="trade pair"><span class="ic"><img src="/assets/images/wow/icons/small/trade_alchemy.jpg" alt=""></span><span class="ic"><img src="/assets/images/wow/icons/small/inv_misc_flower_02.jpg" alt=""></span><span>Alchemy <em>&amp;</em> Herbalism</span></td>
+  <td class="num"><b>13.4%</b><span class="qbar"><i style="width:54%"></i></span></td></tr><tr><td class="rk">5</td><td class="trade pair"><span class="ic"><img src="/assets/images/wow/icons/small/trade_engineering.jpg" alt=""></span><span class="ic"><img src="/assets/images/wow/icons/small/inv_pick_02.jpg" alt=""></span><span>Engineering <em>&amp;</em> Mining</span></td>
+  <td class="num"><b>7.5%</b><span class="qbar"><i style="width:30%"></i></span></td></tr><tr><td class="rk">6</td><td class="trade pair"><span class="ic"><img src="/assets/images/wow/icons/small/inv_pick_02.jpg" alt=""></span><span class="ic"><img src="/assets/images/wow/icons/small/inv_misc_pelt_wolf_01.jpg" alt=""></span><span>Mining <em>&amp;</em> Skinning</span></td>
+  <td class="num"><b>3.7%</b><span class="qbar"><i style="width:15%"></i></span></td></tr></tbody></table>
+            <div class="pc-note"><b>79%</b> of characters run one of the five classic pairings. Only 243 of 4,934 have a free slot.</div></div>
+        </div>
+        <div class="pc-h">Secondary Skills</div>
+        <div class="pc-secs"><div class="pc-sec"><span class="pc-sic"><img src="/assets/images/wow/icons/small/inv_misc_food_14.jpg" alt=""></span><div><b>Cooking</b><span>96% have it &middot; avg 67</span></div></div><div class="pc-sec"><span class="pc-sic"><img src="/assets/images/wow/icons/small/spell_holy_sealofsacrifice.jpg" alt=""></span><div><b>First Aid</b><span>73% have it &middot; avg 93</span></div></div><div class="pc-sec"><span class="pc-sic"><img src="/assets/images/wow/icons/small/trade_fishing.jpg" alt=""></span><div><b>Fishing</b><span>66% have it &middot; avg 64</span></div></div></div>
+        <div class="pc-h">Class Favourites</div>
+        <div class="pc-classes"><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_hunter.jpg" alt="">
+  <div><b style="color:#abd473">Hunter</b><span>Skinning <i>77%</i></span><span>Leatherworking <i>62%</i></span></div></div><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_paladin.jpg" alt="">
+  <div><b style="color:#f58cba">Paladin</b><span>Mining <i>86%</i></span><span>Blacksmithing <i>71%</i></span></div></div><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_shaman.jpg" alt="">
+  <div><b style="color:#0070de">Shaman</b><span>Skinning <i>59%</i></span><span>Leatherworking <i>50%</i></span></div></div><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_priest.jpg" alt="">
+  <div><b style="color:#ffffff">Priest</b><span>Tailoring <i>69%</i></span><span>Enchanting <i>59%</i></span></div></div><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_mage.jpg" alt="">
+  <div><b style="color:#69ccf0">Mage</b><span>Tailoring <i>64%</i></span><span>Enchanting <i>52%</i></span></div></div><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_rogue.jpg" alt="">
+  <div><b style="color:#fff569">Rogue</b><span>Skinning <i>63%</i></span><span>Leatherworking <i>52%</i></span></div></div><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_warrior.jpg" alt="">
+  <div><b style="color:#c79c6e">Warrior</b><span>Mining <i>91%</i></span><span>Blacksmithing <i>76%</i></span></div></div><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_warlock.jpg" alt="">
+  <div><b style="color:#9482c9">Warlock</b><span>Tailoring <i>66%</i></span><span>Enchanting <i>53%</i></span></div></div><div class="pc-cls"><img src="/assets/images/wow/icons/large/classicon_druid.jpg" alt="">
+  <div><b style="color:#ff7d0a">Druid</b><span>Skinning <i>54%</i></span><span>Leatherworking <i>47%</i></span></div></div></div>
+      </div>
+    </section>
+
+    <div class="pf-intro">
+      <svg class="book" viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="pf-bk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a0381a"/><stop offset="1" stop-color="#4a1208"/></linearGradient></defs>
+        <path d="M8 12c8-4 16-4 24 2v40c-8-6-16-6-24-2z" fill="#f8ecc8" stroke="#7a5a20" stroke-width="2"/>
+        <path d="M56 12c-8-4-16-4-24 2v40c8-6 16-6 24-2z" fill="#f1e1b4" stroke="#7a5a20" stroke-width="2"/>
+        <g stroke="#9c7c42" stroke-width="1.6"><line x1="13" y1="22" x2="27" y2="22"/><line x1="13" y1="28" x2="27" y2="28"/><line x1="13" y1="34" x2="24" y2="34"/>
+          <line x1="37" y1="22" x2="51" y2="22"/><line x1="37" y1="28" x2="51" y2="28"/><line x1="37" y1="34" x2="48" y2="34"/></g>
+        <path d="M4 52c10-4 20-4 28 3 8-7 18-7 28-3v4c-10-4-20-4-28 3-8-7-18-7-28-3z" fill="url(#pf-bk)"/>
+      </svg>
+      <p>Every adventurer may learn <b>two primary professions</b> and all <b>three secondary skills</b>. Choose a trade below to open its
+        market ledger: what its <b>materials</b>, <b>crafted goods</b> and <b>recipes</b> are listing for on the WoW: Forever auction house,
+        taken from the same in-game scans as the <a href="/forever/auctionhouse">Auction House</a> page.</p>
+    </div>
+
+    <div class="ahfilters">
+      <span class="lbl">Realm</span>
+      <div class="seg" id="pfRealm"></div>
+      <span class="lbl" style="margin-left:8px">Faction</span>
+      <div class="seg" id="pfFac"></div>
+    </div>
+
+    <section class="section">
+<div class="post-hd">
+<span class="ico g"></span>
+<h2>Crafting Professions</h2>
+<div class="sub">Turn raw goods into gear, potions and gadgets</div>
+</div>
+<div class="section-bd">
+        <div class="pf-cards">
+          <a class="pf-card" href="/forever/professions/alchemy" data-slug="alchemy">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/trade_alchemy.jpg" alt="" width="52" height="52"></span>
+            <h3>Alchemy</h3>
+            <span class="role">Crafting</span>
+            <span class="blurb">Brews potions, elixirs and transmutes from herbs gathered in the wild.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/blacksmithing" data-slug="blacksmithing">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/inv_hammer_20.jpg" alt="" width="52" height="52"></span>
+            <h3>Blacksmithing</h3>
+            <span class="role">Crafting</span>
+            <span class="blurb">Hammers bars and stone into mail, plate, weapons and sharpening stones.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/enchanting" data-slug="enchanting">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/inv_enchant_dustarcane.jpg" alt="" width="52" height="52"></span>
+            <h3>Enchanting</h3>
+            <span class="role">Crafting</span>
+            <span class="blurb">Disenchants magic gear into dust and essences, then binds them onto armor and weapons.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/engineering" data-slug="engineering">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/trade_engineering.jpg" alt="" width="52" height="52"></span>
+            <h3>Engineering</h3>
+            <span class="role">Crafting</span>
+            <span class="blurb">Builds bombs, scopes, gadgets and goggles out of metal parts and blasting powder.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/leatherworking" data-slug="leatherworking">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/inv_misc_armorkit_17.jpg" alt="" width="52" height="52"></span>
+            <h3>Leatherworking</h3>
+            <span class="role">Crafting</span>
+            <span class="blurb">Cures hides into leather and mail armor, armor kits and bags.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/tailoring" data-slug="tailoring">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/inv_fabric_silk_02.jpg" alt="" width="52" height="52"></span>
+            <h3>Tailoring</h3>
+            <span class="role">Crafting</span>
+            <span class="blurb">Weaves cloth dropped by humanoids into robes, cloth armor, shirts and bags.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+        </div>
+    </div>
+</section>
+    <section class="section">
+<div class="post-hd">
+<span class="ico"></span>
+<h2>Gathering Professions</h2>
+<div class="sub">Harvest the world for the crafters</div>
+</div>
+<div class="section-bd">
+        <div class="pf-cards">
+          <a class="pf-card" href="/forever/professions/herbalism" data-slug="herbalism">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/inv_misc_flower_02.jpg" alt="" width="52" height="52"></span>
+            <h3>Herbalism</h3>
+            <span class="role">Gathering</span>
+            <span class="blurb">Picks herbs from the world for alchemists and scribes.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/mining" data-slug="mining">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/inv_pick_02.jpg" alt="" width="52" height="52"></span>
+            <h3>Mining</h3>
+            <span class="role">Gathering</span>
+            <span class="blurb">Digs ore and gems from mineral veins and smelts ore into bars.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/skinning" data-slug="skinning">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/inv_misc_pelt_wolf_01.jpg" alt="" width="52" height="52"></span>
+            <h3>Skinning</h3>
+            <span class="role">Gathering</span>
+            <span class="blurb">Strips leather, hides and scales from slain beasts.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+        </div>
+    </div>
+</section>
+    <section class="section">
+<div class="post-hd">
+<span class="ico p"></span>
+<h2>Secondary Skills</h2>
+<div class="sub">Any character can learn all three</div>
+</div>
+<div class="section-bd">
+        <div class="pf-cards">
+          <a class="pf-card" href="/forever/professions/cooking" data-slug="cooking">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/inv_misc_food_14.jpg" alt="" width="52" height="52"></span>
+            <h3>Cooking</h3>
+            <span class="role">Secondary skill</span>
+            <span class="blurb">Turns meat, fish and spices into food that restores health and grants buffs.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/first-aid" data-slug="first-aid">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/spell_holy_sealofsacrifice.jpg" alt="" width="52" height="52"></span>
+            <h3>First Aid</h3>
+            <span class="role">Secondary skill</span>
+            <span class="blurb">Sews cloth into bandages and makes anti-venoms.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+          <a class="pf-card" href="/forever/professions/fishing" data-slug="fishing">
+            <span class="pf-ic"><img src="/assets/images/wow/icons/large/trade_fishing.jpg" alt="" width="52" height="52"></span>
+            <h3>Fishing</h3>
+            <span class="role">Secondary skill</span>
+            <span class="blurb">Reels in fish for cooks and alchemists, plus the odd clam and trophy catch.</span>
+            <span class="ledger"><span><b data-k="items">—</b> items · <b data-k="gold">—</b> listed</span><span class="go">Market »</span></span>
+          </a>
+        </div>
+    </div>
+</section>
+
+    <div class="ahwin pf-board" style="margin-bottom:16px">
+      <div class="wt">Trade Board<small>professions ranked by listed asking value</small></div>
+      <table class="ahtable"><thead><tr><th class="rk">#</th><th>Profession</th><th class="num">Items</th><th class="num">Units</th><th class="num">Listed Value</th></tr></thead>
+        <tbody id="pfBoard"></tbody></table>
+    </div>
+
+    <div class="source">Auction data from in-game scans · asking prices on listed auctions, not completed sales · an item can count toward more than one trade</div>
+  </main>
+
+</div>
+
+<div id="tip"></div>
+
+<footer class="footer">
+  <div style="flex:1">
+    <div class="links"><a href="/">WoWCensus</a><a href="/realms">Realms</a><a href="/faq.php">FAQ</a><a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Discord</a><a href="/llms.txt">llms.txt</a></div>
+    <p>WoWCensus samples characters seen in-game; counts describe observed characters, not unique players or a live online population. Not affiliated with or endorsed by Blizzard Entertainment.</p>
+  </div>
+</footer>
+
+<script src="/wow2008/common.js?v=60"></script>
+<script src="/wow2008/site.js?v=60"></script>
+<script>window.ROUTE ={"edition":"forever","page":"professions"};</script>
+<script>
+const PF = {"generated":"2026-11-12 16:15Z","views":[{"realm":"all","faction":"all","scanned":"2026-11-12","empty":false,"p":{"alchemy":[167,136512,16288,41,74,52],"blacksmithing":[196,165688,10710,36,113,47],"enchanting":[85,44320,8535,33,9,43],"engineering":[174,688229,10631,45,87,42],"leatherworking":[302,138233,12973,56,127,119],"tailoring":[267,115455,13005,29,126,112],"herbalism":[37,79215,6928,37,0,0],"mining":[51,134179,7945,41,10,0],"skinning":[48,90466,6265,48,0,0],"cooking":[194,252986,5660,70,68,56],"first-aid":[30,117078,2621,8,10,12],"fishing":[45,91150,1530,44,0,1]}},{"realm":"all","faction":"Alliance","scanned":"2026-11-12","empty":false,"p":{"alchemy":[165,69343,7368,41,74,50],"blacksmithing":[186,87900,5237,34,108,44],"enchanting":[82,25672,3170,32,9,41],"engineering":[167,385385,4946,42,85,40],"leatherworking":[298,73375,6645,55,125,118],"tailoring":[265,61205,6240,29,126,110],"herbalism":[37,41349,3691,37,0,0],"mining":[49,72070,4161,39,10,0],"skinning":[47,48564,3172,47,0,0],"cooking":[188,128772,2608,70,63,55],"first-aid":[30,59581,1549,8,10,12],"fishing":[42,39833,442,41,0,1]}},{"realm":"all","faction":"Horde","scanned":"2026-11-12","empty":false,"p":{"alchemy":[166,67169,8920,41,74,51],"blacksmithing":[195,77788,5472,36,113,46],"enchanting":[84,18648,5365,32,9,43],"engineering":[168,302844,5684,45,84,39],"leatherworking":[286,64858,6328,56,126,104],"tailoring":[263,54250,6764,29,124,110],"herbalism":[37,37866,3236,37,0,0],"mining":[51,62109,3784,41,10,0],"skinning":[48,41902,3092,48,0,0],"cooking":[180,124214,3052,70,58,52],"first-aid":[30,57497,1072,8,10,12],"fishing":[44,51317,1087,43,0,1]}},{"realm":"eu:forever:CAMWOW EU4 Realm 10 RP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 10 RP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 10 RP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 2 PvP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 2 PvP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 2 PvP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 3 PvE","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 3 PvE","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 3 PvE","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 7 PvE","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 7 PvE","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 7 PvE","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 9 RP PvP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 9 RP PvP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"eu:forever:CAMWOW EU4 Realm 9 RP PvP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 10 RP","faction":"all","scanned":"2026-11-05","empty":false,"p":{"alchemy":[46,6860,69,15,17,14],"blacksmithing":[58,8435,193,14,37,7],"enchanting":[22,2981,71,11,3,8],"engineering":[45,50862,176,17,23,5],"leatherworking":[55,9826,152,13,31,11],"tailoring":[62,4381,94,12,34,16],"herbalism":[14,3309,32,14,0,0],"mining":[22,6951,146,17,5,0],"skinning":[14,8234,87,14,0,0],"cooking":[73,21069,133,35,22,16],"first-aid":[13,4407,32,6,3,4],"fishing":[17,6993,15,16,0,1]}},{"realm":"us:forever:CAMWOW US1 Realm 10 RP","faction":"Alliance","scanned":"2026-11-05","empty":false,"p":{"alchemy":[46,6860,69,15,17,14],"blacksmithing":[58,8435,193,14,37,7],"enchanting":[22,2981,71,11,3,8],"engineering":[45,50862,176,17,23,5],"leatherworking":[55,9826,152,13,31,11],"tailoring":[62,4381,94,12,34,16],"herbalism":[14,3309,32,14,0,0],"mining":[22,6951,146,17,5,0],"skinning":[14,8234,87,14,0,0],"cooking":[73,21069,133,35,22,16],"first-aid":[13,4407,32,6,3,4],"fishing":[17,6993,15,16,0,1]}},{"realm":"us:forever:CAMWOW US1 Realm 10 RP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 3 PvE","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 3 PvE","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 3 PvE","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 6 PvP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 6 PvP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 6 PvP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 7 PvE","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 7 PvE","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 7 PvE","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 9 RP PvP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 9 RP PvP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US1 Realm 9 RP PvP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 10 RP PvP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 10 RP PvP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 10 RP PvP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 11 RP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 11 RP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 11 RP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 2 PvP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 2 PvP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 2 PvP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 3 PvE","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 3 PvE","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 3 PvE","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 5 PvE","faction":"all","scanned":"2026-11-12","empty":false,"p":{"alchemy":[167,129652,16218,41,74,52],"blacksmithing":[196,157253,10517,36,113,47],"enchanting":[85,41339,8464,33,9,43],"engineering":[174,637367,10454,45,87,42],"leatherworking":[302,128407,12821,56,127,119],"tailoring":[267,111074,12910,29,126,112],"herbalism":[37,75906,6895,37,0,0],"mining":[51,127228,7799,41,10,0],"skinning":[48,82232,6177,48,0,0],"cooking":[194,231917,5527,70,68,56],"first-aid":[30,112671,2589,8,10,12],"fishing":[45,84157,1514,44,0,1]}},{"realm":"us:forever:CAMWOW US2 Realm 5 PvE","faction":"Alliance","scanned":"2026-11-12","empty":false,"p":{"alchemy":[165,62483,7298,41,74,50],"blacksmithing":[186,79465,5044,34,108,44],"enchanting":[82,22691,3098,32,9,41],"engineering":[167,334523,4769,42,85,40],"leatherworking":[298,63549,6493,55,125,118],"tailoring":[265,56824,6145,29,126,110],"herbalism":[37,38040,3659,37,0,0],"mining":[49,65119,4015,39,10,0],"skinning":[47,40330,3085,47,0,0],"cooking":[188,107703,2475,70,63,55],"first-aid":[30,55174,1516,8,10,12],"fishing":[42,32840,427,41,0,1]}},{"realm":"us:forever:CAMWOW US2 Realm 5 PvE","faction":"Horde","scanned":"2026-11-12","empty":false,"p":{"alchemy":[166,67169,8920,41,74,51],"blacksmithing":[195,77788,5472,36,113,46],"enchanting":[84,18648,5365,32,9,43],"engineering":[168,302844,5684,45,84,39],"leatherworking":[286,64858,6328,56,126,104],"tailoring":[263,54250,6764,29,124,110],"herbalism":[37,37866,3236,37,0,0],"mining":[51,62109,3784,41,10,0],"skinning":[48,41902,3092,48,0,0],"cooking":[180,124214,3052,70,58,52],"first-aid":[30,57497,1072,8,10,12],"fishing":[44,51317,1087,43,0,1]}},{"realm":"us:forever:CAMWOW US2 Realm 7 PvE","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 7 PvE","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 7 PvE","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 9 RP PvP","faction":"all","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 9 RP PvP","faction":"Alliance","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}},{"realm":"us:forever:CAMWOW US2 Realm 9 RP PvP","faction":"Horde","scanned":null,"empty":true,"p":{"alchemy":[0,0,0,0,0,0],"blacksmithing":[0,0,0,0,0,0],"enchanting":[0,0,0,0,0,0],"engineering":[0,0,0,0,0,0],"leatherworking":[0,0,0,0,0,0],"tailoring":[0,0,0,0,0,0],"herbalism":[0,0,0,0,0,0],"mining":[0,0,0,0,0,0],"skinning":[0,0,0,0,0,0],"cooking":[0,0,0,0,0,0],"first-aid":[0,0,0,0,0,0],"fishing":[0,0,0,0,0,0]}}]};
+const CARDS = {"alchemy":{"name":"Alchemy","role":"Crafting","kind":"primary","icon":"trade_alchemy","blurb":"Brews potions, elixirs and transmutes from herbs gathered in the wild.","url":"/forever/professions/alchemy"},"blacksmithing":{"name":"Blacksmithing","role":"Crafting","kind":"primary","icon":"inv_hammer_20","blurb":"Hammers bars and stone into mail, plate, weapons and sharpening stones.","url":"/forever/professions/blacksmithing"},"enchanting":{"name":"Enchanting","role":"Crafting","kind":"primary","icon":"inv_enchant_dustarcane","blurb":"Disenchants magic gear into dust and essences, then binds them onto armor and weapons.","url":"/forever/professions/enchanting"},"engineering":{"name":"Engineering","role":"Crafting","kind":"primary","icon":"trade_engineering","blurb":"Builds bombs, scopes, gadgets and goggles out of metal parts and blasting powder.","url":"/forever/professions/engineering"},"leatherworking":{"name":"Leatherworking","role":"Crafting","kind":"primary","icon":"inv_misc_armorkit_17","blurb":"Cures hides into leather and mail armor, armor kits and bags.","url":"/forever/professions/leatherworking"},"tailoring":{"name":"Tailoring","role":"Crafting","kind":"primary","icon":"inv_fabric_silk_02","blurb":"Weaves cloth dropped by humanoids into robes, cloth armor, shirts and bags.","url":"/forever/professions/tailoring"},"herbalism":{"name":"Herbalism","role":"Gathering","kind":"primary","icon":"inv_misc_flower_02","blurb":"Picks herbs from the world for alchemists and scribes.","url":"/forever/professions/herbalism"},"mining":{"name":"Mining","role":"Gathering","kind":"primary","icon":"inv_pick_02","blurb":"Digs ore and gems from mineral veins and smelts ore into bars.","url":"/forever/professions/mining"},"skinning":{"name":"Skinning","role":"Gathering","kind":"primary","icon":"inv_misc_pelt_wolf_01","blurb":"Strips leather, hides and scales from slain beasts.","url":"/forever/professions/skinning"},"cooking":{"name":"Cooking","role":"Secondary","kind":"secondary","icon":"inv_misc_food_14","blurb":"Turns meat, fish and spices into food that restores health and grants buffs.","url":"/forever/professions/cooking"},"first-aid":{"name":"First Aid","role":"Secondary","kind":"secondary","icon":"spell_holy_sealofsacrifice","blurb":"Sews cloth into bandages and makes anti-venoms.","url":"/forever/professions/first-aid"},"fishing":{"name":"Fishing","role":"Secondary","kind":"secondary","icon":"trade_fishing","blurb":"Reels in fish for cooks and alchemists, plus the odd clam and trophy catch.","url":"/forever/professions/fishing"}};
+const REALMS = [["all","All realms"],["eu:forever:CAMWOW EU4 Realm 10 RP","CAMWOW EU4 Realm 10 RP"],["eu:forever:CAMWOW EU4 Realm 2 PvP","CAMWOW EU4 Realm 2 PvP"],["eu:forever:CAMWOW EU4 Realm 3 PvE","CAMWOW EU4 Realm 3 PvE"],["eu:forever:CAMWOW EU4 Realm 7 PvE","CAMWOW EU4 Realm 7 PvE"],["eu:forever:CAMWOW EU4 Realm 9 RP PvP","CAMWOW EU4 Realm 9 RP PvP"],["us:forever:CAMWOW US1 Realm 10 RP","CAMWOW US1 Realm 10 RP"],["us:forever:CAMWOW US1 Realm 3 PvE","CAMWOW US1 Realm 3 PvE"],["us:forever:CAMWOW US1 Realm 6 PvP","CAMWOW US1 Realm 6 PvP"],["us:forever:CAMWOW US1 Realm 7 PvE","CAMWOW US1 Realm 7 PvE"],["us:forever:CAMWOW US1 Realm 9 RP PvP","CAMWOW US1 Realm 9 RP PvP"],["us:forever:CAMWOW US2 Realm 10 RP PvP","CAMWOW US2 Realm 10 RP PvP"],["us:forever:CAMWOW US2 Realm 11 RP","CAMWOW US2 Realm 11 RP"],["us:forever:CAMWOW US2 Realm 2 PvP","CAMWOW US2 Realm 2 PvP"],["us:forever:CAMWOW US2 Realm 3 PvE","CAMWOW US2 Realm 3 PvE"],["us:forever:CAMWOW US2 Realm 5 PvE","CAMWOW US2 Realm 5 PvE"],["us:forever:CAMWOW US2 Realm 7 PvE","CAMWOW US2 Realm 7 PvE"],["us:forever:CAMWOW US2 Realm 9 RP PvP","CAMWOW US2 Realm 9 RP PvP"]];
+const FACTIONS = [["all","Both"],["Alliance","Alliance"],["Horde","Horde"]];
+const view = (r, f) => PF.views.find(v => v.realm === r && v.faction === f);
+const hasData = v => v && !v.empty;
+const goldShort = g => g >= 1e6 ? (g / 1e6).toFixed(1) + 'M' : g >= 1e3 ? Math.round(g / 1e3) + 'k' : fmt(g);
+const goldMoney = g => `<span class="money"><span>${goldShort(g)}<i class="g"></i></span></span>`;
+let realm = REALMS[0][0], fac = FACTIONS[0][0];
+
+function renderFilters() {
+  const btn = (attr, k, l, on, ok) => `<button data-${attr}="${esc(k)}" class="${on ? 'on' : ''} ${ok ? '' : 'nodata'}" ${ok ? '' : 'title="No auction scans yet"'}>${esc(l)}</button>`;
+  document.getElementById('pfRealm').innerHTML = REALMS.length > 6
+    ? `<select class="realm-pick" aria-label="Realm">${REALMS.map(([k, l]) => `<option value="${esc(k)}"${k === realm ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select>`
+    : REALMS.map(([k, l]) => btn('r', k, l, k === realm, FACTIONS.some(([f]) => hasData(view(k, f))))).join('');
+  document.getElementById('pfFac').innerHTML = FACTIONS.map(([k, l]) => btn('f', k, l, k === fac, hasData(view(realm, k)))).join('');
+}
+const pickRealm = r => { realm = r; if (!hasData(view(realm, fac))) fac = (FACTIONS.find(([f]) => hasData(view(realm, f))) || ['all'])[0]; render(); };
+document.getElementById('pfRealm').addEventListener('click', e => { if (e.target.dataset.r) pickRealm(e.target.dataset.r); });
+document.getElementById('pfRealm').addEventListener('change', e => pickRealm(e.target.value));
+document.getElementById('pfFac').addEventListener('click', e => { if (e.target.dataset.f) { fac = e.target.dataset.f; render(); } });
+
+function render() {
+  renderFilters();
+  const v = view(realm, fac), ok = hasData(v);
+  document.getElementById('pfstamp').textContent = ok ? `Scanned: ${v.scanned} · Page generated: ${PF.generated}` : `Page generated: ${PF.generated}`;
+  // Card links carry the filter so the trade page opens on the same realm and faction.
+  const q = (realm === 'all' && fac === 'all') ? '' : `?realm=${encodeURIComponent(realm)}&faction=${encodeURIComponent(fac)}`;
+  document.querySelectorAll('.pf-card').forEach(a => {
+    const p = ok ? v.p[a.dataset.slug] : null;
+    a.href = CARDS[a.dataset.slug].url + q;
+    a.querySelector('[data-k=items]').textContent = p ? fmt(p[0]) : '0';
+    a.querySelector('[data-k=gold]').textContent = p ? goldShort(p[2]) + ' g' : '0 g';
+    a.classList.toggle('quiet', !p || !p[0]);
+  });
+  const rows = ok ? Object.entries(v.p).sort((a, b) => b[1][2] - a[1][2]) : [];
+  const max = rows.length ? rows[0][1][2] || 1 : 1;
+  document.getElementById('pfBoard').innerHTML = rows.length ? rows.map(([s, p], i) => `<tr>
+      <td class="rk">${i + 1}</td>
+      <td class="trade"><a href="${esc(CARDS[s].url + q)}">${wowIcon(CARDS[s].icon)}${esc(CARDS[s].name)}</a></td>
+      <td class="num">${fmt(p[0])}</td><td class="num">${fmt(p[1])}</td>
+      <td class="num">${goldMoney(p[2])}<span class="qbar"><i data-w="${p[2] / max * 100}%"></i></span></td></tr>`).join('')
+    : '<tr><td colspan="5" style="padding:14px">No auction scan for this realm and faction yet.</td></tr>';
+  grow(document.getElementById('pfBoard'));
+}
+render();
+</script>
+</body>
+</html>

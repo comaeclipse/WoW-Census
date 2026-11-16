@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="/style.css"/>
+  <title>WoWCensus Companion</title>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>WoWCensus Companion</h1>
+    <p class="sub" id="summary">Starting…</p>
+  </div>
+  <div class="actions">
+    <button id="btn-scan" class="ghost">Scan</button>
+    <button id="btn-backup" class="ghost">Back up now</button>
+    <button id="btn-upload">Upload now</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="status" class="active">Status</button>
+  <button role="tab" data-tab="settings">Settings</button>
+  <button role="tab" data-tab="maintenance">Maintenance</button>
+  <button role="tab" data-tab="activity">Activity</button>
+</nav>
+
+<main>
+  <section id="tab-status" class="panel active">
+    <div id="consent-banner" class="banner" hidden>
+      Automatic uploads are <b>off</b>. Nothing leaves this computer until you turn them on in Settings or press <b>Upload now</b>.
+    </div>
+    <table class="files">
+      <thead><tr><th>Edition</th><th>Account</th><th>Size</th><th>Saved</th><th>Upload</th></tr></thead>
+      <tbody id="files"></tbody>
+    </table>
+    <p id="no-files" class="muted" hidden>No WoWCensus.lua found yet. Add your World of Warcraft folder in Settings, then /reload or log out in game.</p>
+  </section>
+
+  <section id="tab-settings" class="panel">
+    <form id="settings">
+      <fieldset>
+        <legend>Consent</legend>
+        <label class="check"><input type="checkbox" name="autoUpload"/> Upload new WoWCensus saves automatically</label>
+        <p class="hint">Uploads include your WoWCensus.lua (character names, realms, census data) and a manifest. Your file path and account folder are never sent.</p>
+        <label class="check"><input type="checkbox" name="includeSystemInfo"/> Include basic system info (OS, architecture, CPU count, Go version)</label>
+        <label class="check"><input type="checkbox" name="startAtLogin"/> Start at login (in the tray)</label>
+      </fieldset>
+      <fieldset>
+        <legend>Server</legend>
+        <label>Upload server<input name="serverUrl" type="url" placeholder="https://upload.wowcensus.io"/></label>
+        <label>Device token<input name="deviceToken" type="password" autocomplete="off" placeholder="Paste your token"/></label>
+        <p class="hint" id="token-hint"></p>
+        <button type="button" id="btn-clear-token" class="ghost small">Remove token</button>
+      </fieldset>
+      <fieldset>
+        <legend>World of Warcraft folders</legend>
+        <textarea name="wowRoots" rows="3" placeholder="C:\Program Files (x86)\World of Warcraft"></textarea>
+        <p class="hint">One per line. Typical install locations are checked automatically.</p>
+        <button type="button" id="btn-detect" class="ghost small">Detect now</button>
+        <ul id="detected" class="detected"></ul>
+      </fieldset>
+      <fieldset>
+        <legend>Backups and limits</legend>
+        <label class="check"><input type="checkbox" name="autoBackup"/> Back up each new save (compressed, local only)</label>
+        <div class="grid">
+          <label>Warn above (MB)<input name="sizeThresholdMB" type="number" min="1"/></label>
+          <label>Generations kept per file<input name="backupKeep" type="number" min="1"/></label>
+          <label>Backup cap (MB)<input name="backupCapMB" type="number" min="1"/></label>
+          <label>Check every (seconds)<input name="pollSeconds" type="number" min="5" max="600"/></label>
+        </div>
+        <label>Backup folder<input name="backupDir" placeholder="(default)"/></label>
+      </fieldset>
+      <div class="save-row">
+        <span id="save-msg" class="muted"></span>
+        <button type="submit">Save settings</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="tab-maintenance" class="panel">
+    <p class="muted">A read-only report. The companion never edits WoW's live SavedVariables; it only manages its own backups.</p>
+    <button id="btn-report" class="ghost small">Refresh report</button>
+    <div id="report"></div>
+  </section>
+
+  <section id="tab-activity" class="panel">
+    <ol id="log" class="log"></ol>
+  </section>
+</main>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

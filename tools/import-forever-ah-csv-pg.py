@@ -43,16 +43,14 @@ legacy = pg.legacy
 SOURCE = "forever"
 UNMAPPED = "forever-unmapped"
 CENTRAL = ZoneInfo("America/Chicago")
-# House id groups seen in the Forever auction API: Alliance / Horde / Neutral per economy.
-HOUSE_FACTION = {**{h: "Alliance" for h in (110, 111, 112, 119, 123)},
-                 **{h: "Horde" for h in (113, 114, 115, 120, 124)},
-                 **{h: "Neutral" for h in (116, 117, 118, 121, 125)}}
-# Houses checked against an addon scan from that ruleset and faction (exact rare
-# listings: 1-2 units, >= 1g). Mapped by default; --map adds or overrides.
-#   us:111  2026-11-10: 42 exact matches vs CAMWOW US2 Realm 5 PvE-Alliance; others <= 3
-#   us:114  2026-11-10: 294 of 502 vs CAMWOW US2 Realm 5 PvE-Horde (21:23 UTC); others <= 5
-VERIFIED_HOUSES = {("us", 111): "CAMWOW US2 Realm 5 PvE-Alliance",
-                   ("us", 114): "CAMWOW US2 Realm 5 PvE-Horde"}
+spec = importlib.util.spec_from_file_location("ah_houses", REPO / "tools" / "forever-auction-houses-pg.py")
+houses_db = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(houses_db)
+# Faction per API house id, and the houses cleared for publication. The catalog
+# lives in forever_auction_houses / forever_auction_house_markets (see
+# tools/forever-auction-houses-pg.py); VERIFIED_HOUSES is only the seed.
+HOUSE_FACTION = houses_db.HOUSE_FACTION
+VERIFIED_HOUSES = {k: v[0] for k, v in houses_db.MARKETS.items()}
 COLUMNS = ["snapshot_time_central", "house_id", "item_id", "item_name", "listing_type", "listings",
            "total_quantity", "min_unit_buyout_gold", "median_unit_buyout_gold", "mean_unit_buyout_gold"]
 
@@ -114,7 +112,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    mapping = dict(VERIFIED_HOUSES)
+    overrides = {}
     for m in args.map:
         match = re.fullmatch(r"(us|eu):(\d+)=(.+-(Alliance|Horde|Neutral))", m)
         if not match:
@@ -122,7 +120,7 @@ def main():
         house = int(match.group(2))
         if HOUSE_FACTION.get(house) != match.group(4):
             raise SystemExit(f"--map {m!r}: house {house} is {HOUSE_FACTION.get(house)}, not {match.group(4)}")
-        mapping[(match.group(1), house)] = match.group(3)
+        overrides[(match.group(1), house)] = match.group(3)
 
     conn = pg.psycopg2.connect(args.dsn)
     conn.autocommit = False
@@ -131,6 +129,8 @@ def main():
     lock.execute("SELECT pg_advisory_lock(hashtext('marketlens-import'))")
     conn.commit()
     db.execute(f'SET search_path TO "{args.schema}"')
+    houses_db.ensure(conn.cursor(), args.schema)
+    mapping = {**houses_db.verified_markets(conn.cursor(), args.schema), **overrides}
     imported = {row[0] for row in db.execute("SELECT sha256 FROM local_source_files")}
     for realm in set(mapping.values()):
         if not db.execute("SELECT 1 FROM datasets WHERE game=? AND source_game=?", ("realm:" + realm, SOURCE)).fetchone():

@@ -9,7 +9,7 @@ which no page reads. Once a house is verified (its rare listings match an
 addon scan from that ruleset and faction), this replays each of its stored
 snapshots, oldest first, into that market's existing key exactly as the CSV
 importer would have with --map: snapshots, daily history and current items.
-It then moves the import log rows to source 'forever' and deletes the
+It records the house in forever_auction_house_markets, moves the import log rows to source 'forever' and deletes the
 unpublished copies. One transaction; --dry-run rolls it back after the report.
 Run it through tools/import-live.py (kind `map-house`) to do the same live.
 """
@@ -33,6 +33,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--house", required=True, metavar="REGION:ID", help="for example us:114")
     parser.add_argument("--realm", required=True, help="the market key without 'realm:', ending in its faction")
+    parser.add_argument("--evidence", help="how it was verified, stored in forever_auction_houses")
     parser.add_argument("--dsn", default=pg.DEFAULT_DSN)
     parser.add_argument("--schema", default="marketlens_import")
     parser.add_argument("--archive", help="ignored (accepted so tools/import-live.py can run this)")
@@ -56,6 +57,7 @@ def main():
     lock.execute("SELECT pg_advisory_lock(hashtext('marketlens-import'))")
     conn.commit()
     db.execute(f'SET search_path TO "{args.schema}"')
+    ah.houses_db.ensure(conn.cursor(), args.schema)
     if not db.execute("SELECT 1 FROM datasets WHERE game=? AND source_game=?", ("realm:" + args.realm, ah.SOURCE)).fetchone():
         raise SystemExit(f"realm:{args.realm} is not an existing {ah.SOURCE} market")
 
@@ -78,6 +80,9 @@ def main():
         report["snapshots"].append({"capturedAt": t, "sha256": digest, "items": len(items),
                                     "currentItemsUpdated": details["currentItemsUpdated"],
                                     "olderCurrentItemsKept": details["olderCurrentItemsKept"]})
+    if snapshots:
+        ah.houses_db.record_market(conn.cursor(), region, house, args.realm, args.evidence, args.schema)
+        report["catalog"] = f"forever_auction_house_markets {region}:{house} -> {args.realm}"
     removed = db.execute("DELETE FROM local_auction_snapshots WHERE source_game=? AND game=?", (ah.UNMAPPED, game)).rowcount
     report["unpublishedRowsRemoved"] = removed
     print(json.dumps(report, indent=1))
