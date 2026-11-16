@@ -163,7 +163,8 @@ foreach (['census_characters', 'census_latest', 'census_sightings', 'census_seen
 printf("census cache built for import %s in %.1fs\n", $version, microtime(true) - $started);
 
 // The guilds page views, from the tables just published (a fresh process: this one built live).
-$env = getenv(); unset($env['ML_NO_CENSUS_CACHE']);
+// ML_CENSUS_PUBLISHED: an import that lands meanwhile must not make the tables look stale.
+$env = getenv(); unset($env['ML_NO_CENSUS_CACHE']); $env['ML_CENSUS_PUBLISHED'] = '1';
 $proc = proc_open([PHP_BINARY, '-d', 'memory_limit=' . ini_get('memory_limit'), __DIR__ . '/build-guild-views.php'],
   [STDIN, STDOUT, STDERR], $pipes, null, $env);
 if (!is_resource($proc) || proc_close($proc) !== 0) fwrite(STDERR, "warning: build-guild-views.php failed; the guilds page builds live\n");
