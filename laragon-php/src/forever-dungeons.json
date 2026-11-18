@@ -2,9 +2,9 @@
  "source": {
   "addon": "Dungeon Journal",
   "author": "Exehn",
-  "version": "2.0.8"
+  "version": "2.0.10"
  },
- "uploaders": 1,
+ "uploaders": 2,
  "dungeons": [
   {
    "name": "Hall of Thanes",
@@ -376,7 +376,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     },
     {
      "name": "Witherfang",
@@ -401,6 +401,34 @@
        "id": 271203,
        "name": "Segmented Spider Leg",
        "slot": "Two-Hand, Staff",
+       "quality": 3
+      }
+     ],
+     "killedBy": 2
+    },
+    {
+     "name": "Viktor the Vile",
+     "npcID": 256035,
+     "level": "19",
+     "rare": false,
+     "description": "",
+     "loot": [
+      {
+       "id": 271211,
+       "name": "Vilewalkers",
+       "slot": "Feet, Mail",
+       "quality": 3
+      },
+      {
+       "id": 271212,
+       "name": "Bloodied Chestwraps",
+       "slot": "Chest, Leather",
+       "quality": 3
+      },
+      {
+       "id": 271218,
+       "name": "Vileblood Scimitar",
+       "slot": "One-Hand, Sword",
        "quality": 3
       }
      ],
@@ -432,7 +460,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 0
+     "killedBy": 1
     },
     {
      "name": "Bjork",
@@ -460,7 +488,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 0
+     "killedBy": 1
     },
     {
      "name": "Rath'mael",
@@ -492,43 +520,9 @@
        "name": "Blueprint: Fermenter",
        "slot": "Blueprint",
        "quality": 2
-      },
-      {
-       "id": 273103,
-       "name": "Blueprint: Arcane Salvager",
-       "slot": "Blueprint",
-       "quality": 2
       }
      ],
-     "killedBy": 1
-    },
-    {
-     "name": "Viktor the Vile",
-     "npcID": 256035,
-     "level": "19",
-     "rare": false,
-     "description": "",
-     "loot": [
-      {
-       "id": 271211,
-       "name": "Vilewalkers",
-       "slot": "Feet, Mail",
-       "quality": 3
-      },
-      {
-       "id": 271212,
-       "name": "Bloodied Chestwraps",
-       "slot": "Chest, Leather",
-       "quality": 3
-      },
-      {
-       "id": 271218,
-       "name": "Vileblood Scimitar",
-       "slot": "One-Hand, Sword",
-       "quality": 3
-      }
-     ],
-     "killedBy": 0
+     "killedBy": 2
     },
     {
      "name": "Lordaeron Captain",
@@ -1316,7 +1310,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     },
     {
      "name": "Lady Anacondra",
@@ -1356,7 +1350,7 @@
        "quality": 2
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     },
     {
      "name": "Kresh",
@@ -1384,7 +1378,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 0
+     "killedBy": 1
     },
     {
      "name": "Lord Pythas",
@@ -1430,7 +1424,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     },
     {
      "name": "Skum",
@@ -1464,7 +1458,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 0
+     "killedBy": 1
     },
     {
      "name": "Lord Serpentis",
@@ -1510,7 +1504,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     },
     {
      "name": "Verdan the Everliving",
@@ -1544,7 +1538,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 0
+     "killedBy": 1
     },
     {
      "name": "Mutanus the Devourer",
@@ -1584,7 +1578,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     },
     {
      "name": "Deviate Faerie Dragon",
@@ -4568,7 +4562,7 @@
    "name": "City of Dalaran",
    "slug": "city-of-dalaran",
    "order": 9,
-   "level": "28-33",
+   "level": "28-35",
    "location": "Alterac Mountains",
    "description": "The restored mage city of Dalaran has become a new five-player dungeon in WoW Forever. Enter through the sewers and the Underbelly, then fight through the streets to the Violet Citadel.",
    "icon": "spell_arcane_arcane01",
@@ -8062,7 +8056,7 @@
    "name": "The Drowned City",
    "slug": "the-drowned-city",
    "order": 14,
-   "level": "35-40",
+   "level": "35-42",
    "location": "Stranglethorn Vale",
    "description": "I'lalai, a lost Gurubashi troll city, has risen from the sea off the coast of Stranglethorn Vale, west of Grom'gol. Trolls and naga roam the streets of this open-air dungeon, a pirate ship lies wrecked nearby, and the weather builds into a full storm before the final fight. Dive underwater to find the entrance.",
    "icon": "spell_frost_summonwaterelemental",
@@ -8202,6 +8196,48 @@
      "slot": "Two-Hand, Sword",
      "quality": 3,
      "from": "Risen Sentry / Champion of the Deep / Brinescale Sorceress / Makrura Snapper"
+    },
+    {
+     "id": 286998,
+     "name": "Deep Flora Bindings",
+     "slot": "Wrist, Cloth",
+     "quality": 3
+    },
+    {
+     "id": 286999,
+     "name": "Deathcrawler's Chest",
+     "slot": "Chest, Leather",
+     "quality": 3
+    },
+    {
+     "id": 287000,
+     "name": "Skin-Flayed Footguards",
+     "slot": "Feet, Leather",
+     "quality": 3
+    },
+    {
+     "id": 287001,
+     "name": "Waterlogged Shoulderpads",
+     "slot": "Shoulder, Leather",
+     "quality": 3
+    },
+    {
+     "id": 287003,
+     "name": "Corroded Handguards",
+     "slot": "Hands, Mail",
+     "quality": 3
+    },
+    {
+     "id": 287004,
+     "name": "Touch of the Depths",
+     "slot": "Ranged, Wand",
+     "quality": 3
+    },
+    {
+     "id": 287006,
+     "name": "Resurged Axe",
+     "slot": "One-Hand, Axe",
+     "quality": 3
     }
    ]
   },
@@ -8209,7 +8245,7 @@
    "name": "Scarlet Monastery: Armory",
    "slug": "scarlet-monastery-armory",
    "order": 15,
-   "level": "34-42",
+   "level": "36-44",
    "location": "Tirisfal Glades",
    "description": "The armory wing of the Scarlet Monastery, where the Crusade drills its recruits under the eye of Herod, the Scarlet Champion. The door is locked: you need The Scarlet Key from the Library.",
    "icon": "inv_axe_10",
@@ -8532,7 +8568,7 @@
    "name": "Scarlet Monastery: Cathedral",
    "slug": "scarlet-monastery-cathedral",
    "order": 16,
-   "level": "36-45",
+   "level": "38-46",
    "location": "Tirisfal Glades",
    "description": "The heart of the Scarlet Monastery: the Chapel Gardens and the Crusader's Chapel, held by Scarlet Commander Mograine and High Inquisitor Whitemane. The door is locked: you need The Scarlet Key from the Library.",
    "icon": "inv_shield_05",
@@ -9950,10 +9986,288 @@
    ]
   },
   {
+   "name": "Krol'dok Stronghold",
+   "slug": "kroldok-stronghold",
+   "order": 18,
+   "level": "40-47",
+   "location": "Riverglades",
+   "description": "Ogre outrunners have been kidnapping travelers and raiding settlements across the Riverglades. Their trail leads to a fortress of workshops, encampments and guarded inner passages, where strange chanting is heard after nightfall.",
+   "icon": "inv_misc_key_13",
+   "new": true,
+   "lootIncomplete": true,
+   "quests": 10,
+   "bosses": [
+    {
+     "name": "Slavecrusher Grox",
+     "npcID": 258966,
+     "level": "42",
+     "rare": false,
+     "description": "",
+     "loot": [
+      {
+       "id": 274996,
+       "name": "Resistance Breaker Spaulder",
+       "slot": "Shoulder, Mail",
+       "quality": 3
+      },
+      {
+       "id": 274997,
+       "name": "Chain of Binding",
+       "slot": "Waist, Mail",
+       "quality": 3
+      },
+      {
+       "id": 274995,
+       "name": "Slavecrusher Scepter",
+       "slot": "One-Hand, Mace",
+       "quality": 3
+      },
+      {
+       "id": 273101,
+       "name": "Blueprint: Expert Campfire",
+       "slot": "Blueprint",
+       "quality": 2
+      }
+     ],
+     "killedBy": 0
+    },
+    {
+     "name": "Twilight Commander Zarmok",
+     "npcID": 258972,
+     "level": "43",
+     "rare": false,
+     "description": "",
+     "loot": [
+      {
+       "id": 275000,
+       "name": "Zarmok's Plated Signet",
+       "slot": "Finger",
+       "quality": 3
+      },
+      {
+       "id": 274998,
+       "name": "Shadowlight Athame",
+       "slot": "Main Hand, Dagger",
+       "quality": 3
+      },
+      {
+       "id": 274999,
+       "name": "Shadecaster's Leggings",
+       "slot": "Legs, Cloth",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
+    },
+    {
+     "name": "War Handler Ashka",
+     "npcID": 259281,
+     "level": "43",
+     "rare": false,
+     "description": "",
+     "loot": [
+      {
+       "id": 275001,
+       "name": "Bloodied Gutslicer",
+       "slot": "Two-Hand, Sword",
+       "quality": 3
+      },
+      {
+       "id": 275002,
+       "name": "War Handler's Gaze",
+       "slot": "Head, Leather",
+       "quality": 3
+      },
+      {
+       "id": 275003,
+       "name": "Worgbinder's Treads",
+       "slot": "Feet, Plate",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
+    },
+    {
+     "name": "Nar'gurk",
+     "npcID": 258964,
+     "level": "44",
+     "rare": false,
+     "description": "",
+     "loot": [
+      {
+       "id": 275004,
+       "name": "Chain of the Corruptor",
+       "slot": "Neck",
+       "quality": 3
+      },
+      {
+       "id": 275005,
+       "name": "Krol'dok Warplate Chest",
+       "slot": "Chest, Plate",
+       "quality": 3
+      },
+      {
+       "id": 275006,
+       "name": "Krol'dok Warplate Helmet",
+       "slot": "Head, Plate",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
+    },
+    {
+     "name": "Bossman Toof",
+     "npcID": 264773,
+     "level": "42",
+     "rare": false,
+     "description": "",
+     "loot": [
+      {
+       "id": 286430,
+       "name": "Toofbreaker",
+       "slot": "One-Hand, Mace",
+       "quality": 3
+      },
+      {
+       "id": 286429,
+       "name": "Big-Belly Belt",
+       "slot": "Waist, Cloth",
+       "quality": 3
+      },
+      {
+       "id": 286428,
+       "name": "Band of Bossman",
+       "slot": "Finger",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
+    },
+    {
+     "name": "Kroog",
+     "npcID": 262716,
+     "level": "41",
+     "rare": true,
+     "description": "Rare spawn.",
+     "loot": [
+      {
+       "id": 279863,
+       "name": "Black Horn Necklace",
+       "slot": "Neck",
+       "quality": 3
+      },
+      {
+       "id": 279857,
+       "name": "Kroog's Backscratcher",
+       "slot": "One-Hand, Dagger",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
+    },
+    {
+     "name": "Overlord Mugg",
+     "npcID": 258968,
+     "level": "45",
+     "rare": false,
+     "description": "",
+     "loot": [
+      {
+       "id": 275009,
+       "name": "Emblem of Slamming",
+       "slot": "Trinket",
+       "quality": 3
+      },
+      {
+       "id": 275007,
+       "name": "Mugg's Jabber",
+       "slot": "One-Hand, Fist Weapon",
+       "quality": 3
+      },
+      {
+       "id": 275008,
+       "name": "Mugg's Crosser",
+       "slot": "One-Hand, Fist Weapon",
+       "quality": 3
+      },
+      {
+       "id": 275010,
+       "name": "Strongly Scented Hood",
+       "slot": "Head, Cloth",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
+    }
+   ],
+   "trash": [
+    {
+     "id": 287008,
+     "name": "Ogre Magi's Mantle",
+     "slot": "Shoulder, Cloth",
+     "quality": 3
+    },
+    {
+     "id": 287014,
+     "name": "Krol'dok Warplate Pauldrons",
+     "slot": "Shoulder, Plate",
+     "quality": 3
+    },
+    {
+     "id": 287012,
+     "name": "Krol'dok Warplate Gauntlets",
+     "slot": "Hands, Plate",
+     "quality": 3
+    },
+    {
+     "id": 287013,
+     "name": "Krol'dok Warplate Legplates",
+     "slot": "Legs, Plate",
+     "quality": 3
+    },
+    {
+     "id": 287010,
+     "name": "Outrider's Gloves",
+     "slot": "Hands, Leather",
+     "quality": 3
+    },
+    {
+     "id": 287007,
+     "name": "Stretched Footpads",
+     "slot": "Feet, Cloth",
+     "quality": 3
+    },
+    {
+     "id": 287009,
+     "name": "Twilight Enforcer's Legs",
+     "slot": "Legs, Leather",
+     "quality": 3
+    },
+    {
+     "id": 287011,
+     "name": "Guise of Battle",
+     "slot": "Head, Mail",
+     "quality": 3
+    },
+    {
+     "id": 287015,
+     "name": "Supreme Smasher",
+     "slot": "Two-Hand, Mace",
+     "quality": 3
+    },
+    {
+     "id": 287016,
+     "name": "Shadow-Seer Orb",
+     "slot": "Held In Off-hand",
+     "quality": 3
+    }
+   ]
+  },
+  {
    "name": "Uldaman",
    "slug": "uldaman",
-   "order": 18,
-   "level": "38-48",
+   "order": 19,
+   "level": "41-51",
    "location": "Badlands",
    "description": "An ancient titan vault buried beneath the Badlands, overrun by troggs and Shadowforge dwarves. Archaedas guards the Discs of Norgannon in its deepest chamber.",
    "icon": "inv_misc_platnumdisks",
@@ -10461,288 +10775,10 @@
    ]
   },
   {
-   "name": "Krol'dok Stronghold",
-   "slug": "kroldok-stronghold",
-   "order": 19,
-   "level": "40-45",
-   "location": "Riverglades",
-   "description": "Ogre outrunners have been kidnapping travelers and raiding settlements across the Riverglades. Their trail leads to a fortress of workshops, encampments and guarded inner passages, where strange chanting is heard after nightfall.",
-   "icon": "inv_misc_key_13",
-   "new": true,
-   "lootIncomplete": true,
-   "quests": 10,
-   "bosses": [
-    {
-     "name": "Slavecrusher Grox",
-     "npcID": 258966,
-     "level": "42",
-     "rare": false,
-     "description": "",
-     "loot": [
-      {
-       "id": 274996,
-       "name": "Resistance Breaker Spaulder",
-       "slot": "Shoulder, Mail",
-       "quality": 3
-      },
-      {
-       "id": 274997,
-       "name": "Chain of Binding",
-       "slot": "Waist, Mail",
-       "quality": 3
-      },
-      {
-       "id": 274995,
-       "name": "Slavecrusher Scepter",
-       "slot": "One-Hand, Mace",
-       "quality": 3
-      },
-      {
-       "id": 273101,
-       "name": "Blueprint: Expert Campfire",
-       "slot": "Blueprint",
-       "quality": 2
-      }
-     ],
-     "killedBy": 0
-    },
-    {
-     "name": "Twilight Commander Zarmok",
-     "npcID": 258972,
-     "level": "43",
-     "rare": false,
-     "description": "",
-     "loot": [
-      {
-       "id": 275000,
-       "name": "Zarmok's Plated Signet",
-       "slot": "Finger",
-       "quality": 3
-      },
-      {
-       "id": 274998,
-       "name": "Shadowlight Athame",
-       "slot": "Main Hand, Dagger",
-       "quality": 3
-      },
-      {
-       "id": 274999,
-       "name": "Shadecaster's Leggings",
-       "slot": "Legs, Cloth",
-       "quality": 3
-      }
-     ],
-     "killedBy": 0
-    },
-    {
-     "name": "War Handler Ashka",
-     "npcID": 259281,
-     "level": "43",
-     "rare": false,
-     "description": "",
-     "loot": [
-      {
-       "id": 275001,
-       "name": "Bloodied Gutslicer",
-       "slot": "Two-Hand, Sword",
-       "quality": 3
-      },
-      {
-       "id": 275002,
-       "name": "War Handler's Gaze",
-       "slot": "Head, Leather",
-       "quality": 3
-      },
-      {
-       "id": 275003,
-       "name": "Worgbinder's Treads",
-       "slot": "Feet, Plate",
-       "quality": 3
-      }
-     ],
-     "killedBy": 0
-    },
-    {
-     "name": "Nar'gurk",
-     "npcID": 258964,
-     "level": "44",
-     "rare": false,
-     "description": "",
-     "loot": [
-      {
-       "id": 275004,
-       "name": "Chain of the Corruptor",
-       "slot": "Neck",
-       "quality": 3
-      },
-      {
-       "id": 275005,
-       "name": "Krol'dok Warplate Chest",
-       "slot": "Chest, Plate",
-       "quality": 3
-      },
-      {
-       "id": 275006,
-       "name": "Krol'dok Warplate Helmet",
-       "slot": "Head, Plate",
-       "quality": 3
-      }
-     ],
-     "killedBy": 0
-    },
-    {
-     "name": "Bossman Toof",
-     "npcID": 264773,
-     "level": "42",
-     "rare": false,
-     "description": "",
-     "loot": [
-      {
-       "id": 286430,
-       "name": "Toofbreaker",
-       "slot": "One-Hand, Mace",
-       "quality": 3
-      },
-      {
-       "id": 286429,
-       "name": "Big-Belly Belt",
-       "slot": "Waist, Cloth",
-       "quality": 3
-      },
-      {
-       "id": 286428,
-       "name": "Band of Bossman",
-       "slot": "Finger",
-       "quality": 3
-      }
-     ],
-     "killedBy": 0
-    },
-    {
-     "name": "Kroog",
-     "npcID": 262716,
-     "level": "41",
-     "rare": true,
-     "description": "Rare spawn.",
-     "loot": [
-      {
-       "id": 279863,
-       "name": "Black Horn Necklace",
-       "slot": "Neck",
-       "quality": 3
-      },
-      {
-       "id": 279857,
-       "name": "Kroog's Backscratcher",
-       "slot": "One-Hand, Dagger",
-       "quality": 3
-      }
-     ],
-     "killedBy": 0
-    },
-    {
-     "name": "Overlord Mugg",
-     "npcID": 258968,
-     "level": "45",
-     "rare": false,
-     "description": "",
-     "loot": [
-      {
-       "id": 275009,
-       "name": "Emblem of Slamming",
-       "slot": "Trinket",
-       "quality": 3
-      },
-      {
-       "id": 275007,
-       "name": "Mugg's Jabber",
-       "slot": "One-Hand, Fist Weapon",
-       "quality": 3
-      },
-      {
-       "id": 275008,
-       "name": "Mugg's Crosser",
-       "slot": "One-Hand, Fist Weapon",
-       "quality": 3
-      },
-      {
-       "id": 275010,
-       "name": "Strongly Scented Hood",
-       "slot": "Head, Cloth",
-       "quality": 3
-      }
-     ],
-     "killedBy": 0
-    }
-   ],
-   "trash": [
-    {
-     "id": 287008,
-     "name": "Ogre Magi's Mantle",
-     "slot": "Shoulder, Cloth",
-     "quality": 3
-    },
-    {
-     "id": 287014,
-     "name": "Krol'dok Warplate Pauldrons",
-     "slot": "Shoulder, Plate",
-     "quality": 3
-    },
-    {
-     "id": 287012,
-     "name": "Krol'dok Warplate Gauntlets",
-     "slot": "Hands, Plate",
-     "quality": 3
-    },
-    {
-     "id": 287013,
-     "name": "Krol'dok Warplate Legplates",
-     "slot": "Legs, Plate",
-     "quality": 3
-    },
-    {
-     "id": 287010,
-     "name": "Outrider's Gloves",
-     "slot": "Hands, Leather",
-     "quality": 3
-    },
-    {
-     "id": 287007,
-     "name": "Stretched Footpads",
-     "slot": "Feet, Cloth",
-     "quality": 3
-    },
-    {
-     "id": 287009,
-     "name": "Twilight Enforcer's Legs",
-     "slot": "Legs, Leather",
-     "quality": 3
-    },
-    {
-     "id": 287011,
-     "name": "Guise of Battle",
-     "slot": "Head, Mail",
-     "quality": 3
-    },
-    {
-     "id": 287015,
-     "name": "Supreme Smasher",
-     "slot": "Two-Hand, Mace",
-     "quality": 3
-    },
-    {
-     "id": 287016,
-     "name": "Shadow-Seer Orb",
-     "slot": "Held In Off-hand",
-     "quality": 3
-    }
-   ]
-  },
-  {
    "name": "Zul'Farrak",
    "slug": "zulfarrak",
    "order": 20,
-   "level": "43-50",
+   "level": "44-54",
    "location": "Tanaris",
    "description": "The sun-baked troll city in the deserts of Tanaris, home of the Sandfury tribe and their chief, Ukorz Sandscalp.",
    "icon": "inv_misc_head_troll_01",
@@ -11414,7 +11450,7 @@
    "name": "Maraudon",
    "slug": "maraudon",
    "order": 21,
-   "level": "45-52",
+   "level": "46-55",
    "location": "Desolace",
    "description": "The sacred caverns of the centaur in Desolace, where Princess Theradras and her corrupted earth elementals rule beneath Zaetar's grave. The orange and purple wings lead to the inner caves; the Scepter of Celebras opens the shortcut to the waterfall.",
    "icon": "inv_misc_gem_amethyst_02",
@@ -11951,7 +11987,7 @@
    "name": "Alcaz Prison",
    "slug": "alcaz-prison",
    "order": 22,
-   "level": "48-53",
+   "level": "48-55",
    "location": "Dustwallow Marsh",
    "description": "Long rumored to hold high-ranking prisoners, including King Varian Wrynn, the prison on Alcaz Island has been out of reach until now. Inside, the Defias Brotherhood and the naga are at war.",
    "icon": "inv_misc_key_14",
@@ -12124,6 +12160,37 @@
      "name": "Compound Gloves",
      "slot": "Hands, Cloth",
      "quality": 3
+    },
+    {
+     "id": 287017,
+     "name": "Chaplain's Mitre",
+     "slot": "Head, Cloth",
+     "quality": 3
+    },
+    {
+     "id": 287022,
+     "name": "Spaulders of Containment",
+     "slot": "Shoulder, Mail",
+     "quality": 3
+    },
+    {
+     "id": 287023,
+     "name": "Iron-Wrought Cuffs",
+     "slot": "Wrist, Plate",
+     "quality": 3
+    },
+    {
+     "id": 287024,
+     "name": "Mark of Captivity",
+     "slot": "Neck",
+     "quality": 3
+    },
+    {
+     "id": 287025,
+     "name": "Enchantresses' Spire",
+     "slot": "Two-Hand, Staff",
+     "quality": 3,
+     "from": "Strashaz Enchantress"
     }
    ]
   },
@@ -12131,7 +12198,7 @@
    "name": "Sunken Temple",
    "slug": "sunken-temple",
    "order": 23,
-   "level": "49-56",
+   "level": "50-60",
    "location": "Swamp of Sorrows",
    "description": "The Temple of Atal'Hakkar, sunk beneath the Pool of Tears in the Swamp of Sorrows. The Atal'ai trolls try to summon their blood god Hakkar here, while the green dragons of Eranikus guard the lower halls.",
    "icon": "inv_misc_head_troll_01",
@@ -13400,18 +13467,6 @@
        "name": "Dark Warder's Pauldrons",
        "slot": "Shoulder, Leather",
        "quality": 3
-      },
-      {
-       "id": 11755,
-       "name": "Verek's Collar",
-       "slot": "Neck",
-       "quality": 3
-      },
-      {
-       "id": 22242,
-       "name": "Verek's Leash",
-       "slot": "Waist, Mail",
-       "quality": 3
       }
      ],
      "killedBy": 0
@@ -13704,6 +13759,12 @@
        "quality": 3
       },
       {
+       "id": 276877,
+       "name": "Brewmancer Nightcap",
+       "slot": "Head, Cloth",
+       "quality": 3
+      },
+      {
        "id": 18653,
        "name": "Schematic: Goblin Jumper Cables XL",
        "slot": "Recipe, Engineering",
@@ -13748,6 +13809,12 @@
        "name": "Circle of Flame",
        "slot": "Head, Cloth",
        "quality": 4
+      },
+      {
+       "id": 273122,
+       "name": "Blueprint: Molten Foundry",
+       "slot": "Blueprint",
+       "quality": 2
       }
      ],
      "killedBy": 0
@@ -14403,6 +14470,46 @@
      "killedBy": 0
     },
     {
+     "name": "Mor Grayhoof",
+     "npcID": 16080,
+     "level": null,
+     "rare": true,
+     "description": "Summoned in War Master Voone's room with the Brazier from the Dungeon Set 2 quests: one of the four bosses that drop a piece of Lord Valthalak's Amulet.",
+     "loot": [
+      {
+       "id": 22306,
+       "name": "Ironweave Belt",
+       "slot": "Waist, Cloth",
+       "quality": 3
+      },
+      {
+       "id": 22319,
+       "name": "Tome of Divine Right",
+       "slot": "Held In Off-hand",
+       "quality": 3
+      },
+      {
+       "id": 22322,
+       "name": "The Jaw Breaker",
+       "slot": "One-Hand, Mace",
+       "quality": 3
+      },
+      {
+       "id": 22325,
+       "name": "Belt of the Trickster",
+       "slot": "Waist, Leather",
+       "quality": 3
+      },
+      {
+       "id": 22398,
+       "name": "Idol of Rejuvenation",
+       "slot": "Relic, Idol",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
+    },
+    {
      "name": "Mother Smolderweb",
      "npcID": 10596,
      "level": "59",
@@ -14539,6 +14646,28 @@
        "id": 12838,
        "name": "Plans: Arcanite Reaper",
        "slot": "Recipe, Blacksmithing",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
+    },
+    {
+     "name": "Burning Felguard",
+     "npcID": 10263,
+     "level": null,
+     "rare": true,
+     "description": "Rare demon: Scarshield Warlocks can summon it through their portals.",
+     "loot": [
+      {
+       "id": 13181,
+       "name": "Demonskin Gloves",
+       "slot": "Hands, Cloth",
+       "quality": 3
+      },
+      {
+       "id": 13182,
+       "name": "Phase Blade",
+       "slot": "One-Hand, Sword",
        "quality": 3
       }
      ],
@@ -14823,7 +14952,7 @@
    "name": "Upper Blackrock Spire",
    "slug": "upper-blackrock-spire",
    "order": 26,
-   "level": "55-60",
+   "level": "59-60",
    "location": "Blackrock Mountain",
    "description": "The top of Blackrock Spire, held by Rend Blackhand's Dark Horde and General Drakkisath's black dragonflight. The door needs the Seal of Ascension.",
    "icon": "inv_misc_head_dragon_black",
@@ -15041,6 +15170,12 @@
        "quality": 3
       },
       {
+       "id": 12871,
+       "name": "Chromatic Carapace",
+       "slot": "Reagent",
+       "quality": 4
+      },
+      {
        "id": 13522,
        "name": "Recipe: Flask of Chromatic Resistance",
        "slot": "Recipe, Alchemy",
@@ -15067,6 +15202,12 @@
        "name": "Eye of Rend",
        "slot": "Head, Leather",
        "quality": 3
+      },
+      {
+       "id": 12590,
+       "name": "Felstriker",
+       "slot": "One-Hand, Dagger",
+       "quality": 4
       },
       {
        "id": 12935,
@@ -15191,6 +15332,12 @@
        "name": "Ironweave Boots",
        "slot": "Feet, Cloth",
        "quality": 3
+      },
+      {
+       "id": 273109,
+       "name": "Blueprint: Trapper's Workbench",
+       "slot": "Blueprint",
+       "quality": 2
       }
      ],
      "killedBy": 0
@@ -15386,6 +15533,90 @@
    ],
    "trash": [
     {
+     "id": 16696,
+     "name": "Devout Belt",
+     "slot": "Waist, Cloth",
+     "quality": 3
+    },
+    {
+     "id": 16713,
+     "name": "Shadowcraft Belt",
+     "slot": "Waist, Leather",
+     "quality": 3
+    },
+    {
+     "id": 16735,
+     "name": "Bracers of Valor",
+     "slot": "Wrist, Plate",
+     "quality": 3
+    },
+    {
+     "id": 16717,
+     "name": "Wildheart Gloves",
+     "slot": "Hands, Leather",
+     "quality": 3
+    },
+    {
+     "id": 16673,
+     "name": "Cord of Elements",
+     "slot": "Waist, Mail",
+     "quality": 3
+    },
+    {
+     "id": 16680,
+     "name": "Beaststalker's Belt",
+     "slot": "Waist, Mail",
+     "quality": 3
+    },
+    {
+     "id": 16703,
+     "name": "Dreadmist Bracers",
+     "slot": "Wrist, Cloth",
+     "quality": 3
+    },
+    {
+     "id": 16683,
+     "name": "Magister's Bindings",
+     "slot": "Wrist, Cloth",
+     "quality": 3
+    },
+    {
+     "id": 16685,
+     "name": "Magister's Belt",
+     "slot": "Waist, Cloth",
+     "quality": 3
+    },
+    {
+     "id": 16736,
+     "name": "Belt of Valor",
+     "slot": "Waist, Plate",
+     "quality": 3
+    },
+    {
+     "id": 16681,
+     "name": "Beaststalker's Bindings",
+     "slot": "Wrist, Mail",
+     "quality": 3
+    },
+    {
+     "id": 16710,
+     "name": "Shadowcraft Bracers",
+     "slot": "Wrist, Leather",
+     "quality": 3
+    },
+    {
+     "id": 16716,
+     "name": "Wildheart Belt",
+     "slot": "Waist, Leather",
+     "quality": 3
+    },
+    {
+     "id": 13260,
+     "name": "Wind Dancer Boots",
+     "slot": "Feet, Mail",
+     "quality": 3
+    },
+    {
      "id": 16247,
      "name": "Formula: Enchant 2H Weapon - Superior Impact",
      "slot": "Recipe, Enchanting",
@@ -15398,7 +15629,7 @@
    "name": "Dire Maul: East",
    "slug": "dire-maul-east",
    "order": 27,
-   "level": "55-60",
+   "level": "54-60",
    "location": "Feralas",
    "description": "The eastern quarter of the ruined Highborne city of Eldre'Thalas, overgrown by the Warpwood and ruled by the satyr Alzzin the Wildshaper. Pusillin carries the Crescent Key that opens the other wings.",
    "icon": "inv_misc_key_14",
@@ -15615,6 +15846,13 @@
      "slot": "Wrist, Mail",
      "quality": 3,
      "from": "Wildspawn Rogue / Wildspawn Betrayer"
+    },
+    {
+     "id": 18295,
+     "name": "Phasing Boots",
+     "slot": "Feet, Cloth",
+     "quality": 3,
+     "from": "Phase Lasher"
     }
    ]
   },
@@ -15622,7 +15860,7 @@
    "name": "Dire Maul: West",
    "slug": "dire-maul-west",
    "order": 28,
-   "level": "57-60",
+   "level": "56-60",
    "location": "Feralas",
    "description": "The Capital Gardens and the Court of the Highborne, where the last Shen'dralar keep the demon Immol'thar imprisoned behind five pylons. Needs the Crescent Key from Pusillin.",
    "icon": "inv_misc_book_11",
@@ -15660,6 +15898,12 @@
        "name": "Stoneflower Staff",
        "slot": "Two-Hand, Staff",
        "quality": 3
+      },
+      {
+       "id": 273120,
+       "name": "Blueprint: Seed Hybridizer",
+       "slot": "Blueprint",
+       "quality": 2
       }
      ],
      "killedBy": 0
@@ -15947,13 +16191,28 @@
      "killedBy": 0
     }
    ],
-   "trash": []
+   "trash": [
+    {
+     "id": 18338,
+     "name": "Wand of Arcane Potency",
+     "slot": "Ranged, Wand",
+     "quality": 3,
+     "from": "Mana Remnant / Arcane Aberration / Arcane Torrent / Residual Monstrosity"
+    },
+    {
+     "id": 18344,
+     "name": "Stonebark Gauntlets",
+     "slot": "Hands, Leather",
+     "quality": 3,
+     "from": "Ironbark Protector / Petrified Treant"
+    }
+   ]
   },
   {
    "name": "Dire Maul: North",
    "slug": "dire-maul-north",
    "order": 29,
-   "level": "57-60",
+   "level": "56-60",
    "location": "Feralas",
    "description": "Gordok Commons, the ogre-held northern wing. Kill King Gordok to become the new king; leave the guards alive (the Tribute Run) for a bigger tribute chest.",
    "icon": "inv_misc_bone_orcskull_01",
@@ -17068,6 +17327,12 @@
        "quality": 3
       },
       {
+       "id": 13377,
+       "name": "Miniature Cannon Balls",
+       "slot": "Projectile, Bullet",
+       "quality": 3
+      },
+      {
        "id": 22407,
        "name": "Helm of the New Moon",
        "slot": "Head, Leather",
@@ -17239,6 +17504,46 @@
       }
      ],
      "killedBy": 0
+    },
+    {
+     "name": "Jarien and Sothos",
+     "npcID": 16101,
+     "level": null,
+     "rare": true,
+     "description": "Summoned in Balnazzar's chamber, after the last boss, with the Brazier from the Dungeon Set 2 quests: they drop the pieces of Lord Valthalak's Amulet, and their loot is in the chest they leave.",
+     "loot": [
+      {
+       "id": 22301,
+       "name": "Ironweave Robe",
+       "slot": "Chest, Cloth",
+       "quality": 3
+      },
+      {
+       "id": 22327,
+       "name": "Amulet of the Redeemed",
+       "slot": "Neck",
+       "quality": 3
+      },
+      {
+       "id": 22328,
+       "name": "Legplates of Vigilance",
+       "slot": "Legs, Plate",
+       "quality": 3
+      },
+      {
+       "id": 22329,
+       "name": "Scepter of Interminable Focus",
+       "slot": "Held In Off-hand",
+       "quality": 3
+      },
+      {
+       "id": 22334,
+       "name": "Band of Mending",
+       "slot": "Finger",
+       "quality": 3
+      }
+     ],
+     "killedBy": 0
     }
    ],
    "trash": [
@@ -17396,6 +17701,12 @@
        "quality": 3
       },
       {
+       "id": 13508,
+       "name": "Eye of Arachnida",
+       "slot": "Miscellaneous",
+       "quality": 2
+      },
+      {
        "id": 16675,
        "name": "Beaststalker's Boots",
        "slot": "Feet, Mail",
@@ -17512,6 +17823,12 @@
        "name": "Banshee's Touch",
        "slot": "Hands, Plate",
        "quality": 3
+      },
+      {
+       "id": 273124,
+       "name": "Blueprint: Loom",
+       "slot": "Blueprint",
+       "quality": 2
       }
      ],
      "killedBy": 0
@@ -18154,6 +18471,12 @@
        "name": "Dark Advisor's Pendant",
        "slot": "Neck",
        "quality": 3
+      },
+      {
+       "id": 273121,
+       "name": "Blueprint: Sewing Machine",
+       "slot": "Blueprint",
+       "quality": 2
       }
      ],
      "killedBy": 0
@@ -18616,6 +18939,12 @@
        "name": "Necropile Robe",
        "slot": "Chest, Cloth",
        "quality": 3
+      },
+      {
+       "id": 273118,
+       "name": "Blueprint: Plague Doctor's Laboratory",
+       "slot": "Blueprint",
+       "quality": 2
       }
      ],
      "killedBy": 0
@@ -19522,6 +19851,18 @@
        "quality": 3
       },
       {
+       "id": 22331,
+       "name": "Band of the Steadfast Hero",
+       "slot": "Finger",
+       "quality": 3
+      },
+      {
+       "id": 22333,
+       "name": "Hammer of Divine Might",
+       "slot": "Two-Hand, Mace",
+       "quality": 3
+      },
+      {
        "id": 21984,
        "name": "Left Piece of Lord Valthalak's Amulet",
        "slot": "Quest Item",
@@ -19807,6 +20148,12 @@
        "name": "Legplates of Reinforced Crystal",
        "slot": "Legs, Plate",
        "quality": 3
+      },
+      {
+       "id": 273116,
+       "name": "Blueprint: Arcane Forge",
+       "slot": "Blueprint",
+       "quality": 2
       }
      ],
      "killedBy": 0
