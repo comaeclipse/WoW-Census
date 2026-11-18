@@ -403,7 +403,7 @@ function census_views(string $source): array {
 
 // Inspect records with gear icons from the local cache, as the static build applied them.
 function inspects_with_icons(string $source): array {
-  $inspects = $source === 'retail' ? load_talent_samples($source) : load_inspects($source);
+  $inspects = load_talent_samples($source);
   $icons = item_cache('item-icons', EDITIONS[$source]['branch']);
   // Armory records share equal gear arrays; keep them shared once the icon is set.
   $shared = [];

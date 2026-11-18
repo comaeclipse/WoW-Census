@@ -631,7 +631,43 @@ function forever_talent_identity(array $r): ?string {
   return $region !== '' ? $region . '|' . js_lower($name) : null;
 }
 
-/** Latest active Armory talent build for each stored Forever character, normalized like character_inspects. */
+/** A Blizzard equipment list (equipped_items) as inspect gear rows; enchantments may be a list or a flag. */
+function armory_gear(array $items): array {
+  static $slots = ['HEAD'=>1,'NECK'=>2,'SHOULDER'=>3,'SHIRT'=>4,'CHEST'=>5,'WAIST'=>6,'LEGS'=>7,'FEET'=>8,'WRIST'=>9,
+    'HANDS'=>10,'FINGER_1'=>11,'FINGER_2'=>12,'TRINKET_1'=>13,'TRINKET_2'=>14,'BACK'=>15,'MAIN_HAND'=>16,'OFF_HAND'=>17,
+    'RANGED'=>18,'TABARD'=>19];
+  static $qualities = ['POOR'=>0,'COMMON'=>1,'UNCOMMON'=>2,'RARE'=>3,'EPIC'=>4,'LEGENDARY'=>5,'ARTIFACT'=>6,'HEIRLOOM'=>7];
+  $gear = [];
+  foreach ($items as $it) {
+    $slot = $slots[$it['slot']['type'] ?? ''] ?? null; $id = (int)($it['item']['id'] ?? 0);
+    if ($slot === null || !$id) continue;
+    $gear[] = ['slot' => $slot, 'id' => $id, 'name' => $it['name'] ?? "Item $id",
+      'quality' => $qualities[$it['quality']['type'] ?? ''] ?? null, 'enchant' => !empty($it['enchantments']), 'rune' => null];
+  }
+  return $gear;
+}
+
+/** Newest stored Forever Armory equipment per character, keyed "region:character_id" (compacted in PostgreSQL). */
+function forever_armory_gear(): array {
+  try {
+    $rows = Db::all("SELECT DISTINCT ON (region,character_id) region,character_id,
+        (SELECT jsonb_agg(jsonb_build_object('item', jsonb_build_object('id', i->'item'->'id'), 'name', i->'name',
+           'slot', jsonb_build_object('type', i->'slot'->'type'), 'quality', jsonb_build_object('type', i->'quality'->'type'),
+           'enchantments', jsonb_typeof(i->'enchantments') = 'array' AND jsonb_array_length(i->'enchantments') > 0))
+         FROM jsonb_array_elements(CASE WHEN jsonb_typeof(equipment_json->'equipped_items') = 'array'
+           THEN equipment_json->'equipped_items' ELSE '[]'::jsonb END) i) items
+      FROM forever_armory_snapshots WHERE equipment_json IS NOT NULL
+      ORDER BY region,character_id,snapshot_at DESC");
+  } catch (PDOException $e) {
+    if (in_array($e->getCode(), ['42P01', '42703'], true)) return [];
+    throw $e;
+  }
+  $out = [];
+  foreach ($rows as $r) $out[$r['region'] . ':' . $r['character_id']] = armory_gear(json_decode($r['items'] ?: '[]', true) ?: []);
+  return $out;
+}
+
+/** Latest active Armory talent build and equipment for each stored Forever character, normalized like character_inspects. */
 function forever_armory_talent_records(): array {
   static $records = null;
   if ($records !== null) return $records;
@@ -644,6 +680,8 @@ function forever_armory_talent_records(): array {
     if (in_array($e->getCode(), ['42P01', '42703'], true)) return $records = [];
     throw $e;
   }
+  $gearById = forever_armory_gear();
+  $shared = [];
   $classFiles = [];
   foreach (CLASS_META as $file => $meta) $classFiles[js_lower($meta[0])] = $file;
   $catalog = talent_catalogs()['forever'];
@@ -674,11 +712,17 @@ function forever_armory_talent_records(): array {
     if ($classFile === null) continue;
     $build = describe_build(['class' => $classFile, 'list' => $g['list']], 'forever');
     $time = strtotime((string)($r['last_login_at'] ?: $r['fetched_at'])) ?: 0;
+    $gear = $gearById[$id] ?? [];
+    // Thousands of characters share the same talents, builds and items: keep one copy of each (as Retail's records).
+    foreach ($gear as $i => $item) $gear[$i] = $shared['g' . serialize($item)] ??= $item;
+    foreach ($build['talents'] as $i => $t) $build['talents'][$i] = $shared['t' . serialize($t)] ??= $t;
+    foreach ($build as $k => $v) if (is_array($v)) $build[$k] = $shared['b' . $k . md5(serialize($v))] ??= $v;
+    foreach (['race_name', 'ruleset_name', 'faction', 'guild_name', 'region'] as $k) if (is_string($r[$k])) $r[$k] = $shared['s' . $r[$k]] ??= $r[$k];
     $records[] = ['name' => $r['full_name'], 'classFile' => $classFile, 'race' => $r['race_name'], 'level' => (int)$r['level'],
       'guild' => $r['guild_name'] ?: null, 'time' => $time, 'region' => $r['region'], 'realm' => $r['ruleset_name'],
       'faction' => $r['faction'], 'matchStatus' => 'armory', 'game' => null,
       'characterKey' => 'armory:' . $r['region'] . ':' . $r['character_id'], 'importString' => null,
-      'rawSpecID' => null, 'rawRole' => null, 'gear' => [], 'provenance' => 'armory'] + $build;
+      'rawSpecID' => null, 'rawRole' => null, 'gear' => $gear, 'provenance' => 'armory'] + $build;
   }
   return $records;
 }
@@ -687,19 +731,55 @@ function forever_armory_talent_records(): array {
 // stop at 10,000: every record is held in the 512 MB web worker. Character pages use them all.
 const ARMORY_AGGREGATE_LIMIT = 20000;
 
-/** Latest Retail Armory build and equipment, normalized like character_inspects. */
+/**
+ * Classic-tree Armory talents of the active build, compacted in PostgreSQL from the raw specializations
+ * JSON (the slim copies keep only Retail's shape): [{n talent id, r rank, s spell, nm name, b tree name}].
+ * Classic editions list each tree under specialization_groups; MoP Classic lists each spec's picks under
+ * specializations, and the active one is chosen.
+ */
+const ARMORY_CLASSIC_TALENTS_SQL = "COALESCE(
+  (SELECT jsonb_agg(jsonb_build_object('n', t->'talent'->'id', 'r', COALESCE(t->'talent_rank', '1'::jsonb),
+      's', t->'spell_tooltip'->'spell'->'id', 'nm', COALESCE(t->'talent'->'name', t->'spell_tooltip'->'spell'->'name'),
+      'b', sp->'specialization_name'))
+    FROM jsonb_array_elements(CASE WHEN jsonb_typeof(j.sj->'specialization_groups') = 'array' THEN j.sj->'specialization_groups' ELSE '[]'::jsonb END) g,
+      jsonb_array_elements(CASE WHEN jsonb_typeof(g->'specializations') = 'array' THEN g->'specializations' ELSE '[]'::jsonb END) sp,
+      jsonb_array_elements(CASE WHEN jsonb_typeof(sp->'talents') = 'array' THEN sp->'talents' ELSE '[]'::jsonb END) t
+    WHERE COALESCE((g->>'is_active')::boolean, true)),
+  (SELECT jsonb_agg(jsonb_build_object('n', t->'talent'->'id', 'r', COALESCE(t->'talent_rank', '1'::jsonb),
+      's', t->'spell_tooltip'->'spell'->'id', 'nm', COALESCE(t->'talent'->'name', t->'spell_tooltip'->'spell'->'name')))
+    FROM jsonb_array_elements(CASE WHEN jsonb_typeof(j.sj->'specializations') = 'array' THEN j.sj->'specializations' ELSE '[]'::jsonb END) sp,
+      jsonb_array_elements(CASE WHEN jsonb_typeof(sp->'talents') = 'array' THEN sp->'talents' ELSE '[]'::jsonb END) t
+    WHERE sp->'specialization'->>'id' = j.sj->'active_specialization'->>'id'))";
+
+/** Node facts (tree, position, max rank) seen in an edition's inspects, for Armory talents that lack them. */
+function inspect_talent_nodes(string $source): array {
+  static $cache = [];
+  if (isset($cache[$source])) return $cache[$source];
+  $nodes = [];
+  foreach (load_inspects($source)['records'] as $r)
+    foreach ($r['talents'] as $t)
+      $nodes[$r['classFile'] . "\t" . js_string($t['node'])] ??= ['tree' => $t['tree'] ?? null, 'x' => $t['x'] ?? null,
+        'y' => $t['y'] ?? null, 'max' => $t['max'] ?? null];
+  return $cache[$source] = $nodes;
+}
+
+/** Latest Armory build and equipment of every edition tools/sync-character-armory.py enriches, normalized like character_inspects. */
 function character_armory_records(string $source): array {
   static $cache = [];
   if (isset($cache[$source])) return $cache[$source];
-  if ($source !== 'retail') return $cache[$source] = [];
+  if (!in_array($source, ['retail', 'mop-classic', 'classic-progression', 'classic', 'sod', 'hardcore'], true)) return $cache[$source] = [];
+  $retail = $source === 'retail';
   $classFiles = FOREVER_CLASS_FILES + [6 => 'DEATHKNIGHT', 10 => 'MONK', 12 => 'DEMONHUNTER', 13 => 'EVOKER'];
-  $slots = ['HEAD'=>1,'NECK'=>2,'SHOULDER'=>3,'SHIRT'=>4,'CHEST'=>5,'WAIST'=>6,'LEGS'=>7,'FEET'=>8,'WRIST'=>9,
-    'HANDS'=>10,'FINGER_1'=>11,'FINGER_2'=>12,'TRINKET_1'=>13,'TRINKET_2'=>14,'BACK'=>15,'MAIN_HAND'=>16,'OFF_HAND'=>17,
-    'RANGED'=>18,'TABARD'=>19];
-  $qualities = ['POOR'=>0,'COMMON'=>1,'UNCOMMON'=>2,'RARE'=>3,'EPIC'=>4,'LEGENDARY'=>5,'ARTIFACT'=>6,'HEIRLOOM'=>7];
+  $catalog = $source === 'classic-progression' ? talent_catalogs()['tbc']
+    : (in_array($source, ['classic', 'sod', 'hardcore'], true) ? talent_catalogs()['classic'] : []);
+  $seenNodes = $retail ? [] : inspect_talent_nodes($source);
   $records = []; $shared = [];
   // Slim snapshot copies (tools/armory-slim-pg.sql), a page at a time: the raw
   // Blizzard JSON is ~350 KB per Retail character and must never be loaded here.
+  // The other editions are a few thousand characters; their talents come compacted from the raw JSON.
+  $talentSql = $retail ? 'NULL::jsonb' : '(SELECT ' . ARMORY_CLASSIC_TALENTS_SQL . ' FROM (SELECT x.specializations_json sj
+      FROM character_armory_snapshots x WHERE x.source_game=p.source_game AND x.region=p.region AND x.character_id=p.character_id
+        AND x.specializations_json IS NOT NULL ORDER BY x.snapshot_at DESC LIMIT 1) j)';
   $afterRegion = ''; $afterId = -1;
   try {
     // The newest ARMORY_AGGREGATE_LIMIT logins: the cut is the last login time they reach.
@@ -715,7 +795,7 @@ function character_armory_records(string $source): array {
   try {
     $rows = Db::uncached("SELECT p.region,p.character_id,p.name,p.realm_name,p.class_id,p.class_name,p.race_name,p.level,
         p.faction,p.guild_name,p.last_login_at,p.fetched_at,s.snapshot_at,
-        s.specializations specializations_json,s.equipment equipment_json
+        s.specializations specializations_json,s.equipment equipment_json,$talentSql classic_talents
       FROM character_armory_profiles p JOIN LATERAL (
         SELECT snapshot_at,specializations,equipment FROM character_armory_slim s
         WHERE s.source_game=p.source_game AND s.region=p.region AND s.character_id=p.character_id
@@ -732,32 +812,41 @@ function character_armory_records(string $source): array {
     $classFile = $classFiles[(int)$r['class_id']] ?? null;
     if ($classFile === null) continue;
     $specs = json_decode($r['specializations_json'] ?: '{}', true) ?: [];
-    $activeID = (int)($specs['active_specialization']['id'] ?? 0); $activeSpec = null;
-    foreach ($specs['specializations'] ?? [] as $spec)
-      if ((int)($spec['specialization']['id'] ?? 0) === $activeID) { $activeSpec = $spec; break; }
-    $activeSpec ??= $specs['specializations'][0] ?? [];
-    $loadout = null;
-    foreach ($activeSpec['loadouts'] ?? [] as $candidate) if (!empty($candidate['is_active'])) { $loadout = $candidate; break; }
-    $loadout ??= $activeSpec['loadouts'][0] ?? [];
+    $activeID = (int)($specs['active_specialization']['id'] ?? 0);
     $list = [];
-    foreach ([['selected_class_talents','Class'], ['selected_spec_talents',$specs['active_specialization']['name'] ?? 'Specialization'],
-      ['selected_hero_talents',$loadout['selected_hero_talent_tree']['name'] ?? 'Hero']] as [$key,$branch])
-      foreach ($loadout[$key] ?? [] as $t) {
-        $tip = $t['tooltip'] ?? []; $spell = $tip['spell_tooltip']['spell'] ?? []; $talent = $tip['talent'] ?? [];
-        $rank = max(1, (int)($t['rank'] ?? $t['default_points'] ?? 1));
-        $list[] = ['node' => (string)($t['id'] ?? $talent['id'] ?? ''), 'rank' => $rank, 'max' => $rank,
-          'spell' => isset($spell['id']) ? (int)$spell['id'] : null, 'name' => $talent['name'] ?? ($spell['name'] ?? 'Unknown talent'),
-          'branch' => $branch, 'tree' => $key];
+    if ($retail) {
+      $activeSpec = null;
+      foreach ($specs['specializations'] ?? [] as $spec)
+        if ((int)($spec['specialization']['id'] ?? 0) === $activeID) { $activeSpec = $spec; break; }
+      $activeSpec ??= $specs['specializations'][0] ?? [];
+      $loadout = null;
+      foreach ($activeSpec['loadouts'] ?? [] as $candidate) if (!empty($candidate['is_active'])) { $loadout = $candidate; break; }
+      $loadout ??= $activeSpec['loadouts'][0] ?? [];
+      foreach ([['selected_class_talents','Class'], ['selected_spec_talents',$specs['active_specialization']['name'] ?? 'Specialization'],
+        ['selected_hero_talents',$loadout['selected_hero_talent_tree']['name'] ?? 'Hero']] as [$key,$branch])
+        foreach ($loadout[$key] ?? [] as $t) {
+          $tip = $t['tooltip'] ?? []; $spell = $tip['spell_tooltip']['spell'] ?? []; $talent = $tip['talent'] ?? [];
+          $rank = max(1, (int)($t['rank'] ?? $t['default_points'] ?? 1));
+          $list[] = ['node' => (string)($t['id'] ?? $talent['id'] ?? ''), 'rank' => $rank, 'max' => $rank,
+            'spell' => isset($spell['id']) ? (int)$spell['id'] : null, 'name' => $talent['name'] ?? ($spell['name'] ?? 'Unknown talent'),
+            'branch' => $branch, 'tree' => $key];
+        }
+    } else {
+      // Classic trees: the talent id is the inspect node; MoP Classic: the talent id with the tier inspects report.
+      foreach (json_decode($r['classic_talents'] ?: '[]', true) ?: [] as $t) {
+        if (!isset($t['n'])) continue;
+        $node = (int)$t['n']; $rank = max(1, (int)($t['r'] ?? 1));
+        $known = $seenNodes[$classFile . "\t" . $node] ?? []; $cat = $catalog[$node] ?? null;
+        $cat = $cat && $cat['classFile'] === $classFile ? $cat : null;
+        $list[] = ['node' => $node, 'tree' => $known['tree'] ?? null, 'spell' => $source === 'mop-classic' && isset($t['s']) ? (int)$t['s'] : 0,
+          'branch' => (string)($t['b'] ?? ''), 'name' => $t['nm'] ?? 'Unknown talent', 'rank' => $rank,
+          'max' => (int)($cat['max'] ?? $known['max'] ?? $rank), 'x' => $known['x'] ?? null, 'y' => $known['y'] ?? null,
+          'entry' => null, 'definition' => null, 'groups' => []];
       }
-    $build = describe_build(['class' => $classFile, 'spec' => $activeID ?: null, 'list' => $list], $source);
-    $gear = [];
-    $equipment = json_decode($r['equipment_json'] ?: '{}', true) ?: [];
-    foreach ($equipment['equipped_items'] ?? [] as $it) {
-      $slot = $slots[$it['slot']['type'] ?? ''] ?? null; $id = (int)($it['item']['id'] ?? 0);
-      if ($slot === null || !$id) continue;
-      $gear[] = ['slot' => $slot, 'id' => $id, 'name' => $it['name'] ?? "Item $id",
-        'quality' => $qualities[$it['quality']['type'] ?? ''] ?? null, 'enchant' => !empty($it['enchantments']), 'rune' => null];
     }
+    $build = describe_build(['class' => $classFile, 'spec' => $activeID ?: null, 'list' => $list], $source);
+    $equipment = json_decode($r['equipment_json'] ?: '{}', true) ?: [];
+    $gear = armory_gear($equipment['equipped_items'] ?? []);
     $time = strtotime((string)($r['last_login_at'] ?: $r['snapshot_at'] ?: $r['fetched_at'])) ?: 0;
     // Tens of thousands of characters pick from the same few thousand talents and items: keep one
     // copy of each (PHP shares equal arrays copy-on-write), or this list needs gigabytes.
@@ -782,12 +871,15 @@ function talent_sample_identity(string $source, array $r): ?string {
   return $name !== '' && $realm !== '' && $region !== '' ? $region . '|' . js_lower($realm) . '|' . js_lower($name) : null;
 }
 
-/** Talent records used by aggregate pages: newest valid record per character across inspect and supported Armory data. */
+/**
+ * Records used by the talent, gear, class and race pages: the newest valid record per character across
+ * in-game inspects and the Armory, for every edition. When the chosen record has no gear, the other
+ * source's gear for the same character is kept.
+ */
 function load_talent_samples(string $source): array {
   static $cache = [];
   if (isset($cache[$source])) return $cache[$source];
   $inspects = load_inspects($source);
-  if (!in_array($source, ['forever', 'retail'], true)) return $cache[$source] = $inspects;
   $armory = $source === 'forever' ? forever_armory_talent_records() : character_armory_records($source);
   $combined = [];
   $add = function (array $r) use (&$combined, $source): void {
@@ -796,8 +888,12 @@ function load_talent_samples(string $source): array {
     $valid = count($r['talents'] ?? []) > 0 && ($r['classification'] ?? '') !== 'Unknown build';
     if (!isset($combined[$identity])) { $combined[$identity] = ['record' => $r, 'valid' => $valid]; return; }
     $old = $combined[$identity];
-    if (($valid && !$old['valid']) || ($valid === $old['valid'] && ($r['time'] ?? 0) > ($old['record']['time'] ?? 0)))
+    if (($valid && !$old['valid']) || ($valid === $old['valid'] && ($r['time'] ?? 0) > ($old['record']['time'] ?? 0))) {
+      if (!$r['gear'] && $old['record']['gear']) $r['gear'] = $old['record']['gear'];
       $combined[$identity] = ['record' => $r, 'valid' => $valid];
+    } elseif (!$old['record']['gear'] && $r['gear']) {
+      $combined[$identity]['record']['gear'] = $r['gear'];
+    }
   };
   foreach ($inspects['records'] as $r) $add($r);
   foreach ($armory as $r) $add($r);
@@ -809,7 +905,8 @@ function load_talent_samples(string $source): array {
   $coverage['combined'] = count($records); $coverage['inspectUsed'] = $sources['inspect']; $coverage['armoryUsed'] = $sources['armory'];
   $coverage['armory'] = count($armory);
   $coverage['withSelectedTalents'] = $count(fn($r) => count($r['talents'] ?? []) > 0);
+  $coverage['withGear'] = $count(fn($r) => count($r['gear'] ?? []) > 0);
   return $cache[$source] = array_merge($inspects, ['records' => $records,
-    'lastT' => max($inspects['lastT'], ...array_map(fn($r) => $r['time'] ?? 0, $records)),
+    'lastT' => max([$inspects['lastT'], ...array_map(fn($r) => $r['time'] ?? 0, $records)]),
     'coverage' => $coverage, 'sources' => $sources]);
 }

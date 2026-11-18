@@ -176,18 +176,19 @@ function armory_profession_census(): array {
 }
 
 /**
- * Retail profession census from each character's newest stored Armory snapshot, aggregated in
- * PostgreSQL from the typed tables tools/armory-professions-pg.sql keeps (never professions_json).
+ * An edition's profession census (Retail by default) from each character's newest stored Armory snapshot,
+ * aggregated in PostgreSQL from the typed tables tools/armory-professions-pg.sql keeps (never professions_json).
  */
-function retail_armory_profession_census(): array {
-  return published_page_model('retail-armory-professions', function () {
+function retail_armory_profession_census(string $source = 'retail'): array {
+  return published_page_model('armory-professions:' . $source, function () use ($source) {
+    $game = "'" . preg_replace('/[^a-z-]/', '', $source) . "'";
     $chars = "character_armory_profession_chars c JOIN character_armory_profiles p
       ON p.source_game = c.source_game AND p.region = c.region AND p.character_id = c.character_id
-      WHERE c.source_game = 'retail'";
+      WHERE c.source_game = $game";
     $trades = "character_armory_professions t JOIN character_armory_profession_chars c
       ON c.source_game = t.source_game AND c.region = t.region AND c.character_id = t.character_id
       JOIN character_armory_profiles p ON p.source_game = c.source_game AND p.region = c.region AND p.character_id = c.character_id
-      WHERE t.source_game = 'retail'";
+      WHERE t.source_game = $game";
     try {
       $totals = Db::all("SELECT count(*) n, min(c.snapshot_at) from_at, max(c.snapshot_at) to_at FROM $chars")[0];
       $regionRows = Db::all("SELECT upper(c.region) region, count(*) n FROM $chars GROUP BY 1 ORDER BY 2 DESC, 1");
@@ -328,7 +329,9 @@ function professions_page_model(string $source = PROFESSION_SOURCE): array {
       $views[] = ['realm' => $v['realm'], 'faction' => $v['faction'], 'scanned' => $s['updatedAt'] ? substr((string)$s['updatedAt'], 0, 10) : null,
         'empty' => !$s['items'], 'professions' => $profs];
     }
-    $armory = $source === 'retail' ? retail_armory_profession_census() : ($source === PROFESSION_SOURCE ? armory_profession_census() : null);
+    // Forever has its own Armory tables; every other edition shows its Armory profession census once it has one.
+    $armory = $source === PROFESSION_SOURCE ? armory_profession_census() : retail_armory_profession_census($source);
+    if ($source !== 'retail' && $source !== PROFESSION_SOURCE && !$armory['sampled']) $armory = null;
     return ['source' => $source, 'views' => $views, 'dims' => $model['dims'], 'armory' => $armory];
   });
 }
