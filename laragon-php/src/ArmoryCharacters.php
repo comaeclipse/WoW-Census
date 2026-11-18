@@ -35,59 +35,74 @@ function armory_item_tip(array $it): array {
   return $tip;
 }
 
-/** All newest Armory equipment snapshots for one edition, indexed for item statistics. */
-function armory_wear_index(string $source): array {
+/**
+ * Characters per faction and class among an edition's Armory characters with equipment, plus their total:
+ * the pool an item's wearers are compared with. From the typed tables tools/armory-equipment-pg.sql keeps.
+ */
+function armory_wear_pool(string $source): array {
   static $memo = [];
   if (isset($memo[$source])) return $memo[$source];
   try {
-    $ver = (string)(Db::uncached('SELECT max(fetched_at) v FROM character_armory_profiles WHERE source_game=?', [$source])[0]['v'] ?? '');
+    $rows = Db::all("SELECT COALESCE(p.faction, '') faction, p.class_id, count(*) n
+      FROM character_armory_equipment_chars c JOIN character_armory_profiles p
+        ON p.source_game = c.source_game AND p.region = c.region AND p.character_id = c.character_id
+      WHERE c.source_game = ? AND EXISTS (SELECT 1 FROM character_armory_equipped e
+        WHERE e.source_game = c.source_game AND e.region = c.region AND e.character_id = c.character_id)
+      GROUP BY 1, 2", [$source]);
   } catch (PDOException $e) {
-    if ($e->getCode() === '42P01') return $memo[$source] = [];
+    if ($e->getCode() === '42P01') return $memo[$source] = ['chars' => 0, 'class' => []];
     throw $e;
   }
-  $key = 'ml:armory-wear:' . $source . ':' . $ver;
-  $apcu = getenv('ML_APCU_CACHE') === '1' && function_exists('apcu_enabled') && apcu_enabled();
-  if ($apcu) { $hit = apcu_fetch($key, $ok); if ($ok) return $memo[$source] = $hit; }
-  $rows = Db::uncached("WITH latest AS (SELECT DISTINCT ON (region, character_id) region, character_id, equipment
-        FROM character_armory_slim WHERE source_game=? AND equipment IS NOT NULL ORDER BY region, character_id, snapshot_at DESC)
-      SELECT l.region, l.character_id ch, p.class_id, p.race_name, p.faction, p.level, p.equipped_item_level ilvl,
-        (e->'item'->>'id')::int item, e->'slot'->>'type' slot
-      FROM latest l JOIN character_armory_profiles p ON p.source_game=? AND p.region=l.region AND p.character_id=l.character_id
-      CROSS JOIN LATERAL jsonb_array_elements(l.equipment->'equipped_items') e
-      ORDER BY l.region, l.character_id", [$source, $source]);
-  $index = ['_chars' => 0, '_class' => []];
-  $pairOf = ['FINGER_1' => 'FINGER_2', 'FINGER_2' => 'FINGER_1', 'TRINKET_1' => 'TRINKET_2', 'TRINKET_2' => 'TRINKET_1'];
-  $flush = function (array $ch) use (&$index, $pairOf) {
-    if (!$ch) return;
-    $p = $ch['p']; $index['_chars']++;
-    $index['_class'][$p['faction']][(int)$p['class_id']] = ($index['_class'][$p['faction']][(int)$p['class_id']] ?? 0) + 1;
-    $seen = [];
-    foreach ($ch['slots'] as $slot => $item) {
-      $e = &$index[$item]; $e ??= [0, [], [], [], [], [], [], [], []];
-      $e[7][$slot] = ($e[7][$slot] ?? 0) + 1;
-      if (isset($pairOf[$slot]) && ($other = $ch['slots'][$pairOf[$slot]] ?? null) !== null && $other !== $item) $e[8][$other] = ($e[8][$other] ?? 0) + 1;
-      if (isset($seen[$item])) { unset($e); continue; }
-      $seen[$item] = true; $e[0]++;
-      foreach ([1 => (int)$p['class_id'], 2 => $p['race_name'], 3 => $p['faction'], 4 => $p['region'], 5 => (int)$p['level'], 6 => $p['ilvl'] === null ? null : (int)$p['ilvl']] as $k => $v)
-        if ($v !== null && $v !== '') $e[$k][$v] = ($e[$k][$v] ?? 0) + 1;
-      unset($e);
-    }
-  };
-  $cur = null; $ch = [];
-  foreach ($rows as $r) {
-    $id = $r['region'] . ':' . $r['ch'];
-    if ($id !== $cur) { $flush($ch); $cur = $id; $ch = ['p' => $r, 'slots' => []]; }
-    if ($r['item']) $ch['slots'][$r['slot']] = (int)$r['item'];
+  $pool = ['chars' => 0, 'class' => []];
+  foreach ($rows as $r) { $pool['class'][$r['faction']][(int)$r['class_id']] = (int)$r['n']; $pool['chars'] += (int)$r['n']; }
+  return $memo[$source] = $pool;
+}
+
+/** One item's wearers among an edition's Armory characters, aggregated in PostgreSQL. */
+function armory_item_wear(string $source, int $id): ?array {
+  $wearers = "SELECT w.region, w.character_id, w.slot FROM character_armory_equipped w JOIN character_armory_profiles p
+      ON p.source_game = w.source_game AND p.region = w.region AND p.character_id = w.character_id
+    WHERE w.source_game = ? AND w.item_id = ?";
+  try {
+    $dims = Db::all("WITH d AS MATERIALIZED (
+        SELECT p.class_id, p.race_name, p.faction, p.region, p.level, p.equipped_item_level ilvl
+        FROM (SELECT DISTINCT region, character_id FROM character_armory_equipped WHERE source_game = ? AND item_id = ?) x
+        JOIN character_armory_profiles p ON p.source_game = ? AND p.region = x.region AND p.character_id = x.character_id)
+      SELECT 'n' dim, '' v, count(*) n FROM d
+      UNION ALL SELECT 'class', class_id::text, count(*) FROM d WHERE class_id IS NOT NULL GROUP BY 2
+      UNION ALL SELECT 'race', race_name, count(*) FROM d WHERE COALESCE(race_name, '') <> '' GROUP BY 2
+      UNION ALL SELECT 'faction', faction, count(*) FROM d WHERE COALESCE(faction, '') <> '' GROUP BY 2
+      UNION ALL SELECT 'region', region, count(*) FROM d WHERE COALESCE(region, '') <> '' GROUP BY 2
+      UNION ALL SELECT 'level', level::text, count(*) FROM d WHERE level IS NOT NULL GROUP BY 2
+      UNION ALL SELECT 'ilvl', ilvl::text, count(*) FROM d WHERE ilvl IS NOT NULL GROUP BY 2", [$source, $id, $source]);
+    if (!(int)($dims[0]['n'] ?? 0)) return null;
+    $slots = Db::all("SELECT slot, count(*) n FROM ($wearers) w GROUP BY slot", [$source, $id]);
+    $pairs = Db::all("SELECT o.item_id, count(*) n FROM ($wearers) w JOIN character_armory_equipped o
+        ON o.source_game = ? AND o.region = w.region AND o.character_id = w.character_id
+       AND o.slot = CASE w.slot WHEN 'FINGER_1' THEN 'FINGER_2' WHEN 'FINGER_2' THEN 'FINGER_1'
+                                WHEN 'TRINKET_1' THEN 'TRINKET_2' WHEN 'TRINKET_2' THEN 'TRINKET_1' END
+      WHERE o.item_id <> ? GROUP BY 1 ORDER BY 2 DESC, 1 LIMIT 8", [$source, $id, $source, $id]);
+  } catch (PDOException $e) {
+    if ($e->getCode() === '42P01') return null;
+    throw $e;
   }
-  $flush($ch);
-  if ($apcu) apcu_store($key, $index, 24 * 3600);
-  return $memo[$source] = $index;
+  $out = ['n' => 0, 'class' => [], 'race' => [], 'faction' => [], 'region' => [], 'level' => [], 'ilvl' => [], 'slots' => [], 'pairs' => []];
+  foreach ($dims as $r) {
+    if ($r['dim'] === 'n') { $out['n'] = (int)$r['n']; continue; }
+    $key = in_array($r['dim'], ['class', 'level', 'ilvl'], true) ? (int)$r['v'] : (string)$r['v'];
+    $out[$r['dim']][$key] = (int)$r['n'];
+  }
+  foreach ($slots as $r) $out['slots'][$r['slot']] = (int)$r['n'];
+  foreach ($pairs as $r) $out['pairs'][(int)$r['item_id']] = (int)$r['n'];
+  return $out;
 }
 
 function armory_item_wearers(string $source, int $id, ?int $itemLevel): ?array {
-  $index = armory_wear_index($source); $e = $index[$id] ?? null;
-  if ($e === null) return null;
-  [$n, $classes, $races, $factions, $regions, $levels, $ilvls, $slots, $pairs] = $e;
+  $wear = armory_item_wear($source, $id);
+  if ($wear === null) return null;
+  $pool = armory_wear_pool($source); $index = ['_chars' => $pool['chars'], '_class' => $pool['class']];
+  ['n' => $n, 'class' => $classes, 'race' => $races, 'faction' => $factions, 'region' => $regions,
+   'level' => $levels, 'ilvl' => $ilvls, 'slots' => $slots, 'pairs' => $pairs] = $wear;
   arsort($classes); arsort($races); arsort($factions); arsort($regions); arsort($levels); arsort($pairs);
   $pool = [];
   foreach (array_keys($factions) as $f) foreach ($index['_class'][$f] ?? [] as $cid => $c) $pool[$cid] = ($pool[$cid] ?? 0) + $c;
@@ -111,8 +126,11 @@ function armory_item_wearers(string $source, int $id, ?int $itemLevel): ?array {
   }
   $names = []; $pairs = array_slice($pairs, 0, 8, true);
   if ($pairs) {
-    $marks = implode(',', array_fill(0, count($pairs), '?'));
-    foreach (Db::all("SELECT DISTINCT ON (item_id) item_id,item_json->>'name' n,item_json->'quality'->>'type' q FROM character_armory_items WHERE source_game=? AND item_id IN ($marks) ORDER BY item_id,snapshot_at DESC", [$source, ...array_keys($pairs)]) as $r)
+    $marks = implode(',', array_fill(0, count($pairs), '(?::int)'));
+    // One newest row per item through character_armory_items_lookup, not every snapshot of popular items.
+    foreach (Db::all("SELECT v.item_id, x.n, x.q FROM (VALUES $marks) v(item_id) CROSS JOIN LATERAL (
+        SELECT item_json->>'name' n, item_json->'quality'->>'type' q FROM character_armory_items
+        WHERE source_game=? AND item_id=v.item_id ORDER BY snapshot_at DESC LIMIT 1) x", [...array_keys($pairs), $source]) as $r)
       $names[(int)$r['item_id']] = [$r['n'], FOREVER_QUALITY[$r['q'] ?? ''] ?? 1];
   }
   $regionNames = ['eu' => 'Europe', 'us' => 'Americas', 'kr' => 'Korea', 'tw' => 'Taiwan']; $poolChars = 0;
