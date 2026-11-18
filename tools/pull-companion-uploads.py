@@ -58,6 +58,7 @@ ADDON_FILES = {"auctionator": "Auctionator.lua", "journalator": "Journalator.lua
 MAX_ZIP = 64 << 20
 MAX_LUA = 256 << 20
 MAX_RATIO = 60
+MAX_MANIFEST = 64 << 10
 
 
 def token():
@@ -87,28 +88,58 @@ def ack(receipt_id, status, detail=None):
     call("POST", "/v1/ingest/ack", {"receiptId": receipt_id, "status": status, "detail": detail})
 
 
-def check_bundle(rec, blob, lua_name="WoWCensus.lua"):
-    if len(blob) > MAX_ZIP:
-        raise ValueError("bundle too large")
-    if hashlib.sha256(blob).hexdigest() != rec["zip_sha256"]:
-        raise ValueError("bundle SHA-256 does not match the receipt")
-    with zipfile.ZipFile(io.BytesIO(blob)) as zf:
-        names = sorted(zf.namelist())
-        if names != sorted([lua_name, "manifest.json"]):
-            raise ValueError(f"unexpected bundle contents: {names[:5]}")
-        info = zf.getinfo(lua_name)
-        if info.file_size > MAX_LUA or info.file_size > max(info.compress_size, 1) * MAX_RATIO:
-            raise ValueError("Lua file too large or compressed suspiciously")
-        manifest = json.loads(zf.read("manifest.json")[:65536])
-        lua = zf.read(lua_name)
-    if len(lua) > MAX_LUA or hashlib.sha256(lua).hexdigest() != rec["sha256"]:
-        raise ValueError("Lua SHA-256 does not match the receipt")
+class BadBundle(ValueError):
+    """An upload that can never be imported; the caller marks it failed and moves on."""
+
+
+def read_member(zf, name, limit, ratio=None):
+    info = zf.getinfo(name)
+    if info.file_size > limit or (ratio and info.file_size > max(info.compress_size, 1) * ratio):
+        raise BadBundle(f"{name} too large or compressed suspiciously")
+    with zf.open(info) as fh:
+        data = fh.read(limit + 1)
+    if len(data) > limit or len(data) != info.file_size:
+        raise BadBundle(f"{name} size does not match its header")
+    return data
+
+
+def check_manifest(manifest, rec):
+    if not isinstance(manifest, dict):
+        raise BadBundle("manifest is not a JSON object")
+    for key, types in (("sha256", str), ("edition", str), ("kind", (str, type(None))),
+                       ("mode", str), ("rows", (int, type(None)))):
+        if key in manifest and (not isinstance(manifest[key], types) or isinstance(manifest[key], bool)):
+            raise BadBundle(f"manifest field {key} has the wrong type")
     if manifest.get("sha256") != rec["sha256"] or manifest.get("edition") != rec["edition"]:
-        raise ValueError("manifest does not match the receipt")
+        raise BadBundle("manifest does not match the receipt")
     if (manifest.get("kind") or "wowcensus") != (rec.get("kind") or "wowcensus") or manifest.get("mode", "full") not in ("full", "session"):
-        raise ValueError("manifest kind or mode does not match the receipt")
+        raise BadBundle("manifest kind or mode does not match the receipt")
+
+
+def check_bundle(rec, blob, lua_name="WoWCensus.lua"):
+    """Validate a downloaded bundle. Every problem with its contents raises BadBundle."""
+    if len(blob) > MAX_ZIP:
+        raise BadBundle("bundle too large")
+    if hashlib.sha256(blob).hexdigest() != rec["zip_sha256"]:
+        raise BadBundle("bundle SHA-256 does not match the receipt")
+    try:
+        with zipfile.ZipFile(io.BytesIO(blob)) as zf:
+            names = sorted(zf.namelist())
+            if names != sorted([lua_name, "manifest.json"]):
+                raise BadBundle(f"unexpected bundle contents: {names[:5]}")
+            manifest_bytes = read_member(zf, "manifest.json", MAX_MANIFEST)
+            lua = read_member(zf, lua_name, MAX_LUA, MAX_RATIO)
+        manifest = json.loads(manifest_bytes)
+    except BadBundle:
+        raise
+    except (zipfile.BadZipFile, zipfile.LargeZipFile, json.JSONDecodeError, UnicodeDecodeError,
+            NotImplementedError, RuntimeError, EOFError, OSError, ValueError, KeyError, RecursionError) as exc:
+        raise BadBundle(f"unreadable bundle: {type(exc).__name__}: {exc}") from exc
+    if hashlib.sha256(lua).hexdigest() != rec["sha256"]:
+        raise BadBundle("Lua SHA-256 does not match the receipt")
+    check_manifest(manifest, rec)
     if lua_name == "WoWCensus.lua" and not lua.lstrip().startswith(b"WoWCensusDB"):
-        raise ValueError("not a WoWCensus SavedVariables file")
+        raise BadBundle("not a WoWCensus SavedVariables file")
     return lua, manifest
 
 
@@ -126,9 +157,10 @@ def pull(limit):
             ack(rid, "failed", f"game version {rec['edition']} is not imported")
             print(f"{rid} {rec['edition']}: unsupported game version, marked failed", flush=True)
             continue
+        blob = call("GET", f"/v1/ingest/object/{rid}", raw=True)
         try:
-            lua, manifest = check_bundle(rec, call("GET", f"/v1/ingest/object/{rid}", raw=True))
-        except (ValueError, zipfile.BadZipFile, json.JSONDecodeError) as exc:
+            lua, manifest = check_bundle(rec, blob)
+        except BadBundle as exc:
             ack(rid, "failed", str(exc)[:300])
             print(f"{rid} {rec['edition']}: rejected ({exc}), marked failed", flush=True)
             continue
@@ -160,9 +192,10 @@ def pull_addons(limit):
         if addon not in ADDON_FILES:
             print(f"{rid}: unknown add-on {addon!r}, skipped", flush=True)
             continue
+        blob = call("GET", f"/v1/ingest/object/{rid}", raw=True)
         try:
-            lua, manifest = check_bundle(rec, call("GET", f"/v1/ingest/object/{rid}", raw=True), ADDON_FILES[addon])
-        except (ValueError, zipfile.BadZipFile, json.JSONDecodeError) as exc:
+            lua, manifest = check_bundle(rec, blob, ADDON_FILES[addon])
+        except BadBundle as exc:
             print(f"{rid} {addon}: rejected ({exc}), left queued", flush=True)
             continue
         out = stage / rec["edition"] / addon
