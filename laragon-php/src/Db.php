@@ -65,6 +65,11 @@ final class Db {
     }
   }
 
+  /** Longest a worker waits for another worker's cache fill before running the query itself. */
+  private const LOCK_WAIT_SECONDS = 20;
+  /** How long the previous data version's results stay as a fallback after the version changes. */
+  private const STALE_KEEP_SECONDS = 900;
+
   private static function dataVersion(): string {
     $version = apcu_fetch('ml:data-version', $ok);
     if ($ok) return $version;
@@ -72,33 +77,115 @@ final class Db {
     $row = $published === null ? self::run('SELECT max(imported_at_utc) v FROM local_imports', [], null)[0] ?? [] : ['v' => $published];
     $version = (string)($row['v'] ?? '0');
     apcu_store('ml:data-version', $version, 60);
+    self::sweepVersions($version);
     return $version;
   }
 
+  /**
+   * When the data version changes, the previous version's results stay for
+   * STALE_KEEP_SECONDS so a worker can serve them while the new ones are
+   * computed; anything older is dropped at once instead of waiting out its
+   * 12-hour TTL. Runs at most once a minute, in one worker.
+   */
+  private static function sweepVersions(string $current): void {
+    if (!apcu_add('ml:sweep-lock', 1, 55)) return;
+    $state = apcu_fetch('ml:versions', $ok);
+    if (!$ok || !is_array($state)) $state = ['current' => $current, 'previous' => null, 'changed' => 0];
+    if ($state['current'] !== $current) {
+      $state = ['current' => $current, 'previous' => $state['current'], 'changed' => time()];
+    } elseif ($state['previous'] !== null && time() - $state['changed'] > self::STALE_KEEP_SECONDS) {
+      $state['previous'] = null;
+    }
+    apcu_store('ml:versions', $state);
+    self::dropVersionsExcept(array_values(array_filter([$state['current'], $state['previous']], fn($v) => $v !== null)));
+  }
+
+  /** @return array{0: int, 1: int} entries dropped and their bytes */
+  public static function dropVersionsExcept(array $keep): array {
+    $dropped = 0; $bytes = 0;
+    foreach (new APCUIterator('/^ml:q:/', APC_ITER_KEY | APC_ITER_MEM_SIZE, 500, APC_LIST_ACTIVE) as $key => $e) {
+      if (!preg_match('/^ml:q:(.+):[0-9a-f]{64}(:lock)?$/', (string)$key, $m) || in_array($m[1], $keep, true)) continue;
+      if (apcu_delete($key)) { $dropped++; $bytes += (int)$e['mem_size']; }
+    }
+    return [$dropped, $bytes];
+  }
+
+  /** The previous data version while its results are kept as a fallback, else null. */
+  private static function staleVersion(string $current): ?string {
+    $state = apcu_fetch('ml:versions', $ok);
+    return $ok && is_array($state) && $state['current'] === $current ? $state['previous'] : null;
+  }
+
+  /**
+   * Old rows are fine for a visitor's one-off page, which is then kept out of
+   * the page cache, but never for a rollout's pre-render (X-WoWCensus-Refresh
+   * from 127.0.0.1), whose HTML is cached until the next rollout, and never once
+   * output has started, since the page could no longer be marked uncacheable.
+   */
+  private static function mayServeStale(): bool {
+    if (PHP_SAPI === 'cli' || headers_sent()) return false;
+    $local = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
+    return !($local && ($_SERVER['HTTP_X_WOWCENSUS_REFRESH'] ?? '') === '1');
+  }
+
+  /** Counters for the admin cache page: ml:stat:<name>, since the last PHP-FPM restart. */
+  private static function stat(string $name, int $by = 1): void {
+    apcu_add('ml:stat:' . $name, 0);
+    apcu_inc('ml:stat:' . $name, $by);
+  }
+
   private static function cached(string $key, callable $compute): array {
-    $entry = 'ml:q:' . self::dataVersion() . ':' . $key;
+    $version = self::dataVersion();
+    $entry = 'ml:q:' . $version . ':' . $key;
     $rows = apcu_fetch($entry, $ok);
     if ($ok) return $rows;
     $lock = $entry . ':lock';
-    if (!apcu_add($lock, 1, 300)) {
-      // Another worker is running this query: wait for its result.
-      for ($waited = 0; $waited < 290; $waited += 0.25) {
+    $owned = apcu_add($lock, 1, 300);
+    if (!$owned) {
+      // Another worker is running this query: serve the previous version's
+      // result if it is still kept, else wait a bounded time for the new one.
+      $stale = self::staleVersion($version);
+      if ($stale !== null && self::mayServeStale()) {
+        $rows = apcu_fetch('ml:q:' . $stale . ':' . $key, $ok);
+        if ($ok) {
+          // A page built from old rows must not enter nginx's page cache (or Cloudflare's).
+          header('Cache-Control: private, no-store');
+          header('X-Accel-Expires: 0');
+          self::stat('stale-served');
+          return $rows;
+        }
+      }
+      $start = microtime(true);
+      $outcome = 'timeout';
+      while (microtime(true) - $start < self::LOCK_WAIT_SECONDS) {
         usleep(250000);
         $rows = apcu_fetch($entry, $ok);
-        if ($ok) return $rows;
-        if (!apcu_exists($lock)) break;
+        if ($ok) { $outcome = 'filled'; break; }
+        if (!apcu_exists($lock)) { $outcome = 'released'; break; }
       }
+      $ms = (int)round((microtime(true) - $start) * 1000);
+      self::stat('wait-n'); self::stat('wait-ms', $ms); self::stat('wait-' . $outcome);
+      $max = apcu_fetch('ml:stat:wait-max-ms', $ok);
+      if (!$ok || $ms > $max) apcu_store('ml:stat:wait-max-ms', $ms);
+      if ($outcome === 'filled') return $rows;
+      // The filling worker gave up or could not store its result: take the lock if it is free.
+      $owned = apcu_add($lock, 1, 300);
     }
     try {
       $started = microtime(true);
       $rows = $compute();
-      apcu_store($entry, $rows, 12 * 3600);  // Too large for the cache: still returned.
+      $ms = (int)round((microtime(true) - $started) * 1000);
+      $bytes = strlen(serialize($rows));
+      $limit = (int)(getenv('ML_APCU_MAX_BYTES') ?: 0);
+      $stored = false;
+      if ($limit > 0 && $bytes > $limit) self::stat('skip-large');
+      elseif (!($stored = apcu_store($entry, $rows, 12 * 3600))) self::stat('store-failed');
       // What the entry holds and what it cost, for the admin cache page (src/AdminCache.php).
-      apcu_store('ml:qm:' . $key, ['sql' => self::$lastSql, 'ms' => (int)round((microtime(true) - $started) * 1000),
-        'rows' => count($rows), 'at' => time()], 12 * 3600);
+      apcu_store('ml:qm:' . $key, ['sql' => self::$lastSql, 'ms' => $ms, 'rows' => count($rows), 'bytes' => $bytes,
+        'stored' => $stored, 'at' => time()], 12 * 3600);
       return $rows;
     } finally {
-      apcu_delete($lock);
+      if ($owned) apcu_delete($lock);
     }
   }
 
