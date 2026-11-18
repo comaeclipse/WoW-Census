@@ -409,8 +409,26 @@ def character_region(cur, edition, char, realm, cache):
             WHERE source_game=%s AND name=%s AND realm=%s AND collection_region IS NOT NULL""",
                     (legacy.SOURCES[edition], char, realm))
         found = {r[0] for r in cur.fetchall()}
+        if not found and edition == "forever":
+            found = forever_ruleset_regions(cur, char, realm)
         cache[key] = found.pop() if len(found) == 1 else None
     return cache[key]
+
+
+FOREVER_RULESETS = {"pve": "PvE", "normal": "PvE", "pvp": "PvP", "rp": "RP", "roleplay": "RP",
+                    "rp pvp": "RP PvP", "roleplay pvp": "RP PvP", "rppvp": "RP PvP"}
+
+
+def forever_ruleset_regions(cur, char, realm):
+    """TSM names Forever realms by ruleset only ("Roleplay PvP"); the census /who sightings of
+    the same character on realms of that ruleset say which region it plays in."""
+    ruleset = FOREVER_RULESETS.get(realm.strip().lower())
+    if not ruleset:
+        return set()
+    cur.execute("""SELECT DISTINCT collection_region, realm FROM marketlens_import.characters_with_region
+        WHERE source_game='forever' AND name=%s AND collection_region IS NOT NULL""", (char,))
+    pattern = re.compile(r"^CAMWOW\s+(?:US|EU|KR|TW)\d+\s+Realm\s+\d+\s+" + re.escape(ruleset) + r"$", re.I)
+    return {reg for reg, name in cur.fetchall() if pattern.match(name or "")}
 
 
 def account_region(cur, edition, path, rows, cache):
