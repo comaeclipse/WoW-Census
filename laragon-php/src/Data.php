@@ -683,6 +683,10 @@ function forever_armory_talent_records(): array {
   return $records;
 }
 
+// Aggregate pages read at most this many Armory characters (most recently logged in), as inspects
+// stop at 10,000: every record is held in the 512 MB web worker. Character pages use them all.
+const ARMORY_AGGREGATE_LIMIT = 20000;
+
 /** Latest Retail Armory build and equipment, normalized like character_inspects. */
 function character_armory_records(string $source): array {
   static $cache = [];
@@ -693,10 +697,20 @@ function character_armory_records(string $source): array {
     'HANDS'=>10,'FINGER_1'=>11,'FINGER_2'=>12,'TRINKET_1'=>13,'TRINKET_2'=>14,'BACK'=>15,'MAIN_HAND'=>16,'OFF_HAND'=>17,
     'RANGED'=>18,'TABARD'=>19];
   $qualities = ['POOR'=>0,'COMMON'=>1,'UNCOMMON'=>2,'RARE'=>3,'EPIC'=>4,'LEGENDARY'=>5,'ARTIFACT'=>6,'HEIRLOOM'=>7];
-  $records = [];
+  $records = []; $shared = [];
   // Slim snapshot copies (tools/armory-slim-pg.sql), a page at a time: the raw
   // Blizzard JSON is ~350 KB per Retail character and must never be loaded here.
   $afterRegion = ''; $afterId = -1;
+  try {
+    // The newest ARMORY_AGGREGATE_LIMIT logins: the cut is the last login time they reach.
+    $cut = Db::uncached('SELECT last_login_at FROM character_armory_profiles WHERE source_game=?
+      ORDER BY last_login_at DESC NULLS LAST OFFSET ' . (ARMORY_AGGREGATE_LIMIT - 1) . ' LIMIT 1', [$source]);
+  } catch (PDOException $e) {
+    if (in_array($e->getCode(), ['42P01', '42703'], true)) return $cache[$source] = [];
+    throw $e;
+  }
+  $cutSql = !$cut ? '' : ($cut[0]['last_login_at'] === null ? ' AND p.last_login_at IS NOT NULL' : ' AND p.last_login_at >= ?');
+  $cutArgs = $cut && $cut[0]['last_login_at'] !== null ? [$cut[0]['last_login_at']] : [];
   while (true) {
   try {
     $rows = Db::uncached("SELECT p.region,p.character_id,p.name,p.realm_name,p.class_id,p.class_name,p.race_name,p.level,
@@ -706,8 +720,8 @@ function character_armory_records(string $source): array {
         SELECT snapshot_at,specializations,equipment FROM character_armory_slim s
         WHERE s.source_game=p.source_game AND s.region=p.region AND s.character_id=p.character_id
         ORDER BY snapshot_at DESC LIMIT 1) s ON true
-      WHERE p.source_game=? AND (p.region,p.character_id) > (?,?)
-      ORDER BY p.region,p.character_id LIMIT 500", [$source, $afterRegion, $afterId]);
+      WHERE p.source_game=?$cutSql AND (p.region,p.character_id) > (?,?)
+      ORDER BY p.region,p.character_id LIMIT 500", [$source, ...$cutArgs, $afterRegion, $afterId]);
   } catch (PDOException $e) {
     if (in_array($e->getCode(), ['42P01', '42703'], true)) return $cache[$source] = [];
     throw $e;
@@ -745,6 +759,12 @@ function character_armory_records(string $source): array {
         'quality' => $qualities[$it['quality']['type'] ?? ''] ?? null, 'enchant' => !empty($it['enchantments']), 'rune' => null];
     }
     $time = strtotime((string)($r['last_login_at'] ?: $r['snapshot_at'] ?: $r['fetched_at'])) ?: 0;
+    // Tens of thousands of characters pick from the same few thousand talents and items: keep one
+    // copy of each (PHP shares equal arrays copy-on-write), or this list needs gigabytes.
+    foreach ($build['talents'] as $i => $t) $build['talents'][$i] = $shared['t' . serialize($t)] ??= $t;
+    foreach ($gear as $i => $g) $gear[$i] = $shared['g' . serialize($g)] ??= $g;
+    foreach ($build as $k => $v) if (is_array($v)) $build[$k] = $shared['b' . $k . md5(serialize($v))] ??= $v;
+    foreach (['race_name', 'realm_name', 'faction', 'guild_name', 'region'] as $k) if (is_string($r[$k])) $r[$k] = $shared['s' . $r[$k]] ??= $r[$k];
     $records[] = ['name' => $r['name'], 'classFile' => $classFile, 'race' => $r['race_name'], 'level' => (int)$r['level'],
       'guild' => $r['guild_name'] ?: null, 'time' => $time, 'region' => $r['region'], 'realm' => $r['realm_name'],
       'faction' => $r['faction'], 'matchStatus' => 'armory', 'game' => null,

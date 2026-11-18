@@ -56,9 +56,20 @@ function route_request(string $path): ?array {
     $c = $source ? edition_character_model($source, $m[2]) : null;
     return $c ? [$html, edition_character_html($c)] : null;
   }
-  // Armory-backed profession census and AH trade pages for Forever and Retail.
-  if (preg_match('#^/(forever|retail)/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
-    $source = $m[1];
+  // WoW: Forever dungeons: /forever/dungeons/ and /forever/dungeons/<slug>/.
+  if (preg_match('#^/forever/dungeons(?:/([a-z0-9-]+))?/?(?:index\.html)?$#', $path, $m)) {
+    $page = forever_dungeons_html(($m[1] ?? '') !== '' ? $m[1] : null, edition_path(DUNGEON_SOURCE) . $cssName);
+    return $page === null ? null : [$html, localize_content($page)];
+  }
+  // WoW: Forever dungeon bosses and rare spawns: /forever/npc/<slug>/.
+  if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m)) {
+    $page = forever_npc_html($m[1], edition_path(DUNGEON_SOURCE) . $cssName);
+    return $page === null ? null : [$html, localize_content($page)];
+  }
+  // Profession markets for every edition; Forever and Retail also add an Armory profession census.
+  if (preg_match('#^/([a-z-]+)/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
+    $source = source_for_path('/' . $m[1] . '/');
+    if (!$source) return null;
     $slug = ($m[2] ?? '') !== '' ? $m[2] : null;
     if ($slug !== null && !isset(profession_catalog($source)[$slug])) return null;
     return [$html, localize_content(professions_html($slug, edition_path($source) . $cssName, $source))];

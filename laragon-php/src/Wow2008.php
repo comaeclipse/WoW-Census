@@ -10,7 +10,7 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '64';
+const ASSET_VERSION = '66';
 
 // Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
 const SUPPORT_RAISED = 0;
@@ -140,12 +140,13 @@ function url(?string $page = null, ?string $source = null): string {
 function edition_links(string $source): array {
   $links = [['Census', url('census', $source), false, 'census'], ['Race + Class', url('combos', $source), true, 'combos'],
     ['Realms', url('realms', $source), false, 'realms'], ['Auction House', url('auction-house', $source), false, 'auction-house'],
-    ...(in_array($source, [\PROFESSION_SOURCE, 'retail'], true) ? [['Professions', \profession_path(null, $source), true, 'professions']] : []),
+    ['Professions', \profession_path(null, $source), true, 'professions'],
     ['Guilds', url('guilds', $source), false, 'guilds'], ['Geography', url('geography', $source), false, 'geography'],
     ['Talents', url('talents', $source), false, 'talents']];
   if (race_pages($source)) $links[] = ['Races', url('races', $source), true, 'races'];
   if (class_pages($source)) $links[] = ['Classes', url('classes', $source), true, 'classes'];
   $links[] = ['Gear', url('gear', $source), false, 'gear'];
+  if ($source === \DUNGEON_SOURCE) $links[] = ['Dungeons', \forever_dungeon_path(), false, 'dungeons'];
   if (in_array($source, ['retail', 'forever'], true)) $links[] = ['Skin Colors', '/' . $source . '/skin-colors/', false, 'skin-colors'];
   return $links;
 }
@@ -250,9 +251,23 @@ function render_page(string $html, string $path): string {
     $GLOBALS['w8_source'] = $source;
     return character_page($c, $html);
   }
-  if (preg_match('#^/(forever|retail)/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)) {
-    $GLOBALS['w8_source'] = $m[1];
-    return ($m[2] ?? '') !== '' ? profession_page($m[1], $m[2], $html) : professions_page($m[1], $html);
+  if (preg_match('#^/([a-z-]+)/professions(?:/([a-z-]+))?/?(?:index\.html)?$#', $path, $m)
+      && ($source = \source_for_path('/' . $m[1] . '/'))) {
+    $GLOBALS['w8_source'] = $source;
+    return ($m[2] ?? '') !== '' ? profession_page($source, $m[2], $html) : professions_page($source, $html);
+  }
+  if (preg_match('#^/forever/dungeons(?:/([a-z0-9-]+))?/?(?:index\.html)?$#', $path, $m)
+      && (($m[1] ?? '') === '' || isset(\forever_dungeons()[$m[1]]))) {
+    $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
+    $d = ($m[1] ?? '') !== '' ? \forever_dungeons()[$m[1]] : null;
+    $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . ($d === null ? \DUNGEON_W8_INDEX_STYLE : '') . '</style></head>', $html);
+    if ($d === null) $html = preg_replace_callback('#<!--dg-index-->.*<!--/dg-index-->#s', fn() => \forever_dungeons_w8_index(), $html, 1);
+    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', 'census', $d['name'] ?? 'Dungeons');
+  }
+  if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m) && isset(\forever_npcs()[$m[1]])) {
+    $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
+    $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . '</style></head>', $html);
+    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', 'census', \forever_npcs()[$m[1]]['boss']['name']);
   }
   if (preg_match('#^/(retail|forever)/skin-colors(?:/([a-z0-9-]+))?/?(index\.html)?$#', $path, $m)) { $GLOBALS['w8_source'] = $m[1]; return skin_colors_page($html, $m[2] ?? null, $m[1]); }
   // The current skin's race switcher fetches these fragments; they stay as they are.
@@ -699,7 +714,7 @@ function gear_page(string $source, string $html): string {
     'inspectBuilds' => $model['sources']['inspect'] ?? count($records), 'armoryBuilds' => $model['sources']['armory'] ?? 0,
     'wowhead' => $packed['wowhead'],
     // Forever items have pages of their own (price history and who wears them); other editions link to Wowhead.
-    'itemBase' => in_array($source, [\PROFESSION_SOURCE, 'retail'], true) ? \armory_item_path($source, '') : null]], $html, 'gear');
+    'itemBase' => in_array($source, \ARMORY_SOURCES, true) ? \armory_item_path($source, '') : null]], $html, 'gear');
 }
 
 /** Short realm labels for a list of the site's realm keys. */
@@ -889,8 +904,7 @@ function auction_page(string $source, string $html): string {
   $factions = array_map(fn($f) => [$f['key'], $f['key'] === 'all' ? ($f['label'] === 'Cross-faction' ? 'Cross-faction' : 'Both') : $f['label']], $model['dims']['faction']);
   return page('auction-house', common_vars($source) + ['data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
     'realms' => $realms, 'factions' => $factions, 'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=',
-    // Forever and Retail item observations have local price/profile pages.
-    'itemBase' => in_array($source, [\PROFESSION_SOURCE, 'retail'], true) ? \armory_item_path($source, '') : null], $html, 'auction-house');
+    'itemBase' => in_array($source, \ARMORY_SOURCES, true) ? \armory_item_path($source, '') : null], $html, 'auction-house');
 }
 
 /** Realm and faction filter rows for the professions pages, as on the auction house. */

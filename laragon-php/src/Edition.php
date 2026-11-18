@@ -44,24 +44,24 @@ function utc_timestamp(mixed $value): string {
 function edition_nav(string $source, string $current): array {
   $edition = EDITIONS[$source];
   $currentPage = preg_replace('/\.html$/', '', $current);
-  $pageLabels = ['index' => 'Census', 'combos' => 'Race + Class', 'realms' => 'Realms', 'auctionhouse' => 'Auction House', 'professions' => 'Professions', 'guilds' => 'Guilds', 'geography' => 'Geography', 'talents' => 'Talents', 'gear' => 'Gear'];
+  $pageLabels = ['index' => 'Census', 'combos' => 'Race + Class', 'realms' => 'Realms', 'auctionhouse' => 'Auction House', 'professions' => 'Professions', 'guilds' => 'Guilds', 'geography' => 'Geography', 'talents' => 'Talents', 'gear' => 'Gear', 'dungeons' => 'Dungeons'];
   $item = fn(string $href, string $label, ?bool $active = null) =>
     '<a class="game"' . (($active ?? ($href === $currentPage)) ? ' aria-current="true"' : '') . ' href="' . $href . '">' . $label . '</a>';
   $games = '<nav class="games game-nav" aria-label="Game edition">';
   foreach (EDITIONS as $s => $e) {
-    $gamePage = $currentPage === 'professions' && !in_array($s, [PROFESSION_SOURCE, 'retail'], true) ? 'auctionhouse' : $currentPage;
-    $games .= $item(page_path($s, $gamePage), $e['nav'], $s === $source);
+    $games .= $item($currentPage === 'professions' ? profession_path(null, $s) : page_path($s, $currentPage), $e['nav'], $s === $source);
   }
   $games .= '</nav>';
   $pages = '<nav class="games page-nav" aria-label="Site pages">' .
     $item(page_path($source, 'index'), 'Census', $currentPage === 'index' || $currentPage === 'combos') .
     $item(page_path($source, 'realms'), 'Realms', $currentPage === 'realms') .
     $item(page_path($source, 'auctionhouse'), 'Auction House', $currentPage === 'auctionhouse') .
-    (in_array($source, [PROFESSION_SOURCE, 'retail'], true) ? $item(profession_path(null, $source), 'Professions', $currentPage === 'professions') : '') .
+    $item(profession_path(null, $source), 'Professions', $currentPage === 'professions') .
     $item(page_path($source, 'guilds'), 'Guilds', $currentPage === 'guilds') .
     $item(page_path($source, 'geography'), 'Geography', $currentPage === 'geography') .
     $item(page_path($source, 'talents'), 'Talents', $currentPage === 'talents') .
-    $item(page_path($source, 'gear'), 'Gear', $currentPage === 'gear') . '</nav>';
+    $item(page_path($source, 'gear'), 'Gear', $currentPage === 'gear') .
+    ($source === DUNGEON_SOURCE ? $item(forever_dungeon_path(), 'Dungeons', $currentPage === 'dungeons') : '') . '</nav>';
   return [
     'games' => '<div class="site-nav-stack">' . $games . $pages . '</div>',
     'pages' => '',
@@ -405,10 +405,14 @@ function census_views(string $source): array {
 function inspects_with_icons(string $source): array {
   $inspects = $source === 'retail' ? load_talent_samples($source) : load_inspects($source);
   $icons = item_cache('item-icons', EDITIONS[$source]['branch']);
+  // Armory records share equal gear arrays; keep them shared once the icon is set.
+  $shared = [];
   foreach ($inspects['records'] as &$record)
-    foreach ($record['gear'] as &$item)
+    foreach ($record['gear'] as &$item) {
       if (empty($item['icon'])) $item['icon'] = ($icons[$item['id']] ?? null) ?: null;
-  unset($record, $item);
+      $item = $shared[serialize($item)] ??= $item;
+    }
+  unset($record, $item, $shared);
   return $inspects;
 }
 

@@ -407,31 +407,33 @@ function md_class_name(mixed $value): string {
   return $s === '' ? $s : js_upper(mb_substr($s, 0, 1)) . mb_substr($s, 1);
 }
 
-function unpack_talent_records(array $packed): array {
-  $n = count($packed['fields']);
-  $out = [];
-  foreach ($packed['rows'] as $row) {
-    $r = [];
-    foreach ($packed['fields'] as $i => $f) $r[$f] = $row[$i] < 0 ? null : $packed['values'][$f][$row[$i]];
-    $r['level'] = $row[$n] < 0 ? null : $row[$n];
-    $r['hybrid'] = $row[$n + 1] === 1;
-    $r['talents'] = array_map(fn($i) => ['node' => $i, 'name' => $packed['names'][$i]], $row[$n + 2]);
-    $out[] = $r;
-  }
-  return $out;
-}
-
+// Reads the packed rows in place: expanding every record and its talent
+// selections into arrays costs several times the packed size.
 function talent_summary(array $packed): string {
-  $records = unpack_talent_records($packed);
-  $grouped = []; $classTotals = [];
-  foreach ($records as $row) {
-    if (($row['faction'] ?? '') === '' || ($row['classification'] ?? '') === '' || $row['classification'] === 'Unknown build' || $row['classification'] === 'Unresolved') continue;
-    $key = implode("\t", [$row['faction'], $row['classFile'], $row['classification']]);
-    $grouped[$key] ??= ['count' => 0, 'hybrid' => false];
-    $grouped[$key]['count']++;
-    $grouped[$key]['hybrid'] = $grouped[$key]['hybrid'] || $row['hybrid'];
-    $classKey = $row['faction'] . "\t" . $row['classFile'];
-    $classTotals[$classKey] = ($classTotals[$classKey] ?? 0) + 1;
+  $fields = array_flip($packed['fields']);
+  $n = count($packed['fields']);
+  $fi = $fields['faction']; $ci = $fields['classFile']; $bi = $fields['classification'];
+  $vf = $packed['values']['faction']; $vc = $packed['values']['classFile']; $vb = $packed['values']['classification'];
+  $grouped = []; $classTotals = []; $denominators = []; $talents = [];
+  foreach ($packed['rows'] as $row) {
+    $faction = $row[$fi] < 0 ? null : $vf[$row[$fi]];
+    $classFile = $row[$ci] < 0 ? null : $vc[$row[$ci]];
+    $classification = $row[$bi] < 0 ? null : $vb[$row[$bi]];
+    if (($faction ?? '') !== '' && ($classification ?? '') !== '' && $classification !== 'Unknown build' && $classification !== 'Unresolved') {
+      $key = implode("\t", [$faction, $classFile, $classification]);
+      $grouped[$key] ??= ['count' => 0, 'hybrid' => false];
+      $grouped[$key]['count']++;
+      $grouped[$key]['hybrid'] = $grouped[$key]['hybrid'] || $row[$n + 1] === 1;
+      $classKey = $faction . "\t" . $classFile;
+      $classTotals[$classKey] = ($classTotals[$classKey] ?? 0) + 1;
+    }
+    if (!$row[$n + 2]) continue;
+    $denominators[$classFile] = ($denominators[$classFile] ?? 0) + 1;
+    foreach ($row[$n + 2] as $node) {
+      $tk = $classFile . "\t" . $node;
+      $talents[$tk] ??= ['classFile' => $classFile, 'name' => $packed['names'][$node], 'count' => 0];
+      $talents[$tk]['count']++;
+    }
   }
   $lines = ['## Observed talent builds', '',
     'Shares are within the classified inspect sample for each faction and class, not the full character population.',
@@ -442,16 +444,6 @@ function talent_summary(array $packed): string {
     [$faction, $classFile, $build] = explode("\t", $key);
     $share = js_fixed(100 * $entry['count'] / $classTotals[$faction . "\t" . $classFile], 1);
     $lines[] = '| ' . md_cell($faction) . ' | ' . md_cell(md_class_name($classFile)) . ' | ' . md_cell($build) . ($entry['hybrid'] ? ' Hybrid' : '') . ' | ' . $entry['count'] . ' | ' . $share . '% |';
-  }
-  $denominators = []; $talents = [];
-  foreach ($records as $row) {
-    if (!$row['talents']) continue;
-    $denominators[$row['classFile']] = ($denominators[$row['classFile']] ?? 0) + 1;
-    foreach ($row['talents'] as $talent) {
-      $key = $row['classFile'] . "\t" . $talent['node'];
-      $talents[$key] ??= ['classFile' => $row['classFile'], 'name' => $talent['name'], 'count' => 0];
-      $talents[$key]['count']++;
-    }
   }
   if ($talents) {
     array_push($lines, '', '## Selected talent popularity', '',

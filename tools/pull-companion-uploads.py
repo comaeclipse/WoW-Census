@@ -4,8 +4,8 @@
     python -B tools/pull-companion-uploads.py run                  # pull, import local + live, mark imported
     python -B tools/pull-companion-uploads.py run --target local   # pull and import into local PostgreSQL only
     python -B tools/pull-companion-uploads.py pull                 # only download and stage
-    python -B tools/pull-companion-uploads.py ack <stage dir>      # mark a staged batch imported
-    python -B tools/pull-companion-uploads.py pull-addons          # download other add-ons' uploads (not imported)
+    python -B tools/pull-companion-uploads.py ack <stage dir>      # mark a staged batch imported (census or add-on stage)
+    python -B tools/pull-companion-uploads.py pull-addons          # download other add-ons' uploads; ack the stage once used
 
 Players' uploads wait on api.wowcensus.io (the upload Worker). `pull` asks the
 Worker for every receipt still waiting, downloads each bundle, checks it
@@ -17,12 +17,15 @@ Lua SHA-256) and writes the Lua into a WoW-style tree:
 Since companion 0.1.12 most uploads are sessions: only what is new since the
 last confirmed upload, in the save's own layout, so the importer reads them like
 any save. `pull` only asks for WoWCensus uploads. Uploads from other add-ons
-(Auctionator, Journalator, TradeSkillMaster, Dungeon Journal) have no importer
-yet; `pull-addons` downloads them to
+(Auctionator, Journalator, TradeSkillMaster, Dungeon Journal) are not imported
+here; `pull-addons` downloads them to
 
     MarketLensData/companion-uploads/addons-<UTC time>/<edition>/<addon>/<receipt>.lua (+ .json manifest)
 
-and leaves them queued on the Worker.
+and leaves them queued on the Worker. Once their data is used (ledgers through
+import-live.py journalator, Dungeon Journal saves through
+tools/build-forever-dungeons.py), `ack <that folder>` marks them imported; each
+manifest carries its receipt id.
 
 `run` then hands that tree to tools/import-live.py saves (the same importer as
 local saves: SHA-256 dedup, one transaction, local first, then live) and, only
@@ -173,10 +176,16 @@ def pull_addons(limit):
 
 
 def ack_stage(stage):
-    staged = json.loads((stage / "receipts.json").read_text(encoding="utf-8"))
-    for s in staged:
-        ack(s["receiptId"], "imported")
-    print(f"Marked {len(staged)} upload(s) imported.", flush=True)
+    if (stage / "receipts.json").exists():
+        ids = [s["receiptId"] for s in json.loads((stage / "receipts.json").read_text(encoding="utf-8"))]
+    else:
+        # An add-on stage (pull-addons): each upload's manifest carries its receipt id.
+        ids = [json.loads(m.read_text(encoding="utf-8"))["receiptId"] for m in sorted(stage.glob("*/*/*.json"))]
+        if not ids:
+            raise SystemExit(f"{stage}: no receipts.json and no add-on manifests")
+    for rid in ids:
+        ack(rid, "imported")
+    print(f"Marked {len(ids)} upload(s) imported.", flush=True)
 
 
 def main():

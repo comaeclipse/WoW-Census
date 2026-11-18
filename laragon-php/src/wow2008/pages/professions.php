@@ -6,6 +6,8 @@ namespace Wow2008;
  *       p: slug => [items, units, gold, mats, crafted, recipes]), $pcensus (src/forever-profession-census.json), $subtitle
  */
 $pc = $pcensus;
+$hasCensus = $pc !== null;
+$pc ??= ['profiles' => 0, 'primaries' => [], 'combos' => [], 'primaryCounts' => [], 'secondaries' => [], 'classes' => []];
 $n = $pc['profiles'];
 $prim = $pc['primaries'];
 $combos = $pc['combos'];
@@ -71,6 +73,7 @@ $short = ['Leatherworking' => 'LW', 'Blacksmithing' => 'BS'];
 
     <?= component('banner', ['art' => 'auction-house', 'title' => 'Professions', 'subtitle' => $subtitle . ' · TRADE SKILLS', 'subtitle_color' => '#ffe8a0', 'stamp_id' => 'pfstamp']) ?>
 
+<?php if ($hasCensus): ?>
     <?php component_start('section', ['title' => 'Profession Census', 'icon' => 'g',
       'sub' => fmt($n) . ' characters sampled from the ' . ($isRetail ? 'Retail' : 'Forever') . ' armory' . (!empty($pc['fetchedTo']) ? ' · ' . gmdate('j M Y', strtotime($pc['fetchedTo'])) : '')]) ?>
         <div class="pc-tallies">
@@ -123,6 +126,7 @@ $short = ['Leatherworking' => 'LW', 'Blacksmithing' => 'BS'];
 <?php endforeach; ?>
         </div>
     <?php component_end() ?>
+<?php endif ?>
 
     <div class="ahwin pf-board" style="margin-bottom:16px">
       <div class="wt">Trade Board<small>professions ranked by listed asking value · click a trade for its market</small></div>
@@ -130,7 +134,7 @@ $short = ['Leatherworking' => 'LW', 'Blacksmithing' => 'BS'];
         <tbody id="pfBoard"></tbody></table>
     </div>
 
-    <div class="source">Census from armory profiles of sampled characters · auction data from in-game scans, asking prices on listed auctions · an item can count toward more than one trade</div>
+    <div class="source"><?= $hasCensus ? 'Census from armory profiles of sampled characters · ' : '' ?>auction data from in-game scans, asking prices on listed auctions · an item can count toward more than one trade</div>
   </main>
 
 <?php start_section('scripts') ?>

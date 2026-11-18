@@ -1,8 +1,11 @@
 #!/bin/bash
-# Re-renders every page in nginx's cache in place, one at a time, so new data reaches
-# visitors gradually without ever emptying the cache: each visitor keeps getting the
-# saved copy of a page until this replaces it (X-WoWCensus-Refresh: 1 from 127.0.0.1).
-# Order: the 72 main pages, then the rest by visits in the recent access logs.
+# Re-renders the busiest pages in nginx's cache in place, one at a time, so new data reaches
+# visitors without ever emptying the cache: each visitor keeps getting the saved copy of a
+# page until this replaces it (X-WoWCensus-Refresh: 1 from 127.0.0.1).
+# Order: the 72 main pages, then the rest by visits in the recent access logs, cut off after
+# ROLLOUT_TOP entries. Every other page refreshes on its next visit: nginx keeps pages valid
+# for 1 hour, then serves the saved copy once more while one background request re-renders it
+# (snippets/wowcensus-cache.conf). Entries for tracking-only URLs (?fbclid=, ?utm_*=) are skipped.
 # Waits while the box is busy (1-minute load above ROLLOUT_MAX_LOAD) so visitors come first.
 # After each default-skin HTML page is re-rendered, its URL is purged from Cloudflare (in
 # batches of 30), so the edge can keep pages for a long time and still show changes at once.
@@ -17,6 +20,8 @@
 #   ROLLOUT_MAIN=1             only the main pages (every skin and Accept variant of them)
 #   ROLLOUT_PATHS=<regex>      only pages whose path (no query) matches this awk regex, e.g. a
 #                              release that changed two page types: '/(guilds|geography)$'
+#   ROLLOUT_TOP (0)            only the first N cache entries in that order (uri x skin x accept);
+#                              0 = every cached page. wowcensus-data-refresh passes 500.
 #   ROLLOUT_LIMIT              only the first N cache entries (uri x skin x accept; for testing)
 #   ROLLOUT_DRY_RUN=1          list how many entries per top-level path it would re-render, then stop
 set -u
@@ -73,6 +78,7 @@ awk -F'\t' 'NR==FNR {if ($2>h[$1]) h[$1]=$2; next} {split($0,k,"|"); print (h[k[
       }
       {
         split($0, k, "|"); uri = k[1]; path = uri; sub(/\?.*/, "", path)
+        if (uri ~ /[?&](fbclid|gclid|msclkid|utm_[a-z]+)=/) next
         if (main_only == 1 && !(uri in main)) next
         if (paths != "" && path !~ paths) next
         if (sources == "") { print; next }
@@ -82,9 +88,10 @@ awk -F'\t' 'NR==FNR {if ($2>h[$1]) h[$1]=$2; next} {split($0,k,"|"); print (h[k[
         if (uri == "/" || uri ~ /^\/(index\.(html|md)|sitemap\.xml|llms\.txt)$/) { print; next }
         if (seg in want || (top && !(seg in edition))) print
       }' \
-  | head -n "${ROLLOUT_LIMIT:-100000000}" > "$WORK/order"
+  | head -n "${ROLLOUT_LIMIT:-100000000}"   | { if [ "${ROLLOUT_TOP:-0}" -gt 0 ]; then head -n "$ROLLOUT_TOP"; else cat; fi; } > "$WORK/order"
 total=$(wc -l < "$WORK/order")
 note=; [ "${ROLLOUT_MAIN:-0}" = 1 ] && note=" (main pages only)"; [ -n "${ROLLOUT_PATHS:-}" ] && note="$note (paths matching ${ROLLOUT_PATHS})"
+[ "${ROLLOUT_TOP:-0}" -gt 0 ] && note="$note (busiest $ROLLOUT_TOP; the rest refresh on their next visit)"
 log "rolling out $total cached pages${ROLLOUT_SOURCES:+ (editions: $ROLLOUT_SOURCES)}$note"
 if [ "${ROLLOUT_DRY_RUN:-0}" = 1 ]; then
   cut -d'|' -f1 "$WORK/order" | sed -E 's#\?.*##; s#^/([^/]*).*#\1#' | sort | uniq -c | sort -rn | head -20

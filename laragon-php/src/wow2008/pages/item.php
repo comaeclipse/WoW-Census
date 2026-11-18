@@ -311,7 +311,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     <?php component_start('section', ['title' => 'Often Worn With', 'icon' => '', 'sub' => 'the item in the matching ' . (str_contains(strtolower((string)($tip['slot'] ?? '')), 'finger') ? 'ring' : 'other') . ' slot on the same characters']) ?>
         <div class="it-pairs">
 <?php foreach ($aw['pairs'] as $p): ?>
-          <div class="it-pair" data-tip="<?= e($p['name']) ?>|<?= fmt($p['n']) ?> of <?= fmt($aw['players']) ?> wearers"><a class="q<?= (int)$p['quality'] ?>" href="<?= e(\forever_item_path($p['id'])) ?>"><?= e($p['name']) ?></a><span class="tr"><i data-w="<?= round(100 * $p['n'] / $maxPair, 1) ?>%"></i></span><span class="v"><?= $pct($p['n'], $aw['players']) ?>%</span></div>
+          <div class="it-pair" data-tip="<?= e($p['name']) ?>|<?= fmt($p['n']) ?> of <?= fmt($aw['players']) ?> wearers"><a class="q<?= (int)$p['quality'] ?>" href="<?= e(\armory_item_path($item['source'] ?? \PROFESSION_SOURCE, $p['id'])) ?>"><?= e($p['name']) ?></a><span class="tr"><i data-w="<?= round(100 * $p['n'] / $maxPair, 1) ?>%"></i></span><span class="v"><?= $pct($p['n'], $aw['players']) ?>%</span></div>
 <?php endforeach ?>
         </div>
         <p class="tfoot">From each character's latest Armory snapshot. Characters aren't named here.</p>
@@ -321,7 +321,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
 
 <?php if (!$listed && !$bopNote): ?>
     <?php component_start('section', ['title' => 'Auction House', 'icon' => 'g']) ?>
-        <div class="it-nomkt"><?php if (!empty($item['armoryOnly'])): ?>Seen equipped on characters from the Battle.net Armory. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php elseif (!empty($item['localOnly'])): ?>This local item page was created from equipment observed on an enriched character. Auction history for this edition is not connected to the item page yet.<?php else: ?>No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.<?php endif ?></div>
+        <div class="it-nomkt"><?php if (!empty($item['armoryOnly'])): ?>Seen equipped on characters from the Battle.net Armory. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php elseif (!empty($item['localOnly'])): ?>This item page was created from equipment observed on inspected characters. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php else: ?>No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.<?php endif ?></div>
     <?php component_end() ?>
 <?php elseif ($listed): ?>
     <div class="tiles" id="itTiles"></div>
@@ -392,6 +392,20 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     <?php component_end() ?>
 <?php endif ?>
 
+<?php if (!empty($item['dungeon'])): ?>
+    <?php component_start('section', ['title' => 'Dungeon Drop', 'icon' => 'p', 'sub' => 'from the Dungeon Journal add-on\'s boss loot lists', 'style' => 'margin-top:16px']) ?>
+        <table class="ahtable it-loot">
+          <thead><tr><th>Dropped by</th><th>Dungeon</th></tr></thead>
+          <tbody>
+<?php foreach ($item['dungeon'] as $src): ?>
+            <tr><td><?= $src['boss'] !== null ? '<a href="' . e(\forever_npc_path(\forever_npc_slug($src['boss']))) . '">' . e($src['boss']) . '</a>' : 'Trash' . (!empty($src['from']) ? ' <span class="kind">(' . e($src['from']) . ')</span>' : '') ?></td>
+              <td><a href="<?= e(\forever_dungeon_path($src['slug'])) ?>"><?= e($src['dungeon']) ?></a></td></tr>
+<?php endforeach ?>
+          </tbody>
+        </table>
+    <?php component_end() ?>
+<?php endif ?>
+
 <?php if ($loot):
   $kinds = array_count_values(array_map(fn($r) => $r['kind'] === 'quest' ? 'quest' : 'loot', $loot['rows']));
   $lootWhat = isset($kinds['loot'], $kinds['quest']) ? 'loots and quest rewards' : (isset($kinds['quest']) ? 'quest rewards' : 'loots'); ?>
@@ -400,7 +414,8 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
           <thead><tr><th>Source</th><th>Type</th><th class="num">Drop rate</th><th class="num">Dropped</th><th class="num">Looted</th><th class="num">Avg qty</th></tr></thead>
           <tbody>
 <?php foreach ($loot['rows'] as $r): $small = $r['windows'] < LOOT_SMALL_SAMPLE; $kindLabel = ['npc' => 'Mob', 'world' => 'Object', 'quest' => 'Quest reward'][$r['kind']] ?? $r['kind']; ?>
-            <tr><td><a href="<?= e($whBase . ['npc' => 'npc', 'world' => 'object', 'quest' => 'quest'][$r['kind']] . '=' . $r['id']) ?>" rel="nofollow"><?= e($r['name']) ?></a></td>
+            <?php $npcSlug = $r['kind'] === 'npc' && ($item['source'] ?? \PROFESSION_SOURCE) === \DUNGEON_SOURCE ? \forever_npc_slug_by_id((int)$r['id']) : null; ?>
+            <tr><td><?php if ($npcSlug !== null): ?><a href="<?= e(\forever_npc_path($npcSlug)) ?>"><?= e($r['name']) ?></a><?php else: ?><a href="<?= e($whBase . ['npc' => 'npc', 'world' => 'object', 'quest' => 'quest'][$r['kind']] . '=' . $r['id']) ?>" rel="nofollow"><?= e($r['name']) ?></a><?php endif ?></td>
               <td class="kind"><?= e($kindLabel) ?></td>
               <td class="num"><span class="it-rate<?= $small ? ' early' : '' ?>" title="<?= $small ? 'Early estimate: fewer than ' . LOOT_SMALL_SAMPLE . ' ' . ($r['kind'] === 'quest' ? 'turn-ins' : 'loots') . ' logged' : '' ?>"><i style="width:<?= max(2, (int)round(100 * $r['rate'])) ?>%"></i><b><?= $r['rate'] < 0.1 ? preg_replace('/\.0$/', '', number_format(100 * $r['rate'], 1)) : (int)round(100 * $r['rate']) ?>%</b></span></td>
               <td class="num"><?= fmt($r['drops']) ?></td>

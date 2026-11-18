@@ -4,7 +4,7 @@
 
 declare(strict_types=1);
 
-const ARMORY_SOURCES = ['retail', 'mop-classic', 'classic-progression', 'classic', 'sod', 'hardcore'];
+const ARMORY_SOURCES = ['retail', 'mop-classic', 'classic-progression', 'classic', 'sod', 'hardcore', 'classic-beta'];
 
 function armory_character_id(string $source, string $region, string $realm, string $name): string {
   return guild_hash_id($source, strtolower("$region\n$realm"), mb_strtolower($name));
@@ -18,6 +18,114 @@ function armory_item_path(string $source, int|string $id): string {
   return edition_path($source) . 'item/' . $id;
 }
 
+/** Item tooltip fields shared by the cross-edition Armory item pages. */
+function armory_item_tip(array $it): array {
+  $sub = $it['item_subclass']['name'] ?? '';
+  $tip = ['ilvl' => ($it['level']['value'] ?? 0) > 1 ? (int)$it['level']['value'] : null,
+    'binding' => $it['binding']['name'] ?? null, 'bop' => ($it['binding']['type'] ?? '') === 'ON_ACQUIRE',
+    'unique' => $it['unique_equipped'] ?? null, 'slot' => $it['inventory_type']['name'] ?? null,
+    'type' => $sub !== '' && empty($it['is_subclass_hidden']) && $sub !== 'Miscellaneous' ? $sub : null,
+    'armor' => $it['armor']['display']['display_string'] ?? null,
+    'weapon' => isset($it['weapon']['damage']['display_string']) ? [$it['weapon']['damage']['display_string'], $it['weapon']['attack_speed']['display_string'] ?? '', $it['weapon']['dps']['display_string'] ?? ''] : null,
+    'stats' => [], 'spells' => [], 'requires' => $it['requirements']['level']['display_string'] ?? null,
+    'classes' => $it['requirements']['playable_classes']['display_string'] ?? null,
+    'sell' => ($it['sell_price']['value'] ?? 0) > 0 ? (int)$it['sell_price']['value'] : null];
+  foreach ($it['stats'] ?? [] as $st) if (!empty($st['display']['display_string'])) $tip['stats'][] = [wow_text($st['display']['display_string']), !empty($st['is_equip_bonus'])];
+  foreach ($it['spells'] ?? [] as $sp) if (!empty($sp['description'])) $tip['spells'][] = wow_text($sp['description']);
+  return $tip;
+}
+
+/** All newest Armory equipment snapshots for one edition, indexed for item statistics. */
+function armory_wear_index(string $source): array {
+  static $memo = [];
+  if (isset($memo[$source])) return $memo[$source];
+  try {
+    $ver = (string)(Db::uncached('SELECT max(fetched_at) v FROM character_armory_profiles WHERE source_game=?', [$source])[0]['v'] ?? '');
+  } catch (PDOException $e) {
+    if ($e->getCode() === '42P01') return $memo[$source] = [];
+    throw $e;
+  }
+  $key = 'ml:armory-wear:' . $source . ':' . $ver;
+  $apcu = getenv('ML_APCU_CACHE') === '1' && function_exists('apcu_enabled') && apcu_enabled();
+  if ($apcu) { $hit = apcu_fetch($key, $ok); if ($ok) return $memo[$source] = $hit; }
+  $rows = Db::uncached("WITH latest AS (SELECT DISTINCT ON (region, character_id) region, character_id, equipment
+        FROM character_armory_slim WHERE source_game=? AND equipment IS NOT NULL ORDER BY region, character_id, snapshot_at DESC)
+      SELECT l.region, l.character_id ch, p.class_id, p.race_name, p.faction, p.level, p.equipped_item_level ilvl,
+        (e->'item'->>'id')::int item, e->'slot'->>'type' slot
+      FROM latest l JOIN character_armory_profiles p ON p.source_game=? AND p.region=l.region AND p.character_id=l.character_id
+      CROSS JOIN LATERAL jsonb_array_elements(l.equipment->'equipped_items') e
+      ORDER BY l.region, l.character_id", [$source, $source]);
+  $index = ['_chars' => 0, '_class' => []];
+  $pairOf = ['FINGER_1' => 'FINGER_2', 'FINGER_2' => 'FINGER_1', 'TRINKET_1' => 'TRINKET_2', 'TRINKET_2' => 'TRINKET_1'];
+  $flush = function (array $ch) use (&$index, $pairOf) {
+    if (!$ch) return;
+    $p = $ch['p']; $index['_chars']++;
+    $index['_class'][$p['faction']][(int)$p['class_id']] = ($index['_class'][$p['faction']][(int)$p['class_id']] ?? 0) + 1;
+    $seen = [];
+    foreach ($ch['slots'] as $slot => $item) {
+      $e = &$index[$item]; $e ??= [0, [], [], [], [], [], [], [], []];
+      $e[7][$slot] = ($e[7][$slot] ?? 0) + 1;
+      if (isset($pairOf[$slot]) && ($other = $ch['slots'][$pairOf[$slot]] ?? null) !== null && $other !== $item) $e[8][$other] = ($e[8][$other] ?? 0) + 1;
+      if (isset($seen[$item])) { unset($e); continue; }
+      $seen[$item] = true; $e[0]++;
+      foreach ([1 => (int)$p['class_id'], 2 => $p['race_name'], 3 => $p['faction'], 4 => $p['region'], 5 => (int)$p['level'], 6 => $p['ilvl'] === null ? null : (int)$p['ilvl']] as $k => $v)
+        if ($v !== null && $v !== '') $e[$k][$v] = ($e[$k][$v] ?? 0) + 1;
+      unset($e);
+    }
+  };
+  $cur = null; $ch = [];
+  foreach ($rows as $r) {
+    $id = $r['region'] . ':' . $r['ch'];
+    if ($id !== $cur) { $flush($ch); $cur = $id; $ch = ['p' => $r, 'slots' => []]; }
+    if ($r['item']) $ch['slots'][$r['slot']] = (int)$r['item'];
+  }
+  $flush($ch);
+  if ($apcu) apcu_store($key, $index, 24 * 3600);
+  return $memo[$source] = $index;
+}
+
+function armory_item_wearers(string $source, int $id, ?int $itemLevel): ?array {
+  $index = armory_wear_index($source); $e = $index[$id] ?? null;
+  if ($e === null) return null;
+  [$n, $classes, $races, $factions, $regions, $levels, $ilvls, $slots, $pairs] = $e;
+  arsort($classes); arsort($races); arsort($factions); arsort($regions); arsort($levels); arsort($pairs);
+  $pool = [];
+  foreach (array_keys($factions) as $f) foreach ($index['_class'][$f] ?? [] as $cid => $c) $pool[$cid] = ($pool[$cid] ?? 0) + $c;
+  $classRows = [];
+  $classFiles = FOREVER_CLASS_FILES + [6 => 'DEATHKNIGHT', 10 => 'MONK', 12 => 'DEMONHUNTER', 13 => 'EVOKER'];
+  foreach ($classes as $cid => $c) {
+    $cf = $classFiles[$cid] ?? null;
+    $classRows[] = ['name' => CLASS_META[$cf][0] ?? ('Class ' . $cid), 'file' => strtolower((string)$cf), 'color' => '#' . (CLASS_META[$cf][1] ?? 'c8b898'),
+      'n' => $c, 'of' => !empty($pool[$cid]) ? round(100 * $c / $pool[$cid]) : null, 'pool' => $pool[$cid] ?? 0];
+  }
+  $top = null;
+  foreach ($classRows as $c) if ($c['of'] !== null && $c['n'] >= max(5, $n * .05) && (!$top || $c['of'] > $top['of'])) $top = $c;
+  $hist = null;
+  if ($ilvls) {
+    $lo = min(array_keys($ilvls)); $hi = max(array_keys($ilvls)); $w = max(1, (int)ceil(($hi - $lo + 1) / 10)); $buckets = [];
+    for ($b = $lo; $b <= $hi; $b += $w) $buckets[$b] = 0;
+    $sum = 0;
+    foreach ($ilvls as $lv => $c) { $buckets[$lo + intdiv($lv - $lo, $w) * $w] += $c; $sum += $lv * $c; }
+    $hist = ['w' => $w, 'buckets' => $buckets, 'min' => $lo, 'max' => $hi, 'avg' => round($sum / array_sum($ilvls)), 'own' => $itemLevel,
+      'above' => $itemLevel !== null ? array_sum(array_filter($ilvls, fn($lv) => $lv > $itemLevel, ARRAY_FILTER_USE_KEY)) : null];
+  }
+  $names = []; $pairs = array_slice($pairs, 0, 8, true);
+  if ($pairs) {
+    $marks = implode(',', array_fill(0, count($pairs), '?'));
+    foreach (Db::all("SELECT DISTINCT ON (item_id) item_id,item_json->>'name' n,item_json->'quality'->>'type' q FROM character_armory_items WHERE source_game=? AND item_id IN ($marks) ORDER BY item_id,snapshot_at DESC", [$source, ...array_keys($pairs)]) as $r)
+      $names[(int)$r['item_id']] = [$r['n'], FOREVER_QUALITY[$r['q'] ?? ''] ?? 1];
+  }
+  $regionNames = ['eu' => 'Europe', 'us' => 'Americas', 'kr' => 'Korea', 'tw' => 'Taiwan']; $poolChars = 0;
+  foreach (array_keys($factions) as $f) $poolChars += array_sum($index['_class'][$f] ?? []);
+  return ['players' => $n, 'chars' => $index['_chars'], 'pool' => $poolChars, 'classes' => $classRows, 'top' => $top,
+    'races' => array_map(null, array_keys($races), array_values($races)), 'factions' => $factions,
+    'regions' => array_map(fn($r, $c) => [$regionNames[$r] ?? strtoupper((string)$r), $c], array_keys($regions), array_values($regions)),
+    'levels' => array_slice($levels, 0, 3, true), 'hist' => $hist,
+    'slots' => array_filter(['Top' => ($slots['TRINKET_1'] ?? 0) + ($slots['FINGER_1'] ?? 0), 'Bottom' => ($slots['TRINKET_2'] ?? 0) + ($slots['FINGER_2'] ?? 0)])
+      ?: array_filter(['Main hand' => $slots['MAIN_HAND'] ?? 0, 'Off hand' => $slots['OFF_HAND'] ?? 0]),
+    'pairs' => array_map(fn($pid, $c) => ['id' => $pid, 'name' => $names[$pid][0] ?? ('Item ' . $pid), 'quality' => $names[$pid][1] ?? 1, 'n' => $c], array_keys($pairs), array_values($pairs))];
+}
+
 /** A locally stored item observed on an enriched character in this edition. */
 function armory_item_model(string $source, int $id): ?array {
   if (!in_array($source, ARMORY_SOURCES, true) || $id < 1) return null;
@@ -29,13 +137,16 @@ function armory_item_model(string $source, int $id): ?array {
     if ($e->getCode() === '42P01') return null;
     throw $e;
   }
-  if (!$row && !$market) return null;
+  $wearers = edition_item_wearers($source, $id);
+  if (!$row && !$market && !$wearers) return null;
   $it = $row ? forever_json($row['item_json']) : [];
+  $tip = $row ? armory_item_tip($it) : null;
   $branch = EDITIONS[$source]['branch'] ?: 'retail';
   $icons = (array)item_cache('item-icons', $source) + (array)item_cache('item-icons', $branch) + (array)item_cache('item-icons', 'classic');
   $quality = FOREVER_QUALITY[$it['quality']['type'] ?? ''] ?? 1;
   $latest = $market ? end($market) : null;
   $name = $it['name'] ?? (($latest['name'] ?? '') !== '' && !preg_match('/^item:\d+$/', (string)$latest['name']) ? $latest['name'] : null)
+    ?? ($wearers['name'] ?? null)
     ?? (item_cache('item-names', $branch)[$id] ?? ('Item ' . $id));
   $scans = []; $seen = [];
   foreach ($market as $m) {
@@ -47,10 +158,11 @@ function armory_item_model(string $source, int $id): ?array {
     $scans[] = [preg_replace('/-(Alliance|Horde)$/', '', $game), $faction, (int)$m['captured_at'], (int)$m['quantity'],
       (int)$m['lowest'], (int)$m['median'], (int)$m['weighted_average']];
   }
-  return ['source' => $source, 'id' => $id, 'name' => $name, 'icon' => $icons[$id] ?? $icons[(string)$id] ?? null,
-    'cat' => $it['item_subclass']['name'] ?? ($it['inventory_type']['name'] ?? ($latest['category'] ?? 'Item')), 'crafter' => $latest['crafter'] ?? null,
+  return ['source' => $source, 'id' => $id, 'name' => $name, 'icon' => $icons[$id] ?? $icons[(string)$id] ?? ($wearers['icon'] ?? null),
+    'cat' => $it['item_subclass']['name'] ?? ($it['inventory_type']['name'] ?? ($latest['category'] ?? ($wearers['slot'] ?? 'Item'))), 'crafter' => $latest['crafter'] ?? null,
     'roles' => edition_profession_roles($source, ['name' => $name, 'cat' => $latest['category'] ?? null], $latest['crafter'] ?? null),
-    'taught' => null, 'scans' => $scans, 'wearers' => null, 'quality' => $quality, 'localOnly' => !$market,
+    'taught' => null, 'scans' => $scans, 'wearers' => $wearers, 'quality' => $wearers['quality'] ?? $quality, 'localOnly' => !$market,
+    'tip' => $tip, 'armoryWearers' => $row ? armory_item_wearers($source, $id, $tip['ilvl']) : null, 'armoryOnly' => !$market && $row,
     'loot' => item_loot_sources($source, $id),
     'vendor' => item_vendor_vs_ah(($it['sell_price']['value'] ?? 0) > 0 ? (int)$it['sell_price']['value'] : null, item_vendor_log($source, $id), $scans, null)];
 }
@@ -185,7 +297,7 @@ function armory_character_model(string $source, string $id): ?array {
     'slug' => $p['name_slug'], 'name' => $p['name'], 'first' => $p['name'], 'level' => (int)$p['level'], 'race' => $p['race_name'],
     'class' => $p['class_name'], 'cf' => $classFiles[(int)$p['class_id']] ?? null, 'faction' => $p['faction'], 'gender' => $p['gender'],
     'guild' => $p['guild_name'], 'guildUrl' => null, 'ruleset' => $p['realm_name'], 'ilvl' => $p['equipped_item_level'] !== null ? (int)$p['equipped_item_level'] : null,
-    'achievementPoints' => (int)($p['achievement_points'] ?? 0), 'achievements' => count($j($s['achievements_json'])['achievements'] ?? []),
+    'achievementPoints' => (int)($p['achievement_points'] ?? 0), 'achievements' => (int)(($a = $j($s['achievements_json']))['total_quantity'] ?? count($a['achievements'] ?? [])),
     'lastLogin' => $p['last_login_at'] ? strtotime($p['last_login_at']) : null, 'fetched' => strtotime($s['snapshot_at']),
     'title' => $profile['active_title']['display_string'] ?? null, 'render' => $media['main-raw'] ?? null, 'avatar' => $media['avatar'] ?? null,
     'gear' => $gear, 'trees' => $trees, 'build' => implode(' / ', array_column($trees, 'points')), 'mainTree' => $mainTree['name'] ?? null,

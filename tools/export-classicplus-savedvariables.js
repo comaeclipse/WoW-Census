@@ -8,9 +8,10 @@ const db = readSavedVariables(file, "ClassicPlus_Database");
 const info = db.Info || {};
 if (info.LogVer !== "2.13.0" || info.DataFormat !== "0.8" || db.Packed?.format !== 1)
   throw new Error(`unsupported ClassicPlus format: ${info.LogVer}/${info.DataFormat}/${db.Packed?.format}`);
-const realmKeys = Object.keys(db.Realms || {});
-if (realmKeys.length !== 1 || Object.keys(db.Packed?.realms || {}).join() !== realmKeys[0])
-  throw new Error("expected one matching realm in Realms and Packed.realms");
+// Realms lists every realm the player ever logged into; only Packed.realms carries this save's census.
+const realmKeys = Object.keys(db.Packed?.realms || {});
+if (realmKeys.length !== 1 || !db.Realms?.[realmKeys[0]])
+  throw new Error("expected one packed realm that is also listed in Realms");
 const realmKey = realmKeys[0], realm = db.Realms[realmKey];
 const match = /^(\d+)_(.+)$/.exec(realmKey);
 const region = String(realm.region || "").split("/")[1];

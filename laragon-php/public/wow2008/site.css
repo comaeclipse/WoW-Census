@@ -384,3 +384,8 @@ table.dir{width:100%;border-collapse:separate;border-spacing:0 1px;background:#6
 
 /* Auction tables: numbers stay on one line (a six-digit Qty plus its bar wrapped). */
 .ahtable td.num{white-space:nowrap}
+
+/* Footer sits inside the page frame; a stone statue leans on the frame's bottom-left edge. */
+.page>.footer{grid-column:1/-1;width:auto;margin:0;border:0;border-top:2px solid #6a5022}
+.page-statue{position:absolute;right:calc(100% + 3px);bottom:0;width:219px;height:401px;pointer-events:none;user-select:none}
+@media (max-width:900px){.page-statue{display:none}.page>.footer{margin:0}}

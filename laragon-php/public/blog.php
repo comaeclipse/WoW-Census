@@ -9,8 +9,13 @@ header('Cache-Control: private, no-store');
 header('Cloudflare-CDN-Cache-Control: no-store');
 
 $posts = require dirname(__DIR__) . '/src/blog-posts.php';
+$categories = require dirname(__DIR__) . '/src/blog-categories.php';
 $id = $_GET['id'] ?? null;
-if ($id !== null && (!is_string($id) || !preg_match('/^[1-9][0-9]*$/D', $id) || strlen($id) > 18)) {
+$category = $_GET['category'] ?? null;
+if ($category !== null && (!is_string($category) || !isset($categories[$category]))) {
+    http_response_code(404);
+    $error = 'Category not found';
+} elseif ($id !== null && (!is_string($id) || !preg_match('/^[1-9][0-9]*$/D', $id) || strlen($id) > 18)) {
     http_response_code(400);
     $error = 'Invalid post ID';
 } elseif ($id !== null && !array_key_exists((int)$id, $posts)) {
@@ -20,6 +25,12 @@ if ($id !== null && (!is_string($id) || !preg_match('/^[1-9][0-9]*$/D', $id) || 
 
 function blog_escape(string $value): string {
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+function blog_category_link(array $post, array $categories): string {
+    $slug = $post['category'] ?? null;
+    if (!is_string($slug) || !isset($categories[$slug])) return '';
+    return ' · <a class="blog-cat" href="/blog.php?category=' . blog_escape($slug) . '">' . blog_escape($categories[$slug]) . '</a>';
 }
 
 function blog_body(string $value, array $table = []): string {
@@ -43,7 +54,9 @@ function blog_body(string $value, array $table = []): string {
 
 uksort($posts, static fn(int|string $a, int|string $b): int => strcmp($posts[$b]['date'], $posts[$a]['date']) ?: ((int)$b <=> (int)$a));
 $single = isset($id, $posts[(int)$id]) && !isset($error);
-$title = isset($error) ? $error : ($single ? $posts[(int)$id]['title'] : 'Updates');
+if (!$single && $category !== null && !isset($error))
+    $posts = array_filter($posts, static fn(array $post): bool => ($post['category'] ?? null) === $category);
+$title = isset($error) ? $error : ($single ? $posts[(int)$id]['title'] : ($category !== null ? $categories[$category] : 'Updates'));
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 if (!in_array($method, ['GET', 'HEAD', 'POST'], true) || ($method === 'POST' && !$single)) {
@@ -118,10 +131,10 @@ ob_start();
     <?php elseif ($single): $post = $posts[(int)$id]; ?>
       <p><a href="/blog.php">← All updates</a></p>
       <?php if (isset($post['html_file'])): ?>
-      <article class="blog-econ-post"><header class="blog-head"><time datetime="<?= blog_escape($post['date']) ?>"><?= blog_escape($post['date']) ?></time>
+      <article class="blog-econ-post"><header class="blog-head"><time datetime="<?= blog_escape($post['date']) ?>"><?= blog_escape($post['date']) ?></time><?= blog_category_link($post, $categories) ?>
         <h2><?= blog_escape($post['title']) ?></h2></header><?= file_get_contents(dirname(__DIR__) . '/src/' . basename($post['html_file'])) ?></article>
       <?php else: ?>
-      <article class="panel blog-post"><div class="ptitle"><time datetime="<?= blog_escape($post['date']) ?>"><?= blog_escape($post['date']) ?></time></div>
+      <article class="panel blog-post"><div class="ptitle"><time datetime="<?= blog_escape($post['date']) ?>"><?= blog_escape($post['date']) ?></time><?= blog_category_link($post, $categories) ?></div>
         <h2><?= blog_escape($post['title']) ?></h2><?= blog_body($post['body'], $post['table'] ?? []) ?></article>
       <?php endif; ?>
       <section class="panel blog-comments" id="comments"><div class="ptitle">Comments (<?= count($comments) ?>)</div>
@@ -145,10 +158,12 @@ ob_start();
         </form>
       </section>
     <?php else: ?>
+      <nav class="blog-cats" aria-label="Categories"><a href="/blog.php"<?= $category === null ? ' aria-current="page"' : '' ?>>All</a><?php foreach ($categories as $slug => $label): ?>
+        <a href="/blog.php?category=<?= blog_escape($slug) ?>"<?= $category === $slug ? ' aria-current="page"' : '' ?>><?= blog_escape($label) ?></a><?php endforeach; ?></nav>
       <div class="blog-list">
-      <?php if (!$posts): ?><section class="panel"><p>No updates have been posted yet.</p></section><?php endif; ?>
+      <?php if (!$posts): ?><section class="panel"><p><?= $category !== null ? 'No posts in this category yet.' : 'No updates have been posted yet.' ?></p></section><?php endif; ?>
       <?php foreach ($posts as $postId => $post): ?>
-        <article class="panel blog-post"><div class="ptitle"><time datetime="<?= blog_escape($post['date']) ?>"><?= blog_escape($post['date']) ?></time></div>
+        <article class="panel blog-post"><div class="ptitle"><time datetime="<?= blog_escape($post['date']) ?>"><?= blog_escape($post['date']) ?></time><?= blog_category_link($post, $categories) ?></div>
           <h2><a href="/blog.php?id=<?= (int)$postId ?>"><?= blog_escape($post['title']) ?></a></h2><?= blog_body($post['body'], $post['table'] ?? []) ?>
           <p class="blog-comments-link"><a href="/blog.php?id=<?= (int)$postId ?>#comments">Comments →</a></p></article>
       <?php endforeach; ?>
@@ -160,5 +175,5 @@ ob_start();
 <?php
 $html = ob_get_clean();
 $html = with_skin(with_analytics($html));
-$blogStyle = '<style>.blog-list{display:grid;gap:18px}.blog-post h2{margin:0 0 14px;line-height:1.2}.blog-post h2 a{color:inherit;text-decoration:none}.blog-post h2 a:hover{text-decoration:underline}.blog-post p{line-height:1.4;margin:0 0 14px}.blog-post p:last-child{margin-bottom:0}.blog-table-wrap{overflow-x:auto;margin:0 0 14px}.blog-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.blog-table th,.blog-table td{padding:7px 9px;border-bottom:1px solid #66543b;text-align:left;white-space:nowrap}.blog-table th{font-weight:700}.blog-comments{margin-top:18px}.blog-comment-list{list-style:none;margin:0 0 18px;padding:0}.blog-comment{padding:10px 0;border-bottom:1px solid #66543b}.blog-comment:last-child{border-bottom:0}.blog-comment-meta{font-size:.9em;opacity:.8;margin-bottom:4px}.blog-comment-body{line-height:1.4;overflow-wrap:anywhere}.blog-comment-form h3{margin:0 0 10px}.blog-comment-form p{margin:0 0 10px}.blog-comment-form input:not([type=hidden]),.blog-comment-form textarea{max-width:100%;box-sizing:border-box;font:inherit}.blog-comment-form textarea{width:100%}.blog-captcha{border:1px solid #66543b;border-radius:3px}.blog-comment-error{color:#e0614f;font-weight:700}.blog-comment-ok{color:#7fbf5b;font-weight:700}.blog-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.blog-comments-link{margin-top:14px}</style>';
+$blogStyle = '<style>.blog-list{display:grid;gap:18px}.blog-post h2{margin:0 0 14px;line-height:1.2}.blog-post h2 a{color:inherit;text-decoration:none}.blog-post h2 a:hover{text-decoration:underline}.blog-post p{line-height:1.4;margin:0 0 14px}.blog-post p:last-child{margin-bottom:0}.blog-table-wrap{overflow-x:auto;margin:0 0 14px}.blog-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.blog-table th,.blog-table td{padding:7px 9px;border-bottom:1px solid #66543b;text-align:left;white-space:nowrap}.blog-table th{font-weight:700}.blog-comments{margin-top:18px}.blog-comment-list{list-style:none;margin:0 0 18px;padding:0}.blog-comment{padding:10px 0;border-bottom:1px solid #66543b}.blog-comment:last-child{border-bottom:0}.blog-comment-meta{font-size:.9em;opacity:.8;margin-bottom:4px}.blog-comment-body{line-height:1.4;overflow-wrap:anywhere}.blog-comment-form h3{margin:0 0 10px}.blog-comment-form p{margin:0 0 10px}.blog-comment-form input:not([type=hidden]),.blog-comment-form textarea{max-width:100%;box-sizing:border-box;font:inherit}.blog-comment-form textarea{width:100%}.blog-captcha{border:1px solid #66543b;border-radius:3px}.blog-comment-error{color:#e0614f;font-weight:700}.blog-comment-ok{color:#7fbf5b;font-weight:700}.blog-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.blog-comments-link{margin-top:14px}.blog-cats{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}.blog-cats a{padding:3px 10px;border:1px solid #9c7c42;border-radius:3px;text-decoration:none;font-weight:700}.blog-cats a[aria-current]{background:#9c7c42;color:#fff}.blog-cat{font-weight:700}.blog-recap .recap-lead .section-bd{display:flow-root;padding:14px 16px}.blog-recap .recap-crier{float:left;position:relative;width:170px;margin:-4px 18px 8px -4px;padding:0 0 10px}.blog-recap .recap-crier img{position:relative;z-index:1;display:block;width:100%;height:auto;filter:drop-shadow(2px 3px 2px rgba(40,20,0,.35))}.blog-recap .recap-crier::after{content:"";position:absolute;left:12%;right:22%;bottom:4px;height:16px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(40,20,0,.45),rgba(40,20,0,0) 70%)}.blog-recap .recap-intro{font-size:13px;line-height:1.65}.blog-recap .recap-intro::first-letter{float:left;font:700 40px/.9 "Cinzel",Georgia,serif;color:#5a2a00;margin:4px 6px 0 0}.blog-recap .recap-toc{margin:6px 0 0;padding-left:18px}.blog-recap .recap-sources{columns:2 260px;column-gap:24px}@media (max-width:520px){.blog-recap .recap-crier{width:120px;margin-right:12px}}</style>';
 echo str_replace('</head>', $blogStyle . '<link rel="stylesheet" href="/blog-economy.css"></head>', $html);

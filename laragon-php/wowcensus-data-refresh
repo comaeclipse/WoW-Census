@@ -4,15 +4,17 @@
 #   1. rebuild the census tables (build-census-cache.php) at low CPU and disk priority;
 #      until they are swapped in the site keeps using the previous ones
 #      (ML_CENSUS_PUBLISHED=1 in the PHP-FPM pools), so pages stay fast;
-#   2. re-render the cached pages in place (wowcensus-rollout), main pages first, then by
-#      visits. Only the editions whose data changed since the last publish are re-rendered
-#      (plus the home page, which shows every edition): a Forever AH import re-renders the
-#      Forever pages, not all ~2,500. The cache is never emptied: visitors get each page's
-#      saved copy until it is replaced, and pages nobody has cached render on first visit.
+#   2. re-render the busiest cached pages in place (wowcensus-rollout, ROLLOUT_TOP=500): main
+#      pages first, then by visits, only for the editions whose data changed (plus the home
+#      page). That takes minutes, not hours, and the lock is released right after. Every other
+#      page refreshes on its next visit: nginx keeps pages valid for 1 hour, then serves the
+#      saved copy once more while a background request re-renders it, and Cloudflare keeps
+#      pages for 1 hour (ML_EDGE_HTML_TTL=3600). The cache is never emptied.
 # Runs from /etc/cron.d/wowcensus-data every 5 minutes; safe to run by hand. The lock is held
 # through the rollout, so a newer upload waits for the next pass.
 #   FORCE=1          publish now: skip the interval (and with no new data, re-render everything)
-#   REFRESH_FULL=1   re-render every cached page, not just the changed editions (code releases)
+#   REFRESH_FULL=1   every edition's busiest pages, not just the changed editions (code releases)
+#   ROLLOUT_TOP=N    how many cache entries to re-render (default 500; 0 = every cached page)
 #   REFRESH_WAIT=1   wait for the lock instead of exiting when another pass holds it
 #   RELEASE=<path>   set by wowcensus-release-rollout: skip the pass when a full rollout already
 #                    rendered this release and there is no new data
@@ -72,9 +74,9 @@ RELEASE_NOW=$(readlink -f "$SITE")
 
 # From here new renders use the new tables (PHP rechecks the version within 60 s).
 echo "$P" > "$STATE"; rm -f "$FAILED"
-log "published $P; rolling out ${SOURCES:+the pages of: $SOURCES}${SOURCES:-every cached page}"
+log "published $P; rolling out ${SOURCES:+the busiest pages of: $SOURCES}${SOURCES:-the busiest pages of every edition}"
 sleep 65
-if ROLLOUT_SOURCES="$SOURCES" nice -n 10 /usr/local/bin/wowcensus-rollout; then
+if ROLLOUT_SOURCES="$SOURCES" ROLLOUT_TOP="${ROLLOUT_TOP:-500}" nice -n 10 /usr/local/bin/wowcensus-rollout; then
   [ -z "$SOURCES" ] && echo "$RELEASE_NOW" > "$CODE_STATE"
 else
   log "rollout stopped early; the next publish rolls out again"

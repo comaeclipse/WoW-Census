@@ -157,6 +157,18 @@
         "C:/Users/skarz/AppData/Local/Temp/claude/e5cb809b51646ae2/419d592f-d5f6-4d66-aae7-bc92a8267170/scratchpad/router-wt.php"
       ],
       "port": 8804
+    },
+    {
+      "name": "blog-preview",
+      "runtimeExecutable": "C:/laragon/bin/php/php-8.3.33-Win32-vs16-x64/php.exe",
+      "runtimeArgs": [
+        "-S",
+        "127.0.0.1:8805",
+        "-t",
+        "C:/Users/skarz/Documents/Projects/MarketLens/laragon-php/public",
+        "C:/Users/skarz/AppData/Local/Temp/claude/ccdd2afad77166d5/1edff6af-65ea-4ecf-8ecb-7996a5c1764a/scratchpad/blog-router.php"
+      ],
+      "port": 8805
     }
   ]
 }

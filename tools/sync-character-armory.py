@@ -3,6 +3,8 @@
 
 Public pages use a stable WoWCensus id and never expose the realm in their URL.
 This discovers no characters: candidates always come from characters_with_region.
+Afterwards tools/reconcile-armory-characters-pg.py applies newer Armory guilds, levels and logins to the
+census rows of the same characters (skip with --no-reconcile).
 """
 from __future__ import annotations
 
@@ -10,6 +12,7 @@ import argparse
 import base64
 import concurrent.futures
 import hashlib
+import importlib.util
 import http.client
 import json
 import os
@@ -193,7 +196,10 @@ def save(cur, row: dict) -> None:
        p.get("character_class",{}).get("name"),p.get("race",{}).get("id"),p.get("race",{}).get("name"),
        p.get("faction",{}).get("name"),p.get("gender",{}).get("name"),guild.get("name"),p.get("average_item_level"),
        p.get("equipped_item_level"),p.get("achievement_points"),p.get("last_login_timestamp"),now,Json(p)))
-    e = row["endpoints"]
+    e = dict(row["endpoints"])
+    # The full achievement list is ~290 KB per Retail character; pages only show the totals.
+    if "achievements" in e:
+        e["achievements"] = {k: e["achievements"][k] for k in ("total_quantity", "total_points") if k in e["achievements"]}
     cur.execute("""INSERT INTO marketlens_import.character_armory_snapshots
       (source_game,region,character_id,snapshot_at,profile_json,specializations_json,equipment_json,
        statistics_json,professions_json,achievements_json,reputations_json,pvp_summary_json,
@@ -223,6 +229,7 @@ def main() -> None:
     ap.add_argument("--batch", type=int, default=50, help="commit every N results")
     ap.add_argument("--rate", type=float, default=5.0)
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--no-reconcile", action="store_true", help="skip updating census rows afterwards")
     args = ap.parse_args()
     conn = psycopg2.connect(DSN); conn.autocommit = False
     with conn:
@@ -253,6 +260,12 @@ def main() -> None:
             if len(pending) >= args.batch:
                 flush(); print(json.dumps({"done":i,"of":len(rows),"saved":saved,"missed":missed}),flush=True)
     flush()
+    if saved and not args.no_reconcile:
+        # Newer Armory guilds, levels and logins update the census rows of the same characters.
+        spec = importlib.util.spec_from_file_location("reconcile", os.path.join(os.path.dirname(__file__), "reconcile-armory-characters-pg.py"))
+        rec = importlib.util.module_from_spec(spec); spec.loader.exec_module(rec)
+        with conn:
+            print("RECONCILED", json.dumps(rec.reconcile(conn, sources=(args.source,)), default=str), flush=True)
     conn.close()
     print(json.dumps({"source":args.source,"requested":len(rows),"saved":saved,"missed":missed}))
 
