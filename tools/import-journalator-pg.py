@@ -23,6 +23,8 @@ item links become itemString + itemID, source{character,realm,faction} is flatte
 `time` becomes `t`. Both routes therefore yield identical rows, so a sale seen in a raw
 Journalator file and again in a WoWCensus copy is stored once. Identical events in the
 same second (13 Coarse Thread vendored at once) are kept apart by an occurrence number.
+Fields only some copies carry (IDENTITY_DROP: a training row's trainer specialty) are left
+out of the event's identity, so both copies still match.
 
 Tables (schema marketlens_import, created on first run):
   addon_ledger_sources  one row per imported file (sha256), like local_source_files
@@ -117,6 +119,23 @@ def canon(v):
     if isinstance(v, float) and v.is_integer():
         return int(v)
     return v
+
+
+# Fields one copy of an event has and another lacks: Journalator builds differ on whether a
+# training row carries the trainer's specialty ("group": Restoration) and title (trainer.group).
+IDENTITY_DROP = {"TrainingCosts": (("group",), ("trainer", "group"))}
+
+
+def identity(section, row):
+    """canon(row) without the fields that differ between copies of the same event."""
+    out = canon(row)
+    for path in IDENTITY_DROP.get(section, ()):
+        node = out
+        for k in path[:-1]:
+            node = node.get(k) if isinstance(node, dict) else None
+        if isinstance(node, dict):
+            node.pop(path[-1], None)
+    return canon(out)
 
 
 def journalator_row(raw):
@@ -431,6 +450,48 @@ def forever_ruleset_regions(cur, char, realm):
     return {reg for reg, name in cur.fetchall() if pattern.match(name or "")}
 
 
+def same_realm_key(edition, a, b):
+    """Forever TSM keys name a ruleset ("PvP", "Normal"): two keys match when they mean the same one."""
+    a, b = (a or "").strip().lower(), (b or "").strip().lower()
+    if edition == "forever" and a in FOREVER_RULESETS and b in FOREVER_RULESETS:
+        return FOREVER_RULESETS[a] == FOREVER_RULESETS[b]
+    return a == b
+
+
+def companion_account_region(cur, edition, path, realm, cache):
+    """For a character the census hasn't seen yet: the region this companion account's other
+    ledger rows on the same realm (Forever: the same ruleset) already resolved to. One account
+    plays in one region; None unless every earlier row agrees."""
+    manifest = Path(path).with_suffix(".json")
+    if not realm or not manifest.exists():
+        return None
+    try:
+        account = json.loads(manifest.read_text(encoding="utf-8")).get("accountId")
+    except (OSError, ValueError):
+        return None
+    if not account:
+        return None
+    if "accounts" not in cache:
+        by = defaultdict(set)
+        # <uploads>/addons-<time>/<edition>/<addon>/<receipt>.json
+        for m in manifest.parent.parent.parent.parent.glob("addons-*/*/*/*.json"):
+            try:
+                d = json.loads(m.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            for h in (d.get("sha256"), d.get("fileSha256")):
+                if d.get("accountId") and h:
+                    by[d["accountId"]].add(h)
+        cache["accounts"] = by
+    key = ("account", account, edition, FOREVER_RULESETS.get(realm.strip().lower(), realm.strip().lower()))
+    if key not in cache:
+        cur.execute("""SELECT DISTINCT realm, region FROM marketlens_import.addon_ledger_events
+            WHERE edition=%s AND source_sha256 = ANY(%s)""", (edition, sorted(cache["accounts"].get(account, ()))))
+        found = {reg for r, reg in cur.fetchall() if same_realm_key(edition, r, realm)}
+        cache[key] = found.pop() if len(found) == 1 else None
+    return cache[key]
+
+
 def account_region(cur, edition, path, rows, cache):
     """Region for realm names that exist in two regions (Illidan, Stormrage): the one every
     unambiguous realm of the same account points to, from the file's own rows and the account's
@@ -460,7 +521,7 @@ def source_game_for(edition, realm):
 
 
 def event_key(edition, region, section, row, occ):
-    body = json.dumps(canon(row), sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    body = json.dumps(identity(section, row), sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     ident = "|".join(map(str, (edition, region, row.get("realm"), row.get("char"), section, row.get("t"), occ, body)))
     return hashlib.sha256(ident.encode("utf-8")).hexdigest()
 
@@ -649,11 +710,12 @@ def main():
             row["t"] = t
             realm = row.get("realm")
             reg = (region or overrides.get((realm or "").lower()) or region_for(cur, edition, realm, cache)
-                   or character_region(cur, edition, row.get("char"), realm, cache) or fallback)
+                   or character_region(cur, edition, row.get("char"), realm, cache)
+                   or companion_account_region(cur, edition, path, realm, cache) or fallback)
             if reg not in REGIONS:
                 problems[str(realm)] += 1
                 continue
-            base = (edition, reg, realm, row.get("char"), section, t, json.dumps(canon(row), sort_keys=True))
+            base = (edition, reg, realm, row.get("char"), section, t, json.dumps(identity(section, row), sort_keys=True))
             occ[base] += 1
             key = event_key(edition, reg, section, row, occ[base])
             item, name, qty, money = measures(section, row)

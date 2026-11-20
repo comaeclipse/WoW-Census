@@ -24,7 +24,7 @@ here; `pull-addons` downloads them to
 
 and leaves them queued on the Worker. Once their data is used (ledgers through
 import-live.py journalator, Dungeon Journal saves through
-tools/build-forever-dungeons.py), `ack <that folder>` marks them imported; each
+tools/build-forever-dungeons.py and import-live.py dungeon-runs), `ack <that folder>` marks them imported; each
 manifest carries its receipt id.
 
 `run` then hands that tree to tools/import-live.py saves (the same importer as

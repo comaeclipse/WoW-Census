@@ -6,8 +6,9 @@ declare(strict_types=1);
  *
  * Bosses, levels and loot come from the Dungeon Journal add-on (by Exehn), read as data by
  * tools/build-forever-dungeons.py into forever-dungeons.json, together with how many players'
- * uploaded journals record each boss as killed. What players' Journalator logs saw a boss drop
- * (addon_loot_sources, kind npc) is added at render time.
+ * uploaded journals record each boss as killed. What players saw a boss drop is added at render
+ * time from two logs: Journalator's loot windows (addon_loot_sources, kind npc) and the add-on's own
+ * run logs (dungeon_run_kills / dungeon_run_loot, from tools/import-dungeon-runs-pg.py).
  */
 
 const DUNGEON_SOURCE = 'forever';
@@ -66,6 +67,57 @@ function forever_dungeon_observed(array $npcIds): array {
   return $out;
 }
 
+/**
+ * What the Dungeon Journal run logs players uploaded saw each boss of $dungeon drop:
+ * boss name => ['kills' => kills logged, 'items' => [item id => ['drops', 'name', 'quality']]].
+ */
+function forever_dungeon_runs(string $dungeon): array {
+  static $ready = null, $cache = [];
+  $ready ??= (bool)(Db::first("SELECT to_regclass('dungeon_run_loot') IS NOT NULL AS ok")['ok'] ?? false);
+  if (!$ready) return [];
+  if (isset($cache[$dungeon])) return $cache[$dungeon];
+  $out = [];
+  foreach (Db::all("SELECT boss, count(*) AS kills FROM dungeon_run_kills WHERE source_game = ? AND dungeon = ? GROUP BY 1",
+      [DUNGEON_SOURCE, $dungeon]) as $r)
+    $out[(string)$r['boss']] = ['kills' => (int)$r['kills'], 'items' => []];
+  if ($out) foreach (Db::all("SELECT k.boss, l.item_id, count(*) AS drops, max(l.item_name) AS name, max(l.quality) AS quality
+      FROM dungeon_run_loot l JOIN dungeon_run_kills k ON k.kill_key = l.kill_key
+      WHERE k.source_game = ? AND k.dungeon = ? GROUP BY 1, 2", [DUNGEON_SOURCE, $dungeon]) as $r)
+    $out[(string)$r['boss']]['items'][(int)$r['item_id']] = ['drops' => (int)$r['drops'], 'name' => $r['name'], 'quality' => $r['quality'] !== null ? (int)$r['quality'] : null];
+  return $cache[$dungeon] = $out;
+}
+
+function forever_dungeon_item_name(int $id): string {
+  return (item_cache('item-names', EDITIONS[DUNGEON_SOURCE]['branch'])[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: 'Item ' . $id);
+}
+
+/**
+ * A boss's loot rows: the journal's list, each with how often players saw it drop, then drops players
+ * saw that the journal does not list. $obs is Journalator's (windows, items => drops), $runs the
+ * run logs' (kills, items => [drops, name, quality]).
+ */
+function forever_dungeon_loot_rows(array $b, ?array $obs, ?array $runs): string {
+  $seen = function (int $id) use ($obs, $runs): string {
+    $out = [];
+    if ($runs && isset($runs['items'][$id])) $out[] = $runs['items'][$id]['drops'] . ' of ' . $runs['kills'] . ' run' . ($runs['kills'] === 1 ? '' : 's');
+    if ($obs && isset($obs['items'][$id])) $out[] = $obs['items'][$id] . ' of ' . $obs['windows'] . ' kills';
+    return implode(' · ', $out);
+  };
+  $rows = '';
+  $listed = [];
+  foreach ($b['loot'] as $it) {
+    $listed[$it['id']] = true;
+    $rows .= '<tr><td>' . forever_dungeon_item_link($it) . '</td><td class="s">' . esc($it['slot']) . '</td><td class="o">' . esc($seen((int)$it['id'])) . '</td></tr>';
+  }
+  $extra = [];
+  foreach ($runs['items'] ?? [] as $id => $x) if (!isset($listed[$id])) $extra[$id] = ['name' => $x['name'], 'quality' => $x['quality']];
+  foreach ($obs['items'] ?? [] as $id => $n) if (!isset($listed[$id])) $extra[$id] ??= ['name' => null, 'quality' => null];
+  foreach ($extra as $id => $x)
+    $rows .= '<tr class="dg-extra"><td>' . forever_dungeon_item_link(['id' => $id, 'name' => $x['name'] ?: forever_dungeon_item_name($id), 'quality' => $x['quality'] ?? 1]) .
+      '</td><td class="s">Not in the journal\'s list</td><td class="o">' . esc($seen($id)) . '</td></tr>';
+  return $rows;
+}
+
 function forever_dungeon_icon(?string $icon, string $size = 'small'): string {
   return '/assets/images/wow/icons/' . $size . '/' . ($icon ?: 'inv_misc_questionmark') . '.jpg';
 }
@@ -76,10 +128,14 @@ function forever_dungeon_item_icon(int $id): string {
   return forever_dungeon_icon($icons[$id] ?? null);
 }
 
+function forever_dungeon_seen_note(): string {
+  return 'Counts on the right are drops players saw: "of N runs" from Dungeon Journal run logs, "of N kills" from Journalator loot logs.';
+}
+
 function forever_dungeon_credit(): string {
   $s = forever_dungeon_data()['source'];
   return 'Bosses, levels and loot lists come from the <b>' . esc($s['addon']) . '</b> add-on by ' . esc($s['author']) .
-    ($s['version'] ? ' (version ' . esc($s['version']) . ')' : '') . '. Kill counts come from players\' uploaded journals; observed drops come from players\' Journalator logs.';
+    ($s['version'] ? ' (version ' . esc($s['version']) . ')' : '') . '. Kill counts and run logs come from players\' uploaded journals; observed drops also come from players\' Journalator logs.';
 }
 
 const DUNGEON_STYLE = <<<'CSS'
@@ -100,6 +156,7 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-loot td{padding:3px 6px;border-top:1px solid rgba(255,255,255,.05);vertical-align:middle}
 .dg-loot td.s{opacity:.7;font-size:12px}
 .dg-loot td.o{text-align:right;font-size:12px;opacity:.85;white-space:nowrap}
+.dg-loot tr.dg-extra td.s{font-style:italic;opacity:.85}
 .dg-it{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .dg-it img{width:18px;height:18px;border:1px solid rgba(0,0,0,.6)}
 .dg-it.q0{color:#9d9d9d}.dg-it.q1{color:#fff}.dg-it.q2{color:#1eff00}.dg-it.q3{color:#3d8bff}.dg-it.q4{color:#b579ff}.dg-it.q5{color:#ff8c32}
@@ -177,17 +234,8 @@ function forever_npc_body(array $n): string {
   $b = $n['boss'];
   $d = $n['dungeon'];
   $obs = $b['npcID'] ? (forever_dungeon_observed([$b['npcID']])[$b['npcID']] ?? null) : null;
-  $loot = '';
-  $listed = [];
-  foreach ($b['loot'] as $it) {
-    $listed[$it['id']] = true;
-    $seen = $obs && isset($obs['items'][$it['id']]) ? $obs['items'][$it['id']] . ' of ' . $obs['windows'] . ' kills' : '';
-    $loot .= '<tr><td>' . forever_dungeon_item_link($it) . '</td><td class="s">' . esc($it['slot']) . '</td><td class="o">' . esc($seen) . '</td></tr>';
-  }
-  if ($obs) foreach ($obs['items'] as $id => $c) if (!isset($listed[$id])) {
-    $name = (item_cache('item-names', EDITIONS[DUNGEON_SOURCE]['branch'])[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: 'Item ' . $id);
-    $loot .= '<tr><td>' . forever_dungeon_item_link(['id' => $id, 'name' => $name, 'quality' => 1]) . '</td><td class="s">Seen in players\' logs</td><td class="o">' . $c . ' of ' . $obs['windows'] . ' kills</td></tr>';
-  }
+  $runs = forever_dungeon_runs($d['name'])[$b['name']] ?? null;
+  $loot = forever_dungeon_loot_rows($b, $obs, $runs);
 
   $facts = [
     ['Dungeon', '<a href="' . esc(forever_dungeon_path($d['slug'])) . '">' . esc($d['name']) . '</a>' . ($d['new'] ? ' <span class="dg-new">NEW</span>' : '')],
@@ -197,6 +245,7 @@ function forever_npc_body(array $n): string {
     ['NPC ID', $b['npcID'] ? esc((string)$b['npcID']) : '<span class="dg-unk">Not recorded</span>'],
     ['Kills on record', $b['killedBy'] ? js_locale($b['killedBy']) . ' uploader' . ($b['killedBy'] === 1 ? '' : 's') : '<span class="dg-unk">None yet</span>'],
   ];
+  if ($runs) $facts[] = ['Kills in run logs', js_locale($runs['kills'])];
   if ($obs) $facts[] = ['Looted in logs', js_locale($obs['windows']) . ' time' . ($obs['windows'] === 1 ? '' : 's')];
   $factRows = implode('', array_map(fn($f) => '<tr><th>' . $f[0] . '</th><td>' . $f[1] . '</td></tr>', $facts));
 
@@ -223,7 +272,7 @@ function forever_npc_body(array $n): string {
     '<div class="dg-npc-grid"><div>' .
     '<section class="dg-boss"><h3>Loot</h3>' .
     ($loot !== '' ? '<table class="dg-loot"><tbody>' . $loot . '</tbody></table>' : '<p class="hint">No loot listed yet.</p>') .
-    ($obs ? '<p class="hint">"Seen" counts come from players\' Journalator logs of this NPC.</p>' : '') . '</section>' .
+    ($obs || $runs ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '</section>' .
     '</div><aside>' .
     '<section class="dg-boss"><h3>Details</h3><table class="dg-facts"><tbody>' . $factRows . '</tbody></table></section>' .
     '<section class="dg-boss"><h3>In ' . esc($d['name']) . '</h3><ol class="dg-roster">' . $others . '</ol></section>' .
@@ -296,6 +345,8 @@ function forever_dungeons_body(?array $d): string {
   }
 
   $observed = forever_dungeon_observed(array_map(fn($b) => $b['npcID'], $d['bosses']));
+  $runLog = forever_dungeon_runs($d['name']);
+  $anySeen = false;
   $pick = '<nav class="dg-pick" aria-label="Dungeons">';
   foreach ($dungeons as $x) $pick .= '<a href="' . esc(forever_dungeon_path($x['slug'])) . '"' . ($x['slug'] === $d['slug'] ? ' aria-current="page"' : '') . '>' . esc($x['name']) . '</a>';
   $pick .= '</nav>';
@@ -304,18 +355,9 @@ function forever_dungeons_body(?array $d): string {
     $obs = $b['npcID'] ? ($observed[$b['npcID']] ?? null) : null;
     $sub = array_filter([$b['level'] ? 'Level ' . $b['level'] : null, $b['rare'] ? 'Rare spawn' : null, $b['npcID'] ? 'NPC ' . $b['npcID'] : null]);
     $kill = $b['killedBy'] ? '<span class="dg-kill">Killed by ' . js_locale($b['killedBy']) . ' uploader' . ($b['killedBy'] === 1 ? '' : 's') . '</span>' : '';
-    $loot = '';
-    $listed = [];
-    foreach ($b['loot'] as $it) {
-      $listed[$it['id']] = true;
-      $seen = $obs && isset($obs['items'][$it['id']]) ? $obs['items'][$it['id']] . ' of ' . $obs['windows'] . ' kills' : '';
-      $loot .= '<tr><td>' . forever_dungeon_item_link($it) . '</td><td class="s">' . esc($it['slot']) . '</td><td class="o">' . esc($seen) . '</td></tr>';
-    }
-    // Drops players logged that the journal does not list.
-    if ($obs) foreach ($obs['items'] as $id => $n) if (!isset($listed[$id])) {
-      $name = (item_cache('item-names', EDITIONS[DUNGEON_SOURCE]['branch'])[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: 'Item ' . $id);
-      $loot .= '<tr><td>' . forever_dungeon_item_link(['id' => $id, 'name' => $name, 'quality' => 1]) . '</td><td class="s">Seen in players\' logs</td><td class="o">' . $n . ' of ' . $obs['windows'] . ' kills</td></tr>';
-    }
+    $runs = $runLog[$b['name']] ?? null;
+    $loot = forever_dungeon_loot_rows($b, $obs, $runs);
+    $anySeen = $anySeen || $obs || $runs;
     $bosses .= '<section class="dg-boss"><h3><a class="dg-npc" href="' . esc(forever_npc_path(forever_npc_slug($b['name']))) . '">' . esc($b['name']) . '</a>' . $kill . '</h3>' .
       ($sub ? '<div class="dg-sub">' . esc(implode(' · ', $sub)) . '</div>' : '') .
       ($b['description'] !== '' ? '<p style="margin:0 0 6px">' . esc($b['description']) . '</p>' : '') .
@@ -332,7 +374,7 @@ function forever_dungeons_body(?array $d): string {
     ($d['new'] ? '<span class="dg-new">NEW IN FOREVER</span>' : '') . '</div><p class="dg-meta">' . esc(implode(' · ', $meta)) . '</p>' .
     ($d['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($d['description']) . '</p>' : '') . '</div></div>' .
     ($d['lootIncomplete'] ? '<p class="hint">The loot list for this dungeon is still being filled in.</p>' : '') .
-    $bosses . '<p class="dg-credit"><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a> · ' . forever_dungeon_credit() . '</p></div>';
+    $bosses . ($anySeen ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '<p class="dg-credit"><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a> · ' . forever_dungeon_credit() . '</p></div>';
 }
 
 const DUNGEON_TIERS = [
