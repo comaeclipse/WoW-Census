@@ -16,8 +16,15 @@ namespace Wow2008;
 $paintedBanners = ['census', 'realms', 'auction-house', 'guilds', 'geography', 'talents', 'gear', 'molten-core', 'moonbrook', 'lava-dragon'];
 // Pages with an image of their own always show it.
 $fixedBanners = ['contact'];
+// Pages with their own set rotate within it (banner-<name>.webp).
+$bannerSets = [
+  'dungeons' => ['dungeons-1', 'dungeons-2', 'dungeons-3'],
+  'ragefire-chasm' => ['dungeons-1', 'dungeons-2'],
+  'dire-maul' => ['dungeons-3'],
+];
 $randomBanner = in_array($art, $fixedBanners, true) ? $art
-  : (in_array($art, $paintedBanners, true) ? $paintedBanners[random_int(0, count($paintedBanners) - 1)] : null);
+  : (isset($bannerSets[$art]) ? $bannerSets[$art][random_int(0, count($bannerSets[$art]) - 1)]
+  : (in_array($art, $paintedBanners, true) ? $paintedBanners[random_int(0, count($paintedBanners) - 1)] : null));
 ?>
 <div class="census-banner">
 <?php if ($randomBanner !== null): ?>

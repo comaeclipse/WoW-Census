@@ -161,9 +161,9 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-it img{width:18px;height:18px;border:1px solid rgba(0,0,0,.6)}
 .dg-it.q0{color:#9d9d9d}.dg-it.q1{color:#fff}.dg-it.q2{color:#1eff00}.dg-it.q3{color:#3d8bff}.dg-it.q4{color:#b579ff}.dg-it.q5{color:#ff8c32}
 .dg-credit{font-size:12px;opacity:.75;margin-top:14px}
-.dg-pick{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
-.dg-pick a{font-size:12px;padding:2px 8px;border:1px solid rgba(255,255,255,.15);border-radius:3px;text-decoration:none}
-.dg-pick a[aria-current]{background:rgba(255,255,255,.12)}
+.dg-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px;font-size:12px}
+.dg-pick label{font-weight:bold}
+.dg-pick select{font:inherit;padding:3px 6px;border:1px solid rgba(255,255,255,.25);border-radius:3px;max-width:100%}
 .dg-boss h3 a.dg-npc{color:inherit;text-decoration:none}
 .dg-boss h3 a.dg-npc:hover{text-decoration:underline}
 .dg-rare{display:inline-block;font-size:10px;font-weight:bold;letter-spacing:.05em;padding:1px 5px;border-radius:3px;background:#8a6a10;color:#fff;vertical-align:middle;margin-left:6px}
@@ -192,8 +192,8 @@ const DUNGEON_STYLE = <<<'CSS'
 .w8-framed .dg-roster li[aria-current]{background:rgba(255,215,90,.25)}
 .w8-framed .dg-list th,.w8-framed .dg-list td,.w8-framed .dg-loot td{border-color:rgba(60,40,10,.15)}
 .w8-framed .dg-boss{border-color:rgba(60,40,10,.25);background:rgba(255,250,235,.45)}
-.w8-framed .dg-pick a{border-color:rgba(60,40,10,.3)}
-.w8-framed .dg-pick a[aria-current]{background:rgba(60,40,10,.15);font-weight:bold}
+.w8-framed .dg-pick label{color:#5a2a00}
+.w8-framed .dg-pick select{background:#fff8e6;color:#2a1e0c;border-color:rgba(60,40,10,.4)}
 .w8-framed .dg-kill{background:#2f6b1f;color:#fff}
 .w8-framed .dg-it.q0{color:#6b6b6b}.w8-framed .dg-it.q1{color:#2a1e0c}.w8-framed .dg-it.q2{color:#1a7a00}
 .w8-framed .dg-it.q3{color:#0a4fb0}.w8-framed .dg-it.q4{color:#7a2fb8}.w8-framed .dg-it.q5{color:#b55a00}
@@ -347,9 +347,10 @@ function forever_dungeons_body(?array $d): string {
   $observed = forever_dungeon_observed(array_map(fn($b) => $b['npcID'], $d['bosses']));
   $runLog = forever_dungeon_runs($d['name']);
   $anySeen = false;
-  $pick = '<nav class="dg-pick" aria-label="Dungeons">';
-  foreach ($dungeons as $x) $pick .= '<a href="' . esc(forever_dungeon_path($x['slug'])) . '"' . ($x['slug'] === $d['slug'] ? ' aria-current="page"' : '') . '>' . esc($x['name']) . '</a>';
-  $pick .= '</nav>';
+  $pick = '<nav class="dg-pick" aria-label="Dungeons"><label for="dg-jump">Dungeon</label>' .
+    '<select id="dg-jump" onchange="if(this.value)location.href=this.value">';
+  foreach ($dungeons as $x) $pick .= '<option value="' . esc(forever_dungeon_path($x['slug'])) . '"' . ($x['slug'] === $d['slug'] ? ' selected' : '') . '>' . esc($x['name']) . '</option>';
+  $pick .= '</select><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a></nav>';
   $bosses = '';
   foreach ($d['bosses'] as $b) {
     $obs = $b['npcID'] ? ($observed[$b['npcID']] ?? null) : null;

@@ -55,6 +55,11 @@
 .backdrop::before,.backdrop::after{content:"";position:absolute;top:0;width:900px;height:1300px;background-size:cover;background-repeat:no-repeat}
 .backdrop::before{right:calc(50% + 550px);background-image:url('backdrop-left.webp');background-position:right top}
 .backdrop::after{left:calc(50% + 550px);background-image:url('backdrop-right.webp');background-position:left top}
+/* the 1300px backdrop stretched short pages, leaving black under the footer; grow the page to its height instead */
+@media (min-width:901px){
+  body{display:flex;flex-direction:column;min-height:1300px}
+  body>.page{flex:1 0 auto;grid-template-rows:1fr;grid-auto-rows:auto}
+}
 .census-banner .banner-art{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center 48%}
 .census-banner:has(.banner-art)::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.42) 48%,transparent 78%);pointer-events:none}
 .census-banner .t,.census-banner .stamp{z-index:1}

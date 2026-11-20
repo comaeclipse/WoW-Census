@@ -10,7 +10,7 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '66';
+const ASSET_VERSION = '67';
 
 // Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
 const SUPPORT_RAISED = 0;
@@ -262,12 +262,12 @@ function render_page(string $html, string $path): string {
     $d = ($m[1] ?? '') !== '' ? \forever_dungeons()[$m[1]] : null;
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . ($d === null ? \DUNGEON_W8_INDEX_STYLE : '') . '</style></head>', $html);
     if ($d === null) $html = preg_replace_callback('#<!--dg-index-->.*<!--/dg-index-->#s', fn() => \forever_dungeons_w8_index(), $html, 1);
-    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', 'census', $d['name'] ?? 'Dungeons');
+    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art($d['slug'] ?? null), $d['name'] ?? 'Dungeons');
   }
   if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m) && isset(\forever_npcs()[$m[1]])) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . '</style></head>', $html);
-    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', 'census', \forever_npcs()[$m[1]]['boss']['name']);
+    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art(\forever_npcs()[$m[1]]['dungeon']['slug']), \forever_npcs()[$m[1]]['boss']['name']);
   }
   if (preg_match('#^/(retail|forever)/skin-colors(?:/([a-z0-9-]+))?/?(index\.html)?$#', $path, $m)) { $GLOBALS['w8_source'] = $m[1]; return skin_colors_page($html, $m[2] ?? null, $m[1]); }
   // The current skin's race switcher fetches these fragments; they stay as they are.
@@ -278,6 +278,13 @@ function render_page(string $html, string $path): string {
 }
 
 // ---------------------------------------------------------------- pages
+
+/** Banner set for a dungeon page: its own art where it has some, else the shared dungeon rotation. */
+function dungeon_banner_art(?string $slug): string {
+  if ($slug === 'ragefire-chasm') return 'ragefire-chasm';
+  if ($slug !== null && str_starts_with($slug, 'dire-maul')) return 'dire-maul';
+  return 'dungeons';
+}
 
 /** A page without a 2008 design of its own: its content, inside the 2008 frame. */
 function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null): string {
