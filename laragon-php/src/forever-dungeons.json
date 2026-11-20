@@ -4,7 +4,7 @@
   "author": "Exehn",
   "version": "2.0.10"
  },
- "uploaders": 2,
+ "uploaders": 3,
  "dungeons": [
   {
    "name": "Hall of Thanes",
@@ -189,7 +189,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 0
+     "killedBy": 1
     },
     {
      "name": "Taragaman the Hungerer",
@@ -241,7 +241,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     },
     {
      "name": "Jergosh the Invoker",
@@ -281,7 +281,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     },
     {
      "name": "Bazzalan",
@@ -333,7 +333,7 @@
        "quality": 3
       }
      ],
-     "killedBy": 1
+     "killedBy": 2
     }
    ],
    "trash": []
