@@ -7,7 +7,9 @@ PATH can be:
   * a Journalator.lua SavedVariables file (the add-on's own save; its logs are an
     encoded blob that tools/journalator_decode.py unpacks as data),
   * a WoWCensus.lua save written with "Collect other addon data" on (WoWCensusDB.market:
-    Journalator sections, TSM sales/buys/expired/cancelled, Auctionator posting history),
+    Journalator sections, TSM sales/buys/expired/cancelled, Auctionator posting history;
+    WoWCensusDB.auctionLog since add-on 0.1.16: the add-on's own listings, "buyer found" and
+    "expired" messages, cancels and auction mail, stored as WoWCensus:* sections),
   * a companion upload (JournalatorEntries = decoded logs, TSMAccounting = TSM rows),
   * a folder, searched for all of these (companion upload stages included; a sibling
     <name>.json manifest supplies the edition).
@@ -161,6 +163,25 @@ def to_int(v):
             return None
 
 
+NATIVE_KINDS = {"post", "sold", "expired", "cancelled", "mail", "owned"}
+
+
+def native_auction_rows(log):
+    """WoWCensusDB.auctionLog: the add-on's own record of this character's listings, sales and auction mail."""
+    out = []
+    for entry in (log.values() if isinstance(log, dict) else []):
+        if not isinstance(entry, dict):
+            continue
+        rows = entry.get("rows") or {}
+        for r in (rows.values() if isinstance(rows, dict) else rows):
+            if not isinstance(r, dict) or r.get("kind") not in NATIVE_KINDS:
+                continue
+            r = {k: v for k, v in r.items() if k not in ("base",)}
+            r["itemName"] = r.pop("name", None)
+            r["char"], r["realm"], r["faction"] = entry.get("char"), entry.get("realm"), entry.get("faction")
+            out.append(("WoWCensus:" + r["kind"], r))
+    return out
+
 def measures(section, row):
     """(item_id, item_name, quantity, money) for the common columns."""
     item = to_int(row.get("itemID"))
@@ -180,6 +201,8 @@ def measures(section, row):
     elif section.startswith("TSM:"):
         price = to_int(row.get("price"))
         money = price * (qty or 1) if price is not None else None
+    elif section.startswith("WoWCensus:"):
+        money = to_int(row.get("bid") if section == "WoWCensus:mail" else row.get("buyout"))
     elif section == "Auctionator:Posting":
         price = to_int(row.get("price"))
         money = price * (qty or 1) if price is not None else None
@@ -192,7 +215,7 @@ def lua_tables(path):
     """WoWCensusDB as JSON via the repository's SavedVariables reader (data only)."""
     js = ("const {readSavedVariables}=require(process.argv[1]);"
           "const v=readSavedVariables(process.argv[2]);"
-          "process.stdout.write(JSON.stringify({market:v.market||null,realms:Object.keys(v.realms||{})}));")
+          "process.stdout.write(JSON.stringify({market:v.market||null,auctionLog:v.auctionLog||null,realms:Object.keys(v.realms||{})}));")
     out = subprocess.run(["node", "-e", js, str(REPO / "tools" / "savedvariables.js"), str(path)],
                          capture_output=True, check=True, timeout=600)
     return json.loads(out.stdout)
@@ -309,8 +332,13 @@ def rows_from_file(path):
                 r = dict(r)
                 r["itemID"] = to_int(r.get("key")) if str(r.get("key", "")).isdigit() else None
                 rows.append(("Auctionator:Posting", r))
-        edition = EDITIONS.get(m.get("game")) or edition_from_path(path)
-        region = m.get("region") if m.get("region") in REGIONS else None
+        rows += native_auction_rows(data.get("auctionLog") or {})
+        game = m.get("game") or next((e.get("identity", {}).get("game") for e in (data.get("auctionLog") or {}).values()
+                                      if isinstance(e, dict)), None)
+        region = m.get("region") if m.get("region") in REGIONS else next(
+            (e.get("identity", {}).get("region") for e in (data.get("auctionLog") or {}).values()
+             if isinstance(e, dict) and e.get("identity", {}).get("region") in REGIONS), None)
+        edition = EDITIONS.get(game) or edition_from_path(path)
         return "wowcensus", edition, region, rows
     # Companion uploads: Journalator logs already decoded, and TSM accounting rows.
     if head.startswith(b"JournalatorEntries"):
@@ -550,6 +578,33 @@ def fill_item_ids(cur):
     return borrowed + cur.rowcount
 
 
+def pending_sale_time(row, seen):
+    """Sale time from a Sale Pending mail: when the gold arrives (realm clock) minus the mail delay."""
+    eta_h, eta_m = to_int(row.get("etaHour")), to_int(row.get("etaMin"))
+    game_h, game_m = to_int(row.get("gameHour")), to_int(row.get("gameMinute"))
+    if None in (eta_h, eta_m, game_h, game_m):
+        return None
+    ahead = ((eta_h * 60 + eta_m) - (game_h * 60 + game_m)) % 1440
+    wait = to_int(row.get("moneyDelay"))
+    wait = MAIL_DELAY if wait is None or wait <= 0 else wait * 60 if wait <= 1440 else wait
+    return seen - (seen % 60) + ahead * 60 - wait
+
+
+AUCTION_MAIL_DAYS = 30
+
+
+def mail_delivered(row, seen):
+    """When an auction mail arrived: it is kept AUCTION_MAIL_DAYS days, and daysLeft counts down from that."""
+    try:
+        days = float(row.get("daysLeft"))
+    except (TypeError, ValueError):
+        return None
+    if not 0 < days <= AUCTION_MAIL_DAYS or days == int(days):
+        return None
+    delivered = round(seen - (AUCTION_MAIL_DAYS - days) * 86400)
+    return delivered if delivered <= seen + 60 else None
+
+
 def rebuild_sales(cur, groups):
     """Recompute addon_auction_sales for each (edition, region, realm, character) touched."""
     made = 0
@@ -560,7 +615,8 @@ def rebuild_sales(cur, groups):
         cur.execute("""SELECT event_key, source_game, faction, section, t, item_id, item_name, quantity, money, row
             FROM marketlens_import.addon_ledger_events
             WHERE edition=%s AND region=%s AND realm IS NOT DISTINCT FROM %s AND character IS NOT DISTINCT FROM %s
-              AND section IN ('Invoices','Posting','TSM:sale','Failures') ORDER BY t, event_key""", (edition, region, realm, char))
+              AND (section IN ('Invoices','Posting','TSM:sale','Failures') OR section LIKE 'WoWCensus:%%')
+            ORDER BY t, event_key""", (edition, region, realm, char))
         rows = cur.fetchall()
         # Journalator stamps an invoice when the mail is opened, and outside Retail the gold only
         # arrives an hour after the sale, so the invoice time is "sold by", never the sale itself.
@@ -591,40 +647,122 @@ def rebuild_sales(cur, groups):
                 if twin[0] - t >= LIVE_SALE_GAP:
                     live_sale[twin[1]] = t
         posts = defaultdict(list)       # (name, qty) -> [[t, buyout, bid, used]]; sale rows may lack an item id
+        journalator_posts = [(t, name, qty, money) for _, _, _, section, t, _, name, qty, money, _ in rows if section == "Posting"]
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
             if section == "Posting":
                 posts[(name, qty)].append([t, money, to_int(row.get("bid")), False])
+            elif section == "WoWCensus:post" and not any(
+                    n == name and q == qty and m == money and abs(pt - t) <= 10 for pt, n, q, m in journalator_posts):
+                # WoWCensus's own copy of a listing; Journalator only logs Classic listings made through Auctionator.
+                posts[(name, qty)].append([t, money, to_int(row.get("bid")), False])
+        for stack in posts.values():
+            stack.sort(key=lambda p: p[0])
+
+        def use_listing(name, qty, t):
+            p = next((p for p in posts.get((name, qty), []) if not p[3] and p[0] <= t), None)
+            if p is None and qty is None:
+                p = next((p for (n, _), stack in sorted(posts.items(), key=lambda kv: str(kv[0])) if n == name
+                          for p in stack if not p[3] and p[0] <= t), None)
+            if p:
+                p[3] = True
+
+        # An expired or cancelled auction used up its listing: the oldest one of that stack. The game's
+        # own "has expired" message and Journalator's expired-mail row are the same auction, so a
+        # WoWCensus message is only used when Journalator has no failure for that item after it.
+        failures = [[t, name, False] for _, _, _, section, t, _, name, _, _, _ in rows if section == "Failures"]
+        ended = []                      # (t, name, qty) of every listing that ended unsold
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
             if section == "Failures":
-                # An expired or cancelled auction used up its listing: the oldest one of that stack.
-                p = next((p for p in posts.get((name, qty), []) if not p[3] and p[0] <= t), None)
-                if p:
-                    p[3] = True
+                ended.append((t, name, qty))
+            elif section in ("WoWCensus:expired", "WoWCensus:cancelled"):
+                twin = next((f for f in failures if not f[2] and f[1] == name and t - 60 <= f[0] <= t + 30 * 86400), None)
+                if twin:
+                    twin[2] = True
+                else:
+                    ended.append((t, name, qty))
+
+        # Every completed sale once, each source paired with the others:
+        #   Journalator seller invoice (time = gold taken from the mail),
+        #   WoWCensus "seller" mail (time = mail first seen; outside Retail the gold comes an hour after the sale),
+        #   WoWCensus "seller_temp_invoice" (Sale Pending: arrives at the sale and says when the gold will come),
+        #   TSM Auction sale not already covered by an invoice.
+        delay = MAIL_DELAY if edition != "retail" else 0
+        sales = []
+        for key, sg, fac, section, t, item, name, qty, money, row in rows:
+            if not qty or money is None or money <= 0:
                 continue
-            if section == "Posting" or not qty or money is None or money <= 0:
+            if section == "Invoices" and row.get("invoiceType") == "seller":
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="journalator",
+                                  taken=t, bound=t - delay, live=live_sale.get(key), mail=None, pending=None))
+            elif section == "TSM:sale" and row.get("source") == "Auction" and key not in twins:
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="tsm",
+                                  taken=t, bound=t, live=None, mail=None, pending=None))
+        native_mail = [r for r in rows if r[3] == "WoWCensus:mail" and r[9].get("invoiceType") in ("seller", "seller_temp_invoice")
+                       and r[7] and r[8] and r[8] > 0]
+        for key, sg, fac, section, t, item, name, qty, money, row in native_mail:
+            if row.get("invoiceType") != "seller":
                 continue
-            if section == "Invoices" and row.get("invoiceType") != "seller":
+            twin = next((x for x in sales if x["origin"] == "journalator" and x["mail"] is None and x["name"] == name
+                         and x["qty"] == qty and x["money"] == money and t - 60 <= x["taken"] <= t + 30 * 86400), None)
+            delivered = mail_delivered(row, t)
+            if twin:
+                twin["mail"] = t
+                twin["bound"] = min(twin["bound"], t - delay)
+                twin["delivered"] = delivered
+            else:
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="wowcensus",
+                                  taken=t, bound=t - delay, live=None, mail=t, pending=None, delivered=delivered))
+        for key, sg, fac, section, t, item, name, qty, money, row in native_mail:
+            if row.get("invoiceType") != "seller_temp_invoice":
                 continue
-            # TSM's "sale" also covers selling to a vendor; only Auction House sales count.
-            if section == "TSM:sale" and (row.get("source") != "Auction" or key in twins):
-                continue
-            posted, sold = None, t
-            if section == "Invoices":
-                sold = live_sale.get(key, t - (MAIL_DELAY if edition != "retail" else 0))
+            twin = next((x for x in sales if x["origin"] in ("journalator", "wowcensus") and x["pending"] is None
+                         and x["name"] == name and x["qty"] == qty and x["money"] == money
+                         and x["taken"] >= t - 60 and x["taken"] - t <= 30 * 86400), None)
+            pending = dict(t=t, eta=pending_sale_time(row, t))
+            if twin:
+                twin["pending"] = pending
+                twin["bound"] = min(twin["bound"], t)
+            else:
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="wowcensus",
+                                  taken=t, bound=t, live=None, mail=None, pending=pending))
+
+        # Exact times, best first: the game's "A buyer has been found" message, the Sale Pending
+        # mail's gold arrival time minus the mail delay, the "Auction successful" mail's delivery
+        # time (from its days left) minus the mail delay, TSM's live sighting; otherwise the bound.
+        messages = [[t, name, False] for _, _, _, section, t, _, name, _, _, _ in rows if section == "WoWCensus:sold"]
+        sales.sort(key=lambda x: (x["bound"], x["key"]))
+        ended.sort(key=lambda e: e[0])
+        for x in sales:
+            while ended and ended[0][0] <= x["taken"]:
+                t_end, name_end, qty_end = ended.pop(0)
+                use_listing(name_end, qty_end, t_end)
+            upper = x["bound"] + 60
+            msg = next((m for m in messages if not m[2] and m[1] == x["name"] and upper - SALE_WINDOW <= m[0] <= upper), None)
+            if msg:
+                msg[2], sold = True, msg[0]
+            elif x["pending"] and x["pending"]["eta"] is not None and x["pending"]["eta"] <= upper:
+                sold = x["pending"]["eta"]
+            elif x.get("delivered") is not None and x["delivered"] - delay <= upper:
+                sold = x["delivered"] - delay
+            elif x["live"] is not None:
+                sold = x["live"]
+            else:
+                sold = x["bound"]
+            posted = None
+            if x["origin"] != "tsm":
                 # Oldest unused posting of the same stack that this sale could have come from:
                 # sold at buyout, or won with a bid between the posted bid and buyout.
-                for p in posts.get((name, qty), []):
-                    if p[3] or p[0] > t or t - p[0] > SALE_WINDOW:
+                for p in posts.get((x["name"], x["qty"]), []):
+                    if p[3] or p[0] > upper or upper - p[0] > SALE_WINDOW:
                         continue
-                    if p[1] == money or (p[2] is not None and p[2] <= money and (p[1] is None or money <= p[1])):
+                    if p[1] == x["money"] or (p[2] is not None and p[2] <= x["money"] and (p[1] is None or x["money"] <= p[1])):
                         p[3], posted = True, p[0]
                         break
                 if posted is not None:
                     sold = max(sold, posted)
             cur.execute("""INSERT INTO marketlens_import.addon_auction_sales VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        (key, edition, sg, region, realm, fac, item, name, qty, money, round(money / qty), sold,
-                         posted, (sold - posted) if posted is not None else None,
-                         "journalator" if section == "Invoices" else "tsm"))
+                        (x["key"], edition, x["sg"], region, realm, x["fac"], x["item"], x["name"], x["qty"], x["money"],
+                         round(x["money"] / x["qty"]), sold, posted, (sold - posted) if posted is not None else None, x["origin"]))
             made += 1
     return made
 
