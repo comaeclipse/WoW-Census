@@ -28,8 +28,11 @@ tools/build-forever-dungeons.py and import-live.py dungeon-runs), `ack <that fol
 manifest carries its receipt id.
 
 `run` then hands that tree to tools/import-live.py saves (the same importer as
-local saves: SHA-256 dedup, one transaction, local first, then live) and, only
-after a live import succeeds, tells the Worker each receipt is imported so the
+local saves: SHA-256 dedup, one transaction, local first, then live). When a
+staged save carries ledger data (the add-on's own auctionLog since WoWCensus
+0.1.16 / companion 0.1.16, or shared Journalator/TSM/Auctionator rows in
+market), the same tree then goes through import-live.py journalator. Only after
+every live import succeeds does it tell the Worker each receipt is imported so the
 players' apps show "On wowcensus.io". A bundle that fails the checks is marked
 failed right away. The Worker's INGEST_TOKEN is read from WOWCENSUS_INGEST_TOKEN
 or the secrets file.
@@ -208,6 +211,12 @@ def pull_addons(limit):
     return stage
 
 
+def ledger_saves(stage):
+    """Staged WoWCensus.lua files with rows for tools/import-journalator-pg.py."""
+    return [p for p in sorted((stage / "game").rglob("WoWCensus.lua"))
+            if any(k in p.read_bytes() for k in (b'["auctionLog"]', b'["market"]'))]
+
+
 def ack_stage(stage):
     if (stage / "receipts.json").exists():
         ids = [s["receiptId"] for s in json.loads((stage / "receipts.json").read_text(encoding="utf-8"))]
@@ -254,6 +263,16 @@ def main():
         result = subprocess.run(cmd)
         if result.returncode != 0:
             raise SystemExit(f"Import failed; nothing marked imported. Retry with: python -B tools/pull-companion-uploads.py run")
+        ledgers = ledger_saves(stage)
+        if ledgers:
+            cmd = [sys.executable, "-B", str(REPO / "tools" / "import-live.py"), "journalator",
+                   str(stage / "game"), "--target", args.target]
+            if args.publish_now:
+                cmd.append("--publish-now")
+            print(f"{len(ledgers)} upload(s) carry auction or ledger rows; running: " + " ".join(cmd[2:]), flush=True)
+            if subprocess.run(cmd).returncode != 0:
+                raise SystemExit("Ledger import failed; the census rows are in, nothing marked imported. "
+                                 "Retry with: python -B tools/pull-companion-uploads.py run")
         if args.target == "both":
             ack_stage(stage)
         else:
