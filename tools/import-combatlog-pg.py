@@ -33,6 +33,10 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 SOURCE_GAME = "forever"
+# Site game keys a log can belong to. Every client writes combat log version 22 with the same 19-field
+# advanced block (checked on Forever 1.60.1 and Retail 12.1.0); each line's block must name one of the
+# line's two units, so a client with a different layout yields nothing instead of wrong numbers.
+GAMES = ("forever", "classic-beta", "retail", "classic-progression", "mop-classic", "classic")
 LOGS = Path(r"C:\Program Files (x86)\World of Warcraft\_forever_\Logs")
 
 
@@ -161,7 +165,8 @@ def read_log(path):
             swing = ev.startswith("SWING_")
             adv = 9 if swing else 12
             # A creature with an owner is a player's totem or guardian, not a mob.
-            if len(f) >= adv + ADV_LEN and f[adv].startswith("Creature-") and f[adv + 1] == "0000000000000000":
+            if (len(f) >= adv + ADV_LEN and f[adv].startswith("Creature-") and f[adv] in (f[1], f[5])
+                    and f[adv + 1] == "0000000000000000"):
                 who = npc_id(f[adv])
                 if who is not None and who not in names:
                     who = None  # only units already seen as NPC-controlled
@@ -234,12 +239,16 @@ def store(cur, key, d):
 
 
 def main():
+    global SOURCE_GAME
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("logs", nargs="*", type=Path)
     ap.add_argument("--dsn", default=pg.DEFAULT_DSN)
     ap.add_argument("--archive", help="ignored (accepted so tools/import-live.py can run this)")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--game", default=SOURCE_GAME, choices=GAMES,
+                    help="site game key the logs belong to (default forever)")
     args = ap.parse_args()
+    SOURCE_GAME = args.game
     logs = args.logs or sorted(LOGS.glob("WoWCombatLog*.txt"))
 
     conn = pg.psycopg2.connect(args.dsn)

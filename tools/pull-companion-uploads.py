@@ -6,7 +6,7 @@
     python -B tools/pull-companion-uploads.py pull                 # only download and stage
     python -B tools/pull-companion-uploads.py ack <stage dir>      # mark a staged batch imported (census or add-on stage)
     python -B tools/pull-companion-uploads.py pull-addons          # download other add-ons' uploads; ack the stage once used
-    python -B tools/pull-companion-uploads.py combatlogs           # pull Forever combat logs, import local + live, mark imported
+    python -B tools/pull-companion-uploads.py combatlogs           # pull combat logs, import local + live, mark imported
 
 Players' uploads wait on api.wowcensus.io (the upload Worker). `pull` asks the
 Worker for every receipt still waiting, downloads each bundle, checks it
@@ -28,11 +28,12 @@ import-live.py journalator, Dungeon Journal saves through
 tools/build-forever-dungeons.py and import-live.py dungeon-runs), `ack <that folder>` marks them imported; each
 manifest carries its receipt id.
 
-Forever combat logs (companion setting "Combat logs", add-on key combatlog) arrive already
+Combat logs from any client (companion setting "Combat logs", add-on key combatlog) arrive already
 filtered on the player's PC: only mob events, every player name blanked and every player GUID
 replaced by Player-0-00000000. `combatlogs` (and every `run`) stages them under their own file
 name in MarketLensData/companion-uploads/combatlogs-<UTC time>/<receipt>/ and imports them with
-import-live.py combatlog (the bestiary); a log uploaded again replaces its earlier rows.
+import-live.py combatlog --game <site key> (the bestiary), one run per edition; a log uploaded
+again replaces its earlier rows.
 
 `run` then hands that tree to tools/import-live.py saves (the same importer as
 local saves: SHA-256 dedup, one transaction, local first, then live). When a
@@ -72,6 +73,8 @@ MAX_RATIO = 60
 MAX_MANIFEST = 64 << 10
 COMBAT_LOG_RE = re.compile(r"^WoWCombatLog[^/\\]*\.txt$")
 LEFT_PLAYER_RE = re.compile(rb"Player-(?!0-00000000\b)\d+-[0-9A-Fa-f]+")
+COMBAT_LOG_GAMES = {"forever": "forever", "classic_beta": "classic-beta", "retail": "retail",
+                    "anniversary": "classic-progression", "classic": "mop-classic", "classic_era": "classic"}
 
 
 def token():
@@ -235,7 +238,7 @@ def combat_log_member(blob):
 
 
 def pull_combat_logs(limit):
-    """Download waiting combat log uploads; returns (stage, [log paths]) or (None, [])."""
+    """Download waiting combat log uploads; returns (stage, [(site game, log path)]) or (None, [])."""
     pending = [r for r in call("GET", f"/v1/ingest/pending?kind=addon&limit={limit}")["receipts"]
                if r.get("kind") == "addon" and r.get("addon") == "combatlog"]
     if not pending:
@@ -247,8 +250,8 @@ def pull_combat_logs(limit):
         rid = rec["id"]
         blob = call("GET", f"/v1/ingest/object/{rid}", raw=True)
         try:
-            if rec.get("edition") != "forever":
-                raise BadBundle(f"combat logs are only imported for forever, not {rec.get('edition')!r}")
+            if rec.get("edition") not in COMBAT_LOG_GAMES:
+                raise BadBundle(f"no site game for combat logs from {rec.get('edition')!r}")
             name = combat_log_member(blob)
             data, manifest = check_bundle(rec, blob, name)
             if b"COMBAT_LOG_VERSION," not in data[:4096]:
@@ -264,8 +267,8 @@ def pull_combat_logs(limit):
         (out / name).write_bytes(data)
         (out / "manifest.json").write_text(json.dumps({**manifest, "receiptId": rid, "uploaded": rec["created_at"]}, indent=2),
                                            encoding="utf-8")
-        logs.append(out / name)
-        print(f"{rid} forever      combatlog       {name} {len(data) / 1048576:6.2f} MB", flush=True)
+        logs.append((COMBAT_LOG_GAMES[rec["edition"]], out / name))
+        print(f"{rid} {rec['edition']:12} combatlog       {name} {len(data) / 1048576:6.2f} MB", flush=True)
     return (stage if logs else None), logs
 
 
@@ -273,12 +276,14 @@ def import_combat_logs(target, limit):
     stage, logs = pull_combat_logs(limit)
     if not logs:
         return
-    cmd = [sys.executable, "-B", str(REPO / "tools" / "import-live.py"), "combatlog", *map(str, logs),
-           "--target", target, "--skip-icons"]
-    print(f"running: import-live.py combatlog ({len(logs)} log(s)) --target {target}", flush=True)
-    if subprocess.run(cmd).returncode != 0:
-        raise SystemExit("Combat log import failed; nothing marked imported. "
-                         "Retry with: python -B tools/pull-companion-uploads.py combatlogs")
+    for game in sorted({g for g, _ in logs}):
+        paths = [str(path) for g, path in logs if g == game]
+        cmd = [sys.executable, "-B", str(REPO / "tools" / "import-live.py"), "combatlog", *paths,
+               "--game", game, "--target", target, "--skip-icons"]
+        print(f"running: import-live.py combatlog ({len(paths)} log(s)) --game {game} --target {target}", flush=True)
+        if subprocess.run(cmd).returncode != 0:
+            raise SystemExit("Combat log import failed; nothing marked imported. "
+                             "Retry with: python -B tools/pull-companion-uploads.py combatlogs")
     if target == "both":
         ack_stage(stage)
     else:
