@@ -273,6 +273,7 @@ function forever_npc_body(array $n): string {
     '<section class="dg-boss"><h3>Loot</h3>' .
     ($loot !== '' ? '<table class="dg-loot"><tbody>' . $loot . '</tbody></table>' : '<p class="hint">No loot listed yet.</p>') .
     ($obs || $runs ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '</section>' .
+    bestiary_boss_section(forever_npc_slug($b['name'])) .
     '</div><aside>' .
     '<section class="dg-boss"><h3>Details</h3><table class="dg-facts"><tbody>' . $factRows . '</tbody></table></section>' .
     '<section class="dg-boss"><h3>In ' . esc($d['name']) . '</h3><ol class="dg-roster">' . $others . '</ol></section>' .
@@ -295,7 +296,7 @@ function forever_npc_html(string $slug, string $stylesheet): ?string {
   $heading = page_heading('WoWCensus', $navigation, $b['name']);
   $css = esc($stylesheet);
   $census_css = CENSUS_STYLESHEET;
-  $style = DUNGEON_STYLE;
+  $style = DUNGEON_STYLE . BESTIARY_STYLE;
   $body = forever_npc_body($n);
   return <<<HTML
 <!doctype html><html lang="en"><head>

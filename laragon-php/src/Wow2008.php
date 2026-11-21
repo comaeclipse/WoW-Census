@@ -147,6 +147,7 @@ function edition_links(string $source): array {
   if (class_pages($source)) $links[] = ['Classes', url('classes', $source), true, 'classes'];
   $links[] = ['Gear', url('gear', $source), false, 'gear'];
   if ($source === \DUNGEON_SOURCE) $links[] = ['Dungeons', \forever_dungeon_path(), false, 'dungeons'];
+  if ($source === \DUNGEON_SOURCE) $links[] = ['Bestiary', \forever_npc_path(), false, 'bestiary'];
   if (in_array($source, ['retail', 'forever'], true)) $links[] = ['Skin Colors', '/' . $source . '/skin-colors/', false, 'skin-colors'];
   return $links;
 }
@@ -266,8 +267,14 @@ function render_page(string $html, string $path): string {
   }
   if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m) && isset(\forever_npcs()[$m[1]])) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
-    $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . '</style></head>', $html);
+    $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . \BESTIARY_STYLE . '</style></head>', $html);
     return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art(\forever_npcs()[$m[1]]['dungeon']['slug']), \forever_npcs()[$m[1]]['boss']['name']);
+  }
+  if (preg_match('#^/forever/npc(?:/([a-z0-9-]+))?/?(?:index\.html)?$#', $path, $m)
+      && (($m[1] ?? '') === '' || isset(\forever_bestiary()[$m[1]]))) {
+    $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
+    $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . \BESTIARY_STYLE . '</style></head>', $html);
+    return framed_page(\DUNGEON_SOURCE, $html, 'bestiary', 'dungeons', ($m[1] ?? '') !== '' ? \forever_bestiary()[$m[1]]['name'] : 'Bestiary');
   }
   if (preg_match('#^/(retail|forever)/skin-colors(?:/([a-z0-9-]+))?/?(index\.html)?$#', $path, $m)) { $GLOBALS['w8_source'] = $m[1]; return skin_colors_page($html, $m[2] ?? null, $m[1]); }
   // The current skin's race switcher fetches these fragments; they stay as they are.

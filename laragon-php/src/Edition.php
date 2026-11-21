@@ -44,7 +44,7 @@ function utc_timestamp(mixed $value): string {
 function edition_nav(string $source, string $current): array {
   $edition = EDITIONS[$source];
   $currentPage = preg_replace('/\.html$/', '', $current);
-  $pageLabels = ['index' => 'Census', 'combos' => 'Race + Class', 'realms' => 'Realms', 'auctionhouse' => 'Auction House', 'professions' => 'Professions', 'guilds' => 'Guilds', 'geography' => 'Geography', 'talents' => 'Talents', 'gear' => 'Gear', 'dungeons' => 'Dungeons'];
+  $pageLabels = ['index' => 'Census', 'combos' => 'Race + Class', 'realms' => 'Realms', 'auctionhouse' => 'Auction House', 'professions' => 'Professions', 'guilds' => 'Guilds', 'geography' => 'Geography', 'talents' => 'Talents', 'gear' => 'Gear', 'dungeons' => 'Dungeons', 'bestiary' => 'Bestiary'];
   $item = fn(string $href, string $label, ?bool $active = null) =>
     '<a class="game"' . (($active ?? ($href === $currentPage)) ? ' aria-current="true"' : '') . ' href="' . $href . '">' . $label . '</a>';
   $games = '<nav class="games game-nav" aria-label="Game edition">';
@@ -61,7 +61,8 @@ function edition_nav(string $source, string $current): array {
     $item(page_path($source, 'geography'), 'Geography', $currentPage === 'geography') .
     $item(page_path($source, 'talents'), 'Talents', $currentPage === 'talents') .
     $item(page_path($source, 'gear'), 'Gear', $currentPage === 'gear') .
-    ($source === DUNGEON_SOURCE ? $item(forever_dungeon_path(), 'Dungeons', $currentPage === 'dungeons') : '') . '</nav>';
+    ($source === DUNGEON_SOURCE ? $item(forever_dungeon_path(), 'Dungeons', $currentPage === 'dungeons') .
+      $item(forever_npc_path(), 'Bestiary', $currentPage === 'bestiary') : '') . '</nav>';
   return [
     'games' => '<div class="site-nav-stack">' . $games . $pages . '</div>',
     'pages' => '',

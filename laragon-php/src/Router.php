@@ -61,9 +61,14 @@ function route_request(string $path): ?array {
     $page = forever_dungeons_html(($m[1] ?? '') !== '' ? $m[1] : null, edition_path(DUNGEON_SOURCE) . $cssName);
     return $page === null ? null : [$html, localize_content($page)];
   }
-  // WoW: Forever dungeon bosses and rare spawns: /forever/npc/<slug>/.
+  // WoW: Forever bestiary and dungeon bosses: /forever/npc/ and /forever/npc/<slug>/. A dungeon boss keeps
+  // its journal page; any other mob measured in combat logs gets a bestiary page.
+  if (preg_match('#^/forever/npc/?(?:index\.html)?$#', $path)) {
+    return [$html, localize_content(forever_bestiary_html(null, edition_path(DUNGEON_SOURCE) . $cssName))];
+  }
   if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m)) {
-    $page = forever_npc_html($m[1], edition_path(DUNGEON_SOURCE) . $cssName);
+    $page = isset(forever_npcs()[$m[1]]) ? forever_npc_html($m[1], edition_path(DUNGEON_SOURCE) . $cssName)
+      : forever_bestiary_html($m[1], edition_path(DUNGEON_SOURCE) . $cssName);
     return $page === null ? null : [$html, localize_content($page)];
   }
   // Profession markets for every edition; Forever and Retail also add an Armory profession census.

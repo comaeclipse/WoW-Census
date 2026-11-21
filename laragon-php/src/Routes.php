@@ -43,7 +43,7 @@ function published_routes(?array $sources = null, bool $shared = true): array {
     if ($source === DUNGEON_SOURCE)
       foreach (array_merge([null], array_keys(forever_dungeons())) as $slug) $routes[] = forever_dungeon_path($slug) . 'index.html';
     if ($source === DUNGEON_SOURCE)
-      foreach (array_keys(forever_npcs()) as $slug) $routes[] = forever_npc_path($slug) . 'index.html';
+      foreach (array_merge([null], array_keys(forever_npcs() + forever_bestiary())) as $slug) $routes[] = forever_npc_path($slug) . 'index.html';
     foreach (array_merge([null], array_keys(profession_catalog($source))) as $slug) $routes[] = profession_path($slug, $source) . '/index.html';
   }
   if ($shared) array_push($routes, '/census.css', '/sitemap.xml', '/robots.txt', '/llms.txt', '/.well-known/ai-catalog.json');
