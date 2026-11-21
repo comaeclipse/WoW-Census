@@ -164,14 +164,18 @@ def to_int(v):
 
 
 NATIVE_KINDS = {"post", "sold", "expired", "cancelled", "mail", "owned"}
+# The server ID from the auction log's GUID key, for a row whose realm was recorded blank. It is
+# taken off the row before the row is keyed or stored.
+SERVER_HINT = "\0server"
 
 
 def native_auction_rows(log):
     """WoWCensusDB.auctionLog: the add-on's own record of this character's listings, sales and auction mail."""
     out = []
-    for entry in (log.values() if isinstance(log, dict) else []):
+    for log_key, entry in (log.items() if isinstance(log, dict) else []):
         if not isinstance(entry, dict):
             continue
+        server = re.search(r":Player-(\d+)-", str(log_key))
         rows = entry.get("rows") or {}
         for r in (rows.values() if isinstance(rows, dict) else rows):
             if not isinstance(r, dict) or r.get("kind") not in NATIVE_KINDS:
@@ -179,6 +183,8 @@ def native_auction_rows(log):
             r = {k: v for k, v in r.items() if k not in ("base",)}
             r["itemName"] = r.pop("name", None)
             r["char"], r["realm"], r["faction"] = entry.get("char"), entry.get("realm"), entry.get("faction")
+            if server and not r["realm"]:
+                r[SERVER_HINT] = int(server.group(1))
             out.append(("WoWCensus:" + r["kind"], r))
     return out
 
@@ -462,6 +468,80 @@ def character_region(cur, edition, char, realm, cache):
             found = forever_ruleset_regions(cur, char, realm)
         cache[key] = found.pop() if len(found) == 1 else None
     return cache[key]
+
+
+FOREVER_REALM = re.compile(r"^CAMWOW\s+(US|EU|KR|TW)\d*\s+(?:Realm|서버)\s+\d+\s+(RP PvP|PvP|PvE|RP)$", re.I)
+
+
+def forever_character_realm(cur, char, faction, cache):
+    """Forever add-ons can record a blank realm (the client reports it late). The census's own
+    sightings of the player name it: every sighting of this character (and faction) in one region
+    and one ruleset, the realm it was seen on last. None when the sightings disagree."""
+    if not char:
+        return None
+    key = ("forever-realm", char, faction)
+    if key not in cache:
+        cur.execute("""SELECT realm, game, max(last_seen) FROM marketlens_import.characters_with_region
+            WHERE source_game='forever' AND name=%s AND coalesce(realm,'') <> '' GROUP BY 1, 2""", (char,))
+        rows = [r for r in cur.fetchall() if FOREVER_REALM.match(r[0])
+                and (faction not in ("Alliance", "Horde") or (r[1] or "").endswith("-" + faction))]
+        groups = {(m.group(1).lower(), m.group(2).lower()) for m in (FOREVER_REALM.match(r[0]) for r in rows)}
+        cache[key] = max(rows, key=lambda r: r[2] or 0)[0] if len(groups) == 1 else None
+    return cache[key]
+
+
+def server_realm(cur, server, cache):
+    """The Forever realm the census knows for a server ID (the number in a player GUID)."""
+    if not server:
+        return None
+    key = ("server-realm", server)
+    if key not in cache:
+        cur.execute("""SELECT DISTINCT realm_name FROM marketlens_import.census_collection_realms
+            WHERE source_game='forever' AND realm_id=%s AND coalesce(realm_name,'') <> ''""", (server,))
+        names = {r[0] for r in cur.fetchall()}
+        cache[key] = names.pop() if len(names) == 1 else None
+    return cache[key]
+
+
+def source_servers(cur, sha, cache):
+    """character -> server ID from the auction log keys of the stored file a row came from."""
+    key = ("source-servers", sha)
+    if key not in cache:
+        cache[key] = {}
+        cur.execute("SELECT path FROM marketlens_import.addon_ledger_sources WHERE sha256=%s", (sha,))
+        found = cur.fetchone()
+        if found and Path(found[0]).exists():
+            try:
+                log = lua_tables(found[0]).get("auctionLog") or {}
+            except (subprocess.CalledProcessError, ValueError):
+                log = {}
+            for log_key, entry in log.items():
+                server = re.search(r":Player-(\d+)-", str(log_key))
+                if server and isinstance(entry, dict) and entry.get("char"):
+                    cache[key][entry["char"]] = int(server.group(1))
+    return cache[key]
+
+
+def fill_forever_realms(cur, groups, cache):
+    """Name the realm of stored Forever rows recorded with a blank one; the event key keeps the
+    recorded realm, so later copies of the same rows still dedupe."""
+    cur.execute("""SELECT event_key, region, character, faction, section, source_sha256
+        FROM marketlens_import.addon_ledger_events WHERE edition='forever' AND coalesce(realm,'')=''""")
+    filled = 0
+    for key, region, char, faction, section, sha in cur.fetchall():
+        realm = None
+        if section.startswith("WoWCensus:") and sha:
+            realm = server_realm(cur, source_servers(cur, sha, cache).get(char), cache)
+        realm = realm or forever_character_realm(cur, char, faction, cache)
+        if not realm or region_for(cur, "forever", realm, cache) != region:
+            continue
+        cur.execute("""UPDATE marketlens_import.addon_ledger_events SET realm=%s, source_game=%s
+            WHERE event_key=%s""", (realm, source_game_for("forever", realm), key))
+        groups.add(("forever", region, None, char))
+        groups.add(("forever", region, "", char))
+        groups.add(("forever", region, realm, char))
+        filled += 1
+    return filled
 
 
 FOREVER_RULESETS = {"pve": "PvE", "normal": "PvE", "pvp": "PvP", "rp": "RP", "roleplay": "RP",
@@ -887,6 +967,10 @@ def main():
                 continue
             row["t"] = t
             realm = row.get("realm")
+            server = row.pop(SERVER_HINT, None)
+            if edition == "forever" and not realm:
+                realm = (server_realm(cur, server, cache)
+                         or forever_character_realm(cur, row.get("char"), row.get("faction"), cache) or realm)
             reg = (region or overrides.get((realm or "").lower()) or region_for(cur, edition, realm, cache)
                    or character_region(cur, edition, row.get("char"), realm, cache)
                    or companion_account_region(cur, edition, path, realm, cache) or fallback)
@@ -919,6 +1003,7 @@ def main():
         entry.update(result="imported", newRows=new, newBySection=dict(sorted(per.items())))
 
     report["itemIdsFilled"] = fill_item_ids(cur)
+    report["foreverRealmsFilled"] = fill_forever_realms(cur, groups, cache)
     if args.rebuild_all_sales:
         cur.execute("""SELECT DISTINCT edition, region, realm, character FROM marketlens_import.addon_ledger_events
             WHERE section IN ('Invoices','Posting','TSM:sale')""")
