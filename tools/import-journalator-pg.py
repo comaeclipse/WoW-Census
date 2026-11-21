@@ -685,6 +685,69 @@ def mail_delivered(row, seen):
     return delivered if delivered <= seen + 60 else None
 
 
+def key_row(section, row):
+    """The row as keyed: WoWCensus's own rows without their realm. Before its 0.1.16 realm fix the
+    add-on could record a Forever realm blank, so one row reaches us with and without it."""
+    return {**row, "realm": ""} if section.startswith("WoWCensus:") else row
+
+
+def rekey_native_rows(cur, groups):
+    """Move WoWCensus rows stored under a realm-keyed event key to the realm-free key, or drop them
+    when the copy recorded with a blank realm is already stored."""
+    cur.execute("""SELECT event_key, edition, region, realm, section, character, row, source_sha256
+        FROM marketlens_import.addon_ledger_events
+        WHERE section LIKE 'WoWCensus:%%' AND coalesce(row->>'realm', '') <> '' ORDER BY source_sha256, t, event_key""")
+    occ, moved, dropped = defaultdict(int), 0, 0
+    for key, edition, region, realm, section, char, row, sha in cur.fetchall():
+        keyed = key_row(section, row)
+        base = (sha, edition, region, char, section, row.get("t"), json.dumps(identity(section, keyed), sort_keys=True))
+        occ[base] += 1
+        new = event_key(edition, region, section, keyed, occ[base])
+        if new == key:
+            continue
+        cur.execute("DELETE FROM marketlens_import.addon_auction_sales WHERE event_key=%s", (key,))
+        cur.execute("SELECT 1 FROM marketlens_import.addon_ledger_events WHERE event_key=%s", (new,))
+        if cur.fetchone():
+            cur.execute("DELETE FROM marketlens_import.addon_ledger_events WHERE event_key=%s", (key,))
+            dropped += 1
+        else:
+            cur.execute("UPDATE marketlens_import.addon_ledger_events SET event_key=%s WHERE event_key=%s", (new, key))
+            moved += 1
+        groups.add((edition, region, realm, char))
+    return {"moved": moved, "dropped": dropped}
+
+
+def first_name(char):
+    return (char or "").split(" ")[0].lower()
+
+
+def drop_duplicate_sales(cur):
+    """One auction can reach us from WoWCensus's own log and from Journalator or TSM. Forever's
+    add-on records only the first name ("Benedict"), Journalator the full one, so they land in
+    different groups. A WoWCensus sale with the same realm, item, quantity and total as another
+    add-on's sale by the same first name, within 15 minutes, is the same auction: keep the copy
+    that knows its listing time, else the other add-on's."""
+    cur.execute("""SELECT s.event_key, s.edition, s.region, coalesce(s.realm, ''), coalesce(s.item_id::text, s.item_name),
+            s.quantity, s.total, s.sold_at, s.posted_at, s.origin, e.character
+        FROM marketlens_import.addon_auction_sales s JOIN marketlens_import.addon_ledger_events e USING (event_key)""")
+    pools = defaultdict(list)
+    for key, edition, region, realm, item, qty, total, sold, posted, origin, char in cur.fetchall():
+        pools[(edition, region, realm, item, qty, total, first_name(char))].append([sold, key, posted, origin])
+    dropped = 0
+    for sales in pools.values():
+        native = [s for s in sales if s[3] == "wowcensus"]
+        others = [s for s in sales if s[3] != "wowcensus"]
+        for n in native:
+            twin = next((o for o in others if abs(o[0] - n[0]) <= 900), None)
+            if not twin:
+                continue
+            others.remove(twin)
+            loser = twin if n[2] is not None and twin[2] is None else n
+            cur.execute("DELETE FROM marketlens_import.addon_auction_sales WHERE event_key=%s", (loser[1],))
+            dropped += 1
+    return dropped
+
+
 def rebuild_sales(cur, groups):
     """Recompute addon_auction_sales for each (edition, region, realm, character) touched."""
     made = 0
@@ -706,26 +769,36 @@ def rebuild_sales(cur, groups):
         # online; one it only learned from the mail has the invoice's own time.
         # The pairing runs over the character's rows on every realm key, so each group sees the same pairs.
         live_sale = {}                  # invoice event_key -> TSM's time of the sale
-        twins = set()                   # TSM rows already covered by an invoice
-        cur.execute("""SELECT event_key, section, item_id, quantity, t FROM marketlens_import.addon_ledger_events
+        twins = {}                      # TSM row -> how many of its items no invoice covers
+        cur.execute("""SELECT event_key, section, item_id, quantity, t, row->>'stack' FROM marketlens_import.addon_ledger_events
             WHERE edition=%s AND region=%s AND character IS NOT DISTINCT FROM %s AND item_id IS NOT NULL
               AND ((section='Invoices' AND row->>'invoiceType'='seller') OR (section='TSM:sale' AND row->>'source'='Auction'))
             ORDER BY t, event_key""", (edition, region, char))
         both = cur.fetchall()
         invoices = defaultdict(list)    # (item_id, qty) -> [[t, event_key, used]]
-        for inv_key, section, item_id, qty, t in both:
+        for inv_key, section, item_id, qty, t, _ in both:
             if section == "Invoices":
                 invoices[(item_id, qty)].append([t, inv_key, False])
-        for key, section, item, qty, t in both:
+        for key, section, item, qty, t, stack in both:
             if section != "TSM:sale":
                 continue
-            twin = next((inv for inv in invoices.get((item, qty), [])
-                         if not inv[2] and t - 60 <= inv[0] <= t + 86400), None)
-            if twin:
-                twin[2] = True
-                twins.add(key)
-                if twin[0] - t >= LIVE_SALE_GAP:
-                    live_sale[twin[1]] = t
+            # One TSM row can hold several auctions of one stack size: quantity 27, stack 9 is three
+            # sold stacks. Each auction pairs with its own invoice; the rest stays a TSM sale.
+            size = to_int(stack)
+            if not (size and qty and size < qty and qty % size == 0):
+                size = qty
+            matched = []
+            for inv in invoices.get((item, size), []):
+                if len(matched) == (qty or 0) // (size or 1):
+                    break
+                if not inv[2] and t - 60 <= inv[0] <= t + 86400:
+                    matched.append(inv)
+            for inv in matched:
+                inv[2] = True
+                if inv[0] - t >= LIVE_SALE_GAP:
+                    live_sale[inv[1]] = t
+            if matched:
+                twins[key] = (qty or 0) - len(matched) * (size or 0)
         posts = defaultdict(list)       # (name, qty) -> [[t, buyout, bid, used, auction id]]; sale rows may lack an item id
         journalator_posts = [(t, name, qty, money) for _, _, _, section, t, _, name, qty, money, _ in rows if section == "Posting"]
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
@@ -786,9 +859,10 @@ def rebuild_sales(cur, groups):
             if section == "Invoices" and row.get("invoiceType") == "seller":
                 sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="journalator",
                                   taken=t, bound=t - delay, live=live_sale.get(key), mail=None, pending=None))
-            elif section == "TSM:sale" and row.get("source") == "Auction" and key not in twins:
-                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="tsm",
-                                  taken=t, bound=t, live=None, mail=None, pending=None))
+            elif section == "TSM:sale" and row.get("source") == "Auction" and twins.get(key, qty) > 0:
+                left = twins.get(key, qty)
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=left, money=round(money * left / qty),
+                                  origin="tsm", taken=t, bound=t, live=None, mail=None, pending=None))
         native_mail = [r for r in rows if r[3] == "WoWCensus:mail" and r[9].get("invoiceType") in ("seller", "seller_temp_invoice")
                        and r[7] and r[8] and r[8] > 0]
         for key, sg, fac, section, t, item, name, qty, money, row in native_mail:
@@ -977,9 +1051,11 @@ def main():
             if reg not in REGIONS:
                 problems[str(realm)] += 1
                 continue
-            base = (edition, reg, realm, row.get("char"), section, t, json.dumps(identity(section, row), sort_keys=True))
+            keyed = key_row(section, row)
+            base = (edition, reg, keyed.get("realm") if keyed is not row else realm, row.get("char"), section, t,
+                    json.dumps(identity(section, keyed), sort_keys=True))
             occ[base] += 1
-            key = event_key(edition, reg, section, row, occ[base])
+            key = event_key(edition, reg, section, keyed, occ[base])
             item, name, qty, money = measures(section, row)
             cur.execute("""INSERT INTO marketlens_import.addon_ledger_events
                 (event_key, edition, source_game, region, realm, faction, character, section, t,
@@ -1003,15 +1079,18 @@ def main():
         entry.update(result="imported", newRows=new, newBySection=dict(sorted(per.items())))
 
     report["itemIdsFilled"] = fill_item_ids(cur)
+    report["nativeRowsRekeyed"] = rekey_native_rows(cur, groups)
     report["foreverRealmsFilled"] = fill_forever_realms(cur, groups, cache)
     if args.rebuild_all_sales:
         cur.execute("""SELECT DISTINCT edition, region, realm, character FROM marketlens_import.addon_ledger_events
-            WHERE section IN ('Invoices','Posting','TSM:sale')""")
+            WHERE section IN ('Invoices','Posting','TSM:sale') OR section LIKE 'WoWCensus:%%'""")
         report["salesRebuilt"] = rebuild_sales(cur, set(cur.fetchall()))
         changed = True
     else:
         report["salesRebuilt"] = rebuild_sales(cur, groups)
         changed = bool(groups)
+    report["duplicateSalesDropped"] = drop_duplicate_sales(cur)
+    changed = changed or bool(report["duplicateSalesDropped"])
     report["lootSources"], report["lootItems"] = rebuild_loot(cur)
     cur.execute("""SELECT count(*), count(seconds_to_sell) FROM marketlens_import.addon_auction_sales""")
     total, timed = cur.fetchone()
