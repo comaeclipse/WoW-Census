@@ -56,12 +56,12 @@ $sections = [
   ]],
   ['Getting involved', [
     ['How can I help?',
-      '<p>We are looking for players who would like to contribute. The best place to start is our <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Discord</a>, where you can ask questions and find out how to get involved.</p>'
+      '<p>We are looking for players who would like to contribute. The best place to start is our <a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Discord</a>, where you can ask questions and find out how to get involved.</p>'
       . '<p>Telling other players about the site helps too.</p>'],
     ['Who has helped?',
-      '<p>A big thank you to <b>Duxa</b>, <b>Vertical Bar</b> and <b>HockeyTemper</b> from our <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Discord</a> for their contributions. WoWCensus is better for their help.</p>'],
+      '<p>A big thank you to <b>Duxa</b>, <b>Vertical Bar</b> and <b>HockeyTemper</b> from our <a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Discord</a> for their contributions. WoWCensus is better for their help.</p>'],
     ['How do I get in touch?',
-      '<p>Use the <a href="/contact">contact form</a>, join the <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Discord</a>, or leave a note in the <a href="/shoutbox/">shoutbox</a>. Corrections, ideas and bug reports are all welcome.</p>'],
+      '<p>Use the <a href="/contact">contact form</a>, join the <a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Discord</a>, or leave a note in the <a href="/shoutbox/">shoutbox</a>. Corrections, ideas and bug reports are all welcome.</p>'],
     ['Where can I find out what\'s new?',
       '<p>Changes and write-ups are posted on the <a href="/blog.php">blog</a>.</p>'],
   ]],

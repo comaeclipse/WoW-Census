@@ -470,7 +470,7 @@ function forever_dungeons_w8_index(): string {
     '<div class="section-bd">' . $groups . '<p class="dgx-empty" id="dgx-empty" hidden>No dungeon matches that search.</p></div></div>' .
     '</div><aside class="dgx-rail">' .
     '<div class="box dgx-know"><h4><i></i>Know Something?</h4><p>Found a drop the journal doesn\'t list? Upload your journal and Journalator log with the WoWCensus companion.</p>' .
-    '<a class="btn-red" href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Tell us on Discord</a></div>' .
+    '<a class="btn-red" href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Tell us on Discord</a></div>' .
     '<div class="box"><h4><i></i>Biggest Loot Tables</h4><ul class="ql dgx-ql">' . $biggestLi . '</ul></div>' .
     '<div class="box"><h4><i></i>Guide Legend</h4><ul class="ql dgx-legend">' .
     '<li><i class="dot complete"></i><div><b>Complete</b><small>Bosses and loot listed</small></div></li>' .

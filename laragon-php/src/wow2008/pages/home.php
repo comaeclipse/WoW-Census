@@ -33,7 +33,7 @@ foreach ($slides as $i => &$slide) $slide[0] = 'home-' . $rotation[($day + $i) %
 unset($slide);
 // Fixed slides first. The Discord banner carries its own text, so it shows whole ("plain": not cropped),
 // sitting above the caption bar, and the whole picture links to the invite as well.
-$discord = 'https://discord.gg/Dzw8H3QZX';
+$discord = 'https://discord.gg/kSUGgYDd8V';
 $fixed = [['discord', 'Volunteers needed!', 'Help us scan realms and grow the census. Everyone is welcome.', $discord, 'Join the Discord »', true]];
 if ($totals['tracked'] >= 1000000)
   $fixed[] = ['home-5', 'Over ' . fmt((int)(floor($totals['tracked'] / 1000000) * 1000000)) . ' characters in our database',
@@ -156,7 +156,7 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
         <li><span class="qi"></span><a href="/combos">Every Race &amp; Class</a></li>
         <li><span class="qi g"></span><a href="/auctionhouse">Auction House Prices</a></li>
         <li><span class="qi y"></span><a href="/blog.php">News &amp; Updates</a></li>
-        <li><span class="qi"></span><a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Join us on Discord</a></li>
+        <li><span class="qi"></span><a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Join us on Discord</a></li>
       </ul>
     </div>
   </aside>

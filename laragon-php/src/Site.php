@@ -46,7 +46,7 @@ function site_notice_html(): string {
   return <<<HTML
 <script>document.documentElement.dataset.noticeChoice=String(Math.floor(Math.random()*3))</script>
 <aside class="site-notice" data-notice-id="$id" aria-label="Site notice">
-    <p class="notice-text" data-notice-option="0"><img class="notice-icon" src="/notice-discord.png" alt="" width="29" height="22">Looking for contributors! Join our Discord for more info: <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">discord.gg/Dzw8H3QZX <span class="blink">&#9656;</span></a></p>
+    <p class="notice-text" data-notice-option="0"><img class="notice-icon" src="/notice-discord.png" alt="" width="29" height="22">Looking for contributors! Join our Discord for more info: <a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">discord.gg/kSUGgYDd8V <span class="blink">&#9656;</span></a></p>
     <p class="notice-text" data-notice-option="1">$kofiIcon Like this project? Help support us on <a href="https://ko-fi.com/wowcensus" target="_blank" rel="noopener noreferrer">Ko-fi <span class="blink">&#9656;</span></a></p>
     <p class="notice-text" data-notice-option="2">$coffeeIcon Like this project? Help support us on <a href="https://buymeacoffee.com/wowcensus" target="_blank" rel="noopener noreferrer">Buy Me a Coffee <span class="blink">&#9656;</span></a></p>
     <button class="notice-close" type="button" aria-label="Dismiss notice">&times;</button>
