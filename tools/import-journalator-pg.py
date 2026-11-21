@@ -646,15 +646,27 @@ def rebuild_sales(cur, groups):
                 twins.add(key)
                 if twin[0] - t >= LIVE_SALE_GAP:
                     live_sale[twin[1]] = t
-        posts = defaultdict(list)       # (name, qty) -> [[t, buyout, bid, used]]; sale rows may lack an item id
+        posts = defaultdict(list)       # (name, qty) -> [[t, buyout, bid, used, auction id]]; sale rows may lack an item id
         journalator_posts = [(t, name, qty, money) for _, _, _, section, t, _, name, qty, money, _ in rows if section == "Posting"]
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
             if section == "Posting":
-                posts[(name, qty)].append([t, money, to_int(row.get("bid")), False])
+                posts[(name, qty)].append([t, money, to_int(row.get("bid")), False, None])
             elif section == "WoWCensus:post" and not any(
                     n == name and q == qty and m == money and abs(pt - t) <= 10 for pt, n, q, m in journalator_posts):
                 # WoWCensus's own copy of a listing; Journalator only logs Classic listings made through Auctionator.
-                posts[(name, qty)].append([t, money, to_int(row.get("bid")), False])
+                posts[(name, qty)].append([t, money, to_int(row.get("bid")), False, to_int(row.get("auctionID"))])
+        # The auction house's own list of the player's auctions (modern auction house): the last time an
+        # auction was still active and the first time it showed as sold bracket the sale.
+        sighted = {}                    # auction id -> [last seen active, first seen sold]
+        for key, sg, fac, section, t, item, name, qty, money, row in rows:
+            auction = to_int(row.get("auctionID")) if section == "WoWCensus:owned" else None
+            if auction is None:
+                continue
+            seen = sighted.setdefault(auction, [None, None])
+            if row.get("status") == "sold":
+                seen[1] = t if seen[1] is None else min(seen[1], t)
+            elif row.get("status") == "active" and (seen[1] is None or t < seen[1]):
+                seen[0] = t if seen[0] is None else max(seen[0], t)
         for stack in posts.values():
             stack.sort(key=lambda p: p[0])
 
@@ -748,7 +760,7 @@ def rebuild_sales(cur, groups):
                 sold = x["live"]
             else:
                 sold = x["bound"]
-            posted = None
+            posted = auction = None
             if x["origin"] != "tsm":
                 # Oldest unused posting of the same stack that this sale could have come from:
                 # sold at buyout, or won with a bid between the posted bid and buyout.
@@ -756,9 +768,15 @@ def rebuild_sales(cur, groups):
                     if p[3] or p[0] > upper or upper - p[0] > SALE_WINDOW:
                         continue
                     if p[1] == x["money"] or (p[2] is not None and p[2] <= x["money"] and (p[1] is None or x["money"] <= p[1])):
-                        p[3], posted = True, p[0]
+                        p[3], posted, auction = True, p[0], p[4]
                         break
                 if posted is not None:
+                    seen = sighted.get(auction) if auction is not None else None
+                    if seen and not msg:
+                        if seen[1] is not None:
+                            sold = min(sold, seen[1])
+                        if seen[0] is not None:
+                            sold = max(sold, seen[0])
                     sold = max(sold, posted)
             cur.execute("""INSERT INTO marketlens_import.addon_auction_sales VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                         (x["key"], edition, x["sg"], region, realm, x["fac"], x["item"], x["name"], x["qty"], x["money"],
