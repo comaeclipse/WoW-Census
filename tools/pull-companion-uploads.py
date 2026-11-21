@@ -6,6 +6,7 @@
     python -B tools/pull-companion-uploads.py pull                 # only download and stage
     python -B tools/pull-companion-uploads.py ack <stage dir>      # mark a staged batch imported (census or add-on stage)
     python -B tools/pull-companion-uploads.py pull-addons          # download other add-ons' uploads; ack the stage once used
+    python -B tools/pull-companion-uploads.py combatlogs           # pull Forever combat logs, import local + live, mark imported
 
 Players' uploads wait on api.wowcensus.io (the upload Worker). `pull` asks the
 Worker for every receipt still waiting, downloads each bundle, checks it
@@ -27,6 +28,12 @@ import-live.py journalator, Dungeon Journal saves through
 tools/build-forever-dungeons.py and import-live.py dungeon-runs), `ack <that folder>` marks them imported; each
 manifest carries its receipt id.
 
+Forever combat logs (companion setting "Combat logs", add-on key combatlog) arrive already
+filtered on the player's PC: only mob events, every player name blanked and every player GUID
+replaced by Player-0-00000000. `combatlogs` (and every `run`) stages them under their own file
+name in MarketLensData/companion-uploads/combatlogs-<UTC time>/<receipt>/ and imports them with
+import-live.py combatlog (the bestiary); a log uploaded again replaces its earlier rows.
+
 `run` then hands that tree to tools/import-live.py saves (the same importer as
 local saves: SHA-256 dedup, one transaction, local first, then live). When a
 staged save carries ledger data (the add-on's own auctionLog since WoWCensus
@@ -43,6 +50,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.error
@@ -62,6 +70,8 @@ MAX_ZIP = 64 << 20
 MAX_LUA = 256 << 20
 MAX_RATIO = 60
 MAX_MANIFEST = 64 << 10
+COMBAT_LOG_RE = re.compile(r"^WoWCombatLog[^/\\]*\.txt$")
+LEFT_PLAYER_RE = re.compile(rb"Player-(?!0-00000000\b)\d+-[0-9A-Fa-f]+")
 
 
 def token():
@@ -192,6 +202,8 @@ def pull_addons(limit):
     stage = DATA_ROOT / "companion-uploads" / ("addons-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S"))
     for rec in pending:
         rid, addon = rec["id"], rec.get("addon")
+        if addon == "combatlog":
+            continue
         if addon not in ADDON_FILES:
             print(f"{rid}: unknown add-on {addon!r}, skipped", flush=True)
             continue
@@ -211,6 +223,69 @@ def pull_addons(limit):
     return stage
 
 
+def combat_log_member(blob):
+    try:
+        with zipfile.ZipFile(io.BytesIO(blob)) as zf:
+            names = [n for n in zf.namelist() if n != "manifest.json"]
+    except (zipfile.BadZipFile, OSError, ValueError) as exc:
+        raise BadBundle(f"unreadable bundle: {type(exc).__name__}: {exc}") from exc
+    if len(names) != 1 or not COMBAT_LOG_RE.match(names[0]):
+        raise BadBundle(f"unexpected bundle contents: {names[:5]}")
+    return names[0]
+
+
+def pull_combat_logs(limit):
+    """Download waiting combat log uploads; returns (stage, [log paths]) or (None, [])."""
+    pending = [r for r in call("GET", f"/v1/ingest/pending?kind=addon&limit={limit}")["receipts"]
+               if r.get("kind") == "addon" and r.get("addon") == "combatlog"]
+    if not pending:
+        print("No combat log uploads waiting.", flush=True)
+        return None, []
+    stage = DATA_ROOT / "companion-uploads" / ("combatlogs-" + datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S"))
+    logs = []
+    for rec in pending:
+        rid = rec["id"]
+        blob = call("GET", f"/v1/ingest/object/{rid}", raw=True)
+        try:
+            if rec.get("edition") != "forever":
+                raise BadBundle(f"combat logs are only imported for forever, not {rec.get('edition')!r}")
+            name = combat_log_member(blob)
+            data, manifest = check_bundle(rec, blob, name)
+            if b"COMBAT_LOG_VERSION," not in data[:4096]:
+                raise BadBundle("not a combat log")
+            if LEFT_PLAYER_RE.search(data):
+                raise BadBundle("combat log still holds player GUIDs")
+        except BadBundle as exc:
+            print(f"{rid} combatlog: rejected ({exc}), marked failed", flush=True)
+            ack(rid, "failed", str(exc))
+            continue
+        out = stage / rid
+        out.mkdir(parents=True, exist_ok=True)
+        (out / name).write_bytes(data)
+        (out / "manifest.json").write_text(json.dumps({**manifest, "receiptId": rid, "uploaded": rec["created_at"]}, indent=2),
+                                           encoding="utf-8")
+        logs.append(out / name)
+        print(f"{rid} forever      combatlog       {name} {len(data) / 1048576:6.2f} MB", flush=True)
+    return (stage if logs else None), logs
+
+
+def import_combat_logs(target, limit):
+    stage, logs = pull_combat_logs(limit)
+    if not logs:
+        return
+    cmd = [sys.executable, "-B", str(REPO / "tools" / "import-live.py"), "combatlog", *map(str, logs),
+           "--target", target, "--skip-icons"]
+    print(f"running: import-live.py combatlog ({len(logs)} log(s)) --target {target}", flush=True)
+    if subprocess.run(cmd).returncode != 0:
+        raise SystemExit("Combat log import failed; nothing marked imported. "
+                         "Retry with: python -B tools/pull-companion-uploads.py combatlogs")
+    if target == "both":
+        ack_stage(stage)
+    else:
+        print(f"Local import done. After the live import, mark them imported with:\n"
+              f"  python -B tools/pull-companion-uploads.py ack \"{stage}\"", flush=True)
+
+
 def ledger_saves(stage):
     """Staged WoWCensus.lua files with rows for tools/import-journalator-pg.py."""
     return [p for p in sorted((stage / "game").rglob("WoWCensus.lua"))
@@ -222,7 +297,8 @@ def ack_stage(stage):
         ids = [s["receiptId"] for s in json.loads((stage / "receipts.json").read_text(encoding="utf-8"))]
     else:
         # An add-on stage (pull-addons): each upload's manifest carries its receipt id.
-        ids = [json.loads(m.read_text(encoding="utf-8"))["receiptId"] for m in sorted(stage.glob("*/*/*.json"))]
+        ids = [json.loads(m.read_text(encoding="utf-8"))["receiptId"]
+               for m in sorted(stage.glob("*/*/*.json")) + sorted(stage.glob("*/manifest.json"))]
         if not ids:
             raise SystemExit(f"{stage}: no receipts.json and no add-on manifests")
     for rid in ids:
@@ -243,6 +319,9 @@ def main():
     p_ack.add_argument("stage", type=Path)
     p_addons = sub.add_parser("pull-addons")
     p_addons.add_argument("--limit", type=int, default=200)
+    p_logs = sub.add_parser("combatlogs")
+    p_logs.add_argument("--target", choices=("both", "local"), default="both")
+    p_logs.add_argument("--limit", type=int, default=50)
     args = parser.parse_args()
 
     try:
@@ -252,8 +331,14 @@ def main():
         if args.cmd == "pull-addons":
             pull_addons(args.limit)
             return
+        if args.cmd == "combatlogs":
+            import_combat_logs(args.target, args.limit)
+            return
         stage = pull(args.limit)
-        if args.cmd == "pull" or stage is None:
+        if args.cmd == "pull":
+            return
+        if stage is None:
+            import_combat_logs(args.target, 50)
             return
         cmd = [sys.executable, "-B", str(REPO / "tools" / "import-live.py"), "saves",
                "--game-root", str(stage / "game"), "--target", args.target]
@@ -278,6 +363,7 @@ def main():
         else:
             print(f"Local import done. After the live import, mark them imported with:\n"
                   f"  python -B tools/pull-companion-uploads.py ack \"{stage}\"", flush=True)
+        import_combat_logs(args.target, 50)
     except urllib.error.HTTPError as exc:
         raise SystemExit(f"Upload API returned {exc.code}: {exc.read()[:300].decode(errors='replace')}")
 
