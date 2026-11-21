@@ -76,6 +76,8 @@ PRIVATE = {"playerName", "player", "recipient", "sender", "subject", "text",
            "crafterName", "crafterNote", "customerNote", "otherPlayer"}
 MAX_DEPTH = 6
 SALE_WINDOW = 48 * 3600 + 3600   # longest auction plus slack for clock skew
+MAIL_DELAY = 3600                # outside Retail, auction gold arrives by mail an hour after the sale
+LIVE_SALE_GAP = 600              # TSM time this far before the invoice = TSM saw the sale happen
 
 
 def clean_item(link):
@@ -558,39 +560,57 @@ def rebuild_sales(cur, groups):
         cur.execute("""SELECT event_key, source_game, faction, section, t, item_id, item_name, quantity, money, row
             FROM marketlens_import.addon_ledger_events
             WHERE edition=%s AND region=%s AND realm IS NOT DISTINCT FROM %s AND character IS NOT DISTINCT FROM %s
-              AND section IN ('Invoices','Posting','TSM:sale') ORDER BY t""", (edition, region, realm, char))
+              AND section IN ('Invoices','Posting','TSM:sale','Failures') ORDER BY t, event_key""", (edition, region, realm, char))
         rows = cur.fetchall()
-        # A sale logged by both TSM and Journalator is kept once, as the Journalator invoice (it can
-        # carry posted_at). TSM files realms under its own key (Forever: the ruleset, "Normal"), so
-        # invoices are matched by character across realms. TSM's time is the sale; the invoice is
-        # stamped when the mail is taken, up to a day later.
-        invoices = defaultdict(list)    # (item_id, qty) -> [[t, used]]
-        if any(section == "TSM:sale" for _, _, _, section, *_ in rows):
-            cur.execute("""SELECT item_id, quantity, t FROM marketlens_import.addon_ledger_events
-                WHERE edition=%s AND region=%s AND character IS NOT DISTINCT FROM %s AND section='Invoices'
-                  AND row->>'invoiceType'='seller' AND item_id IS NOT NULL ORDER BY t""", (edition, region, char))
-            for item_id, qty, t in cur.fetchall():
-                invoices[(item_id, qty)].append([t, False])
+        # Journalator stamps an invoice when the mail is opened, and outside Retail the gold only
+        # arrives an hour after the sale, so the invoice time is "sold by", never the sale itself.
+        # A sale logged by both add-ons is kept once, as the invoice (it can carry posted_at).
+        # TSM files realms under its own key (Forever: the ruleset, "Normal"), so invoices are
+        # matched by character across realms. TSM times a sale it saw happen while the seller was
+        # online; one it only learned from the mail has the invoice's own time.
+        # The pairing runs over the character's rows on every realm key, so each group sees the same pairs.
+        live_sale = {}                  # invoice event_key -> TSM's time of the sale
+        twins = set()                   # TSM rows already covered by an invoice
+        cur.execute("""SELECT event_key, section, item_id, quantity, t FROM marketlens_import.addon_ledger_events
+            WHERE edition=%s AND region=%s AND character IS NOT DISTINCT FROM %s AND item_id IS NOT NULL
+              AND ((section='Invoices' AND row->>'invoiceType'='seller') OR (section='TSM:sale' AND row->>'source'='Auction'))
+            ORDER BY t, event_key""", (edition, region, char))
+        both = cur.fetchall()
+        invoices = defaultdict(list)    # (item_id, qty) -> [[t, event_key, used]]
+        for inv_key, section, item_id, qty, t in both:
+            if section == "Invoices":
+                invoices[(item_id, qty)].append([t, inv_key, False])
+        for key, section, item, qty, t in both:
+            if section != "TSM:sale":
+                continue
+            twin = next((inv for inv in invoices.get((item, qty), [])
+                         if not inv[2] and t - 60 <= inv[0] <= t + 86400), None)
+            if twin:
+                twin[2] = True
+                twins.add(key)
+                if twin[0] - t >= LIVE_SALE_GAP:
+                    live_sale[twin[1]] = t
         posts = defaultdict(list)       # (name, qty) -> [[t, buyout, bid, used]]; sale rows may lack an item id
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
             if section == "Posting":
                 posts[(name, qty)].append([t, money, to_int(row.get("bid")), False])
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
+            if section == "Failures":
+                # An expired or cancelled auction used up its listing: the oldest one of that stack.
+                p = next((p for p in posts.get((name, qty), []) if not p[3] and p[0] <= t), None)
+                if p:
+                    p[3] = True
+                continue
             if section == "Posting" or not qty or money is None or money <= 0:
                 continue
             if section == "Invoices" and row.get("invoiceType") != "seller":
                 continue
-            if section == "TSM:sale":
-                # TSM's "sale" also covers selling to a vendor; only Auction House sales count.
-                if row.get("source") != "Auction":
-                    continue
-                twin = next((inv for inv in invoices.get((item, qty), [])
-                             if not inv[1] and t - 60 <= inv[0] <= t + 86400), None)
-                if twin:
-                    twin[1] = True
-                    continue
-            posted = None
+            # TSM's "sale" also covers selling to a vendor; only Auction House sales count.
+            if section == "TSM:sale" and (row.get("source") != "Auction" or key in twins):
+                continue
+            posted, sold = None, t
             if section == "Invoices":
+                sold = live_sale.get(key, t - (MAIL_DELAY if edition != "retail" else 0))
                 # Oldest unused posting of the same stack that this sale could have come from:
                 # sold at buyout, or won with a bid between the posted bid and buyout.
                 for p in posts.get((name, qty), []):
@@ -599,9 +619,11 @@ def rebuild_sales(cur, groups):
                     if p[1] == money or (p[2] is not None and p[2] <= money and (p[1] is None or money <= p[1])):
                         p[3], posted = True, p[0]
                         break
+                if posted is not None:
+                    sold = max(sold, posted)
             cur.execute("""INSERT INTO marketlens_import.addon_auction_sales VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        (key, edition, sg, region, realm, fac, item, name, qty, money, round(money / qty), t,
-                         posted, (t - posted) if posted is not None else None,
+                        (key, edition, sg, region, realm, fac, item, name, qty, money, round(money / qty), sold,
+                         posted, (sold - posted) if posted is not None else None,
                          "journalator" if section == "Invoices" else "tsm"))
             made += 1
     return made

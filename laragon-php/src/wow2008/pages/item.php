@@ -351,18 +351,18 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
         <div class="tiles">
           <div class="stat"><span>Sales recorded</span><b><?= fmt($sales['count']) ?></b><em>completed auctions</em></div>
           <div class="stat"><span>Typical sale</span><b><?= $money($sales['median']) ?></b><em>median price per unit</em></div>
-          <div class="stat"><span>Time to sell</span><b><?= $sales['medianSecs'] !== null ? e($dur($sales['medianSecs'])) : '—' ?></b><em><?= $sales['timed'] ? 'median, from ' . fmt($sales['timed']) . ' sale' . ($sales['timed'] === 1 ? '' : 's') . ' with a logged listing' : 'listing time not logged' ?></em></div>
+          <div class="stat"><span>Time to sell</span><b><?= $sales['medianSecs'] !== null ? e($dur($sales['medianSecs'])) : '—' ?></b><em><?= $sales['timed'] ? 'median upper bound, from ' . fmt($sales['timed']) . ' sale' . ($sales['timed'] === 1 ? '' : 's') . ' with a logged listing' : 'listing time not logged' ?></em></div>
           <div class="stat"><span>Last sale</span><b><?= e($ago($sales['last'])) ?></b><em><?= e(gmdate('M j, Y', $sales['last'])) ?></em></div>
         </div>
         <table class="ahtable it-sales">
-          <thead><tr><th>Sold</th><th>Market</th><th class="num">Qty</th><th class="num">Price each</th><th class="num">Sold after</th></tr></thead>
+          <thead><tr><th>Sold</th><th>Market</th><th class="num">Qty</th><th class="num">Price each</th><th class="num">Sold within</th></tr></thead>
           <tbody>
 <?php foreach ($sales['rows'] as [$t, $label, $fac, $qty, $unit, $secs]): ?>
             <tr><td title="<?= e(gmdate('Y-m-d H:i', $t)) ?> UTC"><?= e($ago($t)) ?></td><td class="fac-<?= e(strtolower($fac)) ?>"><?= e($label) ?></td><td class="num"><?= fmt($qty) ?></td><td class="num"><?= $money($unit) ?></td><td class="num"><?= $secs !== null ? e($dur($secs)) : '<span class="dim" title="This listing wasn\'t in the seller\'s log">—</span>' ?></td></tr>
 <?php endforeach ?>
           </tbody>
         </table>
-        <p class="tfoot">Real sales, not asking prices: each row is an auction a player's Journalator or TradeSkillMaster recorded as sold. "Sold after" is the time from listing to sale, shown when the listing is in the same log. Sellers and buyers aren't named.<?= $sales['count'] > count($sales['rows']) ? ' Showing the latest ' . count($sales['rows']) . '.' : '' ?></p>
+        <p class="tfoot">Real sales, not asking prices: each row is an auction a player's Journalator or TradeSkillMaster recorded as sold. "Sold within" is at most how long the listing took to sell, shown when the listing is in the same log. Most sales are only known from the auction mail, so the real time can be shorter. Sellers and buyers aren't named.<?= $sales['count'] > count($sales['rows']) ? ' Showing the latest ' . count($sales['rows']) . '.' : '' ?></p>
     <?php component_end() ?>
 <?php endif ?>
 
