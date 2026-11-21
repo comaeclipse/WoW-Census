@@ -139,6 +139,72 @@ IMPORT_TABLES = ("census_collection_realms", "character_inspects", "character_lo
                  "pop_samples", "population_sweep_queries", "population_sweeps", "seller_listings", "sellers")
 
 
+OWN_CHARACTERS = {}
+
+
+def own_characters(path):
+    """(GUID, faction) of the save's own characters: its leveling records and auction log."""
+    key = str(path)
+    if key not in OWN_CHARACTERS:
+        js = ("const {readSavedVariables}=require(process.argv[1]);const v=readSavedVariables(process.argv[2]);"
+              "const out=[];for(const e of Object.values(v.leveling||{})){if(e&&e.guid)out.push([e.guid,(e.identity||{}).faction||null]);}"
+              "for(const [k,e] of Object.entries(v.auctionLog||{})){out.push([k.split(':').pop(),(e||{}).faction||null]);}"
+              "process.stdout.write(JSON.stringify(out));")
+        out = subprocess.run(["node", "-e", js, str(REPO / "tools" / "savedvariables.js"), key],
+                             capture_output=True, check=False, timeout=600)
+        OWN_CHARACTERS[key] = json.loads(out.stdout) if out.returncode == 0 and out.stdout else []
+    return OWN_CHARACTERS[key]
+
+
+def forever_own_realm(db, path, region, faction):
+    """The realm of a Forever bucket recorded with a blank realm name, from the save's own
+    characters of that faction: their GUIDs carry the server ID, which the census maps to a
+    realm. None unless every such character is on one realm."""
+    servers = {int(m.group(1)) for guid, fac in own_characters(path)
+               if fac == faction and (m := re.match(r"^Player-(\d+)-", guid or ""))}
+    realms = set()
+    for server in servers:
+        realms |= {tuple(r) for r in db.execute(
+            """SELECT DISTINCT realm_id, realm_name, realm_normalized FROM census_collection_realms
+               WHERE source_game='forever' AND region=? AND realm_id=? AND coalesce(realm_name,'') <> ''""",
+            (region, server)).fetchall()}
+    return realms.pop() if len({r[1] for r in realms}) == 1 and len(realms) == 1 else None
+
+
+FOREVER_REALM = re.compile(r"^CAMWOW\s+(US|EU|KR|TW)\d*\s+(?:Realm|서버)\s+\d+\s+(RP PvP|PvP|PvE|RP)$", re.I)
+
+
+def forever_seen_realm(db, body, region):
+    """The realm of a blank-named Forever bucket from the characters it saw: the census already
+    places many of them on one realm, and /who only shows realms of the player's own ruleset pool.
+    At least 3 such characters and 90% of them in one region and ruleset, or None."""
+    names = sorted({c["n"] for c in body.get("characters") or [] if c.get("n")})
+    if not names:
+        return None
+    votes = {}
+    for name, realms in db.execute(
+            """SELECT name, array_agg(DISTINCT realm) FROM characters_with_region
+               WHERE source_game='forever' AND collection_region=? AND realm LIKE 'CAMWOW%' AND name = ANY(?)
+               GROUP BY name""", (region, names)).fetchall():
+        if len(realms) == 1 and FOREVER_REALM.match(realms[0]):
+            votes[realms[0]] = votes.get(realms[0], 0) + 1
+    total = sum(votes.values())
+    groups = {}
+    for realm, n in votes.items():
+        m = FOREVER_REALM.match(realm)
+        groups.setdefault((m.group(1).lower(), m.group(2).lower()), []).append((n, realm))
+    if total < 3 or not groups:
+        return None
+    best = max(groups.values(), key=lambda g: sum(n for n, _ in g))
+    if sum(n for n, _ in best) < 0.9 * total:
+        return None
+    realm = max(best)[1]
+    known = db.execute("""SELECT realm_id, realm_normalized FROM census_collection_realms
+        WHERE source_game='forever' AND region=? AND realm_name=? AND realm_id IS NOT NULL LIMIT 1""",
+                       (region, realm)).fetchone()
+    return (known[0], realm, known[1]) if known else (None, realm, None)
+
+
 def population_times(body):
     """Every collection time in an exported population bucket (samples, sightings, sweeps)."""
     times = [int(s["t"]) for s in body.get("samples") or [] if s.get("t")]
@@ -255,6 +321,10 @@ def main():
     parser.add_argument("--schema", default="marketlens_import")
     parser.add_argument("--archive", type=Path, default=DATA_ROOT / "imports", help="where changed save files are copied")
     parser.add_argument("--allow-beta-import", action="store_true", help="explicitly import additional beta saves after the Forever launch cutoff")
+    parser.add_argument("--recheck-blank-forever", action="store_true",
+                        help="reopen already imported WoWCensus saves that hold a Forever bucket with a blank realm "
+                             "(us:forever:-Horde); buckets already imported stay skipped, the rest get their realm "
+                             "from the save's own characters")
     args = parser.parse_args()
 
     conn = psycopg2.connect(args.dsn)
@@ -333,6 +403,11 @@ def main():
                 digest = sha256_bytes(data)
                 relative = path.relative_to(args.game_root)
                 copy = run_dir / relative
+                recheck = (args.recheck_blank_forever and kind == "market" and path.name == "WoWCensus.lua"
+                           and re.search(rb'\["(?:us|eu|kr|tw|cn):forever:-(?:Alliance|Horde|Neutral)"\]', data))
+                if recheck and digest in imported:
+                    copy.parent.mkdir(parents=True, exist_ok=True)
+                    copy.write_bytes(data)
                 if digest not in imported:
                     copy.parent.mkdir(parents=True, exist_ok=True)
                     copy.write_bytes(data)
@@ -340,7 +415,7 @@ def main():
                         digest, relative.as_posix(),
                         datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat(),
                         len(data)))
-                client[kind] = {"path": copy, "sha256": digest, "new": digest not in imported, "relative": relative.as_posix()}
+                client[kind] = {"path": copy, "sha256": digest, "new": digest not in imported or bool(recheck), "relative": relative.as_posix()}
                 if relative not in recorded_files:
                     report["files"].append({"file": relative.as_posix(), "sha256": digest, "new": digest not in imported})
                     recorded_files.add(relative)
@@ -445,10 +520,29 @@ def main():
                         note = f"{source} {bucket} is labelled {region.upper()} but the client reported {reported.upper()} (region ID {identity['regionID']})"
                         report["errors"].append(note)
                         print(f"WARNING {note}", flush=True)
+                    recovered = None
+                    if identity.get("game") == "forever" and not identity.get("realmName"):
+                        # WoWCensus before 0.1.16 could read Forever's realm name while it was still empty.
+                        recovered = forever_own_realm(db, market["path"], region, identity.get("faction"))
+                        how = "the save's own characters are on"
+                        if not recovered:
+                            recovered = forever_seen_realm(db, body, region)
+                            how = "the characters it saw are on"
+                        if not recovered:
+                            note = f"{source} {bucket}: skipped, the realm name is blank and neither the save's own characters nor the characters it saw name one realm"
+                            report["errors"].append(note)
+                            print(f"WARNING {note}", flush=True)
+                            result[kind] = "skipped: realm name is blank"
+                            continue
+                        identity["realmID"], identity["realmName"], identity["realmNormalized"] = recovered
+                        body["identity"] = identity
+                        db_bucket = f'{region}:forever:{identity["realmName"]}-{identity.get("faction") or "Neutral"}'
+                        result.update(bucket=db_bucket, recordedBucket=bucket)
+                        print(f"{flavor:18} {bucket}: blank realm; {how} {identity['realmName']}, importing as {db_bucket}", flush=True)
                     if identity.get("game") not in ("retail", "classic-era", "sod", "hardcore", "mop-classic", "tbc-anniversary", "classic-beta", "forever") or not identity.get("realmName"):
                         raise RuntimeError(f"Invalid WoWCensus collection identity in {bucket}")
                     expected = f'{region}:{identity["game"]}:{identity["realmName"]}-{identity.get("faction") or "Neutral"}'
-                    if bucket != expected:
+                    if bucket != expected and not recovered:
                         raise RuntimeError(f"WoWCensus bucket does not match collection identity: {bucket}")
                     body["game"] = "realm:" + db_bucket
                     db.execute("""INSERT INTO census_collection_realms
