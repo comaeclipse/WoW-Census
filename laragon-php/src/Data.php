@@ -584,8 +584,10 @@ function load_inspects(string $source): array {
     WHERE i.source_game=? AND i.captured_at>=? ORDER BY i.captured_at DESC,i.guid COLLATE "C" LIMIT 10001',
     [$source, $source, $end - INSPECT_WINDOW_DAYS * 86400]);
   $truncated = count($rows) > 10000;
-  $records = [];
-  foreach (array_slice($rows, 0, 10000) as $r) {
+  $records = []; $shared = [];
+  // Raw rows are let go as they are read, and equal gear items, builds and strings are kept once.
+  for ($n = 0, $c = min(count($rows), 10000); $n < $c; $n++) {
+    $r = $rows[$n]; $rows[$n] = null;
     $e = ['class' => $r['class_file'], 'spec' => $r['raw_spec_id'], 'list' => json_decode($r['nodes_json'], true)];
     $build = describe_build($e, $source);
     $game = $r['game'];
@@ -598,6 +600,12 @@ function load_inspects(string $source): array {
       foreach (json_decode($r['gear_json'], true) as $g)
         $gear[] = ['slot' => $g['slot'] ?? null, 'id' => $g['id'] ?? null, 'name' => $g['name'] ?? null, 'quality' => $g['quality'] ?? null, 'enchant' => $g['enchant'] ?? null,
           'rune' => $source === 'sod' ? gear_rune($g) : null];
+    foreach ($gear as $i => $g) $gear[$i] = $shared['g' . serialize($g)] ??= $g;
+    foreach ($build['talents'] ?? [] as $i => $t) $build['talents'][$i] = $shared['t' . serialize($t)] ??= $t;
+    foreach ($build as $k => $v) if (is_array($v)) $build[$k] = $shared['b' . $k . md5(serialize($v))] ??= $v;
+    foreach (['guild', 'realm', 'faction', 'game', 'collection_region'] as $k) if (is_string($r[$k])) $r[$k] = $shared['s' . $r[$k]] ??= $r[$k];
+    if (is_string($realm)) $realm = $shared['s' . $realm] ??= $realm;
+    if (is_string($faction)) $faction = $shared['s' . $faction] ??= $faction;
     $records[] = ['name' => $r['name'], 'rawName' => $r['raw_name'], 'classFile' => $r['class_file'], 'race' => $r['race'], 'level' => $r['level'],
       'guild' => ($r['guild'] ?? '') !== '' ? $r['guild'] : null, 'time' => $r['captured_at'],
       'realm' => $realm, 'region' => $r['collection_region'], 'faction' => $faction,
@@ -662,8 +670,12 @@ function forever_armory_gear(): array {
     if (in_array($e->getCode(), ['42P01', '42703'], true)) return [];
     throw $e;
   }
-  $out = [];
-  foreach ($rows as $r) $out[$r['region'] . ':' . $r['character_id']] = armory_gear(json_decode($r['items'] ?: '[]', true) ?: []);
+  $out = []; $shared = [];
+  foreach ($rows as $r) {
+    $gear = armory_gear(json_decode($r['items'] ?: '[]', true) ?: []);
+    foreach ($gear as $i => $g) $gear[$i] = $shared[serialize($g)] ??= $g;
+    $out[$r['region'] . ':' . $r['character_id']] = $gear;
+  }
   return $out;
 }
 
@@ -690,26 +702,12 @@ function forever_armory_talent_records(): array {
     if (isset($t['definition'])) $definitions[(string)$t['definition']] = $t;
     if (isset($t['spell'])) $spells[(string)$t['spell']] = $t;
   }
-  $chosen = []; $groups = [];
-  foreach ($rows as $r) {
-    $id = $r['region'] . ':' . $r['character_id'];
-    if (!isset($chosen[$id])) $chosen[$id] = (int)$r['group_index'];
-    if ((int)$r['group_index'] !== $chosen[$id]) continue;
-    $groups[$id] ??= ['row' => $r, 'list' => []];
-    foreach (json_decode($r['talents'] ?: '[]', true) ?: [] as $t) {
-      $mapped = $definitions[(string)($t['id'] ?? '')] ?? $spells[(string)($t['spell_id'] ?? '')] ?? null;
-      $groups[$id]['list'][] = [
-        'node' => $mapped['node'] ?? ('definition:' . js_string($t['id'] ?? 'unknown')),
-        'rank' => (int)($t['rank'] ?? 0), 'max' => (int)($mapped['max'] ?? max(1, (int)($t['rank'] ?? 1))),
-        'spell' => isset($t['spell_id']) ? (int)$t['spell_id'] : null,
-        'name' => $t['name'] ?? ($mapped['name'] ?? 'Unknown talent'),
-      ];
-    }
-  }
+  // Rows come ordered by character, so each character's record is built as soon as its rows are read:
+  // every decoded talent list held at once took ~150 MB of the 512 MB web worker.
   $records = [];
-  foreach ($groups as $id => $g) {
+  $emit = function (string $id, array $g) use (&$records, &$shared, $classFiles, &$gearById): void {
     $r = $g['row']; $classFile = $classFiles[js_lower((string)$r['class_name'])] ?? null;
-    if ($classFile === null) continue;
+    if ($classFile === null) return;
     $build = describe_build(['class' => $classFile, 'list' => $g['list']], 'forever');
     $time = strtotime((string)($r['last_login_at'] ?: $r['fetched_at'])) ?: 0;
     $gear = $gearById[$id] ?? [];
@@ -723,7 +721,27 @@ function forever_armory_talent_records(): array {
       'faction' => $r['faction'], 'matchStatus' => 'armory', 'game' => null,
       'characterKey' => 'armory:' . $r['region'] . ':' . $r['character_id'], 'importString' => null,
       'rawSpecID' => null, 'rawRole' => null, 'gear' => $gear, 'provenance' => 'armory'] + $build;
+  };
+  $id = null; $group = null; $chosen = null;
+  for ($n = 0, $c = count($rows); $n < $c; $n++) {
+    $r = $rows[$n]; $rows[$n] = null;
+    $rid = $r['region'] . ':' . $r['character_id'];
+    if ($rid !== $id) {
+      if ($group !== null) $emit($id, $group);
+      $id = $rid; $chosen = (int)$r['group_index']; $group = ['row' => $r, 'list' => []];
+    }
+    if ((int)$r['group_index'] !== $chosen) continue;
+    foreach (json_decode($r['talents'] ?: '[]', true) ?: [] as $t) {
+      $mapped = $definitions[(string)($t['id'] ?? '')] ?? $spells[(string)($t['spell_id'] ?? '')] ?? null;
+      $group['list'][] = [
+        'node' => $mapped['node'] ?? ('definition:' . js_string($t['id'] ?? 'unknown')),
+        'rank' => (int)($t['rank'] ?? 0), 'max' => (int)($mapped['max'] ?? max(1, (int)($t['rank'] ?? 1))),
+        'spell' => isset($t['spell_id']) ? (int)$t['spell_id'] : null,
+        'name' => $t['name'] ?? ($mapped['name'] ?? 'Unknown talent'),
+      ];
+    }
   }
+  if ($group !== null) $emit($id, $group);
   return $records;
 }
 
