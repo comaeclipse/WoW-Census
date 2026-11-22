@@ -11,6 +11,7 @@ namespace Wow2008;
  *   stamp           optional text for the dark date box (top right)
  *   stamp_id        optional id for the date box, when a page script fills it in
  *   seen            optional seen_activity() result, drawn bottom right (components/seen.php)
+ *   icon            optional icon URL, drawn before the title
  */
 // Echo the rotating image banners used by the original site's Flash-era headers.
 $paintedBanners = ['census', 'realms', 'auction-house', 'guilds', 'geography', 'talents', 'gear', 'molten-core', 'moonbrook', 'lava-dragon'];
@@ -36,7 +37,7 @@ $randomBanner = in_array($art, $fixedBanners, true) ? $art
 <div class="stamp"<?= isset($stamp_id) ? ' id="' . e($stamp_id) . '"' : '' ?>><?= e($stamp ?? '') ?></div>
 <?php endif; ?>
 <div class="t">
-<h1><?= e($title) ?></h1>
+<h1><?php if (!empty($icon)): ?><img src="<?= e($icon) ?>" alt="" width="40" height="40" style="width:40px;height:40px;margin-right:12px;vertical-align:-7px;border:1px solid #b08a40;border-radius:4px;box-shadow:0 2px 6px #000"><?php endif; ?><?= e($title) ?></h1>
 <div<?= isset($subtitle_color) ? ' style="color:' . e($subtitle_color) . '"' : '' ?>><?= e($subtitle) ?></div>
 </div>
 <?php if (!empty($seen)): ?>

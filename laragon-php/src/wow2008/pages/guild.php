@@ -16,7 +16,7 @@ namespace Wow2008;
     <div class="tiles">
       <?= component('stat', ['label' => 'Members seen', 'value' => fmt(count($members)), 'note' => 'latest known guild is this one']) ?>
       <?= component('stat', ['label' => 'Average level', 'value' => (string)$avgLevel, 'note' => 'highest seen ' . $maxLevel]) ?>
-      <?= component('stat', ['label' => 'Inspected', 'value' => fmt($inspected), 'note' => 'members with a known spec']) ?>
+      <?= component('stat', ['label' => $armorySpecs ? 'Armory Builds' : 'Inspected', 'value' => fmt($inspected), 'note' => 'members with a known spec']) ?>
       <?= component('stat', ['label' => 'First seen', 'value' => $firstSeen, 'value_style' => 'font-size:15px;line-height:26px', 'note' => 'earliest member sighting']) ?>
     </div>
 
@@ -26,7 +26,7 @@ namespace Wow2008;
     <?php component_end() ?>
 
     <?php component_start('section', ['title' => 'Specs & Levels', 'icon' => 'p', 'body_class' => 'cols2']) ?>
-        <div class="panel"><h5 style="color:#ffd75a">Specs <small><?= e(fmt($inspected)) ?> inspected</small></h5><div class="bars wide" id="gSpec"></div></div>
+        <div class="panel"><h5 style="color:#ffd75a">Specs <small><?= e(fmt($inspected)) ?> <?= $armorySpecs ? 'Armory builds' : 'inspected' ?></small></h5><div class="bars wide" id="gSpec"></div></div>
         <div class="panel"><h5 style="color:#ffd75a">Levels <small>members seen</small></h5><div class="bars" id="gLevel"></div></div>
     <?php component_end() ?>
 
@@ -49,10 +49,10 @@ namespace Wow2008;
           <tbody id="mrows"></tbody>
         </table>
         <div class="pager" id="mpager"></div>
-        <p class="tfoot">Members are characters found in /who results whose most recent sighting showed this guild tag. Zone and level are from that sighting. Specs come from inspections and are counted for the guild, not listed per character.</p>
+        <p class="tfoot">Members are characters found in /who results whose most recent sighting showed this guild tag. Zone and level are from that sighting. <?= $armorySpecs ? 'Specs use each character’s active Blizzard Armory build.' : 'Specs come from inspections and are counted for the guild, not listed per character.' ?></p>
     <?php component_end() ?>
 
-    <div class="source">Guild data from in-game /who samples and inspections · last member seen <?= e($lastSeen) ?></div>
+    <div class="source">Guild data from in-game /who samples and <?= $armorySpecs ? 'Blizzard Armory' : 'inspections' ?> · last member seen <?= e($lastSeen) ?></div>
   </main>
 
 <?php start_section('scripts') ?>
@@ -61,13 +61,14 @@ namespace Wow2008;
 const MEMBERS = <?= js($members) ?>;
 const CLASSES = <?= js($classes) ?>, RACES = <?= js($races) ?>, BANDS = <?= js($bands) ?>;
 const SPECS = <?= js($specs) ?>;
+const armorySpecs = <?= js($armorySpecs) ?>;
 const COLOR = <?= js($classColor) ?>;
 const ALLIANCE_RACES = <?= js($allianceRaces) ?>;
 const PER = 50;
 
 // ---------- Breakdowns ----------
 function countBars(el, rows, tip) {
-  if (!rows.length) { el.innerHTML = '<p class="tfoot" style="color:#a8a8a8">No inspections of these members yet.</p>'; return; }
+  if (!rows.length) { el.innerHTML = '<p class="tfoot" style="color:#a8a8a8">No data available yet.</p>'; return; }
   const max = Math.max(...rows.map(r => r[1]));
   el.innerHTML = rows.map(([n, c, col]) => `<div class="bar" data-tip="${esc(shortRace(n))}|${fmt(c)} ${c === 1 ? 'character' : 'characters'}|${tip(c)}">
     <span class="lbl" style="color:${col}">${esc(shortRace(n))}</span>
@@ -81,7 +82,7 @@ countBars(document.getElementById('gRace'), Object.entries(RACES).map(([n, c]) =
 countBars(document.getElementById('gLevel'), Object.entries(BANDS).map(([n, c]) => ['Level ' + n, c, '#c9a050']), pct);
 const inspected = SPECS.reduce((a, s) => a + s[2], 0);
 countBars(document.getElementById('gSpec'), SPECS.map(([cls, spec, c]) => [`${spec} ${cls}`, c, COLOR[cls]]),
-  c => (c / inspected * 100).toFixed(1) + '% of inspected members');
+  c => (c / inspected * 100).toFixed(1) + (armorySpecs ? '% of members with an Armory build' : '% of inspected members'));
 
 // ---------- Roster ----------
 const mclass = document.getElementById('mclass');

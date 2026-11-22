@@ -815,13 +815,7 @@ function character_armory_records(string $source): array {
     $activeID = (int)($specs['active_specialization']['id'] ?? 0);
     $list = [];
     if ($retail) {
-      $activeSpec = null;
-      foreach ($specs['specializations'] ?? [] as $spec)
-        if ((int)($spec['specialization']['id'] ?? 0) === $activeID) { $activeSpec = $spec; break; }
-      $activeSpec ??= $specs['specializations'][0] ?? [];
-      $loadout = null;
-      foreach ($activeSpec['loadouts'] ?? [] as $candidate) if (!empty($candidate['is_active'])) { $loadout = $candidate; break; }
-      $loadout ??= $activeSpec['loadouts'][0] ?? [];
+      $loadout = retail_armory_loadout($specs);
       foreach ([['selected_class_talents','Class'], ['selected_spec_talents',$specs['active_specialization']['name'] ?? 'Specialization'],
         ['selected_hero_talents',$loadout['selected_hero_talent_tree']['name'] ?? 'Hero']] as [$key,$branch])
         foreach ($loadout[$key] ?? [] as $t) {

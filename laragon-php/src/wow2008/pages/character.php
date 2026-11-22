@@ -121,7 +121,7 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
 
     <div class="tiles">
       <?= component('stat', ['label' => 'Item level', 'value' => (string)($c['ilvl'] ?? '—'), 'note' => 'equipped average']) ?>
-      <?= component('stat', ['label' => 'Talents', 'value' => $c['build'] ?: '—', 'note' => $c['mainTree'] ? 'mostly ' . $c['mainTree'] : 'no points spent']) ?>
+      <?= component('stat', ['label' => 'Talents', 'value' => $c['build'] ?: '—', 'note' => !$c['trees'] ? 'talent data unavailable' : ($c['activeSpec'] ?? ($c['mainTree'] ? 'mostly ' . $c['mainTree'] : 'no points spent'))]) ?>
       <?= component('stat', ['label' => 'Honorable kills', 'value' => fmt($c['pvp']['hks']), 'note' => $c['pvp']['rank'] ? 'PvP rank ' . $c['pvp']['rank'] : 'lifetime']) ?>
       <?= component('stat', ['label' => 'Last login', 'value' => $c['lastLogin'] ? gmdate('M j, Y', $c['lastLogin']) : '—', 'value_style' => 'font-size:15px;line-height:26px', 'note' => 'Armory read ' . gmdate('M j, Y', $c['fetched'])]) ?>
     </div>
@@ -161,7 +161,7 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
             <td><span class="cp-meter"><i style="width:<?= $p['max'] ? round($p['skill'] / $p['max'] * 100) : 0 ?>%"></i><em><?= e($p['skill']) ?> / <?= e($p['max']) ?></em></span></td>
             <td class="num"><?= $p['recipes'] ? fmt($p['recipes']) : '' ?></td></tr>
           <?php endforeach; ?>
-          <?php if (!$c['professions']): ?><tr><td colspan="3">No professions learned.</td></tr><?php endif; ?>
+          <?php if (!$c['professions']): ?><tr><td colspan="3"><?= ($c['professionsAvailable'] ?? true) ? 'No professions learned.' : 'Profession data unavailable.' ?></td></tr><?php endif; ?>
         </table>
       </div>
       <div><h4>Battlegrounds · <?= fmt($c['pvp']['hks']) ?> honorable kills<?= $c['pvp']['rank'] ? ' · rank ' . e($c['pvp']['rank']) : '' ?></h4>

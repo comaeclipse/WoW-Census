@@ -29,6 +29,11 @@ namespace Wow2008;
         <p class="shared" id="shared" style="margin:10px 2px 0"></p>
     <?php component_end() ?>
 
+    <?php if ($combat !== ''): ?>
+      <?php component_start('section', ['title' => 'Combat logs', 'icon' => 'p', 'id' => 'combat']) ?>
+        <?= $combat ?>
+      <?php component_end() ?>
+    <?php endif ?>
   </main>
 
 <?php start_section('scripts') ?>

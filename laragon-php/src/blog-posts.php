@@ -46,6 +46,13 @@ The biggest story is the new races. High Order Skyborne made up 16.6% of the All
 Classes are spread far more evenly than races. Every class is between 9% and 14% of its faction. Hunters (13.9%) and Druids (13.5%) are the most popular Alliance picks. On the Horde side, Shamans lead at 13.7%, against just 10.0% on the Alliance. Alliance players lean toward Mages and Paladins, while the Horde has more Warlocks, Rogues and Warriors. We'll keep scanning as people level up and settle on their mains. Follow along at wowcensus.io/forever to see whether the Skyborne novelty holds up and how the class mix shifts once people start reaching max level.
 TEXT,
     ],
+    8 => [
+        'date' => '2026-11-21',
+        'category' => 'site-news',
+        'title' => 'Character pages are coming to every edition',
+        'body' => "Character pages are rolling out across every edition we track, from Classic Era and TBC Anniversary to Retail. See anyone's gear, talents, professions, stats and reputations, with links to who else wears each item.",
+        'html_file' => 'blog-character-pages.html',
+    ],
     7 => [
         'date' => '2026-11-17',
         'category' => 'daily-recap',

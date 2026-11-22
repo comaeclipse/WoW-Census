@@ -61,6 +61,10 @@ function route_request(string $path): ?array {
     $page = forever_dungeons_html(($m[1] ?? '') !== '' ? $m[1] : null, edition_path(DUNGEON_SOURCE) . $cssName);
     return $page === null ? null : [$html, localize_content($page)];
   }
+  if (preg_match('#^/forever/spell/([1-9][0-9]{0,9})/?$#', $path, $m)) {
+    $page = forever_spell_html((int)$m[1], edition_path(DUNGEON_SOURCE) . $cssName);
+    return $page === null ? null : [$html, localize_content($page)];
+  }
   // WoW: Forever bestiary and dungeon bosses: /forever/npc/ and /forever/npc/<slug>/. A dungeon boss keeps
   // its journal page; any other mob measured in combat logs gets a bestiary page.
   if (preg_match('#^/forever/npc/?(?:index\.html)?$#', $path)) {
