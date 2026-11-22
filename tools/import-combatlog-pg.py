@@ -5,9 +5,11 @@
 With no LOG, every WoWCombatLog*.txt in the Forever client's Logs folder is read. The log must be
 written with Advanced Combat Logging on: that is where a unit's level, health and armor come from.
 
-Only creatures are kept. A combat log also records every player the client could see nearby
+By default only creatures are kept. A combat log also records every player the client could see nearby
 (their casts, buffs and fights); none of that is stored, and no player name or GUID reaches the
-database. What a mob does to players is kept only as its damage numbers.
+database. Every log also yields anonymous class/spell totals (combatlog_class_spells, see
+tools/combatlog-player-stats.py: class is inferred from class-exclusive casts, which works on
+companion uploads too); --class-stats rebuilds only those totals. Player names and GUIDs are never stored.
 
 A log grows while the game runs, so each file is keyed by a hash of its first line plus its
 file name; importing it again replaces that file's rows instead of adding to them.
@@ -247,30 +249,49 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--game", default=SOURCE_GAME, choices=GAMES,
                     help="site game key the logs belong to (default forever)")
+    ap.add_argument("--class-stats", action="store_true", help="rebuild only the class/spell totals of the given logs")
     args = ap.parse_args()
     SOURCE_GAME = args.game
+    if args.class_stats and not args.logs:
+        ap.error("--class-stats requires explicit log paths")
+    player_stats = _load("combatlog_player_stats", "combatlog-player-stats.py")
+    class_only = args.class_stats
     logs = args.logs or sorted(LOGS.glob("WoWCombatLog*.txt"))
 
     conn = pg.psycopg2.connect(args.dsn)
     conn.autocommit = False
     cur = conn.cursor()
-    cur.execute("SELECT pg_advisory_lock(hashtext('marketlens-import'))")
+    cur.execute("SELECT pg_advisory_lock(hashtext(%s))",
+                ("marketlens-combat-class" if class_only else "marketlens-import",))
     conn.commit()
-    schema(cur)
+    if not class_only:
+        schema(cur)
+    known = player_stats.known_spells(cur, SOURCE_GAME)
     report = {"files": [], "dryRun": args.dry_run}
     for path in logs:
         d = read_log(path)
         entry = {"file": path.name, "events": d["events"], "mobs": len(d["names"]),
                  "mobsWithLevels": len({n for n, _ in d["levels"]}), "advanced": d["header_ok"]}
-        if not d["header_ok"] or not d["levels"]:
-            entry["skipped"] = "Advanced Combat Logging was off" if not d["header_ok"] else "no mob data"
+        if not d["header_ok"]:
+            entry["skipped"] = "Advanced Combat Logging was off"
         else:
-            store(cur, file_key(path), d)
+            if not class_only and d["levels"]:
+                store(cur, file_key(path), d)
+            elif not class_only:
+                entry["mobData"] = "none"
+            totals = player_stats.aggregate(path, npc_id, to_int, ADV_LEN, known)
+            player_stats.store(cur, file_key(path), SOURCE_GAME, totals)
+            entry["classSpellRows"] = len(totals)
+            entry["classEvents"] = {c: n for c, n in sorted(
+                {c: sum(v[0] for k, v in totals.items() if k[0] == c) for c in {k[0] for k in totals}}.items())}
+            if not d["levels"] and not totals:
+                entry["skipped"] = "no mob or class data"
         report["files"].append(entry)
-    cur.execute("SELECT count(*), count(DISTINCT npc_id) FROM marketlens_import.combatlog_npc_names")
-    rows, mobs = cur.fetchone()
-    cur.execute("SELECT count(*) FROM marketlens_import.combatlog_files")
-    report.update({"logsTotal": cur.fetchone()[0], "mobsTotal": mobs})
+    if not class_only:
+        cur.execute("SELECT count(DISTINCT npc_id) FROM marketlens_import.combatlog_npc_names")
+        mobs = cur.fetchone()[0]
+        cur.execute("SELECT count(*) FROM marketlens_import.combatlog_files")
+        report.update({"logsTotal": cur.fetchone()[0], "mobsTotal": mobs})
     print(json.dumps(report, indent=1))
     if args.dry_run:
         conn.rollback()
