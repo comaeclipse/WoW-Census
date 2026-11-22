@@ -151,6 +151,8 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-new{display:inline-block;font-size:10px;font-weight:bold;letter-spacing:.05em;padding:1px 5px;border-radius:3px;background:#2a64c0;color:#fff;vertical-align:middle;margin-left:6px}
 .dg-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:10px}
 .dg-head img{width:56px;height:56px;border:1px solid rgba(0,0,0,.6);flex:none}
+.dg-npc-heading{align-items:center}
+.dg-npc-heading .iname{margin:0}
 .dg-meta{margin:2px 0;opacity:.85}
 .dg-boss{margin:14px 0;padding:10px 12px;border:1px solid rgba(255,255,255,.1);border-radius:4px}
 .dg-boss h3{margin:0 0 4px;font-size:16px}
@@ -234,6 +236,15 @@ function forever_npc_slug_by_id(int $npcId): ?string {
   return $ids[$npcId] ?? null;
 }
 
+function forever_npc_subtitle(array $n): string {
+  $boss = $n['boss'];
+  return implode(' · ', array_filter([
+    $boss['level'] ? 'Level ' . $boss['level'] : null,
+    $boss['rare'] ? 'Rare spawn' : 'Boss',
+    $n['dungeon']['name'],
+  ]));
+}
+
 function forever_npc_body(array $n): string {
   $b = $n['boss'];
   $d = $n['dungeon'];
@@ -274,12 +285,9 @@ function forever_npc_body(array $n): string {
     ($next ? '<a href="' . esc(forever_npc_path(forever_npc_slug($next['name']))) . '">' . esc($next['name']) . ' &raquo;</a>' : '<span></span>') . '</nav>';
 
   return '<div class="panel census dg-npc">' .
-    '<div class="dg-head"><img src="' . esc(forever_dungeon_icon($d['icon'], 'large')) . '" alt=""><div><div class="ptitle" style="margin:0">' . esc($b['name']) .
-    ($b['rare'] ? '<span class="dg-rare">RARE</span>' : '') . '</div><p class="dg-meta">' .
-    esc(implode(' · ', array_filter([$b['level'] ? 'Level ' . $b['level'] : null, $b['rare'] ? 'Rare spawn' : 'Boss', $d['name']]))) . '</p>' .
-    ($b['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($b['description']) . '</p>' : '') . '</div></div>' .
+    ($b['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($b['description']) . '</p>' : '') .
     '<div class="dg-npc-grid"><div>' .
-    $encounter . forever_dungeon_quests_html($quests, true) .
+    $encounter .
     '<section class="dg-boss"><h3>Loot</h3>' .
     ($loot !== '' ? '<table class="dg-loot"><tbody>' . $loot . '</tbody></table>' : '<p class="hint">No loot listed yet.</p>') .
     ($obs || $runs ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '</section>' .
@@ -288,7 +296,8 @@ function forever_npc_body(array $n): string {
     '<section class="dg-boss"><h3>Details</h3><table class="dg-facts"><tbody>' . $factRows . '</tbody></table></section>' .
     '<section class="dg-boss"><h3>In ' . esc($d['name']) . '</h3><ol class="dg-roster">' . $others . '</ol></section>' .
     '</aside></div>' . $nav .
-    '<p class="dg-credit">' . forever_dungeon_credit() . '</p></div>';
+    '<p class="dg-credit">' . forever_dungeon_credit() . '</p></div>' .
+    forever_dungeon_quests_html($quests, true);
 }
 
 /** The plain NPC page (the default skins); the 2008 skin frames its body. */
@@ -303,7 +312,9 @@ function forever_npc_html(string $slug, string $stylesheet): ?string {
   $desc = $b['name'] . ($b['rare'] ? ', a rare spawn' : '') . ' in ' . $d['name'] . ' (' . $label . ')' . ($b['level'] ? ', level ' . $b['level'] : '') .
     ': ' . count($b['loot']) . ' listed drops' . ($b['loot'] ? ', including ' . implode(', ', array_map(fn($i) => $i['name'], array_slice($b['loot'], 0, 3))) : '') . '.';
   $seo = seo_head($title . ' – WoWCensus', $desc, SITE_ORIGIN . forever_npc_path($slug));
-  $heading = page_heading('WoWCensus', $navigation, $b['name']);
+  $heading = '<div class="dg-head dg-npc-heading"><img src="' . esc(forever_dungeon_icon($d['icon'], 'large')) .
+    '" alt=""><div><h1 class="iname">' . esc($b['name']) . '</h1><p class="dg-meta">' .
+    esc(forever_npc_subtitle($n)) . '</p></div></div>';
   $css = esc($stylesheet);
   $census_css = CENSUS_STYLESHEET;
   $style = DUNGEON_STYLE . BESTIARY_STYLE;
@@ -338,7 +349,9 @@ function forever_dungeon_item_link(array $it, ?string $url = null): string {
 
 function forever_dungeon_quests_html(array $quests, bool $onBoss = false): string {
   if (!$quests) return '';
-  $html = '<section class="dg-boss dg-quests"><h3>' . ($onBoss ? 'Related Quests' : 'Quests') . '</h3>';
+  $html = $onBoss
+    ? '<section class="panel census dg-quests"><h2 class="ptitle">Related Quests</h2>'
+    : '<section class="dg-boss dg-quests"><h3>Quests</h3>';
   foreach ($quests as $quest) {
     $name = esc($quest['name']);
     if ($quest['id']) $name = '<a href="https://www.wowhead.com/forever/quest=' . (int)$quest['id'] . '">' . $name . '</a>';

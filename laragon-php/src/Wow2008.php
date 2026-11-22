@@ -275,8 +275,11 @@ function render_page(string $html, string $path): string {
   }
   if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m) && isset(\forever_npcs()[$m[1]])) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
+    $npc = \forever_npcs()[$m[1]];
+    $dungeon = $npc['dungeon'];
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . \BESTIARY_STYLE . '</style></head>', $html);
-    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art(\forever_npcs()[$m[1]]['dungeon']['slug']), \forever_npcs()[$m[1]]['boss']['name']);
+    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art($dungeon['slug']), $npc['boss']['name'],
+      subtitle: \forever_npc_subtitle($npc), icon: \forever_dungeon_icon($dungeon['icon'], 'large'));
   }
   if (preg_match('#^/forever/npc(?:/([a-z0-9-]+))?/?(?:index\.html)?$#', $path, $m)
       && (($m[1] ?? '') === '' || isset(\forever_bestiary()[$m[1]]))) {
