@@ -392,17 +392,47 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     <?php component_end() ?>
 <?php endif ?>
 
+<?php
+// Journal bosses take their Journalator drop rate into the Dungeon Drop table; Where It Drops keeps the rest.
+$rateFor = function (array $r): string {
+  $small = $r['windows'] < LOOT_SMALL_SAMPLE;
+  return '<span class="it-rate' . ($small ? ' early' : '') . '" title="' . ($small ? 'Early estimate: fewer than ' . LOOT_SMALL_SAMPLE . ' ' . ($r['kind'] === 'quest' ? 'turn-ins' : 'loots') . ' logged' : '') . '">'
+    . '<i style="width:' . max(2, (int)round(100 * $r['rate'])) . '%"></i><b>'
+    . ($r['rate'] < 0.1 ? preg_replace('/\.0$/', '', number_format(100 * $r['rate'], 1)) : (int)round(100 * $r['rate'])) . '%</b></span>';
+};
+$bossLoot = [];
+if (!empty($item['dungeon']) && $loot) {
+  $npcs = \forever_npcs();
+  $bossIds = [];
+  foreach ($item['dungeon'] as $src)
+    if ($src['boss'] !== null && ($id = (int)($npcs[\forever_npc_slug($src['boss'])]['boss']['npcID'] ?? 0))) $bossIds[$id] = $src['boss'];
+  $rest = [];
+  foreach ($loot['rows'] as $r) {
+    if ($r['kind'] === 'npc' && isset($bossIds[$r['id']])) $bossLoot[$bossIds[$r['id']]] = $r;
+    else $rest[] = $r;
+  }
+  $loot = $rest ? ['rows' => $rest, 'windows' => array_sum(array_column($rest, 'windows')), 'drops' => array_sum(array_column($rest, 'drops'))] : null;
+}
+?>
 <?php if (!empty($item['dungeon'])): ?>
-    <?php component_start('section', ['title' => 'Dungeon Drop', 'icon' => 'p', 'sub' => 'from the Dungeon Journal add-on\'s boss loot lists', 'style' => 'margin-top:16px']) ?>
+    <?php component_start('section', ['title' => 'Dungeon Drop', 'icon' => 'p', 'sub' => 'from the Dungeon Journal add-on\'s boss loot lists' . ($bossLoot ? ', drop rates from players\' Journalator logs' : ''), 'style' => 'margin-top:16px']) ?>
         <table class="ahtable it-loot">
-          <thead><tr><th>Dropped by</th><th>Dungeon</th></tr></thead>
+          <thead><tr><th>Dropped by</th><th>Dungeon</th><th class="num">Drop rate</th><th class="num">Dropped</th><th class="num">Looted</th></tr></thead>
           <tbody>
-<?php foreach ($item['dungeon'] as $src): ?>
+<?php foreach ($item['dungeon'] as $src): $r = $src['boss'] !== null ? ($bossLoot[$src['boss']] ?? null) : null; ?>
             <tr><td><?= $src['boss'] !== null ? '<a href="' . e(\forever_npc_path(\forever_npc_slug($src['boss']))) . '">' . e($src['boss']) . '</a>' : 'Trash' . (!empty($src['from']) ? ' <span class="kind">(' . e($src['from']) . ')</span>' : '') ?></td>
-              <td><a href="<?= e(\forever_dungeon_path($src['slug'])) ?>"><?= e($src['dungeon']) ?></a></td></tr>
+              <td><a href="<?= e(\forever_dungeon_path($src['slug'])) ?>"><?= e($src['dungeon']) ?></a></td>
+<?php if ($r): ?>
+              <td class="num"><?= $rateFor($r) ?></td><td class="num"><?= fmt($r['drops']) ?></td><td class="num"><?= fmt($r['windows']) ?></td></tr>
+<?php else: ?>
+              <td class="num"><span class="dim" title="No player has logged looting this yet">—</span></td><td class="num">—</td><td class="num">—</td></tr>
+<?php endif ?>
 <?php endforeach ?>
           </tbody>
         </table>
+<?php if ($bossLoot): ?>
+        <p class="tfoot">Drop rate is how often looting that boss gave this item, out of every time a player's Journalator logged looting it. Faded rates come from fewer than <?= LOOT_SMALL_SAMPLE ?> loots and will settle as more players upload.</p>
+<?php endif ?>
     <?php component_end() ?>
 <?php endif ?>
 
@@ -413,11 +443,11 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
         <table class="ahtable it-loot">
           <thead><tr><th>Source</th><th>Type</th><th class="num">Drop rate</th><th class="num">Dropped</th><th class="num">Looted</th><th class="num">Avg qty</th></tr></thead>
           <tbody>
-<?php foreach ($loot['rows'] as $r): $small = $r['windows'] < LOOT_SMALL_SAMPLE; $kindLabel = ['npc' => 'Mob', 'world' => 'Object', 'quest' => 'Quest reward'][$r['kind']] ?? $r['kind']; ?>
+<?php foreach ($loot['rows'] as $r): $kindLabel = ['npc' => 'Mob', 'world' => 'Object', 'quest' => 'Quest reward'][$r['kind']] ?? $r['kind']; ?>
             <?php $npcSlug = $r['kind'] === 'npc' && ($item['source'] ?? \PROFESSION_SOURCE) === \DUNGEON_SOURCE ? \forever_npc_slug_by_id((int)$r['id']) : null; ?>
             <tr><td><?php if ($npcSlug !== null): ?><a href="<?= e(\forever_npc_path($npcSlug)) ?>"><?= e(\forever_npcs()[$npcSlug]['boss']['name']) ?></a><?php else: ?><a href="<?= e($whBase . ['npc' => 'npc', 'world' => 'object', 'quest' => 'quest'][$r['kind']] . '=' . $r['id']) ?>" rel="nofollow"><?= e($r['name']) ?></a><?php endif ?></td>
               <td class="kind"><?= e($kindLabel) ?></td>
-              <td class="num"><span class="it-rate<?= $small ? ' early' : '' ?>" title="<?= $small ? 'Early estimate: fewer than ' . LOOT_SMALL_SAMPLE . ' ' . ($r['kind'] === 'quest' ? 'turn-ins' : 'loots') . ' logged' : '' ?>"><i style="width:<?= max(2, (int)round(100 * $r['rate'])) ?>%"></i><b><?= $r['rate'] < 0.1 ? preg_replace('/\.0$/', '', number_format(100 * $r['rate'], 1)) : (int)round(100 * $r['rate']) ?>%</b></span></td>
+              <td class="num"><?= $rateFor($r) ?></td>
               <td class="num"><?= fmt($r['drops']) ?></td>
               <td class="num"><?= fmt($r['windows']) ?></td>
               <td class="num"><?= $r['drops'] ? preg_replace('/\.0$/', '', number_format($r['qty'] / $r['drops'], 1)) : '—' ?></td></tr>
