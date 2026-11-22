@@ -134,11 +134,15 @@ function forever_dungeon_seen_note(): string {
 
 function forever_dungeon_credit(): string {
   $s = forever_dungeon_data()['source'];
-  return 'Bosses, levels and loot lists come from the <b>' . esc($s['addon']) . '</b> add-on by ' . esc($s['author']) .
+  return 'Bosses, levels, quests and loot lists come from the <b>' . esc($s['addon']) . '</b> add-on by ' . esc($s['author']) .
     ($s['version'] ? ' (version ' . esc($s['version']) . ')' : '') . '. Kill counts and run logs come from players\' uploaded journals; observed drops also come from players\' Journalator logs.';
 }
 
 const DUNGEON_STYLE = <<<'CSS'
+.dg-quests article{padding:8px 0;border-bottom:1px solid rgba(128,128,128,.25)}
+.dg-quests article:last-child{border-bottom:0}
+.dg-quests h4,.dg-quests p{margin:0 0 4px}
+.dg-quests .dg-it{display:inline-flex;margin-right:8px}
 .dg-list{width:100%;border-collapse:collapse}
 .dg-list th,.dg-list td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left;vertical-align:middle}
 .dg-list td.r,.dg-list th.r{text-align:right}
@@ -236,6 +240,11 @@ function forever_npc_body(array $n): string {
   $obs = $b['npcID'] ? (forever_dungeon_observed([$b['npcID']])[$b['npcID']] ?? null) : null;
   $runs = forever_dungeon_runs($d['name'])[$b['name']] ?? null;
   $loot = forever_dungeon_loot_rows($b, $obs, $runs);
+  $quests = array_filter($d['questDetails'] ?? [], fn($quest) => in_array($b['name'], $quest['bosses'], true));
+  $encounter = $d['slug'] === 'hall-of-thanes' && $b['npcID'] === 261306
+    ? '<section class="dg-boss"><h3>Encounter</h3><p>Faldrim is the first boss in the Hall of Thanes, a royal dwarven burial chamber beneath Ironforge. In Anvilmar’s Rest, the Ghostly Attendant asks adventurers to put the restless thane’s spirit to rest.</p>' .
+      '<p class="hint"><a href="https://worldofwarcraft.blizzard.com/en-us/news/24301455/">Blizzard dungeon overview</a> · <a href="https://www.wowhead.com/forever/guide/hall-of-thanes-dungeon-overview-location-rewards">Hall of Thanes map and guide</a></p></section>'
+    : '';
 
   $facts = [
     ['Dungeon', '<a href="' . esc(forever_dungeon_path($d['slug'])) . '">' . esc($d['name']) . '</a>' . ($d['new'] ? ' <span class="dg-new">NEW</span>' : '')],
@@ -270,6 +279,7 @@ function forever_npc_body(array $n): string {
     esc(implode(' · ', array_filter([$b['level'] ? 'Level ' . $b['level'] : null, $b['rare'] ? 'Rare spawn' : 'Boss', $d['name']]))) . '</p>' .
     ($b['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($b['description']) . '</p>' : '') . '</div></div>' .
     '<div class="dg-npc-grid"><div>' .
+    $encounter . forever_dungeon_quests_html($quests, true) .
     '<section class="dg-boss"><h3>Loot</h3>' .
     ($loot !== '' ? '<table class="dg-loot"><tbody>' . $loot . '</tbody></table>' : '<p class="hint">No loot listed yet.</p>') .
     ($obs || $runs ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '</section>' .
@@ -321,9 +331,35 @@ $style
 HTML;
 }
 
-function forever_dungeon_item_link(array $it): string {
-  return '<a class="dg-it ' . (DUNGEON_QUALITY[$it['quality']] ?? 'q1') . '" href="' . esc(forever_item_path($it['id'])) . '"><img src="' .
+function forever_dungeon_item_link(array $it, ?string $url = null): string {
+  return '<a class="dg-it ' . (DUNGEON_QUALITY[$it['quality']] ?? 'q1') . '" href="' . esc($url ?? forever_item_path($it['id'])) . '"><img src="' .
     esc(forever_dungeon_item_icon((int)$it['id'])) . '" alt="" loading="lazy">' . esc($it['name']) . '</a>';
+}
+
+function forever_dungeon_quests_html(array $quests, bool $onBoss = false): string {
+  if (!$quests) return '';
+  $html = '<section class="dg-boss dg-quests"><h3>' . ($onBoss ? 'Related Quests' : 'Quests') . '</h3>';
+  foreach ($quests as $quest) {
+    $name = esc($quest['name']);
+    if ($quest['id']) $name = '<a href="https://www.wowhead.com/forever/quest=' . (int)$quest['id'] . '">' . $name . '</a>';
+    $meta = array_filter([$quest['faction'] ?? null, $quest['requires'] ? 'Requires level ' . $quest['requires'] : null]);
+    $html .= '<article><h4>' . $name . '</h4>';
+    if ($meta) $html .= '<p class="dg-sub">' . esc(implode(' · ', $meta)) . '</p>';
+    if ($quest['objective'] !== '') $html .= '<p>' . esc($quest['objective']) . '</p>';
+    foreach (['pickup' => 'Pick up', 'turnin' => 'Turn in'] as $key => $label) {
+      if (isset($quest[$key])) $html .= '<p><b>' . $label . '</b> ' . esc($quest[$key]) . '</p>';
+    }
+    if (!$onBoss && $quest['bosses']) {
+      $links = array_map(fn($boss) => '<a href="' . esc(forever_npc_path(forever_npc_slug($boss))) . '">' . esc($boss) . '</a>', $quest['bosses']);
+      $html .= '<p><b>Related bosses</b> ' . implode(', ', $links) . '</p>';
+    }
+    if ($quest['rewards']) {
+      $html .= '<p><b>' . ($quest['rewardChoice'] ? 'Choose a reward' : 'Rewards') . '</b> ' .
+        implode(' ', array_map(fn($item) => forever_dungeon_item_link($item, 'https://www.wowhead.com/forever/item=' . $item['id']), $quest['rewards'])) . '</p>';
+    }
+    $html .= '</article>';
+  }
+  return $html . '</section>';
 }
 
 function forever_dungeons_body(?array $d): string {
@@ -376,7 +412,8 @@ function forever_dungeons_body(?array $d): string {
     ($d['new'] ? '<span class="dg-new">NEW IN FOREVER</span>' : '') . '</div><p class="dg-meta">' . esc(implode(' · ', $meta)) . '</p>' .
     ($d['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($d['description']) . '</p>' : '') . '</div></div>' .
     ($d['lootIncomplete'] ? '<p class="hint">The loot list for this dungeon is still being filled in.</p>' : '') .
-    $bosses . ($anySeen ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '<p class="dg-credit"><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a> · ' . forever_dungeon_credit() . '</p></div>';
+    forever_dungeon_quests_html($d['questDetails'] ?? []) . $bosses .
+    ($anySeen ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '<p class="dg-credit"><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a> · ' . forever_dungeon_credit() . '</p></div>';
 }
 
 const DUNGEON_TIERS = [

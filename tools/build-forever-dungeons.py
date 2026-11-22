@@ -9,8 +9,8 @@ Two inputs:
   _forever_ client: Data/Dungeons.lua (dungeons, bosses, loot) and Data/Bosses.lua
   (boss levels). The files are read as data with a small Lua table reader; nothing
   in them is executed. Only facts are kept: names, levels, locations, NPC and item
-  IDs, slots and qualities, the dungeon's one-line description. Quest text,
-  guides and the add-on's notes are left out.
+  IDs, slots and qualities, descriptions, and structured quest details.
+  Quest dialogue and guides are left out.
 * Players' DungeonJournal companion uploads (pull-companion-uploads.py pull-addons
   stages them under MarketLensData/companion-uploads/addons-*/forever/dungeonjournal/).
   Each install's newest save says which bosses its characters have killed; the
@@ -233,6 +233,39 @@ def loot_rows(rows):
     return out
 
 
+def quest_details(rows, bosses):
+    quests = []
+    for row in rows or []:
+        if not isinstance(row, dict) or not isinstance(row.get("name"), str):
+            continue
+        objective = row.get("objective")
+        objective = objective if isinstance(objective, str) else ""
+        rewards = [
+            {"id": reward[0], "name": reward[1], "quality": reward[2]}
+            for reward in row.get("rewardItems") or []
+            if isinstance(reward, list) and len(reward) >= 3
+            and isinstance(reward[0], int) and isinstance(reward[1], str)
+            and isinstance(reward[2], int)
+        ]
+        quests.append({
+            "name": row["name"],
+            "id": row.get("id") if isinstance(row.get("id"), int) else None,
+            "objective": objective,
+            **{key: row[key] for key in ("pickup", "turnin", "faction")
+               if isinstance(row.get(key), str) and row[key].strip()},
+            "requires": row.get("requires") if isinstance(row.get("requires"), int) else None,
+            "rewards": rewards,
+            "rewardChoice": row.get("rewardChoice") is True,
+            "bosses": [
+                boss["name"] for boss in bosses
+                if boss["name"] and re.search(
+                    rf"(?<!\w){re.escape(boss['name'])}(?!\w)", objective, re.I
+                )
+            ],
+        })
+    return quests
+
+
 def read_journal(addon):
     db, order, levels = {}, [], {}
     for target, value in assignments(addon / "Data" / "Dungeons.lua"):
@@ -277,6 +310,7 @@ def read_journal(addon):
             "description": d.get("description") or "", "icon": icon_name(d.get("icon")),
             "new": name not in CLASSIC, "lootIncomplete": bool(d.get("fullItemsTBD")),
             "quests": len(d.get("quests") or []),
+            "questDetails": quest_details(d.get("quests"), bosses),
             "bosses": bosses, "trash": trash,
         })
     return dungeons, version
