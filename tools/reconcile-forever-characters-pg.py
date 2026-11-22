@@ -11,7 +11,8 @@ newest observation from every reliable source and applies it to all of the chara
 - Forever Pulse's Blizzard-verified rows: external_verified_characters.last_login_at
 - Blizzard's profile API (tools/sync-forever-armory.py): forever_armory_profiles.last_login_at
 
-The newest one wins (ties go to the census). A Blizzard login newer than every census sighting also
+The newest one wins (ties go to the census, then the higher level, then a guild over none, so local
+and live pick the same row; rows stamped in bulk often share a second). A Blizzard login newer than every census sighting also
 counts as a sighting: the character's newest row gets that last_seen and a character_observations row.
 Characters the census has never seen are not added (Blizzard does not say which hidden realm they are on).
 
@@ -70,7 +71,7 @@ SELECT DISTINCT ON (region, lname) region, lname, guild, level, t, src FROM (
   SELECT p.region, lower(p.full_name), COALESCE(p.guild_name,''), p.level, EXTRACT(EPOCH FROM p.last_login_at)::bigint, 2, 'armory'
     FROM forever_armory_profiles p
     WHERE p.last_login_at IS NOT NULL AND EXISTS (SELECT 1 FROM forever_ident i WHERE i.region=p.region AND i.lname=lower(p.full_name))
-) o ORDER BY region, lname, t DESC, pri;
+) o ORDER BY region, lname, t DESC, pri, level DESC NULLS LAST, guild DESC;
 CREATE INDEX ON forever_newest(region, lname);
 """
 
@@ -90,7 +91,7 @@ CREATE TEMP TABLE forever_seen ON COMMIT DROP AS
 SELECT DISTINCT ON (i.region, i.lname) i.game, i.character_key, n.t
 FROM forever_ident i JOIN forever_newest n ON n.region=i.region AND n.lname=i.lname
 WHERE n.src <> 'census' AND n.t > (SELECT max(j.last_seen) FROM forever_ident j WHERE j.region=i.region AND j.lname=i.lname)
-ORDER BY i.region, i.lname, i.last_seen DESC;
+ORDER BY i.region, i.lname, i.last_seen DESC, i.game;
 UPDATE characters c SET last_seen=GREATEST(c.last_seen,s.t),
   seen_count=c.seen_count + CASE WHEN EXISTS (
     SELECT 1 FROM character_observations o
