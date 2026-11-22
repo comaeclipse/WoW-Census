@@ -27,9 +27,10 @@ function localize_content(string $content): string {
   return preg_replace('/<script\s+src="\/assets\/js\/tooltips\.js"[^>]*><\/script>/', '', $content);
 }
 
-// Self-hosted Umami analytics (s.wowcensus.io, on Vercel), added to every HTML page as it is written or served.
-// data-domains keeps local previews (127.0.0.1:8081) out of the counts.
-const ANALYTICS_TAG = '<script defer src="https://s.wowcensus.io/script.js" data-website-id="15776ba3-1f50-4da9-98d7-59b2fc4066f9" data-domains="wowcensus.io"></script>';
+// Self-hosted GoatCounter analytics (s.wowcensus.io, on the droplet), added to every HTML page as it is written or served.
+// count.js skips localhost and private addresses, so local previews (127.0.0.1:8081) stay out of the counts.
+// Pages cached before the switch still load s.wowcensus.io/script.js, which nginx serves as a loader for count.js.
+const ANALYTICS_TAG = '<script data-goatcounter="https://s.wowcensus.io/count" async src="https://s.wowcensus.io/count.js"></script>';
 
 // Temporary notice shown under the header of each edition's census page. Set to null to hide it.
 // Give each new notice a new id: dismissals are remembered per id in the visitor's browser.
@@ -57,18 +58,17 @@ HTML;
 
 function with_analytics(string $html): string {
   $at = stripos($html, '</head>');
-  if ($at === false || str_contains($html, 's.wowcensus.io/script.js')) return $html;
+  if ($at === false || str_contains($html, 's.wowcensus.io/count.js') || str_contains($html, 's.wowcensus.io/script.js')) return $html;
   return substr_replace($html, ANALYTICS_TAG, $at, 0);
 }
 
-// Public names of the skins, used as the Umami tag so pageviews can be filtered by skin.
-// Nginx caches pages per skin, so the tag always matches the page it is in.
+// Public names of the skins.
 const SKIN_NAMES = ['wow2008' => '2008', 'cobalt' => 'retail', 'current' => 'pixel'];
 
 function with_skin(string $html): string {
   $skin = $_COOKIE['wowcensus_skin'] ?? '';
   $skin = isset(SKIN_NAMES[$skin]) ? $skin : 'wow2008';
-  return str_replace(' data-website-id=', ' data-tag="' . SKIN_NAMES[$skin] . '" data-website-id=', render_skin($html, $skin));
+  return render_skin($html, $skin);
 }
 
 // True when an Accept header ranks Markdown above HTML (text/markdown or text/*; */* alone stays HTML).

@@ -517,7 +517,7 @@ function forever_item_model_build(int $id): ?array {
   $wearers = forever_item_wearers($id);
   // Gear only seen on Armory characters still gets a page.
   $armory = forever_armory_item($id);
-  $sales = forever_item_sales($id);
+  $sales = edition_item_sales(PROFESSION_SOURCE, $id);
   $loot = item_loot_sources(PROFESSION_SOURCE, $id);
   $vendorLog = item_vendor_log(PROFESSION_SOURCE, $id);
   // Dungeon bosses that drop it, from the Dungeon Journal add-on's lists.
@@ -541,7 +541,7 @@ function forever_item_model_build(int $id): ?array {
       (int)$r['lowest'], (int)$r['median'], (int)$r['weighted_average']];
   }
   $branch = EDITIONS[PROFESSION_SOURCE]['branch'];
-  $name ??= ($wearers['name'] ?? null) ?: ((item_cache('item-names', $branch)[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: ($dungeon[0]['name'] ?? 'Item ' . $id)));
+  $name ??= ($wearers['name'] ?? null) ?: ((item_cache('item-names', $branch)[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: ($dungeon[0]['name'] ?? $sales['name'] ?? 'Item ' . $id)));
   $icon = ((array)item_cache('item-icons', $branch) + (array)item_cache('item-icons', 'classic'))[$id] ?? ($wearers['icon'] ?? null);
   if ($cat === null && $wearers) $cat = $wearers['slot'];
   if ($cat === null && $armory) $cat = $armory['cat'];
@@ -559,35 +559,47 @@ function forever_item_model_build(int $id): ?array {
   return ['id' => $id, 'name' => $name, 'icon' => $icon, 'cat' => $cat, 'crafter' => $crafter, 'roles' => $roles, 'taught' => $taught, 'scans' => $scans,
     'wearers' => $wearers, 'quality' => $wearers['quality'] ?? ($armory['quality'] ?? ($dungeon[0]['quality'] ?? null)), 'dungeon' => $dungeon, 'iconUrl' => $icon === null ? ($armory['iconUrl'] ?? null) : null,
     'armoryOnly' => !$rows && !$wearers && $armory !== null, 'tip' => $armory['tip'] ?? null, 'armoryWearers' => $armoryWearers,
-    'sales' => ($sales['count'] ?? 0) ? $sales : null, 'loot' => $loot,
-    'vendor' => item_vendor_vs_ah($armory['tip']['sell'] ?? null, $vendorLog, $scans, ($sales['count'] ?? 0) ? $sales : null)];
+    'sales' => $sales, 'loot' => $loot,
+    'vendor' => item_vendor_vs_ah($armory['tip']['sell'] ?? null, $vendorLog, $scans, $sales)];
 }
 
 /**
  * Completed auction sales of one item, newest first, from players' Journalator / TSM ledgers
  * (tools/import-journalator-pg.py). Nobody is named: not the seller who uploaded, not the buyer.
- * Returns null when the ledger tables aren't in this database yet.
+ * Returns null when this edition has no sales for the item or the ledger is unavailable.
  * rows[] = [sold unix, market label, faction, quantity, unit price cu, seconds to sell or null]
  */
-function forever_item_sales(int $id, int $limit = 25): ?array {
+function auction_sales_available(): bool {
   static $have = null;
-  $have ??= (bool)(Db::first("SELECT to_regclass('addon_auction_sales') IS NOT NULL AS ok")['ok'] ?? false);
-  if (!$have) return null;
-  $rows = Db::all('SELECT region, realm, faction, quantity, unit_price, sold_at, seconds_to_sell
-    FROM addon_auction_sales WHERE source_game=? AND item_id=? ORDER BY sold_at DESC LIMIT ' . (int)$limit, [PROFESSION_SOURCE, $id]);
-  if (!$rows) return ['rows' => [], 'count' => 0];
+  return $have ??= (bool)(Db::first("SELECT to_regclass('addon_auction_sales') IS NOT NULL AS ok")['ok'] ?? false);
+}
+
+function auction_sale_market(string $source, array $sale): array {
+  $faction = in_array($sale['faction'], ['Alliance', 'Horde'], true) ? $sale['faction'] : 'Neutral';
+  $realm = realm_name($sale['realm']);
+  $group = $source === PROFESSION_SOURCE ? forever_realm_group($realm) : null;
+  $label = $group['label'] ?? trim(strtoupper((string)$sale['region']) . ' ' . $realm);
+  if ($faction !== 'Neutral') $label .= ' · ' . $faction;
+  return [$label, $faction];
+}
+
+function edition_item_sales(string $source, int $id): ?array {
+  if (!auction_sales_available()) return null;
+  $rows = Db::all('SELECT region, realm, faction, item_name, quantity, unit_price, sold_at, seconds_to_sell
+    FROM addon_auction_sales WHERE source_game=? AND item_id=? ORDER BY sold_at DESC, event_key LIMIT 25', [$source, $id]);
+  if (!$rows) return null;
   $stats = Db::first('SELECT count(*) AS n, percentile_cont(0.5) WITHIN GROUP (ORDER BY unit_price) AS med,
       percentile_cont(0.5) WITHIN GROUP (ORDER BY seconds_to_sell) AS secs, count(seconds_to_sell) AS timed, max(sold_at) AS last
-    FROM addon_auction_sales WHERE source_game=? AND item_id=?', [PROFESSION_SOURCE, $id]);
+    FROM addon_auction_sales WHERE source_game=? AND item_id=?', [$source, $id]);
   $out = [];
+  $name = null;
   foreach ($rows as $r) {
-    $faction = in_array($r['faction'], ['Alliance', 'Horde'], true) ? $r['faction'] : 'Neutral';
-    $group = forever_realm_group((string)$r['realm']);
-    $label = ($group['label'] ?? strtoupper((string)$r['region']) . ' ' . realm_name((string)$r['realm'])) . ($faction === 'Neutral' ? '' : ' · ' . $faction);
+    $name ??= trim((string)$r['item_name']) ?: null;
+    [$label, $faction] = auction_sale_market($source, $r);
     $out[] = [(int)$r['sold_at'], $label, $faction, (int)$r['quantity'], (int)$r['unit_price'],
       $r['seconds_to_sell'] === null ? null : (int)$r['seconds_to_sell']];
   }
-  return ['rows' => $out, 'count' => (int)$stats['n'], 'median' => (int)round((float)$stats['med']),
+  return ['rows' => $out, 'name' => $name, 'count' => (int)$stats['n'], 'median' => (int)round((float)$stats['med']),
     'medianSecs' => $stats['secs'] === null ? null : (int)round((float)$stats['secs']), 'timed' => (int)$stats['timed'], 'last' => (int)$stats['last']];
 }
 
@@ -633,6 +645,54 @@ function forever_item_market_summary(array $m): array {
   return ['markets' => $m['markets'], 'points' => $m['points'], 'scans' => count($m['log']), 'lastScan' => $last];
 }
 
+function item_sale_duration(int $seconds): string {
+  if ($seconds < 60) return $seconds . 's';
+  if ($seconds < 3600) return intdiv($seconds, 60) . 'm';
+  $hours = intdiv($seconds, 3600);
+  $minutes = intdiv($seconds % 3600, 60);
+  return $hours . 'h' . ($minutes ? ' ' . $minutes . 'm' : '');
+}
+
+function edition_recent_sales_table(string $source): string {
+  static $tables = [];
+  if (isset($tables[$source])) return $tables[$source];
+  $sales = auction_sales_available() ? Db::all('SELECT region, realm, faction, item_id, item_name, quantity, unit_price, sold_at, seconds_to_sell
+    FROM addon_auction_sales WHERE source_game=? ORDER BY sold_at DESC, event_key LIMIT 25', [$source]) : [];
+  if (!$sales) return $tables[$source] = '';
+  $rows = '';
+  foreach ($sales as $sale) {
+    [$market] = auction_sale_market($source, $sale);
+    $id = (int)$sale['item_id'];
+    $name = esc(trim((string)$sale['item_name']) ?: ($id ? 'Item ' . $id : 'Unknown item'));
+    $item = $id ? '<a href="' . esc(edition_path($source) . 'item/' . $id) . '">' . $name . '</a>' : $name;
+    $duration = $sale['seconds_to_sell'] === null ? '—' : item_sale_duration((int)$sale['seconds_to_sell']);
+    $rows .= '<tr><td>' . $item . '</td><td>' . gmdate('Y-m-d H:i', (int)$sale['sold_at']) . '</td><td>' . esc($market)
+      . '</td><td class="num r">' . js_locale((int)$sale['quantity']) . '</td><td class="num r">' . esc(money((int)$sale['unit_price']))
+      . '</td><td class="num r">' . esc($duration) . '</td></tr>';
+  }
+  return $tables[$source] = '<div style="overflow-x:auto"><table class="ahtable mkttable"><thead><tr><th>Item</th><th>Sold (UTC)</th><th>Market</th>'
+    . '<th class="num r">Qty</th><th class="num r">Price each</th><th class="num r">Sold after</th></tr></thead><tbody>'
+    . $rows . '</tbody></table></div>';
+}
+
+function item_recent_sales_html(?array $sales): string {
+  if (!$sales) return '';
+  $rows = '';
+  foreach ($sales['rows'] as [$sold, $market, , $quantity, $price, $seconds]) {
+    $duration = $seconds === null ? '—' : item_sale_duration($seconds);
+    $rows .= '<tr><td>' . gmdate('Y-m-d H:i', $sold) . '</td><td>' . esc($market)
+      . '</td><td class="r">' . js_locale($quantity) . '</td><td class="r">' . esc(money($price))
+      . '</td><td class="r">' . esc($duration) . '</td></tr>';
+  }
+  $timing = $sales['medianSecs'] === null ? 'Listing time unavailable'
+    : 'Median time to sell ' . item_sale_duration($sales['medianSecs']) . ' (' . js_locale($sales['timed']) . ' matched)';
+  return '<section class="panel census mkt"><h2 class="ptitle">Recent Sales</h2><p class="hint">'
+    . js_locale($sales['count']) . ' completed auctions · Median unit price ' . esc(money($sales['median']))
+    . ' · ' . esc($timing) . '</p><table class="mkttable"><thead><tr><th>Sold (UTC)</th><th>Market</th>'
+    . '<th class="r">Qty</th><th class="r">Price each</th><th class="r">Sold after</th></tr></thead><tbody>'
+    . $rows . '</tbody></table></section>';
+}
+
 /** The plain page every skin starts from; the 2008 skin rebuilds it from the model. */
 function forever_item_html(array $item, string $stylesheet): string {
   $label = seo_label(EDITIONS[PROFESSION_SOURCE]['label']);
@@ -655,6 +715,7 @@ function forever_item_html(array $item, string $stylesheet): string {
   $css = esc($stylesheet);
   $census_css = CENSUS_STYLESHEET;
   $name = esc($item['name']);
+  $recentSales = item_recent_sales_html($item['sales']);
   $wowhead = esc('https://www.wowhead.com/' . EDITIONS[PROFESSION_SOURCE]['branch'] . '/item=' . $item['id']);
   return <<<HTML
 <!doctype html><html lang="en"><head>
@@ -676,6 +737,7 @@ $style
   <div class="panel census mkt"><div class="ptitle">$name &mdash; current listings</div>
   <p class="hint" style="margin-top:0"><a href="$wowhead" target="_blank" rel="noopener">View on Wowhead</a></p>
   <table class="mkttable"><thead><tr><th class="l">Scanned (UTC)</th><th class="l">Realm</th><th class="r">Qty</th><th class="r">Lowest</th><th class="r">Median</th></tr></thead><tbody>$rows</tbody></table></div>
+  $recentSales
 </div>
 </body></html>
 HTML;

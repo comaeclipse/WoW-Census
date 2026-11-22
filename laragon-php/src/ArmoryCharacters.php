@@ -147,6 +147,7 @@ function armory_item_wearers(string $source, int $id, ?int $itemLevel): ?array {
 /** A locally stored item observed on an enriched character in this edition. */
 function armory_item_model(string $source, int $id): ?array {
   if (!in_array($source, ARMORY_SOURCES, true) || $id < 1) return null;
+  $sales = edition_item_sales($source, $id);
   try {
     $row = Db::first('SELECT item_json FROM character_armory_items WHERE source_game=? AND item_id=? ORDER BY snapshot_at DESC LIMIT 1', [$source, $id]);
     $market = Db::all('SELECT game,captured_at,name,category,crafter,quantity,lowest,median,weighted_average
@@ -156,7 +157,7 @@ function armory_item_model(string $source, int $id): ?array {
     throw $e;
   }
   $wearers = edition_item_wearers($source, $id);
-  if (!$row && !$market && !$wearers) return null;
+  if (!$row && !$market && !$wearers && !$sales) return null;
   $it = $row ? forever_json($row['item_json']) : [];
   $tip = $row ? armory_item_tip($it) : null;
   $branch = EDITIONS[$source]['branch'] ?: 'retail';
@@ -165,6 +166,7 @@ function armory_item_model(string $source, int $id): ?array {
   $latest = $market ? end($market) : null;
   $name = $it['name'] ?? (($latest['name'] ?? '') !== '' && !preg_match('/^item:\d+$/', (string)$latest['name']) ? $latest['name'] : null)
     ?? ($wearers['name'] ?? null)
+    ?? ($sales['name'] ?? null)
     ?? (item_cache('item-names', $branch)[$id] ?? ('Item ' . $id));
   $scans = []; $seen = [];
   foreach ($market as $m) {
@@ -181,8 +183,8 @@ function armory_item_model(string $source, int $id): ?array {
     'roles' => edition_profession_roles($source, ['name' => $name, 'cat' => $latest['category'] ?? null], $latest['crafter'] ?? null),
     'taught' => null, 'scans' => $scans, 'wearers' => $wearers, 'quality' => $wearers['quality'] ?? $quality, 'localOnly' => !$market,
     'tip' => $tip, 'armoryWearers' => $row ? armory_item_wearers($source, $id, $tip['ilvl']) : null, 'armoryOnly' => !$market && $row,
-    'loot' => item_loot_sources($source, $id),
-    'vendor' => item_vendor_vs_ah(($it['sell_price']['value'] ?? 0) > 0 ? (int)$it['sell_price']['value'] : null, item_vendor_log($source, $id), $scans, null)];
+    'sales' => $sales, 'loot' => item_loot_sources($source, $id),
+    'vendor' => item_vendor_vs_ah(($it['sell_price']['value'] ?? 0) > 0 ? (int)$it['sell_price']['value'] : null, item_vendor_log($source, $id), $scans, $sales)];
 }
 
 function armory_item_html(string $source, array $item): string {
@@ -195,10 +197,11 @@ function armory_item_html(string $source, array $item): string {
   usort($newest, fn($a, $b) => $b[2] <=> $a[2]); $rows = '';
   foreach ($newest as [$key, $t, $qty, $lo, $med]) $rows .= '<tr><td class="l">' . esc(gmdate('Y-m-d H:i', $t)) . '</td><td class="l">' . esc($m['markets'][$key][0]) . '</td><td class="r">' . js_locale($qty) . '</td><td class="r">' . esc(money($lo)) . '</td><td class="r">' . esc(money($med)) . '</td></tr>';
   $nav = edition_nav($source, 'auctionhouse.html'); $heading = page_heading('WoWCensus', $nav, $title); $css = esc(edition_path($source) . stylesheet()['name']);
-  $desc = $item['scans'] ? $label . ' auction house prices and current listed supply for ' . $item['name'] . ' from in-game scans.' : $label . ' item profile for ' . $item['name'] . ', observed on an enriched character.';
+  $desc = $item['scans'] ? $label . ' auction house prices and current listed supply for ' . $item['name'] . ' from in-game scans.'
+    : $label . ' item profile for ' . $item['name'] . ($item['sales'] ? ', including completed auction sales.' : '.');
   $wowhead = 'https://www.wowhead.com/' . (EDITIONS[$source]['branch'] !== '' ? EDITIONS[$source]['branch'] . '/' : '') . 'item=' . $item['id'];
   $market = $rows !== '' ? '<div class="panel census mkt"><div class="ptitle">Current listings</div><table class="mkttable"><thead><tr><th class="l">Scanned (UTC)</th><th class="l">Market</th><th class="r">Qty</th><th class="r">Lowest</th><th class="r">Median</th></tr></thead><tbody>' . $rows . '</tbody></table></div>' : '<div class="panel"><p class="hint">No auction listing has been observed for this item yet.</p></div>';
-  return localize_content('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' . seo_head($title . ' – WoWCensus', $desc, $canonical) . '<link rel="stylesheet" href="' . $css . '"></head><body><div class="wrap"><header class="ihead"><div class="page-heading">' . $heading . $nav['games'] . '</div>' . $nav['breadcrumbs'] . '</header><main><div class="panel census"><div class="ptitle"><img src="/assets/images/wow/icons/large/' . esc($icon) . '.jpg" width="40" height="40" alt=""> ' . esc($item['name']) . '</div><p class="hint">' . esc($item['cat'] ?: 'Item') . ' · Item ID ' . $item['id'] . ' · <a href="' . esc($wowhead) . '" target="_blank" rel="noopener">View on Wowhead</a></p></div>' . $market . '</main></div></body></html>\n');
+  return localize_content('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' . seo_head($title . ' – WoWCensus', $desc, $canonical) . '<link rel="stylesheet" href="' . $css . '"></head><body><div class="wrap"><header class="ihead"><div class="page-heading">' . $heading . $nav['games'] . '</div>' . $nav['breadcrumbs'] . '</header><main><div class="panel census"><div class="ptitle"><img src="/assets/images/wow/icons/large/' . esc($icon) . '.jpg" width="40" height="40" alt=""> ' . esc($item['name']) . '</div><p class="hint">' . esc($item['cat'] ?: 'Item') . ' · Item ID ' . $item['id'] . ' · <a href="' . esc($wowhead) . '" target="_blank" rel="noopener">View on Wowhead</a></p></div>' . $market . item_recent_sales_html($item['sales']) . '</main></div></body></html>\n');
 }
 
 /** Profile ids for names on one census realm. Ambiguous cross-region matches are left unlinked. */
@@ -209,9 +212,20 @@ function armory_character_ids(string $source, string $realm, array $names, ?stri
   $marks = implode(',', array_fill(0, count($names), '?'));
   try {
     $regionSql = $region !== null ? ' AND region=?' : '';
-    // A guild on connected realms has members homed on each of them: their Armory guild names it.
-    $placeSql = $guild !== null ? '(lower(realm_name)=lower(?) OR guild_name=?)' : 'lower(realm_name)=lower(?)';
-    $args = [$source, $realm, ...($guild !== null ? [$guild] : []), ...($region !== null ? [$region] : []), ...$names];
+    // A census cross-realm guild tag appends the guild's home realm to its name.
+    $placeSql = 'lower(realm_name)=lower(?)';
+    $placeArgs = [$realm];
+    if ($guild !== null) {
+      [$guildName, $guildRealm] = array_pad(explode('-', $guild, 2), 2, null);
+      $guildSql = 'guild_name=?';
+      $placeArgs[] = $guildName;
+      if ($guildRealm !== null) {
+        $guildSql .= " AND regexp_replace(lower(profile_json#>>'{guild,realm,slug}'), '[^[:alnum:]]', '', 'g') = ?";
+        $placeArgs[] = preg_replace('/[^\p{L}\p{N}]/u', '', mb_strtolower($guildRealm));
+      }
+      $placeSql = "($placeSql OR ($guildSql))";
+    }
+    $args = [$source, ...$placeArgs, ...($region !== null ? [$region] : []), ...$names];
     $rows = Db::all("SELECT lower(name) n,public_id FROM character_armory_profiles
       WHERE source_game=? AND $placeSql$regionSql AND lower(name) IN ($marks)", $args);
   } catch (PDOException $e) {
@@ -241,6 +255,23 @@ function armory_character_rows(string $source, string $id): ?array {
   return $s ? ['profile' => $p, 'snapshot' => $s] : null;
 }
 
+function retail_armory_loadout(array $specs): array {
+  $specializations = $specs['specializations'] ?? [];
+  $activeSpec = $specializations[0] ?? [];
+  $activeId = $specs['active_specialization']['id'] ?? null;
+  foreach ($specializations as $spec) {
+    if ($activeId !== null && (int)$activeId === (int)($spec['specialization']['id'] ?? 0)) {
+      $activeSpec = $spec;
+      break;
+    }
+  }
+  $loadouts = $activeSpec['loadouts'] ?? [];
+  foreach ($loadouts as $loadout) {
+    if (!empty($loadout['is_active'])) return $loadout;
+  }
+  return $loadouts[0] ?? [];
+}
+
 function armory_character_model(string $source, string $id): ?array {
   $rows = armory_character_rows($source, $id);
   if (!$rows) return null;
@@ -267,17 +298,55 @@ function armory_character_model(string $source, string $id): ?array {
       'url' => armory_item_path($source, $itemId)];
   }
 
-  $groups = $j($s['specializations_json'])['specialization_groups'] ?? [];
+  $specializations = $j($s['specializations_json']);
+  $groups = $specializations['specialization_groups'] ?? [];
   $active = null;
   foreach ($groups as $g) if (!empty($g['is_active'])) $active = $g;
   $active ??= $groups[0] ?? null;
+  $activeSpec = null;
+  $defaultTalentRank = 0;
+  if ($source === 'mop-classic' && !empty($specializations['specializations'])) {
+    $activeSpec = $specializations['active_specialization']['name'] ?? null;
+    $activeId = (int)($specializations['active_specialization']['id'] ?? 0);
+    $spec = $specializations['specializations'][0];
+    foreach ($specializations['specializations'] as $candidate) {
+      if ($activeId && (int)($candidate['specialization']['id'] ?? 0) === $activeId) {
+        $spec = $candidate;
+        break;
+      }
+    }
+    $active = ['specializations' => [$spec]];
+    $defaultTalentRank = 1;
+  }
   $trees = [];
   foreach ($active['specializations'] ?? [] as $spec) {
     $talents = [];
     foreach ($spec['talents'] ?? [] as $t) $talents[] = ['name' => $t['talent']['name'] ?? ($t['spell_tooltip']['spell']['name'] ?? ''),
-      'rank' => (int)($t['talent_rank'] ?? 0), 'desc' => $t['spell_tooltip']['description'] ?? ''];
+      'rank' => (int)($t['talent_rank'] ?? $defaultTalentRank), 'desc' => $t['spell_tooltip']['description'] ?? ''];
     $trees[] = ['name' => $spec['specialization_name'] ?? ($spec['specialization']['name'] ?? ''),
-      'points' => (int)($spec['spent_points'] ?? 0), 'talents' => $talents];
+      'points' => (int)($spec['spent_points'] ?? array_sum(array_column($talents, 'rank'))), 'talents' => $talents];
+  }
+  if ($source === 'retail') {
+    $activeSpec = $specializations['active_specialization']['name'] ?? null;
+    $loadout = retail_armory_loadout($specializations);
+    $trees = [];
+    foreach ([
+      'selected_class_talents' => $loadout['selected_class_talent_tree']['name'] ?? 'Class',
+      'selected_spec_talents' => $specializations['active_specialization']['name'] ?? 'Specialization',
+      'selected_hero_talents' => $loadout['selected_hero_talent_tree']['name'] ?? 'Hero',
+    ] as $key => $name) {
+      $talents = [];
+      foreach ($loadout[$key] ?? [] as $talent) {
+        $tooltip = $talent['tooltip'] ?? [];
+        $spell = $tooltip['spell_tooltip'] ?? [];
+        $talents[] = [
+          'name' => $tooltip['talent']['name'] ?? $spell['spell']['name'] ?? ('Talent node ' . ($talent['id'] ?? 'unknown')),
+          'rank' => max(1, (int)($talent['rank'] ?? $talent['default_points'] ?? 1)),
+          'desc' => $spell['description'] ?? '',
+        ];
+      }
+      if ($talents) $trees[] = ['name' => $name, 'points' => array_sum(array_column($talents, 'rank')), 'talents' => $talents];
+    }
   }
   $mainTree = $trees ? array_reduce($trees, fn($a, $b) => $a === null || $b['points'] > $a['points'] ? $b : $a) : null;
 
@@ -318,8 +387,9 @@ function armory_character_model(string $source, string $id): ?array {
     'achievementPoints' => (int)($p['achievement_points'] ?? 0), 'achievements' => (int)(($a = $j($s['achievements_json']))['total_quantity'] ?? count($a['achievements'] ?? [])),
     'lastLogin' => $p['last_login_at'] ? strtotime($p['last_login_at']) : null, 'fetched' => strtotime($s['snapshot_at']),
     'title' => $profile['active_title']['display_string'] ?? null, 'render' => $media['main-raw'] ?? null, 'avatar' => $media['avatar'] ?? null,
-    'gear' => $gear, 'trees' => $trees, 'build' => implode(' / ', array_column($trees, 'points')), 'mainTree' => $mainTree['name'] ?? null,
-    'professions' => $profs, 'pvp' => $pvp, 'stats' => $stats, 'reputations' => $reps, 'mounts' => [], 'titles' => [], 'pets' => []];
+    'gear' => $gear, 'trees' => $trees, 'build' => implode(' / ', array_column($trees, 'points')),
+    'mainTree' => $mainTree['name'] ?? null, 'activeSpec' => $activeSpec,
+    'professions' => $profs, 'professionsAvailable' => $s['professions_json'] !== null, 'pvp' => $pvp, 'stats' => $stats, 'reputations' => $reps, 'mounts' => [], 'titles' => [], 'pets' => []];
 }
 
 function armory_character_description(array $c): string {

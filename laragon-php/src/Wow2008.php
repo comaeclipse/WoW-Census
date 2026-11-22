@@ -163,7 +163,7 @@ function head_tags(string $html): string {
     '/<meta\s+name="(?:description|robots|google-site-verification)"[^>]*>/i',
     '/<meta\s+property="og:[^"]*"[^>]*>/i',
     '/<link\s+rel="(?:canonical|alternate)"[^>]*>/i',
-    '/<script\b[^>]*data-website-id[^>]*><\/script>/i',
+    '/<script\b[^>]*(?:data-goatcounter|data-website-id)[^>]*><\/script>/i',
   ] as $pattern)
     if (preg_match_all($pattern, $head, $m)) array_push($keep, ...$m[0]);
   return implode("\n", $keep);
@@ -265,6 +265,14 @@ function render_page(string $html, string $path): string {
     if ($d === null) $html = preg_replace_callback('#<!--dg-index-->.*<!--/dg-index-->#s', fn() => \forever_dungeons_w8_index(), $html, 1);
     return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art($d['slug'] ?? null), $d['name'] ?? 'Dungeons');
   }
+  if (preg_match('#^/forever/spell/[1-9][0-9]{0,9}/?$#', $path) && str_contains($html, 'class="ptitle bx-spell-title"')) {
+    $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
+    // The banner shows the spell's icon and name, so the page's own title block and ID line go.
+    $icon = preg_match('#<div class="ptitle bx-spell-title"><img[^>]*src="([^"]+)"#', $html, $m) ? html_entity_decode($m[1], ENT_QUOTES) : null;
+    $school = preg_match('#<p class="dg-meta">Spell ID \d+ · ([^<]+)</p>#u', $html, $m) ? ' · ' . mb_strtoupper(html_entity_decode($m[1], ENT_QUOTES)) : '';
+    $html = preg_replace(['#<div class="ptitle bx-spell-title">.*?</div>#s', '#<p class="dg-meta">Spell ID \d+[^<]*</p>#u'], '', $html, 1);
+    return framed_page(\DUNGEON_SOURCE, $html, 'spells', 'no-data', subtitle: 'WOW: FOREVER · SPELLS' . $school, icon: $icon);
+  }
   if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m) && isset(\forever_npcs()[$m[1]])) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . \BESTIARY_STYLE . '</style></head>', $html);
@@ -294,7 +302,7 @@ function dungeon_banner_art(?string $slug): string {
 }
 
 /** A page without a 2008 design of its own: its content, inside the 2008 frame. */
-function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null): string {
+function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null, ?string $icon = null): string {
   $body = '';
   $start = strpos($html, '<div class="wrap">');
   if ($start !== false) {
@@ -311,12 +319,13 @@ function framed_page(?string $source, string $html, ?string $page, string $art =
       ['High Order Skyborne', 'Windshaper Skyborne'], 'Skyborne', $m[1]) . '<', $body);
   preg_match('/<title>(.*?)<\/title>/s', $html, $t);
   $title = trim(preg_replace('/\s+[–-]\s+WoWCensus$/u', '', html_entity_decode($t[1] ?? 'WoWCensus', ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+  if ($page === 'spells') $title = preg_replace('/ – WoW: Forever$/u', '', $title);
   // The banner and breadcrumb already name the edition.
   if ($source !== null) $title = preg_replace('/^' . preg_quote(\seo_label(\EDITIONS[$source]['label']), '/') . '\s+/u', '', $title);
   if ($bannerTitle !== null) $title = $bannerTitle;
   $styles = '';
   if (preg_match_all('/<style\b[^>]*>.*?<\/style>/is', substr($html, 0, stripos($html, '</head>') ?: 0), $m)) $styles = implode("\n", $m[0]);
-  return page('framed', ['title' => $title, 'body' => $body, 'styles' => $styles, 'source' => $source, 'art' => $art, 'subtitle' => $subtitle], $html, $page);
+  return page('framed', ['title' => $title, 'body' => $body, 'styles' => $styles, 'source' => $source, 'art' => $art, 'subtitle' => $subtitle, 'icon' => $icon], $html, $page);
 }
 
 function census_page(string $source, string $html): string {
@@ -794,7 +803,8 @@ function guild_page(string $source, array $g, string $html): string {
   foreach ($g['specs'] as $s) $classColor[class_name($s[0])] = '#' . (\CLASS_META[$s[0]][1] ?? 'C0C0C0');
   return page('guild', common_vars($source) + ['name' => \guild_display_name($g['name']), 'realm' => $realm, 'faction' => $g['faction'], 'members' => $members,
     'classes' => (object)$classes, 'races' => (object)$races, 'bands' => (object)$bands, 'specs' => $specs, 'classColor' => (object)$classColor,
-    'inspected' => array_sum(array_column($g['specs'], 2)), 'avgLevel' => $levels ? round(array_sum($levels) / count($levels), 1) : 0, 'maxLevel' => $max,
+    'armorySpecs' => $g['armorySpecs'] ?? false, 'inspected' => array_sum(array_column($g['specs'], 2)),
+    'avgLevel' => $levels ? round(array_sum($levels) / count($levels), 1) : 0, 'maxLevel' => $max,
     'firstSeen' => $g['firstT'] ? gmdate('M j, Y', (int)$g['firstT']) : '—', 'lastSeen' => $g['lastT'] ? gmdate('M j, Y', (int)$g['lastT']) : '—',
     'allianceRaces' => array_keys(array_filter(\RACE_FACTION, fn($f) => $f === 'Alliance'))], $html, 'guilds');
 }
@@ -918,7 +928,8 @@ function auction_page(string $source, string $html): string {
   $factions = array_map(fn($f) => [$f['key'], $f['key'] === 'all' ? ($f['label'] === 'Cross-faction' ? 'Cross-faction' : 'Both') : $f['label']], $model['dims']['faction']);
   return page('auction-house', common_vars($source) + ['data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
     'realms' => $realms, 'factions' => $factions, 'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=',
-    'itemBase' => in_array($source, \ARMORY_SOURCES, true) ? \armory_item_path($source, '') : null], $html, 'auction-house');
+    'itemBase' => in_array($source, \ARMORY_SOURCES, true) ? \armory_item_path($source, '') : null,
+    'recentSales' => \edition_recent_sales_table($source)], $html, 'auction-house');
 }
 
 /** Realm and faction filter rows for the professions pages, as on the auction house. */
@@ -1074,5 +1085,6 @@ function classes_page(string $source, string $html, string $slug): string {
   }
   $pages = class_pages($source);
   $route = ['edition' => $source, 'page' => 'classes', 'base' => dirname(array_values($pages)[0][1]) . '/', 'initial' => $slug, 'queryUrls' => false];
-  return page('classes', common_vars($source) + ['data' => ['classes' => $cd, 'order' => array_keys($cd)], 'route' => $route], $html, 'classes');
+  $combat = $source === 'forever' && isset($pages[$slug]) ? \forever_class_combat($pages[$slug][2], $pages[$slug][1]) : '';
+  return page('classes', common_vars($source) + ['data' => ['classes' => $cd, 'order' => array_keys($cd)], 'route' => $route, 'combat' => $combat], $html, 'classes');
 }

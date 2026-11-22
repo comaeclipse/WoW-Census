@@ -49,7 +49,7 @@ function edition_nav(string $source, string $current): array {
     '<a class="game"' . (($active ?? ($href === $currentPage)) ? ' aria-current="true"' : '') . ' href="' . $href . '">' . $label . '</a>';
   $games = '<nav class="games game-nav" aria-label="Game edition">';
   foreach (EDITIONS as $s => $e) {
-    $games .= $item($currentPage === 'professions' ? profession_path(null, $s) : page_path($s, $currentPage), $e['nav'], $s === $source);
+    $games .= $item($currentPage === 'professions' ? profession_path(null, $s) : page_path($s, $currentPage === 'spells' ? 'index' : $currentPage), $e['nav'], $s === $source);
   }
   $games .= '</nav>';
   $pages = '<nav class="games page-nav" aria-label="Site pages">' .
@@ -68,7 +68,7 @@ function edition_nav(string $source, string $current): array {
     'pages' => '',
     'breadcrumbs' => '<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">WoWCensus</a><span aria-hidden="true">/</span><a href="' .
       page_path($source, 'index') . '">' . $edition['nav'] . '</a><span aria-hidden="true">/</span><span aria-current="page">' .
-      $pageLabels[$currentPage] . '</span></nav>',
+      ($currentPage === 'spells' ? 'Spells' : $pageLabels[$currentPage]) . '</span></nav>',
   ];
 }
 
@@ -328,7 +328,13 @@ function guild_views_precomputed(string $source, ?array $only): ?array {
   $views = [];
   foreach ($wanted as [$realm, $faction]) {
     if (!isset($data["$realm\n$faction"])) return null;
-    $views[] = ['realm' => $realm, 'faction' => $faction, 'snapshot' => json_decode($data["$realm\n$faction"], true, 512, JSON_THROW_ON_ERROR)];
+    $snapshot = json_decode($data["$realm\n$faction"], true, 512, JSON_THROW_ON_ERROR);
+    if ($source === 'mop-classic') {
+      $guilds = merge_guild_list($source, $snapshot['guilds']);
+      if (isset($snapshot['guildCount'])) $snapshot['guildCount'] -= count($snapshot['guilds']) - count($guilds);
+      $snapshot['guilds'] = js_sort($guilds, fn($a, $b) => js_or($b['members'] - $a['members'], fn() => js_cmp($a['name'], $b['name'])));
+    }
+    $views[] = ['realm' => $realm, 'faction' => $faction, 'snapshot' => $snapshot];
   }
   return ['views' => $views, 'dims' => $dims, 'lastT' => load_census($source)['lastT']];
 }
@@ -527,6 +533,7 @@ function render_edition_page(string $source, string $page, string $stylesheet, s
       return render_market_html($model['views'], $model['dims'], $common + [
         'notes' => ['Latest auction scan: ' . utc_timestamp($first ? $first['summary']['updatedAt'] : null)],
         'tbcAnalysis' => $source === 'classic-progression',
+        'recentSales' => edition_recent_sales_table($source),
       ]);
     case 'guilds':
       $model = guilds_geography_page_model($source, 'guilds');

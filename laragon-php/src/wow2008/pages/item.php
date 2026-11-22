@@ -351,14 +351,14 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
         <div class="tiles">
           <div class="stat"><span>Sales recorded</span><b><?= fmt($sales['count']) ?></b><em>completed auctions</em></div>
           <div class="stat"><span>Typical sale</span><b><?= $money($sales['median']) ?></b><em>median price per unit</em></div>
-          <div class="stat"><span>Time to sell</span><b><?= $sales['medianSecs'] !== null ? e($dur($sales['medianSecs'])) : '—' ?></b><em><?= $sales['timed'] ? 'median upper bound, from ' . fmt($sales['timed']) . ' sale' . ($sales['timed'] === 1 ? '' : 's') . ' with a logged listing' : 'listing time not logged' ?></em></div>
+          <div class="stat"><span>Time to sell</span><b><?= $sales['medianSecs'] !== null ? e(\item_sale_duration($sales['medianSecs'])) : '—' ?></b><em><?= $sales['timed'] ? 'median upper bound, from ' . fmt($sales['timed']) . ' sale' . ($sales['timed'] === 1 ? '' : 's') . ' with a logged listing' : 'listing time not logged' ?></em></div>
           <div class="stat"><span>Last sale</span><b><?= e($ago($sales['last'])) ?></b><em><?= e(gmdate('M j, Y', $sales['last'])) ?></em></div>
         </div>
         <table class="ahtable it-sales">
           <thead><tr><th>Sold</th><th>Market</th><th class="num">Qty</th><th class="num">Price each</th><th class="num">Sold within</th></tr></thead>
           <tbody>
 <?php foreach ($sales['rows'] as [$t, $label, $fac, $qty, $unit, $secs]): ?>
-            <tr><td title="<?= e(gmdate('Y-m-d H:i', $t)) ?> UTC"><?= e($ago($t)) ?></td><td class="fac-<?= e(strtolower($fac)) ?>"><?= e($label) ?></td><td class="num"><?= fmt($qty) ?></td><td class="num"><?= $money($unit) ?></td><td class="num"><?= $secs !== null ? e($dur($secs)) : '<span class="dim" title="This listing wasn\'t in the seller\'s log">—</span>' ?></td></tr>
+            <tr><td title="<?= e(gmdate('Y-m-d H:i', $t)) ?> UTC"><?= e($ago($t)) ?></td><td class="fac-<?= e(strtolower($fac)) ?>"><?= e($label) ?></td><td class="num"><?= fmt($qty) ?></td><td class="num"><?= $money($unit) ?></td><td class="num"><?= $secs !== null ? e(\item_sale_duration($secs)) : '<span class="dim" title="This listing wasn\'t in the seller\'s log">—</span>' ?></td></tr>
 <?php endforeach ?>
           </tbody>
         </table>
@@ -415,7 +415,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
           <tbody>
 <?php foreach ($loot['rows'] as $r): $small = $r['windows'] < LOOT_SMALL_SAMPLE; $kindLabel = ['npc' => 'Mob', 'world' => 'Object', 'quest' => 'Quest reward'][$r['kind']] ?? $r['kind']; ?>
             <?php $npcSlug = $r['kind'] === 'npc' && ($item['source'] ?? \PROFESSION_SOURCE) === \DUNGEON_SOURCE ? \forever_npc_slug_by_id((int)$r['id']) : null; ?>
-            <tr><td><?php if ($npcSlug !== null): ?><a href="<?= e(\forever_npc_path($npcSlug)) ?>"><?= e($r['name']) ?></a><?php else: ?><a href="<?= e($whBase . ['npc' => 'npc', 'world' => 'object', 'quest' => 'quest'][$r['kind']] . '=' . $r['id']) ?>" rel="nofollow"><?= e($r['name']) ?></a><?php endif ?></td>
+            <tr><td><?php if ($npcSlug !== null): ?><a href="<?= e(\forever_npc_path($npcSlug)) ?>"><?= e(\forever_npcs()[$npcSlug]['boss']['name']) ?></a><?php else: ?><a href="<?= e($whBase . ['npc' => 'npc', 'world' => 'object', 'quest' => 'quest'][$r['kind']] . '=' . $r['id']) ?>" rel="nofollow"><?= e($r['name']) ?></a><?php endif ?></td>
               <td class="kind"><?= e($kindLabel) ?></td>
               <td class="num"><span class="it-rate<?= $small ? ' early' : '' ?>" title="<?= $small ? 'Early estimate: fewer than ' . LOOT_SMALL_SAMPLE . ' ' . ($r['kind'] === 'quest' ? 'turn-ins' : 'loots') . ' logged' : '' ?>"><i style="width:<?= max(2, (int)round(100 * $r['rate'])) ?>%"></i><b><?= $r['rate'] < 0.1 ? preg_replace('/\.0$/', '', number_format(100 * $r['rate'], 1)) : (int)round(100 * $r['rate']) ?>%</b></span></td>
               <td class="num"><?= fmt($r['drops']) ?></td>

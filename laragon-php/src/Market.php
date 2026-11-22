@@ -242,6 +242,9 @@ function render_market_html(array $views, array $dims, array $opts): string {
   $games = $navigation['games'] ?? '';
   $crumbs = ($navigation['breadcrumbs'] ?? '') !== '' ? $navigation['breadcrumbs'] : $notes;
   $pages = $navigation['pages'] ?? '';
+  $recentSales = !empty($opts['recentSales'])
+    ? '<section class="panel census mkt"><h2 class="ptitle">Recent Sales</h2><p class="hint">Completed auctions across the edition from Journalator and TSM logs.</p>' . $opts['recentSales'] . '</section>'
+    : '';
   return <<<HTML
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -266,6 +269,7 @@ $style
   </header>
   <div class="page-controls">$pages$chips</div>
   $sections
+  $recentSales
   $generatedNote
 </div>
 $script

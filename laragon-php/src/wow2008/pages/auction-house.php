@@ -20,6 +20,11 @@ namespace Wow2008;
     <div id="ahBody"></div>
 
     <div class="source">Auction data from in-game scans · asking prices on listed auctions, not completed sales · <?= !empty($itemBase) ? 'click an item for its price history' : 'item names link to Wowhead' ?></div>
+<?php if ($recentSales !== ''): ?>
+    <?php component_start('section', ['title' => 'Recent Sales', 'icon' => 'g', 'sub' => 'Completed auctions across the edition from Journalator and TSM logs']) ?>
+      <?= $recentSales ?>
+    <?php component_end() ?>
+<?php endif ?>
   </main>
 
 <?php start_section('scripts') ?>
