@@ -122,10 +122,10 @@ function forever_dungeon_icon(?string $icon, string $size = 'small'): string {
   return '/assets/images/wow/icons/' . $size . '/' . ($icon ?: 'inv_misc_questionmark') . '.jpg';
 }
 
-function forever_dungeon_item_icon(int $id): string {
+function forever_dungeon_item_icon(int $id, string $size = 'small'): string {
   static $icons = null;
   $icons ??= (array)item_cache('item-icons', EDITIONS[DUNGEON_SOURCE]['branch']) + (array)item_cache('item-icons', 'classic');
-  return forever_dungeon_icon($icons[$id] ?? null);
+  return forever_dungeon_icon($icons[$id] ?? null, $size);
 }
 
 function forever_dungeon_seen_note(): string {
@@ -220,6 +220,118 @@ const DUNGEON_STYLE = <<<'CSS'
 }
 .w8-framed .dg-it.q0{color:#6b6b6b}.w8-framed .dg-it.q1{color:#2a1e0c}.w8-framed .dg-it.q2{color:#1a7a00}
 .w8-framed .dg-it.q3{color:#0a4fb0}.w8-framed .dg-it.q4{color:#7a2fb8}.w8-framed .dg-it.q5{color:#b55a00}
+.dg-boss h3 small{font-size:11px;font-weight:normal;opacity:.7;margin-left:6px;font-variant:normal;letter-spacing:0}
+.dg-facts2{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin:0 0 12px;border:1px solid rgba(255,255,255,.12)}
+.dg-facts2 div{padding:8px 10px;border-left:1px solid rgba(255,255,255,.12)}
+.dg-facts2 div:first-child{border-left:0}
+.dg-facts2 b{display:block;font:bold 19px Georgia,serif}
+.dg-facts2 span{font-size:11px;opacity:.75}
+.dg-route-box{margin-top:0;min-width:0}
+.dg-page{min-width:0;max-width:100%}
+.dg-route{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));row-gap:12px;list-style:none;margin:0;padding:4px 0 2px;overflow:hidden}
+.dg-route li{min-width:0;position:relative;text-align:center}
+.dg-route li+li:before{content:"";position:absolute;top:20px;right:50%;width:100%;height:3px;background:#b89552}
+.dg-route a{position:relative;display:block;padding:0 2px;color:inherit;text-decoration:none}
+.dg-route .dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;margin:0 auto;border-radius:50%;border:2px solid #8a6a32;background:#2a1e0c;color:#ffd75a;font:bold 15px Georgia,serif}
+.dg-route a.rare .dot{border-style:dashed}
+.dg-route a.on .dot{background:#7a1e10;border-color:#ffd75a;box-shadow:0 0 0 3px rgba(255,215,90,.35)}
+.dg-route .n{display:block;margin-top:5px;font-size:10.5px;line-height:1.2;font-weight:bold}
+.dg-route .l{display:block;font-size:10px;opacity:.7}
+.dg-route a:hover .n{text-decoration:underline}
+.dg-main{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start}
+.dg-main.solo{grid-template-columns:minmax(0,1fr)}
+.dg-main>.dg-boss,.dg-cards>.dg-boss:first-child{margin-top:0}
+.dg-js .dg-card{display:none;margin:0}
+.dg-js .dg-card.on{display:block}
+.dg-bh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,.12)}
+.dg-bh h3{font-size:19px}
+.dg-bh .dg-sub{margin:0}
+.dg-bh-r{text-align:right}
+.dg-bh-r .dg-kill{margin:0}
+.dg-kill.none{background:rgba(128,128,128,.25);color:inherit;opacity:.8}
+.dg-step{display:none;gap:4px;justify-content:flex-end;margin-top:6px}
+.dg-js .dg-step{display:flex}
+.dg-step button,.dg-qf button{font:11px Verdana,Tahoma,sans-serif;padding:3px 8px;cursor:pointer;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:inherit}
+.dg-desc{margin:0 0 6px}
+.dg-loot2 td{padding:5px 4px}
+.dg-big{display:flex;align-items:center;gap:8px;text-decoration:none}
+.dg-big img{width:30px;height:30px;border:1px solid rgba(0,0,0,.7);border-radius:3px;flex:none}
+.dg-big b{display:block}
+.dg-big small{display:block;font-size:10.5px;opacity:.75;color:#ccc}
+.dg-big:hover b{text-decoration:underline}
+.dg-big.q0{color:#9d9d9d}.dg-big.q1{color:#fff}.dg-big.q2{color:#1eff00}.dg-big.q3{color:#3d8bff}.dg-big.q4{color:#b579ff}.dg-big.q5{color:#ff8c32}
+.dg-loot2 td.o{width:130px;text-align:right;font-size:10.5px}
+.dg-bar{display:block;height:7px;margin-top:3px;position:relative;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
+.dg-bar i{position:absolute;left:0;top:0;bottom:0;background:#b8402a}
+.dg-none{font-style:italic;opacity:.6}
+.dg-recipes{margin-top:8px;border:1px dashed rgba(255,255,255,.25)}
+.dg-recipes summary{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:7px 9px;cursor:pointer;list-style:none;font-size:12px}
+.dg-recipes summary::-webkit-details-marker{display:none}
+.dg-recipes summary img{width:22px;height:22px;border:1px solid rgba(0,0,0,.7);border-radius:3px}
+.dg-pchip{font-size:10.5px;padding:1px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.25);opacity:.85}
+.dg-more{margin-left:auto;font-size:11px;opacity:.7}
+.dg-more:after{content:" \25BE"}
+.dg-recipes[open] .dg-more:after{content:" \25B4"}
+.dg-recipes[open] .dg-more{font-size:0}.dg-recipes[open] .dg-more:before{content:"hide";font-size:11px}
+.dg-prof{padding:4px 10px 0;font-size:10.5px;font-weight:bold;opacity:.75;text-transform:uppercase;letter-spacing:.04em}
+.dg-recipes ul{margin:0;list-style:none;padding:2px 10px 8px 14px;columns:2;column-gap:18px;font-size:11.5px}
+.dg-recipes li{margin:2px 0;break-inside:avoid}
+.dg-recipes li small{opacity:.7;font-size:10px}
+.dg-qcol{margin-top:0}
+.dg-qf{display:flex;gap:4px;margin:0 0 6px}
+.dg-qf button.on{background:#3a2406;color:#ffd75a;border-color:#3a2406}
+.dg-q{border-bottom:1px dotted rgba(255,255,255,.18)}
+.dg-q:last-child{border-bottom:0}
+.dg-q summary{display:flex;flex-wrap:wrap;align-items:center;gap:4px 7px;padding:6px 0;cursor:pointer;list-style:none}
+.dg-q summary::-webkit-details-marker{display:none}
+.dg-q .qn{flex:1;font-weight:bold}
+.dg-q summary:hover .qn{text-decoration:underline}
+.dg-q .ql{font-size:10.5px;opacity:.75}
+.dg-q .rw{flex-basis:100%;display:flex;align-items:center;gap:3px;padding-left:16px}
+.dg-q .rw img{width:20px;height:20px;border:1px solid rgba(0,0,0,.7);border-radius:2px}
+.dg-fac{width:9px;height:9px;border-radius:50%;flex:none;background:#8a7a5a}
+.dg-fac.horde{background:#b3261c}.dg-fac.alliance{background:#2a5fbf}
+.dg-btag{margin-left:4px;font-size:10px;padding:1px 5px;border-radius:2px;background:#7a1e10;color:#fff}
+.dg-qb{padding:0 0 8px 16px;font-size:11.5px}
+.dg-qb p{margin:0 0 3px}
+.dg-qb .dg-it{margin-right:6px}
+.dg-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.dg-tile{display:flex;align-items:center;gap:8px;padding:6px;border:1px solid rgba(255,255,255,.15);text-decoration:none}
+.dg-tile img{width:36px;height:36px;border:1px solid rgba(0,0,0,.7);border-radius:3px;flex:none}
+.dg-tile b{display:block;font-size:11.5px}
+.dg-tile small{display:block;font-size:10.5px;opacity:.75;color:#ccc}
+.dg-tile:hover b,.dg-chip:hover{text-decoration:underline}
+.dg-chips{display:flex;flex-wrap:wrap;gap:6px}
+.dg-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 7px 3px 3px;font-size:11.5px;font-weight:bold;border:1px solid rgba(255,255,255,.15);text-decoration:none}
+.dg-chip img{width:22px;height:22px;border:1px solid rgba(0,0,0,.7);border-radius:2px}
+.dg-tile.q2,.dg-chip.q2{color:#1eff00}.dg-tile.q3,.dg-chip.q3{color:#3d8bff}.dg-tile.q4,.dg-chip.q4{color:#b579ff}.dg-tile.q1,.dg-chip.q1{color:#fff}.dg-tile.q0,.dg-chip.q0{color:#9d9d9d}
+@media (max-width:760px){.dg-main{grid-template-columns:minmax(0,1fr)}.dg-recipes ul{columns:1}.dg-loot2 td.o{width:96px}}
+.w8-framed .dg-facts2{background:#ead4a2;border-color:#c9a86a}
+.w8-framed .dg-facts2 div{border-color:#c9a86a}
+.w8-framed .dg-facts2 b{color:#5a2a00}
+.w8-framed .dg-facts2 span{color:#6b5532;opacity:1}
+.w8-framed .dg-route .n{color:#3a2406}
+.w8-framed .dg-bh{border-color:rgba(60,40,10,.25)}
+.w8-framed .dg-bh h3 a.dg-npc{font-variant:small-caps}
+.w8-framed .dg-kill.none{background:#8a7a5a;color:#fff;opacity:1}
+.w8-framed .dg-step button,.w8-framed .dg-qf button{background:#ead4a2;border-color:#a88850;color:#2a1e0c}
+.w8-framed .dg-qf button.on{background:#3a2406;color:#ffd75a;border-color:#3a2406}
+.w8-framed .dg-big small,.w8-framed .dg-tile small{color:#6b5532;opacity:1}
+.w8-framed .dg-big.q0,.w8-framed .dg-tile.q0,.w8-framed .dg-chip.q0{color:#6b6b6b}.w8-framed .dg-big.q1,.w8-framed .dg-tile.q1,.w8-framed .dg-chip.q1{color:#2a1e0c}
+.w8-framed .dg-big.q2,.w8-framed .dg-tile.q2,.w8-framed .dg-chip.q2{color:#1a7a00}.w8-framed .dg-big.q3,.w8-framed .dg-tile.q3,.w8-framed .dg-chip.q3{color:#0a4fb0}
+.w8-framed .dg-big.q4,.w8-framed .dg-tile.q4,.w8-framed .dg-chip.q4{color:#7a2fb8}.w8-framed .dg-big.q5{color:#b55a00}
+.w8-framed .dg-loot2 td.o{color:#6b5532}
+.w8-framed .dg-bar{background:#e2cb98;border-color:#b89552}
+.w8-framed .dg-bar i{background:#7a1e10}
+.w8-framed .dg-recipes{border-color:#b89552;background:rgba(243,226,184,.6)}
+.w8-framed .dg-pchip{background:#ead4a2;border-color:#c9a86a;color:#6b5532;opacity:1}
+.w8-framed .dg-prof{color:#5a2a00;opacity:1}
+.w8-framed .dg-q{border-color:#d1b57c}
+.w8-framed .dg-q .qn{color:#5a2a00}
+.w8-framed .dg-q .ql{color:#6b5532;opacity:1}
+.w8-framed .dg-qb{color:#4a3618}
+.w8-framed .dg-qb b{color:#2a1e0c}
+.w8-framed .dg-tile,.w8-framed .dg-chip{background:#f3e2b8;border-color:#c9a86a}
 CSS;
 
 function forever_npc_slug(string $name): string {
@@ -422,34 +534,204 @@ function forever_dungeons_body(?array $d): string {
     '<select id="dg-jump" onchange="if(this.value)location.href=this.value">';
   foreach ($dungeons as $x) $pick .= '<option value="' . esc(forever_dungeon_path($x['slug'])) . '"' . ($x['slug'] === $d['slug'] ? ' selected' : '') . '>' . esc($x['name']) . '</option>';
   $pick .= '</select><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a></nav>';
-  $bosses = '';
-  foreach ($d['bosses'] as $b) {
+
+  $route = $cards = '';
+  $best = [];
+  $runs = 0;
+  $count = count($d['bosses']);
+  foreach ($d['bosses'] as $i => $b) {
     $obs = $b['npcID'] ? ($observed[$b['npcID']] ?? null) : null;
+    $bossRuns = $runLog[$b['name']] ?? null;
+    $anySeen = $anySeen || $obs || $bossRuns;
+    $runs = max($runs, $bossRuns['kills'] ?? 0);
+    $anchor = 'boss-' . forever_npc_slug($b['name']);
+    $route .= '<li><a href="#' . esc($anchor) . '" data-i="' . $i . '"' . ($b['rare'] ? ' class="rare"' : '') . '><span class="dot">' . ($b['rare'] ? '&#9733;' : $i + 1) .
+      '</span><span class="n">' . esc($b['name']) . '</span>' . ($b['level'] ? '<span class="l">Lv ' . esc($b['level']) . '</span>' : '') . '</a></li>';
+    [$rows, $recipes, $seen] = forever_dungeon_boss_loot($b, $obs, $bossRuns);
+    foreach ($seen as $s) $best[] = $s + ['boss' => $b['name']];
     $sub = array_filter([$b['level'] ? 'Level ' . $b['level'] : null, $b['rare'] ? 'Rare spawn' : null, $b['npcID'] ? 'NPC ' . $b['npcID'] : null]);
-    $kill = $b['killedBy'] ? '<span class="dg-kill">Killed by ' . js_locale($b['killedBy']) . ' uploader' . ($b['killedBy'] === 1 ? '' : 's') . '</span>' : '';
-    $runs = $runLog[$b['name']] ?? null;
-    $loot = forever_dungeon_loot_rows($b, $obs, $runs);
-    $anySeen = $anySeen || $obs || $runs;
-    $bosses .= '<section class="dg-boss"><h3><a class="dg-npc" href="' . esc(forever_npc_path(forever_npc_slug($b['name']))) . '">' . esc($b['name']) . '</a>' . $kill . '</h3>' .
-      ($sub ? '<div class="dg-sub">' . esc(implode(' · ', $sub)) . '</div>' : '') .
-      ($b['description'] !== '' ? '<p style="margin:0 0 6px">' . esc($b['description']) . '</p>' : '') .
-      ($loot !== '' ? '<table class="dg-loot"><tbody>' . $loot . '</tbody></table>' : '<p class="hint">No loot listed yet.</p>') . '</section>';
+    $kill = $b['killedBy'] ? '<span class="dg-kill">Killed by ' . js_locale($b['killedBy']) . ' uploader' . ($b['killedBy'] === 1 ? '' : 's') . '</span>'
+      : '<span class="dg-kill none">No kills logged</span>';
+    $cards .= '<section class="dg-boss dg-card" id="' . esc($anchor) . '" data-i="' . $i . '"><header class="dg-bh"><div><h3><a class="dg-npc" href="' .
+      esc(forever_npc_path(forever_npc_slug($b['name']))) . '">' . esc($b['name']) . '</a></h3>' .
+      ($sub ? '<div class="dg-sub">' . esc(implode(' · ', $sub)) . '</div>' : '') . '</div><div class="dg-bh-r">' . $kill .
+      ($count > 1 ? '<span class="dg-step"><button type="button" data-step="-1">&lsaquo; Prev</button><button type="button" data-step="1">Next &rsaquo;</button></span>' : '') .
+      '</div></header>' .
+      ($b['description'] !== '' ? '<p class="dg-desc">' . esc($b['description']) . '</p>' : '') .
+      ($rows !== '' ? '<table class="dg-loot dg-loot2"><tbody>' . $rows . '</tbody></table>' : ($recipes === '' ? '<p class="hint">No loot listed yet.</p>' : '')) .
+      $recipes . '</section>';
   }
-  if ($d['trash']) {
-    $loot = '';
-    foreach ($d['trash'] as $it) $loot .= '<tr><td>' . forever_dungeon_item_link($it) . '</td><td class="s">' . esc($it['slot']) . '</td><td class="o">' . esc($it['from'] ?? '') . '</td></tr>';
-    $bosses .= '<section class="dg-boss"><h3>Trash drops</h3><table class="dg-loot"><tbody>' . $loot . '</tbody></table></section>';
+
+  $quests = $d['questDetails'] ?? [];
+  $factions = array_count_values(array_map(fn($q) => $q['faction'] ?? 'Both', $quests));
+  $questPanel = forever_dungeon_quest_list($quests);
+
+  $rare = count(array_filter($d['bosses'], fn($b) => $b['rare']));
+  $facts = [[$d['level'] ?: '-', 'Level range'], [(string)$count, 'Boss' . ($count === 1 ? '' : 'es') . ($rare ? ' (' . $rare . ' rare)' : '')]];
+  if ($quests) {
+    $split = [];
+    foreach (['Horde' => 'Horde', 'Alliance' => 'Alliance', 'Both' => 'both'] as $f => $label) if (isset($factions[$f])) $split[] = $factions[$f] . ' ' . $label;
+    $facts[] = [(string)count($quests), 'Quests · ' . implode(' · ', $split)];
   }
-  $quests = forever_dungeon_quests_html($d['questDetails'] ?? []);
+  $facts[] = [js_locale(forever_dungeon_loot_count($d)), 'Items in the loot tables'];
+  $facts[] = [$runs ? js_locale($runs) : '-', 'Runs logged by players'];
+  $factHtml = '<div class="dg-facts2">' . implode('', array_map(fn($f) => '<div><b>' . esc($f[0]) . '</b><span>' . esc($f[1]) . '</span></div>', $facts)) . '</div>';
+
+  usort($best, fn($a, $b) => [$b['quality'] >= 3, $b['rate'], $b['drops']] <=> [$a['quality'] >= 3, $a['rate'], $a['drops']]);
+  $bestHtml = '';
+  $shown = [];
+  foreach ($best as $x) {
+    if ($x['quality'] < 2 || isset($shown[$x['id']]) || count($shown) >= 8) continue;
+    $shown[$x['id']] = true;
+    $bestHtml .= '<a class="dg-tile ' . (DUNGEON_QUALITY[$x['quality']] ?? 'q1') . '" href="' . esc(forever_item_path($x['id'])) . '"><img src="' .
+      esc(forever_dungeon_item_icon($x['id'], 'large')) . '" alt="" loading="lazy"><span><b>' . esc($x['name']) . '</b><small>' . esc($x['boss']) . ' · ' . esc($x['seen']) . '</small></span></a>';
+  }
+
+  $trash = '';
+  foreach ($d['trash'] as $it)
+    $trash .= '<a class="dg-chip ' . (DUNGEON_QUALITY[$it['quality']] ?? 'q1') . '" href="' . esc(forever_item_path($it['id'])) . '" title="' .
+      esc(implode(' · ', array_filter([$it['slot'], $it['from'] ?? null]))) . '"><img src="' .
+      esc(forever_dungeon_item_icon((int)$it['id'])) . '" alt="" loading="lazy">' . esc($it['name']) . '</a>';
+
   // The 2008 skin moves the marked picker and heading into its banner.
-  return '<div class="panel census"><!--dg-pick-->' . $pick . '<!--/dg-pick--><!--dg-head-->' .
+  return '<div class="panel census dg-page"><!--dg-pick-->' . $pick . '<!--/dg-pick--><!--dg-head-->' .
     '<div class="dg-head"><img src="' . esc(forever_dungeon_icon($d['icon'], 'large')) . '" alt=""><div><div class="ptitle" style="margin:0">' . esc($d['name']) .
     ($d['new'] ? '<span class="dg-new">NEW IN FOREVER</span>' : '') . '</div><p class="dg-meta">' . esc(forever_dungeon_meta($d)) . '</p>' .
     ($d['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($d['description']) . '</p>' : '') . '</div></div><!--/dg-head-->' .
+    $factHtml .
     ($d['lootIncomplete'] ? '<p class="hint">The loot list for this dungeon is still being filled in.</p>' : '') .
-    ($quests !== '' ? '<div class="dg-cols"><div>' . $quests . '</div><div>' . $bosses . '</div></div>' : $bosses) .
-    ($anySeen ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '<p class="dg-credit"><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a> · ' . forever_dungeon_credit() . '</p></div>';
+    ($count ? '<section class="dg-boss dg-route-box"><h3>Boss route <small>in the journal\'s order · pick a boss to see its loot</small></h3><ol class="dg-route">' . $route . '</ol></section>' : '') .
+    '<div class="dg-main' . ($questPanel === '' ? ' solo' : '') . '"><div class="dg-cards">' . $cards . '</div>' . $questPanel . '</div>' .
+    ($bestHtml !== '' ? '<section class="dg-boss"><h3>Best of the dungeon <small>the drops players saw most often</small></h3><div class="dg-tiles">' . $bestHtml . '</div></section>' : '') .
+    ($trash !== '' ? '<section class="dg-boss"><h3>Trash drops <small>from any mob in the dungeon · hover for the slot</small></h3><div class="dg-chips">' . $trash . '</div></section>' : '') .
+    ($anySeen ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '<p class="dg-credit"><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a> · ' . forever_dungeon_credit() . '</p></div>' .
+    DUNGEON_PAGE_SCRIPT;
 }
+
+/**
+ * One boss's loot for its card: [table rows, folded recipe list, items players saw drop].
+ * Recipes ("Recipe, <profession>") fold into one list grouped by profession; each seen item is
+ * ['id', 'name', 'quality', 'rate', 'drops', 'seen'] for "Best of the dungeon".
+ */
+function forever_dungeon_boss_loot(array $b, ?array $obs, ?array $runs): array {
+  $seen = function (int $id) use ($obs, $runs): array {
+    $text = [];
+    $rate = null;
+    $drops = 0;
+    if ($runs && isset($runs['items'][$id])) {
+      $drops = $runs['items'][$id]['drops'];
+      $text[] = $drops . ' of ' . $runs['kills'] . ' run' . ($runs['kills'] === 1 ? '' : 's');
+      $rate = $drops / max(1, $runs['kills']);
+    }
+    if ($obs && isset($obs['items'][$id])) {
+      $text[] = $obs['items'][$id] . ' of ' . $obs['windows'] . ' kill' . ($obs['windows'] === 1 ? '' : 's');
+      $rate ??= $obs['items'][$id] / max(1, $obs['windows']);
+      $drops = max($drops, $obs['items'][$id]);
+    }
+    return [implode(' · ', $text), $rate, $drops];
+  };
+  $found = [];
+  $row = function (array $it, string $slot, bool $extra) use ($seen, &$found): string {
+    [$text, $rate, $drops] = $seen((int)$it['id']);
+    if ($rate !== null) $found[] = ['id' => (int)$it['id'], 'name' => $it['name'], 'quality' => (int)$it['quality'], 'rate' => $rate, 'drops' => $drops, 'seen' => $text];
+    $q = DUNGEON_QUALITY[$it['quality']] ?? 'q1';
+    return '<tr' . ($extra ? ' class="dg-extra"' : '') . '><td><a class="dg-big ' . $q . '" href="' . esc(forever_item_path($it['id'])) . '"><img src="' .
+      esc(forever_dungeon_item_icon((int)$it['id'], 'large')) . '" alt="" loading="lazy"><span><b>' . esc($it['name']) . '</b><small>' . esc($slot) . '</small></span></a></td>' .
+      '<td class="o">' . ($rate !== null ? esc($text) . '<span class="dg-bar"><i style="width:' . max(3, (int)round(100 * min(1, $rate))) . '%"></i></span>'
+        : '<span class="dg-none">not seen yet</span>') . '</td></tr>';
+  };
+  $rows = '';
+  $recipes = [];
+  $listed = [];
+  foreach ($b['loot'] as $it) {
+    $listed[$it['id']] = true;
+    if (preg_match('/^Recipe,\s*(.+)$/', $it['slot'], $m)) { $recipes[$m[1]][] = $it; continue; }
+    $rows .= $row($it, $it['slot'], false);
+  }
+  $extra = [];
+  foreach ($runs['items'] ?? [] as $id => $x) if (!isset($listed[$id])) $extra[$id] = ['name' => $x['name'], 'quality' => $x['quality']];
+  foreach ($obs['items'] ?? [] as $id => $n) if (!isset($listed[$id])) $extra[$id] ??= ['name' => null, 'quality' => null];
+  foreach ($extra as $id => $x)
+    $rows .= $row(['id' => $id, 'name' => $x['name'] ?: forever_dungeon_item_name($id), 'quality' => $x['quality'] ?? 1], 'Also seen here · not in the journal\'s list', true);
+  $fold = '';
+  if ($recipes) {
+    ksort($recipes);
+    $n = array_sum(array_map('count', $recipes));
+    $lists = '';
+    foreach ($recipes as $prof => $list) {
+      $lists .= '<div class="dg-prof">' . esc($prof) . '</div><ul>';
+      foreach ($list as $it) {
+        [$text] = $seen((int)$it['id']);
+        $lists .= '<li>' . forever_dungeon_item_link($it) . ($text !== '' ? ' <small>' . esc($text) . '</small>' : '') . '</li>';
+      }
+      $lists .= '</ul>';
+    }
+    $fold = '<details class="dg-recipes"><summary><img src="' . esc(forever_dungeon_icon('inv_scroll_03')) . '" alt=""><b>' . $n . ' recipe' . ($n === 1 ? '' : 's') . '</b>' .
+      implode('', array_map(fn($p) => '<span class="dg-pchip">' . esc($p) . ' ' . count($recipes[$p]) . '</span>', array_keys($recipes))) .
+      '<span class="dg-more">show</span></summary>' . $lists . '</details>';
+  }
+  return [$rows, $fold, $found];
+}
+
+/** The quest column: one compact line per quest (faction, name, level, reward icons) that opens to its details. */
+function forever_dungeon_quest_list(array $quests): string {
+  if (!$quests) return '';
+  $factions = array_unique(array_map(fn($q) => $q['faction'] ?? 'Both', $quests));
+  $filter = count(array_intersect($factions, ['Horde', 'Alliance'])) === 2
+    ? '<div class="dg-qf" role="group" aria-label="Faction"><button type="button" class="on" data-f="">All</button><button type="button" data-f="Horde">Horde</button><button type="button" data-f="Alliance">Alliance</button></div>' : '';
+  $html = '';
+  foreach ($quests as $quest) {
+    $faction = $quest['faction'] ?? 'Both';
+    $icons = implode('', array_map(fn($it) => '<img src="' . esc(forever_dungeon_item_icon((int)$it['id'])) . '" alt="" title="' . esc($it['name']) . '" loading="lazy">', $quest['rewards']));
+    $body = '';
+    if ($quest['objective'] !== '') $body .= '<p>' . esc($quest['objective']) . '</p>';
+    foreach (['pickup' => 'Pick up', 'turnin' => 'Turn in'] as $key => $label)
+      if (isset($quest[$key])) $body .= '<p><b>' . $label . '</b> ' . esc($quest[$key]) . '</p>';
+    if ($quest['bosses'])
+      $body .= '<p><b>Bosses</b> ' . implode(', ', array_map(fn($boss) => '<a href="#boss-' . esc(forever_npc_slug($boss)) . '" data-boss>' . esc($boss) . '</a>', $quest['bosses'])) . '</p>';
+    if ($quest['rewards'])
+      $body .= '<p><b>' . ($quest['rewardChoice'] ? 'Choose one' : 'Rewards') . '</b> ' .
+        implode(' ', array_map(fn($item) => forever_dungeon_item_link($item, 'https://www.wowhead.com/forever/item=' . $item['id']), $quest['rewards'])) . '</p>';
+    if ($quest['id']) $body .= '<p><a href="https://www.wowhead.com/forever/quest=' . (int)$quest['id'] . '">Quest on Wowhead</a></p>';
+    $html .= '<details class="dg-q" data-f="' . esc($faction) . '"><summary><span class="dg-fac ' . strtolower(esc($faction)) . '" title="' . esc($faction) . '"></span>' .
+      '<span class="qn">' . esc($quest['name']) . '</span><span class="ql">' . ($faction === 'Both' ? 'Both · ' : '') . ($quest['requires'] ? 'Lv ' . (int)$quest['requires'] . '+' : '') . '</span>' .
+      ($icons !== '' || $quest['bosses'] ? '<span class="rw">' . $icons . ($quest['bosses'] ? '<span class="dg-btag">' . esc($quest['bosses'][0]) . '</span>' : '') . '</span>' : '') .
+      '</summary><div class="dg-qb">' . $body . '</div></details>';
+  }
+  return '<section class="dg-boss dg-qcol"><h3>Quests <small>' . count($quests) . ' · open one for its details</small></h3>' . $filter . $html . '</section>';
+}
+
+const DUNGEON_PAGE_SCRIPT = <<<'HTML'
+<script>
+(function(){
+  var page=document.querySelector('.dg-page');if(!page)return;
+  var cards=[].slice.call(page.querySelectorAll('.dg-card')),stops=[].slice.call(page.querySelectorAll('.dg-route a'));
+  if(!cards.length)return;
+  page.classList.add('dg-js');
+  var cur=0;
+  function show(i,scroll,user){
+    cur=(i+cards.length)%cards.length;
+    cards.forEach(function(c,k){c.classList.toggle('on',k===cur)});
+    stops.forEach(function(s,k){s.classList.toggle('on',k===cur);if(k===cur)s.setAttribute('aria-current','true');else s.removeAttribute('aria-current')});
+    if(user&&history.replaceState)history.replaceState(null,'','#'+cards[cur].id);
+    if(scroll)cards[cur].scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  function byId(id){for(var k=0;k<cards.length;k++)if(cards[k].id===id)return k;return -1}
+  page.addEventListener('click',function(e){
+    var a=e.target.closest('.dg-route a,a[data-boss]');
+    if(a){var k=byId(a.getAttribute('href').slice(1));if(k>-1){e.preventDefault();show(k,a.hasAttribute('data-boss'),true);}return}
+    var b=e.target.closest('.dg-step button');if(b){show(cur+(+b.getAttribute('data-step')),false,true);return}
+    var f=e.target.closest('.dg-qf button');
+    if(f){var v=f.getAttribute('data-f');
+      [].forEach.call(page.querySelectorAll('.dg-qf button'),function(x){x.classList.toggle('on',x===f)});
+      [].forEach.call(page.querySelectorAll('.dg-q'),function(q){var g=q.getAttribute('data-f');q.hidden=!!v&&g!==v&&g!=='Both'});}
+  });
+  var start=byId(decodeURIComponent(location.hash.slice(1)));
+  if(start<0)start=0;
+  show(start,false);
+})();
+</script>
+HTML;
 
 const DUNGEON_TIERS = [
   ['novice', 'I', 'Novice Delves', 'Your first dungeons: the caverns, mines and ruins below the capitals.', 0, 20],
