@@ -658,6 +658,29 @@ def fill_item_ids(cur):
     return borrowed + cur.rowcount
 
 
+def fill_item_names(cur, table):
+    """TSM rows carry only the item id: borrow the name from a ledger row of the same id and game,
+    then from the game's newest auction scan of that id."""
+    cur.execute(f"""UPDATE marketlens_import.{table} e SET item_name = s.item_name
+        FROM (SELECT DISTINCT ON (source_game, item_id) source_game, item_id, item_name
+              FROM marketlens_import.addon_ledger_events
+              WHERE item_id IS NOT NULL AND coalesce(item_name, '') <> ''
+              ORDER BY source_game, item_id, t DESC) s
+        WHERE coalesce(e.item_name, '') = '' AND e.item_id IS NOT NULL
+          AND e.source_game = s.source_game AND e.item_id = s.item_id""")
+    borrowed = cur.rowcount
+    cur.execute(f"""UPDATE marketlens_import.{table} e SET item_name = s.name
+        FROM (SELECT DISTINCT ON (source_game, item_id) source_game, item_id, name
+              FROM marketlens_import.local_auction_snapshots
+              WHERE coalesce(name, '') <> ''
+                AND source_game IN (SELECT DISTINCT source_game FROM marketlens_import.{table}
+                                    WHERE coalesce(item_name, '') = '' AND item_id IS NOT NULL)
+              ORDER BY source_game, item_id, captured_at DESC) s
+        WHERE coalesce(e.item_name, '') = '' AND e.item_id IS NOT NULL
+          AND e.source_game = s.source_game AND e.item_id = s.item_id""")
+    return borrowed + cur.rowcount
+
+
 def pending_sale_time(row, seen):
     """Sale time from a Sale Pending mail: when the gold arrives (realm clock) minus the mail delay."""
     eta_h, eta_m = to_int(row.get("etaHour")), to_int(row.get("etaMin"))
@@ -1079,6 +1102,7 @@ def main():
         entry.update(result="imported", newRows=new, newBySection=dict(sorted(per.items())))
 
     report["itemIdsFilled"] = fill_item_ids(cur)
+    report["itemNamesFilled"] = fill_item_names(cur, "addon_ledger_events")
     report["nativeRowsRekeyed"] = rekey_native_rows(cur, groups)
     report["foreverRealmsFilled"] = fill_forever_realms(cur, groups, cache)
     if args.rebuild_all_sales:
@@ -1090,6 +1114,7 @@ def main():
         report["salesRebuilt"] = rebuild_sales(cur, groups)
         changed = bool(groups)
     report["duplicateSalesDropped"] = drop_duplicate_sales(cur)
+    report["saleNamesFilled"] = fill_item_names(cur, "addon_auction_sales")
     changed = changed or bool(report["duplicateSalesDropped"])
     report["lootSources"], report["lootItems"] = rebuild_loot(cur)
     cur.execute("""SELECT count(*), count(seconds_to_sell) FROM marketlens_import.addon_auction_sales""")
