@@ -290,7 +290,7 @@ function render_page(string $html, string $path): string {
     $icon = preg_match('#<div class="ptitle bx-spell-title"><img[^>]*src="([^"]+)"#', $html, $m) ? html_entity_decode($m[1], ENT_QUOTES) : null;
     $school = preg_match('#<p class="dg-meta">Spell ID \d+ · ([^<]+)</p>#u', $html, $m) ? ' · ' . mb_strtoupper(html_entity_decode($m[1], ENT_QUOTES)) : '';
     $html = preg_replace(['#<div class="ptitle bx-spell-title">.*?</div>#s', '#<p class="dg-meta">Spell ID \d+[^<]*</p>#u'], '', $html, 1);
-    return framed_page(\DUNGEON_SOURCE, $html, 'spells', 'no-data', subtitle: 'WOW: FOREVER · SPELLS' . $school, icon: $icon, notice: contribute_notice());
+    return framed_page(\DUNGEON_SOURCE, $html, 'spells', 'census', subtitle: 'WOW: FOREVER · SPELLS' . $school, icon: $icon, notice: contribute_notice());
   }
   if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m) && isset(\forever_npcs()[$m[1]])) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;

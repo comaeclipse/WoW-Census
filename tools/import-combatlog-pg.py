@@ -298,6 +298,14 @@ def main():
         print("DRY RUN: rolled back")
         return
     conn.commit()
+    # Icons for spells these logs added (best effort: a Wowhead outage must not fail the import).
+    try:
+        added, unknown = _load("update_spell_icons", "update-spell-icons.py").update(cur, SOURCE_GAME)
+        conn.commit()
+        print(f"spell icons: added={added} unknown={unknown}")
+    except Exception as e:
+        conn.rollback()
+        print(f"spell icons skipped: {e}", file=sys.stderr)
     print("CHANGED sources=combatlog" if any("skipped" not in f for f in report["files"]) else "Nothing new")
 
 

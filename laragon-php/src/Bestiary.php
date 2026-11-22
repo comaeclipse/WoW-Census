@@ -191,7 +191,15 @@ function bestiary_spell_icon(int $id): string {
     13563 => 'inv_egg_02',
     460939 => 'spell_arcane_teleportstormwind',
   ];
-  return '<img class="bx-spell-icon" src="' . esc(forever_dungeon_icon($icons[$id] ?? null, 'large')) .
+  // Every combat-log spell's icon, from tools/update-spell-icons.py; the list above covers a missing table.
+  static $looked = null;
+  if ($looked === null) {
+    $looked = [];
+    if (Db::first("SELECT to_regclass('combatlog_spell_icons') IS NOT NULL AS ok")['ok'])
+      foreach (Db::all("SELECT spell_id, icon FROM combatlog_spell_icons WHERE source_game = ? AND icon IS NOT NULL", [DUNGEON_SOURCE]) as $r)
+        $looked[$r['spell_id']] = $r['icon'];
+  }
+  return '<img class="bx-spell-icon" src="' . esc(forever_dungeon_icon($looked[$id] ?? $icons[$id] ?? null, 'large')) .
     '" width="20" height="20" alt="" loading="lazy">';
 }
 
@@ -326,8 +334,9 @@ const FOREVER_AUTO_SHOT_STYLE = <<<'CSS'
 .bx-auto-average{position:absolute;bottom:100%;left:clamp(67px,var(--average),100% - 67px);width:134px;transform:translateX(-50%);padding-bottom:8px;text-align:center;font:13px/1.1 Georgia,serif;color:#4b2b14}
 .bx-auto-average strong{display:block;font-size:23px}
 .bx-auto-ends{display:flex;justify-content:space-between;margin-top:8px;font-weight:bold;color:#542c16}
-.bx-auto-sample{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:14px 0 0;border-block:1px solid #a5733b70;text-align:center;color:#4b2b14}
+.bx-auto-sample{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));margin:14px 0 0;border-block:1px solid #a5733b70;text-align:center;color:#4b2b14}
 .bx-auto-sample div{padding:8px 3px}.bx-auto-sample div+div{border-left:1px solid #a5733b70}
+.bx-auto-sample dt{font-size:11px;text-transform:uppercase;letter-spacing:.04em;opacity:.8}
 .bx-auto-sample dd{margin:3px 0 0;font:700 20px Georgia,serif}
 CSS;
 
@@ -541,21 +550,26 @@ function forever_spell_html(int $id, string $stylesheet): ?string {
   $body = '<div class="panel census dg-npc"><div class="ptitle bx-spell-title">' .
     bestiary_spell_icon($id) . esc($name) . '</div>' .
     '<p class="dg-meta">Spell ID ' . $id . ($school !== '' ? ' · ' . esc($school) : '') . '</p>';
-  if ($id === 75) {
-    foreach ($players as $sample) {
-      if ($sample['class_file'] !== 'HUNTER' || $sample['mode'] !== 'PvE' || $sample['periodic']) continue;
-      $body .= forever_auto_shot_feature($sample);
-      break;
-    }
+  // The range graph: NPC casts when there are any, else the most-seen player sample.
+  if ($summary && $summary['hits']) {
+    $body .= forever_spell_range_feature('Cast by NPCs', (int)$summary['lo'], (int)$summary['hi'], (float)$summary['total'],
+      (int)$summary['hits'], (int)$summary['crits'], (int)$summary['logs'], [
+        'Casts' => js_locale($summary['casts']),
+        'Missed or avoided' => round(100 * $summary['misses'] / max(1, $summary['hits'] + $summary['misses']), 1) . '%']);
+  } elseif ($players) {
+    $best = $players[0];
+    foreach ($players as $p) if ([!$p['periodic'], $p['events']] > [!$best['periodic'], $best['events']]) $best = $p;
+    $class = CLASS_META[$best['class_file']][0] ?? $best['class_file'];
+    $healing = $best['mode'] === 'Healing';
+    $body .= forever_spell_range_feature($class . ' · ' . $best['mode'] . ($best['periodic'] ? ' · per tick' : ''),
+      (int)$best['low'], (int)$best['high'], (float)$best['amount'], (int)$best['events'], (int)$best['crits'], (int)$best['logs'],
+      [], $healing ? 'healing' : 'damage');
+  } elseif ($summary) {
+    $body .= '<div class="bx-stats"><span><b>' . js_locale($summary['casts']) . '</b>Casts</span>' .
+      '<span><b>' . js_locale($summary['misses']) . '</b>Missed or avoided</span>' .
+      '<span><b>' . js_locale($summary['logs']) . '</b>Combat logs</span></div>';
   }
-  if ($summary) $body .= '<div class="bx-stats">' .
-    ($summary['hits'] ? '<span><b>' . number_format($summary['total'] / $summary['hits'], 1) . '</b>Avg. damage per hit</span>' .
-      '<span><b>' . bestiary_range([$summary['lo'], $summary['hi']]) . '</b>Damage range</span>' : '') .
-    '<span><b>' . js_locale($summary['casts']) . '</b>Casts</span>' .
-    '<span><b>' . js_locale($summary['hits']) . '</b>Hits</span>' .
-    '<span><b>' . js_locale($summary['crits']) . '</b>Critical hits</span>' .
-    '<span><b>' . js_locale($summary['misses']) . '</b>Missed or avoided</span>' .
-    '<span><b>' . js_locale($summary['logs']) . '</b>Combat logs</span></div>' .
+  if ($summary) $body .=
     '<section class="dg-boss"><h3>Observed damage by NPC</h3>' .
     bestiary_attack_table('NPC', '<tr><td><b>All NPCs</b></td>' . $cells($summary) . '</tr>' . $casters) . '</section>' .
     '<p class="dg-credit">Casts and damage come from NPC observations in WoW: Forever combat logs. Damage includes absorbed damage.</p>';
@@ -587,21 +601,26 @@ function forever_player_spell_observations(array $rows): string {
     '<p class="hint">Player figures cover landed damage and healing. Class is inferred from class-specific casts.</p></section>';
 }
 
-function forever_auto_shot_feature(array $sample): string {
-  $average = $sample['amount'] / $sample['events'];
-  $position = $sample['low'] < $sample['high'] ? 100 * ($average - $sample['low']) / ($sample['high'] - $sample['low']) : 50;
-  $range = sprintf('Minimum %d, average %.1f, maximum %d damage per landed hit', $sample['low'], $average, $sample['high']);
-  $crit = number_format(100 * $sample['crits'] / $sample['events'], 1) . '%';
-  return '<section class="bx-auto-shot bx-auto-summary" aria-labelledby="bx-auto-range"><h2 id="bx-auto-range">Observed damage range</h2>' .
-    '<p class="dg-meta">Hunter · PvE</p>' .
+/** Min / average / max rail for one spell sample, with its counts underneath. */
+function forever_spell_range_feature(string $label, int $low, int $high, float $amount, int $events, int $crits, int $logs,
+    array $extra = [], string $what = 'damage'): string {
+  $average = $amount / $events;
+  $position = $low < $high ? 100 * ($average - $low) / ($high - $low) : 50;
+  $range = sprintf('Minimum %d, average %.1f, maximum %d %s per landed hit', $low, $average, $high, $what);
+  $crit = number_format(100 * $crits / $events, 1) . '%';
+  $cells = '';
+  foreach ($extra as $k => $v) $cells .= '<div><dt>' . esc($k) . '</dt><dd>' . $v . '</dd></div>';
+  $per = $what === 'healing' ? 'Avg. heal' : 'Avg. damage per hit';
+  return '<section class="bx-auto-shot bx-auto-summary" aria-labelledby="bx-auto-range"><h2 id="bx-auto-range">Observed ' . $what . ' range</h2>' .
+    '<p class="dg-meta">' . esc($label) . '</p>' .
     '<div class="bx-auto-scale" role="img" aria-label="' . esc($range) . '"><div class="bx-auto-rail">' .
     '<span class="bx-auto-marker" style="left:' . number_format($position, 2, '.', '') . '%"></span>' .
     '<span class="bx-auto-average" style="--average:' . number_format($position, 2, '.', '') . '%"><strong>' .
-    number_format($average, 1) . '</strong>Avg. damage per hit</span></div>' .
-    '<div class="bx-auto-ends"><span>' . js_locale($sample['low']) . '</span><span>' . js_locale($sample['high']) . '</span></div></div>' .
-    '<dl class="bx-auto-sample"><div><dt>Landed hits</dt><dd>' . js_locale($sample['events']) . '</dd></div>' .
+    number_format($average, 1) . '</strong>' . $per . '</span></div>' .
+    '<div class="bx-auto-ends"><span>' . js_locale($low) . '</span><span>' . js_locale($high) . '</span></div></div>' .
+    '<dl class="bx-auto-sample">' . $cells . '<div><dt>Landed hits</dt><dd>' . js_locale($events) . '</dd></div>' .
     '<div><dt>Crit rate</dt><dd>' . $crit . '</dd></div>' .
-    '<div><dt>Combat logs</dt><dd>' . js_locale($sample['logs']) . '</dd></div></dl></section>';
+    '<div><dt>Combat logs</dt><dd>' . js_locale($logs) . '</dd></div></dl></section>';
 }
 
 function bestiary_page(string $title, string $desc, string $path, string $topic, string $body, string $stylesheet, string $section = 'bestiary'): string {
