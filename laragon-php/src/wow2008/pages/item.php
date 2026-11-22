@@ -169,6 +169,9 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
       </div>
       <a class="it-wh" href="<?= e($wowhead) ?>" target="_blank" rel="noopener">Wowhead »</a>
     </div>
+<?php if (current_source() === 'forever'): ?>
+<?= contribute_notice() ?>
+<?php endif ?>
 
 <?php if ($w): $maxClass = max(array_column($w['classes'], 2)); $fa = $w['factions']['Alliance'] ?? 0; $fh = $w['factions']['Horde'] ?? 0; ?>
     <?php component_start('section', ['title' => 'Who Wears It', 'icon' => 'p', 'sub' => 'from ' . fmt($w['inspected']) . ' inspected characters']) ?>

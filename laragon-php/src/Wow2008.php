@@ -10,7 +10,8 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '68';
+const ASSET_VERSION = '69';
+const DISCORD_URL = 'https://discord.gg/kSUGgYDd8V';
 
 // Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
 const SUPPORT_RAISED = 0;
@@ -44,6 +45,16 @@ function render(string $template, array $vars = []): string {
 
 function component(string $name, array $props = []): string {
   return rtrim(render("components/$name.php", $props), "\n");
+}
+
+function discord_link(string $label): string {
+  return '<a href="' . e(DISCORD_URL) . '" target="_blank" rel="noopener">' . e($label) . '</a>';
+}
+
+/** The note on Forever pages built from player uploads (dungeons, NPCs, spells, items). */
+function contribute_notice(): string {
+  return component('notice', ['title' => 'This data may be incomplete', 'html' => 'This page is built from what players have uploaded so far, so parts of it may be missing or out of date. '
+    . discord_link('Join our Discord') . ' to learn how you can contribute and make it more accurate!']);
 }
 
 function component_start(string $name, array $props = []): void {
@@ -264,14 +275,14 @@ function render_page(string $html, string $path): string {
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . ($d === null ? \DUNGEON_W8_INDEX_STYLE : '') . '</style></head>', $html);
     if ($d === null) {
       $html = preg_replace_callback('#<!--dg-index-->.*<!--/dg-index-->#s', fn() => \forever_dungeons_w8_index(), $html, 1);
-      return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art(null), 'Dungeons');
+      return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art(null), 'Dungeons', notice: contribute_notice());
     }
     // The banner carries the dungeon picker, icon, level and location line, and description.
     $tools = preg_match('#<!--dg-pick-->(.*?)<!--/dg-pick-->#s', $html, $pm) ? $pm[1] : null;
     $html = preg_replace(['#<!--dg-pick-->.*?<!--/dg-pick-->#s', '#<!--dg-head-->.*?<!--/dg-head-->#s'], '', $html, 1);
     return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art($d['slug']), $d['name'],
       subtitle: ($d['new'] ? 'New in Forever · ' : '') . \forever_dungeon_meta($d), icon: \forever_dungeon_icon($d['icon'], 'large'),
-      intro: $d['description'] !== '' ? $d['description'] : null, tools: $tools);
+      intro: $d['description'] !== '' ? $d['description'] : null, tools: $tools, notice: contribute_notice());
   }
   if (preg_match('#^/forever/spell/[1-9][0-9]{0,9}/?$#', $path) && str_contains($html, 'class="ptitle bx-spell-title"')) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
@@ -279,7 +290,7 @@ function render_page(string $html, string $path): string {
     $icon = preg_match('#<div class="ptitle bx-spell-title"><img[^>]*src="([^"]+)"#', $html, $m) ? html_entity_decode($m[1], ENT_QUOTES) : null;
     $school = preg_match('#<p class="dg-meta">Spell ID \d+ · ([^<]+)</p>#u', $html, $m) ? ' · ' . mb_strtoupper(html_entity_decode($m[1], ENT_QUOTES)) : '';
     $html = preg_replace(['#<div class="ptitle bx-spell-title">.*?</div>#s', '#<p class="dg-meta">Spell ID \d+[^<]*</p>#u'], '', $html, 1);
-    return framed_page(\DUNGEON_SOURCE, $html, 'spells', 'no-data', subtitle: 'WOW: FOREVER · SPELLS' . $school, icon: $icon);
+    return framed_page(\DUNGEON_SOURCE, $html, 'spells', 'no-data', subtitle: 'WOW: FOREVER · SPELLS' . $school, icon: $icon, notice: contribute_notice());
   }
   if (preg_match('#^/forever/npc/([a-z0-9-]+)/?(?:index\.html)?$#', $path, $m) && isset(\forever_npcs()[$m[1]])) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
@@ -287,13 +298,13 @@ function render_page(string $html, string $path): string {
     $dungeon = $npc['dungeon'];
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . \BESTIARY_STYLE . '</style></head>', $html);
     return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art($dungeon['slug']), $npc['boss']['name'],
-      subtitle: \forever_npc_subtitle($npc), icon: \forever_dungeon_icon($dungeon['icon'], 'large'));
+      subtitle: \forever_npc_subtitle($npc), icon: \forever_dungeon_icon($dungeon['icon'], 'large'), notice: contribute_notice());
   }
   if (preg_match('#^/forever/npc(?:/([a-z0-9-]+))?/?(?:index\.html)?$#', $path, $m)
       && (($m[1] ?? '') === '' || isset(\forever_bestiary()[$m[1]]))) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . \BESTIARY_STYLE . '</style></head>', $html);
-    return framed_page(\DUNGEON_SOURCE, $html, 'bestiary', 'dungeons', ($m[1] ?? '') !== '' ? \forever_bestiary()[$m[1]]['name'] : 'Bestiary');
+    return framed_page(\DUNGEON_SOURCE, $html, 'bestiary', 'dungeons', ($m[1] ?? '') !== '' ? \forever_bestiary()[$m[1]]['name'] : 'Bestiary', notice: contribute_notice());
   }
   if (preg_match('#^/(retail|forever)/skin-colors(?:/([a-z0-9-]+))?/?(index\.html)?$#', $path, $m)) { $GLOBALS['w8_source'] = $m[1]; return skin_colors_page($html, $m[2] ?? null, $m[1]); }
   // The current skin's race switcher fetches these fragments; they stay as they are.
@@ -313,7 +324,7 @@ function dungeon_banner_art(?string $slug): string {
 }
 
 /** A page without a 2008 design of its own: its content, inside the 2008 frame. */
-function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null, ?string $icon = null, ?string $intro = null, ?string $tools = null): string {
+function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null, ?string $icon = null, ?string $intro = null, ?string $tools = null, ?string $notice = null): string {
   $body = '';
   $start = strpos($html, '<div class="wrap">');
   if ($start !== false) {
@@ -336,7 +347,7 @@ function framed_page(?string $source, string $html, ?string $page, string $art =
   if ($bannerTitle !== null) $title = $bannerTitle;
   $styles = '';
   if (preg_match_all('/<style\b[^>]*>.*?<\/style>/is', substr($html, 0, stripos($html, '</head>') ?: 0), $m)) $styles = implode("\n", $m[0]);
-  return page('framed', ['title' => $title, 'body' => $body, 'styles' => $styles, 'source' => $source, 'art' => $art, 'subtitle' => $subtitle, 'icon' => $icon, 'intro' => $intro, 'tools' => $tools], $html, $page);
+  return page('framed', ['title' => $title, 'body' => $body, 'styles' => $styles, 'source' => $source, 'art' => $art, 'subtitle' => $subtitle, 'icon' => $icon, 'intro' => $intro, 'tools' => $tools, 'notice' => $notice], $html, $page);
 }
 
 function census_page(string $source, string $html): string {
