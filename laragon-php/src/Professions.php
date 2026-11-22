@@ -578,6 +578,11 @@ function auction_sale_market(string $source, array $sale): array {
   $faction = in_array($sale['faction'], ['Alliance', 'Horde'], true) ? $sale['faction'] : 'Neutral';
   $realm = realm_name($sale['realm']);
   $group = $source === PROFESSION_SOURCE ? forever_realm_group($realm) : null;
+  // TSM (and some Journalator rows) name a Forever realm by ruleset only: "Normal", "PvP", "Roleplay PvP".
+  $ruleset = ['normal' => 'PvE', 'pve' => 'PvE', 'pvp' => 'PvP', 'rp' => 'RP', 'roleplay' => 'RP',
+    'rp pvp' => 'RP PvP', 'roleplay pvp' => 'RP PvP', 'rppvp' => 'RP PvP'][strtolower(trim($realm))] ?? null;
+  if ($source === PROFESSION_SOURCE && !$group && $ruleset && in_array(strtolower((string)$sale['region']), ['us', 'eu', 'kr'], true))
+    $group = forever_realm_group('CAMWOW ' . strtoupper($sale['region']) . '1 Realm 1 ' . $ruleset);
   $label = $group['label'] ?? trim(strtoupper((string)$sale['region']) . ' ' . $realm);
   if ($faction !== 'Neutral') $label .= ' · ' . $faction;
   return [$label, $faction];
