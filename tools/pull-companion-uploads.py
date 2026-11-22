@@ -7,6 +7,7 @@
     python -B tools/pull-companion-uploads.py ack <stage dir>      # mark a staged batch imported (census or add-on stage)
     python -B tools/pull-companion-uploads.py pull-addons          # download other add-ons' uploads; ack the stage once used
     python -B tools/pull-companion-uploads.py combatlogs           # pull combat logs, import local + live, mark imported
+    python -B tools/pull-companion-uploads.py prune [--dry-run]    # delete imported census/combat log stages older than 14 days
 
 Players' uploads wait on api.wowcensus.io (the upload Worker). `pull` asks the
 Worker for every receipt still waiting, downloads each bundle, checks it
@@ -35,6 +36,13 @@ name in MarketLensData/companion-uploads/combatlogs-<UTC time>/<receipt>/ and im
 import-live.py combatlog --game <site key> (the bestiary), one run per edition; a log uploaded
 again replaces its earlier rows.
 
+Staged census and combat log uploads are only a working copy: PostgreSQL holds what was imported.
+`prune` (also the last step of every `run`) deletes those stages once they are older than
+--days (14) and none of their receipts is still waiting on the Worker. A run whose import fails
+leaves its stage and the next run downloads the same receipts again, so a stage whose receipts all
+reappear in a later stage is a duplicate; `prune` deletes it once it is two hours old. Add-on
+stages (addons-*) are never pruned: tools/build-forever-dungeons.py rereads every Dungeon Journal upload.
+
 `run` then hands that tree to tools/import-live.py saves (the same importer as
 local saves: SHA-256 dedup, one transaction, local first, then live). When a
 staged save carries ledger data (the add-on's own auctionLog since WoWCensus
@@ -52,6 +60,7 @@ import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import urllib.error
@@ -311,6 +320,74 @@ def ack_stage(stage):
     print(f"Marked {len(ids)} upload(s) imported.", flush=True)
 
 
+STAGE_RE = re.compile(r"^(?:combatlogs-)?(\d{8}-\d{6})$")
+PRUNE_DAYS = 14
+DUPLICATE_AGE = 2 * 3600
+
+
+def stage_receipts(stage):
+    if (stage / "receipts.json").exists():
+        return [s["receiptId"] for s in json.loads((stage / "receipts.json").read_text(encoding="utf-8"))]
+    return [json.loads(m.read_text(encoding="utf-8"))["receiptId"] for m in stage.glob("*/manifest.json")]
+
+
+def still_pending(kind):
+    """Receipt ids the Worker still holds as queued/stored, or None when the list may be cut off."""
+    rows = call("GET", f"/v1/ingest/pending?kind={kind}&limit=200")["receipts"]
+    return None if len(rows) >= 200 else {r["id"] for r in rows}
+
+
+def prune_stages(days=PRUNE_DAYS, dry_run=False):
+    root = DATA_ROOT / "companion-uploads"
+    if not root.is_dir():
+        return
+    now = datetime.now(timezone.utc).timestamp()
+    stages = []
+    for stage in sorted(root.iterdir()):
+        m = STAGE_RE.match(stage.name)
+        if not stage.is_dir() or not m:
+            continue
+        at = datetime.strptime(m.group(1), "%Y%m%d-%H%M%S").replace(tzinfo=timezone.utc).timestamp()
+        try:
+            ids = set(stage_receipts(stage))
+        except (OSError, ValueError, KeyError):
+            ids = None
+        stages.append((at, stage, ids))
+    stages.sort(key=lambda t: t[0])
+    duplicates, old = [], []
+    for i, (at, stage, ids) in enumerate(stages):
+        kind = "combatlogs" if stage.name.startswith("combatlogs-") else "census"
+        later = set()
+        for _, other, other_ids in stages[i + 1:]:
+            if other_ids and (other.name.startswith("combatlogs-")) == (kind == "combatlogs"):
+                later |= other_ids
+        if ids and ids <= later and at < now - DUPLICATE_AGE:
+            duplicates.append(stage)
+        elif at < now - days * 86400:
+            old.append((stage, ids))
+    if not duplicates and not old:
+        return
+    pending = {"wowcensus": still_pending("wowcensus"), "addon": still_pending("addon")} if old else {}
+    removed, freed, kept = 0, 0, 0
+    doomed = list(duplicates)
+    for stage, ids in old:
+        waiting = pending["addon" if stage.name.startswith("combatlogs-") else "wowcensus"]
+        if waiting is None or not ids or waiting & ids:
+            kept += 1
+        else:
+            doomed.append(stage)
+    for stage in doomed:
+        size = sum(f.stat().st_size for f in stage.rglob("*") if f.is_file())
+        if not dry_run:
+            shutil.rmtree(stage)
+        removed += 1
+        freed += size
+    verb = "Would delete" if dry_run else "Deleted"
+    note = f"; kept {kept} with receipts still waiting or unreadable" if kept else ""
+    print(f"{verb} {removed} staged upload folder(s) ({len(duplicates)} re-downloaded duplicates, the rest older than "
+          f"{days} days and imported): {freed / 1073741824:.1f} GB{note}.", flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -327,6 +404,9 @@ def main():
     p_logs = sub.add_parser("combatlogs")
     p_logs.add_argument("--target", choices=("both", "local"), default="both")
     p_logs.add_argument("--limit", type=int, default=50)
+    p_prune = sub.add_parser("prune")
+    p_prune.add_argument("--days", type=int, default=PRUNE_DAYS)
+    p_prune.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
     try:
@@ -339,11 +419,17 @@ def main():
         if args.cmd == "combatlogs":
             import_combat_logs(args.target, args.limit)
             return
+        if args.cmd == "prune":
+            if args.days < 1:
+                raise SystemExit("--days must be at least 1")
+            prune_stages(args.days, args.dry_run)
+            return
         stage = pull(args.limit)
         if args.cmd == "pull":
             return
         if stage is None:
             import_combat_logs(args.target, 50)
+            prune_stages()
             return
         cmd = [sys.executable, "-B", str(REPO / "tools" / "import-live.py"), "saves",
                "--game-root", str(stage / "game"), "--target", args.target]
@@ -369,6 +455,7 @@ def main():
             print(f"Local import done. After the live import, mark them imported with:\n"
                   f"  python -B tools/pull-companion-uploads.py ack \"{stage}\"", flush=True)
         import_combat_logs(args.target, 50)
+        prune_stages()
     except urllib.error.HTTPError as exc:
         raise SystemExit(f"Upload API returned {exc.code}: {exc.read()[:300].decode(errors='replace')}")
 
