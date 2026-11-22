@@ -262,8 +262,16 @@ function render_page(string $html, string $path): string {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
     $d = ($m[1] ?? '') !== '' ? \forever_dungeons()[$m[1]] : null;
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . ($d === null ? \DUNGEON_W8_INDEX_STYLE : '') . '</style></head>', $html);
-    if ($d === null) $html = preg_replace_callback('#<!--dg-index-->.*<!--/dg-index-->#s', fn() => \forever_dungeons_w8_index(), $html, 1);
-    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art($d['slug'] ?? null), $d['name'] ?? 'Dungeons');
+    if ($d === null) {
+      $html = preg_replace_callback('#<!--dg-index-->.*<!--/dg-index-->#s', fn() => \forever_dungeons_w8_index(), $html, 1);
+      return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art(null), 'Dungeons');
+    }
+    // The banner carries the dungeon picker, icon, level and location line, and description.
+    $tools = preg_match('#<!--dg-pick-->(.*?)<!--/dg-pick-->#s', $html, $pm) ? $pm[1] : null;
+    $html = preg_replace(['#<!--dg-pick-->.*?<!--/dg-pick-->#s', '#<!--dg-head-->.*?<!--/dg-head-->#s'], '', $html, 1);
+    return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art($d['slug']), $d['name'],
+      subtitle: ($d['new'] ? 'New in Forever · ' : '') . \forever_dungeon_meta($d), icon: \forever_dungeon_icon($d['icon'], 'large'),
+      intro: $d['description'] !== '' ? $d['description'] : null, tools: $tools);
   }
   if (preg_match('#^/forever/spell/[1-9][0-9]{0,9}/?$#', $path) && str_contains($html, 'class="ptitle bx-spell-title"')) {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
@@ -305,7 +313,7 @@ function dungeon_banner_art(?string $slug): string {
 }
 
 /** A page without a 2008 design of its own: its content, inside the 2008 frame. */
-function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null, ?string $icon = null): string {
+function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null, ?string $icon = null, ?string $intro = null, ?string $tools = null): string {
   $body = '';
   $start = strpos($html, '<div class="wrap">');
   if ($start !== false) {
@@ -328,7 +336,7 @@ function framed_page(?string $source, string $html, ?string $page, string $art =
   if ($bannerTitle !== null) $title = $bannerTitle;
   $styles = '';
   if (preg_match_all('/<style\b[^>]*>.*?<\/style>/is', substr($html, 0, stripos($html, '</head>') ?: 0), $m)) $styles = implode("\n", $m[0]);
-  return page('framed', ['title' => $title, 'body' => $body, 'styles' => $styles, 'source' => $source, 'art' => $art, 'subtitle' => $subtitle, 'icon' => $icon], $html, $page);
+  return page('framed', ['title' => $title, 'body' => $body, 'styles' => $styles, 'source' => $source, 'art' => $art, 'subtitle' => $subtitle, 'icon' => $icon, 'intro' => $intro, 'tools' => $tools], $html, $page);
 }
 
 function census_page(string $source, string $html): string {

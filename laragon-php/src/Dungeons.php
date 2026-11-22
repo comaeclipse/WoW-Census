@@ -173,6 +173,8 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-boss h3 a.dg-npc{color:inherit;text-decoration:none}
 .dg-boss h3 a.dg-npc:hover{text-decoration:underline}
 .dg-rare{display:inline-block;font-size:10px;font-weight:bold;letter-spacing:.05em;padding:1px 5px;border-radius:3px;background:#8a6a10;color:#fff;vertical-align:middle;margin-left:6px}
+.dg-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.dg-cols>div>.dg-boss:first-child{margin-top:0}
 .dg-npc-grid{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:14px;align-items:start}
 .dg-npc-grid .dg-boss{margin:10px 0 0}
 .dg-facts{width:100%;border-collapse:collapse;font-size:12px}
@@ -189,7 +191,7 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-npc-nav a:nth-child(2){text-align:center}
 .dg-npc-nav a:last-child{text-align:right}
 @media (max-width:640px){.dg-list .hide-sm{display:none}.dg-loot td.s{display:none}}
-@media (max-width:760px){.dg-npc-grid{grid-template-columns:minmax(0,1fr)}.dg-npc-nav{flex-wrap:wrap}}
+@media (max-width:760px){.dg-npc-grid,.dg-cols{grid-template-columns:minmax(0,1fr)}.dg-npc-nav{flex-wrap:wrap}}
 .w8-framed .dg-facts{font-size:11px}
 .w8-framed .dg-facts th,.w8-framed .dg-facts td,.w8-framed .dg-roster li{border-color:rgba(60,40,10,.15);text-align:left;font-size:11px}
 .w8-framed .dg-facts th{background:none;border-bottom:0;color:#5a2a00}
@@ -201,6 +203,21 @@ const DUNGEON_STYLE = <<<'CSS'
 .w8-framed .dg-pick label{color:#5a2a00}
 .w8-framed .dg-pick select{background:#fff8e6;color:#2a1e0c;border-color:rgba(60,40,10,.4)}
 .w8-framed .dg-kill{background:#2f6b1f;color:#fff}
+.census-banner.has-intro .t{right:22px}
+.census-banner .t .intro{margin:6px 0 0;max-width:600px;font:12px/1.45 Tahoma,Arial,sans-serif;color:#eadfc4;text-shadow:0 1px 2px #000}
+.census-banner .banner-tools{position:absolute;right:12px;top:10px;z-index:1;padding:4px 8px;background:rgba(0,0,0,.65);border:1px solid #6a5022}
+.w8-framed .banner-tools .dg-pick{margin:0;font-size:11px;gap:6px}
+.w8-framed .banner-tools .dg-pick label{color:#f0c860}
+.w8-framed .banner-tools .dg-pick a{color:#f0c860}
+.w8-framed .banner-tools .dg-pick select{padding:1px 4px;font-size:11px}
+@media (max-width:600px){
+  .census-banner.has-intro{height:auto;min-height:150px;display:flex;flex-direction:column}
+  .census-banner.has-intro .t{position:relative;left:auto;right:auto;bottom:auto;padding:12px 14px 14px}
+  .census-banner .banner-tools{position:relative;top:auto;right:auto;order:-1;margin:10px 10px 0}
+  .w8-framed .banner-tools .dg-pick{flex-wrap:nowrap}
+  .w8-framed .banner-tools .dg-pick select{flex:1;min-width:0}
+  .census-banner.has-intro h1{font-size:24px}
+}
 .w8-framed .dg-it.q0{color:#6b6b6b}.w8-framed .dg-it.q1{color:#2a1e0c}.w8-framed .dg-it.q2{color:#1a7a00}
 .w8-framed .dg-it.q3{color:#0a4fb0}.w8-framed .dg-it.q4{color:#7a2fb8}.w8-framed .dg-it.q5{color:#b55a00}
 CSS;
@@ -375,6 +392,10 @@ function forever_dungeon_quests_html(array $quests, bool $onBoss = false): strin
   return $html . '</section>';
 }
 
+function forever_dungeon_meta(array $d): string {
+  return implode(' · ', array_filter([$d['level'] ? 'Level ' . $d['level'] : null, $d['location'] ?: null, count($d['bosses']) . ' bosses']));
+}
+
 function forever_dungeons_body(?array $d): string {
   $data = forever_dungeon_data();
   $dungeons = forever_dungeons();
@@ -419,13 +440,14 @@ function forever_dungeons_body(?array $d): string {
     foreach ($d['trash'] as $it) $loot .= '<tr><td>' . forever_dungeon_item_link($it) . '</td><td class="s">' . esc($it['slot']) . '</td><td class="o">' . esc($it['from'] ?? '') . '</td></tr>';
     $bosses .= '<section class="dg-boss"><h3>Trash drops</h3><table class="dg-loot"><tbody>' . $loot . '</tbody></table></section>';
   }
-  $meta = array_filter([$d['level'] ? 'Level ' . $d['level'] : null, $d['location'] ?: null, count($d['bosses']) . ' bosses']);
-  return '<div class="panel census">' . $pick .
+  $quests = forever_dungeon_quests_html($d['questDetails'] ?? []);
+  // The 2008 skin moves the marked picker and heading into its banner.
+  return '<div class="panel census"><!--dg-pick-->' . $pick . '<!--/dg-pick--><!--dg-head-->' .
     '<div class="dg-head"><img src="' . esc(forever_dungeon_icon($d['icon'], 'large')) . '" alt=""><div><div class="ptitle" style="margin:0">' . esc($d['name']) .
-    ($d['new'] ? '<span class="dg-new">NEW IN FOREVER</span>' : '') . '</div><p class="dg-meta">' . esc(implode(' · ', $meta)) . '</p>' .
-    ($d['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($d['description']) . '</p>' : '') . '</div></div>' .
+    ($d['new'] ? '<span class="dg-new">NEW IN FOREVER</span>' : '') . '</div><p class="dg-meta">' . esc(forever_dungeon_meta($d)) . '</p>' .
+    ($d['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($d['description']) . '</p>' : '') . '</div></div><!--/dg-head-->' .
     ($d['lootIncomplete'] ? '<p class="hint">The loot list for this dungeon is still being filled in.</p>' : '') .
-    forever_dungeon_quests_html($d['questDetails'] ?? []) . $bosses .
+    ($quests !== '' ? '<div class="dg-cols"><div>' . $quests . '</div><div>' . $bosses . '</div></div>' : $bosses) .
     ($anySeen ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '<p class="dg-credit"><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a> · ' . forever_dungeon_credit() . '</p></div>';
 }
 
