@@ -319,13 +319,13 @@ function render_page(string $html, string $path): string {
 /** Banner set for a dungeon page: its own art where it has some, else the shared dungeon rotation. */
 function dungeon_banner_art(?string $slug): string {
   if ($slug === 'ragefire-chasm') return 'ragefire-chasm';
+  if ($slug === 'uldaman' || $slug === 'excavation-site-wetlands') return 'uldaman';
   if ($slug !== null && str_starts_with($slug, 'dire-maul')) return 'dire-maul';
   return 'dungeons';
 }
 
 /** A page without a 2008 design of its own: its content, inside the 2008 frame. */
 function framed_page(?string $source, string $html, ?string $page, string $art = 'census', ?string $bannerTitle = null, ?string $subtitle = null, ?string $icon = null, ?string $intro = null, ?string $tools = null, ?string $notice = null): string {
-  if ($slug === 'uldaman' || $slug === 'excavation-site-wetlands') return 'uldaman';
   $body = '';
   $start = strpos($html, '<div class="wrap">');
   if ($start !== false) {
