@@ -10,7 +10,7 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '70';
+const ASSET_VERSION = '71';
 const DISCORD_URL = 'https://discord.gg/kSUGgYDd8V';
 
 // Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
@@ -951,7 +951,7 @@ function auction_page(string $source, string $html): string {
   $factions = array_map(fn($f) => [$f['key'], $f['key'] === 'all' ? ($f['label'] === 'Cross-faction' ? 'Cross-faction' : 'Both') : $f['label']], $model['dims']['faction']);
   return page('auction-house', common_vars($source) + ['data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
     'realms' => $realms, 'factions' => $factions, 'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=',
-    'itemBase' => in_array($source, \ARMORY_SOURCES, true) ? \armory_item_path($source, '') : null,
+    'itemBase' => $source === \PROFESSION_SOURCE ? \forever_item_path('') : (in_array($source, \ARMORY_SOURCES, true) ? \armory_item_path($source, '') : null),
     'recentSales' => \edition_recent_sales_table($source)], $html, 'auction-house');
 }
 

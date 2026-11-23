@@ -661,6 +661,11 @@ a{color:inherit}
 .ahtable tbody tr:hover{background:rgba(255,215,90,.10)}
 .ahtable a{color:#fff;text-decoration:none;font-weight:bold}
 .ahtable a:hover{color:#ffd75a;text-decoration:underline}
+.section .mkttable td{color:#2a1a08;border-bottom-color:#d8c49a}
+.section .mkttable tbody tr:nth-child(odd){background:rgba(120,80,20,.06)}
+.section .mkttable tbody tr:hover{background:rgba(160,110,20,.14)}
+.section .mkttable a{color:#7a3a00}
+.section .mkttable a:hover{color:#b05a00}
 .ahtable .rk{width:22px;color:#9a8a6a;text-align:right}
 .ahtable .ic{display:inline-grid;place-items:center;width:18px;height:18px;margin-right:6px;vertical-align:-5px;border-radius:2px;
   border:1px solid #000;outline:1px solid #6a6050;font:900 9px Tahoma,Arial,sans-serif;color:#fff;text-shadow:0 1px 1px #000}
