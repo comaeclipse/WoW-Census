@@ -7,6 +7,8 @@
     python -B tools/pull-companion-uploads.py ack <stage dir>      # mark a staged batch imported (census or add-on stage)
     python -B tools/pull-companion-uploads.py pull-addons          # download other add-ons' uploads; ack the stage once used
     python -B tools/pull-companion-uploads.py combatlogs           # pull combat logs, import local + live, mark imported
+    python -B tools/pull-companion-uploads.py pull-combatlogs      # only download and stage combat logs
+    python -B tools/pull-companion-uploads.py combatlogs --stage <combatlogs-* dir>   # import a staged batch
     python -B tools/pull-companion-uploads.py prune [--dry-run]    # delete imported census/combat log stages older than 14 days
 
 Players' uploads wait on api.wowcensus.io (the upload Worker). `pull` asks the
@@ -274,15 +276,34 @@ def pull_combat_logs(limit):
         out = stage / rid
         out.mkdir(parents=True, exist_ok=True)
         (out / name).write_bytes(data)
-        (out / "manifest.json").write_text(json.dumps({**manifest, "receiptId": rid, "uploaded": rec["created_at"]}, indent=2),
+        (out / "manifest.json").write_text(json.dumps({**manifest, "receiptId": rid, "edition": rec["edition"],
+                                                       "uploaded": rec["created_at"]}, indent=2),
                                            encoding="utf-8")
         logs.append((COMBAT_LOG_GAMES[rec["edition"]], out / name))
         print(f"{rid} {rec['edition']:12} combatlog       {name} {len(data) / 1048576:6.2f} MB", flush=True)
     return (stage if logs else None), logs
 
 
-def import_combat_logs(target, limit):
-    stage, logs = pull_combat_logs(limit)
+def staged_combat_logs(stage):
+    """(site game, log path) for every upload in a combatlogs-* stage, read back from its manifests."""
+    logs = []
+    for m in sorted(stage.glob("*/manifest.json")):
+        manifest = json.loads(m.read_text(encoding="utf-8"))
+        game = COMBAT_LOG_GAMES.get(manifest.get("edition"))
+        files = [f for f in m.parent.iterdir() if f.name != "manifest.json"]
+        if game is None or len(files) != 1:
+            raise SystemExit(f"{m.parent}: no site game for edition {manifest.get('edition')!r} or not one log file")
+        logs.append((game, files[0]))
+    if not logs:
+        raise SystemExit(f"{stage}: no staged combat logs")
+    return logs
+
+
+def import_combat_logs(target, limit, stage=None):
+    if stage is not None:
+        logs = staged_combat_logs(stage)
+    else:
+        stage, logs = pull_combat_logs(limit)
     if not logs:
         return
     for game in sorted({g for g, _ in logs}):
@@ -291,8 +312,8 @@ def import_combat_logs(target, limit):
                "--game", game, "--target", target, "--skip-icons"]
         print(f"running: import-live.py combatlog ({len(paths)} log(s)) --game {game} --target {target}", flush=True)
         if subprocess.run(cmd).returncode != 0:
-            raise SystemExit("Combat log import failed; nothing marked imported. "
-                             "Retry with: python -B tools/pull-companion-uploads.py combatlogs")
+            raise SystemExit("Combat log import failed; nothing marked imported. Retry with: "
+                             f"python -B tools/pull-companion-uploads.py combatlogs --stage \"{stage}\"")
     if target == "both":
         ack_stage(stage)
     else:
@@ -404,6 +425,9 @@ def main():
     p_logs = sub.add_parser("combatlogs")
     p_logs.add_argument("--target", choices=("both", "local"), default="both")
     p_logs.add_argument("--limit", type=int, default=50)
+    p_logs.add_argument("--stage", type=Path, help="import this combatlogs-* stage instead of pulling")
+    p_pull_logs = sub.add_parser("pull-combatlogs")
+    p_pull_logs.add_argument("--limit", type=int, default=50)
     p_prune = sub.add_parser("prune")
     p_prune.add_argument("--days", type=int, default=PRUNE_DAYS)
     p_prune.add_argument("--dry-run", action="store_true")
@@ -417,7 +441,13 @@ def main():
             pull_addons(args.limit)
             return
         if args.cmd == "combatlogs":
-            import_combat_logs(args.target, args.limit)
+            import_combat_logs(args.target, args.limit, args.stage)
+            return
+        if args.cmd == "pull-combatlogs":
+            stage, logs = pull_combat_logs(args.limit)
+            if logs:
+                print(f"stage={stage}  logs={len(logs)} (left queued on the Worker)\n"
+                      f"Import with: python -B tools/pull-companion-uploads.py combatlogs --stage \"{stage}\"", flush=True)
             return
         if args.cmd == "prune":
             if args.days < 1:
