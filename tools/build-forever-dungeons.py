@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Build laragon-php/src/forever-dungeons.json for the WoW: Forever dungeon pages.
+"""Build the WoW: Forever dungeon tables in PostgreSQL for the dungeon and boss pages.
 
-    python -B tools/build-forever-dungeons.py [--addon DIR] [--uploads DIR]
+    python -B tools/build-forever-dungeons.py [--addon DIR] [--uploads DIR] [--dry-run]
+    python -B tools/import-live.py forever-dungeons      # local, then live
 
 Two inputs:
 
@@ -15,16 +16,30 @@ Two inputs:
   stages them under MarketLensData/companion-uploads/addons-*/forever/dungeonjournal/).
   Each install's newest save says which bosses its characters have killed; the
   output counts characters per boss. Character names are not written.
+
+Tables (schema marketlens_import, created on first run, replaced as a whole in one
+transaction; a run whose content matches the stored content_sha256 writes nothing):
+  forever_dungeon_journal       one row: add-on, author, version, uploaders, content_sha256, built_at
+  forever_dungeons              one row per dungeon (slug, journal order, level range, location, ...)
+  forever_dungeon_bosses        one row per boss (dungeon, order, npc_id, level, rare, killed_by)
+  forever_dungeon_boss_loot     the journal's loot list of each boss
+  forever_dungeon_trash_loot    loot from a dungeon's trash, with the mobs it drops from
+  forever_dungeon_quests        the dungeon's quests (objective, pickup, turn-in, faction, level)
+  forever_dungeon_quest_rewards each quest's reward items
+  forever_dungeon_quest_bosses  the bosses a quest involves (journal boss names)
 """
 
 import argparse
+import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-OUT = REPO / "laragon-php" / "src" / "forever-dungeons.json"
+DEFAULT_DSN = os.environ.get("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbname=marketlens_local user=skarz")
+S = "marketlens_import."
 ADDON = Path(r"C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\ForeverDungeonJournal")
 UPLOADS = Path.home() / "Documents" / "MarketLensData" / "companion-uploads"
 
@@ -351,11 +366,116 @@ def read_kills(uploads):
     return kills, chars
 
 
+SCHEMA = [
+    f"""CREATE TABLE IF NOT EXISTS {S}forever_dungeon_journal (
+        id smallint PRIMARY KEY CHECK (id = 1), addon text NOT NULL, author text NOT NULL, version text,
+        uploaders integer NOT NULL, content_sha256 text NOT NULL, built_at timestamptz NOT NULL DEFAULT now())""",
+    f"""CREATE TABLE IF NOT EXISTS {S}forever_dungeons (
+        slug text PRIMARY KEY, name text NOT NULL UNIQUE, sort_order integer NOT NULL, level_range text,
+        location text, description text, icon text, is_new boolean NOT NULL, loot_incomplete boolean NOT NULL)""",
+    f"""CREATE TABLE IF NOT EXISTS {S}forever_dungeon_bosses (
+        dungeon_slug text NOT NULL REFERENCES {S}forever_dungeons(slug) ON DELETE CASCADE,
+        boss_order integer NOT NULL, npc_id integer, name text NOT NULL, level text, rare boolean NOT NULL,
+        description text, killed_by integer NOT NULL, PRIMARY KEY (dungeon_slug, boss_order))""",
+    f"""CREATE TABLE IF NOT EXISTS {S}forever_dungeon_boss_loot (
+        dungeon_slug text NOT NULL, boss_order integer NOT NULL, loot_order integer NOT NULL,
+        item_id integer NOT NULL, item_name text, slot text, quality smallint, drop_from text,
+        PRIMARY KEY (dungeon_slug, boss_order, loot_order),
+        FOREIGN KEY (dungeon_slug, boss_order) REFERENCES {S}forever_dungeon_bosses ON DELETE CASCADE)""",
+    f"""CREATE TABLE IF NOT EXISTS {S}forever_dungeon_trash_loot (
+        dungeon_slug text NOT NULL REFERENCES {S}forever_dungeons(slug) ON DELETE CASCADE,
+        loot_order integer NOT NULL, item_id integer NOT NULL, item_name text, slot text, quality smallint,
+        drop_from text, PRIMARY KEY (dungeon_slug, loot_order))""",
+    f"""CREATE TABLE IF NOT EXISTS {S}forever_dungeon_quests (
+        dungeon_slug text NOT NULL REFERENCES {S}forever_dungeons(slug) ON DELETE CASCADE,
+        quest_order integer NOT NULL, quest_id integer, name text NOT NULL, objective text, pickup text,
+        turnin text, faction text, requires_level integer, reward_choice boolean NOT NULL,
+        PRIMARY KEY (dungeon_slug, quest_order))""",
+    f"""CREATE TABLE IF NOT EXISTS {S}forever_dungeon_quest_rewards (
+        dungeon_slug text NOT NULL, quest_order integer NOT NULL, reward_order integer NOT NULL,
+        item_id integer NOT NULL, item_name text, quality smallint,
+        PRIMARY KEY (dungeon_slug, quest_order, reward_order),
+        FOREIGN KEY (dungeon_slug, quest_order) REFERENCES {S}forever_dungeon_quests ON DELETE CASCADE)""",
+    f"""CREATE TABLE IF NOT EXISTS {S}forever_dungeon_quest_bosses (
+        dungeon_slug text NOT NULL, quest_order integer NOT NULL, boss_order integer NOT NULL, boss_name text NOT NULL,
+        PRIMARY KEY (dungeon_slug, quest_order, boss_order),
+        FOREIGN KEY (dungeon_slug, quest_order) REFERENCES {S}forever_dungeon_quests ON DELETE CASCADE)""",
+    f"CREATE INDEX IF NOT EXISTS forever_dungeon_boss_loot_item ON {S}forever_dungeon_boss_loot (item_id)",
+    f"CREATE INDEX IF NOT EXISTS forever_dungeon_trash_loot_item ON {S}forever_dungeon_trash_loot (item_id)",
+]
+
+TABLES = (("dungeons", "forever_dungeons"), ("bosses", "forever_dungeon_bosses"),
+          ("boss_loot", "forever_dungeon_boss_loot"), ("trash_loot", "forever_dungeon_trash_loot"),
+          ("quests", "forever_dungeon_quests"), ("quest_rewards", "forever_dungeon_quest_rewards"),
+          ("quest_bosses", "forever_dungeon_quest_bosses"))
+
+
+def table_rows(dungeons):
+    """The journal as rows for each table, in the journal's order."""
+    rows = {k: [] for k, _ in TABLES}
+    for d in dungeons:
+        slug = d["slug"]
+        rows["dungeons"].append((slug, d["name"], d["order"], d.get("level"), d.get("location"), d.get("description"),
+                                 d.get("icon"), bool(d.get("new")), bool(d.get("lootIncomplete"))))
+        for bi, b in enumerate(d["bosses"]):
+            rows["bosses"].append((slug, bi, b.get("npcID"), b["name"], b.get("level"), bool(b.get("rare")),
+                                   b.get("description"), int(b.get("killedBy") or 0)))
+            for li, it in enumerate(b["loot"]):
+                rows["boss_loot"].append((slug, bi, li, it["id"], it.get("name"), it.get("slot"), it.get("quality"),
+                                          it.get("from")))
+        for li, it in enumerate(d["trash"]):
+            rows["trash_loot"].append((slug, li, it["id"], it.get("name"), it.get("slot"), it.get("quality"),
+                                       it.get("from")))
+        for qi, q in enumerate(d.get("questDetails") or []):
+            rows["quests"].append((slug, qi, q.get("id"), q["name"], q.get("objective"), q.get("pickup"),
+                                   q.get("turnin"), q.get("faction"), q.get("requires"), bool(q.get("rewardChoice"))))
+            for ri, r in enumerate(q.get("rewards") or []):
+                rows["quest_rewards"].append((slug, qi, ri, r["id"], r.get("name"), r.get("quality")))
+            for oi, name in enumerate(q.get("bosses") or []):
+                rows["quest_bosses"].append((slug, qi, oi, name))
+    return rows
+
+
+def write_pg(dsn, rows, version, uploaders, dry_run):
+    """Replace every dungeon table in one transaction; False when the stored content is already this."""
+    import psycopg2
+    from psycopg2.extras import execute_values
+    digest = hashlib.sha256(json.dumps([version, uploaders, rows], ensure_ascii=False).encode("utf-8")).hexdigest()
+    conn = psycopg2.connect(dsn)
+    try:
+        with conn, conn.cursor() as cur:
+            for ddl in SCHEMA:
+                cur.execute(ddl)
+            cur.execute(f"SELECT content_sha256 FROM {S}forever_dungeon_journal WHERE id = 1")
+            stored = cur.fetchone()
+            if stored and stored[0] == digest:
+                return False
+            if dry_run:
+                conn.rollback()
+                return True
+            cur.execute(f"DELETE FROM {S}forever_dungeons")
+            for key, table in TABLES:
+                if rows[key]:
+                    execute_values(cur, f"INSERT INTO {S}{table} VALUES %s", rows[key], page_size=1000)
+            cur.execute(f"""INSERT INTO {S}forever_dungeon_journal (id, addon, author, version, uploaders, content_sha256, built_at)
+                VALUES (1, 'Dungeon Journal', 'Exehn', %s, %s, %s, now())
+                ON CONFLICT (id) DO UPDATE SET version = EXCLUDED.version, uploaders = EXCLUDED.uploaders,
+                    content_sha256 = EXCLUDED.content_sha256, built_at = EXCLUDED.built_at""",
+                        (version, uploaders, digest))
+            for _, table in TABLES:
+                cur.execute(f"ANALYZE {S}{table}")
+        return True
+    finally:
+        conn.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--addon", type=Path, default=ADDON)
     ap.add_argument("--uploads", type=Path, default=UPLOADS)
-    ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--dsn", default=DEFAULT_DSN)
+    ap.add_argument("--archive", help="ignored (accepted so tools/import-live.py can run this)")
+    ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
     dungeons, version = read_journal(args.addon)
@@ -365,16 +485,15 @@ def main():
         for b in d["bosses"]:
             by_id = seen.get(str(b["npcID"])) if b["npcID"] else None
             b["killedBy"] = max(by_id or 0, seen.get((b["name"] or "").lower(), 0))
-    out = {
-        "source": {"addon": "Dungeon Journal", "author": "Exehn", "version": version},
-        "uploaders": chars,
-        "dungeons": dungeons,
-    }
-    args.out.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    bosses = sum(len(d["bosses"]) for d in dungeons)
-    items = sum(len(b["loot"]) for d in dungeons for b in d["bosses"]) + sum(len(d["trash"]) for d in dungeons)
-    print(f"dungeons={len(dungeons)} new={sum(d['new'] for d in dungeons)} bosses={bosses} loot={items} "
-          f"uploaders={chars} addon={version} -> {args.out}")
+    rows = table_rows(dungeons)
+    changed = write_pg(args.dsn, rows, version, chars, args.dry_run)
+    print(f"dungeons={len(rows['dungeons'])} new={sum(d['new'] for d in dungeons)} bosses={len(rows['bosses'])} "
+          f"loot={len(rows['boss_loot']) + len(rows['trash_loot'])} quests={len(rows['quests'])} "
+          f"uploaders={chars} addon={version} dryRun={args.dry_run}")
+    if args.dry_run:
+        print("Would change" if changed else "Nothing new")
+    else:
+        print("CHANGED sources=forever-dungeons" if changed else "Nothing new")
 
 
 if __name__ == "__main__":

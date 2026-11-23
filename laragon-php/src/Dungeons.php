@@ -5,7 +5,7 @@ declare(strict_types=1);
  * WoW: Forever dungeon pages: /forever/dungeons/ and /forever/dungeons/<slug>/.
  *
  * Bosses, levels and loot come from the Dungeon Journal add-on (by Exehn), read as data by
- * tools/build-forever-dungeons.py into forever-dungeons.json, together with how many players'
+ * tools/build-forever-dungeons.py into the forever_dungeon* tables, together with how many players'
  * uploaded journals record each boss as killed. What players saw a boss drop is added at render
  * time from two logs: Journalator's loot windows (addon_loot_sources, kind npc) and the add-on's own
  * run logs (dungeon_run_kills / dungeon_run_loot, from tools/import-dungeon-runs-pg.py).
@@ -14,9 +14,59 @@ declare(strict_types=1);
 const DUNGEON_SOURCE = 'forever';
 const DUNGEON_QUALITY = [0 => 'q0', 1 => 'q1', 2 => 'q2', 3 => 'q3', 4 => 'q4', 5 => 'q5'];
 
+/**
+ * The journal as one array: ['source' => [addon, author, version], 'uploaders', 'dungeons' => [...]], each
+ * dungeon with its bosses (and their loot), trash loot and quest details, in the journal's order.
+ * Empty (no dungeons) until tools/build-forever-dungeons.py has created the tables.
+ */
 function forever_dungeon_data(): array {
   static $data = null;
-  return $data ??= json_decode(file_get_contents(__DIR__ . '/forever-dungeons.json'), true, 512, JSON_THROW_ON_ERROR);
+  if ($data !== null) return $data;
+  $journal = (bool)(Db::first("SELECT to_regclass('forever_dungeon_journal') IS NOT NULL AS ok")['ok'] ?? false)
+    ? Db::first('SELECT addon, author, version, uploaders FROM forever_dungeon_journal WHERE id = 1') : null;
+  if (!$journal) return $data = ['source' => ['addon' => 'Dungeon Journal', 'author' => 'Exehn', 'version' => null], 'uploaders' => 0, 'dungeons' => []];
+  $loot = static function (array $r): array {
+    $it = ['id' => (int)$r['item_id'], 'name' => $r['item_name'], 'slot' => $r['slot'], 'quality' => $r['quality'] !== null ? (int)$r['quality'] : null];
+    if ($r['drop_from'] !== null) $it['from'] = $r['drop_from'];
+    return $it;
+  };
+  $bossLoot = $trash = $rewards = $questBosses = [];
+  foreach (Db::all('SELECT dungeon_slug, boss_order, item_id, item_name, slot, quality, drop_from
+      FROM forever_dungeon_boss_loot ORDER BY dungeon_slug, boss_order, loot_order') as $r)
+    $bossLoot[$r['dungeon_slug']][(int)$r['boss_order']][] = $loot($r);
+  foreach (Db::all('SELECT dungeon_slug, item_id, item_name, slot, quality, drop_from
+      FROM forever_dungeon_trash_loot ORDER BY dungeon_slug, loot_order') as $r)
+    $trash[$r['dungeon_slug']][] = $loot($r);
+  foreach (Db::all('SELECT dungeon_slug, quest_order, item_id, item_name, quality
+      FROM forever_dungeon_quest_rewards ORDER BY dungeon_slug, quest_order, reward_order') as $r)
+    $rewards[$r['dungeon_slug']][(int)$r['quest_order']][] = ['id' => (int)$r['item_id'], 'name' => $r['item_name'], 'quality' => $r['quality'] !== null ? (int)$r['quality'] : null];
+  foreach (Db::all('SELECT dungeon_slug, quest_order, boss_name FROM forever_dungeon_quest_bosses
+      ORDER BY dungeon_slug, quest_order, boss_order') as $r)
+    $questBosses[$r['dungeon_slug']][(int)$r['quest_order']][] = $r['boss_name'];
+  $bosses = $quests = [];
+  foreach (Db::all('SELECT dungeon_slug, boss_order, npc_id, name, level, rare, description, killed_by
+      FROM forever_dungeon_bosses ORDER BY dungeon_slug, boss_order') as $r)
+    $bosses[$r['dungeon_slug']][] = ['name' => $r['name'], 'npcID' => $r['npc_id'] !== null ? (int)$r['npc_id'] : null,
+      'level' => $r['level'], 'rare' => (bool)$r['rare'], 'description' => $r['description'],
+      'loot' => $bossLoot[$r['dungeon_slug']][(int)$r['boss_order']] ?? [], 'killedBy' => (int)$r['killed_by']];
+  foreach (Db::all('SELECT dungeon_slug, quest_order, quest_id, name, objective, pickup, turnin, faction, requires_level, reward_choice
+      FROM forever_dungeon_quests ORDER BY dungeon_slug, quest_order') as $r)
+    $quests[$r['dungeon_slug']][] = ['name' => $r['name'], 'id' => $r['quest_id'] !== null ? (int)$r['quest_id'] : null,
+      'objective' => $r['objective'], 'pickup' => $r['pickup'], 'turnin' => $r['turnin'], 'faction' => $r['faction'],
+      'requires' => $r['requires_level'] !== null ? (int)$r['requires_level'] : null,
+      'rewards' => $rewards[$r['dungeon_slug']][(int)$r['quest_order']] ?? [], 'rewardChoice' => (bool)$r['reward_choice'],
+      'bosses' => $questBosses[$r['dungeon_slug']][(int)$r['quest_order']] ?? []];
+  $dungeons = [];
+  foreach (Db::all('SELECT slug, name, sort_order, level_range, location, description, icon, is_new, loot_incomplete
+      FROM forever_dungeons ORDER BY sort_order, slug') as $r) {
+    $q = $quests[$r['slug']] ?? [];
+    $dungeons[] = ['name' => $r['name'], 'slug' => $r['slug'], 'order' => (int)$r['sort_order'], 'level' => $r['level_range'],
+      'location' => $r['location'], 'description' => $r['description'], 'icon' => $r['icon'], 'new' => (bool)$r['is_new'],
+      'lootIncomplete' => (bool)$r['loot_incomplete'], 'quests' => count($q), 'questDetails' => $q,
+      'bosses' => $bosses[$r['slug']] ?? [], 'trash' => $trash[$r['slug']] ?? []];
+  }
+  return $data = ['source' => ['addon' => $journal['addon'], 'author' => $journal['author'], 'version' => $journal['version']],
+    'uploaders' => (int)$journal['uploaders'], 'dungeons' => $dungeons];
 }
 
 /** @return array<string, array> slug => dungeon, in the journal's order (by level). */
@@ -231,7 +281,7 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-route{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));row-gap:12px;list-style:none;margin:0;padding:4px 0 2px;overflow:hidden}
 .dg-route li{min-width:0;position:relative;text-align:center}
 .dg-route li+li:before{content:"";position:absolute;top:20px;right:50%;width:100%;height:3px;background:#b89552}
-.dg-route a{position:relative;display:block;padding:0 2px;color:inherit;text-decoration:none}
+.dg-route a{position:relative;z-index:1;display:block;padding:0 2px;color:inherit;text-decoration:none}
 .dg-route .dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;margin:0 auto;border-radius:50%;border:2px solid #8a6a32;background:#2a1e0c;color:#ffd75a;font:bold 15px Georgia,serif}
 .dg-route a.rare .dot{border-style:dashed}
 .dg-route a.on .dot{background:#7a1e10;border-color:#ffd75a;box-shadow:0 0 0 3px rgba(255,215,90,.35)}

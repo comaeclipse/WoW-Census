@@ -8,7 +8,8 @@
 tools/import-savedvariables-pg.py and `map-house` runs
 tools/map-forever-house-pg.py (publish a verified Forever auction house), `journalator` runs
 tools/import-journalator-pg.py (Journalator/TSM/Auctionator ledgers), `dungeon-runs` runs
-tools/import-dungeon-runs-pg.py (boss kills and drops from Dungeon Journal run logs), `combatlog` runs
+tools/import-dungeon-runs-pg.py (boss kills and drops from Dungeon Journal run logs), `forever-dungeons` runs
+tools/build-forever-dungeons.py (the dungeon/boss/loot/quest tables from the Dungeon Journal add-on), `combatlog` runs
 tools/import-combatlog-pg.py (Forever bestiary from advanced combat logs); every argument after the kind is passed to
 that importer unchanged. The importer runs locally first (local PostgreSQL stays
 the full copy and the source of truth). Only if that succeeds does it run again,
@@ -61,6 +62,7 @@ IMPORTERS = {"csv": REPO / "tools" / "import-forever-ah-csv-pg.py",
              "map-house": REPO / "tools" / "map-forever-house-pg.py",
              "journalator": REPO / "tools" / "import-journalator-pg.py",
              "dungeon-runs": REPO / "tools" / "import-dungeon-runs-pg.py",
+             "forever-dungeons": REPO / "tools" / "build-forever-dungeons.py",
              "combatlog": REPO / "tools" / "import-combatlog-pg.py",
              "repair-ledger-identity": REPO / "tools" / "repair-ledger-identity-pg.py"}
 LIVE_DB = "dbname=marketlens user=wowcensus"
