@@ -298,7 +298,7 @@ function render_page(string $html, string $path): string {
     $dungeon = $npc['dungeon'];
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . \BESTIARY_STYLE . '</style></head>', $html);
     return framed_page(\DUNGEON_SOURCE, $html, 'dungeons', dungeon_banner_art($dungeon['slug']), $npc['boss']['name'],
-      subtitle: \forever_npc_subtitle($npc), icon: \forever_dungeon_icon($dungeon['icon'], 'large'), notice: contribute_notice());
+      subtitle: \forever_npc_subtitle($npc), icon: \forever_boss_portrait($npc['boss']) ?? \forever_dungeon_icon($dungeon['icon'], 'large'), notice: contribute_notice());
   }
   if (preg_match('#^/forever/npc(?:/([a-z0-9-]+))?/?(?:index\.html)?$#', $path, $m)
       && (($m[1] ?? '') === '' || isset(\forever_bestiary()[$m[1]]))) {

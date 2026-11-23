@@ -43,12 +43,17 @@ function forever_dungeon_data(): array {
   foreach (Db::all('SELECT dungeon_slug, quest_order, boss_name FROM forever_dungeon_quest_bosses
       ORDER BY dungeon_slug, quest_order, boss_order') as $r)
     $questBosses[$r['dungeon_slug']][(int)$r['quest_order']][] = $r['boss_name'];
+  $portraits = [];
+  if ((bool)(Db::first("SELECT to_regclass('forever_dungeon_boss_portraits') IS NOT NULL AS ok")['ok'] ?? false))
+    foreach (Db::all('SELECT dungeon_slug, boss_name, portrait FROM forever_dungeon_boss_portraits') as $r)
+      $portraits[$r['dungeon_slug']][$r['boss_name']] = $r['portrait'];
   $bosses = $quests = [];
   foreach (Db::all('SELECT dungeon_slug, boss_order, npc_id, name, level, rare, description, killed_by
       FROM forever_dungeon_bosses ORDER BY dungeon_slug, boss_order') as $r)
     $bosses[$r['dungeon_slug']][] = ['name' => $r['name'], 'npcID' => $r['npc_id'] !== null ? (int)$r['npc_id'] : null,
       'level' => $r['level'], 'rare' => (bool)$r['rare'], 'description' => $r['description'],
-      'loot' => $bossLoot[$r['dungeon_slug']][(int)$r['boss_order']] ?? [], 'killedBy' => (int)$r['killed_by']];
+      'loot' => $bossLoot[$r['dungeon_slug']][(int)$r['boss_order']] ?? [], 'killedBy' => (int)$r['killed_by'],
+      'portrait' => $portraits[$r['dungeon_slug']][$r['name']] ?? null];
   foreach (Db::all('SELECT dungeon_slug, quest_order, quest_id, name, objective, pickup, turnin, faction, requires_level, reward_choice
       FROM forever_dungeon_quests ORDER BY dungeon_slug, quest_order') as $r)
     $quests[$r['dungeon_slug']][] = ['name' => $r['name'], 'id' => $r['quest_id'] !== null ? (int)$r['quest_id'] : null,
@@ -195,6 +200,11 @@ function forever_dungeon_credit(): string {
     ($s['version'] ? ' (version ' . esc($s['version']) . ')' : '') . '. Kill counts and run logs come from players\' uploaded journals; observed drops also come from players\' Journalator logs.';
 }
 
+/** URL of a boss's Forever Journal portrait, or null. */
+function forever_boss_portrait(array $b): ?string {
+  return !empty($b['portrait']) ? '/wow2008/' . $b['portrait'] : null;
+}
+
 /** URL of a dungeon's Forever Journal artwork ('card' or 'detail', falling back to the card), or null. */
 function forever_dungeon_art(array $d, string $kind = 'card'): ?string {
   $g = $d['guide'] ?? null;
@@ -314,6 +324,15 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-route a{position:relative;z-index:1;display:block;padding:0 2px;color:inherit;text-decoration:none}
 .dg-route .dot{display:flex;align-items:center;justify-content:center;width:40px;height:40px;margin:0 auto;border-radius:50%;border:2px solid #8a6a32;background:#2a1e0c;color:#ffd75a;font:bold 15px Georgia,serif}
 .dg-route a.rare .dot{border-style:dashed}
+.dg-route .dot.pic{position:relative;width:46px;height:46px;margin-top:-3px;overflow:visible;background:#100b05}
+.dg-route .dot.pic img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.dg-route .dot.pic i{position:absolute;right:-6px;bottom:-4px;min-width:16px;height:16px;padding:0 2px;box-sizing:border-box;border-radius:8px;background:#2a1e0c;border:1px solid #8a6a32;color:#ffd75a;font:bold 10px/14px Georgia,serif;font-style:normal;text-align:center}
+.dg-route a.on .dot.pic i{background:#7a1e10;border-color:#ffd75a}
+.dg-bh{align-items:center}
+.dg-bh-n{flex:1;min-width:0}
+.dg-portrait{flex:none;width:64px;height:64px;border-radius:50%;border:2px solid #8a6a32;background:#100b05;box-shadow:0 2px 5px rgba(0,0,0,.5)}
+.dg-npc-pic{text-align:center}
+.dg-npc-pic img{display:block;width:96px;height:96px;margin:0 auto;border-radius:50%;border:3px solid #8a6a32;background:#100b05;box-shadow:0 3px 8px rgba(0,0,0,.5)}
 .dg-route a.on .dot{background:#7a1e10;border-color:#ffd75a;box-shadow:0 0 0 3px rgba(255,215,90,.35)}
 .dg-route .n{display:block;margin-top:5px;font-size:10.5px;line-height:1.2;font-weight:bold}
 .dg-route .l{display:block;font-size:10px;opacity:.7}
@@ -504,6 +523,7 @@ function forever_npc_body(array $n): string {
     ($obs || $runs ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '</section>' .
     bestiary_boss_section(forever_npc_slug($b['name'])) .
     '</div><aside>' .
+    (($pic = forever_boss_portrait($b)) ? '<section class="dg-boss dg-npc-pic"><img src="' . esc($pic) . '" alt="' . esc($b['name']) . '" width="96" height="96"></section>' : '') .
     '<section class="dg-boss"><h3>Details</h3><table class="dg-facts"><tbody>' . $factRows . '</tbody></table></section>' .
     '<section class="dg-boss"><h3>In ' . esc($d['name']) . '</h3><ol class="dg-roster">' . $others . '</ol></section>' .
     '</aside></div>' . $nav .
@@ -627,14 +647,17 @@ function forever_dungeons_body(?array $d): string {
     $anySeen = $anySeen || $obs || $bossRuns;
     $runs = max($runs, $bossRuns['kills'] ?? 0);
     $anchor = 'boss-' . forever_npc_slug($b['name']);
-    $route .= '<li><a href="#' . esc($anchor) . '" data-i="' . $i . '"' . ($b['rare'] ? ' class="rare"' : '') . '><span class="dot">' . ($b['rare'] ? '&#9733;' : $i + 1) .
+    $pic = forever_boss_portrait($b);
+    $route .= '<li><a href="#' . esc($anchor) . '" data-i="' . $i . '"' . ($b['rare'] ? ' class="rare"' : '') . '><span class="dot' . ($pic ? ' pic' : '') . '">' .
+      ($pic ? '<img src="' . esc($pic) . '" alt="" loading="lazy"><i>' . ($b['rare'] ? '&#9733;' : $i + 1) . '</i>' : ($b['rare'] ? '&#9733;' : $i + 1)) .
       '</span><span class="n">' . esc($b['name']) . '</span>' . ($b['level'] ? '<span class="l">Lv ' . esc($b['level']) . '</span>' : '') . '</a></li>';
     [$rows, $recipes, $seen] = forever_dungeon_boss_loot($b, $obs, $bossRuns);
     foreach ($seen as $s) $best[] = $s + ['boss' => $b['name']];
     $sub = array_filter([$b['level'] ? 'Level ' . $b['level'] : null, $b['rare'] ? 'Rare spawn' : null, $b['npcID'] ? 'NPC ' . $b['npcID'] : null]);
     $kill = $b['killedBy'] ? '<span class="dg-kill">Killed by ' . js_locale($b['killedBy']) . ' uploader' . ($b['killedBy'] === 1 ? '' : 's') . '</span>'
       : '<span class="dg-kill none">No kills logged</span>';
-    $cards .= '<section class="dg-boss dg-card" id="' . esc($anchor) . '" data-i="' . $i . '"><header class="dg-bh"><div><h3><a class="dg-npc" href="' .
+    $cards .= '<section class="dg-boss dg-card" id="' . esc($anchor) . '" data-i="' . $i . '"><header class="dg-bh">' .
+      ($pic ? '<img class="dg-portrait" src="' . esc($pic) . '" alt="' . esc($b['name']) . '" width="64" height="64" loading="lazy">' : '') . '<div class="dg-bh-n"><h3><a class="dg-npc" href="' .
       esc(forever_npc_path(forever_npc_slug($b['name']))) . '">' . esc($b['name']) . '</a></h3>' .
       ($sub ? '<div class="dg-sub">' . esc(implode(' · ', $sub)) . '</div>' : '') . '</div><div class="dg-bh-r">' . $kill .
       ($count > 1 ? '<span class="dg-step"><button type="button" data-step="-1">&lsaquo; Prev</button><button type="button" data-step="1">Next &rsaquo;</button></span>' : '') .
