@@ -33,7 +33,7 @@ foreach ($slides as $i => &$slide) $slide[0] = 'home-' . $rotation[($day + $i) %
 unset($slide);
 // Fixed slides first. The Discord banner carries its own text, so it shows whole ("plain": not cropped),
 // sitting above the caption bar, and the whole picture links to the invite as well.
-$discord = 'https://discord.gg/Dzw8H3QZX';
+$discord = 'https://discord.gg/kSUGgYDd8V';
 $fixed = [['discord', 'Volunteers needed!', 'Help us scan realms and grow the census. Everyone is welcome.', $discord, 'Join the Discord »', true]];
 if ($totals['tracked'] >= 1000000)
   $fixed[] = ['home-5', 'Over ' . fmt((int)(floor($totals['tracked'] / 1000000) * 1000000)) . ' characters in our database',
@@ -63,7 +63,7 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
       <div class="stat"><b><?= e(fmt($totals['tracked'])) ?></b><span>Characters tracked</span><em>across <?= count($editions) ?> editions</em></div>
       <div class="stat"><b><?= e(fmt($totals['seen7'])) ?></b><span>Seen last 7 days</span><?php if ($totals['change'] !== null): ?><em class="<?= $totals['change'] < 0 ? 'dnt' : 'upt' ?>"><?= $totals['change'] < 0 ? '▼' : '▲' ?> <?= e($pct($totals['change'])) ?> vs last week</em><?php else: ?><em>across <?= (int)$totals['seen7Editions'] ?> editions</em><?php endif; ?></div>
       <div class="stat"><b><?= e(fmt($totals['realms'])) ?></b><span>Realms surveyed</span><em>in the census sample</em></div>
-      <div class="stat"><b data-ago="<?= (int)$totals['newestT'] ?>" data-short><?= e(gmdate('M j', (int)$totals['newestT'])) ?></b><span>Since last scan</span><em><?= e($totals['newestName']) ?></em></div>
+      <div class="stat"><b data-ago="<?= (int)$totals['newestT'] ?>" data-short id="home-last-scan"><?= e(gmdate('M j', (int)$totals['newestT'])) ?></b><span>Since last scan</span><em id="home-last-scan-edition"><?= e($totals['newestName']) ?></em></div>
     </div>
 
     <?php component_start('section', ['title' => 'Pick Your Edition', 'sub' => 'Sorted by characters seen this week', 'body_class' => 'flush']) ?>
@@ -77,7 +77,7 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
               <td><span class="n"><?= e(fmt($ed['n7'])) ?></span> <?= $trend($ed['delta']) ?></td>
               <td><svg viewBox="0 0 208 38" preserveAspectRatio="none" aria-hidden="true"><path d="M<?= str_replace(' ', ' L', $pts) ?> L208,38 L0,38Z" fill="rgba(176,122,0,.22)"/><polyline points="<?= $pts ?>" fill="none" stroke="#7a2a00" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg></td>
               <td class="r"><?= e(fmt($ed['total'])) ?></td>
-              <td class="last" data-ago="<?= $ed['lastT'] ?>"><?= e(gmdate('M j', $ed['lastT'])) ?></td>
+              <td class="last" data-scan-source="<?= e($ed['source']) ?>" data-ago="<?= $ed['lastT'] ?>"><?= e(gmdate('M j', $ed['lastT'])) ?></td>
             </tr>
 <?php endforeach; ?>
           </tbody>
@@ -156,7 +156,7 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
         <li><span class="qi"></span><a href="/combos">Every Race &amp; Class</a></li>
         <li><span class="qi g"></span><a href="/auctionhouse">Auction House Prices</a></li>
         <li><span class="qi y"></span><a href="/blog.php">News &amp; Updates</a></li>
-        <li><span class="qi"></span><a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">Join us on Discord</a></li>
+        <li><span class="qi"></span><a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Join us on Discord</a></li>
       </ul>
     </div>
   </aside>
@@ -166,15 +166,47 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
 (function () {
   var nf = function (n) { return n.toLocaleString('en-US'); };
 
-  // Times since each scan, worked out in the browser (pages are cached).
-  var now = Date.now() / 1000;
-  document.querySelectorAll('[data-ago]').forEach(function (el) {
-    var s = now - +el.dataset.ago, hrs = Math.floor(s / 3600), days = Math.floor(s / 86400);
-    if (!+el.dataset.ago || s < 0) return;
-    el.textContent = 'short' in el.dataset ? (s < 7200 ? Math.max(1, Math.floor(s / 60)) + ' min' : days < 2 ? hrs + ' hrs' : days + ' days')
-      : s < 3600 ? 'under an hour ago' : days < 1 ? hrs + (hrs === 1 ? ' hr' : ' hrs') + ' ago' : days + (days === 1 ? ' day' : ' days') + ' ago';
-    if (el.classList.contains('last')) el.classList.add(s < 86400 ? 'fresh' : s > 7 * 86400 ? 'stale' : 'ok');
-  });
+  var scanColumn = document.querySelectorAll('[data-scan-source]');
+  var newestScan = document.getElementById('home-last-scan');
+  var newestEdition = document.getElementById('home-last-scan-edition');
+  function renderScanAge(el) {
+    var timestamp = Number(el.dataset.ago);
+    if (!Number.isFinite(timestamp) || timestamp <= 0) return;
+    var seconds = Math.max(0, Date.now() / 1000 - timestamp);
+    var minutes = Math.floor(seconds / 60), hours = Math.floor(seconds / 3600), days = Math.floor(seconds / 86400);
+    if ('short' in el.dataset) {
+      el.textContent = minutes < 1 ? 'Just now' : hours < 2 ? minutes + ' min' : days < 2 ? hours + ' hrs' : days + ' days';
+    } else {
+      el.textContent = minutes < 1 ? 'Just now' : hours < 1 ? minutes + ' min ago'
+        : days < 1 ? hours + (hours === 1 ? ' hr' : ' hrs') + ' ago' : days + (days === 1 ? ' day' : ' days') + ' ago';
+      el.classList.remove('fresh', 'stale', 'ok');
+      el.classList.add(seconds < 86400 ? 'fresh' : seconds > 7 * 86400 ? 'stale' : 'ok');
+    }
+    el.title = new Date(timestamp * 1000).toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+  }
+  function refreshScanTimes() {
+    fetch('/last-scans.json').then(function (response) {
+      if (!response.ok) throw new Error('Scan times unavailable');
+      return response.json();
+    }).then(function (times) {
+      scanColumn.forEach(function (cell) {
+        var timestamp = times[cell.dataset.scanSource];
+        if (!Number.isSafeInteger(timestamp) || timestamp <= 0) return;
+        cell.dataset.ago = timestamp;
+        renderScanAge(cell);
+        if (timestamp >= Number(newestScan.dataset.ago)) {
+          newestScan.dataset.ago = timestamp;
+          newestEdition.textContent = cell.parentElement.querySelector('.nm a').textContent;
+        }
+      });
+      renderScanAge(newestScan);
+    }).catch(function () {});
+  }
+  scanColumn.forEach(renderScanAge);
+  renderScanAge(newestScan);
+  refreshScanTimes();
+  setInterval(function () { if (!document.hidden) refreshScanTimes(); }, 30000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) refreshScanTimes(); });
 
   // News rotator.
   var slides = [].slice.call(document.querySelectorAll('#hero .slide')), dots = [].slice.call(document.querySelectorAll('#hero .dots button')), cur = 0, timer;

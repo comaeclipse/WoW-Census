@@ -46,6 +46,7 @@ ob_start();
         <span class="donate-amt">$<?= donate_escape((string)$raised) ?> / $<?= donate_escape((string)$goal) ?> this month</span>
       </div>
       <div class="sup-btns"><?= $buttons ?></div>
+      <p>WoWCensus is built and maintained by one person. I work a full-time job and I'm a dad to three girls, so the site gets built in whatever evenings and weekends are left over. The project is entirely self-funded.</p>
       <p>If you found the information on this site helpful or interesting, please consider donating towards the expenses of running it.</p>
     </section>
   </main>

@@ -63,11 +63,7 @@ function ac_apcu_drop_old(): string {
   if (!ac_apcu_on()) return 'APCu is not enabled here.';
   $current = ac_apcu_current_version();
   if ($current === null) return 'The current data version is not known yet; load a page first.';
-  $dropped = 0; $bytes = 0;
-  foreach (new APCUIterator('/^ml:q:/', APC_ITER_KEY | APC_ITER_MEM_SIZE, 500, APC_LIST_ACTIVE) as $key => $e) {
-    if (!preg_match('/^ml:q:(.+):[0-9a-f]{64}$/', $key, $m) || $m[1] === $current) continue;
-    if (apcu_delete($key)) { $dropped++; $bytes += (int)$e['mem_size']; }
-  }
+  [$dropped, $bytes] = Db::dropVersionsExcept([$current]);
   return 'Dropped ' . number_format($dropped) . ' query results from older data versions (' . ac_bytes($bytes) . ').';
 }
 
@@ -128,6 +124,13 @@ function ac_apcu(): array {
   $slow = [];
   foreach ($live as $e) if (isset($meta[$e['sha']]) && ($m = apcu_fetch('ml:qm:' . $e['sha']))) $slow[] = $e + ['meta' => $m];
   usort($slow, fn($a, $b) => $b['meta']['ms'] <=> $a['meta']['ms']);
+  // Counters from Db::cached(), and results computed but not kept (too large or the store failed).
+  $stats = [];
+  foreach (['wait-n', 'wait-ms', 'wait-max-ms', 'wait-filled', 'wait-released', 'wait-timeout', 'stale-served', 'store-failed', 'skip-large'] as $n)
+    $stats[$n] = (int)(apcu_fetch('ml:stat:' . $n) ?: 0);
+  $unstored = [];
+  foreach (array_keys($meta) as $sha) if (($m = apcu_fetch('ml:qm:' . $sha)) && array_key_exists('stored', $m) && !$m['stored']) $unstored[] = ['sha' => $sha, 'meta' => $m];
+  usort($unstored, fn($a, $b) => $b['meta']['bytes'] <=> $a['meta']['bytes']);
   $saved = 0;
   foreach ($slow as $e) $saved += $e['meta']['ms'] * $e['hits'];
   $hits = (int)$info['num_hits']; $misses = (int)$info['num_misses'];
@@ -142,6 +145,8 @@ function ac_apcu(): array {
     'top_hits' => $top(fn($a, $b) => $b['hits'] <=> $a['hits']),
     'top_bytes' => $top(fn($a, $b) => $b['bytes'] <=> $a['bytes']),
     'slow' => array_slice($slow, 0, 15),
+    'stats' => $stats, 'unstored' => array_slice($unstored, 0, 15), 'unstored_n' => count($unstored),
+    'previous' => (apcu_fetch('ml:versions') ?: [])['previous'] ?? null,
     'config' => ['shm_size' => ini_get('apc.shm_size'), 'ttl' => ini_get('apc.ttl'), 'gc_ttl' => ini_get('apc.gc_ttl'), 'entries_hint' => ini_get('apc.entries_hint')],
   ];
 }
@@ -738,7 +743,7 @@ form.inline{display:inline;margin:0}button,input{font:inherit;font-size:.82rem;b
 </section>
 
 <section class="card" id="apcu">
-  <div class="card-head"><h2>APCu query cache</h2><p>Db.php keeps every query's rows here, keyed by the published data version, for 12 hours</p></div>
+  <div class="card-head"><h2>APCu query cache</h2><p>Db.php keeps every query's rows here, keyed by the published data version, for 12 hours; the previous version's stay 15 minutes as a fallback, older ones are dropped</p></div>
 <?php if (isset($apcu['error'])): ?><?= ac_error($apcu) ?>
 <?php else: $i = $apcu['info']; $used = $apcu['total'] - $apcu['free']; $old = array_filter($apcu['versions'], fn($k) => $k !== $apcu['current'], ARRAY_FILTER_USE_KEY); ?>
   <div class="mem"><?= ac_meter($used, $apcu['total']) ?><p><?= ac_bytes($used) ?> used of <?= ac_bytes($apcu['total']) ?> · <?= ac_bytes($apcu['free']) ?> free in <?= number_format($apcu['free_blocks']) ?> blocks (largest <?= ac_bytes($apcu['largest_free']) ?>) · fragmentation <?= ac_pct($apcu['fragmentation']) ?></p></div>
@@ -758,10 +763,16 @@ form.inline{display:inline;margin:0}button,input{font:inherit;font-size:.82rem;b
       'Computing now' => $apcu['locks'] ? implode('<br>', array_map(fn($l) => '<span class="badge run">' . cs_h(substr($l['sha'], 0, 10)) . '</span> for ' . cs_h(ac_dur(time() - $l['since'])) . ' ' . ac_sql(apcu_fetch('ml:qm:' . $l['sha']) ?: null), $apcu['locks'])) : '<span class="badge ok">nothing</span>',
       'Other keys' => number_format($apcu['other']['n']) . ' · ' . ac_bytes($apcu['other']['bytes']),
     ]) ?></div>
+    <div><?php $st = $apcu['stats']; $lim = (int)(getenv('ML_APCU_MAX_BYTES') ?: 0); ?><?= ac_kv([
+      'Lock waits' => $st['wait-n'] ? number_format($st['wait-n']) . ' · avg ' . cs_h(ac_dur($st['wait-ms'] / max(1, $st['wait-n']) / 1000)) . ' · max ' . cs_h(ac_dur($st['wait-max-ms'] / 1000)) . ' <span class="muted">(' . number_format($st['wait-filled']) . ' got the result, ' . number_format($st['wait-released']) . ' saw the lock freed, ' . number_format($st['wait-timeout']) . ' timed out)</span>' : '<span class="badge ok">none</span>',
+      'Stale results served' => number_format($st['stale-served']) . ' <span class="muted">from the previous data version while the new one was computed</span>',
+      'Failed stores' => $st['store-failed'] ? '<span class="badge warn">' . number_format($st['store-failed']) . '</span> apcu_store refused (no room or too large)' : '<span class="badge ok">0</span>',
+      'Admission limit' => $lim ? ac_bytes($lim) . ' · ' . number_format($st['skip-large']) . ' results skipped' : '<span class="muted">none set (ML_APCU_MAX_BYTES)</span>',
+    ]) ?></div>
   </div>
   <h3>By data version</h3>
   <table><thead><tr><th>Version</th><th class="num">Entries</th><th class="num">Size</th><th class="num">Reads</th><th>Newest</th><th></th></tr></thead><tbody>
-    <?php foreach ($apcu['versions'] as $v => $g): ?><tr><td class="mono"><?= cs_h((string)$v) ?></td><td class="num"><?= number_format($g['n']) ?></td><td class="num"><?= ac_bytes($g['bytes']) ?></td><td class="num"><?= number_format($g['hits']) ?></td><td><?= ac_ago($g['newest']) ?></td><td><?= (string)$v === $apcu['current'] ? '<span class="badge ok">current</span>' : '<span class="badge warn">dead</span>' ?></td></tr><?php endforeach; ?>
+    <?php foreach ($apcu['versions'] as $v => $g): ?><tr><td class="mono"><?= cs_h((string)$v) ?></td><td class="num"><?= number_format($g['n']) ?></td><td class="num"><?= ac_bytes($g['bytes']) ?></td><td class="num"><?= number_format($g['hits']) ?></td><td><?= ac_ago($g['newest']) ?></td><td><?= (string)$v === $apcu['current'] ? '<span class="badge ok">current</span>' : ((string)$v === $apcu['previous'] ? '<span class="badge run">fallback</span>' : '<span class="badge warn">dead</span>') ?></td></tr><?php endforeach; ?>
   </tbody></table>
   <?php if ($old): ?><form class="inline" method="post" action="/admin/?view=cache" data-confirm="Drop every query result from older data versions? Nothing reads them."><input type="hidden" name="csrf" value="<?= cs_h($csrf) ?>"><input type="hidden" name="action" value="cache-apcu-drop-old"><p><button type="submit">Free <?= ac_bytes(array_sum(array_column($old, 'bytes'))) ?>: drop <?= number_format(array_sum(array_column($old, 'n'))) ?> dead entries</button> <span class="muted">Only entries for older data versions; the current ones stay.</span></p></form><?php endif; ?>
   <div class="grid">
@@ -771,6 +782,10 @@ form.inline{display:inline;margin:0}button,input{font:inherit;font-size:.82rem;b
     <div class="scroll"><h3>Slowest to compute</h3><table><thead><tr><th>Query</th><th class="num">Cost</th><th class="num">Rows</th><th class="num">Reads</th></tr></thead><tbody>
       <?php if (!$apcu['slow']): ?><tr><td colspan="4" class="muted">Timings are recorded for queries cached from now on.</td></tr><?php endif; ?>
       <?php foreach ($apcu['slow'] as $e): ?><tr><td><?= ac_sql($e['meta']) ?></td><td class="num"><?= number_format($e['meta']['ms']) ?> ms</td><td class="num"><?= number_format($e['meta']['rows']) ?></td><td class="num"><?= number_format($e['hits']) ?></td></tr><?php endforeach; ?>
+    </tbody></table></div>
+    <div class="scroll"><h3>Computed but not kept</h3><table><thead><tr><th>Query</th><th class="num">Size</th><th class="num">Cost</th></tr></thead><tbody>
+      <?php if (!$apcu['unstored']): ?><tr><td colspan="3" class="muted">Every result recorded since sizes were tracked fit.</td></tr><?php endif; ?>
+      <?php foreach ($apcu['unstored'] as $e): ?><tr><td><?= ac_sql($e['meta']) ?></td><td class="num"><?= ac_bytes($e['meta']['bytes']) ?></td><td class="num"><?= number_format($e['meta']['ms']) ?> ms</td></tr><?php endforeach; ?>
     </tbody></table></div>
     <div class="scroll"><h3>Largest</h3><table><thead><tr><th>Query</th><th class="num">Size</th><th class="num">Reads</th></tr></thead><tbody>
       <?php foreach ($apcu['top_bytes'] as $e): ?><tr><td><?= ac_sql($e['meta']) ?></td><td class="num"><?= ac_bytes($e['bytes']) ?></td><td class="num"><?= number_format($e['hits']) ?></td></tr><?php endforeach; ?>

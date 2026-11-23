@@ -7,7 +7,9 @@ PATH can be:
   * a Journalator.lua SavedVariables file (the add-on's own save; its logs are an
     encoded blob that tools/journalator_decode.py unpacks as data),
   * a WoWCensus.lua save written with "Collect other addon data" on (WoWCensusDB.market:
-    Journalator sections, TSM sales/buys/expired/cancelled, Auctionator posting history),
+    Journalator sections, TSM sales/buys/expired/cancelled, Auctionator posting history;
+    WoWCensusDB.auctionLog since add-on 0.1.16: the add-on's own listings, "buyer found" and
+    "expired" messages, cancels and auction mail, stored as WoWCensus:* sections),
   * a companion upload (JournalatorEntries = decoded logs, TSMAccounting = TSM rows),
   * a folder, searched for all of these (companion upload stages included; a sibling
     <name>.json manifest supplies the edition).
@@ -23,6 +25,8 @@ item links become itemString + itemID, source{character,realm,faction} is flatte
 `time` becomes `t`. Both routes therefore yield identical rows, so a sale seen in a raw
 Journalator file and again in a WoWCensus copy is stored once. Identical events in the
 same second (13 Coarse Thread vendored at once) are kept apart by an occurrence number.
+Fields only some copies carry (IDENTITY_DROP: a training row's trainer specialty) are left
+out of the event's identity, so both copies still match.
 
 Tables (schema marketlens_import, created on first run):
   addon_ledger_sources  one row per imported file (sha256), like local_source_files
@@ -74,6 +78,8 @@ PRIVATE = {"playerName", "player", "recipient", "sender", "subject", "text",
            "crafterName", "crafterNote", "customerNote", "otherPlayer"}
 MAX_DEPTH = 6
 SALE_WINDOW = 48 * 3600 + 3600   # longest auction plus slack for clock skew
+MAIL_DELAY = 3600                # outside Retail, auction gold arrives by mail an hour after the sale
+LIVE_SALE_GAP = 600              # TSM time this far before the invoice = TSM saw the sale happen
 
 
 def clean_item(link):
@@ -119,6 +125,23 @@ def canon(v):
     return v
 
 
+# Fields one copy of an event has and another lacks: Journalator builds differ on whether a
+# training row carries the trainer's specialty ("group": Restoration) and title (trainer.group).
+IDENTITY_DROP = {"TrainingCosts": (("group",), ("trainer", "group"))}
+
+
+def identity(section, row):
+    """canon(row) without the fields that differ between copies of the same event."""
+    out = canon(row)
+    for path in IDENTITY_DROP.get(section, ()):
+        node = out
+        for k in path[:-1]:
+            node = node.get(k) if isinstance(node, dict) else None
+        if isinstance(node, dict):
+            node.pop(path[-1], None)
+    return canon(out)
+
+
 def journalator_row(raw):
     """A raw Journalator log entry in WoWCensus's copied shape."""
     row = copy_value(raw)
@@ -140,6 +163,31 @@ def to_int(v):
             return None
 
 
+NATIVE_KINDS = {"post", "sold", "expired", "cancelled", "mail", "owned"}
+# The server ID from the auction log's GUID key, for a row whose realm was recorded blank. It is
+# taken off the row before the row is keyed or stored.
+SERVER_HINT = "\0server"
+
+
+def native_auction_rows(log):
+    """WoWCensusDB.auctionLog: the add-on's own record of this character's listings, sales and auction mail."""
+    out = []
+    for log_key, entry in (log.items() if isinstance(log, dict) else []):
+        if not isinstance(entry, dict):
+            continue
+        server = re.search(r":Player-(\d+)-", str(log_key))
+        rows = entry.get("rows") or {}
+        for r in (rows.values() if isinstance(rows, dict) else rows):
+            if not isinstance(r, dict) or r.get("kind") not in NATIVE_KINDS:
+                continue
+            r = {k: v for k, v in r.items() if k not in ("base",)}
+            r["itemName"] = r.pop("name", None)
+            r["char"], r["realm"], r["faction"] = entry.get("char"), entry.get("realm"), entry.get("faction")
+            if server and not r["realm"]:
+                r[SERVER_HINT] = int(server.group(1))
+            out.append(("WoWCensus:" + r["kind"], r))
+    return out
+
 def measures(section, row):
     """(item_id, item_name, quantity, money) for the common columns."""
     item = to_int(row.get("itemID"))
@@ -159,6 +207,8 @@ def measures(section, row):
     elif section.startswith("TSM:"):
         price = to_int(row.get("price"))
         money = price * (qty or 1) if price is not None else None
+    elif section.startswith("WoWCensus:"):
+        money = to_int(row.get("bid") if section == "WoWCensus:mail" else row.get("buyout"))
     elif section == "Auctionator:Posting":
         price = to_int(row.get("price"))
         money = price * (qty or 1) if price is not None else None
@@ -171,7 +221,7 @@ def lua_tables(path):
     """WoWCensusDB as JSON via the repository's SavedVariables reader (data only)."""
     js = ("const {readSavedVariables}=require(process.argv[1]);"
           "const v=readSavedVariables(process.argv[2]);"
-          "process.stdout.write(JSON.stringify({market:v.market||null,realms:Object.keys(v.realms||{})}));")
+          "process.stdout.write(JSON.stringify({market:v.market||null,auctionLog:v.auctionLog||null,realms:Object.keys(v.realms||{})}));")
     out = subprocess.run(["node", "-e", js, str(REPO / "tools" / "savedvariables.js"), str(path)],
                          capture_output=True, check=True, timeout=600)
     return json.loads(out.stdout)
@@ -288,8 +338,13 @@ def rows_from_file(path):
                 r = dict(r)
                 r["itemID"] = to_int(r.get("key")) if str(r.get("key", "")).isdigit() else None
                 rows.append(("Auctionator:Posting", r))
-        edition = EDITIONS.get(m.get("game")) or edition_from_path(path)
-        region = m.get("region") if m.get("region") in REGIONS else None
+        rows += native_auction_rows(data.get("auctionLog") or {})
+        game = m.get("game") or next((e.get("identity", {}).get("game") for e in (data.get("auctionLog") or {}).values()
+                                      if isinstance(e, dict)), None)
+        region = m.get("region") if m.get("region") in REGIONS else next(
+            (e.get("identity", {}).get("region") for e in (data.get("auctionLog") or {}).values()
+             if isinstance(e, dict) and e.get("identity", {}).get("region") in REGIONS), None)
+        edition = EDITIONS.get(game) or edition_from_path(path)
         return "wowcensus", edition, region, rows
     # Companion uploads: Journalator logs already decoded, and TSM accounting rows.
     if head.startswith(b"JournalatorEntries"):
@@ -409,6 +464,169 @@ def character_region(cur, edition, char, realm, cache):
             WHERE source_game=%s AND name=%s AND realm=%s AND collection_region IS NOT NULL""",
                     (legacy.SOURCES[edition], char, realm))
         found = {r[0] for r in cur.fetchall()}
+        if not found and edition == "forever":
+            found = forever_ruleset_regions(cur, char, realm)
+        cache[key] = found.pop() if len(found) == 1 else None
+    return cache[key]
+
+
+FOREVER_REALM = re.compile(r"^CAMWOW\s+(US|EU|KR|TW)\d*\s+(?:Realm|서버)\s+\d+\s+(RP PvP|PvP|PvE|RP)$", re.I)
+
+
+def forever_character_realm(cur, char, faction, cache, ruleset=None):
+    """Forever add-ons can record a blank realm (the client reports it late), and TSM and some
+    Journalator rows name only the ruleset ("Normal", "PvP"). The census's own sightings of the
+    player name it: every sighting of this character (and faction, and ruleset) in one region and
+    one ruleset, the realm it was seen on last. Returns (realm, faction), the faction from the
+    sightings when the row has none and they agree on one; None when the sightings disagree."""
+    if not char:
+        return None
+    key = ("forever-realm", char, faction, ruleset)
+    if key not in cache:
+        cur.execute("""SELECT realm, game, max(last_seen) FROM marketlens_import.characters_with_region
+            WHERE source_game='forever' AND name=%s AND coalesce(realm,'') <> '' GROUP BY 1, 2""", (char,))
+        rows = [r for r in cur.fetchall() if FOREVER_REALM.match(r[0])
+                and (faction not in ("Alliance", "Horde") or (r[1] or "").endswith("-" + faction))
+                and (ruleset is None or FOREVER_REALM.match(r[0]).group(2).lower() == ruleset.lower())]
+        groups = {(m.group(1).lower(), m.group(2).lower()) for m in (FOREVER_REALM.match(r[0]) for r in rows)}
+        if len(groups) != 1:
+            cache[key] = None
+        else:
+            realm = max(rows, key=lambda r: r[2] or 0)[0]
+            if faction in ("Alliance", "Horde"):
+                found = faction
+            else:
+                sides = {s for s in ("Alliance", "Horde") for r in rows if (r[1] or "").endswith("-" + s)}
+                found = sides.pop() if len(sides) == 1 else None
+            cache[key] = (realm, found)
+    return cache[key]
+
+
+def server_realm(cur, server, cache):
+    """The Forever realm the census knows for a server ID (the number in a player GUID)."""
+    if not server:
+        return None
+    key = ("server-realm", server)
+    if key not in cache:
+        cur.execute("""SELECT DISTINCT realm_name FROM marketlens_import.census_collection_realms
+            WHERE source_game='forever' AND realm_id=%s AND coalesce(realm_name,'') <> ''""", (server,))
+        names = {r[0] for r in cur.fetchall()}
+        cache[key] = names.pop() if len(names) == 1 else None
+    return cache[key]
+
+
+def source_servers(cur, sha, cache):
+    """character -> server ID from the auction log keys of the stored file a row came from."""
+    key = ("source-servers", sha)
+    if key not in cache:
+        cache[key] = {}
+        cur.execute("SELECT path FROM marketlens_import.addon_ledger_sources WHERE sha256=%s", (sha,))
+        found = cur.fetchone()
+        if found and Path(found[0]).exists():
+            try:
+                log = lua_tables(found[0]).get("auctionLog") or {}
+            except (subprocess.CalledProcessError, ValueError):
+                log = {}
+            for log_key, entry in log.items():
+                server = re.search(r":Player-(\d+)-", str(log_key))
+                if server and isinstance(entry, dict) and entry.get("char"):
+                    cache[key][entry["char"]] = int(server.group(1))
+    return cache[key]
+
+
+def fill_forever_realms(cur, groups, cache):
+    """Name the realm of stored Forever rows recorded with a blank one or with only a ruleset (TSM
+    files Forever under "Normal", "PvP", "Roleplay PvP"; some Journalator rows say "PvE"), and the
+    faction of rows recorded without one (TSM's realm keys carry no faction there). The event key
+    keeps the recorded realm, so later copies of the same rows still dedupe."""
+    cur.execute("""SELECT event_key, region, realm, character, faction, section, source_sha256
+        FROM marketlens_import.addon_ledger_events
+        WHERE edition='forever' AND character IS NOT NULL
+          AND (coalesce(realm,'')='' OR lower(trim(realm)) = ANY(%s)
+               OR (faction IS NULL AND (section LIKE 'TSM:%%' OR section IN ('Invoices','Posting','Failures'))))""",
+                (list(FOREVER_RULESETS),))
+    filled = 0
+    for key, region, recorded, char, faction, section, sha in cur.fetchall():
+        realm = None
+        recorded = (recorded or "").strip()
+        named = FOREVER_REALM.match(recorded)
+        ruleset = named.group(2) if named else FOREVER_RULESETS.get(recorded.lower())
+        if named:
+            realm = recorded
+        elif section.startswith("WoWCensus:") and sha:
+            realm = server_realm(cur, source_servers(cur, sha, cache).get(char), cache)
+        place = forever_character_realm(cur, char, faction, cache, ruleset)
+        if not realm and place:
+            realm = place[0]
+        side = faction if faction in ("Alliance", "Horde") else (place[1] if place else None)
+        if not realm or region_for(cur, "forever", realm, cache) != region:
+            continue
+        if realm == recorded and side == faction:
+            continue
+        cur.execute("""UPDATE marketlens_import.addon_ledger_events SET realm=%s, faction=%s, source_game=%s
+            WHERE event_key=%s""", (realm, side, source_game_for("forever", realm), key))
+        groups.add(("forever", region, None, char))
+        groups.add(("forever", region, "", char))
+        groups.add(("forever", region, recorded, char))
+        groups.add(("forever", region, realm, char))
+        filled += 1
+    return filled
+
+
+FOREVER_RULESETS = {"pve": "PvE", "normal": "PvE", "pvp": "PvP", "rp": "RP", "roleplay": "RP",
+                    "rp pvp": "RP PvP", "roleplay pvp": "RP PvP", "rppvp": "RP PvP"}
+
+
+def forever_ruleset_regions(cur, char, realm):
+    """TSM names Forever realms by ruleset only ("Roleplay PvP"); the census /who sightings of
+    the same character on realms of that ruleset say which region it plays in."""
+    ruleset = FOREVER_RULESETS.get(realm.strip().lower())
+    if not ruleset:
+        return set()
+    cur.execute("""SELECT DISTINCT collection_region, realm FROM marketlens_import.characters_with_region
+        WHERE source_game='forever' AND name=%s AND collection_region IS NOT NULL""", (char,))
+    pattern = re.compile(r"^CAMWOW\s+(?:US|EU|KR|TW)\d+\s+Realm\s+\d+\s+" + re.escape(ruleset) + r"$", re.I)
+    return {reg for reg, name in cur.fetchall() if pattern.match(name or "")}
+
+
+def same_realm_key(edition, a, b):
+    """Forever TSM keys name a ruleset ("PvP", "Normal"): two keys match when they mean the same one."""
+    a, b = (a or "").strip().lower(), (b or "").strip().lower()
+    if edition == "forever" and a in FOREVER_RULESETS and b in FOREVER_RULESETS:
+        return FOREVER_RULESETS[a] == FOREVER_RULESETS[b]
+    return a == b
+
+
+def companion_account_region(cur, edition, path, realm, cache):
+    """For a character the census hasn't seen yet: the region this companion account's other
+    ledger rows on the same realm (Forever: the same ruleset) already resolved to. One account
+    plays in one region; None unless every earlier row agrees."""
+    manifest = Path(path).with_suffix(".json")
+    if not realm or not manifest.exists():
+        return None
+    try:
+        account = json.loads(manifest.read_text(encoding="utf-8")).get("accountId")
+    except (OSError, ValueError):
+        return None
+    if not account:
+        return None
+    if "accounts" not in cache:
+        by = defaultdict(set)
+        # <uploads>/addons-<time>/<edition>/<addon>/<receipt>.json
+        for m in manifest.parent.parent.parent.parent.glob("addons-*/*/*/*.json"):
+            try:
+                d = json.loads(m.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            for h in (d.get("sha256"), d.get("fileSha256")):
+                if d.get("accountId") and h:
+                    by[d["accountId"]].add(h)
+        cache["accounts"] = by
+    key = ("account", account, edition, FOREVER_RULESETS.get(realm.strip().lower(), realm.strip().lower()))
+    if key not in cache:
+        cur.execute("""SELECT DISTINCT realm, region FROM marketlens_import.addon_ledger_events
+            WHERE edition=%s AND source_sha256 = ANY(%s)""", (edition, sorted(cache["accounts"].get(account, ()))))
+        found = {reg for r, reg in cur.fetchall() if same_realm_key(edition, r, realm)}
         cache[key] = found.pop() if len(found) == 1 else None
     return cache[key]
 
@@ -442,7 +660,7 @@ def source_game_for(edition, realm):
 
 
 def event_key(edition, region, section, row, occ):
-    body = json.dumps(canon(row), sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    body = json.dumps(identity(section, row), sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     ident = "|".join(map(str, (edition, region, row.get("realm"), row.get("char"), section, row.get("t"), occ, body)))
     return hashlib.sha256(ident.encode("utf-8")).hexdigest()
 
@@ -469,6 +687,120 @@ def fill_item_ids(cur):
     return borrowed + cur.rowcount
 
 
+def fill_item_names(cur, table):
+    """TSM rows carry only the item id: borrow the name from a ledger row of the same id and game,
+    then from the game's newest auction scan of that id."""
+    cur.execute(f"""UPDATE marketlens_import.{table} e SET item_name = s.item_name
+        FROM (SELECT DISTINCT ON (source_game, item_id) source_game, item_id, item_name
+              FROM marketlens_import.addon_ledger_events
+              WHERE item_id IS NOT NULL AND coalesce(item_name, '') <> ''
+              ORDER BY source_game, item_id, t DESC) s
+        WHERE coalesce(e.item_name, '') = '' AND e.item_id IS NOT NULL
+          AND e.source_game = s.source_game AND e.item_id = s.item_id""")
+    borrowed = cur.rowcount
+    cur.execute(f"""UPDATE marketlens_import.{table} e SET item_name = s.name
+        FROM (SELECT DISTINCT ON (source_game, item_id) source_game, item_id, name
+              FROM marketlens_import.local_auction_snapshots
+              WHERE coalesce(name, '') <> ''
+                AND source_game IN (SELECT DISTINCT source_game FROM marketlens_import.{table}
+                                    WHERE coalesce(item_name, '') = '' AND item_id IS NOT NULL)
+              ORDER BY source_game, item_id, captured_at DESC) s
+        WHERE coalesce(e.item_name, '') = '' AND e.item_id IS NOT NULL
+          AND e.source_game = s.source_game AND e.item_id = s.item_id""")
+    return borrowed + cur.rowcount
+
+
+def pending_sale_time(row, seen):
+    """Sale time from a Sale Pending mail: when the gold arrives (realm clock) minus the mail delay."""
+    eta_h, eta_m = to_int(row.get("etaHour")), to_int(row.get("etaMin"))
+    game_h, game_m = to_int(row.get("gameHour")), to_int(row.get("gameMinute"))
+    if None in (eta_h, eta_m, game_h, game_m):
+        return None
+    ahead = ((eta_h * 60 + eta_m) - (game_h * 60 + game_m)) % 1440
+    wait = to_int(row.get("moneyDelay"))
+    wait = MAIL_DELAY if wait is None or wait <= 0 else wait * 60 if wait <= 1440 else wait
+    return seen - (seen % 60) + ahead * 60 - wait
+
+
+AUCTION_MAIL_DAYS = 30
+
+
+def mail_delivered(row, seen):
+    """When an auction mail arrived: it is kept AUCTION_MAIL_DAYS days, and daysLeft counts down from that."""
+    try:
+        days = float(row.get("daysLeft"))
+    except (TypeError, ValueError):
+        return None
+    if not 0 < days <= AUCTION_MAIL_DAYS or days == int(days):
+        return None
+    delivered = round(seen - (AUCTION_MAIL_DAYS - days) * 86400)
+    return delivered if delivered <= seen + 60 else None
+
+
+def key_row(section, row):
+    """The row as keyed: WoWCensus's own rows without their realm. Before its 0.1.16 realm fix the
+    add-on could record a Forever realm blank, so one row reaches us with and without it."""
+    return {**row, "realm": ""} if section.startswith("WoWCensus:") else row
+
+
+def rekey_native_rows(cur, groups):
+    """Move WoWCensus rows stored under a realm-keyed event key to the realm-free key, or drop them
+    when the copy recorded with a blank realm is already stored."""
+    cur.execute("""SELECT event_key, edition, region, realm, section, character, row, source_sha256
+        FROM marketlens_import.addon_ledger_events
+        WHERE section LIKE 'WoWCensus:%%' AND coalesce(row->>'realm', '') <> '' ORDER BY source_sha256, t, event_key""")
+    occ, moved, dropped = defaultdict(int), 0, 0
+    for key, edition, region, realm, section, char, row, sha in cur.fetchall():
+        keyed = key_row(section, row)
+        base = (sha, edition, region, char, section, row.get("t"), json.dumps(identity(section, keyed), sort_keys=True))
+        occ[base] += 1
+        new = event_key(edition, region, section, keyed, occ[base])
+        if new == key:
+            continue
+        cur.execute("DELETE FROM marketlens_import.addon_auction_sales WHERE event_key=%s", (key,))
+        cur.execute("SELECT 1 FROM marketlens_import.addon_ledger_events WHERE event_key=%s", (new,))
+        if cur.fetchone():
+            cur.execute("DELETE FROM marketlens_import.addon_ledger_events WHERE event_key=%s", (key,))
+            dropped += 1
+        else:
+            cur.execute("UPDATE marketlens_import.addon_ledger_events SET event_key=%s WHERE event_key=%s", (new, key))
+            moved += 1
+        groups.add((edition, region, realm, char))
+    return {"moved": moved, "dropped": dropped}
+
+
+def first_name(char):
+    return (char or "").split(" ")[0].lower()
+
+
+def drop_duplicate_sales(cur):
+    """One auction can reach us from WoWCensus's own log and from Journalator or TSM. Forever's
+    add-on records only the first name ("Benedict"), Journalator the full one, so they land in
+    different groups. A WoWCensus sale with the same realm, item, quantity and total as another
+    add-on's sale by the same first name, within 15 minutes, is the same auction: keep the copy
+    that knows its listing time, else the other add-on's."""
+    cur.execute("""SELECT s.event_key, s.edition, s.region, coalesce(s.realm, ''), coalesce(s.item_id::text, s.item_name),
+            s.quantity, s.total, s.sold_at, s.posted_at, s.origin, e.character
+        FROM marketlens_import.addon_auction_sales s JOIN marketlens_import.addon_ledger_events e USING (event_key)""")
+    pools = defaultdict(list)
+    for key, edition, region, realm, item, qty, total, sold, posted, origin, char in cur.fetchall():
+        pools[(edition, region, realm, item, qty, total, first_name(char))].append([sold, key, posted, origin])
+    dropped = 0
+    for sales in pools.values():
+        native = [s for s in sales if s[3] == "wowcensus"]
+        others = [s for s in sales if s[3] != "wowcensus"]
+        for n in native:
+            twin = next((o for o in others if abs(o[0] - n[0]) <= 900), None)
+            if not twin:
+                continue
+            others.remove(twin)
+            # The native copy also has the game's own sale messages, so it wins whenever it knows its listing.
+            loser = twin if n[2] is not None else n
+            cur.execute("DELETE FROM marketlens_import.addon_auction_sales WHERE event_key=%s", (loser[1],))
+            dropped += 1
+    return dropped
+
+
 def rebuild_sales(cur, groups):
     """Recompute addon_auction_sales for each (edition, region, realm, character) touched."""
     made = 0
@@ -479,51 +811,198 @@ def rebuild_sales(cur, groups):
         cur.execute("""SELECT event_key, source_game, faction, section, t, item_id, item_name, quantity, money, row
             FROM marketlens_import.addon_ledger_events
             WHERE edition=%s AND region=%s AND realm IS NOT DISTINCT FROM %s AND character IS NOT DISTINCT FROM %s
-              AND section IN ('Invoices','Posting','TSM:sale') ORDER BY t""", (edition, region, realm, char))
+              AND (section IN ('Invoices','Posting','TSM:sale','Failures') OR section LIKE 'WoWCensus:%%')
+            ORDER BY t, event_key""", (edition, region, realm, char))
         rows = cur.fetchall()
-        # A sale logged by both TSM and Journalator is kept once, as the Journalator invoice (it can
-        # carry posted_at). TSM files realms under its own key (Forever: the ruleset, "Normal"), so
-        # invoices are matched by character across realms. TSM's time is the sale; the invoice is
-        # stamped when the mail is taken, up to a day later.
-        invoices = defaultdict(list)    # (item_id, qty) -> [[t, used]]
-        if any(section == "TSM:sale" for _, _, _, section, *_ in rows):
-            cur.execute("""SELECT item_id, quantity, t FROM marketlens_import.addon_ledger_events
-                WHERE edition=%s AND region=%s AND character IS NOT DISTINCT FROM %s AND section='Invoices'
-                  AND row->>'invoiceType'='seller' AND item_id IS NOT NULL ORDER BY t""", (edition, region, char))
-            for item_id, qty, t in cur.fetchall():
-                invoices[(item_id, qty)].append([t, False])
-        posts = defaultdict(list)       # (name, qty) -> [[t, buyout, bid, used]]; sale rows may lack an item id
-        for key, sg, fac, section, t, item, name, qty, money, row in rows:
-            if section == "Posting":
-                posts[(name, qty)].append([t, money, to_int(row.get("bid")), False])
-        for key, sg, fac, section, t, item, name, qty, money, row in rows:
-            if section == "Posting" or not qty or money is None or money <= 0:
-                continue
-            if section == "Invoices" and row.get("invoiceType") != "seller":
-                continue
-            if section == "TSM:sale":
-                # TSM's "sale" also covers selling to a vendor; only Auction House sales count.
-                if row.get("source") != "Auction":
-                    continue
-                twin = next((inv for inv in invoices.get((item, qty), [])
-                             if not inv[1] and t - 60 <= inv[0] <= t + 86400), None)
-                if twin:
-                    twin[1] = True
-                    continue
-            posted = None
+        # Journalator stamps an invoice when the mail is opened, and outside Retail the gold only
+        # arrives an hour after the sale, so the invoice time is "sold by", never the sale itself.
+        # A sale logged by both add-ons is kept once, as the invoice (it can carry posted_at).
+        # TSM files realms under its own key (Forever: the ruleset, "Normal"), so invoices are
+        # matched by character across realms. TSM times a sale it saw happen while the seller was
+        # online; one it only learned from the mail has the invoice's own time.
+        # The pairing runs over the character's rows on every realm key, so each group sees the same pairs.
+        live_sale = {}                  # invoice event_key -> TSM's time of the sale
+        twins = {}                      # TSM row -> how many of its items no invoice covers
+        cur.execute("""SELECT event_key, section, item_id, quantity, t, row->>'stack' FROM marketlens_import.addon_ledger_events
+            WHERE edition=%s AND region=%s AND character IS NOT DISTINCT FROM %s AND item_id IS NOT NULL
+              AND ((section='Invoices' AND row->>'invoiceType'='seller') OR (section='TSM:sale' AND row->>'source'='Auction'))
+            ORDER BY t, event_key""", (edition, region, char))
+        both = cur.fetchall()
+        invoices = defaultdict(list)    # (item_id, qty) -> [[t, event_key, used]]
+        for inv_key, section, item_id, qty, t, _ in both:
             if section == "Invoices":
-                # Oldest unused posting of the same stack that this sale could have come from:
-                # sold at buyout, or won with a bid between the posted bid and buyout.
-                for p in posts.get((name, qty), []):
-                    if p[3] or p[0] > t or t - p[0] > SALE_WINDOW:
-                        continue
-                    if p[1] == money or (p[2] is not None and p[2] <= money and (p[1] is None or money <= p[1])):
-                        p[3], posted = True, p[0]
-                        break
+                invoices[(item_id, qty)].append([t, inv_key, False])
+        for key, section, item, qty, t, stack in both:
+            if section != "TSM:sale":
+                continue
+            # One TSM row can hold several auctions of one stack size: quantity 27, stack 9 is three
+            # sold stacks. Each auction pairs with its own invoice; the rest stays a TSM sale.
+            size = to_int(stack)
+            if not (size and qty and size < qty and qty % size == 0):
+                size = qty
+            matched = []
+            for inv in invoices.get((item, size), []):
+                if len(matched) == (qty or 0) // (size or 1):
+                    break
+                if not inv[2] and t - 60 <= inv[0] <= t + 86400:
+                    matched.append(inv)
+            for inv in matched:
+                inv[2] = True
+                if inv[0] - t >= LIVE_SALE_GAP:
+                    live_sale[inv[1]] = t
+            if matched:
+                twins[key] = (qty or 0) - len(matched) * (size or 0)
+        # name -> [{t, unit, bid, left, whole, auction}]; sale rows may lack an item id.
+        # Journalator logs a listing's price per unit and its total count, and one row can be several
+        # stacks (220 Runecloth = 11 stacks of 20), so its units are used up a stack at a time.
+        # WoWCensus logs one auction with its total buyout: it pairs only with a sale of the whole stack.
+        posts = defaultdict(list)
+        journalator_posts = [(t, name, qty, money) for _, _, _, section, t, _, name, qty, money, _ in rows if section == "Posting"]
+        for key, sg, fac, section, t, item, name, qty, money, row in rows:
+            if section == "Posting" and qty:
+                posts[name].append(dict(t=t, unit=money, bid=to_int(row.get("bid")), left=qty, whole=False, auction=None))
+            elif section == "WoWCensus:post" and qty and not any(
+                    n == name and q == qty and m * q == money and abs(pt - t) <= 10 for pt, n, q, m in journalator_posts):
+                # WoWCensus's own copy of a listing; Journalator only logs Classic listings made through Auctionator.
+                bid = to_int(row.get("bid"))
+                posts[name].append(dict(t=t, unit=money / qty if money is not None else None,
+                                        bid=bid / qty if bid is not None else None, left=qty, whole=True,
+                                        auction=to_int(row.get("auctionID"))))
+        # The auction house's own list of the player's auctions (modern auction house): the last time an
+        # auction was still active and the first time it showed as sold bracket the sale.
+        sighted = {}                    # auction id -> [last seen active, first seen sold]
+        for key, sg, fac, section, t, item, name, qty, money, row in rows:
+            auction = to_int(row.get("auctionID")) if section == "WoWCensus:owned" else None
+            if auction is None:
+                continue
+            seen = sighted.setdefault(auction, [None, None])
+            if row.get("status") == "sold":
+                seen[1] = t if seen[1] is None else min(seen[1], t)
+            elif row.get("status") == "active" and (seen[1] is None or t < seen[1]):
+                seen[0] = t if seen[0] is None else max(seen[0], t)
+        for stack in posts.values():
+            stack.sort(key=lambda p: p["t"])
+
+        def fits(p, qty):
+            return p["left"] > 0 and (qty is None or (p["left"] == qty if p["whole"] else p["left"] >= qty))
+
+        def take(p, qty):
+            p["left"] = 0 if p["whole"] or qty is None else p["left"] - qty
+
+        def use_listing(name, qty, t):
+            p = next((p for p in posts.get(name, []) if p["t"] <= t and fits(p, qty)), None)
+            if p:
+                take(p, qty)
+
+        # An expired or cancelled auction used up its listing: the oldest one of that stack. The game's
+        # own "has expired" message and Journalator's expired-mail row are the same auction, so a
+        # WoWCensus message is only used when Journalator has no failure for that item after it.
+        failures = [[t, name, False] for _, _, _, section, t, _, name, _, _, _ in rows if section == "Failures"]
+        ended = []                      # (t, name, qty) of every listing that ended unsold
+        for key, sg, fac, section, t, item, name, qty, money, row in rows:
+            if section == "Failures":
+                ended.append((t, name, qty))
+            elif section in ("WoWCensus:expired", "WoWCensus:cancelled"):
+                twin = next((f for f in failures if not f[2] and f[1] == name and t - 60 <= f[0] <= t + 30 * 86400), None)
+                if twin:
+                    twin[2] = True
+                else:
+                    ended.append((t, name, qty))
+
+        # Every completed sale once, each source paired with the others:
+        #   Journalator seller invoice (time = gold taken from the mail),
+        #   WoWCensus "seller" mail (time = mail first seen; outside Retail the gold comes an hour after the sale),
+        #   WoWCensus "seller_temp_invoice" (Sale Pending: arrives at the sale and says when the gold will come),
+        #   TSM Auction sale not already covered by an invoice.
+        delay = MAIL_DELAY if edition != "retail" else 0
+        sales = []
+        for key, sg, fac, section, t, item, name, qty, money, row in rows:
+            if not qty or money is None or money <= 0:
+                continue
+            if section == "Invoices" and row.get("invoiceType") == "seller":
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="journalator",
+                                  taken=t, bound=t - delay, live=live_sale.get(key), mail=None, pending=None))
+            elif section == "TSM:sale" and row.get("source") == "Auction" and twins.get(key, qty) > 0:
+                left = twins.get(key, qty)
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=left, money=round(money * left / qty),
+                                  origin="tsm", taken=t, bound=t, live=None, mail=None, pending=None))
+        native_mail = [r for r in rows if r[3] == "WoWCensus:mail" and r[9].get("invoiceType") in ("seller", "seller_temp_invoice")
+                       and r[7] and r[8] and r[8] > 0]
+        for key, sg, fac, section, t, item, name, qty, money, row in native_mail:
+            if row.get("invoiceType") != "seller":
+                continue
+            twin = next((x for x in sales if x["origin"] == "journalator" and x["mail"] is None and x["name"] == name
+                         and x["qty"] == qty and x["money"] == money and t - 60 <= x["taken"] <= t + 30 * 86400), None)
+            delivered = mail_delivered(row, t)
+            if twin:
+                twin["mail"] = t
+                twin["bound"] = min(twin["bound"], t - delay)
+                twin["delivered"] = delivered
+            else:
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="wowcensus",
+                                  taken=t, bound=t - delay, live=None, mail=t, pending=None, delivered=delivered))
+        for key, sg, fac, section, t, item, name, qty, money, row in native_mail:
+            if row.get("invoiceType") != "seller_temp_invoice":
+                continue
+            twin = next((x for x in sales if x["origin"] in ("journalator", "wowcensus") and x["pending"] is None
+                         and x["name"] == name and x["qty"] == qty and x["money"] == money
+                         and x["taken"] >= t - 60 and x["taken"] - t <= 30 * 86400), None)
+            pending = dict(t=t, eta=pending_sale_time(row, t))
+            if twin:
+                twin["pending"] = pending
+                twin["bound"] = min(twin["bound"], t)
+            else:
+                sales.append(dict(key=key, sg=sg, fac=fac, item=item, name=name, qty=qty, money=money, origin="wowcensus",
+                                  taken=t, bound=t, live=None, mail=None, pending=pending))
+
+        # Exact times, best first: the game's "A buyer has been found" message, the Sale Pending
+        # mail's gold arrival time minus the mail delay, the "Auction successful" mail's delivery
+        # time (from its days left) minus the mail delay, TSM's live sighting; otherwise the bound.
+        messages = [[t, name, False] for _, _, _, section, t, _, name, _, _, _ in rows if section == "WoWCensus:sold"]
+        sales.sort(key=lambda x: (x["bound"], x["key"]))
+        ended.sort(key=lambda e: e[0])
+        for x in sales:
+            while ended and ended[0][0] <= x["taken"]:
+                t_end, name_end, qty_end = ended.pop(0)
+                use_listing(name_end, qty_end, t_end)
+            upper = x["bound"] + 60
+            msg = next((m for m in messages if not m[2] and m[1] == x["name"] and upper - SALE_WINDOW <= m[0] <= upper), None)
+            if msg:
+                msg[2], sold = True, msg[0]
+            elif x["pending"] and x["pending"]["eta"] is not None and x["pending"]["eta"] <= upper:
+                sold = x["pending"]["eta"]
+            elif x.get("delivered") is not None and x["delivered"] - delay <= upper:
+                sold = x["delivered"] - delay
+            elif x["live"] is not None:
+                sold = x["live"]
+            else:
+                sold = x["bound"]
+            posted = auction = None
+            # Oldest unused posting of the same stack that this sale could have come from:
+            # sold at buyout, or won with a bid between the posted bid and buyout. TSM logs no
+            # listings, but the seller's Journalator or WoWCensus listing of the stack pairs the same way.
+            money, qty = x["money"], x["qty"]
+            for p in posts.get(x["name"], []):
+                if not fits(p, qty) or p["t"] > upper or upper - p["t"] > SALE_WINDOW:
+                    continue
+                buyout = p["unit"] * qty if p["unit"] is not None else None
+                bid = p["bid"] * qty if p["bid"] is not None else None
+                if (buyout is not None and abs(buyout - money) <= 0.5) or (
+                        bid is not None and bid <= money + 0.5 and (buyout is None or money <= buyout + 0.5)):
+                    take(p, qty)
+                    posted, auction = p["t"], p["auction"]
+                    break
+            if posted is not None:
+                seen = sighted.get(auction) if auction is not None else None
+                if seen and not msg:
+                    if seen[1] is not None:
+                        sold = min(sold, seen[1])
+                    if seen[0] is not None:
+                        sold = max(sold, seen[0])
+                sold = max(sold, posted)
             cur.execute("""INSERT INTO marketlens_import.addon_auction_sales VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                        (key, edition, sg, region, realm, fac, item, name, qty, money, round(money / qty), t,
-                         posted, (t - posted) if posted is not None else None,
-                         "journalator" if section == "Invoices" else "tsm"))
+                        (x["key"], edition, x["sg"], region, realm, x["fac"], x["item"], x["name"], x["qty"], x["money"],
+                         round(x["money"] / x["qty"]), sold, posted, (sold - posted) if posted is not None else None, x["origin"]))
             made += 1
     return made
 
@@ -630,14 +1109,21 @@ def main():
                 continue
             row["t"] = t
             realm = row.get("realm")
+            server = row.pop(SERVER_HINT, None)
+            if edition == "forever" and not realm:
+                realm = (server_realm(cur, server, cache)
+                         or (forever_character_realm(cur, row.get("char"), row.get("faction"), cache) or (realm,))[0])
             reg = (region or overrides.get((realm or "").lower()) or region_for(cur, edition, realm, cache)
-                   or character_region(cur, edition, row.get("char"), realm, cache) or fallback)
+                   or character_region(cur, edition, row.get("char"), realm, cache)
+                   or companion_account_region(cur, edition, path, realm, cache) or fallback)
             if reg not in REGIONS:
                 problems[str(realm)] += 1
                 continue
-            base = (edition, reg, realm, row.get("char"), section, t, json.dumps(canon(row), sort_keys=True))
+            keyed = key_row(section, row)
+            base = (edition, reg, keyed.get("realm") if keyed is not row else realm, row.get("char"), section, t,
+                    json.dumps(identity(section, keyed), sort_keys=True))
             occ[base] += 1
-            key = event_key(edition, reg, section, row, occ[base])
+            key = event_key(edition, reg, section, keyed, occ[base])
             item, name, qty, money = measures(section, row)
             cur.execute("""INSERT INTO marketlens_import.addon_ledger_events
                 (event_key, edition, source_game, region, realm, faction, character, section, t,
@@ -661,14 +1147,20 @@ def main():
         entry.update(result="imported", newRows=new, newBySection=dict(sorted(per.items())))
 
     report["itemIdsFilled"] = fill_item_ids(cur)
+    report["itemNamesFilled"] = fill_item_names(cur, "addon_ledger_events")
+    report["nativeRowsRekeyed"] = rekey_native_rows(cur, groups)
+    report["foreverRealmsFilled"] = fill_forever_realms(cur, groups, cache)
     if args.rebuild_all_sales:
         cur.execute("""SELECT DISTINCT edition, region, realm, character FROM marketlens_import.addon_ledger_events
-            WHERE section IN ('Invoices','Posting','TSM:sale')""")
+            WHERE section IN ('Invoices','Posting','TSM:sale') OR section LIKE 'WoWCensus:%%'""")
         report["salesRebuilt"] = rebuild_sales(cur, set(cur.fetchall()))
         changed = True
     else:
         report["salesRebuilt"] = rebuild_sales(cur, groups)
         changed = bool(groups)
+    report["duplicateSalesDropped"] = drop_duplicate_sales(cur)
+    report["saleNamesFilled"] = fill_item_names(cur, "addon_auction_sales")
+    changed = changed or bool(report["duplicateSalesDropped"])
     report["lootSources"], report["lootItems"] = rebuild_loot(cur)
     cur.execute("""SELECT count(*), count(seconds_to_sell) FROM marketlens_import.addon_auction_sales""")
     total, timed = cur.fetchone()

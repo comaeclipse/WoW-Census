@@ -1,10 +1,9 @@
 ## Interface: 120100, 120007, 50504, 38000, 20506, 16001, 11508, 11509
 ## Title: MarketLens
-## Notes: Auction House market + population analytics for Classic Era, TBC Anniversary, and Retail
+## Notes: Auction House scanning and market analytics for Classic Era, TBC Anniversary, MoP Classic, and Retail
 ## Author: skarz
-## Version: 0.1.3
+## Version: 0.1.4
 ## SavedVariables: MarketLensDB
-## OptionalDeps: NameplateInspect
 ## X-Category: Auction House & Vendors
 
 # Embedded libraries. LibAHTab-1-0 gives us a native tab on the modern
@@ -36,16 +35,8 @@ Analytics/Demand.lua
 Analytics/Saturation.lua
 Analytics/Scores.lua
 
-Population/WhoScan.lua
-Population/SpecInspect.lua
-Population/CensusProfiles.lua
-Population/Census.lua
-Population/Passive.lua
-
-UI/Population.lua
 UI/MainFrame.lua
 UI/MarketTable.lua
 UI/ItemTable.lua
 UI/Minimap.lua
 UI/Tooltips.lua
-UI/CensusPlan.lua

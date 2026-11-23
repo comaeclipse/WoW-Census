@@ -32,7 +32,7 @@ function item_loot_sources(string $sourceGame, int $id): ?array {
       SELECT h.kind, h.source_id, h.drops, h.qty, h.last, w.windows, w.name
         FROM hit h
         JOIN LATERAL (SELECT count(*) AS windows,
-                             (array_agg(source_name ORDER BY t DESC) FILTER (WHERE source_name <> ''))[1] AS name
+                             (array_agg(source_name ORDER BY t DESC) FILTER (WHERE source_name NOT IN ('', 'Unknown')))[1] AS name
                         FROM addon_loot_sources
                        WHERE source_game = ? AND kind = h.kind AND source_id = h.source_id) w ON true",
     [$sourceGame, $id, $sourceGame]);
@@ -41,7 +41,7 @@ function item_loot_sources(string $sourceGame, int $id): ?array {
   foreach ($rows as $r) {
     $windows = max(1, (int)$r['windows']);
     $out[] = ['kind' => (string)$r['kind'], 'id' => (int)$r['source_id'],
-      'name' => (string)($r['name'] ?? '') !== '' ? (string)$r['name'] : ucfirst((string)$r['kind']) . ' ' . $r['source_id'],
+      'name' => (string)($r['name'] ?? '') !== '' ? (string)$r['name'] : (['npc' => 'Mob', 'world' => 'Object', 'quest' => 'Quest'][$r['kind']] ?? ucfirst((string)$r['kind'])) . ' #' . $r['source_id'],
       'windows' => $windows, 'drops' => (int)$r['drops'], 'qty' => (int)$r['qty'],
       'rate' => min(1.0, (int)$r['drops'] / $windows), 'last' => (int)$r['last']];
   }

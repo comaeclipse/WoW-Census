@@ -210,6 +210,12 @@ function render_class_profile(array $D, string $source, string $classFile, strin
   $eSheet = esc_profile($stylesheet); $style = profile_style($prefix) . js_template_const('class-profile.mjs', 'CLASS_STYLE');
   $eNav = esc_profile($P['nav']); $talents = talents_path($source); $portrait = esc_profile($icon('classicon_' . js_lower($classFile)));
   $bigN = js_locale($D['n']); $ePlural = esc_profile($plural); $with = $modern ? 'known specs' : 'talents';
+  $combat = $source === 'forever' && in_array($_COOKIE['wowcensus_skin'] ?? '', ['current', 'cobalt'], true)
+    ? forever_class_combat($classFile, $route) : '';
+  if ($combat !== '') {
+    $style .= BESTIARY_STYLE;
+    $combat = '<section class="panel" id="combat"><h2>Combat logs</h2>' . $combat . '</section>';
+  }
   return <<<HTML
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>$eTitle</title>
@@ -242,6 +248,7 @@ $classChips
   <div class="specbar">$seg</div><div class="speckey">$key</div>
 </section>
 <div class="speccols">$columns</div>
+$combat
 </div></body></html>
 HTML;
 }

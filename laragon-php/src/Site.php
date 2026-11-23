@@ -27,9 +27,10 @@ function localize_content(string $content): string {
   return preg_replace('/<script\s+src="\/assets\/js\/tooltips\.js"[^>]*><\/script>/', '', $content);
 }
 
-// Self-hosted Umami analytics (s.wowcensus.io, on Vercel), added to every HTML page as it is written or served.
-// data-domains keeps local previews (127.0.0.1:8081) out of the counts.
-const ANALYTICS_TAG = '<script defer src="https://s.wowcensus.io/script.js" data-website-id="15776ba3-1f50-4da9-98d7-59b2fc4066f9" data-domains="wowcensus.io"></script>';
+// Self-hosted GoatCounter analytics (s.wowcensus.io, on the droplet), added to every HTML page as it is written or served.
+// count.js skips localhost and private addresses, so local previews (127.0.0.1:8081) stay out of the counts.
+// Pages cached before the switch still load s.wowcensus.io/script.js, which nginx serves as a loader for count.js.
+const ANALYTICS_TAG = '<script data-goatcounter="https://s.wowcensus.io/count" async src="https://s.wowcensus.io/count.js"></script>';
 
 // Temporary notice shown under the header of each edition's census page. Set to null to hide it.
 // Give each new notice a new id: dismissals are remembered per id in the visitor's browser.
@@ -46,7 +47,7 @@ function site_notice_html(): string {
   return <<<HTML
 <script>document.documentElement.dataset.noticeChoice=String(Math.floor(Math.random()*3))</script>
 <aside class="site-notice" data-notice-id="$id" aria-label="Site notice">
-    <p class="notice-text" data-notice-option="0"><img class="notice-icon" src="/notice-discord.png" alt="" width="29" height="22">Looking for contributors! Join our Discord for more info: <a href="https://discord.gg/Dzw8H3QZX" target="_blank" rel="noopener">discord.gg/Dzw8H3QZX <span class="blink">&#9656;</span></a></p>
+    <p class="notice-text" data-notice-option="0"><img class="notice-icon" src="/notice-discord.png" alt="" width="29" height="22">Looking for contributors! Join our Discord for more info: <a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">discord.gg/kSUGgYDd8V <span class="blink">&#9656;</span></a></p>
     <p class="notice-text" data-notice-option="1">$kofiIcon Like this project? Help support us on <a href="https://ko-fi.com/wowcensus" target="_blank" rel="noopener noreferrer">Ko-fi <span class="blink">&#9656;</span></a></p>
     <p class="notice-text" data-notice-option="2">$coffeeIcon Like this project? Help support us on <a href="https://buymeacoffee.com/wowcensus" target="_blank" rel="noopener noreferrer">Buy Me a Coffee <span class="blink">&#9656;</span></a></p>
     <button class="notice-close" type="button" aria-label="Dismiss notice">&times;</button>
@@ -57,18 +58,17 @@ HTML;
 
 function with_analytics(string $html): string {
   $at = stripos($html, '</head>');
-  if ($at === false || str_contains($html, 's.wowcensus.io/script.js')) return $html;
+  if ($at === false || str_contains($html, 's.wowcensus.io/count.js') || str_contains($html, 's.wowcensus.io/script.js')) return $html;
   return substr_replace($html, ANALYTICS_TAG, $at, 0);
 }
 
-// Public names of the skins, used as the Umami tag so pageviews can be filtered by skin.
-// Nginx caches pages per skin, so the tag always matches the page it is in.
+// Public names of the skins.
 const SKIN_NAMES = ['wow2008' => '2008', 'cobalt' => 'retail', 'current' => 'pixel'];
 
 function with_skin(string $html): string {
   $skin = $_COOKIE['wowcensus_skin'] ?? '';
   $skin = isset(SKIN_NAMES[$skin]) ? $skin : 'wow2008';
-  return str_replace(' data-website-id=', ' data-tag="' . SKIN_NAMES[$skin] . '" data-website-id=', render_skin($html, $skin));
+  return render_skin($html, $skin);
 }
 
 // True when an Accept header ranks Markdown above HTML (text/markdown or text/*; */* alone stays HTML).
@@ -150,7 +150,7 @@ function sitemap_xml(): string {
   $routes = [];
   foreach (EDITIONS as $source => $_) foreach ([...PAGES, 'realms'] as $page) $routes[] = page_path($source, $page);
   $routes = array_merge($routes, race_routes(), class_routes());
-  foreach ([PROFESSION_SOURCE, 'retail'] as $source)
+  foreach (array_keys(EDITIONS) as $source)
     foreach (array_merge([null], array_keys(profession_catalog($source))) as $slug) $routes[] = profession_path($slug, $source);
   return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n" .

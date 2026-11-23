@@ -5,7 +5,7 @@ MarketLens = MarketLens or {}
 local ML = MarketLens
 
 ML.ADDON = ADDON
-ML.VERSION = "0.1.1"
+ML.VERSION = "0.1.4"
 ML.DB_VERSION = 5
 
 BINDING_HEADER_MARKETLENS = "MarketLens"
@@ -19,7 +19,6 @@ ML.Trends     = ML.Trends     or {}
 ML.Demand     = ML.Demand     or {}
 ML.Saturation = ML.Saturation or {}
 ML.Scores     = ML.Scores     or {}
-ML.Population  = ML.Population  or {}
 ML.Data       = ML.Data       or {}
 ML.UI         = ML.UI         or {}
 ML.Util       = ML.Util       or {}
@@ -54,21 +53,8 @@ function ML:Debug(fmt, ...)
     DEFAULT_CHAT_FRAME:AddMessage(PREFIX .. "|cff888888[dbg]|r " .. msg)
 end
 
--- Population collection is intentionally headless. Detailed census progress
--- belongs on the website; keep it out of chat unless addon debugging is on.
-function ML:CensusPrint(fmt, ...)
-    self:Debug(fmt, ...)
-end
-
 local DEFAULT_SETTINGS = {
-    -- The importer keeps full history in PostgreSQL, so the save only holds
-    -- what in-game features read (the census planner looks back 14 days).
     snapshotRetentionDays = 14,
-    populationRetentionDays = 14, -- characters, daily observations and sweeps
-    censusPassive         = false, -- advance an active census from normal play input
-    censusAutoStart       = false, -- start/resume a census when this character logs in
-    specRetentionDays     = 14, -- successful inspect observations retained
-    specSampling          = true, -- opportunistically inspect exposed nearby/group unit tokens
     minimumSamples        = 3,   -- snapshots needed before demand is scored
     scanThrottle          = 0.5, -- seconds between paged AH queries
     sellerSampleSeconds   = 1200, -- hard budget for /ml scan paged seller sampling
@@ -170,11 +156,6 @@ local function migrate(db)
     for k, v in pairs(DEFAULT_SETTINGS) do
         if db.settings[k] == nil then db.settings[k] = v end
     end
-    -- v4 -> v5: retention dropped from 35 to 14 days; saves still hold 35.
-    if db.version < 5 then
-        db.settings.populationRetentionDays = DEFAULT_SETTINGS.populationRetentionDays
-        db.settings.specRetentionDays = DEFAULT_SETTINGS.specRetentionDays
-    end
     db.version = ML.DB_VERSION
 end
 
@@ -202,8 +183,6 @@ function ML:InitDB()
     -- tables. The uploader rebuilds both payloads directly, so discard them.
     self.db.export = nil
     self.db.popExport = nil
-    if self.Population.CompactStorage then self.Population:CompactStorage() end
-    if self.Population.RepairForeverKeys then self.Population:RepairForeverKeys() end
 end
 
 -- Build a compact JSON string of this realm's per-item snapshot history for
@@ -234,87 +213,6 @@ function ML:BuildExport()
         .. ',"items":{' .. table.concat(parts, ",") .. "}}"
 end
 
--- Build population samples plus first/last-seen character identity and rolling
--- daily observations. /who exposes names and roster attributes, but no GUID.
-function ML:BuildPopExport()
-    local function jstr(s)
-        return '"' .. tostring(s or ""):gsub("\\", "\\\\"):gsub('"', '\\"') .. '"'
-    end
-    local function countObj(map)
-        local kv = {}
-        for k, v in pairs(map or {}) do kv[#kv + 1] = jstr(k) .. ":" .. tostring(v) end
-        return "{" .. table.concat(kv, ",") .. "}"
-    end
-
-    local pop = self.realm.population
-    local samples = {}
-    if pop and pop.samples then
-        for _, s in ipairs(pop.samples) do
-            samples[#samples + 1] = string.format(
-                '{"t":%d,"f":%s,"o":%d,"tot":%d,"flt":%s,"c":%s,"r":%s}',
-                s.t or 0, jstr(s.faction), s.observed or 0, s.total or 0,
-                jstr(s.filter), countObj(s.classes), countObj(s.races))
-        end
-    end
-
-    local characters, observations = {}, {}
-    if pop and pop.characters then
-        for key, c in pairs(pop.characters) do
-            characters[#characters + 1] = string.format(
-                '{"k":%s,"fn":%s,"n":%s,"first":%s,"last":%s,"r":%s,"g":%s,"l":%d,"race":%s,"class":%s,"cf":%s,"z":%s,"fs":%d,"ls":%d,"sc":%d}',
-                jstr(key), jstr(c.fullName), jstr(c.name), jstr(c.firstName), jstr(c.lastName), jstr(c.realm), jstr(c.guild),
-                c.level or 0, jstr(c.race), jstr(c.class), jstr(c.classFile),
-                jstr(c.zone), c.firstSeen or 0, c.lastSeen or 0, c.seenCount or 0)
-            for day, d in pairs(c.days or {}) do
-                observations[#observations + 1] = string.format('[%s,%d,%d,%d,%d]',
-                jstr(key), tonumber(day) or 0, d.count or d[1] or 0,
-                d.firstSeen or d[2] or 0, d.lastSeen or d[3] or 0)
-            end
-        end
-    end
-    local sweeps, sweepQueries, locationObservations = {}, {}, {}
-    if pop and pop.sweeps then
-        for id, sweep in pairs(pop.sweeps) do
-            local queryCount, cappedCount = 0, 0
-            for _, q in ipairs(sweep.queries or {}) do
-                queryCount = queryCount + 1
-                if q.capped then cappedCount = cappedCount + 1 end
-                sweepQueries[#sweepQueries + 1] = string.format(
-                    '[%s,%d,%d,%s,%d,%d,%s]', jstr(id), q.index or queryCount,
-                    q.t or 0, jstr(q.filter), q.observed or 0, q.total or q.observed or 0,
-                    q.capped and "true" or "false")
-            end
-            local characterCount = 0
-            for key, o in pairs(sweep.observations or {}) do
-                characterCount = characterCount + 1
-                locationObservations[#locationObservations + 1] = string.format(
-                    '[%s,%s,%d,%d,%s,%d,%s,%s]', jstr(id), jstr(key),
-                    o.queryIndex or o[1] or 0, o.observedAt or o[2] or 0,
-                    jstr(o.zone or o[3]), o.level or o[4] or 0,
-                    jstr(o.classFile or o[5]), jstr(o.race or o[6]))
-            end
-            sweeps[#sweeps + 1] = string.format(
-                '{"id":%s,"startedAt":%d,"completedAt":%d,"status":%s,"label":%s,"faction":%s,"queryCount":%d,"characterCount":%d,"cappedCount":%d}',
-                jstr(id), sweep.startedAt or 0, sweep.completedAt or 0,
-                jstr(sweep.status or "partial"), jstr(sweep.label), jstr(sweep.faction),
-                queryCount, characterCount, cappedCount)
-        end
-    end
-    table.sort(characters)
-    table.sort(observations)
-    table.sort(sweeps)
-    table.sort(sweepQueries)
-    table.sort(locationObservations)
-    return '{"type":"ml-pop-v3","realm":' .. jstr(self:RealmKey())
-        .. ',"flavor":' .. jstr(self:GameFlavor())
-        .. ',"exportedAt":' .. time() .. ',"samples":[' .. table.concat(samples, ",")
-        .. '],"characters":[' .. table.concat(characters, ",")
-        .. '],"observations":[' .. table.concat(observations, ",")
-        .. '],"sweeps":[' .. table.concat(sweeps, ",")
-        .. '],"sweepQueries":[' .. table.concat(sweepQueries, ",")
-        .. '],"locationObservations":[' .. table.concat(locationObservations, ",") .. "]}"
-end
-
 -- Legacy compatibility hook. Export payloads are now rebuilt by the companion
 -- uploader instead of being duplicated in SavedVariables during play.
 function ML:RefreshExports()
@@ -336,8 +234,6 @@ boot:SetScript("OnEvent", function(_, event, arg1)
         ML:Fire("LOGIN")
         if ML.realm then ML:StampIdentity(ML.realm) end
         if ML.Scanner.Init then ML.Scanner:Init() end
-        if ML.Population.Init then ML.Population:Init() end
-        if ML.Population.Passive and ML.Population.Passive.Init then ML.Population.Passive:Init() end
         if ML.UI.Init then ML.UI:Init() end
         ML:Print("v%s loaded. Type |cffffff00/ml|r to open, |cffffff00/ml scan|r at the AH.", ML.VERSION)
     elseif event == "PLAYER_LOGOUT" then
@@ -353,17 +249,12 @@ boot:SetScript("OnEvent", function(_, event, arg1)
                 realm.items = nil
             end
         end
-        -- Serialize lifetime population identities as bounded strings. Large
-        -- table constructors can exceed the beta client's Lua constant limit.
-        if ML.Population.PackStorage then ML.Population:PackStorage() end
     end
 end)
 
 SLASH_MARKETLENS1 = "/marketlens"
 SLASH_MARKETLENS2 = "/ml"
 SlashCmdList["MARKETLENS"] = function(msg)
-    -- Keep the raw text (case preserved) so /who filters like z-"Shattrath City"
-    -- survive; match keywords case-insensitively off a lowered copy.
     local raw = (msg or ""):gsub("^%s+", ""):gsub("%s+$", "")
     msg = raw:lower()
     if msg == "scan" then
@@ -385,87 +276,16 @@ SlashCmdList["MARKETLENS"] = function(msg)
         ML.Scanner:StartScan(true, true, false, nil, nil, itemName)
     elseif msg == "scan replicate" then
         if ML.Scanner.StartReplicate then ML.Scanner:StartReplicate() end
-    elseif msg == "who" or msg:match("^who%s") then
-        -- Slash execution is a hardware event, so SendWho is allowed here.
-        -- A typed query matching the census's next step runs as that step.
-        local filter = raw:sub(4)
-        if not ML.Population.Census:TryChatQuery(filter) then ML.Population:Scan(filter) end
-    elseif msg == "spec on" or msg == "spec off" then
-        local on = msg == "spec on"
-        ML.db.settings.specSampling = on
-        if ML.Population.Inspect then ML.Population.Inspect:Status() end
-    elseif msg == "spec" then
-        if ML.Population.Inspect then ML.Population.Inspect:Status() end
-    elseif msg == "spec status" then
-        if ML.Population.Inspect then ML.Population.Inspect:Status() end
-    elseif msg == "plan" or msg == "plan snapshot" or msg == "plan full" or msg == "plan auto" or msg == "plan new" then
-        -- The old plan commands are retained only so existing macros do not
-        -- break. Population collection now lives in the main addon window.
-        ML.UI:ShowCensus()
-    elseif msg == "census" then
-        local C = ML.Population.Census
-        if C:IsActive() then C:RunNext() else C:Start() end
-    elseif msg == "census next" then
-        -- Hardware event: a macro with /ml census next can step it by key.
-        -- Never starts a new census, so a finished run is not silently restarted.
-        ML.Population.Census:RunNext()
-    elseif msg == "census start" then
-        ML.Population.Census:Start()
-    elseif msg == "census stop" then
-        ML.Population.Census:Stop()
-    elseif msg == "census status" then
-        ML.Population.Census:Status()
-    elseif msg == "census passive on" or msg == "census passive off" then
-        local on = msg == "census passive on"
-        ML.db.settings.censusPassive = on
-        if on then ML.Population.Census:SetViaChat(false, true) end
-        ML:Print("Passive census: %s. %s", on and "|cff40c040on|r" or "off",
-            on and "Normal movement, turning and world clicks will advance an active census."
-                or "Use /ml census next, the Run Next button, or chat mode.")
-    elseif msg == "census auto on" or msg == "census auto off" then
-        local on = msg == "census auto on"
-        ML.db.settings.censusAutoStart = on
-        ML:Print("Census at login: %s.%s", on and "|cff40c040on|r" or "off",
-            on and " It will advance passively only when passive census is also on." or "")
-    elseif msg == "census profile" then
-        ML.Population.Census:PrintProfile()
-    elseif msg == "census fixed on" or msg == "census fixed off" then
-        if ML.Population.Census:Profile().id == "tbc-anniversary" then
-            ML:Print("TBC Anniversary census always starts broad and splits queries that hit the 50-result cap.")
-        else
-            -- Applies to the next census started on this client.
-            ML.db.settings.censusFixed = (msg == "census fixed on")
-            ML:Print("Census list: %s.", ML.db.settings.censusFixed
-                and "fixed -- decided at start, never grows" or "adaptive -- capped queries are split")
-        end
-    elseif msg == "census chat on" or msg == "census chat off" then
-        ML.Population.Census:SetViaChat(msg == "census chat on")
-    elseif msg:match("^census cap%s") then
-        if ML:IsForeverBeta() then
-            ML:Print("Forever census is capped at level 60.")
-        else
-            local n = tonumber(msg:match("^census cap%s+(%d+)$"))
-            ML.db.settings.censusLevelCap = n
-            ML.Population.Census.profile = nil
-            ML:Print("Census level cap: %s.", n and tostring(n) or "auto (from observed levels)")
-        end
-    elseif msg == "census forget" then
-        ML.Population.Census:Forget()
-    elseif msg == "zones" then
-        if ML.Population.DumpZones then ML.Population:DumpZones() end
-    elseif msg == "sweep start" or msg:match("^sweep start%s+") then
-        local label = raw:match("^[Ss][Ww][Ee][Ee][Pp]%s+[Ss][Tt][Aa][Rr][Tt]%s*(.*)$") or ""
-        ML.Population:StartSweep(label)
-    elseif msg == "sweep complete" then
-        ML.Population:FinishSweep("complete")
-    elseif msg == "sweep partial" then
-        ML.Population:FinishSweep("partial")
-    elseif msg == "sweep status" then
-        ML.Population:SweepStatus()
+    elseif msg == "who" or msg:match("^who%s")
+        or msg == "spec" or msg:match("^spec%s")
+        or msg == "plan" or msg:match("^plan%s")
+        or msg == "census" or msg:match("^census%s")
+        or msg == "zones"
+        or msg == "sweep" or msg:match("^sweep%s") then
+        ML:Print("Population collection has moved to the |cffffff00WoWCensus|r addon.")
     elseif msg == "purge" then
         local snaps = ML.Snapshots:Purge()
-        local pops  = ML.Population:Purge()
-        ML:Print("Purged %d expired snapshot(s), %d population sample(s).", snaps, pops)
+        ML:Print("Purged %d expired snapshot(s).", snaps)
     elseif msg == "export" then
         if ML.UI.ShowExport then ML.UI:ShowExport() end
     elseif msg == "minimap" or msg == "hide" then

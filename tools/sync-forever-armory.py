@@ -215,10 +215,38 @@ class Blizzard:
         return 0, None, "retry exhausted"
 
 
-def select_due(cur, region: str, limit: int, max_age: int, name: str | None = None, min_level: int = 0):
+def select_guilded(cur, region: str, limit: int, max_age: int, min_level: int = 0):
+    """Census characters whose newest sighting is in a guild, biggest guilds first, so whole rosters link."""
+    realm_prefix = {"us": "CAMWOW US%", "eu": "CAMWOW EU%", "kr": "CAMWOW KR%", "tw": "CAMWOW TW%"}[region]
+    cur.execute("""WITH latest AS (SELECT DISTINCT ON (lower(ch.name)) ch.name,ch.guild,ch.character_key
+        FROM marketlens_import.characters ch
+        WHERE ch.source_game='forever' AND ch.level>=%s AND ch.realm LIKE %s AND ch.name LIKE '%% %%'
+        ORDER BY lower(ch.name),ch.last_seen DESC),
+      sized AS (SELECT l.*,count(*) OVER (PARTITION BY lower(l.guild)) guild_size
+        FROM latest l WHERE trim(coalesce(l.guild,''))<>'')
+      SELECT %s,s.name,lower(replace(s.name,' ','-')),s.character_key FROM sized s
+      WHERE NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_profiles p
+          WHERE p.region=%s AND lower(p.full_name)=lower(s.name)
+            AND p.fetched_at>=now()-(%s||' hours')::interval)
+        AND NOT EXISTS (SELECT 1 FROM marketlens_import.forever_armory_candidates c
+          WHERE c.region=%s AND lower(c.name)=lower(s.name) AND c.next_attempt_at>now())
+      ORDER BY s.guild_size DESC,lower(s.guild),lower(s.name) LIMIT %s""",
+                (max(10, min_level), realm_prefix, region, region, max_age, region, limit))
+    rows = cur.fetchall()
+    if rows:
+        execute_values(cur, """INSERT INTO marketlens_import.forever_armory_candidates
+          (region,name,slug,discovery_source,source_identity) VALUES %s ON CONFLICT(region,name) DO NOTHING""",
+                       [(r, n, s, "wowcensus", identity) for r, n, s, identity in rows])
+    return [row[:3] for row in rows]
+
+
+def select_due(cur, region: str, limit: int, max_age: int, name: str | None = None, min_level: int = 0,
+               guilded: bool = False):
     """Select a bounded batch without materializing the known-name inventory."""
     if limit <= 0:
         return []
+    if guilded and not name:
+        return select_guilded(cur, region, limit, max_age, min_level)
     name_sql, name_args = ("AND lower(c.name)=lower(%s)", [name]) if name else ("", [])
     if min_level > 0 and not name:
         name_sql += """ AND (p.level>=%s OR EXISTS (SELECT 1 FROM marketlens_import.external_verified_characters v
@@ -416,6 +444,7 @@ def main() -> None:
     parser.add_argument("--include", nargs="+", default=["all"], choices=("all", "guilds", *ENDPOINTS))
     parser.add_argument("--rate", type=float, default=5.0, help="all HTTP requests per second")
     parser.add_argument("--min-level", type=int, default=0, help="only characters at or above this level")
+    parser.add_argument("--guilded", action="store_true", help="only guild members, biggest guilds first")
     parser.add_argument("--no-reconcile", action="store_true", help="skip updating census rows afterwards")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--max-age", type=int, default=24, help="hours before refreshing a success")
@@ -436,11 +465,13 @@ def main() -> None:
                         (args.region, args.name, slugify(args.name)))
     with conn.cursor() as cur:
         if args.region:
-            candidates = select_due(cur, args.region, args.limit, args.max_age, args.name, args.min_level)
+            candidates = select_due(cur, args.region, args.limit, args.max_age, args.name, args.min_level,
+                                    args.guilded)
         else:
             share = max(1, (args.limit + len(REGIONS) - 1) // len(REGIONS))
             candidates = [row for region in REGIONS
-                          for row in select_due(cur, region, share, args.max_age, min_level=args.min_level)][:args.limit]
+                          for row in select_due(cur, region, share, args.max_age, min_level=args.min_level,
+                                                guilded=args.guilded)][:args.limit]
         random.Random(args.seed).shuffle(candidates)
         cur.execute("INSERT INTO marketlens_import.forever_armory_runs(requested,options) VALUES(%s,%s) RETURNING run_id",
                     (len(candidates), Json(vars(args))))

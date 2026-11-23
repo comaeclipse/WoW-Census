@@ -41,6 +41,12 @@ $continentArt = $tbcMap || $classicMap || $mopMap || $retailMap;
               <div class="panel"><div class="bars toplocs" id="top"></div></div>
     <?php component_end() ?>
 
+    <?php if ($foreverMap && ($combatZones = \bestiary_zone_links()) !== ''): ?>
+      <?php component_start('section', ['title' => 'Combat observations by zone', 'sub' => 'Open a zone in the bestiary to compare observed mob attacks']) ?>
+        <p><?= $combatZones ?></p>
+      <?php component_end() ?>
+    <?php endif ?>
+
     <!-- Play-style mix -->
     <?php component_start('section', ['title' => 'Play-Style Mix', 'icon' => 'p', 'sub' => 'Recent characters, by the kind of place they were last seen']) ?>
         <div class="mix" id="mix"></div>

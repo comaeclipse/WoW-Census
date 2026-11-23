@@ -32,11 +32,12 @@ namespace Wow2008;
 <?= render('partials/sidebar.php', ['source' => $source, 'page' => $page]) ?>
 
 <?= $content ?>
+
+<?= render('partials/footer.php') ?>
+<img class="page-statue" src="/wow2008/page-statue.webp?v=<?= e(ASSET_VERSION) ?>" width="219" height="401" alt="" aria-hidden="true">
 </div>
 
 <div id="tip"></div>
-
-<?= render('partials/footer.php') ?>
 
 <script src="<?= e(asset('js/common.js')) ?>"></script>
 <script src="<?= e(asset('js/site.js')) ?>"></script>

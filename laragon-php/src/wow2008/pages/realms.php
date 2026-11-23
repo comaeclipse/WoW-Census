@@ -22,6 +22,11 @@ $oneName = $one ? ($groupForever ? $one['displayName'] : $one['name'] . ($one['r
     <?= component('banner', ['art' => 'realms', 'title' => 'Realm Viewer', 'subtitle' => $subtitle . ($groupForever ? ' · POPULATION BY REGION AND TYPE' : ($connected ? ' · POPULATION BY CONNECTED REALM' : ' · POPULATION BY REALM')), 'subtitle_color' => '#e0c0ff', 'stamp' => 'Scanned: ' . $scanned . ' · Page generated: ' . $generated]) ?>
 
 <?php endif ?>
+<?php if ($groupForever && (!$one || str_contains((string)$one['realmType'], 'PvP'))): ?>
+    <?= component('notice', ['title' => 'PvP data may be inaccurate', 'html' => "We can't collect data on PvP realms at this time, so "
+      . ($one ? 'the numbers for this group' : 'the PvP and RP-PvP groups below') . ' may be incomplete or out of date. '
+      . ($one ? 'Treat them as a rough guide.' : 'PvE and RP groups are not affected.') . ' ' . discord_link('Join our Discord') . ' to find out how to correct this data!']) ?>
+<?php endif ?>
 
 <?php if (!$one): ?>
     <div class="tiles">

@@ -4,10 +4,11 @@
 # cached page keeps the old release's HTML.
 #   1. waits RELEASE_SETTLE_SECONDS (120) so PHP's realpath cache stops serving the old release
 #      (a rollout started sooner re-caches old HTML);
-#   2. runs one full pass of wowcensus-data-refresh (REFRESH_FULL=1), waiting for the lock if a
-#      data publish is running. That pass publishes any data waiting to go live too, so a
-#      release and new data cost one re-render of every page, not two. A release whose code an
-#      earlier full pass already rendered (several releases queued behind one rollout) is
+#   2. runs one pass of wowcensus-data-refresh (REFRESH_FULL=1), waiting for the lock if a
+#      data publish is running. That pass publishes any data waiting to go live too and
+#      re-renders the busiest 500 cache entries of every edition; every other page picks up the
+#      new code on its next visit (1-hour nginx validity, background re-render). A release whose
+#      code an earlier pass already rendered (several releases queued behind one rollout) is
 #      skipped, as long as no new data arrived meanwhile.
 # wowcensus-rollout purges each re-rendered page from Cloudflare when cloudflare.env is set up.
 # Usage: nohup /usr/local/bin/wowcensus-release-rollout >> /var/log/wowcensus-data-refresh.log 2>&1 &

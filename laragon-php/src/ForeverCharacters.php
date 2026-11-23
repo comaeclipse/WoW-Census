@@ -15,12 +15,46 @@ const FOREVER_GEAR_SLOTS = ['HEAD', 'NECK', 'SHOULDER', 'BACK', 'CHEST', 'SHIRT'
   'FINGER_1', 'FINGER_2', 'TRINKET_1', 'TRINKET_2', 'MAIN_HAND', 'OFF_HAND', 'RANGED'];
 const FOREVER_QUALITY = ['POOR' => 0, 'COMMON' => 1, 'UNCOMMON' => 2, 'RARE' => 3, 'EPIC' => 4, 'LEGENDARY' => 5, 'ARTIFACT' => 6, 'HEIRLOOM' => 7];
 
+/**
+ * Game text from the Armory carries the client's inline escapes: colours (|cffRRGGBB…|r, |cnIQ4:…|r),
+ * textures (|T…|t), atlases (|A…|a), hyperlinks (|H…|h…|h) and line breaks (|n).
+ * Returns the readable text and the crafted-quality tier its atlas showed, if any.
+ * Midnight's atlases (Quality-12-TierN) have two tiers; older ones are drawn as if they had three.
+ * @return array{0: string, 1: ?array{0: int, 1: int}} [text, [tier, top tier] or null]
+ */
+function wow_markup_parts(string $s): array {
+  $tier = null;
+  $s = preg_replace_callback('/\|A:([^:|]+)[^|]*\|a/i', function ($m) use (&$tier) {
+    if (preg_match('/Quality(?:-(\d+))?-Tier(\d)/i', $m[1], $q)) $tier = [(int)$q[2], $q[1] === '12' ? 2 : 3];
+    return '';
+  }, $s);
+  $s = preg_replace(['/\|T[^|]*\|t/i', '/\|H[^|]*\|h/', '/\|h/', '/\|c(?:[0-9a-f]{8}|n[^:|]*:)/i', '/\|r/', '/\|n/'], ['', '', '', '', '', ' '], $s);
+  return [trim(preg_replace('/\s{2,}/', ' ', str_replace('||', '|', $s))), $tier];
+}
+
+/** Game text with its escapes removed; a crafted-quality atlas becomes " (Tier N)". */
+function wow_text(string $s): string {
+  [$text, $tier] = wow_markup_parts($s);
+  return $tier ? "$text (Tier {$tier[0]})" : $text;
+}
+
+/** Game text as HTML, with a crafted-quality atlas drawn as a small rank pip. */
+function wow_text_html(string $s): string {
+  [$text, $tier] = wow_markup_parts($s);
+  if (!$tier) return esc($text);
+  [$n, $of] = $tier;
+  $rank = $n >= $of ? 'gold' : ($n === $of - 1 ? 'silver' : 'bronze');
+  return esc($text) . ' <span class="wow-tier ' . $rank . '" title="Quality tier ' . $n . '">' . $n . '</span>';
+}
+
 function forever_character_path(string $id): string {
   return '/forever/character/' . $id . '/';
 }
 
 /**
- * The stored profile row and its newest snapshot, or null (unknown character, or no Armory tables here).
+ * The stored profile row and a snapshot assembled from each endpoint's newest successful response,
+ * or null (unknown character, or no Armory tables here). Collector runs may intentionally refresh
+ * only some endpoints, so treating the newest sparse row as a complete snapshot hides older data.
  * public_id is the realm-free page id of /<edition>/character/<id>/: guild_hash_id('forever', region,
  * lowercase full name), stored by tools/sync-forever-armory.py.
  */
@@ -28,13 +62,22 @@ function forever_character_rows(string $id): ?array {
   try {
     $p = Db::first('SELECT * FROM forever_armory_profiles WHERE public_id=? ORDER BY fetched_at DESC LIMIT 1', [$id]);
     if (!$p) return null;
-    $s = Db::first('SELECT * FROM forever_armory_snapshots WHERE region=? AND character_id=? ORDER BY snapshot_at DESC LIMIT 1',
+    $snapshots = Db::all('SELECT * FROM forever_armory_snapshots WHERE region=? AND character_id=? ORDER BY snapshot_at DESC',
       [$p['region'], $p['character_id']]);
   } catch (PDOException $e) {
     if (in_array($e->getCode(), ['42P01', '42703'], true)) return null;
     throw $e;
   }
-  return $s ? ['profile' => $p, 'snapshot' => $s] : null;
+  if (!$snapshots) return null;
+  $s = $snapshots[0];
+  $endpointColumns = ['specializations_json', 'equipment_json', 'statistics_json', 'professions_json', 'achievements_json',
+    'reputations_json', 'pvp_summary_json', 'appearance_json', 'character_media_json', 'titles_json', 'mounts_json', 'hunter_pets_json'];
+  foreach ($endpointColumns as $column) {
+    if ($s[$column] !== null) continue;
+    foreach (array_slice($snapshots, 1) as $older)
+      if ($older[$column] !== null) { $s[$column] = $older[$column]; break; }
+  }
+  return ['profile' => $p, 'snapshot' => $s];
 }
 
 /** The page id of an old /forever/characters/<region>/<slug>/ link, for its redirect. */
@@ -351,7 +394,7 @@ function forever_character_html(array $c): string {
   $gear = '';
   foreach ($c['gear'] as $g)
     $gear .= '<tr><td>' . esc($g['slot']) . '</td><td><a href="' . esc(forever_item_path($g['id'])) . '">' . esc($g['name']) . '</a>' .
-      ($g['enchants'] ? '<br><small>' . esc(implode('; ', $g['enchants'])) . '</small>' : '') . '</td><td>' . esc($g['ilvl'] ?? '') . '</td></tr>';
+      ($g['enchants'] ? '<br><small>' . esc(implode('; ', array_map('wow_text', $g['enchants']))) . '</small>' : '') . '</td><td>' . esc($g['ilvl'] ?? '') . '</td></tr>';
   $trees = '';
   foreach ($c['trees'] as $t)
     $trees .= '<li>' . esc($t['name']) . ': ' . esc($t['points']) . ' points' . ($t['talents'] ? ' (' . esc(implode(', ', array_map(fn($x) => $x['name'] . ' ' . $x['rank'], $t['talents']))) . ')' : '') . '</li>';

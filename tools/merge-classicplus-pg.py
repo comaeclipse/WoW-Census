@@ -38,6 +38,10 @@ RACES = {
     # esMX
     "Humano": "Human", "Enano": "Dwarf", "Elfo de la noche": "Night Elf", "Gnomo": "Gnome",
     "Cielonato de la Suma Orden": "High Order Skyborne",
+    # esES
+    "Orco": "Orc", "No-muerto": "Undead", "Trol": "Troll",
+    "Cielonato Formavientos": "Windshaper Skyborne",
+    "Cielonato de la Orden Eminente": "High Order Skyborne",
     # koKR
     "인간": "Human", "드워프": "Dwarf", "나이트 엘프": "Night Elf", "노움": "Gnome",
     "고등 마법원 스카이본": "High Order Skyborne",
@@ -71,6 +75,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dsn", default=DSN)
     ap.add_argument("--region", choices=sorted(REGION_ID), help="merge only this region's sources")
+    ap.add_argument("--source", action="append", help="merge only these ClassicPlus source SHA-256 hashes")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--archive", help=argparse.SUPPRESS)  # set by tools/import-live.py; nothing to archive here
     a = ap.parse_args()
@@ -88,7 +93,8 @@ def main():
             FROM external_classicplus_sources s
             WHERE NOT EXISTS (SELECT 1 FROM external_classicplus_canonical_imports m WHERE m.source_sha256=s.sha256)
               AND (%s IS NULL OR s.region = %s)
-            ORDER BY s.imported_at, s.sha256""", (a.region, a.region))
+              AND (%s::text[] IS NULL OR s.sha256 = ANY(%s::text[]))
+            ORDER BY s.imported_at, s.sha256""", (a.region, a.region, a.source, a.source))
         sources = cur.fetchall()
         if not sources:
             print("NOTHING TO MERGE")

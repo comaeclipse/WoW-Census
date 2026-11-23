@@ -34,7 +34,7 @@ def main():
         digest = hashlib.sha256(raw).hexdigest()
         result = subprocess.run(["node", str(REPO / "tools" / "export-classicplus-savedvariables.js"), str(path)],
                                 capture_output=True, text=True, encoding="utf-8", check=True)
-        files.append((path, raw, digest, json.loads(result.stdout)))  # one body per faction
+        files.append((path, raw, digest, json.loads(result.stdout)))  # one body per realm and faction
     if len({x[2] for x in files}) != len(files):
         raise SystemExit("duplicate file content in this batch")
 
@@ -73,8 +73,9 @@ def main():
                 cur.execute("""INSERT INTO marketlens_import.local_source_files
                   (sha256,relative_path,source_modified_utc,bytes,content) VALUES (%s,%s,%s,%s,NULL)""",
                             (digest, f"external/classicplus/{path.name}", modified, len(raw)))
+                multiple_realms = len({body["realmId"] for body in bodies}) > 1
                 for body in bodies:
-                    import_faction(cur, path, raw, digest, body, target, modified, len(bodies) > 1)
+                    import_faction(cur, path, raw, digest, body, target, modified, len(bodies) > 1, multiple_realms)
                     imported.append(body)
         print(f"IMPORTED sources={len(imported)} characters={sum(len(b['rows']) for b in imported)}", flush=True)
         print("CHANGED sources=", flush=True)
@@ -82,15 +83,17 @@ def main():
         conn.close()
 
 
-def import_faction(cur, path, raw, file_digest, body, target, modified, split):
-    """One source row per faction. A file holding both factions gets a per-faction id,
-    sha256("<file sha256>:<Faction>"), registered in local_source_files as <file>#<Faction>."""
+def import_faction(cur, path, raw, file_digest, body, target, modified, split, multiple_realms):
     digest = file_digest
     if split:
-        digest = hashlib.sha256(f"{file_digest}:{body['faction']}".encode()).hexdigest()
+        # Keep existing source IDs for single-realm saves.
+        suffix = body["faction"]
+        if multiple_realms:
+            suffix = f"{body['region']}:{body['realmId']}:{suffix}"
+        digest = hashlib.sha256(f"{file_digest}:{suffix}".encode()).hexdigest()
         cur.execute("""INSERT INTO marketlens_import.local_source_files
           (sha256,relative_path,source_modified_utc,bytes,content) VALUES (%s,%s,%s,%s,NULL)""",
-                    (digest, f"external/classicplus/{path.name}#{body['faction']}", modified, len(raw)))
+                    (digest, f"external/classicplus/{path.name}#{suffix}", modified, len(raw)))
     cur.execute("""INSERT INTO marketlens_import.external_classicplus_sources
       (sha256,version,data_format,saved_at,locale,region,realm_id,realm_name,ruleset,faction,
        character_rows,first_day,last_day,scan_passes,scan_times,archive_path)

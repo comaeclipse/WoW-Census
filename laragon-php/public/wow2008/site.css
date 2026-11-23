@@ -11,6 +11,7 @@
 .logo img{display:block;width:100%;height:auto}
 .topbar{background:#000}
 .nav h3{background:transparent url('edition-heading.png') center / 100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;padding-left:11px}
+.nav h3:has(.nav-toggle){cursor:pointer;user-select:none}
 .nav .nav-toggle{position:relative;box-sizing:border-box;width:15px;height:14px;margin-left:auto;padding:0;flex:none;border:1px solid #050505;border-radius:3px;background:linear-gradient(#a11b08,#b20d05 48%,#650700);box-shadow:inset 0 0 0 1px #5a5b56,inset 0 0 0 2px #2d0904;cursor:pointer}
 .nav .nav-toggle::before,.nav .nav-toggle::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#ffc51a;box-shadow:0 1px #9c3a00}
 .nav .nav-toggle::before{width:9px;height:2px}
@@ -55,6 +56,11 @@
 .backdrop::before,.backdrop::after{content:"";position:absolute;top:0;width:900px;height:1300px;background-size:cover;background-repeat:no-repeat}
 .backdrop::before{right:calc(50% + 550px);background-image:url('backdrop-left.webp');background-position:right top}
 .backdrop::after{left:calc(50% + 550px);background-image:url('backdrop-right.webp');background-position:left top}
+/* the 1300px backdrop stretched short pages, leaving black under the footer; grow the page to its height instead */
+@media (min-width:901px){
+  body{display:flex;flex-direction:column;min-height:1300px}
+  body>.page{flex:1 0 auto;grid-template-rows:1fr;grid-auto-rows:auto}
+}
 .census-banner .banner-art{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center 48%}
 .census-banner:has(.banner-art)::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.42) 48%,transparent 78%);pointer-events:none}
 .census-banner .t,.census-banner .stamp{z-index:1}
@@ -384,3 +390,13 @@ table.dir{width:100%;border-collapse:separate;border-spacing:0 1px;background:#6
 
 /* Auction tables: numbers stay on one line (a six-digit Qty plus its bar wrapped). */
 .ahtable td.num{white-space:nowrap}
+
+/* Footer sits inside the page frame; a stone statue leans on the frame's bottom-left edge. */
+.page>.footer{grid-column:1/-1;width:auto;margin:0;border:0;border-top:2px solid #6a5022}
+.page-statue{position:absolute;right:calc(100% + 3px);bottom:0;width:219px;height:401px;pointer-events:none;user-select:none}
+@media (max-width:900px){.page-statue{display:none}.page>.footer{margin:0}}
+.w8-notice{display:flex;gap:12px;align-items:flex-start;margin:0 0 14px;padding:10px 14px;border:1px solid #8a5a14;border-left:5px solid #c8781c;border-radius:3px;background:linear-gradient(#fff4d6,#f3dfa8);color:#4a2c08;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 3px rgba(0,0,0,.35);font:12px/1.5 Tahoma,Arial,sans-serif}
+.w8-notice .ico{flex:none;width:26px;height:26px;border-radius:50%;margin-top:1px;background:radial-gradient(circle at 35% 30%,#ffe08a,#d08a1a 70%,#8a4a08);border:1px solid #5a2a00;color:#2a1200;font:700 16px/24px Georgia,serif;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.w8-notice .t{display:block;margin-bottom:2px;font:700 13px Tahoma,Arial,sans-serif;color:#7a1a00}
+.w8-notice p{margin:0}
+.w8-notice a{color:#7a3a00;font-weight:700;text-decoration:underline}

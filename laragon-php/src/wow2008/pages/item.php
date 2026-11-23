@@ -169,6 +169,9 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
       </div>
       <a class="it-wh" href="<?= e($wowhead) ?>" target="_blank" rel="noopener">Wowhead »</a>
     </div>
+<?php if (current_source() === 'forever'): ?>
+<?= contribute_notice() ?>
+<?php endif ?>
 
 <?php if ($w): $maxClass = max(array_column($w['classes'], 2)); $fa = $w['factions']['Alliance'] ?? 0; $fh = $w['factions']['Horde'] ?? 0; ?>
     <?php component_start('section', ['title' => 'Who Wears It', 'icon' => 'p', 'sub' => 'from ' . fmt($w['inspected']) . ' inspected characters']) ?>
@@ -311,7 +314,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     <?php component_start('section', ['title' => 'Often Worn With', 'icon' => '', 'sub' => 'the item in the matching ' . (str_contains(strtolower((string)($tip['slot'] ?? '')), 'finger') ? 'ring' : 'other') . ' slot on the same characters']) ?>
         <div class="it-pairs">
 <?php foreach ($aw['pairs'] as $p): ?>
-          <div class="it-pair" data-tip="<?= e($p['name']) ?>|<?= fmt($p['n']) ?> of <?= fmt($aw['players']) ?> wearers"><a class="q<?= (int)$p['quality'] ?>" href="<?= e(\forever_item_path($p['id'])) ?>"><?= e($p['name']) ?></a><span class="tr"><i data-w="<?= round(100 * $p['n'] / $maxPair, 1) ?>%"></i></span><span class="v"><?= $pct($p['n'], $aw['players']) ?>%</span></div>
+          <div class="it-pair" data-tip="<?= e($p['name']) ?>|<?= fmt($p['n']) ?> of <?= fmt($aw['players']) ?> wearers"><a class="q<?= (int)$p['quality'] ?>" href="<?= e(\armory_item_path($item['source'] ?? \PROFESSION_SOURCE, $p['id'])) ?>"><?= e($p['name']) ?></a><span class="tr"><i data-w="<?= round(100 * $p['n'] / $maxPair, 1) ?>%"></i></span><span class="v"><?= $pct($p['n'], $aw['players']) ?>%</span></div>
 <?php endforeach ?>
         </div>
         <p class="tfoot">From each character's latest Armory snapshot. Characters aren't named here.</p>
@@ -321,7 +324,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
 
 <?php if (!$listed && !$bopNote): ?>
     <?php component_start('section', ['title' => 'Auction House', 'icon' => 'g']) ?>
-        <div class="it-nomkt"><?php if (!empty($item['armoryOnly'])): ?>Seen equipped on characters from the Battle.net Armory. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php elseif (!empty($item['localOnly'])): ?>This local item page was created from equipment observed on an enriched character. Auction history for this edition is not connected to the item page yet.<?php else: ?>No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.<?php endif ?></div>
+        <div class="it-nomkt"><?php if (!empty($item['armoryOnly'])): ?>Seen equipped on characters from the Battle.net Armory. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php elseif (!empty($item['localOnly'])): ?>This item page was created from equipment observed on inspected characters. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php else: ?>No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.<?php endif ?></div>
     <?php component_end() ?>
 <?php elseif ($listed): ?>
     <div class="tiles" id="itTiles"></div>
@@ -351,18 +354,18 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
         <div class="tiles">
           <div class="stat"><span>Sales recorded</span><b><?= fmt($sales['count']) ?></b><em>completed auctions</em></div>
           <div class="stat"><span>Typical sale</span><b><?= $money($sales['median']) ?></b><em>median price per unit</em></div>
-          <div class="stat"><span>Time to sell</span><b><?= $sales['medianSecs'] !== null ? e($dur($sales['medianSecs'])) : '—' ?></b><em><?= $sales['timed'] ? 'median, from ' . fmt($sales['timed']) . ' sale' . ($sales['timed'] === 1 ? '' : 's') . ' with a logged listing' : 'listing time not logged' ?></em></div>
+          <div class="stat"><span>Time to sell</span><b><?= $sales['medianSecs'] !== null ? e(\item_sale_duration($sales['medianSecs'])) : '—' ?></b><em><?= $sales['timed'] ? 'median upper bound, from ' . fmt($sales['timed']) . ' sale' . ($sales['timed'] === 1 ? '' : 's') . ' with a logged listing' : 'listing time not logged' ?></em></div>
           <div class="stat"><span>Last sale</span><b><?= e($ago($sales['last'])) ?></b><em><?= e(gmdate('M j, Y', $sales['last'])) ?></em></div>
         </div>
         <table class="ahtable it-sales">
-          <thead><tr><th>Sold</th><th>Market</th><th class="num">Qty</th><th class="num">Price each</th><th class="num">Sold after</th></tr></thead>
+          <thead><tr><th>Sold</th><th>Market</th><th class="num">Qty</th><th class="num">Price each</th><th class="num">Sold within</th></tr></thead>
           <tbody>
 <?php foreach ($sales['rows'] as [$t, $label, $fac, $qty, $unit, $secs]): ?>
-            <tr><td title="<?= e(gmdate('Y-m-d H:i', $t)) ?> UTC"><?= e($ago($t)) ?></td><td class="fac-<?= e(strtolower($fac)) ?>"><?= e($label) ?></td><td class="num"><?= fmt($qty) ?></td><td class="num"><?= $money($unit) ?></td><td class="num"><?= $secs !== null ? e($dur($secs)) : '<span class="dim" title="This listing wasn\'t in the seller\'s log">—</span>' ?></td></tr>
+            <tr><td title="<?= e(gmdate('Y-m-d H:i', $t)) ?> UTC"><?= e($ago($t)) ?></td><td class="fac-<?= e(strtolower($fac)) ?>"><?= e($label) ?></td><td class="num"><?= fmt($qty) ?></td><td class="num"><?= $money($unit) ?></td><td class="num"><?= $secs !== null ? e(\item_sale_duration($secs)) : '<span class="dim" title="This listing wasn\'t in the seller\'s log">—</span>' ?></td></tr>
 <?php endforeach ?>
           </tbody>
         </table>
-        <p class="tfoot">Real sales, not asking prices: each row is an auction a player's Journalator or TradeSkillMaster recorded as sold. "Sold after" is the time from listing to sale, shown when the listing is in the same log. Sellers and buyers aren't named.<?= $sales['count'] > count($sales['rows']) ? ' Showing the latest ' . count($sales['rows']) . '.' : '' ?></p>
+        <p class="tfoot">Real sales, not asking prices: each row is an auction a player's Journalator or TradeSkillMaster recorded as sold. "Sold within" is at most how long the listing took to sell, shown when the listing is in the same log. Most sales are only known from the auction mail, so the real time can be shorter. Sellers and buyers aren't named.<?= $sales['count'] > count($sales['rows']) ? ' Showing the latest ' . count($sales['rows']) . '.' : '' ?></p>
     <?php component_end() ?>
 <?php endif ?>
 
@@ -392,6 +395,50 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     <?php component_end() ?>
 <?php endif ?>
 
+<?php
+// Journal bosses take their Journalator drop rate into the Dungeon Drop table; Where It Drops keeps the rest.
+$rateFor = function (array $r): string {
+  $small = $r['windows'] < LOOT_SMALL_SAMPLE;
+  return '<span class="it-rate' . ($small ? ' early' : '') . '" title="' . ($small ? 'Early estimate: fewer than ' . LOOT_SMALL_SAMPLE . ' ' . ($r['kind'] === 'quest' ? 'turn-ins' : 'loots') . ' logged' : '') . '">'
+    . '<i style="width:' . max(2, (int)round(100 * $r['rate'])) . '%"></i><b>'
+    . ($r['rate'] < 0.1 ? preg_replace('/\.0$/', '', number_format(100 * $r['rate'], 1)) : (int)round(100 * $r['rate'])) . '%</b></span>';
+};
+$bossLoot = [];
+if (!empty($item['dungeon']) && $loot) {
+  $npcs = \forever_npcs();
+  $bossIds = [];
+  foreach ($item['dungeon'] as $src)
+    if ($src['boss'] !== null && ($id = (int)($npcs[\forever_npc_slug($src['boss'])]['boss']['npcID'] ?? 0))) $bossIds[$id] = $src['boss'];
+  $rest = [];
+  foreach ($loot['rows'] as $r) {
+    if ($r['kind'] === 'npc' && isset($bossIds[$r['id']])) $bossLoot[$bossIds[$r['id']]] = $r;
+    else $rest[] = $r;
+  }
+  $loot = $rest ? ['rows' => $rest, 'windows' => array_sum(array_column($rest, 'windows')), 'drops' => array_sum(array_column($rest, 'drops'))] : null;
+}
+?>
+<?php if (!empty($item['dungeon'])): ?>
+    <?php component_start('section', ['title' => 'Dungeon Drop', 'icon' => 'p', 'sub' => 'from the Dungeon Journal add-on\'s boss loot lists' . ($bossLoot ? ', drop rates from players\' Journalator logs' : ''), 'style' => 'margin-top:16px']) ?>
+        <table class="ahtable it-loot">
+          <thead><tr><th>Dropped by</th><th>Dungeon</th><th class="num">Drop rate</th><th class="num">Dropped</th><th class="num">Looted</th></tr></thead>
+          <tbody>
+<?php foreach ($item['dungeon'] as $src): $r = $src['boss'] !== null ? ($bossLoot[$src['boss']] ?? null) : null; ?>
+            <tr><td><?= $src['boss'] !== null ? '<a href="' . e(\forever_npc_path(\forever_npc_slug($src['boss']))) . '">' . e($src['boss']) . '</a>' : 'Trash' . (!empty($src['from']) ? ' <span class="kind">(' . e($src['from']) . ')</span>' : '') ?></td>
+              <td><a href="<?= e(\forever_dungeon_path($src['slug'])) ?>"><?= e($src['dungeon']) ?></a></td>
+<?php if ($r): ?>
+              <td class="num"><?= $rateFor($r) ?></td><td class="num"><?= fmt($r['drops']) ?></td><td class="num"><?= fmt($r['windows']) ?></td></tr>
+<?php else: ?>
+              <td class="num"><span class="dim" title="No player has logged looting this yet">—</span></td><td class="num">—</td><td class="num">—</td></tr>
+<?php endif ?>
+<?php endforeach ?>
+          </tbody>
+        </table>
+<?php if ($bossLoot): ?>
+        <p class="tfoot">Drop rate is how often looting that boss gave this item, out of every time a player's Journalator logged looting it. Faded rates come from fewer than <?= LOOT_SMALL_SAMPLE ?> loots and will settle as more players upload.</p>
+<?php endif ?>
+    <?php component_end() ?>
+<?php endif ?>
+
 <?php if ($loot):
   $kinds = array_count_values(array_map(fn($r) => $r['kind'] === 'quest' ? 'quest' : 'loot', $loot['rows']));
   $lootWhat = isset($kinds['loot'], $kinds['quest']) ? 'loots and quest rewards' : (isset($kinds['quest']) ? 'quest rewards' : 'loots'); ?>
@@ -399,10 +446,11 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
         <table class="ahtable it-loot">
           <thead><tr><th>Source</th><th>Type</th><th class="num">Drop rate</th><th class="num">Dropped</th><th class="num">Looted</th><th class="num">Avg qty</th></tr></thead>
           <tbody>
-<?php foreach ($loot['rows'] as $r): $small = $r['windows'] < LOOT_SMALL_SAMPLE; $kindLabel = ['npc' => 'Mob', 'world' => 'Object', 'quest' => 'Quest reward'][$r['kind']] ?? $r['kind']; ?>
-            <tr><td><a href="<?= e($whBase . ['npc' => 'npc', 'world' => 'object', 'quest' => 'quest'][$r['kind']] . '=' . $r['id']) ?>" rel="nofollow"><?= e($r['name']) ?></a></td>
+<?php foreach ($loot['rows'] as $r): $kindLabel = ['npc' => 'Mob', 'world' => 'Object', 'quest' => 'Quest reward'][$r['kind']] ?? $r['kind']; ?>
+            <?php $npcSlug = $r['kind'] === 'npc' && ($item['source'] ?? \PROFESSION_SOURCE) === \DUNGEON_SOURCE ? \forever_npc_slug_by_id((int)$r['id']) : null; ?>
+            <tr><td><?php if ($npcSlug !== null): ?><a href="<?= e(\forever_npc_path($npcSlug)) ?>"><?= e(\forever_npcs()[$npcSlug]['boss']['name']) ?></a><?php else: ?><a href="<?= e($whBase . ['npc' => 'npc', 'world' => 'object', 'quest' => 'quest'][$r['kind']] . '=' . $r['id']) ?>" rel="nofollow"><?= e($r['name']) ?></a><?php endif ?></td>
               <td class="kind"><?= e($kindLabel) ?></td>
-              <td class="num"><span class="it-rate<?= $small ? ' early' : '' ?>" title="<?= $small ? 'Early estimate: fewer than ' . LOOT_SMALL_SAMPLE . ' ' . ($r['kind'] === 'quest' ? 'turn-ins' : 'loots') . ' logged' : '' ?>"><i style="width:<?= max(2, (int)round(100 * $r['rate'])) ?>%"></i><b><?= $r['rate'] < 0.1 ? preg_replace('/\.0$/', '', number_format(100 * $r['rate'], 1)) : (int)round(100 * $r['rate']) ?>%</b></span></td>
+              <td class="num"><?= $rateFor($r) ?></td>
               <td class="num"><?= fmt($r['drops']) ?></td>
               <td class="num"><?= fmt($r['windows']) ?></td>
               <td class="num"><?= $r['drops'] ? preg_replace('/\.0$/', '', number_format($r['qty'] / $r['drops'], 1)) : '—' ?></td></tr>

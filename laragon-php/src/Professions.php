@@ -71,7 +71,10 @@ const RETAIL_PROFESSIONS = [
 ];
 
 function profession_catalog(string $source): array {
-  return $source === 'retail' ? RETAIL_PROFESSIONS : PROFESSIONS;
+  if ($source === 'retail') return RETAIL_PROFESSIONS;
+  if ($source === 'classic-progression') return PROFESSIONS + ['jewelcrafting' => RETAIL_PROFESSIONS['jewelcrafting']];
+  if ($source === 'mop-classic') return RETAIL_PROFESSIONS + ['first-aid' => PROFESSIONS['first-aid']];
+  return PROFESSIONS;
 }
 
 // Recipe name prefixes that belong to one trade.
@@ -172,62 +175,62 @@ function armory_profession_census(): array {
   });
 }
 
-/** Retail profession census from each character's newest stored Armory snapshot. */
-function retail_armory_profession_census(): array {
-  return published_page_model('retail-armory-professions', function () {
+/**
+ * An edition's profession census (Retail by default) from each character's newest stored Armory snapshot,
+ * aggregated in PostgreSQL from the typed tables tools/armory-professions-pg.sql keeps (never professions_json).
+ */
+function retail_armory_profession_census(string $source = 'retail'): array {
+  return published_page_model('armory-professions:' . $source, function () use ($source) {
+    $game = "'" . preg_replace('/[^a-z-]/', '', $source) . "'";
+    $chars = "character_armory_profession_chars c JOIN character_armory_profiles p
+      ON p.source_game = c.source_game AND p.region = c.region AND p.character_id = c.character_id
+      WHERE c.source_game = $game";
+    $trades = "character_armory_professions t JOIN character_armory_profession_chars c
+      ON c.source_game = t.source_game AND c.region = t.region AND c.character_id = t.character_id
+      JOIN character_armory_profiles p ON p.source_game = c.source_game AND p.region = c.region AND p.character_id = c.character_id
+      WHERE t.source_game = $game";
     try {
-      $rows = Db::all("WITH latest AS (
-          SELECT DISTINCT ON (region,character_id) region,character_id,snapshot_at,professions_json
-          FROM character_armory_snapshots WHERE source_game='retail' AND professions_json IS NOT NULL
-          ORDER BY region,character_id,snapshot_at DESC)
-        SELECT p.region,p.character_id,p.class_name,p.level,l.snapshot_at,l.professions_json
-        FROM latest l JOIN character_armory_profiles p
-          ON p.source_game='retail' AND p.region=l.region AND p.character_id=l.character_id");
+      $totals = Db::all("SELECT count(*) n, min(c.snapshot_at) from_at, max(c.snapshot_at) to_at FROM $chars")[0];
+      $regionRows = Db::all("SELECT upper(c.region) region, count(*) n FROM $chars GROUP BY 1 ORDER BY 2 DESC, 1");
+      $classRows = Db::all("SELECT COALESCE(p.class_name, '') class_name, count(*) n FROM $chars GROUP BY 1 ORDER BY 2 DESC, 1");
+      $tradeRows = Db::all("SELECT t.kind, t.profession, count(*) n, sum(t.skill) skill_sum,
+          percentile_disc(0.5) WITHIN GROUP (ORDER BY t.skill) median, max(t.skill) top, sum(t.known_recipes) recipes,
+          count(*) FILTER (WHERE t.max_skill > 0 AND t.skill >= t.max_skill) maxed
+        FROM $trades GROUP BY t.kind, t.profession ORDER BY 3 DESC, 2");
+      $primaryRows = Db::all("SELECT least(k, 2) k, count(*) n FROM (
+          SELECT c.character_id, (SELECT count(*) FROM character_armory_professions t
+            WHERE t.source_game = c.source_game AND t.region = c.region AND t.character_id = c.character_id AND t.kind = 'primary') k
+          FROM $chars) x GROUP BY 1");
+      $comboRows = Db::all("SELECT combo, count(*) n FROM (
+          SELECT string_agg(t.profession, ' + ' ORDER BY t.profession COLLATE \"C\") combo
+          FROM $trades AND t.kind = 'primary' GROUP BY t.region, t.character_id) x
+        GROUP BY combo ORDER BY 2 DESC, 1 LIMIT 10");
+      $classTradeRows = Db::all("SELECT COALESCE(p.class_name, '') class_name, t.profession, count(*) n
+        FROM $trades AND t.kind = 'primary' GROUP BY 1, 2 ORDER BY 1, 3 DESC, 2");
     } catch (PDOException $e) {
-      if (in_array($e->getCode(), ['42P01', '42703'], true)) $rows = [];
-      else throw $e;
+      if (!in_array($e->getCode(), ['42P01', '42703'], true)) throw $e;
+      $totals = ['n' => 0, 'from_at' => null, 'to_at' => null];
+      $regionRows = $classRows = $tradeRows = $primaryRows = $comboRows = $classTradeRows = [];
     }
-    $n = count($rows); $from = null; $to = null; $regions = []; $classTotals = [];
-    $primaryCounts = ['0' => 0, '1' => 0, '2' => 0]; $stats = ['primary' => [], 'secondary' => []];
-    $combos = []; $classTrades = []; $learned = 0; $recipes = 0; $capped = 0;
-    foreach ($rows as $r) {
-      $regions[strtoupper((string)$r['region'])] = ($regions[strtoupper((string)$r['region'])] ?? 0) + 1;
-      $class = (string)$r['class_name']; $classTotals[$class] = ($classTotals[$class] ?? 0) + 1;
-      $t = strtotime((string)$r['snapshot_at']); $from = $from === null ? $t : min($from, $t); $to = $to === null ? $t : max($to, $t);
-      $json = forever_json($r['professions_json']); $primaryNames = [];
-      foreach (['primaries' => 'primary', 'secondaries' => 'secondary'] as $key => $kind) foreach ($json[$key] ?? [] as $prof) {
-        $name = trim((string)($prof['profession']['name'] ?? ($prof['tiers'][0]['tier']['name'] ?? '')));
-        if ($name === '') continue;
-        $tiers = $prof['tiers'] ?? []; $skill = 0; $max = 0; $known = 0;
-        foreach ($tiers as $tier) { $skill = max($skill, (int)($tier['skill_points'] ?? 0)); $max = max($max, (int)($tier['max_skill_points'] ?? 0)); $known += count($tier['known_recipes'] ?? []); }
-        $stats[$kind][$name] ??= ['skills' => [], 'recipes' => 0, 'maxed' => 0, 'top' => 0];
-        $stats[$kind][$name]['skills'][] = $skill; $stats[$kind][$name]['recipes'] += $known; $stats[$kind][$name]['top'] = max($stats[$kind][$name]['top'], $skill);
-        if ($max > 0 && $skill >= $max) { $stats[$kind][$name]['maxed']++; $capped++; }
-        $learned++; $recipes += $known;
-        if ($kind === 'primary') { $primaryNames[] = $name; $classTrades[$class][$name] = ($classTrades[$class][$name] ?? 0) + 1; }
-      }
-      $primaryNames = array_values(array_unique($primaryNames)); sort($primaryNames, SORT_STRING);
-      $primaryCounts[(string)min(2, count($primaryNames))]++;
-      if ($primaryNames) { $combo = implode(' + ', $primaryNames); $combos[$combo] = ($combos[$combo] ?? 0) + 1; }
+    $n = (int)$totals['n']; $pct = fn($count, $of) => $of ? round(100 * $count / $of, 1) : 0;
+    $regions = []; foreach ($regionRows as $r) $regions[$r['region']] = (int)$r['n'];
+    $primaryCounts = ['0' => 0, '1' => 0, '2' => 0]; foreach ($primaryRows as $r) $primaryCounts[(string)$r['k']] = (int)$r['n'];
+    $stats = ['primary' => [], 'secondary' => []]; $learned = 0; $recipes = 0; $capped = 0;
+    foreach ($tradeRows as $r) {
+      $count = (int)$r['n']; $learned += $count; $recipes += (int)$r['recipes']; $capped += (int)$r['maxed'];
+      $stats[$r['kind']][] = ['name' => $r['profession'], 'count' => $count, 'pct' => $pct($count, $n),
+        'avg' => round($r['skill_sum'] / max(1, $count), 1), 'median' => (int)$r['median'], 'top' => (int)$r['top'],
+        'recipes' => round($r['recipes'] / max(1, $count), 1), 'maxed' => $pct((int)$r['maxed'], $count), 'brackets' => []];
     }
-    $summaries = function (array $group) use ($n): array {
-      $out = [];
-      foreach ($group as $name => $s) { sort($s['skills']); $count = count($s['skills']); $out[] = ['name' => $name, 'count' => $count,
-        'pct' => $n ? round(100 * $count / $n, 1) : 0, 'avg' => round(array_sum($s['skills']) / max(1, $count), 1),
-        'median' => $s['skills'][(int)floor(($count - 1) / 2)] ?? 0, 'top' => $s['top'], 'recipes' => round($s['recipes'] / max(1, $count), 1),
-        'maxed' => round(100 * $s['maxed'] / max(1, $count), 1), 'brackets' => []]; }
-      usort($out, fn($a, $b) => $b['count'] <=> $a['count'] ?: strcmp($a['name'], $b['name'])); return $out;
-    };
-    arsort($combos); $comboRows = [];
-    foreach (array_slice($combos, 0, 10, true) as $name => $count) $comboRows[] = [$name, $count, $n ? round(100 * $count / $n, 1) : 0];
-    $classes = [];
-    foreach ($classTotals as $class => $total) { $top = []; foreach ($classTrades[$class] ?? [] as $name => $count) $top[] = [$name, round(100 * $count / $total, 1)];
-      usort($top, fn($a, $b) => $b[1] <=> $a[1]); $classes[] = ['class' => $class, 'count' => $total, 'top' => $top]; }
-    usort($classes, fn($a, $b) => $b['count'] <=> $a['count']);
-    return ['source' => 'character_armory_snapshots', 'sampled' => $n, 'profiles' => $n, 'notFound' => 0,
-      'fetchedFrom' => $from ? gmdate('c', $from) : null, 'fetchedTo' => $to ? gmdate('c', $to) : null, 'regions' => $regions, 'rulesets' => [],
-      'primaryCounts' => $primaryCounts, 'primaries' => $summaries($stats['primary']), 'secondaries' => $summaries($stats['secondary']),
-      'combos' => $comboRows, 'classes' => $classes, 'levels' => [], 'learned' => $learned, 'recipes' => $recipes, 'capped' => $capped];
+    $combos = []; foreach ($comboRows as $r) $combos[] = [$r['combo'], (int)$r['n'], $pct((int)$r['n'], $n)];
+    $classTotals = []; foreach ($classRows as $r) $classTotals[$r['class_name']] = (int)$r['n'];
+    $classTop = []; foreach ($classTradeRows as $r) $classTop[$r['class_name']][] = [$r['profession'], $pct((int)$r['n'], $classTotals[$r['class_name']] ?? 0)];
+    $classes = []; foreach ($classTotals as $class => $total) $classes[] = ['class' => $class, 'count' => $total, 'top' => $classTop[$class] ?? []];
+    $at = fn($v) => $v === null ? null : gmdate('c', strtotime((string)$v));
+    return ['source' => 'character_armory_professions', 'sampled' => $n, 'profiles' => $n, 'notFound' => 0,
+      'fetchedFrom' => $at($totals['from_at']), 'fetchedTo' => $at($totals['to_at']), 'regions' => $regions, 'rulesets' => [],
+      'primaryCounts' => $primaryCounts, 'primaries' => $stats['primary'], 'secondaries' => $stats['secondary'],
+      'combos' => $combos, 'classes' => $classes, 'levels' => [], 'learned' => $learned, 'recipes' => $recipes, 'capped' => $capped];
   });
 }
 
@@ -326,8 +329,10 @@ function professions_page_model(string $source = PROFESSION_SOURCE): array {
       $views[] = ['realm' => $v['realm'], 'faction' => $v['faction'], 'scanned' => $s['updatedAt'] ? substr((string)$s['updatedAt'], 0, 10) : null,
         'empty' => !$s['items'], 'professions' => $profs];
     }
-    return ['source' => $source, 'views' => $views, 'dims' => $model['dims'],
-      'armory' => $source === 'retail' ? retail_armory_profession_census() : armory_profession_census()];
+    // Forever has its own Armory tables; every other edition shows its Armory profession census once it has one.
+    $armory = $source === PROFESSION_SOURCE ? armory_profession_census() : retail_armory_profession_census($source);
+    if ($source !== 'retail' && $source !== PROFESSION_SOURCE && !$armory['sampled']) $armory = null;
+    return ['source' => $source, 'views' => $views, 'dims' => $model['dims'], 'armory' => $armory];
   });
 }
 
@@ -348,10 +353,12 @@ function professions_html(?string $slug, string $stylesheet, string $source = PR
   if ($slug === null) {
     $title = $seoLabel . ' Professions';
     $desc = $seoLabel . ' professions: auction house supply and asking prices for each trade\'s materials, crafted goods and recipes.';
-    $pc = $model['armory'];
-    $pop = '<div class="panel census"><div class="ptitle">Armory profession popularity</div><p class="hint" style="margin-top:0">Newest last-logout Armory profile for ' . js_locale($pc['profiles']) . ' sampled characters through ' . esc(substr($pc['fetchedTo'], 0, 10)) . '. This is profile coverage, not a population census.</p><table class="mkttable"><thead><tr><th class="l">Primary profession</th><th class="r">Characters</th><th class="r">Share</th><th class="r">Average skill</th></tr></thead><tbody>';
-    foreach ($pc['primaries'] as $p) $pop .= '<tr><td class="l">' . esc($p['name']) . '</td><td class="r">' . js_locale($p['count']) . '</td><td class="r">' . esc($p['pct']) . '%</td><td class="r">' . esc($p['avg']) . '</td></tr>';
-    $pop .= '</tbody></table></div>';
+    $pc = $model['armory']; $pop = '';
+    if ($pc) {
+      $pop = '<div class="panel census"><div class="ptitle">Armory profession popularity</div><p class="hint" style="margin-top:0">Newest last-logout Armory profile for ' . js_locale($pc['profiles']) . ' sampled characters through ' . esc(substr($pc['fetchedTo'], 0, 10)) . '. This is profile coverage, not a population census.</p><table class="mkttable"><thead><tr><th class="l">Primary profession</th><th class="r">Characters</th><th class="r">Share</th><th class="r">Average skill</th></tr></thead><tbody>';
+      foreach ($pc['primaries'] as $p) $pop .= '<tr><td class="l">' . esc($p['name']) . '</td><td class="r">' . js_locale($p['count']) . '</td><td class="r">' . esc($p['pct']) . '%</td><td class="r">' . esc($p['avg']) . '</td></tr>';
+      $pop .= '</tbody></table></div>';
+    }
     $body = $pop . '<div class="panel census"><div class="ptitle">Profession markets</div><p class="hint" style="margin-top:0">Pick a trade to see what its materials, crafted goods and recipes list for on the auction house.</p><table class="mkttable"><thead><tr><th class="l">Profession</th><th class="r">Items listed</th><th class="r">Units</th><th class="r">Listed value</th></tr></thead><tbody>';
     foreach ($catalog as $s => $p) {
       $d = $all['professions'][$s] ?? ['items' => 0, 'units' => 0, 'value' => 0];
@@ -412,13 +419,13 @@ function forever_item_path(int|string $id): string { return edition_path(PROFESS
  * id => [name, quality, icon, players, enchanted, slots {slot: n}, classes {classFile: n}, races, factions, levels [min, max, sum, n]],
  * plus '_slots' => {slot: players with that slot filled}. Cached in APCu per data version when available.
  */
-function forever_wear_index(): array {
-  static $index = null;
-  if ($index !== null) return $index;
-  $key = 'ml:forever-wear:' . (Db::publishedVersion() ?? 'live');
+function edition_wear_index(string $source): array {
+  static $indexes = [];
+  if (isset($indexes[$source])) return $indexes[$source];
+  $key = 'ml:edition-wear:' . $source . ':' . (Db::publishedVersion() ?? 'live');
   $apcu = getenv('ML_APCU_CACHE') === '1' && function_exists('apcu_enabled') && apcu_enabled();
-  if ($apcu) { $hit = apcu_fetch($key, $ok); if ($ok) return $index = $hit; }
-  $packed = gear_page_model(PROFESSION_SOURCE)['packed'];
+  if ($apcu) { $hit = apcu_fetch($key, $ok); if ($ok) return $indexes[$source] = $hit; }
+  $packed = gear_page_model($source)['packed'];
   $index = ['_slots' => [], '_players' => 0];
   foreach (unpack_gear_records($packed) as $r) {
     $index['_players']++;
@@ -441,8 +448,10 @@ function forever_wear_index(): array {
     foreach ($filled as $slot => $_) $index['_slots'][$slot] = ($index['_slots'][$slot] ?? 0) + 1;
   }
   if ($apcu) apcu_store($key, $index, 12 * 3600);
-  return $index;
+  return $indexes[$source] = $index;
 }
+
+function forever_wear_index(): array { return edition_wear_index(PROFESSION_SOURCE); }
 
 /**
  * One item's wearers for its page, or null when no inspected character wore it. Reads the row
@@ -461,9 +470,18 @@ function forever_item_wearers(int $id): ?array {
   return forever_item_wearers_live($id);
 }
 
+/** An inspected-gear item page for any edition; Forever uses its precomputed lookup table. */
+function edition_item_wearers(string $source, int $id): ?array {
+  return $source === PROFESSION_SOURCE ? forever_item_wearers($id) : edition_item_wearers_live($source, $id);
+}
+
 /** forever_item_wearers() from the inspections themselves (about a second for Forever's 10,000). */
 function forever_item_wearers_live(int $id): ?array {
-  $index = forever_wear_index();
+  return edition_item_wearers_live(PROFESSION_SOURCE, $id);
+}
+
+function edition_item_wearers_live(string $source, int $id): ?array {
+  $index = edition_wear_index($source);
   $e = $index[$id] ?? null;
   if ($e === null) return null;
   [$name, $quality, $icon, $players, $ench, $slots, $classes, $races, $factions, $lv] = $e;
@@ -499,10 +517,12 @@ function forever_item_model_build(int $id): ?array {
   $wearers = forever_item_wearers($id);
   // Gear only seen on Armory characters still gets a page.
   $armory = forever_armory_item($id);
-  $sales = forever_item_sales($id);
+  $sales = edition_item_sales(PROFESSION_SOURCE, $id);
   $loot = item_loot_sources(PROFESSION_SOURCE, $id);
   $vendorLog = item_vendor_log(PROFESSION_SOURCE, $id);
-  if (!$rows && !$wearers && !$armory && !($sales['count'] ?? 0) && !$loot && !$vendorLog) return null;
+  // Dungeon bosses that drop it, from the Dungeon Journal add-on's lists.
+  $dungeon = forever_dungeon_item_sources($id);
+  if (!$rows && !$wearers && !$armory && !($sales['count'] ?? 0) && !$loot && !$vendorLog && !$dungeon) return null;
   // Armory characters' gear: who wears it, when the inspections behind the Gear page don't.
   $armoryWearers = !$wearers && $armory ? forever_armory_wearers($id, $armory['tip']['ilvl'] ?? null) : null;
   $name = $armory['name'] ?? null; $cat = null; $crafter = null; $scans = []; $seen = [];
@@ -521,7 +541,7 @@ function forever_item_model_build(int $id): ?array {
       (int)$r['lowest'], (int)$r['median'], (int)$r['weighted_average']];
   }
   $branch = EDITIONS[PROFESSION_SOURCE]['branch'];
-  $name ??= ($wearers['name'] ?? null) ?: ((item_cache('item-names', $branch)[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: 'Item ' . $id));
+  $name ??= ($wearers['name'] ?? null) ?: ((item_cache('item-names', $branch)[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: ($dungeon[0]['name'] ?? $sales['name'] ?? 'Item ' . $id)));
   $icon = ((array)item_cache('item-icons', $branch) + (array)item_cache('item-icons', 'classic'))[$id] ?? ($wearers['icon'] ?? null);
   if ($cat === null && $wearers) $cat = $wearers['slot'];
   if ($cat === null && $armory) $cat = $armory['cat'];
@@ -537,37 +557,54 @@ function forever_item_model_build(int $id): ?array {
   }
   $roles = profession_roles(['name' => $name, 'cat' => $cat], $crafter, $craftedBy);
   return ['id' => $id, 'name' => $name, 'icon' => $icon, 'cat' => $cat, 'crafter' => $crafter, 'roles' => $roles, 'taught' => $taught, 'scans' => $scans,
-    'wearers' => $wearers, 'quality' => $wearers['quality'] ?? ($armory['quality'] ?? null), 'iconUrl' => $icon === null ? ($armory['iconUrl'] ?? null) : null,
+    'wearers' => $wearers, 'quality' => $wearers['quality'] ?? ($armory['quality'] ?? ($dungeon[0]['quality'] ?? null)), 'dungeon' => $dungeon, 'iconUrl' => $icon === null ? ($armory['iconUrl'] ?? null) : null,
     'armoryOnly' => !$rows && !$wearers && $armory !== null, 'tip' => $armory['tip'] ?? null, 'armoryWearers' => $armoryWearers,
-    'sales' => ($sales['count'] ?? 0) ? $sales : null, 'loot' => $loot,
-    'vendor' => item_vendor_vs_ah($armory['tip']['sell'] ?? null, $vendorLog, $scans, ($sales['count'] ?? 0) ? $sales : null)];
+    'sales' => $sales, 'loot' => $loot,
+    'vendor' => item_vendor_vs_ah($armory['tip']['sell'] ?? null, $vendorLog, $scans, $sales)];
 }
 
 /**
  * Completed auction sales of one item, newest first, from players' Journalator / TSM ledgers
  * (tools/import-journalator-pg.py). Nobody is named: not the seller who uploaded, not the buyer.
- * Returns null when the ledger tables aren't in this database yet.
+ * Returns null when this edition has no sales for the item or the ledger is unavailable.
  * rows[] = [sold unix, market label, faction, quantity, unit price cu, seconds to sell or null]
  */
-function forever_item_sales(int $id, int $limit = 25): ?array {
+function auction_sales_available(): bool {
   static $have = null;
-  $have ??= (bool)(Db::first("SELECT to_regclass('addon_auction_sales') IS NOT NULL AS ok")['ok'] ?? false);
-  if (!$have) return null;
-  $rows = Db::all('SELECT region, realm, faction, quantity, unit_price, sold_at, seconds_to_sell
-    FROM addon_auction_sales WHERE source_game=? AND item_id=? ORDER BY sold_at DESC LIMIT ' . (int)$limit, [PROFESSION_SOURCE, $id]);
-  if (!$rows) return ['rows' => [], 'count' => 0];
+  return $have ??= (bool)(Db::first("SELECT to_regclass('addon_auction_sales') IS NOT NULL AS ok")['ok'] ?? false);
+}
+
+function auction_sale_market(string $source, array $sale): array {
+  $faction = in_array($sale['faction'], ['Alliance', 'Horde'], true) ? $sale['faction'] : 'Neutral';
+  $realm = realm_name($sale['realm']);
+  $group = $source === PROFESSION_SOURCE ? forever_realm_group($realm) : null;
+  // TSM (and some Journalator rows) name a Forever realm by ruleset only: "Normal", "PvP", "Roleplay PvP".
+  $ruleset = ['normal' => 'PvE', 'pve' => 'PvE', 'pvp' => 'PvP', 'rp' => 'RP', 'roleplay' => 'RP',
+    'rp pvp' => 'RP PvP', 'roleplay pvp' => 'RP PvP', 'rppvp' => 'RP PvP'][strtolower(trim($realm))] ?? null;
+  if ($source === PROFESSION_SOURCE && !$group && $ruleset && in_array(strtolower((string)$sale['region']), ['us', 'eu', 'kr'], true))
+    $group = forever_realm_group('CAMWOW ' . strtoupper($sale['region']) . '1 Realm 1 ' . $ruleset);
+  $label = $group['label'] ?? trim(strtoupper((string)$sale['region']) . ' ' . $realm);
+  if ($faction !== 'Neutral') $label .= ' · ' . $faction;
+  return [$label, $faction];
+}
+
+function edition_item_sales(string $source, int $id): ?array {
+  if (!auction_sales_available()) return null;
+  $rows = Db::all('SELECT region, realm, faction, item_name, quantity, unit_price, sold_at, seconds_to_sell
+    FROM addon_auction_sales WHERE source_game=? AND item_id=? ORDER BY sold_at DESC, event_key LIMIT 25', [$source, $id]);
+  if (!$rows) return null;
   $stats = Db::first('SELECT count(*) AS n, percentile_cont(0.5) WITHIN GROUP (ORDER BY unit_price) AS med,
       percentile_cont(0.5) WITHIN GROUP (ORDER BY seconds_to_sell) AS secs, count(seconds_to_sell) AS timed, max(sold_at) AS last
-    FROM addon_auction_sales WHERE source_game=? AND item_id=?', [PROFESSION_SOURCE, $id]);
+    FROM addon_auction_sales WHERE source_game=? AND item_id=?', [$source, $id]);
   $out = [];
+  $name = null;
   foreach ($rows as $r) {
-    $faction = in_array($r['faction'], ['Alliance', 'Horde'], true) ? $r['faction'] : 'Neutral';
-    $group = forever_realm_group((string)$r['realm']);
-    $label = ($group['label'] ?? strtoupper((string)$r['region']) . ' ' . realm_name((string)$r['realm'])) . ($faction === 'Neutral' ? '' : ' · ' . $faction);
+    $name ??= trim((string)$r['item_name']) ?: null;
+    [$label, $faction] = auction_sale_market($source, $r);
     $out[] = [(int)$r['sold_at'], $label, $faction, (int)$r['quantity'], (int)$r['unit_price'],
       $r['seconds_to_sell'] === null ? null : (int)$r['seconds_to_sell']];
   }
-  return ['rows' => $out, 'count' => (int)$stats['n'], 'median' => (int)round((float)$stats['med']),
+  return ['rows' => $out, 'name' => $name, 'count' => (int)$stats['n'], 'median' => (int)round((float)$stats['med']),
     'medianSecs' => $stats['secs'] === null ? null : (int)round((float)$stats['secs']), 'timed' => (int)$stats['timed'], 'last' => (int)$stats['last']];
 }
 
@@ -613,6 +650,54 @@ function forever_item_market_summary(array $m): array {
   return ['markets' => $m['markets'], 'points' => $m['points'], 'scans' => count($m['log']), 'lastScan' => $last];
 }
 
+function item_sale_duration(int $seconds): string {
+  if ($seconds < 60) return $seconds . 's';
+  if ($seconds < 3600) return intdiv($seconds, 60) . 'm';
+  $hours = intdiv($seconds, 3600);
+  $minutes = intdiv($seconds % 3600, 60);
+  return $hours . 'h' . ($minutes ? ' ' . $minutes . 'm' : '');
+}
+
+function edition_recent_sales_table(string $source): string {
+  static $tables = [];
+  if (isset($tables[$source])) return $tables[$source];
+  $sales = auction_sales_available() ? Db::all('SELECT region, realm, faction, item_id, item_name, quantity, unit_price, sold_at, seconds_to_sell
+    FROM addon_auction_sales WHERE source_game=? ORDER BY sold_at DESC, event_key LIMIT 25', [$source]) : [];
+  if (!$sales) return $tables[$source] = '';
+  $rows = '';
+  foreach ($sales as $sale) {
+    [$market] = auction_sale_market($source, $sale);
+    $id = (int)$sale['item_id'];
+    $name = esc(trim((string)$sale['item_name']) ?: ($id ? 'Item ' . $id : 'Unknown item'));
+    $item = $id ? '<a href="' . esc(edition_path($source) . 'item/' . $id) . '">' . $name . '</a>' : $name;
+    $duration = $sale['seconds_to_sell'] === null ? '—' : item_sale_duration((int)$sale['seconds_to_sell']);
+    $rows .= '<tr><td>' . $item . '</td><td>' . gmdate('Y-m-d H:i', (int)$sale['sold_at']) . '</td><td>' . esc($market)
+      . '</td><td class="num r">' . js_locale((int)$sale['quantity']) . '</td><td class="num r">' . esc(money((int)$sale['unit_price']))
+      . '</td><td class="num r">' . esc($duration) . '</td></tr>';
+  }
+  return $tables[$source] = '<div style="overflow-x:auto"><table class="ahtable mkttable"><thead><tr><th>Item</th><th>Sold (UTC)</th><th>Market</th>'
+    . '<th class="num r">Qty</th><th class="num r">Price each</th><th class="num r">Sold after</th></tr></thead><tbody>'
+    . $rows . '</tbody></table></div>';
+}
+
+function item_recent_sales_html(?array $sales): string {
+  if (!$sales) return '';
+  $rows = '';
+  foreach ($sales['rows'] as [$sold, $market, , $quantity, $price, $seconds]) {
+    $duration = $seconds === null ? '—' : item_sale_duration($seconds);
+    $rows .= '<tr><td>' . gmdate('Y-m-d H:i', $sold) . '</td><td>' . esc($market)
+      . '</td><td class="r">' . js_locale($quantity) . '</td><td class="r">' . esc(money($price))
+      . '</td><td class="r">' . esc($duration) . '</td></tr>';
+  }
+  $timing = $sales['medianSecs'] === null ? 'Listing time unavailable'
+    : 'Median time to sell ' . item_sale_duration($sales['medianSecs']) . ' (' . js_locale($sales['timed']) . ' matched)';
+  return '<section class="panel census mkt"><h2 class="ptitle">Recent Sales</h2><p class="hint">'
+    . js_locale($sales['count']) . ' completed auctions · Median unit price ' . esc(money($sales['median']))
+    . ' · ' . esc($timing) . '</p><table class="mkttable"><thead><tr><th>Sold (UTC)</th><th>Market</th>'
+    . '<th class="r">Qty</th><th class="r">Price each</th><th class="r">Sold after</th></tr></thead><tbody>'
+    . $rows . '</tbody></table></section>';
+}
+
 /** The plain page every skin starts from; the 2008 skin rebuilds it from the model. */
 function forever_item_html(array $item, string $stylesheet): string {
   $label = seo_label(EDITIONS[PROFESSION_SOURCE]['label']);
@@ -635,6 +720,7 @@ function forever_item_html(array $item, string $stylesheet): string {
   $css = esc($stylesheet);
   $census_css = CENSUS_STYLESHEET;
   $name = esc($item['name']);
+  $recentSales = item_recent_sales_html($item['sales']);
   $wowhead = esc('https://www.wowhead.com/' . EDITIONS[PROFESSION_SOURCE]['branch'] . '/item=' . $item['id']);
   return <<<HTML
 <!doctype html><html lang="en"><head>
@@ -656,6 +742,7 @@ $style
   <div class="panel census mkt"><div class="ptitle">$name &mdash; current listings</div>
   <p class="hint" style="margin-top:0"><a href="$wowhead" target="_blank" rel="noopener">View on Wowhead</a></p>
   <table class="mkttable"><thead><tr><th class="l">Scanned (UTC)</th><th class="l">Realm</th><th class="r">Qty</th><th class="r">Lowest</th><th class="r">Median</th></tr></thead><tbody>$rows</tbody></table></div>
+  $recentSales
 </div>
 </body></html>
 HTML;

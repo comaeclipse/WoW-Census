@@ -149,73 +149,65 @@ swap the names with PHP-FPM stopped (about a second), and the next pass publishe
 it. Check first that every `local_imports.source_sha256` on the server is also
 local, so no upload made on the live site is lost.
 
-Cloudflare caches pages for the default 2008 skin at the edge for 15 minutes: the
-origin sends `Cloudflare-CDN-Cache-Control: public, max-age=900` for that skin
+Cloudflare caches pages for the default 2008 skin at the edge for 1 hour: the
+origin sends `Cloudflare-CDN-Cache-Control: public, max-age=3600` (`ML_EDGE_HTML_TTL`) for that skin
 (browsers still get `private, no-store`, so a skin switch shows at once), and the
 zone's Cache Rule "Pages: default skin" makes HTML eligible except for
 `wowcensus_skin=current|cobalt` cookies, Accept headers naming Markdown or `text/*`,
 and the per-visitor routes. Those always reach the origin (`cf-cache-status: DYNAMIC`).
-New data therefore reaches visitors up to 15 minutes after the rollout re-renders a page.
+New data reaches visitors as soon as the rollout re-renders and purges a busy page; other pages
+within about 2 hours (1 hour in nginx, 1 hour at the edge).
 
 ### Cache strategy
 
-Each page should be rendered about once per change; caches serve everyone else, and no step
-ever empties a cache.
+Each busy page is re-rendered right after a change; every other page refreshes on its next
+visit. Caches serve everyone else, and no step ever empties a cache. (Until 2026-11-17 every
+publish and release re-rendered every cached page, one at a time: 8,000-12,000 entries took
+2-4 hours, held the publish lock throughout, and kept new data off the site for hours.)
 
-1. **Every change re-renders in place.** Data publishes already run `wowcensus-rollout`. After a
-   code release, start `wowcensus-release-rollout` (copy: `laragon-php/wowcensus-release-rollout`,
-   install to `/usr/local/bin/`):
+1. **Publishes and releases re-render the busiest 500 cache entries.** `wowcensus-data-refresh`
+   rebuilds the census tables, then runs `wowcensus-rollout` with `ROLLOUT_TOP=500`: the 72 main
+   pages first, then by visits in the access logs, only for the editions whose data changed
+   (plus the home page). That takes minutes, and the lock is released afterwards. After a code
+   release, start `wowcensus-release-rollout` (copy: `laragon-php/wowcensus-release-rollout`,
+   install to `/usr/local/bin/`); it waits 2 minutes for PHP's realpath cache, then runs one
+   `FORCE=1 REFRESH_FULL=1 REFRESH_WAIT=1` pass over every edition's busiest pages:
 
    ```sh
    nohup /usr/local/bin/wowcensus-release-rollout >> /var/log/wowcensus-data-refresh.log 2>&1 &
    ```
 
-   It waits 2 minutes for PHP's realpath cache to drop the old release, then runs one
-   `wowcensus-data-refresh` pass with `FORCE=1 REFRESH_FULL=1 REFRESH_WAIT=1`: it waits for the
-   lock (so two rollouts never overlap), publishes any data waiting to go live, and re-renders
-   every cached page once, main pages first. A release whose code an earlier full pass already
-   rendered (`/var/lib/wowcensus/code-rollout`) is skipped when no new data arrived meanwhile,
-   so releases queued behind one rollout don't each re-render the whole site again. (Until
-   2026-11-10 a release ran two full passes: `ROLLOUT_MAIN=1` was documented but not
-   implemented, so its "main pages" pass re-rendered every page.)
-2. **A 24-hour safety net in nginx.** Pages go stale after 24 hours instead of never, but are
-   never thrown away and never make a visitor wait: nginx serves the saved copy and one
-   background request re-renders it. In `snippets/wowcensus-cache.conf`, replace the
-   `fastcgi_cache_valid` line with these (keep `inactive=3650d` on `fastcgi_cache_path`):
+   `ROLLOUT_TOP=0` re-renders every cached page (by hand only). Entries for tracking-only URLs
+   are never re-rendered.
+2. **Everything else refreshes on its next visit.** `snippets/wowcensus-cache.conf` keeps pages
+   valid for 1 hour; after that nginx serves the saved copy once more while one background
+   request re-renders it, so no visitor waits:
 
    ```nginx
-   fastcgi_cache_valid 200 301 302 404 24h;
+   fastcgi_cache_valid 200 1h;
    fastcgi_cache_use_stale updating error timeout http_500 http_503;
    fastcgi_cache_background_update on;
    fastcgi_cache_lock on;
    fastcgi_cache_lock_timeout 10s;
    ```
 
-   The snippet must also ignore `Vary` (`fastcgi_ignore_headers Cache-Control Expires Vary;`).
-   PHP sends `Vary: Accept`, and nginx honours it by keeping one copy per distinct `Accept`
-   string. Rollouts send curl's `*/*`, so until 2026-11-11 browsers kept getting copies from
-   days earlier. The cache key's `$wowcensus_accept` field already separates Markdown from HTML.
-
-   `nginx -t && systemctl reload nginx`. The lock means one render per page at a time; a failed
-   render keeps serving the old copy. nginx stores each page's expiry when it saves it, so pages
-   saved before this change keep their 10-year expiry until the next full rollout re-saves them.
-3. **Cloudflare serves most traffic.** Turn on Tiered Cache (Caching > Tiered Cache > Smart
-   Tiered Caching), so a miss at one location asks a large Cloudflare location before the
-   origin. Then let pages live at the edge for a day and purge them when they change:
-   `wowcensus-rollout` purges each re-rendered default-skin HTML page (30 URLs per API call)
-   when `/etc/wowcensus/cloudflare.env` (root:root 600) holds
-
-   ```sh
-   CF_ZONE_ID=<wowcensus.io zone id>
-   CF_API_TOKEN=<token with Zone > Cache Purge on wowcensus.io only>
-   ```
-
-   Once a rollout log shows `N purged at Cloudflare`, add `env[ML_EDGE_HTML_TTL] = 86400` to both
-   PHP-FPM pools and restart PHP-FPM; the next rollout re-saves pages with the longer edge TTL.
-   Leave the TTL at its 900-second default wherever purging is not set up.
+   `conf.d/wowcensus-cache.conf` drops entries nobody requested for 30 days (`inactive=30d`).
+   The snippet must also ignore `Vary` (`fastcgi_ignore_headers Cache-Control Expires Vary;`):
+   PHP sends `Vary: Accept`, and the cache key's `$wowcensus_accept` field already separates
+   Markdown from HTML. `snippets/wowcensus-site.conf` 301-redirects URLs whose query is only
+   tracking parameters (`fbclid`, `gclid`, `msclkid`, `utm_*`) to the clean URL, so shared links
+   don't each get their own cache entry. `nginx -t && systemctl reload nginx` after any change.
+3. **Cloudflare keeps pages for 1 hour.** Both PHP-FPM pools set `env[ML_EDGE_HTML_TTL] = 3600`.
+   `wowcensus-rollout` purges each page it re-renders (30 URLs per API call) when
+   `/etc/wowcensus/cloudflare.env` (root:root 600) holds `CF_ZONE_ID` and `CF_API_TOKEN` (Zone >
+   Cache Purge on wowcensus.io only), so busy pages change at the edge at once. Pages refreshed
+   on a visit are not purged, so the 1-hour TTL bounds how long the edge keeps an old copy. Keep
+   Tiered Cache on (Caching > Tiered Cache > Smart Tiered Caching).
 4. **Load guards stay.** One page at a time, the load-average pause, and the separate
    `wowcensus-live` pool. A bigger VPS changes settings only: more `pm.max_children`, a higher
-   `ROLLOUT_MAX_LOAD`, a shorter `ROLLOUT_PAUSE_SECONDS`.
+   `ROLLOUT_MAX_LOAD`, a shorter `ROLLOUT_PAUSE_SECONDS`, a larger `ROLLOUT_TOP`.
+
+The previous config files are in `/root/wowcensus-backup-20261117-rollout/` on the server.
 
 ## Contact form
 
