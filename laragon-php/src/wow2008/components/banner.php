@@ -16,12 +16,13 @@ namespace Wow2008;
  *   tools           optional raw HTML (a picker), drawn top right
  */
 // Echo the rotating image banners used by the original site's Flash-era headers.
-$paintedBanners = ['census', 'realms', 'auction-house', 'guilds', 'geography', 'talents', 'gear', 'molten-core', 'moonbrook', 'lava-dragon'];
+$paintedBanners = ['census', 'realms', 'auction-house', 'guilds', 'geography', 'talents', 'gear', 'molten-core', 'moonbrook', 'lava-dragon', 'uldaman-1', 'uldaman-2'];
 // Pages with an image of their own always show it.
 $fixedBanners = ['contact'];
 // Pages with their own set rotate within it (banner-<name>.webp).
 $bannerSets = [
-  'dungeons' => ['dungeons-1', 'dungeons-2', 'dungeons-3'],
+  'dungeons' => ['dungeons-1', 'dungeons-2', 'dungeons-3', 'uldaman-1', 'uldaman-2'],
+  'uldaman' => ['uldaman-1', 'uldaman-2'],
   'ragefire-chasm' => ['dungeons-1', 'dungeons-2'],
   'dire-maul' => ['dungeons-3'],
 ];
