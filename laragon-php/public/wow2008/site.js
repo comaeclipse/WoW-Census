@@ -5,7 +5,7 @@
 Object.assign(CLASS_COLOR, { 'Death Knight': '#C41E3A', Monk: '#00FF98', 'Demon Hunter': '#A330C9', Evoker: '#33937F' });
 
 document.querySelector('.nav')?.addEventListener('click', event => {
-  const button = event.target.closest('.nav-toggle');
+  const button = event.target.closest('.nav-toggle') || event.target.closest('h3')?.querySelector('.nav-toggle');
   if (!button) return;
   const links = document.getElementById(button.getAttribute('aria-controls'));
   if (!links) return;

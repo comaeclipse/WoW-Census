@@ -11,6 +11,7 @@
 .logo img{display:block;width:100%;height:auto}
 .topbar{background:#000}
 .nav h3{background:transparent url('edition-heading.png') center / 100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;padding-left:11px}
+.nav h3:has(.nav-toggle){cursor:pointer;user-select:none}
 .nav .nav-toggle{position:relative;box-sizing:border-box;width:15px;height:14px;margin-left:auto;padding:0;flex:none;border:1px solid #050505;border-radius:3px;background:linear-gradient(#a11b08,#b20d05 48%,#650700);box-shadow:inset 0 0 0 1px #5a5b56,inset 0 0 0 2px #2d0904;cursor:pointer}
 .nav .nav-toggle::before,.nav .nav-toggle::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#ffc51a;box-shadow:0 1px #9c3a00}
 .nav .nav-toggle::before{width:9px;height:2px}
