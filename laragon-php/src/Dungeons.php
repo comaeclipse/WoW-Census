@@ -56,6 +56,13 @@ function forever_dungeon_data(): array {
       'requires' => $r['requires_level'] !== null ? (int)$r['requires_level'] : null,
       'rewards' => $rewards[$r['dungeon_slug']][(int)$r['quest_order']] ?? [], 'rewardChoice' => (bool)$r['reward_choice'],
       'bosses' => $questBosses[$r['dungeon_slug']][(int)$r['quest_order']] ?? []];
+  $guides = [];
+  if ((bool)(Db::first("SELECT to_regclass('forever_dungeon_guides') IS NOT NULL AS ok")['ok'] ?? false)) {
+    foreach (Db::all('SELECT dungeon_slug, source_url, card_art, detail_art FROM forever_dungeon_guides') as $r)
+      $guides[$r['dungeon_slug']] = ['source' => $r['source_url'], 'card' => $r['card_art'], 'detail' => $r['detail_art'], 'overview' => []];
+    foreach (Db::all('SELECT dungeon_slug, body FROM forever_dungeon_guide_paragraphs ORDER BY dungeon_slug, para_order') as $r)
+      if (isset($guides[$r['dungeon_slug']])) $guides[$r['dungeon_slug']]['overview'][] = $r['body'];
+  }
   $dungeons = [];
   foreach (Db::all('SELECT slug, name, sort_order, level_range, location, description, icon, is_new, loot_incomplete
       FROM forever_dungeons ORDER BY sort_order, slug') as $r) {
@@ -63,7 +70,7 @@ function forever_dungeon_data(): array {
     $dungeons[] = ['name' => $r['name'], 'slug' => $r['slug'], 'order' => (int)$r['sort_order'], 'level' => $r['level_range'],
       'location' => $r['location'], 'description' => $r['description'], 'icon' => $r['icon'], 'new' => (bool)$r['is_new'],
       'lootIncomplete' => (bool)$r['loot_incomplete'], 'quests' => count($q), 'questDetails' => $q,
-      'bosses' => $bosses[$r['slug']] ?? [], 'trash' => $trash[$r['slug']] ?? []];
+      'bosses' => $bosses[$r['slug']] ?? [], 'trash' => $trash[$r['slug']] ?? [], 'guide' => $guides[$r['slug']] ?? null];
   }
   return $data = ['source' => ['addon' => $journal['addon'], 'author' => $journal['author'], 'version' => $journal['version']],
     'uploaders' => (int)$journal['uploaders'], 'dungeons' => $dungeons];
@@ -188,6 +195,23 @@ function forever_dungeon_credit(): string {
     ($s['version'] ? ' (version ' . esc($s['version']) . ')' : '') . '. Kill counts and run logs come from players\' uploaded journals; observed drops also come from players\' Journalator logs.';
 }
 
+/** URL of a dungeon's Forever Journal artwork ('card' or 'detail', falling back to the card), or null. */
+function forever_dungeon_art(array $d, string $kind = 'card'): ?string {
+  $g = $d['guide'] ?? null;
+  $file = $g ? ($kind === 'detail' ? ($g['detail'] ?: $g['card']) : $g['card']) : null;
+  return $file ? '/wow2008/' . $file : null;
+}
+
+/** The dungeon's overview from Forever Journal, with its artwork; '' when there is none. */
+function forever_dungeon_overview_html(array $d): string {
+  $g = $d['guide'] ?? null;
+  if (!$g || !$g['overview']) return '';
+  $art = forever_dungeon_art($d, 'detail');
+  return '<section class="dg-boss dg-overview">' . ($art ? '<img class="dg-ov-art" src="' . esc($art) . '" alt="' . esc($d['name']) . '" loading="lazy">' : '') .
+    '<div class="dg-ov-text"><h3>Overview</h3>' . implode('', array_map(fn($p) => '<p>' . esc($p) . '</p>', $g['overview'])) .
+    '<p class="dg-ov-src">Overview and artwork: <a href="' . esc($g['source']) . '" target="_blank" rel="noopener">Forever Journal</a></p></div></section>';
+}
+
 const DUNGEON_STYLE = <<<'CSS'
 .dg-quests article{padding:8px 0;border-bottom:1px solid rgba(128,128,128,.25)}
 .dg-quests article:last-child{border-bottom:0}
@@ -277,6 +301,12 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-facts2 b{display:block;font:bold 19px Georgia,serif}
 .dg-facts2 span{font-size:11px;opacity:.75}
 .dg-route-box{margin-top:0;min-width:0}
+.dg-overview{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;align-items:start;margin-top:0}
+.dg-ov-art{display:block;width:100%;aspect-ratio:2/1;object-fit:cover;border:2px solid #1a1208;outline:1px solid #b08a40;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.dg-ov-text h3{margin-top:0}
+.dg-ov-text p{margin:0 0 8px;line-height:1.5}
+.dg-ov-text p.dg-ov-src{margin:0;font-size:11px;opacity:.75}
+@media (max-width:760px){.dg-overview{grid-template-columns:minmax(0,1fr)}}
 .dg-page{min-width:0;max-width:100%}
 .dg-route{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));row-gap:12px;list-style:none;margin:0;padding:4px 0 2px;overflow:hidden}
 .dg-route li{min-width:0;position:relative;text-align:center}
@@ -361,6 +391,8 @@ const DUNGEON_STYLE = <<<'CSS'
 .w8-framed .dg-facts2 b{color:#5a2a00}
 .w8-framed .dg-facts2 span{color:#6b5532;opacity:1}
 .w8-framed .dg-route .n{color:#3a2406}
+.w8-framed .dg-ov-text p{color:#2a1e0c}
+.w8-framed .dg-ov-text p.dg-ov-src{color:#6b5532;opacity:1}
 .w8-framed .dg-bh{border-color:rgba(60,40,10,.25)}
 .w8-framed .dg-bh h3 a.dg-npc{font-variant:small-caps}
 .w8-framed .dg-kill.none{background:#8a7a5a;color:#fff;opacity:1}
@@ -650,6 +682,7 @@ function forever_dungeons_body(?array $d): string {
     ($d['description'] !== '' ? '<p style="margin:4px 0 0">' . esc($d['description']) . '</p>' : '') . '</div></div><!--/dg-head-->' .
     $factHtml .
     ($d['lootIncomplete'] ? '<p class="hint">The loot list for this dungeon is still being filled in.</p>' : '') .
+    forever_dungeon_overview_html($d) .
     ($count ? '<section class="dg-boss dg-route-box"><h3>Boss route <small>in the journal\'s order · pick a boss to see its loot</small></h3><ol class="dg-route">' . $route . '</ol></section>' : '') .
     '<div class="dg-main' . ($questPanel === '' ? ' solo' : '') . '"><div class="dg-cards">' . $cards . '</div>' . $questPanel . '</div>' .
     ($bestHtml !== '' ? '<section class="dg-boss"><h3>Best of the dungeon <small>the drops players saw most often</small></h3><div class="dg-tiles">' . $bestHtml . '</div></section>' : '') .
@@ -819,7 +852,8 @@ function forever_dungeons_w8_index(): string {
 
   $cards = '';
   foreach ($new as $d)
-    $cards .= '<a class="dgx-card" href="' . esc(forever_dungeon_path($d['slug'])) . '" style="--glow:' . (DUNGEON_GLOW[$d['slug']] ?? '#c88f10') . '">' .
+    $cards .= '<a class="dgx-card' . (($art = forever_dungeon_art($d)) ? ' art' : '') . '" href="' . esc(forever_dungeon_path($d['slug'])) . '" style="--glow:' . (DUNGEON_GLOW[$d['slug']] ?? '#c88f10') . '">' .
+      ($art ? '<img class="dgx-card-art" src="' . esc($art) . '" alt="">' : '') .
       '<span class="dgx-card-top"><span>5 player · ' . count($d['bosses']) . ' bosses</span><span class="dgx-badge">New</span></span>' .
       '<img src="' . esc(forever_dungeon_icon($d['icon'], 'large')) . '" alt="" loading="lazy">' .
       '<span class="dgx-card-nm">' . esc($d['name']) . '</span><span class="dgx-card-sub">' . esc($d['location']) . ' · Levels ' . esc($d['level']) . '</span></a>';
@@ -923,7 +957,13 @@ const DUNGEON_W8_INDEX_STYLE = <<<'CSS'
 .dgx-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .dgx-card{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:118px;padding:10px;text-decoration:none;overflow:hidden;border:2px solid #1a1208;outline:1px solid #b08a40;background:radial-gradient(circle at 72% 30%,color-mix(in srgb,var(--glow) 55%,transparent),transparent 58%),linear-gradient(160deg,#20180e,#0c0906 70%);box-shadow:inset 0 0 24px rgba(0,0,0,.8),0 2px 4px rgba(60,30,0,.5)}
 .dgx-card:hover{outline-color:#ffd75a;filter:brightness(1.15)}
-.dgx-card img{position:absolute;right:12px;top:26px;width:44px;height:44px;border:2px ridge #856636;box-shadow:0 0 14px color-mix(in srgb,var(--glow) 70%,transparent),0 2px 4px #000}
+.dgx-card.art{background:#0c0906}
+.dgx-card img.dgx-card-art{position:absolute;inset:0;right:auto;top:0;width:100%;height:100%;object-fit:cover;border:0;box-shadow:none}
+.dgx-card.art:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,0) 30%,rgba(0,0,0,.15) 50%,rgba(0,0,0,.85))}
+.dgx-card.art>span{position:relative;z-index:1}
+.dgx-card.art>.dgx-card-top{position:absolute}
+.dgx-card.art>img:not(.dgx-card-art){z-index:1}
+.dgx-card img:not(.dgx-card-art){position:absolute;right:12px;top:26px;width:44px;height:44px;border:2px ridge #856636;box-shadow:0 0 14px color-mix(in srgb,var(--glow) 70%,transparent),0 2px 4px #000}
 .dgx-card-top{position:absolute;left:8px;right:8px;top:7px;display:flex;justify-content:space-between;align-items:center;font:700 8px Tahoma,Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#cbb88a;white-space:nowrap}
 .dgx-badge{background:#8a1a08;color:#ffe8c0;border:1px solid #c04020;padding:1px 5px}
 .dgx-card-nm{font:700 14px/1.15 'Cinzel',serif;color:#f6e3ae;text-shadow:0 2px 3px #000;padding-right:50px}
