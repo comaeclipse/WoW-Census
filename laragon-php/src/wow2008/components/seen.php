@@ -2,7 +2,8 @@
 namespace Wow2008;
 /**
  * Banner overlay: distinct characters seen in the last 7 or 30 days or overall,
- * with a running-total line chart and a range toggle. Each range is rendered
+ * with a line chart and a range toggle. The 7- and 30-day charts plot characters
+ * seen each day, so they fall when activity falls; "All" plots the running total. Each range is rendered
  * here; the toggle only shows one. See seen_activity() in src/Data.php.
  *
  * Props:
@@ -24,7 +25,7 @@ $firstDay = $seen['all']['firstDay'];
     $pct = 100 * ($r['n'] - $r['prev']) / $r['prev'];
     $delta = [($pct < 0 ? '▼ ' : '▲ ') . (abs($pct) < 10 ? number_format(abs($pct), 1) : round(abs($pct))) . '% ' . $per, $pct < 0];
   }
-  $vals = $r['running'];
+  $vals = $key === 'all' ? $r['running'] : ($r['daily'] ?? $r['running']);
   $lo = min($vals);
   $hi = max($vals);
   $count = count($vals);
