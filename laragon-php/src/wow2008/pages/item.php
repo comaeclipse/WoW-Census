@@ -52,13 +52,14 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     .it-wh{align-self:start;font:700 10px Tahoma,Arial,sans-serif;padding:5px 10px;border:1px solid #000;border-radius:3px;text-decoration:none;
       color:#2a1200;background:linear-gradient(#ffd75a,#b07a00);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
     .it-wh:hover{background:linear-gradient(#ffe890,#c88a10)}
-    .it-trades{display:flex;flex-wrap:wrap;gap:8px}
-    .it-trade{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 5px;text-decoration:none;color:#3a1a00;border:1px solid #8a6a2a;border-radius:3px;
-      background:linear-gradient(#fff6d8,#ecd59c);box-shadow:inset 0 0 0 1px #fff7d8}
-    .it-trade:hover{box-shadow:inset 0 0 0 1px #fff7d8,0 0 0 2px #ffd75a}
-    .it-trade img{width:28px;height:28px;border:1px solid #000;outline:1px solid #c8a050;border-radius:2px}
-    .it-trade b{display:block;font:700 13px 'Cinzel',serif;font-variant:small-caps;color:#5a2a00}
-    .it-trade small{font:700 9px Tahoma,Arial,sans-serif;text-transform:uppercase;letter-spacing:.6px;color:#8a5a10}
+    .it-side{align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;gap:10px}
+    .it-used{display:flex;align-items:center;gap:5px}
+    .it-used span{font:700 9px Tahoma,Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#b89a60;margin-right:2px}
+    .it-used a{display:block;line-height:0}
+    .it-used img{width:30px;height:30px;border:1px solid #000;outline:1px solid #c8a050;border-radius:2px}
+    .it-used a:hover img{outline:2px solid #ffd75a}
+    .report .rpt-ico{width:32px;height:32px}
+    .report:has(.rpt-ico){grid-template-columns:32px 1fr}
     .it-chart{background:linear-gradient(#1c1810,#0e0c08);border:2px solid #000;outline:1px solid #8a7040;border-radius:4px;padding:8px 8px 4px}
     .it-chart svg{display:block;width:100%;height:auto}
     .it-verdict{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin-bottom:10px;padding:8px 12px;border:1px solid #8a6a2a;border-radius:3px;
@@ -146,7 +147,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     @media (max-width:860px){.it-top{grid-template-columns:1fr}.it-pairs{grid-template-columns:1fr}}
     @media (max-width:760px){.it-wear{grid-template-columns:1fr}}
     @media (max-width:760px){.it-charts{grid-template-columns:1fr}}
-    @media (max-width:600px){.it-hero{grid-template-columns:auto 1fr}.it-wh{grid-column:1 / -1;justify-self:start}.it-hero h1{font-size:21px}.it-hero .emb{width:52px;height:52px}}
+    @media (max-width:600px){.it-hero{grid-template-columns:auto 1fr}.it-side{grid-column:1 / -1;flex-direction:row;align-items:center}.it-hero h1{font-size:21px}.it-hero .emb{width:52px;height:52px}}
   </style>
   <main class="main">
     <?= component('crumb', ['trail' => [['label' => 'Auction House', 'url' => url('auction-house')], ['label' => $item['name']]]]) ?>
@@ -169,7 +170,16 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
 <?php endif ?>
         </div>
       </div>
-      <a class="it-wh" href="<?= e($wowhead) ?>" target="_blank" rel="noopener">Wowhead »</a>
+      <div class="it-side">
+        <a class="it-wh" href="<?= e($wowhead) ?>" target="_blank" rel="noopener">Wowhead »</a>
+<?php if ($trades): ?>
+        <div class="it-used"><span>Used in</span>
+<?php foreach ($trades as $t): ?>
+          <a href="<?= e($t['url']) ?>" data-tip="<?= e($t['name']) ?>|<?= e($t['role']) ?>" aria-label="<?= e($t['name']) ?>"><img src="/assets/images/wow/icons/large/<?= e($t['icon']) ?>.jpg" alt="" width="30" height="30"></a>
+<?php endforeach ?>
+        </div>
+<?php endif ?>
+      </div>
     </div>
 <?php if (current_source() === 'forever'): ?>
 <?= contribute_notice() ?>
@@ -329,8 +339,6 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
         <div class="it-nomkt"><?php if (!empty($item['armoryOnly'])): ?>Seen equipped on characters from the Battle.net Armory. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php elseif (!empty($item['localOnly'])): ?>This item page was created from equipment observed on inspected characters. No auction scan has seen <b><?= e($item['name']) ?></b> listed yet.<?php else: ?>No auction scan has seen <b><?= e($item['name']) ?></b> listed yet. It may bind when picked up, or nobody has put one up for sale. Price history appears here once it's listed.<?php endif ?></div>
     <?php component_end() ?>
 <?php elseif ($listed): ?>
-    <div class="tiles" id="itTiles"></div>
-
     <section class="section">
       <div class="post-hd"><span class="ico g"></span><h2>Market Report</h2><div class="sub">every region, ruleset and faction</div></div>
       <div class="section-bd"><div class="report" id="itReport"></div></div>
@@ -464,16 +472,6 @@ if (!empty($item['dungeon']) && $loot) {
     <?php component_end() ?>
 <?php endif ?>
 
-<?php if ($trades): ?>
-    <?php component_start('section', ['title' => 'Used in Professions', 'icon' => 'p', 'sub' => 'open a trade to see its whole market', 'style' => 'margin-top:16px']) ?>
-        <div class="it-trades">
-<?php foreach ($trades as $t): ?>
-          <a class="it-trade" href="<?= e($t['url']) ?>"><img src="/assets/images/wow/icons/large/<?= e($t['icon']) ?>.jpg" alt="" width="28" height="28"><span><b><?= e($t['name']) ?></b><small><?= e($t['role']) ?></small></span></a>
-<?php endforeach ?>
-        </div>
-    <?php component_end() ?>
-<?php endif ?>
-
     <div class="source"><?= !empty($item['localOnly']) || !empty($item['armoryOnly']) ? 'Item details from a Battle.net Armory equipment snapshot' : 'Auction data from in-game scans · asking prices on listed auctions, not completed sales · "lowest" is the cheapest listing, "median" the middle unit price' . ($sales ? ' · Recent Sales are completed auctions from players\' add-on logs' : '') ?></div>
   </main>
 
@@ -561,23 +559,18 @@ function charts() {
 function render() {
   const listed = latest.reduce((a, s) => a + s.qty, 0);
   const cheapest = latest.reduce((a, s) => !a || s.lo < a.lo ? s : a, null);
-  const meds = SC.map(s => s.med), lastT = Math.max(...Object.values(IT.lastScan));
-  document.getElementById('itTiles').innerHTML = `
-    <div class="stat"><span>Lowest price now</span><b style="font-size:17px;line-height:26px">${money(cheapest.lo)}</b><em>${esc(label(cheapest))}</em></div>
-    <div class="stat"><span>Listed now</span><b>${fmt(listed)}</b><em>units across ${fmt(latest.length)} market${latest.length === 1 ? '' : 's'}</em></div>
-    <div class="stat"><span>Median range</span><b style="font-size:15px;line-height:26px">${money(Math.min(...meds))} – ${money(Math.max(...meds))}</b><em>across every scanned day</em></div>
-    <div class="stat"><span>Scans</span><b>${fmt(IT.scans)}</b><em>last ${day(lastT)}</em></div>`;
+  const lastT = Math.max(...Object.values(IT.lastScan));
 
   // Report: compare each market's newest day with its previous one.
   const moved = latest.filter(s => s.prev).map(s => ({ s, dp: s.prev.med ? Math.round((s.med - s.prev.med) / s.prev.med * 100) : 0, dq: s.prev.qty ? Math.round((s.qty - s.prev.qty) / s.prev.qty * 100) : 0 }));
-  const lines = [`<b>${esc(NAME)}</b> has been seen in <b>${fmt(IT.scans)}</b> auction scan${IT.scans === 1 ? '' : 's'} across ${fmt(latest.length)} market${latest.length === 1 ? '' : 's'} (${latest.map(s => esc(label(s))).join(', ')}), most recently on <b>${day(lastT)}</b>.`,
-    `Right now <b>${fmt(listed)}</b> ${listed === 1 ? 'is' : 'are'} listed; the cheapest is ${money(cheapest.lo)} each on ${esc(label(cheapest))}.`];
-  moved.forEach(({ s, dp, dq }) => lines.push(`On ${esc(label(s))} the median price ${dp === 0 ? 'held at' : dp > 0 ? `rose <span class="up-t">${dp}%</span> to` : `fell ${-dp}% to`} ${money(s.med)} and supply ${dq === 0 ? 'was unchanged' : dq > 0 ? `grew ${dq}%` : `shrank ${-dq}%`} since ${day(s.prev.t)}.`));
+  const lines = [`<b>${fmt(listed)}</b> listed across ${fmt(latest.length)} market${latest.length === 1 ? '' : 's'}; cheapest ${money(cheapest.lo)} on ${esc(label(cheapest))}. Seen in <b>${fmt(IT.scans)}</b> scan${IT.scans === 1 ? '' : 's'}, last <b>${day(lastT)}</b>.`];
+  if (moved.length) {
+    const up = moved.filter(m => m.dp > 0).length, dn = moved.filter(m => m.dp < 0).length;
+    const big = moved.reduce((a, m) => Math.abs(m.dp) > Math.abs(a.dp) ? m : a);
+    lines.push(`Median price up in ${up}, down in ${dn} of ${moved.length}` + (big.dp ? `; biggest move ${esc(label(big.s))}, ${big.dp > 0 ? `<span class="up-t">+${big.dp}%</span>` : `${big.dp}%`} to ${money(big.s.med)}.` : '.'));
+  }
   document.getElementById('itReport').innerHTML = `
-    <svg viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="it-c" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff6b0"/><stop offset=".55" stop-color="#e0a810"/><stop offset="1" stop-color="#6a4400"/></radialGradient></defs>
-      <rect x="8" y="6" width="40" height="52" rx="2" fill="#f8ecc8" stroke="#7a5a20" stroke-width="2"/>
-      <g stroke="#9c7c42" stroke-width="2"><line x1="14" y1="16" x2="42" y2="16"/><line x1="14" y1="24" x2="42" y2="24"/><line x1="14" y1="32" x2="36" y2="32"/><line x1="14" y1="40" x2="40" y2="40"/></g>
-      <circle cx="46" cy="46" r="13" fill="url(#it-c)" stroke="#5a3a00" stroke-width="1.5"/><text x="46" y="51" text-anchor="middle" font-family="Tahoma, Arial, sans-serif" font-weight="900" font-size="13" fill="#5a3a00">g</text></svg>
+    <img class="rpt-ico" src="/wow2008/report-help.png" alt="" width="32" height="32">
     <div><p>${lines.join(' ')}</p><p class="caveat">Asking prices on listed auctions. They don't show what actually sold.</p></div>`;
 
   const groups = {};
