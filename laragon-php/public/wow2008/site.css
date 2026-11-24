@@ -20,6 +20,9 @@
 .nav .nav-toggle:hover{filter:brightness(1.25)}
 .nav .nav-toggle:focus-visible{outline:2px solid #ffc51a;outline-offset:2px}
 .nav ul[hidden]{display:none!important}
+.nav-ad{padding:9px 0 0;overflow:hidden}
+.header-ad{position:absolute;left:190px;top:4px;z-index:3;width:600px;height:50px;line-height:0}
+@media (max-width:900px){.header-ad{display:none}}
 .lamp-badges{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 0 3px}
 .lamp-badges img{display:block;width:88px;height:31px;object-fit:contain}
 .map-tabs{display:flex;gap:5px;flex-wrap:wrap;margin:0 0 8px}

@@ -12,6 +12,7 @@ namespace Wow2008;
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <?= $head ?>
+<?= \ADSENSE_TAG ?>
 
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
 <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">

@@ -28,6 +28,18 @@ $requested = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 <?php endforeach; ?>
     </ul>
 <?php if ($key === 'retail'): ?>
+    <div class="nav-ad">
+      <!-- sidebar -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-4396914692724371"
+           data-ad-slot="6209088536"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
     <div class="lamp-badges<?= $source === 'retail' ? ' is-retail' : '' ?>" aria-label="Retro web badges">
       <img src="<?= e(asset('lamp-linux.png')) ?>" width="88" height="31" alt="GNU/Linux badge">
       <img src="<?= e(asset('lamp-apache.png')) ?>" width="88" height="31" alt="Apache badge">

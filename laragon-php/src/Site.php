@@ -55,10 +55,16 @@ function site_notice_html(): string {
 HTML;
 }
 
+// Google AdSense loader, in the head of every page (the 2008 layout adds it itself; with_analytics covers the rest).
+const ADSENSE_TAG = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4396914692724371" crossorigin="anonymous"></script>';
+
 function with_analytics(string $html): string {
   $at = stripos($html, '</head>');
-  if ($at === false || str_contains($html, 's.wowcensus.io/count.js') || str_contains($html, 's.wowcensus.io/script.js')) return $html;
-  return substr_replace($html, ANALYTICS_TAG, $at, 0);
+  if ($at === false) return $html;
+  $tags = '';
+  if (!str_contains($html, 's.wowcensus.io/count.js') && !str_contains($html, 's.wowcensus.io/script.js')) $tags .= ANALYTICS_TAG;
+  if (!str_contains($html, 'pagead/js/adsbygoogle.js')) $tags .= ADSENSE_TAG;
+  return $tags === '' ? $html : substr_replace($html, $tags, $at, 0);
 }
 
 // Public names of the skins.

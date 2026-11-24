@@ -11,6 +11,16 @@ namespace Wow2008;
     <a class="logo" href="<?= e(url()) ?>" aria-label="WoWCensus home">
       <img src="<?= e(asset('logo-wowcensus.png')) ?>" alt="" width="480" height="191">
     </a>
+    <div class="header-ad">
+      <!-- top -->
+      <ins class="adsbygoogle"
+           style="display:inline-block;width:600px;height:50px"
+           data-ad-client="ca-pub-4396914692724371"
+           data-ad-slot="6240878127"></ins>
+      <script>
+        if (matchMedia('(min-width:901px)').matches) (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </div>
     <form class="search" action="/" onsubmit="if(this.edition.value)location.href=this.edition.value;return false">
       <label class="w8-pick" for="w8-edition">Edition</label>
       <select id="w8-edition" name="edition" aria-label="Edition">
