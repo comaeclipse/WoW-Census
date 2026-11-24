@@ -10,7 +10,7 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '71';
+const ASSET_VERSION = '72';
 const DISCORD_URL = 'https://discord.gg/kSUGgYDd8V';
 
 // Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
