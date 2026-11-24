@@ -76,6 +76,8 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     .it-legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 2px 2px;font:10px Tahoma,Arial,sans-serif;color:#d8c8a8}
     .it-legend i{display:inline-block;width:14px;height:3px;margin-right:5px;vertical-align:3px}
     .it-legend .lo{display:inline-block;width:14px;border-top:2px dashed #b8a888;margin-right:5px;vertical-align:3px}
+    .it-pick{display:flex;align-items:center;gap:6px;font:700 10px Tahoma,Arial,sans-serif;color:#6a4a20}
+    .it-pick select{height:20px;padding:0 2px;font:12px Arial,sans-serif;color:#ffac04;background:#040d1a;border:1px solid #7f7f7f}
     .it-charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .it-one{padding:14px;color:#c8b898;font-size:11px;text-align:center}
     .report .money,.tiles .money{color:#3a1a00;text-shadow:none}
@@ -335,7 +337,7 @@ $nameColor = $item['quality'] !== null ? ($QCOL[$item['quality']] ?? '#ffffff') 
     </section>
 
     <section class="section">
-      <div class="post-hd"><span class="ico"></span><h2>Price &amp; Supply History</h2><div class="sub">one line per region, ruleset and faction · one point per scanned day</div></div>
+      <div class="post-hd"><span class="ico"></span><h2>Price &amp; Supply History</h2><label class="sub it-pick">Market <select id="itPick"><option value="">All regions &amp; rulesets</option></select></label></div>
       <div class="section-bd">
         <div class="it-charts">
           <div class="it-chart" id="itPrice"></div>
@@ -513,32 +515,46 @@ const used = {};
 Object.values(series).forEach(sr => { const i = used[sr.fac] = (used[sr.fac] ?? -1) + 1; sr.color = PAL[sr.fac][i % 3]; });
 const latest = Object.values(series).map(sr => ({ ...sr.pts[sr.pts.length - 1], prev: sr.pts.length > 1 ? sr.pts[sr.pts.length - 2] : null, color: sr.color }));
 
+// Region + ruleset ("US PvE") without the faction; the chart dropdown filters on it.
+const groupOf = k => k.split('|')[0];
+const groupLabel = k => IT.markets[k][0].replace(/ · (Alliance|Horde)$/, '');
+let pick = '';
+
 function chart(el, title, field, fmtAxis, fmtTip, withLow) {
   const W = 440, H = 210, L = 54, R = 10, T = 22, B = 26;
-  const ts = SC.map(s => s.t), t0 = Math.min(...ts), t1 = Math.max(...ts);
-  const vals = SC.flatMap(s => withLow ? [s[field], s.lo] : [s[field]]);
+  const pts = SC.filter(s => !pick || groupOf(s.k) === pick);
+  const srs = Object.values(series).filter(sr => !pick || groupOf(sr.k) === pick);
+  const ts = pts.map(s => s.t), t0 = Math.min(...ts), t1 = Math.max(...ts);
+  const vals = pts.flatMap(s => withLow ? [s[field], s.lo] : [s[field]]);
   let v1 = Math.max(...vals) * 1.1 || 1, v0 = 0;
   const x = t => t1 === t0 ? L + (W - L - R) / 2 : L + (t - t0) / (t1 - t0) * (W - L - R);
   const y = v => T + (1 - (v - v0) / (v1 - v0)) * (H - T - B);
   let g = `<text class="ttl" x="${L}" y="13">${title}</text>`;
   for (let i = 0; i <= 4; i++) { const v = v0 + (v1 - v0) * i / 4, yy = y(v);
     g += `<line class="grid" x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}"/><text x="${L - 6}" y="${yy + 3}" text-anchor="end">${fmtAxis(v)}</text>`; }
-  const days = [...new Set(SC.map(s => day(s.t)))];
+  const days = [...new Set(pts.map(s => day(s.t)))];
   const tickDays = days.length <= 6 ? days : days.filter((_, i) => i % Math.ceil(days.length / 6) === 0);
   tickDays.forEach(d => { const t = Date.parse(d + 'T12:00:00Z') / 1000; const xx = t1 === t0 ? x(t0) : Math.min(Math.max(x(t), L), W - R);
     const anchor = xx > W - R - 16 ? 'end' : xx < L + 16 ? 'start' : 'middle';
     g += `<text x="${xx}" y="${H - 8}" text-anchor="${anchor}">${d.slice(5)}</text>`; });
-  Object.values(series).forEach(sr => {
+  srs.forEach(sr => {
     const p = sr.pts;
     if (withLow && p.length > 1) g += `<polyline fill="none" stroke="${sr.color}" stroke-width="1.5" stroke-dasharray="4 3" opacity=".55" points="${p.map(s => `${x(s.t)},${y(s.lo)}`).join(' ')}"/>`;
     if (p.length > 1) g += `<polyline fill="none" stroke="${sr.color}" stroke-width="2.5" points="${p.map(s => `${x(s.t)},${y(s[field])}`).join(' ')}"/>`;
     p.forEach(s => g += `<circle cx="${x(s.t)}" cy="${y(s[field])}" r="4.5" fill="${sr.color}" stroke="#000" stroke-width="1.5" style="cursor:pointer"
       data-tip="${esc(label(s))}|${day(s.t)}|${fmtTip(s)}"/>`);
   });
-  const legend = Object.values(series).map(sr => `<span><i style="background:${sr.color}"></i>${esc(label(sr))}</span>`).join('') +
+  const legend = srs.map(sr => `<span><i style="background:${sr.color}"></i>${esc(label(sr))}</span>`).join('') +
     (withLow ? '<span><span class="lo"></span>lowest listing</span>' : '');
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">${g}</svg><div class="it-legend">${legend}</div>` +
-    (Object.values(series).every(sr => sr.pts.length < 2) ? '<div class="it-one">One day of scans so far — the lines appear once this item is seen on another day.</div>' : '');
+    (srs.every(sr => sr.pts.length < 2) ? '<div class="it-one">One day of scans so far — the lines appear once this item is seen on another day.</div>' : '');
+}
+
+function charts() {
+  chart(document.getElementById('itPrice'), 'Median unit price', 'med', v => coins(Math.round(v)),
+    s => `Median ${coins(s.med)}|Lowest ${coins(s.lo)}|${fmt(s.qty)} listed`, true);
+  chart(document.getElementById('itQty'), 'Units listed', 'qty', v => v >= 1e3 ? (v / 1e3).toFixed(v >= 1e4 ? 0 : 1) + 'k' : fmt(Math.round(v)),
+    s => `${fmt(s.qty)} listed|Median ${coins(s.med)}`, false);
 }
 
 function render() {
@@ -563,10 +579,13 @@ function render() {
       <circle cx="46" cy="46" r="13" fill="url(#it-c)" stroke="#5a3a00" stroke-width="1.5"/><text x="46" y="51" text-anchor="middle" font-family="Tahoma, Arial, sans-serif" font-weight="900" font-size="13" fill="#5a3a00">g</text></svg>
     <div><p>${lines.join(' ')}</p><p class="caveat">Asking prices on listed auctions. They don't show what actually sold.</p></div>`;
 
-  chart(document.getElementById('itPrice'), 'Median unit price', 'med', v => coins(Math.round(v)),
-    s => `Median ${coins(s.med)}|Lowest ${coins(s.lo)}|${fmt(s.qty)} listed`, true);
-  chart(document.getElementById('itQty'), 'Units listed', 'qty', v => v >= 1e3 ? (v / 1e3).toFixed(v >= 1e4 ? 0 : 1) + 'k' : fmt(Math.round(v)),
-    s => `${fmt(s.qty)} listed|Median ${coins(s.med)}`, false);
+  const groups = {};
+  Object.keys(series).forEach(k => groups[groupOf(k)] ||= groupLabel(k));
+  const sel = document.getElementById('itPick');
+  Object.entries(groups).sort((a, b) => a[1].localeCompare(b[1])).forEach(([g, l]) => sel.add(new Option(l, g)));
+  if (Object.keys(groups).length < 2) sel.closest('label').style.display = 'none';
+  sel.onchange = () => { pick = sel.value; charts(); };
+  charts();
 
   const tbl = (title, sub, head, rows) => `<div class="ahwin"><div class="wt">${title}<small>${sub}</small></div>
     <table class="ahtable"><thead><tr>${head.map(([h, n]) => `<th class="${n ? 'num' : ''}">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
