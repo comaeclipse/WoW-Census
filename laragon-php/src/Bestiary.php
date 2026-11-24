@@ -133,6 +133,13 @@ function forever_spell_path(int $id): string {
 }
 
 function bestiary_spell_icon(int $id): string {
+  return '<img class="bx-spell-icon" src="' . esc(forever_dungeon_icon(bestiary_spell_icon_name($id), 'large')) .
+    '" width="20" height="20" alt="" loading="lazy">';
+}
+
+/** A combat-log spell's icon name; melee swings (spell 0) get the melee icon. */
+function bestiary_spell_icon_name(int $id): ?string {
+  if ($id === 0) return 'ability_meleedamage';
   // Icon names from the Forever spell catalog, keyed by the combat log's spell ID.
   static $icons = [
     75 => 'ability_whirlwind',
@@ -199,8 +206,7 @@ function bestiary_spell_icon(int $id): string {
       foreach (Db::all("SELECT spell_id, icon FROM combatlog_spell_icons WHERE source_game = ? AND icon IS NOT NULL", [DUNGEON_SOURCE]) as $r)
         $looked[$r['spell_id']] = $r['icon'];
   }
-  return '<img class="bx-spell-icon" src="' . esc(forever_dungeon_icon($looked[$id] ?? $icons[$id] ?? null, 'large')) .
-    '" width="20" height="20" alt="" loading="lazy">';
+  return $looked[$id] ?? $icons[$id] ?? null;
 }
 
 function bestiary_spell_link(int $id, string $name): string {

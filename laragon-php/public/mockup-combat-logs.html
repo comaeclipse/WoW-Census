@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="wow2008">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[MOCKUP] WoW: Forever Combat Logs – WoWCensus</title>
+<meta name="description" content="Paladin talents in WoW: Forever from sampled in-game inspections and last-logout Armory profiles, ranked by how often each build appears.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WoWCensus">
+<meta property="og:title" content="WoW: Forever Paladin Talents – WoWCensus">
+<meta property="og:url" content="https://wowcensus.io/forever/paladin/">
+<link rel="canonical" href="https://wowcensus.io/forever/paladin/">
+<link rel="alternate" type="text/markdown" href="/forever/paladin/index.md">
+
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48 96x96">
+<link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/wow2008/style.css?v=69">
+<link rel="stylesheet" href="/wow2008/site.css?v=69">
+<style>
+.cbtn.cl-empty{opacity:.45}
+.cl-split{display:flex;height:22px;border:2px solid #000;outline:1px solid #8a7040;border-radius:3px;overflow:hidden;background:#1a160c}
+.cl-split i{display:flex;align-items:center;justify-content:center;font:700 10px Tahoma,Arial,sans-serif;font-style:normal;color:#fff;text-shadow:0 1px 1px #000;white-space:nowrap;overflow:hidden;transition:flex-grow .8s ease;flex-basis:0}
+.cl-legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:11px}
+.cl-legend i{display:inline-block;width:10px;height:10px;margin-right:5px;border:1px solid #000;vertical-align:-1px}
+.cl-levels{display:flex;align-items:flex-end;gap:3px;height:70px;margin-top:12px;padding:6px 6px 0;border:2px solid #000;outline:1px solid #8a7040;border-radius:4px;background:linear-gradient(#1c1810,#0e0c08)}
+.cl-levels div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;cursor:default}
+.cl-levels i{display:block;background:linear-gradient(#ffd75a,#b07a00);border:1px solid #000;border-bottom:0;transition:height .8s ease;min-height:2px}
+.cl-levels span{font:9px Verdana;color:#d8b8a0;text-align:center;padding:2px 0}
+.cl-cap{font-size:10px;opacity:.75;margin:5px 2px 0}
+.cl-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:0 0 10px}
+.cl-mode{display:flex;gap:6px}
+.cl-mode .pill{font:700 11px Tahoma,Arial,sans-serif;padding:3px 12px;border:1px solid #6a5022;border-radius:12px;background:linear-gradient(#f4e4b0,#d8bc78);color:#3a1a00;cursor:pointer}
+.cl-mode .pill.on{background:linear-gradient(#5a1a10,#2a0806);color:#ffd75a;border-color:#000}
+#clq{font:11px Verdana;padding:3px 6px;width:170px}
+.cl-sp{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
+.cl-sp img{width:18px;height:18px;border:1px solid #000;border-radius:2px;flex:none}
+.ahtable .cl-dim,.cl-dim{color:#a89878;opacity:.85}
+.cl-bar{display:inline-block;width:80px;height:8px;margin-right:6px;vertical-align:middle;background:#2a2418;border:1px solid #000;border-radius:2px;overflow:hidden}
+.cl-bar i{display:block;height:100%;background:#b07a00;transition:width .8s ease}
+.cl-ab td{white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- ======= Backdrop scenery (original abstract artwork) ======= -->
+<div class="backdrop" aria-hidden="true">
+  <!-- Left: fel-fire / golden arcane storm -->
+  <svg class="left" width="900" viewBox="0 0 900 1300" preserveAspectRatio="xMaxYMin slice">
+    <defs>
+      <radialGradient id="lg1" cx="85%" cy="18%" r="70%">
+        <stop offset="0" stop-color="#d7ff6a"/>
+        <stop offset=".12" stop-color="#5fd400"/>
+        <stop offset=".35" stop-color="#1c4a06"/>
+        <stop offset=".7" stop-color="#071204"/>
+        <stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <radialGradient id="lg2" cx="70%" cy="22%" r="30%">
+        <stop offset="0" stop-color="#fff6c0" stop-opacity=".95"/>
+        <stop offset=".3" stop-color="#ffb000" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#ff6a00" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="fade" x1="0" x2="0" y1="0" y2="1">
+        <stop offset=".55" stop-color="#000" stop-opacity="0"/>
+        <stop offset="1" stop-color="#000"/>
+      </linearGradient>
+      <filter id="blur6"><feGaussianBlur stdDeviation="6"/></filter>
+      <filter id="blur2"><feGaussianBlur stdDeviation="2"/></filter>
+      <filter id="turb">
+        <feTurbulence type="fractalNoise" baseFrequency=".012 .03" numOctaves="4" seed="7"/>
+        <feColorMatrix values="0 0 0 0 .3  0 0 0 0 .9  0 0 0 0 .1  0 0 0 .9 -.35"/>
+      </filter>
+    </defs>
+    <rect width="900" height="1300" fill="url(#lg1)"/>
+    <rect width="900" height="900" filter="url(#turb)" opacity=".6"/>
+    <!-- swirling energy arcs -->
+    <g fill="none" stroke-linecap="round">
+      <path d="M900 150 C 700 120, 560 260, 640 380 S 860 470, 760 600" stroke="#ffcf3a" stroke-width="14" opacity=".35" filter="url(#blur6)"/>
+      <path d="M900 150 C 700 120, 560 260, 640 380 S 860 470, 760 600" stroke="#fff3b0" stroke-width="2.5" opacity=".9" filter="url(#blur2)"/>
+      <path d="M880 260 C 650 260, 520 420, 690 520 S 900 640, 820 820" stroke="#9cff3a" stroke-width="10" opacity=".35" filter="url(#blur6)"/>
+      <path d="M880 260 C 650 260, 520 420, 690 520 S 900 640, 820 820" stroke="#e5ffb0" stroke-width="2" opacity=".85"/>
+      <path d="M760 90 C 600 200, 700 300, 560 420" stroke="#ffd75a" stroke-width="1.5" opacity=".7"/>
+    </g>
+    <circle cx="720" cy="240" r="210" fill="url(#lg2)"/>
+    <!-- floating sparks -->
+    <g fill="#fff6c0">
+      <circle cx="640" cy="180" r="2.5"/><circle cx="700" cy="330" r="1.8"/><circle cx="790" cy="420" r="2.2"/>
+      <circle cx="610" cy="470" r="1.5"/><circle cx="830" cy="210" r="1.6"/><circle cx="560" cy="300" r="1.2"/>
+      <circle cx="745" cy="560" r="2"/><circle cx="680" cy="640" r="1.4"/>
+    </g>
+    <!-- silhouetted crags -->
+    <path d="M0 980 L120 860 L180 900 L260 790 L330 860 L420 760 L520 870 L600 820 L700 900 L780 850 L900 910 L900 1300 L0 1300Z" fill="#040703"/>
+    <path d="M300 1040 L420 930 L470 960 L560 880 L640 950 L740 900 L900 980 L900 1300 L300 1300Z" fill="#020302"/>
+    <rect width="900" height="1300" fill="url(#fade)"/>
+  </svg>
+
+  <!-- Right: twisting nether / violet storm with floating crystals -->
+  <svg class="right" width="900" viewBox="0 0 900 1300" preserveAspectRatio="xMinYMin slice">
+    <defs>
+      <radialGradient id="rg1" cx="20%" cy="20%" r="75%">
+        <stop offset="0" stop-color="#ffb3ff"/>
+        <stop offset=".1" stop-color="#c54bff"/>
+        <stop offset=".35" stop-color="#4a0a7a"/>
+        <stop offset=".7" stop-color="#10021c"/>
+        <stop offset="1" stop-color="#000"/>
+      </radialGradient>
+      <linearGradient id="crys" x1="0" x2="1">
+        <stop offset="0" stop-color="#2a0a40"/>
+        <stop offset=".5" stop-color="#e6a6ff"/>
+        <stop offset="1" stop-color="#3a0a5a"/>
+      </linearGradient>
+      <filter id="turb2">
+        <feTurbulence type="fractalNoise" baseFrequency=".008 .02" numOctaves="4" seed="3"/>
+        <feColorMatrix values="0 0 0 0 .8  0 0 0 0 .3  0 0 0 0 1  0 0 0 1 -.4"/>
+      </filter>
+      <filter id="glow"><feGaussianBlur stdDeviation="5"/></filter>
+    </defs>
+    <rect width="900" height="1300" fill="url(#rg1)"/>
+    <rect width="900" height="900" filter="url(#turb2)" opacity=".55"/>
+    <!-- lightning -->
+    <g fill="none" stroke="#f6d8ff" stroke-linejoin="round">
+      <path d="M40 0 L90 120 L60 140 L130 280 L110 300 L170 420" stroke-width="2.5"/>
+      <path d="M40 0 L90 120 L60 140 L130 280 L110 300 L170 420" stroke-width="12" opacity=".35" filter="url(#glow)"/>
+      <path d="M130 280 L200 320 L230 300" stroke-width="1.2" opacity=".8"/>
+    </g>
+    <!-- floating crystal spire -->
+    <g transform="translate(220 330)">
+      <ellipse cx="0" cy="40" rx="70" ry="16" fill="#d07aff" opacity=".35" filter="url(#glow)"/>
+      <path d="M0 -160 L26 -20 L0 70 L-26 -20Z" fill="url(#crys)"/>
+      <path d="M0 -160 L0 70" stroke="#fff" stroke-width=".8" opacity=".6"/>
+      <circle cx="0" cy="-60" r="58" fill="none" stroke="#9a5aca" stroke-width="3" opacity=".7"/>
+      <circle cx="0" cy="-60" r="70" fill="none" stroke="#6a2a9a" stroke-width="1.5" opacity=".6" stroke-dasharray="6 6"/>
+    </g>
+    <!-- floating rocks -->
+    <g fill="#120420">
+      <path d="M60 640 l60 -30 l80 10 l30 30 l-60 40 l-80 -10Z"/>
+      <path d="M260 560 l40 -18 l50 8 l14 22 l-40 26 l-50 -8Z"/>
+      <path d="M380 700 l30 -12 l40 6 l10 16 l-30 18 l-40 -6Z"/>
+    </g>
+    <path d="M0 920 L90 860 L160 900 L260 830 L360 890 L470 840 L600 900 L720 860 L900 920 L900 1300 L0 1300Z" fill="#06010a"/>
+    <rect width="900" height="1300" fill="url(#fade)"/>
+  </svg>
+</div>
+<!-- ======= Top utility bar ======= -->
+<div class="topbar">
+  <div class="inner">
+    <a class="w8-fund" href="/donate.php" title="Monthly server upkeep: $0 of $20">
+      <span class="cap">Server fund</span>
+      <span class="w8-gbar empty" style="--p:0" role="progressbar" aria-label="Monthly server upkeep funded" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><span class="track"><span class="fill"></span></span></span>
+      <span class="amt">$0 / $20</span>
+    </a>
+    <a href="/">WoWCensus.io</a>
+    <a href="/forever/realms">Realms</a>
+    <a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Discord</a>
+  </div>
+</div>
+<!-- ======= Header band ======= -->
+<div class="header">
+  <div class="inner">
+    <a class="logo" href="/" aria-label="WoWCensus home">
+      <img src="/wow2008/logo-wowcensus.png?v=69" alt="" width="480" height="191">
+    </a>
+    <form class="search" action="/" onsubmit="if(this.edition.value)location.href=this.edition.value;return false">
+      <label class="w8-pick" for="w8-edition">Edition</label>
+      <select id="w8-edition" name="edition" aria-label="Edition">
+        <option value="/forever/" selected>Forever</option>
+        <option value="/forever-beta/">Forever (Beta)</option>
+        <option value="/tbc/">TBC Anniversary</option>
+        <option value="/classic/">Classic Era</option>
+        <option value="/sod/">SoD</option>
+        <option value="/hardcore/">Hardcore</option>
+        <option value="/mop/">MoP Classic</option>
+        <option value="/retail/">Retail</option>
+      </select>
+      <button class="btn-red" type="submit">Go</button>
+    </form>
+  </div>
+</div>
+<!-- ======= Page ======= -->
+<div class="page wide">
+
+  <nav class="nav">
+    <h3>Site <button class="nav-toggle" type="button" aria-label="Collapse Site" aria-controls="nav-site" aria-expanded="true"></button></h3>
+    <ul class="cur" id="nav-site">
+      <li><a href="/">Home</a></li>
+      <li><a href="/blog.php">Blog</a></li>
+      <li><a href="/faq.php">FAQ</a></li>
+      <li><a href="/shoutbox/">Shoutbox</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+    <h3>Forever <button class="nav-toggle" type="button" aria-label="Collapse Forever" aria-controls="nav-forever" aria-expanded="true"></button></h3>
+    <ul id="nav-forever" class="cur">
+      <li><a href="/forever/">Census</a></li>
+      <li class="sub"><a href="/forever/combos">Race + Class</a></li>
+      <li><a href="/forever/realms">Realms</a></li>
+      <li><a href="/forever/auctionhouse">Auction House</a></li>
+      <li class="sub"><a href="/forever/professions">Professions</a></li>
+      <li><a href="/forever/guilds">Guilds</a></li>
+      <li><a href="/forever/geography">Geography</a></li>
+      <li><a href="/forever/talents">Talents</a></li>
+      <li class="sub"><a href="/forever/human/">Races</a></li>
+      <li class="sub"><a href="/forever/paladin/">Classes</a></li>
+      <li><a href="/forever/gear">Gear</a></li>
+      <li><a href="/forever/dungeons/">Dungeons</a></li>
+      <li><a href="/forever/npc/">Bestiary</a></li>
+      <li><a href="/mockup-combat-logs.html" style="color:#fff" aria-current="page">» Combat Logs</a></li>
+      <li><a href="/forever/skin-colors/">Skin Colors</a></li>
+    </ul>
+
+    <h3>TBC Anniversary <button class="nav-toggle" type="button" aria-label="Expand TBC Anniversary" aria-controls="nav-classic-progression" aria-expanded="false"></button></h3>
+    <ul id="nav-classic-progression" hidden>
+      <li><a href="/tbc/">Census</a></li>
+      <li class="sub"><a href="/tbc/combos">Race + Class</a></li>
+      <li><a href="/tbc/realms">Realms</a></li>
+      <li><a href="/tbc/auctionhouse">Auction House</a></li>
+      <li class="sub"><a href="/tbc/professions">Professions</a></li>
+      <li><a href="/tbc/guilds">Guilds</a></li>
+      <li><a href="/tbc/geography">Geography</a></li>
+      <li><a href="/tbc/talents">Talents</a></li>
+      <li class="sub"><a href="/tbc/human/">Races</a></li>
+      <li class="sub"><a href="/tbc/paladin/">Classes</a></li>
+      <li><a href="/tbc/gear">Gear</a></li>
+    </ul>
+
+    <h3>Classic Era <button class="nav-toggle" type="button" aria-label="Expand Classic Era" aria-controls="nav-classic" aria-expanded="false"></button></h3>
+    <ul id="nav-classic" hidden>
+      <li><a href="/classic/">Census</a></li>
+      <li class="sub"><a href="/classic/combos">Race + Class</a></li>
+      <li><a href="/classic/realms">Realms</a></li>
+      <li><a href="/classic/auctionhouse">Auction House</a></li>
+      <li class="sub"><a href="/classic/professions">Professions</a></li>
+      <li><a href="/classic/guilds">Guilds</a></li>
+      <li><a href="/classic/geography">Geography</a></li>
+      <li><a href="/classic/talents">Talents</a></li>
+      <li class="sub"><a href="/classic/human/">Races</a></li>
+      <li class="sub"><a href="/classic/paladin/">Classes</a></li>
+      <li><a href="/classic/gear">Gear</a></li>
+    </ul>
+
+    <h3>SoD <button class="nav-toggle" type="button" aria-label="Expand SoD" aria-controls="nav-sod" aria-expanded="false"></button></h3>
+    <ul id="nav-sod" hidden>
+      <li><a href="/sod/">Census</a></li>
+      <li class="sub"><a href="/sod/combos">Race + Class</a></li>
+      <li><a href="/sod/realms">Realms</a></li>
+      <li><a href="/sod/auctionhouse">Auction House</a></li>
+      <li class="sub"><a href="/sod/professions">Professions</a></li>
+      <li><a href="/sod/guilds">Guilds</a></li>
+      <li><a href="/sod/geography">Geography</a></li>
+      <li><a href="/sod/talents">Talents</a></li>
+      <li class="sub"><a href="/sod/human/">Races</a></li>
+      <li class="sub"><a href="/sod/paladin/">Classes</a></li>
+      <li><a href="/sod/gear">Gear</a></li>
+    </ul>
+
+    <h3>Hardcore <button class="nav-toggle" type="button" aria-label="Expand Hardcore" aria-controls="nav-hardcore" aria-expanded="false"></button></h3>
+    <ul id="nav-hardcore" hidden>
+      <li><a href="/hardcore/">Census</a></li>
+      <li class="sub"><a href="/hardcore/combos">Race + Class</a></li>
+      <li><a href="/hardcore/realms">Realms</a></li>
+      <li><a href="/hardcore/auctionhouse">Auction House</a></li>
+      <li class="sub"><a href="/hardcore/professions">Professions</a></li>
+      <li><a href="/hardcore/guilds">Guilds</a></li>
+      <li><a href="/hardcore/geography">Geography</a></li>
+      <li><a href="/hardcore/talents">Talents</a></li>
+      <li class="sub"><a href="/hardcore/human/">Races</a></li>
+      <li class="sub"><a href="/hardcore/paladin/">Classes</a></li>
+      <li><a href="/hardcore/gear">Gear</a></li>
+    </ul>
+
+    <h3>MoP Classic <button class="nav-toggle" type="button" aria-label="Expand MoP Classic" aria-controls="nav-mop-classic" aria-expanded="false"></button></h3>
+    <ul id="nav-mop-classic" hidden>
+      <li><a href="/mop/">Census</a></li>
+      <li class="sub"><a href="/mop/combos">Race + Class</a></li>
+      <li><a href="/mop/realms">Realms</a></li>
+      <li><a href="/mop/auctionhouse">Auction House</a></li>
+      <li class="sub"><a href="/mop/professions">Professions</a></li>
+      <li><a href="/mop/guilds">Guilds</a></li>
+      <li><a href="/mop/geography">Geography</a></li>
+      <li><a href="/mop/talents">Talents</a></li>
+      <li class="sub"><a href="/mop/human/">Races</a></li>
+      <li class="sub"><a href="/mop/paladin/">Classes</a></li>
+      <li><a href="/mop/gear">Gear</a></li>
+    </ul>
+
+    <h3>Retail <button class="nav-toggle" type="button" aria-label="Expand Retail" aria-controls="nav-retail" aria-expanded="false"></button></h3>
+    <ul id="nav-retail" hidden>
+      <li><a href="/retail/">Census</a></li>
+      <li class="sub"><a href="/retail/combos">Race + Class</a></li>
+      <li><a href="/retail/realms">Realms</a></li>
+      <li><a href="/retail/auctionhouse">Auction House</a></li>
+      <li class="sub"><a href="/retail/professions">Professions</a></li>
+      <li><a href="/retail/guilds">Guilds</a></li>
+      <li><a href="/retail/geography">Geography</a></li>
+      <li><a href="/retail/talents">Talents</a></li>
+      <li class="sub"><a href="/retail/human/">Races</a></li>
+      <li class="sub"><a href="/retail/paladin/">Classes</a></li>
+      <li><a href="/retail/gear">Gear</a></li>
+      <li><a href="/retail/skin-colors/">Skin Colors</a></li>
+    </ul>
+    <div class="lamp-badges" aria-label="Retro web badges">
+      <img src="/wow2008/lamp-linux.png?v=69" width="88" height="31" alt="GNU/Linux badge">
+      <img src="/wow2008/lamp-apache.png?v=69" width="88" height="31" alt="Apache badge">
+      <img src="/wow2008/lamp-mysql.png?v=69" width="88" height="31" alt="MySQL badge">
+      <img src="/wow2008/lamp-php.png?v=69" width="88" height="31" alt="PHP badge">
+      <img src="/wow2008/badge-amd-k6.png?v=69" width="88" height="31" alt="AMD K6 Upgrade Now badge">
+      <img src="/wow2008/badge-take-back-the-web.png?v=69" width="88" height="31" alt="Take back the web badge">
+    </div>
+
+  </nav>
+
+  <main class="main">
+    <div class="crumb"><a href="/">Home</a> » <a href="/forever/">Forever</a> » <a href="/forever/combat-logs/">Combat Logs</a> » <span id="crumbCls">All classes</span></div>
+    <div class="classbar" id="clbar"></div>
+
+    <div class="race-hero class-hero" id="clhero"></div>
+
+    <div class="w8-notice" role="note"><span class="ico" aria-hidden="true">!</span><div>
+      <b class="t">This data may be incomplete</b>
+      <p>Everything below comes from the combat logs players have uploaded so far, so it covers only the zones, levels and classes those players happened to fight in. <a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Join our Discord</a> to learn how you can contribute your logs and make it more accurate!</p>
+    </div></div>
+
+    <div class="tiles5" id="cltiles"></div>
+
+    <div class="cols2" style="margin-bottom:16px;align-items:start">
+      <section class="section" style="margin:0">
+        <div class="post-hd"><span class="ico g"></span><h2 id="boardTitle">Damage by Class</h2><div class="sub" id="boardSub"></div></div>
+        <div class="section-bd"><div class="panel"><ol class="board" id="clboard"></ol></div></div>
+      </section>
+      <div>
+        <section class="section" style="margin:0 0 14px">
+          <div class="post-hd"><span class="ico p"></span><h2>Combat Type</h2><div class="sub" id="modeSub"></div></div>
+          <div class="section-bd">
+            <div class="cl-split" id="clsplit"></div>
+            <div class="cl-legend" id="cllegend"></div>
+          </div>
+        </section>
+        <section class="section" style="margin:0">
+          <div class="post-hd"><span class="ico r"></span><h2>Where It Was Logged</h2><div class="sub">mobs seen per zone</div></div>
+          <div class="section-bd"><div class="ahwin"><div class="wt">Zones<small>sightings</small></div><table class="ahtable"><thead><tr><th>Zone</th><th class="num">Mobs</th><th class="num">Sightings</th><th style="width:38%">Share</th></tr></thead><tbody id="clzones"></tbody></table></div>
+            <div class="cl-levels" id="cllevels"></div>
+            <div class="cl-cap">Mob levels measured (distinct mobs per level)</div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="section" id="abilities">
+      <div class="post-hd"><span class="ico p"></span><h2 id="abTitle">Class Abilities</h2><div class="sub">every hit, tick and heal in the logs</div></div>
+      <div class="section-bd">
+        <div class="cl-tools"><span class="cl-mode" id="clmode"></span><input type="search" id="clq" placeholder="Find an ability…" aria-label="Find an ability"></div>
+        <div class="ahwin"><div class="wt" id="abWt">Abilities<small></small></div>
+          <div style="overflow-x:auto"><table class="ahtable cl-ab"><thead><tr><th>Ability</th><th id="abClsTh">Class</th><th class="num">Average</th><th class="num">Range</th><th class="num">Hits</th><th class="num">Crit</th><th class="num">Total</th><th style="width:150px">Share</th></tr></thead><tbody id="clab"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="cols2" style="margin-bottom:16px;align-items:start">
+      <section class="section" style="margin:0">
+        <div class="post-hd"><span class="ico r"></span><h2>Most Killed</h2><div class="sub">deaths in the logs</div></div>
+        <div class="section-bd"><div class="ahwin"><div class="wt">Bestiary<small>top 10</small></div><table class="ahtable"><thead><tr><th>#</th><th>Mob</th><th class="num">Level</th><th class="num">Kills</th></tr></thead><tbody id="clkills"></tbody></table></div></div>
+      </section>
+      <section class="section" style="margin:0">
+        <div class="post-hd"><span class="ico r"></span><h2>Hardest Hitters</h2><div class="sub">biggest single hit on a player</div></div>
+        <div class="section-bd"><div class="ahwin"><div class="wt">Mob Abilities<small>top 10</small></div><table class="ahtable"><thead><tr><th>Ability</th><th>Mob</th><th class="num">Hits</th><th class="num">Biggest</th></tr></thead><tbody id="clhits"></tbody></table></div></div>
+      </section>
+    </div>
+
+    <section class="section">
+      <div class="post-hd"><span class="ico g"></span><h2>Uploaded Logs</h2><div class="sub">uploaders are never stored or shown</div></div>
+      <div class="section-bd"><div class="ahwin"><div class="wt">Combat Log Archive<small id="filesSub"></small></div><table class="ahtable"><thead><tr><th>Log</th><th>Recorded</th><th class="num">Length</th><th class="num">Events</th><th class="num">Mobs</th></tr></thead><tbody id="clfiles"></tbody></table></div>
+        <p class="cl-cap" style="margin-top:8px">Upload your own <b>WoWCombatLog.txt</b> with the WoWCensus Companion. Player names are stripped on import; only class, level and spell totals are kept.</p>
+      </div>
+    </section>
+  </main>
+
+      </main>
+
+
+<footer class="footer">
+  <div style="flex:1">
+    <div class="links"><a href="/">WoWCensus</a><a href="/realms">Realms</a><a href="/faq.php">FAQ</a><a href="https://discord.gg/kSUGgYDd8V" target="_blank" rel="noopener">Discord</a><span style="color:#8a7a5a">Page generated in 9.7669 seconds</span></div>
+    <p>WoWCensus samples characters seen in-game; counts describe observed characters, not unique players or a live online population. Not affiliated with or endorsed by Blizzard Entertainment.</p>
+  </div>
+</footer>
+<img class="page-statue" src="/wow2008/page-statue.webp?v=69" width="219" height="401" alt="" aria-hidden="true">
+</div>
+
+<div id="tip"></div>
+
+<script src="/wow2008/common.js?v=69"></script>
+<script src="/wow2008/site.js?v=69"></script>
+<script>
+const D = {"files":[{"first":"2026-11-21T10:39:38.036-06:00","last":"2026-11-21T16:12:06.187-06:00","events":20400,"npcs":47},{"first":"2026-11-21T19:56:40.192-06:00","last":"2026-11-21T20:46:05.023-06:00","events":13208,"npcs":44}],"totals":{"npcs":76,"kills":426,"npcSpells":29,"classSpells":84,"mobDamage":45045},"spells":[{"c":"PALADIN","m":"PvE","id":0,"n":"Melee","ev":841,"amt":36740,"cr":57,"lo":1,"hi":274,"ic":null},{"c":"WARRIOR","m":"PvE","id":0,"n":"Melee","ev":857,"amt":28848,"cr":57,"lo":1,"hi":164,"ic":null},{"c":"ROGUE","m":"PvE","id":0,"n":"Melee","ev":609,"amt":9948,"cr":94,"lo":1,"hi":48,"ic":null},{"c":"HUNTER","m":"PvE","id":75,"n":"Auto Shot","ev":169,"amt":7602,"cr":14,"lo":21,"hi":109,"ic":"ability_whirlwind"},{"c":"HUNTER","m":"PvE","id":0,"n":"Melee","ev":165,"amt":5592,"cr":4,"lo":4,"hi":71,"ic":null},{"c":"HUNTER","m":"PvE","id":14281,"n":"Arcane Shot","ev":71,"amt":4949,"cr":10,"lo":54,"hi":128,"ic":"ability_impalingbolt"},{"c":"PRIEST","m":"PvE","id":5019,"n":"Shoot","ev":235,"amt":4855,"cr":12,"lo":5,"hi":38,"ic":"ability_shootwand"},{"c":"WARRIOR","m":"PvE","id":284,"n":"Heroic Strike","ev":83,"amt":4240,"cr":7,"lo":37,"hi":129,"ic":"ability_rogue_ambush"},{"c":"PRIEST","m":"PvE","id":8092,"n":"Mind Blast","ev":88,"amt":3949,"cr":9,"lo":40,"hi":68,"ic":"spell_shadow_unholyfrenzy"},{"c":"PRIEST","m":"PvE","id":594,"n":"Shadow Word: Pain","ev":318,"amt":3713,"cr":14,"lo":10,"hi":21,"ic":"spell_shadow_shadowwordpain"},{"c":"DRUID","m":"PvE","id":5178,"n":"Wrath","ev":83,"amt":3487,"cr":2,"lo":32,"hi":63,"ic":"spell_nature_abolishmagic"},{"c":"MAGE","m":"PvE","id":7268,"n":"Arcane Missile","ev":101,"amt":2814,"cr":4,"lo":25,"hi":38,"ic":"spell_nature_starfall"},{"c":"MAGE","m":"PvE","id":145,"n":"Fireball","ev":102,"amt":2775,"cr":7,"lo":2,"hi":101,"ic":"spell_fire_flamebolt"},{"c":"PRIEST","m":"PvE","id":591,"n":"Smite","ev":82,"amt":2732,"cr":6,"lo":28,"hi":53,"ic":"spell_holy_holysmite"},{"c":"ROGUE","m":"PvE","id":1758,"n":"Sinister Strike","ev":80,"amt":2377,"cr":4,"lo":23,"hi":63,"ic":"spell_shadow_ritualofsacrifice"},{"c":"MAGE","m":"PvE","id":837,"n":"Frostbolt","ev":39,"amt":2219,"cr":3,"lo":53,"hi":85,"ic":"spell_frost_frostbolt02"},{"c":"WARRIOR","m":"PvE","id":6546,"n":"Rend","ev":185,"amt":2033,"cr":12,"lo":9,"hi":21,"ic":"ability_gouge"},{"c":"DRUID","m":"PvE","id":0,"n":"Melee","ev":53,"amt":1894,"cr":4,"lo":22,"hi":81,"ic":null},{"c":"DRUID","m":"PvE","id":8924,"n":"Moonfire","ev":123,"amt":1706,"cr":6,"lo":6,"hi":28,"ic":"spell_nature_starfall"},{"c":"MAGE","m":"PvE","id":2137,"n":"Fire Blast","ev":21,"amt":1355,"cr":0,"lo":59,"hi":71,"ic":"spell_fire_fireball"},{"c":"WARLOCK","m":"PvE","id":707,"n":"Immolate","ev":110,"amt":1284,"cr":9,"lo":6,"hi":35,"ic":"spell_fire_immolation"},{"c":"PALADIN","m":"PvE","id":1311650,"n":"Judgement of Fury","ev":31,"amt":1156,"cr":2,"lo":29,"hi":72,"ic":"spell_holy_retributionaura"},{"c":"PALADIN","m":"PvE","id":678,"n":"Holy Strike","ev":45,"amt":1060,"cr":3,"lo":13,"hi":58,"ic":"classicon_paladin"},{"c":"WARRIOR","m":"PvE","id":6343,"n":"Thunder Clap","ev":68,"amt":1034,"cr":0,"lo":11,"hi":17,"ic":"spell_nature_thunderclap"},{"c":"ROGUE","m":"PvE","id":6760,"n":"Eviscerate","ev":25,"amt":1020,"cr":2,"lo":15,"hi":120,"ic":"ability_rogue_eviscerate"},{"c":"PALADIN","m":"PvE","id":20280,"n":"Judgement of Righteousness","ev":24,"amt":987,"cr":4,"lo":29,"hi":67,"ic":"ability_thunderbolt"},{"c":"WARLOCK","m":"PvE","id":172,"n":"Corruption","ev":69,"amt":953,"cr":4,"lo":10,"hi":21,"ic":"spell_shadow_abominationexplosion"},{"c":"ROGUE","m":"PvE","id":1757,"n":"Sinister Strike","ev":36,"amt":934,"cr":2,"lo":18,"hi":53,"ic":"spell_shadow_ritualofsacrifice"},{"c":"PALADIN","m":"Healing","id":639,"n":"Holy Light","ev":10,"amt":890,"cr":0,"lo":82,"hi":95,"ic":"spell_holy_holybolt"},{"c":"PALADIN","m":"PvE","id":1280345,"n":"Consecration","ev":133,"amt":874,"cr":13,"lo":2,"hi":10,"ic":"spell_holy_innerfire"},{"c":"PALADIN","m":"PvE","id":1866,"n":"Holy Strike","ev":23,"amt":870,"cr":0,"lo":25,"hi":45,"ic":"classicon_paladin"},{"c":"PALADIN","m":"Healing","id":633,"n":"Lay on Hands","ev":1,"amt":752,"cr":0,"lo":752,"hi":752,"ic":"spell_holy_layonhands"},{"c":"PALADIN","m":"PvE","id":1311647,"n":"Seal of Fury","ev":93,"amt":712,"cr":12,"lo":6,"hi":20,"ic":"spell_holy_retributionaura"},{"c":"PALADIN","m":"PvE","id":25739,"n":"Seal of Righteousness","ev":36,"amt":704,"cr":4,"lo":17,"hi":36,"ic":"ability_thunderbolt"},{"c":"SHAMAN","m":"PvE","id":0,"n":"Melee","ev":18,"amt":702,"cr":3,"lo":17,"hi":152,"ic":null},{"c":"PRIEST","m":"Healing","id":2053,"n":"Lesser Heal","ev":4,"amt":678,"cr":0,"lo":159,"hi":180,"ic":"spell_holy_lesserheal"},{"c":"PRIEST","m":"PvE","id":0,"n":"Melee","ev":70,"amt":668,"cr":6,"lo":1,"hi":29,"ic":null},{"c":"WARLOCK","m":"PvE","id":980,"n":"Bane of Agony","ev":108,"amt":625,"cr":8,"lo":3,"hi":12,"ic":"spell_shadow_curseofsargeras"},{"c":"PALADIN","m":"Healing","id":647,"n":"Holy Light","ev":4,"amt":617,"cr":0,"lo":144,"hi":164,"ic":"spell_holy_holybolt"},{"c":"PALADIN","m":"PvE","id":25740,"n":"Seal of Righteousness","ev":72,"amt":582,"cr":2,"lo":6,"hi":21,"ic":"ability_thunderbolt"},{"c":"HUNTER","m":"PvE","id":2643,"n":"Multi-Shot","ev":6,"amt":543,"cr":2,"lo":65,"hi":134,"ic":"ability_upgrademoonglaive"},{"c":"HUNTER","m":"PvE","id":14260,"n":"Raptor Strike","ev":12,"amt":437,"cr":0,"lo":32,"hi":42,"ic":"ability_meleedamage"},{"c":"PRIEST","m":"Healing","id":139,"n":"Renew","ev":39,"amt":419,"cr":3,"lo":10,"hi":16,"ic":"spell_holy_renew"},{"c":"HUNTER","m":"PvE","id":14261,"n":"Raptor Strike","ev":4,"amt":397,"cr":1,"lo":59,"hi":172,"ic":"ability_meleedamage"},{"c":"DRUID","m":"PvE","id":5177,"n":"Wrath","ev":16,"amt":395,"cr":1,"lo":23,"hi":36,"ic":"spell_nature_abolishmagic"},{"c":"DRUID","m":"PvE","id":2912,"n":"Starfire","ev":3,"amt":381,"cr":0,"lo":123,"hi":132,"ic":"spell_arcane_starfire"},{"c":"MAGE","m":"PvE","id":143,"n":"Fireball","ev":20,"amt":356,"cr":1,"lo":1,"hi":58,"ic":"spell_fire_flamebolt"},{"c":"WARRIOR","m":"PvE","id":6572,"n":"Revenge","ev":4,"amt":336,"cr":0,"lo":80,"hi":89,"ic":"ability_warrior_revenge"},{"c":"MAGE","m":"PvE","id":2136,"n":"Fire Blast","ev":9,"amt":304,"cr":0,"lo":30,"hi":37,"ic":"spell_fire_fireball"},{"c":"WARLOCK","m":"PvE","id":705,"n":"Shadow Bolt","ev":6,"amt":294,"cr":1,"lo":40,"hi":60,"ic":"spell_shadow_shadowbolt"},{"c":"MAGE","m":"PvE","id":7322,"n":"Frostbolt","ev":2,"amt":282,"cr":0,"lo":139,"hi":143,"ic":"spell_frost_frostbolt02"},{"c":"MAGE","m":"PvE","id":205,"n":"Frostbolt","ev":8,"amt":263,"cr":1,"lo":30,"hi":47,"ic":"spell_frost_frostbolt02"},{"c":"WARRIOR","m":"PvE","id":7384,"n":"Overpower","ev":7,"amt":261,"cr":0,"lo":31,"hi":52,"ic":"ability_meleedamage"},{"c":"PALADIN","m":"PvE","id":20467,"n":"Judgement of Command","ev":3,"amt":250,"cr":1,"lo":67,"hi":114,"ic":"ability_warrior_innerrage"},{"c":"WARRIOR","m":"PvE","id":8198,"n":"Thunder Clap","ev":7,"amt":205,"cr":1,"lo":25,"hi":39,"ic":"spell_nature_thunderclap"},{"c":"PRIEST","m":"PvE","id":598,"n":"Smite","ev":3,"amt":183,"cr":0,"lo":60,"hi":62,"ic":"spell_holy_holysmite"},{"c":"HUNTER","m":"PvE","id":14282,"n":"Arcane Shot","ev":2,"amt":182,"cr":0,"lo":91,"hi":91,"ic":"ability_impalingbolt"},{"c":"WARLOCK","m":"PvE","id":6222,"n":"Corruption","ev":10,"amt":170,"cr":0,"lo":16,"hi":18,"ic":"spell_shadow_abominationexplosion"},{"c":"ROGUE","m":"Healing","id":440,"n":"Healing Potion","ev":1,"amt":156,"cr":0,"lo":156,"hi":156,"ic":"temp"},{"c":"PALADIN","m":"Healing","id":440,"n":"Healing Potion","ev":1,"amt":156,"cr":0,"lo":156,"hi":156,"ic":"temp"},{"c":"SHAMAN","m":"Healing","id":332,"n":"Healing Wave","ev":2,"amt":140,"cr":0,"lo":70,"hi":70,"ic":"spell_nature_magicimmunity"},{"c":"HUNTER","m":"PvE","id":13550,"n":"Serpent Sting","ev":4,"amt":133,"cr":1,"lo":25,"hi":55,"ic":"ability_hunter_quickshot"},{"c":"WARLOCK","m":"PvE","id":5019,"n":"Shoot","ev":8,"amt":131,"cr":1,"lo":13,"hi":23,"ic":"ability_shootwand"},{"c":"WARLOCK","m":"PvE","id":695,"n":"Shadow Bolt","ev":5,"amt":129,"cr":0,"lo":24,"hi":28,"ic":"spell_shadow_shadowbolt"},{"c":"WARLOCK","m":"PvE","id":1014,"n":"Bane of Agony","ev":15,"amt":127,"cr":2,"lo":7,"hi":12,"ic":"spell_shadow_curseofsargeras"},{"c":"DRUID","m":"PvE","id":6807,"n":"Maul","ev":3,"amt":124,"cr":0,"lo":39,"hi":45,"ic":"ability_druid_maul"},{"c":"WARLOCK","m":"PvE","id":1120,"n":"Drain Soul","ev":6,"amt":121,"cr":1,"lo":18,"hi":28,"ic":"spell_shadow_haunting"},{"c":"MAGE","m":"PvE","id":0,"n":"Melee","ev":10,"amt":119,"cr":0,"lo":2,"hi":26,"ic":null},{"c":"PRIEST","m":"Healing","id":2052,"n":"Lesser Heal","ev":1,"amt":106,"cr":0,"lo":106,"hi":106,"ic":"spell_holy_lesserheal"},{"c":"HUNTER","m":"PvE","id":19434,"n":"Aimed Shot","ev":1,"amt":96,"cr":0,"lo":96,"hi":96,"ic":"inv_spear_07"},{"c":"WARRIOR","m":"PvE","id":1715,"n":"Hamstring","ev":24,"amt":92,"cr":1,"lo":3,"hi":7,"ic":"ability_shockwave"},{"c":"MAGE","m":"PvE","id":122,"n":"Frost Nova","ev":3,"amt":89,"cr":1,"lo":21,"hi":46,"ic":"spell_frost_frostnova"},{"c":"PALADIN","m":"Healing","id":439,"n":"Healing Potion","ev":1,"amt":84,"cr":0,"lo":84,"hi":84,"ic":"temp"},{"c":"HUNTER","m":"PvE","id":2974,"n":"Wing Clip","ev":20,"amt":84,"cr":1,"lo":4,"hi":8,"ic":"ability_rogue_trip"},{"c":"HUNTER","m":"PvE","id":13549,"n":"Serpent Sting","ev":6,"amt":84,"cr":0,"lo":13,"hi":18,"ic":"ability_hunter_quickshot"},{"c":"PRIEST","m":"PvE","id":8102,"n":"Mind Blast","ev":1,"amt":76,"cr":0,"lo":76,"hi":76,"ic":"spell_shadow_unholyfrenzy"},{"c":"WARLOCK","m":"PvE","id":0,"n":"Melee","ev":8,"amt":76,"cr":3,"lo":1,"hi":25,"ic":null},{"c":"WARRIOR","m":"PvE","id":72,"n":"Shield Bash","ev":17,"amt":75,"cr":1,"lo":4,"hi":8,"ic":"ability_warrior_shieldbash"},{"c":"ROGUE","m":"PvE","id":6761,"n":"Eviscerate","ev":1,"amt":74,"cr":0,"lo":74,"hi":74,"ic":"ability_rogue_eviscerate"},{"c":"WARRIOR","m":"PvE","id":2764,"n":"Throw","ev":6,"amt":69,"cr":0,"lo":11,"hi":13,"ic":"ability_throw"},{"c":"HUNTER","m":"Healing","id":746,"n":"First Aid","ev":6,"amt":66,"cr":0,"lo":11,"hi":11,"ic":"spell_holy_heal"},{"c":"WARRIOR","m":"Healing","id":746,"n":"First Aid","ev":6,"amt":66,"cr":0,"lo":11,"hi":11,"ic":"spell_holy_heal"},{"c":"DRUID","m":"PvE","id":8925,"n":"Moonfire","ev":4,"amt":62,"cr":0,"lo":11,"hi":27,"ic":"spell_nature_starfall"},{"c":"HUNTER","m":"PvE","id":1495,"n":"Mongoose Bite","ev":1,"amt":57,"cr":0,"lo":57,"hi":57,"ic":"ability_hunter_swiftstrike"},{"c":"SHAMAN","m":"PvE","id":8050,"n":"Flame Shock","ev":5,"amt":54,"cr":0,"lo":7,"hi":26,"ic":"spell_fire_flameshock"},{"c":"PALADIN","m":"PvE","id":679,"n":"Holy Strike","ev":4,"amt":53,"cr":0,"lo":13,"hi":14,"ic":"classicon_paladin"},{"c":"ROGUE","m":"PvE","id":2764,"n":"Throw","ev":3,"amt":52,"cr":0,"lo":14,"hi":20,"ic":"ability_throw"},{"c":"DRUID","m":"PvE","id":339,"n":"Entangling Roots","ev":8,"amt":47,"cr":1,"lo":5,"hi":9,"ic":"spell_nature_stranglevines"},{"c":"PRIEST","m":"PvE","id":589,"n":"Shadow Word: Pain","ev":7,"amt":42,"cr":0,"lo":6,"hi":6,"ic":"spell_shadow_shadowwordpain"},{"c":"MAGE","m":"PvE","id":5019,"n":"Shoot","ev":2,"amt":41,"cr":1,"lo":17,"hi":24,"ic":"ability_shootwand"},{"c":"WARRIOR","m":"Healing","id":1261483,"n":"Thrill of Adventure","ev":20,"amt":40,"cr":0,"lo":1,"hi":3,"ic":"ability_hunter_huntervswild"},{"c":"SHAMAN","m":"PvE","id":26364,"n":"Lightning Shield","ev":2,"amt":28,"cr":0,"lo":14,"hi":14,"ic":"spell_nature_lightning"},{"c":"SHAMAN","m":"PvE","id":29469,"n":"Flametongue Attack","ev":3,"amt":27,"cr":0,"lo":8,"hi":11,"ic":"spell_fire_flametounge"},{"c":"MAGE","m":"PvE","id":133,"n":"Fireball","ev":1,"amt":23,"cr":0,"lo":23,"hi":23,"ic":"spell_fire_flamebolt"},{"c":"PALADIN","m":"PvE","id":25741,"n":"Seal of Righteousness","ev":3,"amt":21,"cr":0,"lo":7,"hi":7,"ic":"ability_thunderbolt"},{"c":"WARLOCK","m":"Healing","id":1261483,"n":"Thrill of Adventure","ev":12,"amt":20,"cr":0,"lo":1,"hi":2,"ic":"ability_hunter_huntervswild"},{"c":"PALADIN","m":"Healing","id":1261483,"n":"Thrill of Adventure","ev":5,"amt":14,"cr":0,"lo":2,"hi":3,"ic":"ability_hunter_huntervswild"},{"c":"WARLOCK","m":"PvE","id":686,"n":"Shadow Bolt","ev":1,"amt":14,"cr":0,"lo":14,"hi":14,"ic":"spell_shadow_shadowbolt"},{"c":"WARLOCK","m":"PvE","id":348,"n":"Immolate","ev":4,"amt":12,"cr":0,"lo":3,"hi":3,"ic":"spell_fire_immolation"},{"c":"ROGUE","m":"PvE","id":1776,"n":"Gouge","ev":1,"amt":11,"cr":0,"lo":11,"hi":11,"ic":"ability_gouge"}],"zones":[{"n":"Westfall","npcs":32,"s":7032},{"n":"Elwynn Forest","npcs":10,"s":467}],"kills":[{"n":"Harvest Watcher","d":91,"lv":15},{"n":"Harvest Golem","d":51,"lv":12},{"n":"Defias Looter","d":44,"lv":14},{"n":"Defias Pillager","d":38,"lv":15},{"n":"Young Fleshripper","d":25,"lv":11},{"n":"Young Goretusk","d":25,"lv":13},{"n":"Rusty Harvest Golem","d":23,"lv":10},{"n":"Murloc Warrior","d":19,"lv":16},{"n":"Riverpaw Outrunner","d":19,"lv":10},{"n":"Murloc Hunter","d":14,"lv":17}],"hits":[{"mob":"Defias Pillager","ab":"Fireball","id":19816,"sc":4,"h":173,"mx":84,"t":11952,"ic":"spell_fire_flamebolt"},{"mob":"Defias Pillager","ab":"Shred","id":6595,"sc":1,"h":2,"mx":63,"t":115,"ic":"ability_backstab"},{"mob":"Defias Magician","ab":"Fireball","id":9053,"sc":4,"h":2,"mx":60,"t":118,"ic":"spell_fire_flamebolt"},{"mob":"Young Goretusk","ab":"Melee","id":0,"sc":1,"h":191,"mx":58,"t":3134,"ic":null},{"mob":"Defias Looter","ab":"Backstab","id":7159,"sc":1,"h":7,"mx":58,"t":282,"ic":"ability_backstab"},{"mob":"Benny Blaanco","ab":"Melee","id":0,"sc":1,"h":2,"mx":52,"t":70,"ic":null},{"mob":"Defias Conjurer","ab":"Fireball","id":9053,"sc":4,"h":2,"mx":51,"t":99,"ic":"spell_fire_flamebolt"},{"mob":"Riverpaw Bandit","ab":"Backstab","id":53,"sc":1,"h":3,"mx":49,"t":130,"ic":"ability_backstab"},{"mob":"Defias Trapper","ab":"Backstab","id":2589,"sc":1,"h":6,"mx":48,"t":247,"ic":"ability_backstab"},{"mob":"Murloc Warrior","ab":"Melee","id":0,"sc":1,"h":45,"mx":47,"t":1350,"ic":null}],"levels":[{"lv":1,"n":1},{"lv":5,"n":1},{"lv":6,"n":2},{"lv":8,"n":1},{"lv":9,"n":5},{"lv":10,"n":5},{"lv":11,"n":9},{"lv":12,"n":6},{"lv":13,"n":5},{"lv":14,"n":7},{"lv":15,"n":8},{"lv":16,"n":8},{"lv":17,"n":1},{"lv":18,"n":1},{"lv":50,"n":1}]};
+const ORDER = ['all', 'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'];
+const NAME = s => s === 'all' ? 'All Classes' : s[0].toUpperCase() + s.slice(1);
+const GOLD = '#ffd75a';
+const COL = s => s === 'all' ? '#c9a050' : (CLASS_COLOR[NAME(s)] || '#c9a050');
+const spellIcon = (ic, id) => `/assets/images/wow/icons/large/${id === 0 ? 'ability_meleedamage' : (ic || 'inv_misc_questionmark')}.jpg`;
+const SCHOOL = { 1: 'Physical', 2: 'Holy', 4: 'Fire', 8: 'Nature', 16: 'Frost', 32: 'Shadow', 64: 'Arcane' };
+const pct = (a, b) => b ? Math.round(a / b * 1000) / 10 : 0;
+const MODES = [['PvE', '#c0392b'], ['Healing', '#3fa34d'], ['PvP', '#6a5acd']];
+const spellsOf = s => D.spells.filter(r => s === 'all' || r.c === s.toUpperCase());
+const sum = (a, k) => a.reduce((t, r) => t + r[k], 0);
+const dur = (a, b) => { const m = Math.round((new Date(b) - new Date(a)) / 60000); return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`; };
+const playMin = D.files.reduce((t, f) => t + (new Date(f.last) - new Date(f.first)) / 60000, 0);
+const events = sum(D.files, 'events');
+
+const bar = document.getElementById('clbar');
+bar.innerHTML = ORDER.map(s => {
+  const has = s === 'all' || spellsOf(s).length;
+  const icon = s === 'all' ? wowIcon('ability_dualwield') : wowClassIcon(NAME(s));
+  return `<a class="cbtn${has ? '' : ' cl-empty'}" href="?class=${s}" data-c="${s}" style="text-decoration:none"><span class="ci">${icon}</span>${s === 'all' ? 'All' : NAME(s)}</a>`;
+}).join('');
+bar.addEventListener('click', e => { const a = e.target.closest('.cbtn'); if (!a) return; e.preventDefault(); show(a.dataset.c, true); });
+
+let cur = 'all', mode = 'PvE', query = '';
+
+function hero(s) {
+  const col = COL(s), rows = spellsOf(s), dmg = sum(rows.filter(r => r.m === 'PvE'), 'amt');
+  const top = rows.filter(r => r.m === 'PvE' && r.id !== 0).sort((a, b) => b.amt - a.amt)[0];
+  const emb = s === 'all' ? `<img class="hires" src="/assets/images/wow/icons/large/inv_misc_note_06.jpg" alt="">`
+    : `<img class="hires" src="/wow2008/class-icons/${s}.png?v=69" alt="">`;
+  const intro = s === 'all'
+    ? `We've parsed <b style="color:${GOLD}">${fmt(D.files.length)} combat logs</b> so far: ${fmt(events)} events across ${dur(0, playMin * 60000)} of play in
+       ${D.zones.map(z => esc(z.n)).join(' and ')}. That's <b style="color:${GOLD}">${fmt(D.totals.npcs)}</b> mobs measured, ${fmt(D.totals.kills)} kills and ${fmt(D.totals.classSpells)} player spells identified.`
+    : rows.length
+      ? `${fmt(sum(rows, 'ev'))} hits and heals from ${NAME(s).toLowerCase()}s in the logs. <b style="color:${shade(col, .3)}">${top ? esc(top.n) : 'Melee'}</b> is their biggest
+         ability after auto-attacks, and ${fmt(dmg)} damage was recorded in total.`
+      : `No ${NAME(s).toLowerCase()} has shown up in an uploaded combat log yet.`;
+  document.getElementById('clhero').innerHTML = `<div class="emb">${emb}</div>
+    <div class="t"><div class="kick" style="color:${shade(col, .35)}">COMBAT LOGS · ${s === 'all' ? 'OVERVIEW' : 'CLASS'}</div>
+    <h1 style="color:${shade(col, .1)}">${s === 'all' ? 'Combat Logs' : NAME(s)}</h1><div class="intro">${intro}</div></div>`;
+}
+
+function tiles(s) {
+  const el = document.getElementById('cltiles');
+  if (s === 'all') {
+    el.innerHTML = `
+      <div class="stat"><span>Logs parsed</span><b>${fmt(D.files.length)}</b><em>${dur(0, playMin * 60000)} of play</em></div>
+      <div class="stat"><span>Events</span><b>${fmt(events)}</b><em>combat log lines read</em></div>
+      <div class="stat"><span>Mobs measured</span><b>${fmt(D.totals.npcs)}</b><em>health, armor &amp; level</em></div>
+      <div class="stat"><span>Kills</span><b>${fmt(D.totals.kills)}</b><em>in ${D.zones.length} zones</em></div>
+      <div class="stat"><span>Spells</span><b>${fmt(D.totals.classSpells + D.totals.npcSpells)}</b><em>${D.totals.classSpells} player · ${D.totals.npcSpells} mob</em></div>`;
+    return;
+  }
+  const col = COL(s), rows = spellsOf(s), pve = rows.filter(r => r.m === 'PvE'), heal = rows.filter(r => r.m === 'Healing');
+  const big = pve.slice().sort((a, b) => b.hi - a.hi)[0];
+  const top = pve.filter(r => r.id !== 0).sort((a, b) => b.amt - a.amt)[0];
+  el.innerHTML = `
+    <div class="stat"><span>Damage</span><b>${fmt(sum(pve, 'amt'))}</b><em>${fmt(sum(pve, 'ev'))} hits</em></div>
+    <div class="stat"><span>Crit rate</span><b>${pct(sum(pve, 'cr'), sum(pve, 'ev'))}%</b><em>damage only</em></div>
+    <div class="stat"><span>Top ability</span><b style="color:${shade(col, -.45)}">${top ? esc(top.n) : '—'}</b><em>${top ? fmt(top.amt) + ' damage' : 'no spells yet'}</em></div>
+    <div class="stat"><span>Biggest hit</span><b>${big ? fmt(big.hi) : '—'}</b><em>${big ? esc(big.n) : ''}</em></div>
+    <div class="stat"><span>Healing</span><b>${fmt(sum(heal, 'amt'))}</b><em>${fmt(sum(heal, 'ev'))} heals &amp; ticks</em></div>`;
+}
+
+function board(s) {
+  const ol = document.getElementById('clboard');
+  const row = (rk, icon, label, sub, col, n, p, max, tip) => `<li data-tip="${tip}">
+    <span class="rk">${rk}</span><span class="cico">${icon}</span>
+    <span class="nm"><b style="color:${col}">${esc(label)}</b><small>${esc(sub)}</small></span>
+    <span class="track"><span class="fill" style="display:block;background:${col}" data-w="${n / max * 100}%"></span></span>
+    <span class="nv">${fmt(n)}<span>${p}%</span></span></li>`;
+  if (s === 'all') {
+    document.getElementById('boardTitle').textContent = 'Damage by Class';
+    const cls = ORDER.slice(1).map(c => [c, sum(spellsOf(c).filter(r => r.m === 'PvE'), 'amt')]).filter(x => x[1]).sort((a, b) => b[1] - a[1]);
+    const tot = sum(cls.map(x => ({ v: x[1] })), 'v'), max = cls[0][1];
+    document.getElementById('boardSub').textContent = `${fmt(tot)} damage`;
+    ol.innerHTML = cls.map(([c, n], i) => row(i + 1, wowClassIcon(NAME(c)), NAME(c), `${spellsOf(c).filter(r => r.m === 'PvE').length} abilities`, COL(c), n, pct(n, tot), max,
+      `${NAME(c)}|${fmt(n)} damage|${pct(n, tot)}% of all logged damage`)).join('');
+  } else {
+    document.getElementById('boardTitle').textContent = 'Top Abilities';
+    const rows = spellsOf(s).filter(r => r.m === 'PvE').sort((a, b) => b.amt - a.amt).slice(0, 10);
+    const tot = sum(spellsOf(s).filter(r => r.m === 'PvE'), 'amt');
+    document.getElementById('boardSub').textContent = `${NAME(s)} damage`;
+    ol.innerHTML = rows.length ? rows.map((r, i) => row(i + 1, `<img src="${spellIcon(r.ic, r.id)}" alt="" loading="lazy">`, r.n, `${fmt(r.ev)} hits · avg ${(r.amt / r.ev).toFixed(1)}`,
+      COL(s), r.amt, pct(r.amt, tot), rows[0].amt, `${esc(r.n)}|${fmt(r.amt)} damage|${fmt(r.lo)}–${fmt(r.hi)} per hit`)).join('')
+      : '<li style="display:block" class="nosplit">No damage logged for this class yet.</li>';
+  }
+}
+
+function split(s) {
+  const rows = spellsOf(s), tot = sum(rows, 'ev');
+  const parts = MODES.map(([m, c]) => [m, c, sum(rows.filter(r => r.m === m), 'ev')]);
+  document.getElementById('modeSub').textContent = `${fmt(tot)} events`;
+  document.getElementById('clsplit').innerHTML = parts.map(([m, c, n]) => n ? `<i style="background:${c};flex-grow:0" data-g="${n}" title="${m} ${pct(n, tot)}%">${pct(n, tot) >= 6 ? `${m} ${pct(n, tot)}%` : ''}</i>` : '').join('');
+  document.getElementById('cllegend').innerHTML = parts.map(([m, c, n]) => `<span><i style="background:${c}"></i><b>${m}</b> ${fmt(n)} · ${pct(n, tot)}%</span>`).join('');
+}
+
+function abilities() {
+  const all = cur === 'all';
+  document.getElementById('abClsTh').style.display = all ? '' : 'none';
+  document.getElementById('abTitle').textContent = all ? 'Class Abilities' : `${NAME(cur)} Abilities`;
+  document.getElementById('clmode').innerHTML = MODES.map(([m]) => `<button type="button" class="pill${m === mode ? ' on' : ''}" data-m="${m}">${m}</button>`).join('');
+  let rows = spellsOf(cur).filter(r => r.m === mode);
+  const tot = sum(rows, 'amt');
+  if (query) rows = rows.filter(r => r.n.toLowerCase().includes(query));
+  rows.sort((a, b) => b.amt - a.amt);
+  document.querySelector('#abWt').innerHTML = `${mode === 'Healing' ? 'Heals' : 'Damage'}<small>${fmt(rows.length)} abilities · ${fmt(tot)} total</small>`;
+  document.getElementById('clab').innerHTML = rows.length ? rows.slice(0, 40).map(r => {
+    const c = r.c.toLowerCase(), link = r.id ? `/forever/spell/${r.id}` : null;
+    const name = `<span class="cl-sp"><img src="${spellIcon(r.ic, r.id)}" alt="" loading="lazy">${link ? `<a href="${link}">${esc(r.n)}</a>` : `<b>${esc(r.n)}</b>`}</span>`;
+    return `<tr><td>${name}</td><td style="${all ? '' : 'display:none'};color:${COL(c)}">${NAME(c)}</td><td class="num">${(r.amt / r.ev).toFixed(1)}</td>
+      <td class="num cl-dim">${fmt(r.lo)}–${fmt(r.hi)}</td><td class="num">${fmt(r.ev)}</td><td class="num">${pct(r.cr, r.ev)}%</td><td class="num">${fmt(r.amt)}</td>
+      <td><span class="cl-bar"><i style="width:0;background:${COL(c)}" data-w="${pct(r.amt, tot)}%"></i></span>${pct(r.amt, tot)}%</td></tr>`;
+  }).join('') : `<tr><td colspan="8" class="cl-dim" style="text-align:center;padding:14px">No ${mode} events logged${all ? '' : ' for ' + NAME(cur).toLowerCase() + 's'} yet.</td></tr>`;
+  grow(document.getElementById('abilities'));
+}
+document.getElementById('clmode').addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (b) { mode = b.dataset.m; abilities(); } });
+document.getElementById('clq').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); abilities(); });
+
+// Static sections (the whole collection, not per class).
+const zMax = D.zones[0].s, zTot = sum(D.zones, 's');
+document.getElementById('clzones').innerHTML = D.zones.map(z => `<tr><td><a href="/forever/geography">${esc(z.n)}</a></td><td class="num">${z.npcs}</td><td class="num">${fmt(z.s)}</td>
+  <td style="white-space:nowrap"><span class="cl-bar" style="width:110px"><i style="width:0" data-w="${z.s / zMax * 100}%"></i></span>${pct(z.s, zTot)}%</td></tr>`).join('');
+const lvMax = Math.max(...D.levels.map(l => l.n));
+document.getElementById('cllevels').innerHTML = D.levels.map(l => `<div data-tip="Level ${l.lv}|${l.n} mob${l.n > 1 ? 's' : ''} measured"><i style="height:0" data-h="${l.n / lvMax * 100}%"></i><span>${l.lv}</span></div>`).join('');
+const slug = n => n.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+document.getElementById('clkills').innerHTML = D.kills.map((k, i) => `<tr><td class="cl-dim">${i + 1}</td><td><a href="/forever/npc/${slug(k.n)}/">${esc(k.n)}</a></td><td class="num">${k.lv ?? '—'}</td><td class="num">${fmt(k.d)}</td></tr>`).join('');
+document.getElementById('clhits').innerHTML = D.hits.map(h => `<tr><td><span class="cl-sp"><img src="${spellIcon(h.ic, h.id)}" alt="" loading="lazy">${h.id ? `<a href="/forever/spell/${h.id}">${esc(h.ab)}</a>` : `<b>${esc(h.ab)}</b>`}</span><small class="cl-dim"> ${SCHOOL[h.sc] || ''}</small></td>
+  <td><a href="/forever/npc/${slug(h.mob)}/" style="font-weight:normal;color:#e8dcc0">${esc(h.mob)}</a></td><td class="num">${fmt(h.h)}</td><td class="num" style="color:#ff6a4a">${fmt(h.mx)}</td></tr>`).join('');
+document.getElementById('filesSub').textContent = `${D.files.length} logs · ${fmt(events)} events`;
+document.getElementById('clfiles').innerHTML = D.files.slice().reverse().map((f, i) => `<tr><td><span class="cl-sp"><img src="/assets/images/wow/icons/large/inv_misc_note_0${(i % 6) + 1}.jpg" alt="">Log #${D.files.length - i}</span></td>
+  <td>${new Date(f.first).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td><td class="num">${dur(f.first, f.last)}</td><td class="num">${fmt(f.events)}</td><td class="num">${f.npcs}</td></tr>`).join('');
+
+function show(s, push) {
+  cur = s; query = ''; document.getElementById('clq').value = '';
+  if (!spellsOf(s).some(r => r.m === mode)) mode = 'PvE';
+  if (push) history.pushState({ s }, '', s === 'all' ? location.pathname : `?class=${s}`);
+  document.getElementById('crumbCls').textContent = NAME(s);
+  bar.querySelectorAll('.cbtn').forEach(b => b.classList.toggle('on', b.dataset.c === s));
+  hero(s); tiles(s); board(s); split(s); abilities();
+  grow(document.querySelector('.main'));
+  requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll('[data-h]').forEach(el => el.style.height = el.dataset.h)));
+}
+addEventListener('popstate', () => show(new URLSearchParams(location.search).get('class') || 'all'));
+show(ORDER.includes(new URLSearchParams(location.search).get('class')) ? new URLSearchParams(location.search).get('class') : 'all');
+</script>
+</body>
+</html>

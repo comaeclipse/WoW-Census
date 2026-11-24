@@ -10,7 +10,7 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '74';
+const ASSET_VERSION = '75';
 const DISCORD_URL = 'https://discord.gg/kSUGgYDd8V';
 
 // Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
@@ -159,6 +159,7 @@ function edition_links(string $source): array {
   $links[] = ['Gear', url('gear', $source), false, 'gear'];
   if ($source === \DUNGEON_SOURCE) $links[] = ['Dungeons', \forever_dungeon_path(), false, 'dungeons'];
   if ($source === \DUNGEON_SOURCE) $links[] = ['Bestiary', \forever_npc_path(), false, 'bestiary'];
+  if ($source === \DUNGEON_SOURCE) $links[] = ['Combat Logs', \forever_combat_logs_path(), false, 'combat-logs'];
   if (in_array($source, ['retail', 'forever'], true)) $links[] = ['Skin Colors', '/' . $source . '/skin-colors/', false, 'skin-colors'];
   return $links;
 }
@@ -305,6 +306,11 @@ function render_page(string $html, string $path): string {
     $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
     $html = str_replace('</head>', '<style>' . \DUNGEON_STYLE . \BESTIARY_STYLE . '</style></head>', $html);
     return framed_page(\DUNGEON_SOURCE, $html, 'bestiary', 'dungeons', ($m[1] ?? '') !== '' ? \forever_bestiary()[$m[1]]['name'] : 'Bestiary', notice: contribute_notice());
+  }
+  if (preg_match('#^/forever/combat-logs/(?:([a-z-]+)/)?(?:index\.html)?$#', $path, $m)
+      && (($m[1] ?? '') === '' || isset(\forever_combat_logs_classes()[$m[1]]))) {
+    $GLOBALS['w8_source'] = \DUNGEON_SOURCE;
+    return combat_logs_page($html, ($m[1] ?? '') !== '' ? $m[1] : null);
   }
   if (preg_match('#^/(retail|forever)/skin-colors(?:/([a-z0-9-]+))?/?(index\.html)?$#', $path, $m)) { $GLOBALS['w8_source'] = $m[1]; return skin_colors_page($html, $m[2] ?? null, $m[1]); }
   // The current skin's race switcher fetches these fragments; they stay as they are.
@@ -1089,6 +1095,16 @@ function skin_colors_page(string $html, ?string $slug, string $source = 'retail'
   $route = ['edition' => $source, 'page' => 'skin-colors', 'base' => '/' . $source . '/skin-colors/', 'initial' => $slug !== null && isset($races[$slug]) ? $slug : array_key_first($races)];
   $sampleInfo = $source === 'forever' ? \forever_skin_data() : null;
   return page('skin-colors', common_vars($source) + ['data' => ['races' => $rd, 'spectrum' => $rows, 'maxShare' => $spectrum['maxShare']], 'route' => $route, 'sampleInfo' => $sampleInfo], $html, 'skin-colors');
+}
+
+/** WoW: Forever combat logs overview, with a class switcher like the class pages. */
+function combat_logs_page(string $html, ?string $class): string {
+  $model = \forever_combat_logs_model();
+  $classes = [];
+  foreach (\forever_combat_logs_classes() as $slug => [$label, $cf])
+    $classes[] = ['slug' => $slug, 'name' => $label, 'cf' => $cf, 'path' => \class_route(\DUNGEON_SOURCE, $cf)];
+  return page('combat-logs', common_vars(\DUNGEON_SOURCE) + ['data' => $model ? $model + ['classes' => $classes] : null,
+    'route' => ['edition' => \DUNGEON_SOURCE, 'page' => 'combat-logs', 'base' => \forever_combat_logs_path(), 'initial' => $class ?? 'all']], $html, 'combat-logs');
 }
 
 function classes_page(string $source, string $html, string $slug): string {

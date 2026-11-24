@@ -23,9 +23,9 @@ $oneName = $one ? ($groupForever ? $one['displayName'] : $one['name'] . ($one['r
 
 <?php endif ?>
 <?php if ($groupForever && (!$one || str_contains((string)$one['realmType'], 'PvP'))): ?>
-    <?= component('notice', ['title' => 'PvP data may be inaccurate', 'html' => "We can't collect data on PvP realms at this time, so "
+    <?= component('notice', ['title' => 'PvP data may be inaccurate', 'html' => 'Due to faction imbalance, we may not be able to collect accurate data on PvP realms at this time, so '
       . ($one ? 'the numbers for this group' : 'the PvP and RP-PvP groups below') . ' may be incomplete or out of date. '
-      . ($one ? 'Treat them as a rough guide.' : 'PvE and RP groups are not affected.') . ' ' . discord_link('Join our Discord') . ' to find out how to correct this data!']) ?>
+      . ($one ? 'Treat them as a rough guide.' : 'PvE and RP groups are not affected.') . ' ' . discord_link('Join our Discord') . ' to learn how you can contribute and help make it more accurate!']) ?>
 <?php endif ?>
 
 <?php if (!$one): ?>

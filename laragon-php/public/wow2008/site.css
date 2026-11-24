@@ -399,7 +399,7 @@ table.dir{width:100%;border-collapse:separate;border-spacing:0 1px;background:#6
 .page-statue{position:absolute;right:calc(100% + 3px);bottom:0;width:219px;height:401px;pointer-events:none;user-select:none}
 @media (max-width:900px){.page-statue{display:none}.page>.footer{margin:0}}
 .w8-notice{display:flex;gap:12px;align-items:flex-start;margin:0 0 14px;padding:10px 14px;border:1px solid #8a5a14;border-left:5px solid #c8781c;border-radius:3px;background:linear-gradient(#fff4d6,#f3dfa8);color:#4a2c08;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 3px rgba(0,0,0,.35);font:12px/1.5 Tahoma,Arial,sans-serif}
-.w8-notice .ico{flex:none;width:26px;height:26px;border-radius:50%;margin-top:1px;background:radial-gradient(circle at 35% 30%,#ffe08a,#d08a1a 70%,#8a4a08);border:1px solid #5a2a00;color:#2a1200;font:700 16px/24px Georgia,serif;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.w8-notice .ico{flex:none;width:32px;height:32px}
 .w8-notice .t{display:block;margin-bottom:2px;font:700 13px Tahoma,Arial,sans-serif;color:#7a1a00}
 .w8-notice p{margin:0}
 .w8-notice a{color:#7a3a00;font-weight:700;text-decoration:underline}

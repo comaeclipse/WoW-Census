@@ -65,6 +65,11 @@ function route_request(string $path): ?array {
     $page = forever_spell_html((int)$m[1], edition_path(DUNGEON_SOURCE) . $cssName);
     return $page === null ? null : [$html, localize_content($page)];
   }
+  // WoW: Forever combat logs: the overview at /forever/combat-logs/, a class view at /forever/combat-logs/<class>/.
+  if (preg_match('#^/forever/combat-logs/(?:([a-z-]+)/)?(?:index\.html)?$#', $path, $m)) {
+    $page = forever_combat_logs_html(($m[1] ?? '') !== '' ? $m[1] : null, edition_path(DUNGEON_SOURCE) . $cssName);
+    return $page === null ? null : [$html, localize_content($page)];
+  }
   // WoW: Forever bestiary and dungeon bosses: /forever/npc/ and /forever/npc/<slug>/. A dungeon boss keeps
   // its journal page; any other mob measured in combat logs gets a bestiary page.
   if (preg_match('#^/forever/npc/?(?:index\.html)?$#', $path)) {

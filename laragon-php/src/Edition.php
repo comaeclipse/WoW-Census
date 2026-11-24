@@ -44,12 +44,12 @@ function utc_timestamp(mixed $value): string {
 function edition_nav(string $source, string $current): array {
   $edition = EDITIONS[$source];
   $currentPage = preg_replace('/\.html$/', '', $current);
-  $pageLabels = ['index' => 'Census', 'combos' => 'Race + Class', 'realms' => 'Realms', 'auctionhouse' => 'Auction House', 'professions' => 'Professions', 'guilds' => 'Guilds', 'geography' => 'Geography', 'talents' => 'Talents', 'gear' => 'Gear', 'dungeons' => 'Dungeons', 'bestiary' => 'Bestiary'];
+  $pageLabels = ['index' => 'Census', 'combos' => 'Race + Class', 'realms' => 'Realms', 'auctionhouse' => 'Auction House', 'professions' => 'Professions', 'guilds' => 'Guilds', 'geography' => 'Geography', 'talents' => 'Talents', 'gear' => 'Gear', 'dungeons' => 'Dungeons', 'bestiary' => 'Bestiary', 'combat-logs' => 'Combat Logs'];
   $item = fn(string $href, string $label, ?bool $active = null) =>
     '<a class="game"' . (($active ?? ($href === $currentPage)) ? ' aria-current="true"' : '') . ' href="' . $href . '">' . $label . '</a>';
   $games = '<nav class="games game-nav" aria-label="Game edition">';
   foreach (EDITIONS as $s => $e) {
-    $games .= $item($currentPage === 'professions' ? profession_path(null, $s) : page_path($s, $currentPage === 'spells' ? 'index' : $currentPage), $e['nav'], $s === $source);
+    $games .= $item($currentPage === 'professions' ? profession_path(null, $s) : page_path($s, in_array($currentPage, ['spells', 'combat-logs'], true) ? 'index' : $currentPage), $e['nav'], $s === $source);
   }
   $games .= '</nav>';
   $pages = '<nav class="games page-nav" aria-label="Site pages">' .
@@ -62,7 +62,8 @@ function edition_nav(string $source, string $current): array {
     $item(page_path($source, 'talents'), 'Talents', $currentPage === 'talents') .
     $item(page_path($source, 'gear'), 'Gear', $currentPage === 'gear') .
     ($source === DUNGEON_SOURCE ? $item(forever_dungeon_path(), 'Dungeons', $currentPage === 'dungeons') .
-      $item(forever_npc_path(), 'Bestiary', $currentPage === 'bestiary') : '') . '</nav>';
+      $item(forever_npc_path(), 'Bestiary', $currentPage === 'bestiary') .
+      $item(forever_combat_logs_path(), 'Combat Logs', $currentPage === 'combat-logs') : '') . '</nav>';
   return [
     'games' => '<div class="site-nav-stack">' . $games . $pages . '</div>',
     'pages' => '',
@@ -143,7 +144,8 @@ function edition_snaps(string $source): array {
     if ($source === 'retail') $realm = retail_auction_group_label($realm);
     if (isset($snaps[$realm]) && strcmp((string)$snaps[$realm]['updatedAt'], (string)$snap['updatedAt']) >= 0) continue;
     $snaps[$realm] = ['realm' => $realm, 'faction' => preg_match('/-(Alliance|Horde)$/', $realm, $m) ? $m[1] : 'Neutral',
-      'items' => $snap['items'] ?? [], 'columns' => $snap['columns'], 'updatedAt' => $snap['updatedAt']];
+      'items' => $snap['items'] ?? [], 'columns' => $snap['columns'], 'updatedAt' => $snap['updatedAt'],
+      'connectedApi' => $source === 'mop-classic' && ($snap['items'][0][10] ?? null) === 'Blizzard MoP connected-realm API'];
   }
   return $cache[$source] = array_values($snaps);
 }
@@ -183,9 +185,15 @@ function model_auctionhouse(string $source): array {
   $snapshotOf = function (array $from, array $fallbackRealms) use ($edition, $newest): array {
     if (!empty($edition['factionlessMarket']) && count($from) > 1) $selected = [$newest($from)];
     elseif (!empty($edition['connectedMarket']) && count($from) > 1) {
-      $selected = [];
-      foreach (array_unique(array_map(fn($s) => $s['faction'], $from)) as $faction)
-        $selected[] = $newest(array_values(array_filter($from, fn($s) => $s['faction'] === $faction)));
+      $latest = $newest($from);
+      if (!empty($latest['connectedApi'])) {
+        $selected = [$latest];
+      } else {
+        $from = array_values(array_filter($from, fn($snap) => empty($snap['connectedApi'])));
+        $selected = [];
+        foreach (array_unique(array_map(fn($s) => $s['faction'], $from)) as $faction)
+          $selected[] = $newest(array_values(array_filter($from, fn($s) => $s['faction'] === $faction)));
+      }
     } else $selected = $from;
     $updated = array_values(array_filter(array_map(fn($s) => $s['updatedAt'], $selected)));
     sort($updated, SORT_STRING);
@@ -480,9 +488,62 @@ function race_profiles_model(string $source): array {
 // The auction house views, each reduced to what its page section shows.
 function auctionhouse_page_model(string $source): array {
   return published_page_model('auctionhouse:' . $source, function () use ($source) {
+    if ($source === 'retail') return retail_auctionhouse_page_model();
     $model = model_auctionhouse($source);
     return ['views' => market_view_summaries($model['views']), 'dims' => $model['dims']];
   });
+}
+
+/** Summarize one connected market at a time so raw item rows can be released. */
+function retail_auctionhouse_page_model(): array {
+  $markets = [];
+  $games = Db::uncached("SELECT d.game, MAX(i.updated_at) AS updated
+    FROM datasets d JOIN items i ON i.game=d.game
+    WHERE d.source_game='retail' AND d.game LIKE 'realm:%'
+    GROUP BY d.game ORDER BY d.game COLLATE \"C\"");
+  foreach ($games as $game) {
+    $realm = retail_auction_group_label(preg_replace('/^realm:/', '', canonical_game($game['game'])));
+    if (!isset($markets[$realm]) || strcmp((string)$game['updated'], (string)$markets[$realm]['updated']) > 0) {
+      $markets[$realm] = $game;
+    }
+  }
+
+  $branch = EDITIONS['retail']['branch'];
+  $names = item_cache('item-names', $branch);
+  $savedNames = [];
+  foreach (Db::uncached("SELECT DISTINCT ON (item_id) item_id, name FROM local_auction_snapshots
+      WHERE source_game='retail' AND name!='' AND name NOT ILIKE 'item:%'
+      ORDER BY item_id, game COLLATE \"C\", captured_at DESC") as $row) {
+    $savedNames[$row['item_id']] = $row['name'];
+  }
+
+  $views = [];
+  $latest = null;
+  foreach ($markets as $realm => $game) {
+    $rows = Db::uncached('SELECT id,name,mv,asp,q,pq,cat FROM items WHERE game=? ORDER BY q DESC NULLS LAST, seq', [$game['game']]);
+    $items = merge_items([['columns' => ['id','name','mv','asp','q','pq','cat'], 'items' => array_map('array_values', $rows)]]);
+    unset($rows);
+    foreach ($items as &$item) {
+      if (preg_match('/^item:\d+$/', (string)$item['name'])) {
+        $item['name'] = ($names[$item['id']] ?? null) ?: (($savedNames[$item['id']] ?? null) ?: $item['name']);
+      }
+    }
+    unset($item);
+    $summary = market_view_summary([
+      'items' => $items, 'realms' => [$realm], 'updatedAt' => $game['updated'], 'branch' => $branch, 'aggregateOnly' => true,
+    ], INF);
+    unset($items);
+    $views[$realm] = ['realm' => $realm, 'faction' => 'all', 'summary' => $summary];
+    if (!str_ends_with($game['game'], ':Region-wide commodities') &&
+        ($latest === null || strcmp((string)$summary['updatedAt'], (string)$latest['updatedAt']) > 0)) {
+      $latest = $summary;
+    }
+  }
+  ksort($views, SORT_STRING);
+  $realms = [['key' => 'all', 'label' => 'Latest connected realm']];
+  foreach (array_keys($views) as $realm) $realms[] = ['key' => $realm, 'label' => $realm];
+  $all = ['realm' => 'all', 'faction' => 'all', 'summary' => $latest ?? market_view_summary(['branch' => $branch, 'aggregateOnly' => true], INF)];
+  return ['views' => [$all, ...array_values($views)], 'dims' => ['realm' => $realms, 'faction' => [['key' => 'all', 'label' => 'Cross-faction']]]];
 }
 
 // The filter data file a page fetches, or null.
