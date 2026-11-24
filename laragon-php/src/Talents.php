@@ -279,7 +279,7 @@ function unpack_gear_records(array $packed): array {
 function pack_gear_page(array $data, string $branch, ?string $source = null): array {
   $packed = pack_gear_records($data['records']);
   $packed['wowhead'] = 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=';
-  $packed['itemBase'] = $source !== null && in_array($source, ARMORY_SOURCES, true) ? armory_item_path($source, '') : null;
+  $packed['itemBase'] = item_page_base($source);
   return $packed;
 }
 

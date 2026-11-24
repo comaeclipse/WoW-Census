@@ -18,6 +18,12 @@ function armory_item_path(string $source, int|string $id): string {
   return edition_path($source) . 'item/' . $id;
 }
 
+/** Prefix of this edition's own item pages (append the item id), or null when it has none. */
+function item_page_base(?string $source): ?string {
+  if ($source === PROFESSION_SOURCE) return forever_item_path('');
+  return $source !== null && in_array($source, ARMORY_SOURCES, true) ? armory_item_path($source, '') : null;
+}
+
 /** Item tooltip fields shared by the cross-edition Armory item pages. */
 function armory_item_tip(array $it): array {
   $sub = $it['item_subclass']['name'] ?? '';

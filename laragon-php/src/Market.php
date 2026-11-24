@@ -24,8 +24,9 @@ function item_label(array $it): string {
 }
 
 function item_link(array $it, string $branch, ?string $source = null): string {
-  $local = $source !== null && in_array($source, ARMORY_SOURCES, true);
-  $href = $local ? armory_item_path($source, $it['id']) : 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=' . js_string($it['id']);
+  $base = item_page_base($source);
+  $local = $base !== null;
+  $href = $local ? $base . js_string($it['id']) :'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=' . js_string($it['id']);
   return '<a href="' . esc($href) . '"' . ($local ? '' : ' target="_blank" rel="noopener"') . '>' . esc(item_label($it)) . '</a>';
 }
 

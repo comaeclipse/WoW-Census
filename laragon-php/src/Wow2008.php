@@ -759,8 +759,7 @@ function gear_page(string $source, string $html): string {
   return page('gear', common_vars($source) + ['data' => ['latest' => \inspect_time($model['lastT']), 'generated' => \utc_timestamp(\generated_at()), 'slots' => $slots,
     'inspectBuilds' => $model['sources']['inspect'] ?? count($records), 'armoryBuilds' => $model['sources']['armory'] ?? 0,
     'wowhead' => $packed['wowhead'],
-    // Forever items have pages of their own (price history and who wears them); other editions link to Wowhead.
-    'itemBase' => in_array($source, \ARMORY_SOURCES, true) ? \armory_item_path($source, '') : null]], $html, 'gear');
+    'itemBase' => \item_page_base($source)]], $html, 'gear');
 }
 
 /** Short realm labels for a list of the site's realm keys. */
@@ -951,7 +950,7 @@ function auction_page(string $source, string $html): string {
   $factions = array_map(fn($f) => [$f['key'], $f['key'] === 'all' ? ($f['label'] === 'Cross-faction' ? 'Cross-faction' : 'Both') : $f['label']], $model['dims']['faction']);
   return page('auction-house', common_vars($source) + ['data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
     'realms' => $realms, 'factions' => $factions, 'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=',
-    'itemBase' => $source === \PROFESSION_SOURCE ? \forever_item_path('') : (in_array($source, \ARMORY_SOURCES, true) ? \armory_item_path($source, '') : null),
+    'itemBase' => \item_page_base($source),
     'recentSales' => \edition_recent_sales_table($source)], $html, 'auction-house');
 }
 

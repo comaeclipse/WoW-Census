@@ -420,12 +420,13 @@ if (!empty($item['dungeon']) && $loot) {
 }
 ?>
 <?php if (!empty($item['dungeon'])): ?>
-    <?php component_start('section', ['title' => 'Dungeon Drop', 'icon' => 'p', 'sub' => 'from the Dungeon Journal add-on\'s boss loot lists' . ($bossLoot ? ', drop rates from players\' Journalator logs' : ''), 'style' => 'margin-top:16px']) ?>
+    <?php $onlyQuest = !array_filter($item['dungeon'], fn($s) => empty($s['quest'])); ?>
+    <?php component_start('section', ['title' => $onlyQuest ? 'Dungeon Quest Reward' : 'Dungeon Drop', 'icon' => 'p', 'sub' => 'from the Dungeon Journal add-on\'s ' . ($onlyQuest ? 'quest lists' : 'boss loot lists') . ($bossLoot ? ', drop rates from players\' Journalator logs' : ''), 'style' => 'margin-top:16px']) ?>
         <table class="ahtable it-loot">
           <thead><tr><th>Dropped by</th><th>Dungeon</th><th class="num">Drop rate</th><th class="num">Dropped</th><th class="num">Looted</th></tr></thead>
           <tbody>
 <?php foreach ($item['dungeon'] as $src): $r = $src['boss'] !== null ? ($bossLoot[$src['boss']] ?? null) : null; ?>
-            <tr><td><?= $src['boss'] !== null ? '<a href="' . e(\forever_npc_path(\forever_npc_slug($src['boss']))) . '">' . e($src['boss']) . '</a>' : 'Trash' . (!empty($src['from']) ? ' <span class="kind">(' . e($src['from']) . ')</span>' : '') ?></td>
+            <tr><td><?= $src['boss'] !== null ? '<a href="' . e(\forever_npc_path(\forever_npc_slug($src['boss']))) . '">' . e($src['boss']) . '</a>' : (!empty($src['quest']) ? 'Quest reward <span class="kind">(' . e($src['quest']) . ')</span>' : 'Trash' . (!empty($src['from']) ? ' <span class="kind">(' . e($src['from']) . ')</span>' : '')) ?></td>
               <td><a href="<?= e(\forever_dungeon_path($src['slug'])) ?>"><?= e($src['dungeon']) ?></a></td>
 <?php if ($r): ?>
               <td class="num"><?= $rateFor($r) ?></td><td class="num"><?= fmt($r['drops']) ?></td><td class="num"><?= fmt($r['windows']) ?></td></tr>

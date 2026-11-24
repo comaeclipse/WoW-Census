@@ -103,6 +103,9 @@ function forever_dungeon_item_sources(int $id): array {
       foreach ($d['bosses'] as $b)
         foreach ($b['loot'] as $it) $index[$it['id']][] = ['dungeon' => $d['name'], 'slug' => $d['slug'], 'boss' => $b['name'], 'name' => $it['name'], 'quality' => $it['quality'], 'slot' => $it['slot']];
       foreach ($d['trash'] as $it) $index[$it['id']][] = ['dungeon' => $d['name'], 'slug' => $d['slug'], 'boss' => null, 'from' => $it['from'] ?? null, 'name' => $it['name'], 'quality' => $it['quality'], 'slot' => $it['slot']];
+      // Quest rewards get item pages too, so the dungeon page can link them.
+      foreach ($d['questDetails'] ?? [] as $q)
+        foreach ($q['rewards'] as $it) $index[$it['id']][] = ['dungeon' => $d['name'], 'slug' => $d['slug'], 'boss' => null, 'quest' => $q['name'], 'name' => $it['name'], 'quality' => $it['quality'], 'slot' => null];
     }
   }
   return $index[$id] ?? [];
@@ -599,7 +602,7 @@ function forever_dungeon_quests_html(array $quests, bool $onBoss = false): strin
     }
     if ($quest['rewards']) {
       $html .= '<p><b>' . ($quest['rewardChoice'] ? 'Choose a reward' : 'Rewards') . '</b> ' .
-        implode(' ', array_map(fn($item) => forever_dungeon_item_link($item, 'https://www.wowhead.com/forever/item=' . $item['id']), $quest['rewards'])) . '</p>';
+        implode(' ', array_map(fn($item) => forever_dungeon_item_link($item), $quest['rewards'])) . '</p>';
     }
     $html .= '</article>';
   }
@@ -797,7 +800,7 @@ function forever_dungeon_quest_list(array $quests): string {
       $body .= '<p><b>Bosses</b> ' . implode(', ', array_map(fn($boss) => '<a href="#boss-' . esc(forever_npc_slug($boss)) . '" data-boss>' . esc($boss) . '</a>', $quest['bosses'])) . '</p>';
     if ($quest['rewards'])
       $body .= '<p><b>' . ($quest['rewardChoice'] ? 'Choose one' : 'Rewards') . '</b> ' .
-        implode(' ', array_map(fn($item) => forever_dungeon_item_link($item, 'https://www.wowhead.com/forever/item=' . $item['id']), $quest['rewards'])) . '</p>';
+        implode(' ', array_map(fn($item) => forever_dungeon_item_link($item), $quest['rewards'])) . '</p>';
     if ($quest['id']) $body .= '<p><a href="https://www.wowhead.com/forever/quest=' . (int)$quest['id'] . '">Quest on Wowhead</a></p>';
     $html .= '<details class="dg-q" data-f="' . esc($faction) . '"><summary><span class="dg-fac ' . strtolower(esc($faction)) . '" title="' . esc($faction) . '"></span>' .
       '<span class="qn">' . esc($quest['name']) . '</span><span class="ql">' . ($faction === 'Both' ? 'Both · ' : '') . ($quest['requires'] ? 'Lv ' . (int)$quest['requires'] . '+' : '') . '</span>' .
