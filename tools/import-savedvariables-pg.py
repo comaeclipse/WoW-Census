@@ -174,10 +174,11 @@ def forever_own_realm(db, path, region, faction):
 FOREVER_REALM = re.compile(r"^CAMWOW\s+(US|EU|KR|TW)\d*\s+(?:Realm|서버)\s+\d+\s+(RP PvP|PvP|PvE|RP)$", re.I)
 
 
-def forever_seen_realm(db, body, region):
+def forever_seen_realm(db, body, region, own_realms=()):
     """The realm of a blank-named Forever bucket from the characters it saw: the census already
     places many of them on one realm, and /who only shows realms of the player's own ruleset pool.
-    At least 3 such characters and 90% of them in one region and ruleset, or None."""
+    At least 3 such characters and 90% of them in one region and ruleset, or None. Within that
+    pool a realm of the save's own characters (own_realms) wins over the most-seen one."""
     names = sorted({c["n"] for c in body.get("characters") or [] if c.get("n")})
     if not names:
         return None
@@ -198,11 +199,87 @@ def forever_seen_realm(db, body, region):
     best = max(groups.values(), key=lambda g: sum(n for n, _ in g))
     if sum(n for n, _ in best) < 0.9 * total:
         return None
-    realm = max(best)[1]
+    pool = FOREVER_REALM.match(best[0][1]).group(1, 2)
+    mine = [r for r in own_realms if FOREVER_REALM.match(r)
+            and tuple(s.lower() for s in FOREVER_REALM.match(r).group(1, 2)) == tuple(s.lower() for s in pool)]
+    realm = max(mine, key=lambda r: votes.get(r, 0)) if mine else max(best)[1]
     known = db.execute("""SELECT realm_id, realm_normalized FROM census_collection_realms
         WHERE source_game='forever' AND region=? AND realm_name=? AND realm_id IS NOT NULL LIMIT 1""",
                        (region, realm)).fetchone()
     return (known[0], realm, known[1]) if known else (None, realm, None)
+
+
+SESSION_GAP = 15 * 60
+SESSION_MAX = 60 * 60
+
+
+def forever_own_realms(db, path, region, faction):
+    """{realm name} of the save's own characters of this faction (their GUIDs' server IDs)."""
+    servers = {int(m.group(1)) for guid, fac in own_characters(path)
+               if fac == faction and (m := re.match(r"^Player-(\d+)-", guid or ""))}
+    realms = set()
+    for server in servers:
+        realms |= {r[0] for r in db.execute(
+            """SELECT DISTINCT realm_name FROM census_collection_realms
+               WHERE source_game='forever' AND region=? AND realm_id=? AND coalesce(realm_name,'') <> ''""",
+            (region, server)).fetchall()}
+    return realms
+
+
+def forever_seen_sessions(db, body, region, own_realms=()):
+    """A blank-named Forever bucket can hold several characters' play: WoWCensus kept one bucket
+    per faction while the realm name was empty, filled from realms of different ruleset pools.
+    Its rows are cut into play sessions (a 15-minute gap, at most an hour each) and each session
+    is placed like a whole bucket (forever_seen_realm: at least 3 of the characters it saw on
+    known realms, 90% of them in one region and ruleset pool). Within that pool a realm of the
+    save's own characters wins over the most-seen realm. Returns ([(recovered, part body)], the
+    number of sessions that could not be placed); one part per realm."""
+    keyed = {c["k"]: c for c in body.get("characters") or [] if c.get("k")}
+    events = []                                            # (t, list name, row)
+    for o in body.get("observations") or []:
+        if (o[4] or o[3]) and o[0] in keyed:
+            events.append((int(o[4] or o[3]), "observations", o))
+    for s in body.get("samples") or []:
+        if s.get("t"):
+            events.append((int(s["t"]), "samples", s))
+    for q in body.get("sweepQueries") or []:
+        if q[2]:
+            events.append((int(q[2]), "sweepQueries", q))
+    for lo in body.get("locationObservations") or []:
+        if lo[3] and lo[1] in keyed:
+            events.append((int(lo[3]), "locationObservations", lo))
+    events.sort(key=lambda e: e[0])
+    sessions, start, last = [], None, None
+    for event in events:
+        if start is None or event[0] - last > SESSION_GAP or event[0] - start > SESSION_MAX:
+            sessions.append([])
+            start = event[0]
+        sessions[-1].append(event)
+        last = event[0]
+    parts, unplaced = {}, 0
+    for session in sessions:
+        seen = {row[0] if kind == "observations" else row[1]
+                for _, kind, row in session if kind in ("observations", "locationObservations")}
+        recovered = forever_seen_realm(db, {"characters": [keyed[k] for k in seen]}, region, own_realms)
+        if not recovered:
+            unplaced += 1
+            continue
+        part = parts.setdefault(recovered[1], (recovered, {"keys": set(), "rows": {}}))[1]
+        part["keys"] |= seen
+        for _, kind, row in session:
+            part["rows"].setdefault(kind, []).append(row)
+    out = []
+    for recovered, part in parts.values():
+        sweep_ids = {q[0] for q in part["rows"].get("sweepQueries", [])} | {
+            lo[0] for lo in part["rows"].get("locationObservations", [])}
+        sub = {k: v for k, v in body.items() if not isinstance(v, list)}
+        sub["identity"] = dict(body.get("identity") or {})
+        sub["characters"] = [keyed[k] for k in sorted(part["keys"])]
+        sub["sweeps"] = [s for s in body.get("sweeps") or [] if s.get("id") in sweep_ids]
+        for kind in ("observations", "samples", "sweepQueries", "locationObservations"):
+            sub[kind] = part["rows"].get(kind, [])
+        out.append((recovered, sub))
+    return out, unplaced
 
 
 def population_times(body):
@@ -525,9 +602,43 @@ def main():
                         # WoWCensus before 0.1.16 could read Forever's realm name while it was still empty.
                         recovered = forever_own_realm(db, market["path"], region, identity.get("faction"))
                         how = "the save's own characters are on"
+                        parts = []
                         if not recovered:
-                            recovered = forever_seen_realm(db, body, region)
+                            # One faction bucket can hold play on several realms: place it session by session.
+                            own = forever_own_realms(db, market["path"], region, identity.get("faction"))
+                            parts, unplaced = forever_seen_sessions(db, body, region, own)
                             how = "the characters it saw are on"
+                            if parts and unplaced:
+                                note = f"{source} {bucket}: blank realm; {unplaced} play session(s) left out, their sightings name no one realm"
+                                report["errors"].append(note)
+                                print(f"WARNING {note}", flush=True)
+                            if len(parts) == 1:
+                                (recovered, body), parts = parts[0], []
+                        if len(parts) > 1:
+                            imported = []
+                            for part_recovered, part in parts:
+                                part_identity = part["identity"]
+                                part_identity["realmID"], part_identity["realmName"], part_identity["realmNormalized"] = part_recovered
+                                part_bucket = f'{region}:forever:{part_identity["realmName"]}-{part_identity.get("faction") or "Neutral"}'
+                                part["game"] = "realm:" + part_bucket
+                                db.execute("""INSERT INTO census_collection_realms
+                                  (game,source_game,region,region_id,realm_id,realm_name,realm_normalized,faction)
+                                  VALUES (?,?,?,?,?,?,?,?) ON CONFLICT (game) DO UPDATE SET
+                                  region_id=excluded.region_id,realm_id=excluded.realm_id,
+                                  realm_normalized=excluded.realm_normalized""",
+                                  (part["game"], source, region, part_identity.get("regionID"), part_identity.get("realmID"),
+                                   part_identity["realmName"], part_identity.get("realmNormalized"), part_identity.get("faction")))
+                                phase_started = time.perf_counter()
+                                imported.append(importer(part))
+                                report["timingSeconds"][kind] += time.perf_counter() - phase_started
+                                print(f"{flavor:18} {bucket}: blank realm; {len(part['characters'])} characters from sessions "
+                                      f"on {part_identity['realmName']}, importing as {part_bucket}", flush=True)
+                            details = {"game": imported[0].get("game"), "parts": imported}
+                            legacy.log_import(db, market["sha256"], kind, log_bucket, source, details)
+                            result.update(recordedBucket=bucket, splitInto=[p[0][1] for p in parts])
+                            result[kind] = details
+                            changed_sources.add(source)
+                            continue
                         if not recovered:
                             note = f"{source} {bucket}: skipped, the realm name is blank and neither the save's own characters nor the characters it saw name one realm"
                             report["errors"].append(note)
