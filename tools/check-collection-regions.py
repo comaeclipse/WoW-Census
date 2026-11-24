@@ -15,7 +15,11 @@ for keys with rows in the last --days:
   MISMATCH     Retail only, labelled keys included: the characters seen on the
                key come from the other region's connected realms. Retail /who lists only the realm's
                connected group, and most realm names exist in both US and EU,
-               so the home realms say which one was scanned.
+               so the home realms say which one was scanned. KR/TW-labelled
+               keys are instead checked against Blizzard's realm list for that
+               region (tools/retail-connected-realms-apac.json, from
+               update-retail-connected-realms.py --apac), since the US/EU
+               votes cannot see those regions.
 
 Each problem line ends with the evidence. Exit status is 1 when anything is
 listed. import-savedvariables-pg.py runs this after every import.
@@ -36,6 +40,9 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
 
 REPO = Path(__file__).resolve().parent.parent
 CATALOG = REPO / "laragon-php" / "src" / "retail-connected-realms.json"
+APAC_CATALOG = REPO / "tools" / "retail-connected-realms-apac.json"
+# Pseudo-realm keys that hold region-wide data rather than one realm's.
+REGION_WIDE = {"regionwidecommodities"}
 DEFAULT_DSN = os.environ.get("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbname=marketlens_local user=skarz")
 
 
@@ -69,6 +76,16 @@ def retail_groups():
             for r in group["realms"]:
                 groups[region][norm(r["name"])] = members
     return groups
+
+
+def apac_realms():
+    """{region: set of normalized realm names, localized alternates included} for KR and TW,
+    or None when the catalog has not been fetched."""
+    if not APAC_CATALOG.is_file():
+        return None
+    data = json.loads(APAC_CATALOG.read_text(encoding="utf-8"))
+    return {region: {norm(n) for group in data.get(region, []) for r in group["realms"] for n in [r["name"], *r.get("alt", [])]}
+            for region in ("kr", "tw")}
 
 
 def main():
@@ -108,6 +125,7 @@ def main():
     groups = retail_groups()
     only_in = {region: set(groups[region]) - set(groups[other])
                for region, other in (("us", "eu"), ("eu", "us"))}
+    apac = apac_realms()
 
     problems = []
     for (source, game), regions in sorted(keys.items()):
@@ -120,6 +138,18 @@ def main():
         if source != "retail" or not regions:
             continue
         realm = norm(realm_of(game))
+        if realm in REGION_WIDE:
+            continue
+        labelled = re.match(r"^realm:(kr|tw):", game)
+        if labelled:
+            region = labelled.group(1)
+            if apac is None:
+                problems.append(f"UNCHECKED  {source} {game}: no KR/TW realm list; run "
+                                "tools/update-retail-connected-realms.py --apac")
+            elif realm not in apac[region]:
+                problems.append(f"MISMATCH   {source} {game}: {sum(regions.values())} rows labelled {region.upper()}, "
+                                f"but Blizzard lists no {region.upper()} realm by that name")
+            continue
         seen = home.get(game_realm(game), Counter())
         votes = {}
         for region in ("us", "eu"):

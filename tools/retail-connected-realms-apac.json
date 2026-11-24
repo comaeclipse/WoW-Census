@@ -1,0 +1,382 @@
+{
+ "fetchedAt": "2026-11-24T20:00:20Z",
+ "source": "Blizzard Game Data API, /data/wow/search/connected-realm (dynamic namespace)",
+ "kr": [
+  {
+   "id": 205,
+   "realms": [
+    {
+     "name": "Azshara",
+     "alt": [
+      "艾萨拉",
+      "艾薩拉",
+      "아즈샤라"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 210,
+   "realms": [
+    {
+     "name": "Burning Legion",
+     "alt": [
+      "燃烧军团",
+      "燃燒軍團",
+      "불타는 군단"
+     ]
+    },
+    {
+     "name": "Durotan",
+     "alt": [
+      "杜洛坦",
+      "杜隆坦",
+      "듀로탄"
+     ]
+    },
+    {
+     "name": "Stormrage",
+     "alt": [
+      "怒風",
+      "风暴之怒",
+      "스톰레이지"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 214,
+   "realms": [
+    {
+     "name": "Alexstrasza",
+     "alt": [
+      "红龙女王",
+      "雅立史卓莎",
+      "알렉스트라자"
+     ]
+    },
+    {
+     "name": "Deathwing",
+     "alt": [
+      "死亡之翼",
+      "데스윙"
+     ]
+    },
+    {
+     "name": "Rexxar",
+     "alt": [
+      "雷克萨",
+      "雷克薩",
+      "렉사르"
+     ]
+    },
+    {
+     "name": "Wildhammer",
+     "alt": [
+      "蛮锤",
+      "蠻錘",
+      "와일드해머"
+     ]
+    },
+    {
+     "name": "Windrunner",
+     "alt": [
+      "Ветрокрылая",
+      "風行者",
+      "风行者",
+      "윈드러너"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2116,
+   "realms": [
+    {
+     "name": "Cenarius",
+     "alt": [
+      "塞納留斯",
+      "塞纳留斯",
+      "세나리우스"
+     ]
+    },
+    {
+     "name": "Dalaran",
+     "alt": [
+      "达拉然",
+      "達拉然",
+      "달라란"
+     ]
+    },
+    {
+     "name": "Garona",
+     "alt": [
+      "迦罗娜",
+      "迦羅娜",
+      "가로나"
+     ]
+    },
+    {
+     "name": "Gul'dan",
+     "alt": [
+      "古尔丹",
+      "古爾丹",
+      "굴단"
+     ]
+    },
+    {
+     "name": "Hellscream",
+     "alt": [
+      "地狱咆哮",
+      "地獄吼",
+      "헬스크림"
+     ]
+    },
+    {
+     "name": "Hyjal",
+     "alt": [
+      "海加尔",
+      "海加爾山",
+      "하이잘"
+     ]
+    },
+    {
+     "name": "Malfurion",
+     "alt": [
+      "玛法里奥",
+      "瑪法里恩",
+      "말퓨리온"
+     ]
+    },
+    {
+     "name": "Norgannon",
+     "alt": [
+      "諾甘農",
+      "诺甘农",
+      "노르간논"
+     ]
+    },
+    {
+     "name": "Zul'jin",
+     "alt": [
+      "祖尔金",
+      "祖爾金",
+      "줄진"
+     ]
+    }
+   ]
+  }
+ ],
+ "tw": [
+  {
+   "id": 963,
+   "realms": [
+    {
+     "name": "Arthas",
+     "alt": [
+      "阿尔萨斯",
+      "阿薩斯"
+     ]
+    },
+    {
+     "name": "Chillwind Point",
+     "alt": [
+      "Берег Промозглого Ветра",
+      "冰風崗哨",
+      "冰风岗"
+     ]
+    },
+    {
+     "name": "Hellscream",
+     "alt": [
+      "地狱咆哮",
+      "地獄吼"
+     ]
+    },
+    {
+     "name": "Icecrown",
+     "alt": [
+      "寒冰皇冠"
+     ]
+    },
+    {
+     "name": "Quel'dorei",
+     "alt": [
+      "奎尔多雷",
+      "眾星之子"
+     ]
+    },
+    {
+     "name": "Shadowmoon",
+     "alt": [
+      "暗影之月"
+     ]
+    },
+    {
+     "name": "Spirestone",
+     "alt": [
+      "尖石",
+      "岩石巨塔"
+     ]
+    },
+    {
+     "name": "Whisperwind",
+     "alt": [
+      "語風",
+      "轻风之语"
+     ]
+    },
+    {
+     "name": "Zealot Blade",
+     "alt": [
+      "狂热之刃",
+      "狂熱之刃"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 966,
+   "realms": [
+    {
+     "name": "Arygos",
+     "alt": [
+      "亚雷戈斯",
+      "亞雷戈斯"
+     ]
+    },
+    {
+     "name": "Bleeding Hollow",
+     "alt": [
+      "血之谷",
+      "血环"
+     ]
+    },
+    {
+     "name": "Dragonmaw",
+     "alt": [
+      "巨龍之喉",
+      "巨龙之吼"
+     ]
+    },
+    {
+     "name": "Frostmane",
+     "alt": [
+      "冰霜之刃",
+      "冰霜之刺"
+     ]
+    },
+    {
+     "name": "Menethil",
+     "alt": [
+      "米奈希尔",
+      "米奈希爾"
+     ]
+    },
+    {
+     "name": "Nightsong",
+     "alt": [
+      "夜空之歌"
+     ]
+    },
+    {
+     "name": "Order of the Cloud Serpent",
+     "alt": [
+      "云端翔龙骑士团",
+      "雲蛟衛"
+     ]
+    },
+    {
+     "name": "Stormscale",
+     "alt": [
+      "雷鱗",
+      "风暴之鳞"
+     ]
+    },
+    {
+     "name": "World Tree",
+     "alt": [
+      "世界之树",
+      "世界之樹"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 980,
+   "realms": [
+    {
+     "name": "Crystalpine Stinger",
+     "alt": [
+      "水晶之刺"
+     ]
+    },
+    {
+     "name": "Demon Fall Canyon",
+     "alt": [
+      "屠魔山谷"
+     ]
+    },
+    {
+     "name": "Light's Hope",
+     "alt": [
+      "圣光之愿",
+      "聖光之願"
+     ]
+    },
+    {
+     "name": "Silverwing Hold",
+     "alt": [
+      "銀翼要塞",
+      "银翼要塞"
+     ]
+    },
+    {
+     "name": "Skywall",
+     "alt": [
+      "天空之墙",
+      "天空之牆"
+     ]
+    },
+    {
+     "name": "Sundown Marsh",
+     "alt": [
+      "日落沼泽",
+      "日落沼澤"
+     ]
+    },
+    {
+     "name": "Wrathbringer",
+     "alt": [
+      "天罚使者",
+      "憤怒使者"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 5735,
+   "realms": [
+    {
+     "name": "Krol Blade",
+     "alt": [
+      "克羅之刃",
+      "科罗尔之刃"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 5736,
+   "realms": [
+    {
+     "name": "Old Blanchy",
+     "alt": [
+      "老馬布蘭契",
+      "老马布兰契"
+     ]
+    }
+   ]
+  }
+ ]
+}

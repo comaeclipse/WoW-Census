@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Fetch Retail connected realms (US and EU) from Blizzard's Game Data API.
+"""Fetch Retail connected realms from Blizzard's Game Data API.
 
-    python -B tools/update-retail-connected-realms.py
+    python -B tools/update-retail-connected-realms.py           # US and EU
+    python -B tools/update-retail-connected-realms.py --apac    # Korea and Taiwan
 
 Reads BLIZZARD_CLIENT_ID and BLIZZARD_CLIENT_SECRET from the environment or the
-repository's .env. Writes laragon-php/src/retail-connected-realms.json, which the
-realm explorer uses to show each connected group as one row. Each realm keeps its
-display name (en_US in the US, en_GB in Europe) and any other localized names,
-so names seen in /who in another client language still match.
+repository's .env. The default writes laragon-php/src/retail-connected-realms.json,
+which the realm explorer uses to show each connected group as one row. --apac
+writes tools/retail-connected-realms-apac.json instead (the site does not read it;
+check-collection-regions.py uses it to confirm KR/TW-labelled keys). Each realm
+keeps its display name (en_US in the US, Korea and Taiwan, en_GB in Europe) and
+any other localized names, so names seen in /who in another client language
+still match.
 """
 
+import argparse
 import json
 import os
 import urllib.parse
@@ -19,7 +24,9 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "laragon-php" / "src" / "retail-connected-realms.json"
+APAC_OUT = REPO / "tools" / "retail-connected-realms-apac.json"
 REGIONS = {"us": "en_US", "eu": "en_GB"}
+APAC_REGIONS = {"kr": "en_US", "tw": "en_US"}
 
 
 def credentials():
@@ -68,18 +75,22 @@ def fetch_region(region, locale, token):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--apac", action="store_true", help="fetch Korea and Taiwan into tools/retail-connected-realms-apac.json")
+    args = parser.parse_args()
+    regions, target = (APAC_REGIONS, APAC_OUT) if args.apac else (REGIONS, OUT)
     client_id, secret = credentials()
     token = request_json("https://oauth.battle.net/token", data=b"grant_type=client_credentials",
                          auth=f"{client_id}:{secret}")["access_token"]
     out = {"fetchedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
            "source": "Blizzard Game Data API, /data/wow/search/connected-realm (dynamic namespace)"}
-    for region, locale in REGIONS.items():
+    for region, locale in regions.items():
         out[region] = fetch_region(region, locale, token)
         connected = sum(1 for g in out[region] if len(g["realms"]) > 1)
         print(f"{region}: {len(out[region])} connected realms, {connected} with more than one realm, "
               f"{sum(len(g['realms']) for g in out[region])} realms", flush=True)
-    OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"wrote {OUT.relative_to(REPO)}", flush=True)
+    target.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"wrote {target.relative_to(REPO)}", flush=True)
 
 
 if __name__ == "__main__":
