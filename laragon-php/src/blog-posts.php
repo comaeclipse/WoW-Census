@@ -9,6 +9,7 @@ return [
     //     'category' => 'site-news', // a slug from blog-categories.php
     //     'title' => 'Example update',
     //     'body' => "What changed and why.\n\nAny follow-up notes go here.",
+    //     'thumb' => 'blog-example-thumb.webp', // optional home page thumbnail in public/wow2008/ (96x64 shown)
     // ],
     1 => [
         'date' => '2026-09-07',
@@ -45,6 +46,14 @@ The biggest story is the new races. High Order Skyborne made up 16.6% of the All
 
 Classes are spread far more evenly than races. Every class is between 9% and 14% of its faction. Hunters (13.9%) and Druids (13.5%) are the most popular Alliance picks. On the Horde side, Shamans lead at 13.7%, against just 10.0% on the Alliance. Alliance players lean toward Mages and Paladins, while the Horde has more Warlocks, Rogues and Warriors. We'll keep scanning as people level up and settle on their mains. Follow along at wowcensus.io/forever to see whether the Skyborne novelty holds up and how the class mix shifts once people start reaching max level.
 TEXT,
+    ],
+    9 => [
+        'date' => '2026-11-24',
+        'category' => 'site-news',
+        'title' => 'Tracking real auction sales with the WoWCensus add-on',
+        'body' => 'The WoWCensus add-on now logs your own auctions as they sell, so item pages can show what things actually sold for and how long they took. Here is what the first few days of WoW: Forever sales show, and how to add yours.',
+        'html_file' => 'blog-realtime-sales.html',
+        'thumb' => 'blog-recent-sales-thumb.webp',
     ],
     8 => [
         'date' => '2026-11-21',

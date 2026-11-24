@@ -419,7 +419,7 @@ function home_page(): string {
   foreach (array_slice($posts, 0, 3, true) as $id => $p) {
     $text = trim(preg_replace('/\s+/u', ' ', $p['body']));
     if (mb_strlen($text) > 380) $text = rtrim(mb_substr($text, 0, mb_strrpos(mb_substr($text, 0, 380), ' ')), ' ,.;:') . '…';
-    $news[] = ['id' => $id, 'title' => $p['title'], 'date' => $p['date'], 'excerpt' => $text];
+    $news[] = ['id' => $id, 'title' => $p['title'], 'date' => $p['date'], 'excerpt' => $text, 'thumb' => $p['thumb'] ?? null];
   }
 
   // "Seen last 7 days" counts only editions with data in the newest week: an edition whose collection

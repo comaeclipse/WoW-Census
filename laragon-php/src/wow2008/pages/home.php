@@ -89,7 +89,7 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
         <article class="post">
           <div class="post-hd"><span class="ico<?= $i ? '' : ' g' ?>"></span><div><h2><a href="/blog.php?id=<?= e($post['id']) ?>"><?= e($post['title']) ?></a></h2><div class="by">Posted by <b>WoWCensus</b> on <?= e(gmdate('l, F j, Y', strtotime($post['date'] . ' UTC'))) ?></div></div></div>
           <div class="post-bd">
-            <img class="thumb" src="<?= e(asset($thumbs[$i % count($thumbs)])) ?>" alt="" width="96" height="64">
+            <img class="thumb" src="<?= e(asset($post['thumb'] ?? $thumbs[$i % count($thumbs)])) ?>" alt="" width="96" height="64">
             <p><?= e($post['excerpt']) ?></p>
             <div class="more"><a href="/blog.php?id=<?= e($post['id']) ?>">Read more »</a></div>
           </div>
