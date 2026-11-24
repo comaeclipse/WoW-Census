@@ -27,10 +27,9 @@ function localize_content(string $content): string {
   return preg_replace('/<script\s+src="\/assets\/js\/tooltips\.js"[^>]*><\/script>/', '', $content);
 }
 
-// Self-hosted GoatCounter analytics (s.wowcensus.io, on the droplet), added to every HTML page as it is written or served.
-// count.js skips localhost and private addresses, so local previews (127.0.0.1:8081) stay out of the counts.
-// Pages cached before the switch still load s.wowcensus.io/script.js, which nginx serves as a loader for count.js.
-const ANALYTICS_TAG = '<script data-goatcounter="https://s.wowcensus.io/count" async src="https://s.wowcensus.io/count.js"></script>';
+// Umami analytics (s.wowcensus.io = Vercel project wowcensus-umami, database on Supabase), added to every HTML page as it is written or served.
+// data-domains limits counting to wowcensus.io, so local previews (127.0.0.1:8081) stay out of the counts.
+const ANALYTICS_TAG = '<script defer src="https://s.wowcensus.io/script.js" data-website-id="15776ba3-1f50-4da9-98d7-59b2fc4066f9" data-domains="wowcensus.io"></script>';
 
 // Temporary notice shown under the header of each edition's census page. Set to null to hide it.
 // Give each new notice a new id: dismissals are remembered per id in the visitor's browser.
