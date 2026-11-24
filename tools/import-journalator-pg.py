@@ -502,6 +502,34 @@ def forever_character_realm(cur, char, faction, cache, ruleset=None):
     return cache[key]
 
 
+def ledger_character_realm(cur, region, char, faction, ruleset, cache):
+    """For a character the census has never seen: the realm its own ledger rows name in full.
+    Journalator keeps the full name ("Keshier Goldmourne"), the WoWCensus add-on only the first
+    ("Keshier"), so the full name is tried first, then the first name. Only rows in the same
+    region, ruleset and (when known) faction count, and they must all name one realm."""
+    if not char:
+        return None
+    key = ("ledger-realm", region, char, faction, ruleset)
+    if key not in cache:
+        cache[key] = None
+        for who, sql in ((char, "character = %s"), (first_name(char), "lower(split_part(character, ' ', 1)) = %s")):
+            cur.execute(f"""SELECT realm, faction FROM marketlens_import.addon_ledger_events
+                WHERE edition='forever' AND region=%s AND {sql} AND coalesce(realm,'') <> ''
+                GROUP BY 1, 2""", (region, who))
+            rows = [(r, f) for r, f in cur.fetchall() if FOREVER_REALM.match(r)
+                    and (ruleset is None or FOREVER_REALM.match(r).group(2).lower() == ruleset.lower())
+                    and (faction not in ("Alliance", "Horde") or f == faction)]
+            if not rows:
+                continue
+            realms = {r for r, _ in rows}
+            sides = {f for _, f in rows if f in ("Alliance", "Horde")}
+            if len(realms) == 1:
+                side = faction if faction in ("Alliance", "Horde") else (sides.pop() if len(sides) == 1 else None)
+                cache[key] = (realms.pop(), side)
+            break
+    return cache[key]
+
+
 def server_realm(cur, server, cache):
     """The Forever realm the census knows for a server ID (the number in a player GUID)."""
     if not server:
@@ -556,6 +584,8 @@ def fill_forever_realms(cur, groups, cache):
         elif section.startswith("WoWCensus:") and sha:
             realm = server_realm(cur, source_servers(cur, sha, cache).get(char), cache)
         place = forever_character_realm(cur, char, faction, cache, ruleset)
+        if not realm and not place:
+            place = ledger_character_realm(cur, region, char, faction, ruleset, cache)
         if not realm and place:
             realm = place[0]
         side = faction if faction in ("Alliance", "Horde") else (place[1] if place else None)
@@ -778,19 +808,29 @@ def drop_duplicate_sales(cur):
     add-on records only the first name ("Benedict"), Journalator the full one, so they land in
     different groups. A WoWCensus sale with the same realm, item, quantity and total as another
     add-on's sale by the same first name, within 15 minutes, is the same auction: keep the copy
-    that knows its listing time, else the other add-on's."""
+    that knows its listing time, else the other add-on's. A Forever row whose realm stayed a bare
+    ruleset ("PvP") pairs with a sale on any realm of that ruleset."""
     cur.execute("""SELECT s.event_key, s.edition, s.region, coalesce(s.realm, ''), coalesce(s.item_id::text, s.item_name),
             s.quantity, s.total, s.sold_at, s.posted_at, s.origin, e.character
         FROM marketlens_import.addon_auction_sales s JOIN marketlens_import.addon_ledger_events e USING (event_key)""")
     pools = defaultdict(list)
     for key, edition, region, realm, item, qty, total, sold, posted, origin, char in cur.fetchall():
-        pools[(edition, region, realm, item, qty, total, first_name(char))].append([sold, key, posted, origin])
+        place, bare = realm.strip().lower(), False
+        if edition == "forever":
+            named = FOREVER_REALM.match(realm.strip())
+            if named:
+                place = named.group(2).lower()
+            elif place in FOREVER_RULESETS:
+                place, bare = FOREVER_RULESETS[place].lower(), True
+        pools[(edition, region, place, item, qty, total, first_name(char))].append(
+            [sold, key, posted, origin, realm.strip().lower(), bare])
     dropped = 0
     for sales in pools.values():
         native = [s for s in sales if s[3] == "wowcensus"]
         others = [s for s in sales if s[3] != "wowcensus"]
         for n in native:
-            twin = next((o for o in others if abs(o[0] - n[0]) <= 900), None)
+            twin = next((o for o in others if abs(o[0] - n[0]) <= 900
+                         and (o[4] == n[4] or o[5] or n[5])), None)
             if not twin:
                 continue
             others.remove(twin)
