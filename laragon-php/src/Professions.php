@@ -704,7 +704,7 @@ function auction_market_key(string $source, ?string $region, ?string $realm): ?s
 /** The market key of one realm option on the AH page ("us:forever:CAMWOW US2 Realm 5 PvE" -> "us:PvE"), or null. */
 function auction_view_market_key(string $source, string $realmKey): ?string {
   if ($realmKey === 'all') return 'all';
-  if ($source === 'retail') return $realmKey;
+  if ($source === 'retail') return preg_match('/^[a-z]{2}:[^:]*:/i', $realmKey) ? retail_auction_group_label($realmKey) : $realmKey;
   if (!preg_match('/^([a-z]{2}):[^:]*:(.*)$/i', $realmKey, $m)) return null;
   return auction_market_key($source, $m[1], preg_replace('/-(Alliance|Horde)$/', '', $m[2]));
 }
