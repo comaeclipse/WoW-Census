@@ -680,6 +680,120 @@ function edition_recent_sales_table(string $source): string {
     . $rows . '</tbody></table></div>';
 }
 
+/**
+ * The auction-house market a ledger row belongs to, as a key the AH page's realm filter maps onto:
+ * Forever's ruleset economy ("us:PvE"), Retail's connected-realm label, otherwise "region:realm".
+ */
+function auction_market_key(string $source, ?string $region, ?string $realm): ?string {
+  $region = strtolower(trim((string)$region));
+  $realm = trim((string)$realm);
+  if ($realm === '') return null;
+  if ($source === PROFESSION_SOURCE) {
+    $group = forever_realm_group($realm);
+    $ruleset = ['normal' => 'PvE', 'pve' => 'PvE', 'pvp' => 'PvP', 'rp' => 'RP', 'roleplay' => 'RP',
+      'rp pvp' => 'RP PvP', 'roleplay pvp' => 'RP PvP', 'rppvp' => 'RP PvP'][strtolower($realm)] ?? null;
+    if (!$group && $ruleset && in_array($region, ['us', 'eu', 'kr'], true))
+      $group = forever_realm_group('CAMWOW ' . strtoupper($region) . '1 Realm 1 ' . $ruleset);
+    return $group['key'] ?? null;
+  }
+  if ($region === '') return null;
+  if ($source === 'retail') return retail_auction_group_label($region . ':retail:' . $realm);
+  return $region . ':' . js_lower($realm);
+}
+
+/** The market key of one realm option on the AH page ("us:forever:CAMWOW US2 Realm 5 PvE" -> "us:PvE"), or null. */
+function auction_view_market_key(string $source, string $realmKey): ?string {
+  if ($realmKey === 'all') return 'all';
+  if ($source === 'retail') return $realmKey;
+  if (!preg_match('/^([a-z]{2}):[^:]*:(.*)$/i', $realmKey, $m)) return null;
+  return auction_market_key($source, $m[1], preg_replace('/-(Alliance|Horde)$/', '', $m[2]));
+}
+
+/**
+ * Fastest and slowest movers from players' add-on ledgers, per market and faction.
+ * Fast: median time from listing to sale (WoWCensus / Journalator / TSM sales with a matched posting).
+ * Slow: auctions that came back unsold (Journalator expired mail, TSM expired, the add-on's own
+ * "has expired" message), then the slowest median sale time. Cancels are the seller's choice and not counted.
+ * Returns scopes["<market key>|<faction>"] = ['fast' => [...], 'slow' => [...], 'sales' => n, 'expired' => n];
+ * market key "all" and faction "all" cover everything.
+ */
+function auction_movers(string $source, int $limit = 10): array {
+  static $memo = [];
+  if (isset($memo[$source])) return $memo[$source];
+  if (!auction_sales_available()) return $memo[$source] = [];
+  $sales = Db::all('SELECT region, realm, faction, item_id, item_name, seconds_to_sell FROM addon_auction_sales
+    WHERE source_game=? AND item_id IS NOT NULL', [$source]);
+  // TSM leaves faction blank: take it from the same character's other rows on that realm.
+  $expired = Db::all("WITH e AS (
+      SELECT section, region, realm, faction, character, item_id, item_name, coalesce(quantity, 1) AS qty, t
+      FROM addon_ledger_events
+      WHERE source_game=? AND item_id IS NOT NULL AND section IN ('Failures', 'TSM:expired', 'WoWCensus:expired')
+        AND (section <> 'Failures' OR coalesce(row->>'failedType', 'expired') = 'expired'))
+    SELECT e.region, e.realm, coalesce(nullif(e.faction, ''), (SELECT f.faction FROM addon_ledger_events f
+        WHERE f.source_game=? AND f.region=e.region AND f.realm=e.realm AND f.character=e.character AND coalesce(f.faction, '') <> ''
+        LIMIT 1)) AS faction, e.item_id, e.item_name, e.qty
+    FROM e
+    WHERE e.section = 'Failures'
+      OR (e.section = 'TSM:expired' AND NOT EXISTS (SELECT 1 FROM e j WHERE j.section = 'Failures'
+        AND j.item_id = e.item_id AND j.character = e.character AND abs(j.t - e.t) <= 7200))
+      OR (e.section = 'WoWCensus:expired' AND NOT EXISTS (SELECT 1 FROM e j WHERE j.section = 'Failures'
+        AND j.item_id = e.item_id AND split_part(j.character, ' ', 1) = split_part(e.character, ' ', 1)
+        AND j.t BETWEEN e.t - 60 AND e.t + 30 * 86400))", [$source, $source]);
+  $buckets = [];
+  $scopesOf = function (array $r) use ($source): array {
+    $market = auction_market_key($source, $r['region'], $r['realm']);
+    $faction = in_array($r['faction'], ['Alliance', 'Horde'], true) ? $r['faction'] : null;
+    $keys = ['all|all'];
+    if ($faction) $keys[] = 'all|' . $faction;
+    if ($market !== null) { $keys[] = $market . '|all'; if ($faction) $keys[] = $market . '|' . $faction; }
+    return $keys;
+  };
+  foreach ($sales as $r) {
+    $id = (int)$r['item_id'];
+    foreach ($scopesOf($r) as $k) {
+      $it = &$buckets[$k]['items'][$id];
+      $it ??= ['name' => null, 'secs' => [], 'sold' => 0, 'expired' => 0];
+      $it['name'] ??= trim((string)$r['item_name']) ?: null;
+      $it['sold']++;
+      if ($r['seconds_to_sell'] !== null) $it['secs'][] = (int)$r['seconds_to_sell'];
+      $buckets[$k]['sales'] = ($buckets[$k]['sales'] ?? 0) + 1;
+      unset($it);
+    }
+  }
+  foreach ($expired as $r) {
+    $id = (int)$r['item_id'];
+    foreach ($scopesOf($r) as $k) {
+      $it = &$buckets[$k]['items'][$id];
+      $it ??= ['name' => null, 'secs' => [], 'sold' => 0, 'expired' => 0];
+      $it['name'] ??= trim((string)$r['item_name']) ?: null;
+      $it['expired']++;
+      $buckets[$k]['expired'] = ($buckets[$k]['expired'] ?? 0) + 1;
+      unset($it);
+    }
+  }
+  $median = function (array $v): ?int {
+    if (!$v) return null;
+    sort($v);
+    $n = count($v);
+    return (int)round($n % 2 ? $v[intdiv($n, 2)] : ($v[$n / 2 - 1] + $v[$n / 2]) / 2);
+  };
+  $out = [];
+  foreach ($buckets as $k => $b) {
+    $rows = [];
+    foreach ($b['items'] as $id => $it)
+      $rows[] = ['id' => $id, 'name' => $it['name'] ?? 'Item ' . $id, 'med' => $median($it['secs']),
+        'timed' => count($it['secs']), 'sold' => $it['sold'], 'expired' => $it['expired']];
+    // One quick sale is luck: items sold at least twice with a known listing time come first.
+    $timed = array_values(array_filter($rows, fn($r) => $r['timed'] > 0 && $r['expired'] < $r['sold']));
+    usort($timed, fn($a, $b) => (($b['timed'] >= 2) <=> ($a['timed'] >= 2)) ?: ($a['med'] <=> $b['med']) ?: ($b['timed'] <=> $a['timed']));
+    $slow = array_values(array_filter($rows, fn($r) => $r['expired'] > 0 || ($r['timed'] > 0 && $r['med'] >= 86400)));
+    usort($slow, fn($a, $b) => ($b['expired'] <=> $a['expired']) ?: (($b['med'] ?? 0) <=> ($a['med'] ?? 0)) ?: ($a['sold'] <=> $b['sold']));
+    $out[$k] = ['fast' => array_slice($timed, 0, $limit), 'slow' => array_slice($slow, 0, $limit),
+      'sales' => $b['sales'] ?? 0, 'expired' => $b['expired'] ?? 0];
+  }
+  return $memo[$source] = $out;
+}
+
 function item_recent_sales_html(?array $sales): string {
   if (!$sales) return '';
   $rows = '';

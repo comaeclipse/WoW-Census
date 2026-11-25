@@ -954,7 +954,13 @@ function auction_page(string $source, string $html): string {
   }
   $realms = array_map(fn($r) => [$r['key'], $r['key'] === 'all' ? $r['label'] : ($realmLabels[$r['key']] ?? $r['label'])], $model['dims']['realm']);
   $factions = array_map(fn($f) => [$f['key'], $f['key'] === 'all' ? ($f['label'] === 'Cross-faction' ? 'Cross-faction' : 'Both') : $f['label']], $model['dims']['faction']);
-  return page('auction-house', common_vars($source) + ['data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views],
+  $moverRow = fn(array $r) => [$r['id'], $r['name'], $icons[$r['id']] ?? null, $r['med'], $r['timed'], $r['sold'], $r['expired']];
+  $movers = ['scopes' => [], 'market' => []];
+  foreach (\auction_movers($source) as $k => $s)
+    $movers['scopes'][$k] = ['fast' => array_map($moverRow, $s['fast']), 'slow' => array_map($moverRow, $s['slow']),
+      'sales' => $s['sales'], 'expired' => $s['expired']];
+  foreach ($model['dims']['realm'] as $r) $movers['market'][$r['key']] = \auction_view_market_key($source, $r['key']);
+  return page('auction-house', common_vars($source) + ['data' => ['generated' => \utc_timestamp(\generated_at()), 'views' => $views, 'movers' => $movers],
     'realms' => $realms, 'factions' => $factions, 'wowhead' => 'https://www.wowhead.com/' . ($branch !== '' ? $branch . '/' : '') . 'item=',
     'itemBase' => \item_page_base($source),
     'recentSales' => \edition_recent_sales_table($source)], $html, 'auction-house');
