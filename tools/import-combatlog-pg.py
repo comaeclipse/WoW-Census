@@ -21,6 +21,22 @@ Tables (schema marketlens_import, created on first run):
                            crits, misses, min/max/total damage
   combatlog_npc_places     per log, mob and map: sightings, map name
   combatlog_npc_names      per log and mob: name, deaths, first/last seen
+  combatlog_npc_instances  per log, mob and instance map id (the 4th part of a creature GUID): sightings
+  combatlog_npc_mechanics  per log, mob and spell: casts started, casts players interrupted, summons (and what),
+                           time between one mob's casts of it, debuffs it left on players (applications, top
+                           stack, time on the player), and volleys (one cast landing on several players at once)
+
+Players are blanked to one GUID in companion uploads, so a debuff's time on a player is measured from its
+application to the next removal of that mob's debuff (approximate when one mob debuffs several players),
+and a volley is damage from one mob's spell landing within VOLLEY_SECONDS of the first hit.
+
+Inside a dungeon the advanced block's uiMapID is 0 and no MAP_CHANGE names the place, so a Forever
+dungeon is recognised from the creature GUIDs' instance map id instead: the Dungeon Journal run logs
+name it (dungeon_run_kills.map_id), or a journal boss's NPC id seen in that instance does. Those mobs
+get a combatlog_npc_places row with ui_map_id = -instance id and the dungeon's name, so the bestiary
+lists them under the dungeon. resolve_instance_places() rebuilds those rows from every log; this
+importer and tools/import-dungeon-runs-pg.py both run it. --instances refreshes only the instance and mechanics
+rows of logs already imported (for logs imported before the table existed).
 """
 
 import argparse
@@ -58,6 +74,8 @@ ADV_LEN = 19
 DAMAGE = {"SPELL_DAMAGE", "SPELL_PERIODIC_DAMAGE", "RANGE_DAMAGE", "SWING_DAMAGE", "DAMAGE_SHIELD", "SPELL_BUILDING_DAMAGE"}
 MISSED = {"SPELL_MISSED", "SPELL_PERIODIC_MISSED", "RANGE_MISSED", "SWING_MISSED", "DAMAGE_SHIELD_MISSED"}
 CASTS = {"SPELL_CAST_SUCCESS"}
+VOLLEY_SECONDS = 0.05
+CAST_GAP_MAX = 60.0  # a longer pause between one mob's casts is a new fight, not its rhythm
 
 
 def schema(cur):
@@ -82,7 +100,19 @@ def schema(cur):
         file_key text NOT NULL REFERENCES {s}.combatlog_files(file_key) ON DELETE CASCADE,
         source_game text NOT NULL, npc_id integer NOT NULL, ui_map_id integer NOT NULL, map_name text,
         sightings integer NOT NULL, PRIMARY KEY (file_key, npc_id, ui_map_id))""")
-    for t in ("names", "levels", "abilities", "places"):
+    cur.execute(f"""CREATE TABLE IF NOT EXISTS {s}.combatlog_npc_instances (
+        file_key text NOT NULL REFERENCES {s}.combatlog_files(file_key) ON DELETE CASCADE,
+        source_game text NOT NULL, npc_id integer NOT NULL, instance_id integer NOT NULL,
+        sightings integer NOT NULL, PRIMARY KEY (file_key, npc_id, instance_id))""")
+    cur.execute(f"""CREATE TABLE IF NOT EXISTS {s}.combatlog_npc_mechanics (
+        file_key text NOT NULL REFERENCES {s}.combatlog_files(file_key) ON DELETE CASCADE,
+        source_game text NOT NULL, npc_id integer NOT NULL, spell_id integer NOT NULL, ability text NOT NULL,
+        starts integer NOT NULL, interrupted integer NOT NULL, summons integer NOT NULL, summon_name text,
+        gap_sum_ms bigint NOT NULL, gap_n integer NOT NULL,
+        debuffs integer NOT NULL, debuff_max_stack integer NOT NULL, debuff_ms_sum bigint NOT NULL, debuff_n integer NOT NULL,
+        debuff_max_ms bigint NOT NULL, volleys integer NOT NULL, volley_hits integer NOT NULL,
+        PRIMARY KEY (file_key, npc_id, spell_id))""")
+    for t in ("names", "levels", "abilities", "places", "instances", "mechanics"):
         cur.execute(f"CREATE INDEX IF NOT EXISTS combatlog_npc_{t}_npc ON {s}.combatlog_npc_{t} (source_game, npc_id)")
 
 
@@ -101,6 +131,12 @@ def npc_id(guid, flags="0x0"):
         pass
     parts = guid.split("-")
     return int(parts[5]) if len(parts) > 6 and parts[5].isdigit() else None
+
+
+def instance_of(guid):
+    """Creature-0-7072-3065-5803-263390-000205FAA5 -> 3065 (the map the creature lives on)."""
+    parts = guid.split("-")
+    return int(parts[3]) if len(parts) > 6 and parts[3].isdigit() else None
 
 
 def to_int(v):
@@ -126,6 +162,13 @@ def read_log(path):
     levels = defaultdict(lambda: [0, None, None, None])   # (npc, level) -> [sightings, min_hp, max_hp, armor]
     abilities = defaultdict(lambda: [None, None, 0, 0, 0, 0, None, None, 0])  # (npc, spell) -> name, school, casts, hits, crits, misses, min, max, total
     places = defaultdict(int)  # (npc, map) -> sightings
+    instances = defaultdict(int)  # (npc, instance map id) -> sightings
+    # (npc, spell) -> name, starts, interrupted, summons, summon name, gap sum ms, gaps, debuffs, top stack,
+    # debuff ms sum, debuff timings, longest debuff ms, volleys, volley hits
+    mech = defaultdict(lambda: [None, 0, 0, 0, None, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    last_cast = {}     # (unit guid, spell) -> time of its last cast
+    debuff_on = {}     # (unit guid, spell) -> time its debuff went on
+    volley_at = {}     # (unit guid, spell) -> time of the volley's first hit
     map_names = {}
     first = last = None
     events = 0
@@ -156,13 +199,59 @@ def read_log(path):
             first = first or t
             last = t
             src, dst = npc_id(f[1], f[3]), npc_id(f[5], f[7])
-            for n, name in ((src, f[2]), (dst, f[6])):
+            for n, name, guid in ((src, f[2], f[1]), (dst, f[6], f[5])):
                 if n is not None and name and name != "nil":
                     rec = names.setdefault(n, [name, 0, t, t])
                     rec[0], rec[3] = name, t
+                    inst = instance_of(guid)
+                    if inst is not None:
+                        instances[(n, inst)] += 1
             if ev == "UNIT_DIED" and dst is not None:
                 names[dst][1] += 1
                 continue
+            if ev == "SPELL_INTERRUPT" and dst is not None and len(f) > 13 and to_int(f[12]):
+                m = mech[(dst, int(f[12]))]
+                m[0] = m[0] or f[13]
+                m[2] += 1
+                continue
+            if src is not None and not ev.startswith("SWING_") and len(f) > 11 and to_int(f[9]):
+                key, now = (f[1], int(f[9])), t.timestamp()
+                m = mech[(src, int(f[9]))]
+                if ev == "SPELL_CAST_START":
+                    m[0] = f[10]
+                    m[1] += 1
+                elif ev == "SPELL_CAST_SUCCESS":
+                    m[0] = f[10]
+                    prev = last_cast.get(key)
+                    if prev is not None and 0 < now - prev <= CAST_GAP_MAX:
+                        m[5] += int((now - prev) * 1000)
+                        m[6] += 1
+                    last_cast[key] = now
+                elif ev == "SPELL_SUMMON":
+                    m[0] = f[10]
+                    m[3] += 1
+                    m[4] = f[6] if f[6] and f[6] != "nil" else m[4]
+                elif ev.startswith("SPELL_AURA_") and f[5].startswith("Player-") and len(f) > 12 and f[12] == "DEBUFF":
+                    m[0] = f[10]
+                    if ev == "SPELL_AURA_APPLIED":
+                        m[7] += 1
+                        m[8] = max(m[8], 1)
+                        debuff_on.setdefault(key, now)
+                    elif ev == "SPELL_AURA_APPLIED_DOSE":
+                        m[8] = max(m[8], to_int(f[13]) or 0 if len(f) > 13 else 0)
+                        debuff_on.setdefault(key, now)
+                    elif ev == "SPELL_AURA_REMOVED" and key in debuff_on:
+                        ms = int((now - debuff_on.pop(key)) * 1000)
+                        m[9] += ms
+                        m[10] += 1
+                        m[11] = max(m[11], ms)
+                elif ev in ("SPELL_DAMAGE", "RANGE_DAMAGE") and f[5].startswith("Player-"):
+                    m[0] = f[10]
+                    first = volley_at.get(key)
+                    if first is None or now - first > VOLLEY_SECONDS:
+                        volley_at[key] = now
+                        m[12] += 1
+                    m[13] += 1
 
             swing = ev.startswith("SWING_")
             adv = 9 if swing else 12
@@ -214,6 +303,7 @@ def read_log(path):
                 a[0], a[1] = ability, school
                 a[5] += 1
     return {"header_ok": header_ok, "names": names, "levels": levels, "abilities": abilities, "places": places,
+            "instances": instances, "mechanics": mech,
             "map_names": map_names, "first": first, "last": last, "events": events}
 
 
@@ -238,6 +328,87 @@ def store(cur, key, d):
           [(key, SOURCE_GAME, n, sp, *v) for (n, sp), v in d["abilities"].items() if v[0]])
     batch(cur, f"""INSERT INTO {s}.combatlog_npc_places (file_key, source_game, npc_id, ui_map_id, map_name, sightings)
         VALUES (%s,%s,%s,%s,%s,%s)""", [(key, SOURCE_GAME, n, m, d["map_names"].get(m), c) for (n, m), c in d["places"].items()])
+    store_instances(cur, key, d)
+
+
+def store_mechanics(cur, key, d):
+    s = "marketlens_import"
+    cur.execute(f"DELETE FROM {s}.combatlog_npc_mechanics WHERE file_key = %s", (key,))
+    rows = [(key, SOURCE_GAME, n, sp, *v) for (n, sp), v in d["mechanics"].items()
+            if v[0] and (v[1] or v[2] or v[3] or v[6] or v[7] or v[12])]
+    pg.psycopg2.extras.execute_batch(cur, f"""INSERT INTO {s}.combatlog_npc_mechanics (file_key, source_game, npc_id, spell_id,
+        ability, starts, interrupted, summons, summon_name, gap_sum_ms, gap_n, debuffs, debuff_max_stack, debuff_ms_sum,
+        debuff_n, debuff_max_ms, volleys, volley_hits) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", rows)
+
+
+def store_instances(cur, key, d):
+    s = "marketlens_import"
+    cur.execute(f"DELETE FROM {s}.combatlog_npc_instances WHERE file_key = %s", (key,))
+    pg.psycopg2.extras.execute_batch(cur, f"""INSERT INTO {s}.combatlog_npc_instances (file_key, source_game, npc_id, instance_id, sightings)
+        VALUES (%s,%s,%s,%s,%s)""", [(key, SOURCE_GAME, n, i, c) for (n, i), c in d["instances"].items()])
+    store_mechanics(cur, key, d)
+
+
+def resolve_instance_places(cur):
+    """Rebuild the dungeon rows of combatlog_npc_places (ui_map_id = -instance id) for Forever logs and
+    return how many it wrote. An instance is named by the run logs' map id first, else by the journal
+    dungeon whose boss NPCs were seen there most."""
+    s = "marketlens_import"
+    cur.execute("SELECT to_regclass('marketlens_import.combatlog_npc_instances') IS NOT NULL, "
+                "to_regclass('marketlens_import.dungeon_run_kills') IS NOT NULL, "
+                "to_regclass('marketlens_import.forever_dungeon_bosses') IS NOT NULL")
+    have_inst, have_runs, have_bosses = cur.fetchone()
+    if not have_inst:
+        return 0
+    named = []
+    if have_runs:
+        named.append(f"SELECT DISTINCT map_id AS instance_id, dungeon AS name, 0 AS rank FROM {s}.dungeon_run_kills "
+                     "WHERE source_game = 'forever' AND map_id IS NOT NULL")
+    if have_bosses:
+        named.append(f"""SELECT * FROM (SELECT DISTINCT ON (i.instance_id) i.instance_id, d.name, 1 AS rank
+            FROM {s}.combatlog_npc_instances i JOIN {s}.forever_dungeon_bosses b ON b.npc_id = i.npc_id
+            JOIN {s}.forever_dungeons d ON d.slug = b.dungeon_slug
+            WHERE i.source_game = 'forever' AND i.instance_id > 1
+            GROUP BY i.instance_id, d.name ORDER BY i.instance_id, sum(i.sightings) DESC) b""")
+    cur.execute(f"DELETE FROM {s}.combatlog_npc_places WHERE source_game = 'forever' AND ui_map_id < 0")
+    if not named:
+        return 0
+    union = " UNION ALL ".join(named)
+    cur.execute(f"""WITH named AS ({union}),
+        pick AS (SELECT DISTINCT ON (instance_id) instance_id, name FROM named WHERE instance_id > 1 ORDER BY instance_id, rank)
+        INSERT INTO {s}.combatlog_npc_places (file_key, source_game, npc_id, ui_map_id, map_name, sightings)
+        SELECT i.file_key, i.source_game, i.npc_id, -i.instance_id, p.name, i.sightings
+        FROM {s}.combatlog_npc_instances i JOIN pick p USING (instance_id)
+        WHERE i.source_game = 'forever'
+          AND EXISTS (SELECT 1 FROM {s}.combatlog_npc_levels l WHERE l.file_key = i.file_key AND l.npc_id = i.npc_id)""")
+    return cur.rowcount
+
+
+def instances_only(args):
+    conn = pg.psycopg2.connect(args.dsn)
+    conn.autocommit = False
+    cur = conn.cursor()
+    cur.execute("SELECT pg_advisory_lock(hashtext('marketlens-import'))")
+    conn.commit()
+    schema(cur)
+    report = {"files": [], "dryRun": args.dry_run}
+    for path in args.logs or sorted(LOGS.glob("WoWCombatLog*.txt")):
+        key = file_key(path)
+        cur.execute("SELECT 1 FROM marketlens_import.combatlog_files WHERE file_key = %s AND source_game = %s", (key, SOURCE_GAME))
+        if cur.fetchone() is None:
+            report["files"].append({"file": path.name, "skipped": "not imported"})
+            continue
+        d = read_log(path)
+        store_instances(cur, key, d)
+        report["files"].append({"file": path.name, "instanceRows": len(d["instances"]), "mechanicRows": len(d["mechanics"])})
+    report["dungeonPlaceRows"] = resolve_instance_places(cur)
+    print(json.dumps(report, indent=1))
+    if args.dry_run:
+        conn.rollback()
+        print("DRY RUN: rolled back")
+        return
+    conn.commit()
+    print("CHANGED sources=combatlog" if report["dungeonPlaceRows"] or any("skipped" not in f for f in report["files"]) else "Nothing new")
 
 
 def main():
@@ -250,10 +421,14 @@ def main():
     ap.add_argument("--game", default=SOURCE_GAME, choices=GAMES,
                     help="site game key the logs belong to (default forever)")
     ap.add_argument("--class-stats", action="store_true", help="rebuild only the class/spell totals of the given logs")
+    ap.add_argument("--instances", action="store_true",
+                    help="refresh only the instance and mechanics rows of the given (already imported) logs, then the dungeon places")
     args = ap.parse_args()
     SOURCE_GAME = args.game
     if args.class_stats and not args.logs:
         ap.error("--class-stats requires explicit log paths")
+    if args.instances:
+        return instances_only(args)
     player_stats = _load("combatlog_player_stats", "combatlog-player-stats.py")
     class_only = args.class_stats
     logs = args.logs or sorted(LOGS.glob("WoWCombatLog*.txt"))
@@ -291,7 +466,7 @@ def main():
         cur.execute("SELECT count(DISTINCT npc_id) FROM marketlens_import.combatlog_npc_names")
         mobs = cur.fetchone()[0]
         cur.execute("SELECT count(*) FROM marketlens_import.combatlog_files")
-        report.update({"logsTotal": cur.fetchone()[0], "mobsTotal": mobs})
+        report.update({"logsTotal": cur.fetchone()[0], "mobsTotal": mobs, "dungeonPlaceRows": resolve_instance_places(cur)})
     print(json.dumps(report, indent=1))
     if args.dry_run:
         conn.rollback()

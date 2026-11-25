@@ -152,6 +152,210 @@ function forever_dungeon_runs(string $dungeon): array {
   return $cache[$dungeon] = $out;
 }
 
+function forever_dungeon_median(array $values): ?float {
+  $values = array_values(array_filter($values, fn($v) => $v !== null));
+  if (!$values) return null;
+  sort($values);
+  $n = count($values);
+  return $n % 2 ? (float)$values[intdiv($n, 2)] : ($values[$n / 2 - 1] + $values[$n / 2]) / 2;
+}
+
+/**
+ * How Dungeon Journal runs of $dungeon went, one run per group (several uploaders of one group share a
+ * group_key): ['runs', 'completed', 'clear' => median seconds to the last boss of completed runs,
+ * 'deaths' / 'releases' => per uploader per run, 'trash' => median trash kills,
+ * 'bosses' => [boss => ['at' => median seconds from the start, 'runs']]] in the order they fall; null without runs.
+ */
+function forever_dungeon_run_profile(string $dungeon): ?array {
+  static $ready = null;
+  $ready ??= (bool)(Db::first("SELECT to_regclass('dungeon_runs') IS NOT NULL AS ok")['ok'] ?? false);
+  if (!$ready) return null;
+  $runs = Db::all("SELECT DISTINCT ON (group_key) run_key, started_at, final_kill, completed, deaths, releases, trash_kills
+      FROM dungeon_runs WHERE source_game = ? AND dungeon = ? AND boss_kills > 0
+      ORDER BY group_key, boss_kills + trash_kills DESC, last_seen DESC NULLS LAST", [DUNGEON_SOURCE, $dungeon]);
+  if (!$runs) return null;
+  $start = [];
+  foreach ($runs as $r) $start[(string)$r['run_key']] = (int)$r['started_at'];
+  $marks = implode(',', array_fill(0, count($start), '?'));
+  $at = [];
+  foreach (Db::all("SELECT run_key, boss, min(killed_at) AS t FROM dungeon_run_kills WHERE run_key IN ($marks) GROUP BY 1, 2", array_keys($start)) as $k)
+    $at[(string)$k['boss']][] = (int)$k['t'] - $start[(string)$k['run_key']];
+  $bosses = [];
+  foreach ($at as $boss => $times) $bosses[$boss] = ['at' => forever_dungeon_median($times), 'runs' => count($times)];
+  uasort($bosses, fn($a, $b) => $a['at'] <=> $b['at']);
+  $done = array_filter($runs, fn($r) => $r['completed'] && $r['final_kill'] !== null);
+  return [
+    'runs' => count($runs), 'completed' => count($done),
+    'clear' => forever_dungeon_median(array_map(fn($r) => (int)$r['final_kill'] - (int)$r['started_at'], $done)),
+    'deaths' => array_sum(array_column($runs, 'deaths')) / count($runs),
+    'releases' => array_sum(array_column($runs, 'releases')) / count($runs),
+    'trash' => forever_dungeon_median(array_map(fn($r) => (int)$r['trash_kills'], $runs)),
+    'bosses' => $bosses,
+  ];
+}
+
+function forever_dungeon_minutes(float $seconds): string {
+  $m = (int)round($seconds / 60);
+  return $m >= 60 ? intdiv($m, 60) . ' h ' . ($m % 60) . ' min' : $m . ' min';
+}
+
+function forever_dungeon_run_profile_html(?array $p): string {
+  if (!$p) return '';
+  $n = $p['runs'];
+  $facts = [
+    [$p['clear'] !== null ? forever_dungeon_minutes($p['clear']) : '-', 'Typical clear' . ($p['completed'] ? ' (' . $p['completed'] . ' finished)' : '')],
+    [number_format($p['deaths'], 1), 'Deaths per player per run'],
+    [number_format($p['releases'], 1), 'Corpse runs per player per run'],
+    [$p['trash'] !== null ? js_locale((int)round($p['trash'])) : '-', 'Trash kills per run'],
+  ];
+  $factHtml = '<div class="dg-facts2">' . implode('', array_map(fn($f) => '<div><b>' . esc($f[0]) . '</b><span>' . esc($f[1]) . '</span></div>', $facts)) . '</div>';
+  $legs = [];
+  $prev = 0.0;
+  foreach ($p['bosses'] as $boss => $b) {
+    $legs[] = ['boss' => $boss, 'at' => $b['at'], 'leg' => max(0.0, $b['at'] - $prev), 'runs' => $b['runs']];
+    $prev = $b['at'];
+  }
+  $longest = $legs ? max(array_column($legs, 'leg')) : 0;
+  $rows = '';
+  foreach ($legs as $i => $l) {
+    $slow = count($legs) > 1 && $l['leg'] === $longest && $longest > 0;
+    $rows .= '<li' . ($slow ? ' class="slow"' : '') . '><span class="n">' . esc((string)$l['boss']) . '</span><span class="bar"><i style="width:' .
+      ($longest > 0 ? max(2, (int)round(100 * $l['leg'] / $longest)) : 2) . '%"></i></span><span class="t">+' . esc(forever_dungeon_minutes($l['leg'])) .
+      '<small> · at ' . esc(forever_dungeon_minutes($l['at'])) . ($l['runs'] < $n ? ' · ' . $l['runs'] . ' of ' . $n . ' runs' : '') . '</small></span></li>';
+  }
+  return '<section class="dg-boss dg-runs"><h3>How runs go <small>from ' . js_locale($n) . ' run' . ($n === 1 ? '' : 's') .
+    ' players logged with the Dungeon Journal add-on' . ($n < 3 ? ' · too few to call a trend yet' : '') . '</small></h3>' . $factHtml .
+    ($rows !== '' ? '<p class="hint" style="margin:0 0 4px">Time from the first pull to each boss (median); the longest bar is the slowest stretch.</p><ol class="dg-split">' . $rows . '</ol>' : '') .
+    '</section>';
+}
+
+/**
+ * Mobs combat logs saw inside $dungeon (bestiary entries placed there by their instance map id),
+ * ranked by the damage they did per kill: [slug => bestiary entry + 'perKill', 'damage'].
+ */
+function forever_dungeon_mobs(string $dungeon): array {
+  if (!function_exists('forever_bestiary')) return [];
+  $out = [];
+  foreach (forever_bestiary() as $slug => $m) {
+    if (!isset($m['places'][$dungeon])) continue;
+    $damage = array_sum(array_map(fn($a) => $a[9], $m['abilities']));
+    if ($damage <= 0) continue;  // critters and objects
+    $out[$slug] = $m + ['damage' => $damage, 'perKill' => $m['deaths'] > 0 ? $damage / $m['deaths'] : null, 'boss' => isset(forever_npcs()[$slug])];
+  }
+  // Trash first (which packs hurt), then the bosses; each by damage per kill.
+  uasort($out, fn($a, $b) => [$a['boss'], -($a['perKill'] ?? -1), -$a['damage']] <=> [$b['boss'], -($b['perKill'] ?? -1), -$b['damage']]);
+  return $out;
+}
+
+/**
+ * What each mob's spells did in players' combat logs (combatlog_npc_mechanics), npc id => [spell id => totals]
+ * with 'ability', 'starts', 'interrupted', 'summons', 'summon', 'gap' (average seconds between one mob's casts),
+ * 'debuffs', 'stack', 'debuffSec' (average time on a player), 'volleys', 'volleyHits'.
+ */
+function forever_dungeon_mechanics(array $npcIds): array {
+  static $ready = null;
+  $ready ??= (bool)(Db::first("SELECT to_regclass('combatlog_npc_mechanics') IS NOT NULL AS ok")['ok'] ?? false);
+  $npcIds = array_values(array_unique(array_map('intval', $npcIds)));
+  if (!$ready || !$npcIds) return [];
+  $marks = implode(',', array_fill(0, count($npcIds), '?'));
+  $out = [];
+  foreach (Db::all("SELECT npc_id, spell_id, max(ability) AS ability, sum(starts) AS starts, sum(interrupted) AS interrupted,
+      sum(summons) AS summons, max(summon_name) AS summon, sum(gap_sum_ms) AS gap_ms, sum(gap_n) AS gaps, sum(debuffs) AS debuffs,
+      max(debuff_max_stack) AS stack, sum(debuff_ms_sum) AS debuff_ms, sum(debuff_n) AS debuff_n, sum(volleys) AS volleys, sum(volley_hits) AS volley_hits
+      FROM combatlog_npc_mechanics WHERE source_game = ? AND npc_id IN ($marks) GROUP BY 1, 2", array_merge([DUNGEON_SOURCE], $npcIds)) as $r)
+    $out[(int)$r['npc_id']][(int)$r['spell_id']] = [
+      'ability' => (string)$r['ability'], 'starts' => (int)$r['starts'], 'interrupted' => (int)$r['interrupted'],
+      'summons' => (int)$r['summons'], 'summon' => $r['summon'], 'gap' => (int)$r['gaps'] > 0 ? (int)$r['gap_ms'] / (int)$r['gaps'] / 1000 : null,
+      'debuffs' => (int)$r['debuffs'], 'stack' => (int)$r['stack'], 'debuffSec' => (int)$r['debuff_n'] > 0 ? (int)$r['debuff_ms'] / (int)$r['debuff_n'] / 1000 : null,
+      'volleys' => (int)$r['volleys'], 'volleyHits' => (int)$r['volley_hits'],
+    ];
+  return $out;
+}
+
+function forever_dungeon_duration(float $sec): string {
+  if ($sec >= 90) return round($sec / 60) . ' min';
+  return (int)round($sec) . ' s';
+}
+
+/** One spell's measured behaviour as [tags, plain-language notes]; empty for spells with nothing to say. */
+function forever_dungeon_spell_notes(array $x): array {
+  $tags = $notes = [];
+  if ($x['debuffs'] > 0) {
+    $notes[] = 'leaves a debuff' . ($x['stack'] > 1 ? ' that stacks to ' . $x['stack'] : '') .
+      ($x['debuffSec'] !== null && $x['debuffSec'] >= 10 ? ', about ' . forever_dungeon_duration($x['debuffSec']) . ' on the player' : '');
+    if ($x['stack'] > 1) $tags[] = 'Stacks';
+    if (($x['debuffSec'] ?? 0) >= 120) $tags[] = 'Long debuff';
+  }
+  if ($x['volleys'] >= 2 && $x['volleyHits'] / $x['volleys'] >= 1.5) {
+    $notes[] = 'hits ' . number_format($x['volleyHits'] / $x['volleys'], 1) . ' players per cast on average';
+    $tags[] = 'Hits several';
+  }
+  if ($x['summons'] > 0) {
+    $notes[] = 'summons ' . ($x['summon'] ?: 'a helper');
+    $tags[] = 'Summons';
+  }
+  if ($x['starts'] > 0) {
+    $notes[] = 'has a cast time' . ($x['interrupted'] > 0 ? ', players interrupted ' . $x['interrupted'] . ' of ' . $x['starts'] : '');
+    if ($x['interrupted'] > 0) $tags[] = 'Interruptible';
+  }
+  if ($x['gap'] !== null && $x['gap'] >= 2) $notes[] = ($notes ? 'about' : 'used about') . ' every ' . forever_dungeon_duration($x['gap']) . ' while fighting';
+  return [$tags, $notes];
+}
+
+/** "What the mobs do": each measured mob's spells with what they did to players, trash first. */
+function forever_dungeon_mechanics_html(string $dungeon): string {
+  $mobs = forever_dungeon_mobs($dungeon);
+  if (!$mobs) return '';
+  $mech = forever_dungeon_mechanics(array_merge(...array_map(fn($m) => $m['ids'], array_values($mobs))));
+  $cards = '';
+  foreach ($mobs as $slug => $m) {
+    // Keyed by name: one spell can have several ids (ranks, versions); the first with something to say wins.
+    $spells = [];
+    foreach ($m['ids'] as $id) foreach ($mech[$id] ?? [] as $sp => $x) {
+      if ($x['ability'] === 'Dazed' || isset($spells[$x['ability']])) continue;  // every melee mob dazes from behind
+      [$tags, $notes] = forever_dungeon_spell_notes($x);
+      if ($notes) $spells[$x['ability']] = [$sp, $tags, $notes];
+    }
+    foreach ($m['abilities'] as $a) if ($a[0] !== 0 && !isset($spells[$a[1]]) && $a[3] > 0 && $a[1] !== 'Dazed')
+      $spells[$a[1]] = [$a[0], [], [js_locale($a[3]) . ' cast' . ($a[3] === 1 ? '' : 's') . ' logged']];
+    if (!$spells) continue;
+    $rows = '';
+    foreach ($spells as $name => [$sp, $tags, $notes])
+      $rows .= '<li><span class="sp">' . bestiary_spell_link((int)$sp, $name) . '</span>' .
+        implode('', array_map(fn($t) => '<span class="dg-mtag">' . esc($t) . '</span>', $tags)) .
+        '<span class="nt">' . esc(ucfirst(implode('; ', $notes))) . '</span></li>';
+    $cards .= '<div class="dg-mech-mob"><h4><a href="' . esc(forever_npc_path($slug)) . '">' . esc($m['name']) . '</a>' .
+      ($m['boss'] ? ' <span class="dg-rare">BOSS</span>' : '') . ' <small>Lv ' . esc(bestiary_levels($m)) . '</small></h4><ul>' . $rows . '</ul></div>';
+  }
+  if ($cards === '') return '';
+  return '<section class="dg-boss dg-mech"><h3>What the mobs do <small>measured from players\' combat logs</small></h3>' .
+    '<div class="dg-mech-grid">' . $cards . '</div>' .
+    '<p class="hint">Debuff times are how long a debuff stayed on a player; "players per cast" counts players hit within the same instant. Interrupts are the ones players landed in these logs.</p></section>';
+}
+
+function forever_dungeon_mobs_html(string $dungeon): string {
+  $mobs = forever_dungeon_mobs($dungeon);
+  if (!$mobs) return '';
+  $total = array_sum(array_column($mobs, 'damage')) ?: 1;
+  $rows = '';
+  foreach ($mobs as $slug => $m) {
+    $hardest = bestiary_hardest_hit($m);
+    $top = null;
+    foreach ($m['abilities'] as $a) if ($top === null || $a[9] > $top[9]) $top = $a;
+    $rows .= '<tr><td><a href="' . esc(forever_npc_path($slug)) . '">' . esc($m['name']) . '</a>' . ($m['boss'] ? ' <span class="dg-rare">BOSS</span>' : '') . '</td>' .
+      '<td>' . bestiary_levels($m) . '</td><td class="r">' . js_locale($m['deaths']) . '</td>' .
+      '<td class="r"><b>' . ($m['perKill'] !== null ? js_locale((int)round($m['perKill'])) : '-') . '</b></td>' .
+      '<td class="r hide-sm">' . js_locale((int)round(100 * $m['damage'] / $total)) . '%</td>' .
+      '<td class="hide-sm">' . ($top && $top[9] > 0 ? bestiary_ability_label($top) . ' <small>(' . js_locale($top[9]) . ')</small>' : '') . '</td>' .
+      '<td class="r hide-sm">' . ($hardest ? js_locale($hardest[8]) : '') . '</td></tr>';
+  }
+  return '<section class="dg-boss"><h3>Mobs in this dungeon <small>measured from players\' combat logs · trash, then bosses, each ranked by damage dealt per kill</small></h3>' .
+    '<table class="dg-list"><thead><tr><th>Mob</th><th>Level</th><th class="r">Killed</th><th class="r">Damage per kill</th>' .
+    '<th class="r hide-sm">Share of damage</th><th class="hide-sm">Does most damage with</th><th class="r hide-sm">Hardest hit</th></tr></thead><tbody>' . $rows . '</tbody></table>' .
+    '<p class="hint">Damage players took from each mob, after their armor and resistances. <a href="' . esc(forever_npc_path() . '?zone=' . rawurlencode($dungeon)) .
+    '">All of them in the bestiary</a>.</p></section>';
+}
+
 function forever_dungeon_item_name(int $id): string {
   return (item_cache('item-names', EDITIONS[DUNGEON_SOURCE]['branch'])[$id] ?? null) ?: ((item_cache('item-names', 'classic')[$id] ?? null) ?: 'Item ' . $id);
 }
@@ -397,6 +601,32 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-qb{padding:0 0 8px 16px;font-size:11.5px}
 .dg-qb p{margin:0 0 3px}
 .dg-qb .dg-it{margin-right:6px}
+.dg-split{list-style:none;margin:0;padding:0}
+.dg-split li{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) minmax(150px,auto);align-items:center;gap:8px;padding:3px 0;font-size:12px}
+.dg-split .n{font-weight:bold}
+.dg-split .bar{display:block;height:10px;background:rgba(255,255,255,.08);border-radius:2px}
+.dg-split .bar i{display:block;height:100%;background:#c8a040;border-radius:2px}
+.dg-split li.slow .bar i{background:#c0392b}
+.dg-split li.slow .n:after{content:" slowest stretch";font-size:10px;font-weight:normal;color:#e07060;margin-left:4px}
+.dg-split .t small{opacity:.7}
+@media (max-width:640px){.dg-split li{grid-template-columns:minmax(0,1fr) auto}.dg-split .bar{grid-column:1/-1;grid-row:2}}
+.w8-framed .dg-split .bar{background:#e2cb98}
+.w8-framed .dg-split .bar i{background:#7a5a20}
+.w8-framed .dg-split li.slow .bar i{background:#7a1e10}
+.w8-framed .dg-split li.slow .n:after{color:#7a1e10}
+.dg-mech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.dg-mech-mob{padding:6px 9px;border:1px solid rgba(255,255,255,.12);border-radius:3px}
+.dg-mech-mob h4{margin:0 0 4px;font-size:13px}
+.dg-mech-mob h4 small{font-weight:normal;opacity:.7;font-size:10.5px}
+.dg-mech-mob ul{margin:0;padding:0;list-style:none}
+.dg-mech-mob li{margin:4px 0;font-size:11.5px;line-height:1.4}
+.dg-mech-mob .sp{font-weight:bold;margin-right:4px}
+.dg-mech-mob .nt{display:block;opacity:.85}
+.dg-mtag{display:inline-block;margin-right:3px;padding:0 5px;font-size:9.5px;border-radius:2px;background:#5a2a10;color:#ffd75a;text-transform:uppercase;letter-spacing:.03em}
+@media (max-width:640px){.dg-mech-grid{grid-template-columns:minmax(0,1fr)}}
+.w8-framed .dg-mech-mob{border-color:#c9a86a;background:rgba(243,226,184,.5)}
+.w8-framed .dg-mech-mob .nt{color:#4a3618;opacity:1}
+.w8-framed .dg-mtag{background:#7a1e10;color:#fff}
 .dg-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
 .dg-tile{display:flex;align-items:center;gap:8px;padding:6px;border:1px solid rgba(255,255,255,.15);text-decoration:none}
 .dg-tile img{width:36px;height:36px;border:1px solid rgba(0,0,0,.7);border-radius:3px;flex:none}
@@ -682,6 +912,8 @@ function forever_dungeons_body(?array $d): string {
     $facts[] = [(string)count($quests), 'Quests · ' . implode(' · ', $split)];
   }
   $facts[] = [js_locale(forever_dungeon_loot_count($d)), 'Items in the loot tables'];
+  $profile = forever_dungeon_run_profile($d['name']);
+  if ($profile) $runs = max($runs, $profile['runs']);
   $facts[] = [$runs ? js_locale($runs) : '-', 'Runs logged by players'];
   $factHtml = '<div class="dg-facts2">' . implode('', array_map(fn($f) => '<div><b>' . esc($f[0]) . '</b><span>' . esc($f[1]) . '</span></div>', $facts)) . '</div>';
 
@@ -710,7 +942,10 @@ function forever_dungeons_body(?array $d): string {
     ($d['lootIncomplete'] ? '<p class="hint">The loot list for this dungeon is still being filled in.</p>' : '') .
     forever_dungeon_overview_html($d) .
     ($count ? '<section class="dg-boss dg-route-box"><h3>Boss route <small>in the journal\'s order · pick a boss to see its loot</small></h3><ol class="dg-route">' . $route . '</ol></section>' : '') .
+    forever_dungeon_run_profile_html($profile) .
     '<div class="dg-main' . ($questPanel === '' ? ' solo' : '') . '"><div class="dg-cards">' . $cards . '</div>' . $questPanel . '</div>' .
+    forever_dungeon_mobs_html($d['name']) .
+    forever_dungeon_mechanics_html($d['name']) .
     ($bestHtml !== '' ? '<section class="dg-boss"><h3>Best of the dungeon <small>the drops players saw most often</small></h3><div class="dg-tiles">' . $bestHtml . '</div></section>' : '') .
     ($trash !== '' ? '<section class="dg-boss"><h3>Trash drops <small>from any mob in the dungeon · hover for the slot</small></h3><div class="dg-chips">' . $trash . '</div></section>' : '') .
     ($anySeen ? '<p class="hint">' . forever_dungeon_seen_note() . '</p>' : '') . '<p class="dg-credit"><a href="' . esc(forever_dungeon_path()) . '">All dungeons</a> · ' . forever_dungeon_credit() . '</p></div>' .
