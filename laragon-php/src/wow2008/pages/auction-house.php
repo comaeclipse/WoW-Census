@@ -18,34 +18,15 @@ namespace Wow2008;
     </div>
 
     <style>
-      .ahcols{display:grid;grid-template-columns:200px minmax(0,1fr) 200px;gap:12px;align-items:start}
-      .ahcols #ahBody .tiles{grid-template-columns:repeat(2,1fr)}
-      .ahcols #ahBody .ahgrid{grid-template-columns:minmax(0,1fr)}
-      .ahrail .ahwin .wt{flex-wrap:wrap;gap:2px 8px}
-      .ahrail .ahwin .wt small{margin-left:0;flex-basis:100%}
-      .mv{list-style:none;margin:0;padding:0;font-size:11px}
-      .mv li{display:grid;grid-template-columns:16px 20px minmax(0,1fr);gap:0 4px;align-items:center;padding:4px 6px;border-bottom:1px solid #2a2418;color:#e8dcc0}
-      .mv li:nth-child(odd){background:rgba(255,255,255,.025)}
-      .mv li:hover{background:rgba(255,215,90,.10)}
-      .mv .rk{color:#9a8a6a;text-align:right;font-size:10px}
-      .mv .ic{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:2px;border:1px solid #000;outline:1px solid #6a6050;font:900 9px Tahoma,Arial,sans-serif;color:#fff}
-      .mv .ic img{display:block;width:100%;height:100%;object-fit:cover}
-      .mv .ic:has(img){overflow:hidden;background:#111}
-      .mv .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      .mv .nm a{color:#fff;text-decoration:none;font-weight:bold}
-      .mv .nm a:hover{color:#ffd75a;text-decoration:underline}
-      .mv .mt{grid-column:3;font-size:10px;color:#b8a888}
-      .mv .mt b{color:#7cff3a;font-weight:bold}
-      .mv.slow .mt b{color:#ff7a5a}
-      .mv-empty{padding:12px 10px;font-size:11px;color:#b8a888}
-      .ahrail .mv-note{padding:6px 8px;font-size:10px;color:#8a7a5a;border-top:1px solid #2a2418}
-      @media (max-width:900px){.ahcols{display:flex;flex-direction:column}.ahcols>*{width:100%}.ahcols #ahBody .ahgrid{grid-template-columns:1fr}}
+      #ahMovers{margin-bottom:14px}
+      #ahMovers .mt{color:#b8a888;white-space:nowrap}
+      #ahMovers .fast{color:#7cff3a;font-weight:bold}
+      #ahMovers .slow{color:#ff7a5a;font-weight:bold}
+      #ahMovers .mv-empty{padding:14px 10px;font-size:11px;color:#b8a888}
+      @media (max-width:700px){#ahMovers{grid-template-columns:1fr}}
     </style>
-    <div class="ahcols">
-      <aside class="ahrail" id="ahFast"></aside>
-      <div id="ahBody"></div>
-      <aside class="ahrail" id="ahSlow"></aside>
-    </div>
+    <div class="ahgrid" id="ahMovers"></div>
+    <div id="ahBody"></div>
 
     <div class="source">Auction data from in-game scans · asking prices on listed auctions, not completed sales · <?= !empty($itemBase) ? 'click an item for its price history' : 'item names link to Wowhead' ?></div>
 <?php if ($recentSales !== ''): ?>
@@ -134,26 +115,27 @@ const MV = AH.movers || { scopes: {}, market: {} };
 const dur = s => s < 60 ? `${s}s` : s < 3600 ? `${Math.floor(s / 60)}m` : s < 86400
   ? `${Math.floor(s / 3600)}h${Math.floor(s % 3600 / 60) ? ' ' + Math.floor(s % 3600 / 60) + 'm' : ''}`
   : `${Math.floor(s / 86400)}d${Math.floor(s % 86400 / 3600) ? ' ' + Math.floor(s % 86400 / 3600) + 'h' : ''}`;
-const plural = (n, w) => `${fmt(n)} ${w}${n === 1 ? '' : 's'}`;
 function renderMovers(realmName, facName) {
   const market = MV.market[realm];
   const s = market != null ? MV.scopes[`${market}|${fac}`] : null;
   const ruleset = market && market.match(/^([a-z]{2}):((?:RP[- ])?PvP|PvE|RP)$/);
   const where = ruleset ? `${ruleset[1].toUpperCase()} ${ruleset[2].replace("-", " ")} economy` : realmName;
   const scope = `${esc(where)}${fac === 'all' ? '' : ' · ' + esc(facName)}`;
-  const link = ([id, name]) => id
-    ? <?php if (!empty($itemBase)): ?>`<a href="<?= e($itemBase) ?>${id}" title="Price history for ${esc(name)}">${esc(name)}</a>`<?php else: ?>`<a href="<?= e($wowhead) ?>${id}" target="_blank" rel="noopener">${esc(name)}</a>`<?php endif ?>
-    : esc(name);
-  const list = (rows, cls, meta) => `<ol class="mv ${cls}">${rows.map((r, i) =>
-    `<li><span class="rk">${i + 1}</span><span class="ic">${wowIcon(r[2] || 'inv_misc_questionmark', esc(r[1][0]))}</span><span class="nm" title="${esc(r[1])}">${link(r)}</span><span class="mt">${meta(r)}</span></li>`).join('')}</ol>`;
-  const empty = what => `<div class="mv-empty">No ${what} recorded for ${scope} yet.</div>`;
-  document.getElementById('ahFast').innerHTML = `<div class="ahwin"><div class="wt">Fastest Movers<small>${scope}</small></div>
-    ${s && s.fast.length ? list(s.fast, 'fast', r => `<b>${dur(r[3])}</b> median · ${plural(r[4], 'sale')}`) : empty('timed sales')}
-    <div class="mv-note">Median time from listing to sale, from players' WoWCensus, Journalator and TSM logs.</div></div>`;
-  document.getElementById('ahSlow').innerHTML = `<div class="ahwin"><div class="wt">Slowest Movers<small>${scope}</small></div>
-    ${s && s.slow.length ? list(s.slow, 'slow', r => [r[6] ? `<b>${fmt(r[6])} expired</b>` : '',
-      r[5] ? plural(r[5], 'sale') : 'no sales', r[3] != null && r[4] ? dur(r[3]) + ' median' : ''].filter(Boolean).join(' · ')) : empty('expired auctions')}
-    <div class="mv-note">Auctions that came back unsold, then the longest waits to sell. Cancelled auctions aren't counted.</div></div>`;
+  const item = r => itemLink({ id: r[0], name: r[1], icon: r[2] });
+  const box = (title, sub, what, cols, rows) => rows && rows.length ? table(title, sub, cols, rows)
+    : `<div class="ahwin"><div class="wt">${title}<small>${sub}</small></div><div class="mv-empty">No ${what} recorded for ${scope} yet.</div></div>`;
+  document.getElementById('ahMovers').innerHTML =
+    box('Fastest Movers', `median time to sell · ${scope}`, 'timed sales', [
+      { h: 'Item', v: item },
+      { h: 'Sells in', num: true, v: r => `<span class="fast">${dur(r[3])}</span>` },
+      { h: 'Sales', num: true, v: r => fmt(r[4]) }
+    ], s && s.fast) +
+    box('Slowest Movers', `expired auctions, then longest waits · ${scope}`, 'expired auctions', [
+      { h: 'Item', v: item },
+      { h: 'Expired', num: true, v: r => r[6] ? `<span class="slow">${fmt(r[6])}</span>` : '<span class="mt">0</span>' },
+      { h: 'Sold', num: true, v: r => fmt(r[5]) },
+      { h: 'Sells in', num: true, v: r => r[3] != null && r[4] ? dur(r[3]) : '<span class="mt">—</span>' }
+    ], s && s.slow);
 }
 
 function render() {
