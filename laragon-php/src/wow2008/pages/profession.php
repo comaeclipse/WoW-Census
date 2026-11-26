@@ -170,14 +170,8 @@ function render() {
     <section class="section">
       <div class="post-hd"><span class="ico g"></span><h2>${esc(PROF.name)} Market Report</h2><div class="sub">${esc(realmName)} · ${esc(facName)}</div></div>
       <div class="section-bd">
-        <div class="report">
-          <svg viewBox="0 0 64 64" aria-hidden="true">
-            <defs><radialGradient id="pf-c" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff6b0"/><stop offset=".55" stop-color="#e0a810"/><stop offset="1" stop-color="#6a4400"/></radialGradient></defs>
-            <rect x="8" y="6" width="40" height="52" rx="2" fill="#f8ecc8" stroke="#7a5a20" stroke-width="2"/>
-            <g stroke="#9c7c42" stroke-width="2"><line x1="14" y1="16" x2="42" y2="16"/><line x1="14" y1="24" x2="42" y2="24"/><line x1="14" y1="32" x2="36" y2="32"/><line x1="14" y1="40" x2="40" y2="40"/></g>
-            <circle cx="46" cy="46" r="13" fill="url(#pf-c)" stroke="#5a3a00" stroke-width="1.5"/>
-            <text x="46" y="51" text-anchor="middle" font-family="Tahoma, Arial, sans-serif" font-weight="900" font-size="13" fill="#5a3a00">g</text>
-          </svg>
+        <div class="report" style="grid-template-columns:32px 1fr">
+          <img src="/wow2008/report-help.png" alt="" width="32" height="32">
           <div>
             <p>${sentences.join(' ')}</p>
             <p class="caveat">These figures describe what's listed and at what asking price. They don't show what actually sold.</p>
