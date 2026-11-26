@@ -87,8 +87,8 @@ const DATA = <?= js($data) ?>;
 const sum = o => Object.values(o).reduce((a,b)=>a+b,0);
 const pct = (n,t) => (n/t*100).toFixed(1) + '%';
 
-// Faction balance (class-distribution totals = characters shown)
-const aT = sum(DATA.cls.A), hT = sum(DATA.cls.H), all = aT + hT;
+// Faction balance: every character seen, including those of no recorded class
+const aT = DATA.n.A, hT = DATA.n.H, all = aT + hT;
 document.getElementById('aTot').textContent = fmt(aT);
 document.getElementById('hTot').textContent = fmt(hT);
 const tugA = document.getElementById('tugA'), tugH = document.getElementById('tugH');

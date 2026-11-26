@@ -361,8 +361,17 @@ function framed_page(?string $source, string $html, ?string $page, string $art =
 }
 
 function census_page(string $source, string $html): string {
-  $view = \census_views($source)[0]['census'];
-  $faction = fn(string $f) => array_values(array_filter($view['groups'], fn($g) => $g['faction'] === $f))[0] ?? null;
+  // The Realm Viewer's characters, summed over every realm, so the totals here match the realms list.
+  $byFaction = [];
+  foreach (\realm_explorer_data($source)['realms'] as $realm)
+    foreach ($realm['factions'] as $fac => $f) {
+      $g = &$byFaction[$fac];
+      $g ??= ['characters' => 0, 'races' => [], 'classes' => [], 'combos' => []];
+      $g['characters'] += $f['chars'];
+      foreach (['races', 'classes', 'combos'] as $k) foreach ((array)$f[$k] as $name => $n) $g[$k][(string)$name] = ($g[$k][(string)$name] ?? 0) + $n;
+      unset($g);
+    }
+  $faction = fn(string $f) => $byFaction[$f] ?? null;
   $data = ['top' => [], 'race' => [], 'cls' => []];
   $totals = [];
   foreach (['A' => 'Alliance', 'H' => 'Horde'] as $k => $name) {
@@ -382,6 +391,7 @@ function census_page(string $source, string $html): string {
     foreach ($g['classes'] ?? [] as $cf => $n) $classes[\CLASS_META[$cf][0] ?? $cf] = $n;
     $data['cls'][$k] = (object)$classes;
   }
+  $data['n'] = $totals;
   $summary = \inspect_summary($source);
   $split = in_array($source, ['retail', 'classic-progression', 'mop-classic', 'classic'], true) ? $summary['roleSplit'] : null;
   if ($split) {
