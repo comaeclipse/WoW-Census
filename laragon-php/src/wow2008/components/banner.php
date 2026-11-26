@@ -14,6 +14,7 @@ namespace Wow2008;
  *   icon            optional icon URL, drawn before the title
  *   intro           optional description under the subtitle
  *   tools           optional raw HTML (a picker), drawn top right
+ *   overlay         optional raw HTML (a stats strip), drawn bottom right
  */
 // Echo the rotating image banners used by the original site's Flash-era headers.
 $paintedBanners = ['census', 'realms', 'auction-house', 'guilds', 'geography', 'talents', 'gear', 'molten-core', 'moonbrook', 'lava-dragon', 'uldaman-1', 'uldaman-2'];
@@ -48,6 +49,9 @@ $randomBanner = in_array($art, $fixedBanners, true) ? $art
 </div>
 <?php if (!empty($tools)): ?>
 <div class="banner-tools"><?= $tools ?></div>
+<?php endif; ?>
+<?php if (!empty($overlay)): ?>
+<div class="banner-overlay"><?= $overlay ?></div>
 <?php endif; ?>
 <?php if (!empty($seen)): ?>
 <?= component('seen', ['seen' => $seen]) ?>

@@ -1204,7 +1204,8 @@ const DUNGEON_W8_INDEX_SCRIPT = <<<'HTML'
 HTML;
 
 const DUNGEON_W8_INDEX_STYLE = <<<'CSS'
-.dgx-stats{position:relative;z-index:2;display:flex;width:max-content;margin:-74px 12px 30px auto;background:rgba(0,0,0,.72);border:1px solid #6a5022;box-shadow:inset 0 0 0 1px rgba(255,215,90,.08)}
+.census-banner .banner-overlay{position:absolute;right:12px;bottom:10px;z-index:1}
+.dgx-stats{display:flex;width:max-content;background:rgba(0,0,0,.72);border:1px solid #6a5022;box-shadow:inset 0 0 0 1px rgba(255,215,90,.08)}
 .dgx-stats div{padding:6px 12px 5px;text-align:center;border-left:1px solid #3a2a12}
 .dgx-stats div:first-child{border-left:0}
 .dgx-stats b{display:block;font:900 22px/1 'Cinzel',serif;color:var(--gold-lt);text-shadow:0 0 6px rgba(255,170,0,.45)}
@@ -1278,7 +1279,10 @@ const DUNGEON_W8_INDEX_STYLE = <<<'CSS'
 .w8-framed .dgx-know .btn-red{display:block;margin:0 8px;text-align:center;text-decoration:none;color:#ffe8c0}
 @media (max-width:900px){.dgx-wrap{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:760px){
-  .dgx-stats{width:auto;margin:-12px 0 16px}
+  .census-banner:has(.banner-overlay){height:206px}
+  .census-banner:has(.banner-overlay) .t{bottom:70px}
+  .census-banner .banner-overlay{left:8px;right:8px;bottom:8px}
+  .dgx-stats{width:auto}
   .dgx-stats div{flex:1;padding:5px 4px}
   .dgx-stats b{font-size:17px}
   .dgx-find-bd{grid-template-columns:1fr 1fr}
