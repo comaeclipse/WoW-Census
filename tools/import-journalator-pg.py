@@ -78,7 +78,7 @@ PRIVATE = {"playerName", "player", "recipient", "sender", "subject", "text",
            "crafterName", "crafterNote", "customerNote", "otherPlayer"}
 MAX_DEPTH = 6
 SALE_WINDOW = 48 * 3600 + 3600   # longest auction plus slack for clock skew
-MAIL_DELAY = 3600                # outside Retail, auction gold arrives by mail an hour after the sale
+MAIL_DELAY = 3600                # outside Retail and Forever, auction gold arrives by mail an hour after the sale
 LIVE_SALE_GAP = 600              # TSM time this far before the invoice = TSM saw the sale happen
 
 
@@ -842,15 +842,26 @@ def drop_duplicate_sales(cur):
 
 
 def rebuild_sales(cur, groups):
-    """Recompute addon_auction_sales for each (edition, region, realm, character) touched."""
+    """Recompute addon_auction_sales for each (edition, region, realm, character) touched.
+
+    Forever's add-on records a seller by first name ("Naomi") while Journalator and TSM record the
+    full name ("Naomi Spellclicker"), so a Forever character is every name with that first word:
+    otherwise an invoice never meets the add-on's mail and sale message for the same auction, is
+    stored twice and keeps only its "sold by" time (the mail opened, often hours later)."""
     made = 0
+    seller = {}
     for edition, region, realm, char in groups:
-        cur.execute("""DELETE FROM marketlens_import.addon_auction_sales s USING marketlens_import.addon_ledger_events e
+        if edition == "forever" and char is not None:
+            seller[(edition, region, realm, first_name(char))] = "lower(split_part(character, ' ', 1)) = %s"
+        else:
+            seller.setdefault((edition, region, realm, char), "character IS NOT DISTINCT FROM %s")
+    for (edition, region, realm, char), match in seller.items():
+        cur.execute(f"""DELETE FROM marketlens_import.addon_auction_sales s USING marketlens_import.addon_ledger_events e
             WHERE s.event_key=e.event_key AND e.edition=%s AND e.region=%s AND e.realm IS NOT DISTINCT FROM %s
-              AND e.character IS NOT DISTINCT FROM %s""", (edition, region, realm, char))
-        cur.execute("""SELECT event_key, source_game, faction, section, t, item_id, item_name, quantity, money, row
+              AND {match.replace("character", "e.character")}""", (edition, region, realm, char))
+        cur.execute(f"""SELECT event_key, source_game, faction, section, t, item_id, item_name, quantity, money, row
             FROM marketlens_import.addon_ledger_events
-            WHERE edition=%s AND region=%s AND realm IS NOT DISTINCT FROM %s AND character IS NOT DISTINCT FROM %s
+            WHERE edition=%s AND region=%s AND realm IS NOT DISTINCT FROM %s AND {match}
               AND (section IN ('Invoices','Posting','TSM:sale','Failures') OR section LIKE 'WoWCensus:%%')
             ORDER BY t, event_key""", (edition, region, realm, char))
         rows = cur.fetchall()
@@ -863,8 +874,8 @@ def rebuild_sales(cur, groups):
         # The pairing runs over the character's rows on every realm key, so each group sees the same pairs.
         live_sale = {}                  # invoice event_key -> TSM's time of the sale
         twins = {}                      # TSM row -> how many of its items no invoice covers
-        cur.execute("""SELECT event_key, section, item_id, quantity, t, row->>'stack' FROM marketlens_import.addon_ledger_events
-            WHERE edition=%s AND region=%s AND character IS NOT DISTINCT FROM %s AND item_id IS NOT NULL
+        cur.execute(f"""SELECT event_key, section, item_id, quantity, t, row->>'stack' FROM marketlens_import.addon_ledger_events
+            WHERE edition=%s AND region=%s AND {match} AND item_id IS NOT NULL
               AND ((section='Invoices' AND row->>'invoiceType'='seller') OR (section='TSM:sale' AND row->>'source'='Auction'))
             ORDER BY t, event_key""", (edition, region, char))
         both = cur.fetchall()
@@ -896,18 +907,41 @@ def rebuild_sales(cur, groups):
         # Journalator logs a listing's price per unit and its total count, and one row can be several
         # stacks (220 Runecloth = 11 stacks of 20), so its units are used up a stack at a time.
         # WoWCensus logs one auction with its total buyout: it pairs only with a sale of the whole stack.
+        # A listing both add-ons logged is kept once, as Journalator's, with the add-on's auction ids.
         posts = defaultdict(list)
-        journalator_posts = [(t, name, qty, money) for _, _, _, section, t, _, name, qty, money, _ in rows if section == "Posting"]
+        journalator_posts = []
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
             if section == "Posting" and qty:
-                posts[name].append(dict(t=t, unit=money, bid=to_int(row.get("bid")), left=qty, whole=False, auction=None))
-            elif section == "WoWCensus:post" and qty and not any(
-                    n == name and q == qty and m * q == money and abs(pt - t) <= 10 for pt, n, q, m in journalator_posts):
+                p = dict(t=t, item=item, unit=money, bid=to_int(row.get("bid")), left=qty, whole=False, auctions=set(), n=qty)
+                posts[name].append(p)
+                journalator_posts.append(p)
+            elif section == "WoWCensus:post" and qty and (twin := next((
+                    p for p in journalator_posts if not p["auctions"] and p["left"] == qty and p["unit"] is not None
+                    and money in (p["unit"], p["unit"] * qty) and abs(p["t"] - t) <= 10 and p in posts[name]), None)):
+                twin["auctions"].add(to_int(row.get("auctionID")))
+            elif section == "WoWCensus:post" and qty:
                 # WoWCensus's own copy of a listing; Journalator only logs Classic listings made through Auctionator.
                 bid = to_int(row.get("bid"))
-                posts[name].append(dict(t=t, unit=money / qty if money is not None else None,
+                posts[name].append(dict(t=t, item=item, unit=money / qty if money is not None else None,
                                         bid=bid / qty if bid is not None else None, left=qty, whole=True,
-                                        auction=to_int(row.get("auctionID"))))
+                                        auctions={to_int(row.get("auctionID"))}, n=1))
+        # Posting several stacks makes one auction each, but the listing names only the first. The
+        # add-on's scan of the player's auctions right after posting lists the rest.
+        first_active = {}
+        for key, sg, fac, section, t, item, name, qty, money, row in rows:
+            auction = to_int(row.get("auctionID")) if section == "WoWCensus:owned" and row.get("status") == "active" else None
+            if auction is not None and auction not in first_active:
+                first_active[auction] = (t, item, qty, money)
+        claimed = {a for stack in posts.values() for p in stack for a in p["auctions"]}
+        for auction, (t, item, qty, money) in sorted(first_active.items(), key=lambda a: a[1][0]):
+            if auction in claimed or item is None:
+                continue
+            p = next((p for stack in posts.values() for p in stack if p["item"] == item and p["auctions"]
+                      and len(p["auctions"]) < p["n"] and p["t"] <= t <= p["t"] + 30 and p["unit"] is not None
+                      and money in (p["unit"], p["unit"] * (qty or 1))), None)
+            if p:
+                p["auctions"].add(auction)
+                claimed.add(auction)
         # The auction house's own list of the player's auctions (modern auction house): the last time an
         # auction was still active and the first time it showed as sold bracket the sale.
         sighted = {}                    # auction id -> [last seen active, first seen sold]
@@ -929,32 +963,45 @@ def rebuild_sales(cur, groups):
         def take(p, qty):
             p["left"] = 0 if p["whole"] or qty is None else p["left"] - qty
 
-        def use_listing(name, qty, t):
-            p = next((p for p in posts.get(name, []) if p["t"] <= t and fits(p, qty)), None)
+        # The game's "A buyer has been found" and "has expired" messages name their auction, so that
+        # listing is the one that sold or ended; guesses by item name leave such listings alone.
+        named = {to_int(row.get("auctionID")) for _, _, _, section, t, _, _, _, _, row in rows
+                 if section in ("WoWCensus:sold", "WoWCensus:expired", "WoWCensus:cancelled") and to_int(row.get("auctionID")) is not None}
+
+        def listing_of(name, auction):
+            return next((p for p in posts.get(name, []) if auction is not None and auction in p["auctions"] and p["left"] > 0), None)
+
+        def use_listing(name, qty, t, auction=None):
+            p = listing_of(name, auction) or next((p for p in posts.get(name, []) if p["t"] <= t and fits(p, qty)
+                                                   and not (p["auctions"] and p["auctions"] <= named)), None)
             if p:
                 take(p, qty)
 
         # An expired or cancelled auction used up its listing: the oldest one of that stack. The game's
         # own "has expired" message and Journalator's expired-mail row are the same auction, so a
         # WoWCensus message is only used when Journalator has no failure for that item after it.
-        failures = [[t, name, False] for _, _, _, section, t, _, name, _, _, _ in rows if section == "Failures"]
-        ended = []                      # (t, name, qty) of every listing that ended unsold
+        failures = [[t, name, False, qty] for _, _, _, section, t, _, name, qty, _, _ in rows if section == "Failures"]
+        ended = []                      # (t, name, qty, auction id) of every listing that ended unsold
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
-            if section == "Failures":
-                ended.append((t, name, qty))
-            elif section in ("WoWCensus:expired", "WoWCensus:cancelled"):
+            if section in ("WoWCensus:expired", "WoWCensus:cancelled"):
                 twin = next((f for f in failures if not f[2] and f[1] == name and t - 60 <= f[0] <= t + 30 * 86400), None)
                 if twin:
                     twin[2] = True
+                auction = to_int(row.get("auctionID"))
+                if not twin or auction is not None:
+                    # The add-on's message knows which listing ended, so it stands in for Journalator's row.
+                    ended.append((t, name, qty, auction))
                 else:
-                    ended.append((t, name, qty))
+                    twin[2] = None
+        ended += [(t, name, qty, None) for t, name, used, qty in failures if used is not True]
 
         # Every completed sale once, each source paired with the others:
         #   Journalator seller invoice (time = gold taken from the mail),
         #   WoWCensus "seller" mail (time = mail first seen; outside Retail the gold comes an hour after the sale),
         #   WoWCensus "seller_temp_invoice" (Sale Pending: arrives at the sale and says when the gold will come),
         #   TSM Auction sale not already covered by an invoice.
-        delay = MAIL_DELAY if edition != "retail" else 0
+        # Forever's auction mail arrives at the sale (its delivery time matches the game's sale message).
+        delay = MAIL_DELAY if edition not in ("retail", "forever") else 0
         sales = []
         for key, sg, fac, section, t, item, name, qty, money, row in rows:
             if not qty or money is None or money <= 0:
@@ -998,15 +1045,19 @@ def rebuild_sales(cur, groups):
         # Exact times, best first: the game's "A buyer has been found" message, the Sale Pending
         # mail's gold arrival time minus the mail delay, the "Auction successful" mail's delivery
         # time (from its days left) minus the mail delay, TSM's live sighting; otherwise the bound.
-        messages = [[t, name, False] for _, _, _, section, t, _, name, _, _, _ in rows if section == "WoWCensus:sold"]
+        messages = [[t, name, False, to_int(row.get("auctionID"))] for _, _, _, section, t, _, name, _, _, row in rows
+                    if section == "WoWCensus:sold"]
         sales.sort(key=lambda x: (x["bound"], x["key"]))
         ended.sort(key=lambda e: e[0])
         for x in sales:
             while ended and ended[0][0] <= x["taken"]:
-                t_end, name_end, qty_end = ended.pop(0)
-                use_listing(name_end, qty_end, t_end)
+                t_end, name_end, qty_end, auction_end = ended.pop(0)
+                use_listing(name_end, qty_end, t_end, auction_end)
             upper = x["bound"] + 60
             msg = next((m for m in messages if not m[2] and m[1] == x["name"] and upper - SALE_WINDOW <= m[0] <= upper), None)
+            # Only a time from one of these is the sale's own; the bound is when the gold was
+            # collected, which can be hours or days later, so it gets no time to sell.
+            exact = True
             if msg:
                 msg[2], sold = True, msg[0]
             elif x["pending"] and x["pending"]["eta"] is not None and x["pending"]["eta"] <= upper:
@@ -1016,33 +1067,38 @@ def rebuild_sales(cur, groups):
             elif x["live"] is not None:
                 sold = x["live"]
             else:
-                sold = x["bound"]
+                sold, exact = x["bound"], x["origin"] == "tsm"
             posted = auction = None
             # Oldest unused posting of the same stack that this sale could have come from:
             # sold at buyout, or won with a bid between the posted bid and buyout. TSM logs no
             # listings, but the seller's Journalator or WoWCensus listing of the stack pairs the same way.
             money, qty = x["money"], x["qty"]
-            for p in posts.get(x["name"], []):
-                if not fits(p, qty) or p["t"] > upper or upper - p["t"] > SALE_WINDOW:
+            own = listing_of(x["name"], msg[3]) if msg else None
+            latest_post = sold if msg else upper
+            for p in ([own] if own else posts.get(x["name"], [])):
+                if not fits(p, qty) or p["t"] > latest_post or upper - p["t"] > SALE_WINDOW or (
+                        p is not own and p["auctions"] and p["auctions"] <= named):
                     continue
                 buyout = p["unit"] * qty if p["unit"] is not None else None
                 bid = p["bid"] * qty if p["bid"] is not None else None
                 if (buyout is not None and abs(buyout - money) <= 0.5) or (
                         bid is not None and bid <= money + 0.5 and (buyout is None or money <= buyout + 0.5)):
                     take(p, qty)
-                    posted, auction = p["t"], p["auction"]
+                    posted = p["t"]
+                    auction = msg[3] if own else next(iter(p["auctions"]), None) if len(p["auctions"]) == 1 else None
                     break
             if posted is not None:
                 seen = sighted.get(auction) if auction is not None else None
                 if seen and not msg:
                     if seen[1] is not None:
-                        sold = min(sold, seen[1])
+                        sold, exact = min(sold, seen[1]), exact or seen[0] is not None
                     if seen[0] is not None:
                         sold = max(sold, seen[0])
                 sold = max(sold, posted)
             cur.execute("""INSERT INTO marketlens_import.addon_auction_sales VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                         (x["key"], edition, x["sg"], region, realm, x["fac"], x["item"], x["name"], x["qty"], x["money"],
-                         round(x["money"] / x["qty"]), sold, posted, (sold - posted) if posted is not None else None, x["origin"]))
+                         round(x["money"] / x["qty"]), sold, posted, (sold - posted) if posted is not None and exact else None,
+                         x["origin"]))
             made += 1
     return made
 
