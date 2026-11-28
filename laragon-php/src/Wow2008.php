@@ -10,7 +10,7 @@ namespace Wow2008;
 
 const TEMPLATE_DIR = __DIR__ . '/wow2008';
 // Bump when public/wow2008/ changes, so browsers fetch the new files.
-const ASSET_VERSION = '75';
+const ASSET_VERSION = '76';
 const DISCORD_URL = 'https://discord.gg/kSUGgYDd8V';
 
 // Home page "Support WoWCensus" box: this month's donations against the monthly server bill, in US dollars.
@@ -325,12 +325,17 @@ function render_page(string $html, string $path): string {
 
 // ---------------------------------------------------------------- pages
 
-/** Banner set for a dungeon page: its own art where it has some, else the shared dungeon rotation. */
+/**
+ * Banner for a dungeon page: its own painted set, else its Forever Journal artwork (a URL), else no image.
+ * The shared rotation is for the index only, so a dungeon never shows another dungeon's picture.
+ */
 function dungeon_banner_art(?string $slug): string {
+  if ($slug === null) return 'dungeons';
   if ($slug === 'ragefire-chasm') return 'ragefire-chasm';
   if ($slug === 'uldaman' || $slug === 'excavation-site-wetlands') return 'uldaman';
-  if ($slug !== null && str_starts_with($slug, 'dire-maul')) return 'dire-maul';
-  return 'dungeons';
+  if (str_starts_with($slug, 'dire-maul')) return 'dire-maul';
+  $d = \forever_dungeons()[$slug] ?? null;
+  return ($d ? \forever_dungeon_art($d, 'detail') : null) ?? 'none';
 }
 
 /** A page without a 2008 design of its own: its content, inside the 2008 frame. */

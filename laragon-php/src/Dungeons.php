@@ -419,12 +419,11 @@ function forever_dungeon_art(array $d, string $kind = 'card'): ?string {
   return $file ? '/wow2008/' . $file : null;
 }
 
-/** The dungeon's overview from Forever Journal, with its artwork; '' when there is none. */
+/** The dungeon's overview from Forever Journal (its artwork is the page banner); '' when there is none. */
 function forever_dungeon_overview_html(array $d): string {
   $g = $d['guide'] ?? null;
   if (!$g || !$g['overview']) return '';
-  $art = forever_dungeon_art($d, 'detail');
-  return '<section class="dg-boss dg-overview">' . ($art ? '<img class="dg-ov-art" src="' . esc($art) . '" alt="' . esc($d['name']) . '" loading="lazy">' : '') .
+  return '<section class="dg-boss dg-overview">' .
     '<div class="dg-ov-text"><h3>Overview</h3>' . implode('', array_map(fn($p) => '<p>' . esc($p) . '</p>', $g['overview'])) .
     '<p class="dg-ov-src">Overview and artwork: <a href="' . esc($g['source']) . '" target="_blank" rel="noopener">Forever Journal</a></p></div></section>';
 }
@@ -518,12 +517,10 @@ const DUNGEON_STYLE = <<<'CSS'
 .dg-facts2 b{display:block;font:bold 19px Georgia,serif}
 .dg-facts2 span{font-size:11px;opacity:.75}
 .dg-route-box{margin-top:0;min-width:0}
-.dg-overview{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;align-items:start;margin-top:0}
-.dg-ov-art{display:block;width:100%;aspect-ratio:2/1;object-fit:cover;border:2px solid #1a1208;outline:1px solid #b08a40;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.dg-overview{margin-top:0}
 .dg-ov-text h3{margin-top:0}
 .dg-ov-text p{margin:0 0 8px;line-height:1.5}
 .dg-ov-text p.dg-ov-src{margin:0;font-size:11px;opacity:.75}
-@media (max-width:760px){.dg-overview{grid-template-columns:minmax(0,1fr)}}
 .dg-page{min-width:0;max-width:100%}
 .dg-route{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));row-gap:12px;list-style:none;margin:0;padding:4px 0 2px;overflow:hidden}
 .dg-route li{min-width:0;position:relative;text-align:center}

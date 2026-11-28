@@ -4,7 +4,8 @@ namespace Wow2008;
  * Page banner (stands in for the 2008 site's Flash banner). See DESIGN.md, "Banners and artwork".
  *
  * Props:
- *   art             name of a painted banner, with SVG fallback for no-data
+ *   art             name of a painted banner, with SVG fallback for no-data; an image URL (starting with /)
+ *                   is drawn cropped to the banner; 'none' draws no picture
  *   title           large title
  *   subtitle        small uppercase line under the title
  *   subtitle_color  optional CSS color for the subtitle
@@ -32,8 +33,11 @@ $randomBanner = in_array($art, $fixedBanners, true) ? $art
   : (in_array($art, $paintedBanners, true) ? $paintedBanners[random_int(0, count($paintedBanners) - 1)] : null));
 ?>
 <div class="census-banner<?= !empty($intro) ? ' has-intro' : '' ?>">
-<?php if ($randomBanner !== null): ?>
+<?php if (str_starts_with($art, '/')): ?>
+<img class="banner-art banner-art-wide" src="<?= e($art) ?>" alt="" width="880" height="150">
+<?php elseif ($randomBanner !== null): ?>
 <img class="banner-art" src="<?= e(asset("banner-{$randomBanner}.webp")) ?>" alt="" width="880" height="150">
+<?php elseif ($art === 'none'): ?>
 <?php else: ?>
 <?= render("art/banners/{$art}.php") ?>
 <?php endif; ?>
