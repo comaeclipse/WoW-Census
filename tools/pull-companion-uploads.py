@@ -79,6 +79,7 @@ SECRETS = Path(os.environ.get("WOWCENSUS_SECRETS", Path.home() / "Documents" / "
 SUPPORTED = {"anniversary", "classic", "classic_era", "forever", "retail"}
 ADDON_FILES = {"auctionator": "Auctionator.lua", "journalator": "Journalator.lua",
                "tsm": "TradeSkillMaster.lua", "dungeonjournal": "ForeverDungeonJournal.lua"}
+PENDING_CAP = 200  # the Worker's pending list has no add-on filter and no paging; ask for this many and filter here
 MAX_ZIP = 64 << 20
 MAX_LUA = 256 << 20
 MAX_RATIO = 60
@@ -211,6 +212,8 @@ def pull(limit):
 def pull_addons(limit):
     pending = [r for r in call("GET", f"/v1/ingest/pending?kind=addon&limit={limit}")["receipts"]
                if r.get("kind") == "addon"]
+    if len(pending) >= limit:
+        print(f"warning: the Worker returned {len(pending)} add-on uploads, the --limit; more may be queued", flush=True)
     if not pending:
         print("No add-on uploads waiting.", flush=True)
         return None
@@ -251,8 +254,11 @@ def combat_log_member(blob):
 
 def pull_combat_logs(limit):
     """Download waiting combat log uploads; returns (stage, [(site game, log path)]) or (None, [])."""
-    pending = [r for r in call("GET", f"/v1/ingest/pending?kind=addon&limit={limit}")["receipts"]
-               if r.get("kind") == "addon" and r.get("addon") == "combatlog"]
+    queued = call("GET", f"/v1/ingest/pending?kind=addon&limit={PENDING_CAP}")["receipts"]
+    if len(queued) >= PENDING_CAP:
+        print(f"warning: {len(queued)} add-on uploads queued (Worker list cap {PENDING_CAP}); "
+              "combat logs further back stay hidden until add-on stages are acked", flush=True)
+    pending = [r for r in queued if r.get("kind") == "addon" and r.get("addon") == "combatlog"][:limit]
     if not pending:
         print("No combat log uploads waiting.", flush=True)
         return None, []
@@ -355,8 +361,8 @@ def stage_receipts(stage):
 
 def still_pending(kind):
     """Receipt ids the Worker still holds as queued/stored, or None when the list may be cut off."""
-    rows = call("GET", f"/v1/ingest/pending?kind={kind}&limit=200")["receipts"]
-    return None if len(rows) >= 200 else {r["id"] for r in rows}
+    rows = call("GET", f"/v1/ingest/pending?kind={kind}&limit={PENDING_CAP}")["receipts"]
+    return None if len(rows) >= PENDING_CAP else {r["id"] for r in rows}
 
 
 def prune_stages(days=PRUNE_DAYS, dry_run=False):
