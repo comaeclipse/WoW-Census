@@ -162,22 +162,24 @@ def candidates(cur, source: str, region: str | None, limit: int, min_level: int,
     return rows
 
 
-def fetch_one(api: Blizzard, row: dict) -> dict:
+def fetch_one(api: Blizzard, row: dict, endpoints: tuple[str, ...] | None = None) -> dict:
     status, profile = api.get(api_url(row["source"], row["region"], row["realm_slug"], row["name_slug"]))
     out = dict(row, status=status, profile=profile, endpoints={}, endpoint_status={})
     if status != 200 or not profile:
         return out
-    for endpoint in ENDPOINTS:
+    for endpoint in ENDPOINTS if endpoints is None else endpoints:
         code, body = api.get(api_url(row["source"], row["region"], row["realm_slug"], row["name_slug"], endpoint))
         out["endpoint_status"][endpoint] = code
         if code == 200: out["endpoints"][endpoint] = body
     return out
 
 
-def save(cur, row: dict) -> None:
+def save(cur, row: dict, *, preserve_missing: bool = False) -> None:
     p = row["profile"]; now = datetime.now(timezone.utc); source = row["source"]; region = row["region"]
     realm = p.get("realm", {}); guild = p.get("guild", {})
     pid = public_id(source, region, row["realm"], row["name"])
+    cur.execute("""DELETE FROM marketlens_import.character_armory_profiles
+      WHERE source_game=%s AND public_id=%s AND (region,character_id)<>(%s,%s)""", (source, pid, region, p["id"]))
     cur.execute("""INSERT INTO marketlens_import.character_armory_profiles
       (source_game,public_id,region,character_id,realm_id,realm_name,realm_slug,name,name_slug,level,
        class_id,class_name,race_id,race_name,faction,gender,guild_name,average_item_level,
@@ -200,12 +202,24 @@ def save(cur, row: dict) -> None:
     # The full achievement list is ~290 KB per Retail character; pages only show the totals.
     if "achievements" in e:
         e["achievements"] = {k: e["achievements"][k] for k in ("total_quantity", "total_points") if k in e["achievements"]}
+    snapshot_endpoints = [Json(e[key]) if key in e else None for key in ENDPOINTS]
+    if preserve_missing:
+        for index, key in enumerate(ENDPOINTS):
+            if key in e:
+                continue
+            column = key.replace("-", "_") + "_json"
+            cur.execute(f"""SELECT {column} FROM marketlens_import.character_armory_snapshots
+              WHERE (source_game,region,character_id)=(%s,%s,%s) AND {column} IS NOT NULL
+                AND snapshot_at<%s ORDER BY snapshot_at DESC LIMIT 1""", (source, region, p["id"], now))
+            previous = cur.fetchone()
+            if previous:
+                snapshot_endpoints[index] = Json(previous[0])
     cur.execute("""INSERT INTO marketlens_import.character_armory_snapshots
       (source_game,region,character_id,snapshot_at,profile_json,specializations_json,equipment_json,
        statistics_json,professions_json,achievements_json,reputations_json,pvp_summary_json,
        appearance_json,character_media_json,endpoint_status_json)
       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-      (source,region,p["id"],now,Json(p),*[Json(e[x]) if x in e else None for x in ENDPOINTS],Json(row["endpoint_status"])))
+      (source,region,p["id"],now,Json(p),*snapshot_endpoints,Json(row["endpoint_status"])))
     equipped = e.get("equipment", {}).get("equipped_items", [])
     item_rows = [(source, region, p["id"], now, int(it.get("item", {}).get("id", 0)), Json(it))
                  for it in equipped if int(it.get("item", {}).get("id", 0))]

@@ -45,7 +45,7 @@ DEFAULT_DSN = os.environ.get("MARKETLENS_PG_DSN", "host=127.0.0.1 port=5433 dbna
 FLAVORS = ("_anniversary_", "_classic_", "_classic_beta_", "_classic_era_", "_forever_", "_retail_")
 FOREVER_LAUNCH_UTC = datetime(2026, 11, 4, 23, 0, tzinfo=timezone.utc)
 
-spec = importlib.util.spec_from_file_location("import_functions", REPO / "tools" / "import-functions.py")
+spec = importlib.util.spec_from_file_location("import_functions", Path(__file__).with_name("import-functions.py"))
 legacy = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(legacy)
 

@@ -1,0 +1,9 @@
+[Unit]
+Description=Refresh Blizzard-backed WoWCensus auction markets once daily
+
+[Timer]
+OnCalendar=*-*-* 04:35:00 America/Chicago
+Persistent=true
+
+[Install]
+WantedBy=timers.target

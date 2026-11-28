@@ -1,0 +1,9 @@
+[Unit]
+Description=Discover MoP Classic and Forever characters daily
+
+[Timer]
+OnCalendar=*-*-* 05:35:00 America/Chicago
+Persistent=true
+
+[Install]
+WantedBy=timers.target

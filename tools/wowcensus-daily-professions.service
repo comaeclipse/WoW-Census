@@ -1,0 +1,19 @@
+[Unit]
+Description=Refresh Forever profession snapshots and pages
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=postgres
+EnvironmentFile=/etc/wowcensus/forever-api.env
+EnvironmentFile=/etc/wowcensus/cloudflare.env
+EnvironmentFile=/etc/wowcensus/armory-worker.env
+Environment="MARKETLENS_PG_DSN=dbname=marketlens user=postgres"
+Environment=WOWCENSUS_PROFESSION_CATALOG=/srv/wowcensus/current/src/Professions.php
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -u /srv/wowcensus/tools/hourly-armory/daily-forever-professions.py --storage-path /var/lib/postgresql
+TimeoutStartSec=40min
+Nice=10
+NoNewPrivileges=yes
+PrivateTmp=yes

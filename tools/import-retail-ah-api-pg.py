@@ -21,6 +21,7 @@ import urllib.parse
 import urllib.request
 import urllib.error
 from collections import defaultdict
+from contextlib import closing
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
@@ -59,9 +60,11 @@ def request(url, *, token=None, data=None, basic=None):
             with urllib.request.urlopen(req, timeout=120) as response:
                 return response.read(), dict(response.headers)
         except urllib.error.HTTPError as error:
-            if error.code != 429 or attempt == 4:
+            if error.code not in (429, 500, 502, 503, 504) or attempt == 4:
                 raise
-            time.sleep(int(error.headers.get("Retry-After") or 2 ** (attempt + 1)))
+            retry_after = error.headers.get("Retry-After", "")
+            delay = int(retry_after) if retry_after.isdecimal() else 2 ** (attempt + 1)
+            time.sleep(min(delay, 60))
 
 
 def realm_group(region, realm=None, connected_id=None):
@@ -117,11 +120,28 @@ def main():
     raw, headers = request(
         f"https://{args.region}.api.blizzard.com/data/wow/connected-realm/{connected_id}/auctions?{query}",
         token=token)
-    body = json.loads(raw)
     captured = int(parsedate_to_datetime(headers["Last-Modified"]).timestamp()) if headers.get("Last-Modified") \
         else int(datetime.now(timezone.utc).timestamp())
-    digest = hashlib.sha256(raw).hexdigest()
+    with closing(psycopg2.connect(args.dsn)) as conn:
+        count = store_snapshot(conn, raw, captured, game=game, source="retail", region=args.region,
+                               market_id=connected_id, members=members)
+    print(f"{game}: imported {count:,} items")
 
+
+def item_names(cur, source):
+    cur.execute("""SELECT DISTINCT ON (item_id) item_id,name FROM local_auction_snapshots
+        WHERE source_game=%s AND name NOT LIKE 'item:%%' ORDER BY item_id,captured_at DESC""", (source,))
+    names = dict(cur.fetchall())
+    cur.execute("SELECT DISTINCT ON (id) id,name FROM items WHERE name NOT LIKE 'item:%%' ORDER BY id,updated_at DESC")
+    for item_id, name in cur.fetchall():
+        names.setdefault(item_id, name)
+    return names
+
+
+def store_snapshot(conn, raw, captured, *, game, source, region, market_id, members, names=None,
+                   label="Blizzard Game Data API", kind="blizzard-retail-auctions", skip_current=False):
+    body = json.loads(raw)
+    digest = hashlib.sha256(raw).hexdigest()
     grouped = defaultdict(lambda: {"q": 0, "n": 0, "value": 0, "prices": []})
     excluded_battle_pets = 0
     for auction in body.get("auctions", []):
@@ -136,7 +156,8 @@ def main():
         quantity = int(auction.get("quantity") or 0)
         if not item_id or not quantity:
             continue
-        total = int(auction.get("buyout") or auction.get("bid") or 0)
+        total = (int(auction["unit_price"]) * quantity if auction.get("unit_price") is not None
+                 else int(auction.get("buyout") or auction.get("bid") or 0))
         unit = total // quantity if total else 0
         row = grouped[item_id]
         row["q"] += quantity
@@ -145,66 +166,62 @@ def main():
         if unit:
             row["prices"].append((unit, quantity))
 
-    conn = psycopg2.connect(args.dsn)
-    try:
-        with conn, conn.cursor() as cur:
-            cur.execute("SET search_path TO marketlens_import, public")
-            # Makes a retry of the same API snapshot repairable if aggregation
-            # logic changes; other snapshots and import sources are untouched.
-            cur.execute("DELETE FROM local_auction_snapshots WHERE game=%s AND captured_at=%s AND source_sha256=%s",
-                        (game, captured, digest))
-            cur.execute("SELECT item_id,name FROM local_auction_snapshots WHERE source_game='retail' AND name NOT LIKE 'item:%%' ORDER BY captured_at DESC")
-            names = {}
-            for item_id, name in cur.fetchall():
-                names.setdefault(int(item_id), name)
-            cur.execute("SELECT id,name FROM items WHERE name NOT LIKE 'item:%%'")
-            for item_id, name in cur.fetchall():
-                names.setdefault(int(item_id), name)
-            cur.execute("SELECT id,q,updated_at FROM items WHERE game=%s", (game,))
-            prior = {int(i): (int(q or 0), updated) for i, q, updated in cur.fetchall()}
-            stamp = datetime.fromtimestamp(captured, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-            snapshot_rows, item_rows, history_rows = [], [], []
-            for item_id, data in grouped.items():
-                quantity = data["q"]
-                average = data["value"] // quantity if quantity else 0
-                lowest = min((p for p, _ in data["prices"]), default=0)
-                median = weighted_median(data["prices"])
-                name = names.get(item_id, f"item:{item_id}")
-                snapshot_rows.append(("retail", game, item_id, captured, name, None, "Blizzard Game Data API", None,
-                                      quantity, data["n"], None, lowest, median, average, None, digest))
-                previous = prior.get(item_id, (None, None))[0]
-                item_rows.append((game, item_id, name, slug(name), data["value"], average, stamp,
-                                  quantity, previous, None, None, None, "Blizzard Game Data API", None))
-                history_rows.append((game, item_id, captured // 86400, data["value"], average, quantity))
-            psycopg2.extras.execute_batch(cur, """INSERT INTO local_auction_snapshots
-              (source_game,game,item_id,captured_at,name,category,item_source,crafter,quantity,auctions,sellers,lowest,median,weighted_average,top_seller_concentration,source_sha256)
-              VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING""", snapshot_rows, page_size=1000)
-            psycopg2.extras.execute_batch(cur, """INSERT INTO history (game,id,ts,mv,asp,q) VALUES (%s,%s,%s,%s,%s,%s)
-              ON CONFLICT(game,id,ts) DO UPDATE SET mv=excluded.mv,asp=excluded.asp,q=excluded.q""", history_rows, page_size=1000)
-            psycopg2.extras.execute_batch(cur, """INSERT INTO items
-              (game,id,name,slug,mv,asp,updated_at,q,pq,sc,tc,cat,src,crafter)
-              VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-              ON CONFLICT(game,id) DO UPDATE SET name=excluded.name,slug=excluded.slug,mv=excluded.mv,asp=excluded.asp,
-              updated_at=excluded.updated_at,q=excluded.q,pq=excluded.pq,sc=excluded.sc,tc=excluded.tc,cat=excluded.cat,src=excluded.src,crafter=excluded.crafter""",
-              item_rows, page_size=1000)
-            cur.execute("DELETE FROM items WHERE game=%s AND updated_at<>%s", (game, stamp))
-            cur.execute("""INSERT INTO datasets(game,source_game,updated_at) VALUES (%s,'retail',%s)
-              ON CONFLICT(game) DO UPDATE SET source_game='retail',updated_at=excluded.updated_at""", (game, stamp))
-            details = json.dumps({"region": args.region, "connectedRealmId": connected_id, "members": members,
-                                  "records": len(body.get("auctions", [])), "items": len(grouped),
-                                  "excludedBattlePetAuctions": excluded_battle_pets})
-            cur.execute("""INSERT INTO local_imports(source_sha256,kind,bucket,source_game,imported_at_utc,details_json)
-              VALUES (%s,'blizzard-retail-auctions',%s,'retail',%s,%s) ON CONFLICT(source_sha256,kind,bucket)
-              DO UPDATE SET imported_at_utc=excluded.imported_at_utc,details_json=excluded.details_json""",
-                        (digest, f"{args.region}:{connected_id}", stamp, details))
-            cur.execute("ANALYZE local_auction_snapshots")
-            cur.execute("ANALYZE items")
-        print(f"imported {len(body.get('auctions', [])):,} auctions as {len(grouped):,} items")
-        print(f"connected realm {connected_id}: {', '.join(members)}")
-        print(f"excluded {excluded_battle_pets:,} battle-pet auctions (species variants need a separate key)")
-        print(f"game {game} captured {stamp} sha256 {digest}")
-    finally:
-        conn.close()
+    if not grouped:
+        return 0
+
+    with conn, conn.cursor() as cur:
+        cur.execute("SET search_path TO marketlens_import, public")
+        cur.execute("SELECT pg_advisory_xact_lock(hashtext('marketlens-import'))")
+        cur.execute("SELECT updated_at FROM datasets WHERE game=%s", (game,))
+        current = cur.fetchone()
+        if current and current[0]:
+            current_time = datetime.fromisoformat(current[0]).timestamp()
+            if current_time > captured or (skip_current and current_time == captured):
+                return 0
+        # Makes a retry of the same API snapshot repairable if aggregation
+        # logic changes; other snapshots and import sources are untouched.
+        cur.execute("DELETE FROM local_auction_snapshots WHERE game=%s AND captured_at=%s AND source_sha256=%s",
+                    (game, captured, digest))
+        if names is None:
+            names = item_names(cur, source)
+        cur.execute("SELECT id,q,updated_at FROM items WHERE game=%s", (game,))
+        prior = {int(i): (int(q or 0), updated) for i, q, updated in cur.fetchall()}
+        stamp = datetime.fromtimestamp(captured, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        snapshot_rows, item_rows, history_rows = [], [], []
+        for item_id, data in grouped.items():
+            quantity = data["q"]
+            average = data["value"] // quantity if quantity else 0
+            lowest = min((p for p, _ in data["prices"]), default=0)
+            median = weighted_median(data["prices"])
+            name = names.get(item_id, f"item:{item_id}")
+            snapshot_rows.append((source, game, item_id, captured, name, None, label, None,
+                                  quantity, data["n"], None, lowest, median, average, None, digest))
+            previous = prior.get(item_id, (None, None))[0]
+            item_rows.append((game, item_id, name, slug(name), data["value"], average, stamp,
+                              quantity, previous, None, None, None, label, None))
+            history_rows.append((game, item_id, captured // 86400, data["value"], average, quantity))
+        psycopg2.extras.execute_values(cur, """INSERT INTO local_auction_snapshots
+          (source_game,game,item_id,captured_at,name,category,item_source,crafter,quantity,auctions,sellers,lowest,median,weighted_average,top_seller_concentration,source_sha256)
+          VALUES %s ON CONFLICT DO NOTHING""", snapshot_rows, page_size=1000)
+        psycopg2.extras.execute_values(cur, """INSERT INTO history (game,id,ts,mv,asp,q) VALUES %s
+          ON CONFLICT(game,id,ts) DO UPDATE SET mv=excluded.mv,asp=excluded.asp,q=excluded.q""", history_rows, page_size=1000)
+        psycopg2.extras.execute_values(cur, """INSERT INTO items
+          (game,id,name,slug,mv,asp,updated_at,q,pq,sc,tc,cat,src,crafter)
+          VALUES %s
+          ON CONFLICT(game,id) DO UPDATE SET name=excluded.name,slug=excluded.slug,mv=excluded.mv,asp=excluded.asp,
+          updated_at=excluded.updated_at,q=excluded.q,pq=excluded.pq,sc=excluded.sc,tc=excluded.tc,cat=excluded.cat,src=excluded.src,crafter=excluded.crafter""",
+          item_rows, page_size=1000)
+        cur.execute("DELETE FROM items WHERE game=%s AND updated_at<>%s", (game, stamp))
+        cur.execute("""INSERT INTO datasets(game,source_game,updated_at) VALUES (%s,%s,%s)
+          ON CONFLICT(game) DO UPDATE SET source_game=excluded.source_game,updated_at=excluded.updated_at""", (game, source, stamp))
+        details = json.dumps({"region": region, "connectedRealmId": market_id, "members": members,
+                              "records": len(body.get("auctions", [])), "items": len(grouped),
+                              "excludedBattlePetAuctions": excluded_battle_pets})
+        cur.execute("""INSERT INTO local_imports(source_sha256,kind,bucket,source_game,imported_at_utc,details_json)
+          VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT(source_sha256,kind,bucket)
+          DO UPDATE SET imported_at_utc=excluded.imported_at_utc,details_json=excluded.details_json""",
+                    (digest, kind, f"{region}:{market_id}", source, stamp, details))
+    return len(grouped)
 
 
 if __name__ == "__main__":

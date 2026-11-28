@@ -1,0 +1,16 @@
+[Unit]
+Description=Discover MoP Classic and Forever characters from Blizzard
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=postgres
+EnvironmentFile=/etc/wowcensus/forever-api.env
+Environment="MARKETLENS_PG_DSN=dbname=marketlens user=postgres"
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -u /srv/wowcensus/tools/hourly-armory/discover-blizzard-characters.py
+TimeoutStartSec=35min
+Nice=10
+NoNewPrivileges=yes
+PrivateTmp=yes

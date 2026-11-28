@@ -1,0 +1,18 @@
+[Unit]
+Description=Refresh Blizzard auction snapshots and WoWCensus auction pages
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=postgres
+EnvironmentFile=/etc/wowcensus/forever-api.env
+EnvironmentFile=/etc/wowcensus/cloudflare.env
+Environment="MARKETLENS_PG_DSN=dbname=marketlens user=postgres"
+Environment=WOWCENSUS_RETAIL_REALMS=/srv/wowcensus/current/src/retail-connected-realms.json
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -u /srv/wowcensus/tools/hourly-armory/daily-auction-refresh.py --publish --storage-path /var/lib/postgresql
+TimeoutStartSec=2h
+Nice=10
+NoNewPrivileges=yes
+PrivateTmp=yes

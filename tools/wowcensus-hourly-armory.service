@@ -1,0 +1,18 @@
+[Unit]
+Description=Refresh up to 400 WoWCensus Armory characters and their pages
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=postgres
+EnvironmentFile=/etc/wowcensus/forever-api.env
+EnvironmentFile=/etc/wowcensus/cloudflare.env
+EnvironmentFile=-/etc/wowcensus/armory-worker.env
+Environment="MARKETLENS_PG_DSN=dbname=marketlens user=postgres"
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -u /srv/wowcensus/tools/hourly-armory/hourly-armory-refresh.py --limit 400 --refresh-cache --storage-path /var/lib/postgresql
+TimeoutStartSec=50min
+Nice=10
+NoNewPrivileges=yes
+PrivateTmp=yes

@@ -88,14 +88,17 @@ function armory_profession_census(): array {
   return published_page_model('forever-armory-professions', function () {
     $fallback = fn() => json_decode(file_get_contents(__DIR__ . '/forever-profession-census.json'), true, 512, JSON_THROW_ON_ERROR);
     try {
+      // Armory jobs write independently of the published census import version.
+      $through = Db::uncached("SELECT max(snapshot_at) AS latest FROM forever_armory_snapshots WHERE professions_json IS NOT NULL")[0]['latest'] ?? null;
+      if ($through === null) return $fallback();
       $profiles = Db::all("WITH latest AS (
           SELECT DISTINCT ON (region,character_id) region,character_id,snapshot_at,professions_json
-          FROM forever_armory_snapshots WHERE professions_json IS NOT NULL ORDER BY region,character_id,snapshot_at DESC)
+          FROM forever_armory_snapshots WHERE professions_json IS NOT NULL AND snapshot_at<=? ORDER BY region,character_id,snapshot_at DESC)
         SELECT p.region,p.character_id,p.ruleset_name,p.class_name,p.level,l.snapshot_at
-        FROM latest l JOIN forever_armory_profiles p USING(region,character_id)");
+        FROM latest l JOIN forever_armory_profiles p USING(region,character_id)", [$through]);
       $trades = Db::all("WITH latest AS (
           SELECT DISTINCT ON (region,character_id) region,character_id,snapshot_at,professions_json
-          FROM forever_armory_snapshots WHERE professions_json IS NOT NULL ORDER BY region,character_id,snapshot_at DESC), expanded AS (
+          FROM forever_armory_snapshots WHERE professions_json IS NOT NULL AND snapshot_at<=? ORDER BY region,character_id,snapshot_at DESC), expanded AS (
           SELECT l.region,l.character_id,x.kind,x.prof
           FROM latest l CROSS JOIN LATERAL (
             SELECT 'primary' kind,j prof FROM jsonb_array_elements(COALESCE(l.professions_json->'primaries','[]'::jsonb)) j
@@ -105,7 +108,7 @@ function armory_profession_census(): array {
           COALESCE((prof->'tiers'->0->>'skill_points')::int,0) skill,
           COALESCE((prof->'tiers'->0->>'max_skill_points')::int,0) max_skill,
           jsonb_array_length(COALESCE(prof->'tiers'->0->'known_recipes','[]'::jsonb)) recipes
-        FROM expanded WHERE COALESCE(prof->'profession'->>'name',prof->'tiers'->0->'tier'->>'name') IS NOT NULL");
+        FROM expanded WHERE COALESCE(prof->'profession'->>'name',prof->'tiers'->0->'tier'->>'name') IS NOT NULL", [$through]);
     } catch (PDOException $e) {
       if (in_array($e->getCode(), ['42P01', '42703'], true)) return $fallback();
       throw $e;
