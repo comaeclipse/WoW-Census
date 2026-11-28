@@ -282,6 +282,16 @@ function armory_character_model(string $source, string $id): ?array {
   $rows = armory_character_rows($source, $id);
   if (!$rows) return null;
   ['profile' => $p, 'snapshot' => $s] = $rows;
+  $raiderio = false;
+  if ($source === 'retail') {
+    try {
+      $raiderio = Db::first("SELECT 1 FROM raiderio_character_discoveries
+        WHERE region=? AND realm_key=lower(?) AND name_key=lower(?)",
+        [$p['region'], $p['realm_name'], $p['name']]) !== null;
+    } catch (PDOException $e) {
+      if ($e->getCode() !== '42P01') throw $e;
+    }
+  }
   $j = fn(?string $v): array => forever_json($v);
   $edition = EDITIONS[$source];
   $classFiles = FOREVER_CLASS_FILES + [6 => 'DEATHKNIGHT', 10 => 'MONK', 12 => 'DEMONHUNTER', 13 => 'EVOKER'];
@@ -395,7 +405,8 @@ function armory_character_model(string $source, string $id): ?array {
     'title' => $profile['active_title']['display_string'] ?? null, 'render' => $media['main-raw'] ?? null, 'avatar' => $media['avatar'] ?? null,
     'gear' => $gear, 'trees' => $trees, 'build' => implode(' / ', array_column($trees, 'points')),
     'mainTree' => $mainTree['name'] ?? null, 'activeSpec' => $activeSpec,
-    'professions' => $profs, 'professionsAvailable' => $s['professions_json'] !== null, 'pvp' => $pvp, 'stats' => $stats, 'reputations' => $reps, 'mounts' => [], 'titles' => [], 'pets' => []];
+    'professions' => $profs, 'professionsAvailable' => $s['professions_json'] !== null, 'pvp' => $pvp, 'stats' => $stats, 'reputations' => $reps, 'mounts' => [], 'titles' => [], 'pets' => [],
+    'raiderioDiscovery' => $raiderio];
 }
 
 function armory_character_description(array $c): string {
@@ -408,5 +419,7 @@ function armory_character_html(array $c): string {
   return localize_content('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' .
     seo_head($title . ' – WoWCensus', armory_character_description($c), SITE_ORIGIN . armory_character_path($c['source'], $c['id'])) .
     '<link rel="stylesheet" href="/' . stylesheet()['name'] . '"></head><body><main class="wrap"><h1 class="iname">' . esc($c['name']) .
-    '</h1><p>' . esc(armory_character_description($c)) . '</p></main></body></html>\n');
+    '</h1><p>' . esc(armory_character_description($c)) . '</p>' .
+    (!empty($c['raiderioDiscovery']) ? '<p>Character discovered via <a href="https://raider.io/">Raider.IO</a>.</p>' : '') .
+    '</main></body></html>\n');
 }

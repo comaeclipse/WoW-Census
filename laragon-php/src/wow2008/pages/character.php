@@ -197,6 +197,9 @@ $TIER = [0 => '#cc2222', 1 => '#ff4400', 2 => '#ff8800', 3 => '#c8c800', 4 => '#
 
     <div class="cp-strip"><?php foreach ($strip as $k => $v): ?><div><strong><?= e(is_int($v) ? fmt($v) : $v) ?></strong><span><?= e($k) ?></span></div><?php endforeach; ?></div>
 
+    <?php if (!empty($c['raiderioDiscovery'])): ?>
+      <p class="source">Character discovered via <a href="https://raider.io/">Raider.IO</a>.</p>
+    <?php endif ?>
     <div id="cp-tt"></div>
   </main>
 

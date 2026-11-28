@@ -63,12 +63,12 @@ $thumbs = ['shoutbox-stone.avif', 'banner-census.webp', 'banner-guilds.webp'];
       <div class="stat"><b><?= e(fmt($totals['tracked'])) ?></b><span>Characters tracked</span><em>across <?= count($editions) ?> editions</em></div>
       <div class="stat"><b><?= e(fmt($totals['seen7'])) ?></b><span>Seen last 7 days</span><?php if ($totals['change'] !== null): ?><em class="<?= $totals['change'] < 0 ? 'dnt' : 'upt' ?>"><?= $totals['change'] < 0 ? '▼' : '▲' ?> <?= e($pct($totals['change'])) ?> vs last week</em><?php else: ?><em>across <?= (int)$totals['seen7Editions'] ?> editions</em><?php endif; ?></div>
       <div class="stat"><b><?= e(fmt($totals['realms'])) ?></b><span>Realms surveyed</span><em>in the census sample</em></div>
-      <div class="stat"><b data-ago="<?= (int)$totals['newestT'] ?>" data-short id="home-last-scan"><?= e(gmdate('M j', (int)$totals['newestT'])) ?></b><span>Since last scan</span><em id="home-last-scan-edition"><?= e($totals['newestName']) ?></em></div>
+      <div class="stat"><b data-ago="<?= (int)$totals['newestT'] ?>" data-short id="home-last-scan"><?= e(gmdate('M j', (int)$totals['newestT'])) ?></b><span>Since last update</span><em id="home-last-scan-edition"><?= e($totals['newestName']) ?></em></div>
     </div>
 
     <?php component_start('section', ['title' => 'Pick Your Edition', 'sub' => 'Sorted by characters seen this week', 'body_class' => 'flush']) ?>
         <table class="dir">
-          <thead><tr><th colspan="2">Edition</th><th>Seen 7d</th><th>This week</th><th class="r">Tracked</th><th>Last scan</th></tr></thead>
+          <thead><tr><th colspan="2">Edition</th><th>Seen 7d</th><th>This week</th><th class="r">Tracked</th><th>Updated</th></tr></thead>
           <tbody>
 <?php foreach ($listed as $ed): $pts = $spark($ed['week']); ?>
             <tr>

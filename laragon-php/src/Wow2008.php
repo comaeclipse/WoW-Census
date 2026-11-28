@@ -417,6 +417,8 @@ const HOME_NAMES = ['forever' => 'WoW: Forever', 'classic-beta' => 'WoW: Forever
 
 /** The front page: news, per-edition activity and the shoutbox, from data the census pages already use. */
 function home_page(): string {
+  require_once __DIR__ . '/HomeFreshness.php';
+  $updates = \homepage_update_times();
   $editions = [];
   foreach (\EDITIONS as $source => $_) {
     $seen = \seen_activity($source);
@@ -427,7 +429,7 @@ function home_page(): string {
     $delta = $r['prev'] && $seen['all']['firstDay'] <= $seen['lastDay'] - 13 ? 100 * ($r['n'] - $r['prev']) / $r['prev'] : null;
     $editions[] = ['source' => $source, 'name' => HOME_NAMES[$source] ?? edition_name($source), 'href' => url('census', $source),
       'color' => EDITION_COLORS[$source] ?? '#c9a050', 'n7' => $r['n'], 'prev7' => $r['prev'], 'delta' => $delta,
-      'total' => $seen['all']['n'], 'realms' => count($census['realms']), 'lastT' => (int)$census['lastT'],
+      'total' => $seen['all']['n'], 'realms' => count($census['realms']), 'lastT' => $updates[$source] ?? (int)$census['lastT'],
       'week' => $seen['daily'] ?? $r['running'], 'lastDay' => (int)$seen['lastDay']];
   }
   usort($editions, fn($a, $b) => $b['n7'] <=> $a['n7']);

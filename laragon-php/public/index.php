@@ -10,21 +10,8 @@ header('X-Content-Type-Options: nosniff');
 if ($path === '/last-scans.json') {
   header('Content-Type: application/json; charset=utf-8');
   try {
-    // One indexed lookup per dataset. Read committed samples without waiting for census rollups.
-    $rows = Db::uncached('SELECT d.source_game, MAX(s.t) AS last_scan
-      FROM datasets d JOIN LATERAL (
-        SELECT t FROM pop_samples WHERE game = d.game ORDER BY t DESC LIMIT 1
-      ) s ON true GROUP BY d.source_game');
-    $scans = array_intersect_key(array_column($rows, 'last_scan', 'source_game'), EDITIONS);
-    // A stored guild snapshot marks a completed roster refresh for the edition.
-    if (Db::uncached("SELECT to_regclass('guild_roster_snapshots') IS NOT NULL AS available")[0]['available']) {
-      $refreshes = Db::uncached('SELECT source_game, FLOOR(EXTRACT(EPOCH FROM MAX(stored_at)))::bigint AS refreshed_at
-        FROM guild_roster_snapshots GROUP BY source_game');
-      foreach ($refreshes as $row) {
-        $edition = $row['source_game'];
-        if (isset(EDITIONS[$edition])) $scans[$edition] = max($scans[$edition] ?? 0, $row['refreshed_at']);
-      }
-    }
+    require_once dirname(__DIR__) . '/src/HomeFreshness.php';
+    $scans = homepage_update_times();
     header('X-Accel-Expires: 15');
     header('Cache-Control: public, max-age=15');
     header('Cloudflare-CDN-Cache-Control: no-store');
