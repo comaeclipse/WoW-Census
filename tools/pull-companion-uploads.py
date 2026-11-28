@@ -33,7 +33,8 @@ manifest carries its receipt id.
 
 Combat logs from any client (companion setting "Combat logs", add-on key combatlog) arrive already
 filtered on the player's PC: only mob events, every player name blanked and every player GUID
-replaced by Player-0-00000000. `combatlogs` (and every `run`) stages them under their own file
+replaced by Player-0-00000000, or by Player-0-0000000N where N is the player's class id (hex, 1-D)
+when the companion could tell the class. `combatlogs` (and every `run`) stages them under their own file
 name in MarketLensData/companion-uploads/combatlogs-<UTC time>/<receipt>/ and imports them with
 import-live.py combatlog --game <site key> (the bestiary), one run per edition; a log uploaded
 again replaces its earlier rows.
@@ -83,7 +84,7 @@ MAX_LUA = 256 << 20
 MAX_RATIO = 60
 MAX_MANIFEST = 64 << 10
 COMBAT_LOG_RE = re.compile(r"^WoWCombatLog[^/\\]*\.txt$")
-LEFT_PLAYER_RE = re.compile(rb"Player-(?!0-00000000\b)\d+-[0-9A-Fa-f]+")
+LEFT_PLAYER_RE = re.compile(rb"Player-(?!0-0000000[0-9A-Da-d]\b)\d+-[0-9A-Fa-f]+")
 COMBAT_LOG_GAMES = {"forever": "forever", "classic_beta": "classic-beta", "retail": "retail",
                     "anniversary": "classic-progression", "classic": "mop-classic", "classic_era": "classic"}
 

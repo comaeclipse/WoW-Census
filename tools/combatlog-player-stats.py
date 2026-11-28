@@ -9,6 +9,10 @@ GUID. Class comes from two kinds of evidence instead:
   * a spell cast by actors of exactly one class is that class's spell. Spell damage, ticks and heals
     (whose advanced block describes the target, not the player) are attributed by the spell alone.
 
+Companion uploads from the version that tags classes write Player-0-0000000N instead (N = WoW class id
+in hex), worked out on the player's PC from that player's real GUID and the local census save; those
+lines take their class from the tag and skip the guessing below.
+
 Conflicting evidence excludes: an actor whose casts name two classes, or a spell cast by two classes
 (wand Shoot, Throw), is left out rather than guessed. Raw logs keep the real GUID as the actor key.
 """
@@ -71,6 +75,10 @@ NAME_CLASS = {name: cls for cls, names in CLASS_NAMES.items() for name in names}
 # Attacks several classes share; never attributed through the spell alone.
 SHARED = {"Shoot", "Throw", "Shoot Bow", "Shoot Gun", "Shoot Crossbow", "Attack"}
 BLANK = "Player-0-00000000"
+CLASS_TAGS = {f"Player-0-{i:08X}": cls for i, cls in (
+    (1, "WARRIOR"), (2, "PALADIN"), (3, "HUNTER"), (4, "ROGUE"), (5, "PRIEST"), (6, "DEATHKNIGHT"),
+    (7, "SHAMAN"), (8, "MAGE"), (9, "WARLOCK"), (10, "MONK"), (11, "DRUID"), (12, "DEMONHUNTER"),
+    (13, "EVOKER"))}
 DAMAGE = ("SWING_DAMAGE", "RANGE_DAMAGE", "SPELL_DAMAGE", "SPELL_PERIODIC_DAMAGE")
 HEALING = ("SPELL_HEAL", "SPELL_PERIODIC_HEAL")
 
@@ -154,7 +162,9 @@ def aggregate(path, npc_id, to_int, adv_len, known=None):
         if not healing and event not in DAMAGE:
             continue
         swing = event == "SWING_DAMAGE"
-        if swing:
+        if f[1] in CLASS_TAGS:
+            cls = CLASS_TAGS[f[1]]
+        elif swing:
             cls = actor_classes.get(actor(f, 9, adv_len), ())
             cls = next(iter(cls)) if len(cls) == 1 else None
         else:
